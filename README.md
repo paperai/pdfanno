@@ -1,9 +1,8 @@
 # paperanno
-
-[paperanno](https://paperanno.github.io/paperanno/) is a browser-based annotation tool for papers.  
+paperanno is a browser-based annotation tool for papers.  
 Users can add annotations on pdf and html directly.
 
-[Demo](http://pdf-anno.paint-ink.com)
+[Demo](https://paperai.github.io/paperanno/)
 
 ## Features
 
