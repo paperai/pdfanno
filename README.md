@@ -1,3 +1,5 @@
+<p align="center"><img src="https://github.com/paperai/paperanno/blob/master/paperanno.png" width="200"></p>
+
 # paperanno
 paperanno is a browser-based annotation tool for papers.  
 Users can add annotations on pdf and html directly.
