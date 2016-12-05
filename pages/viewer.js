@@ -25,7 +25,7 @@
 
 'use strict';
 
-var DEFAULT_URL = '/pdfs/106.pdf';
+var DEFAULT_URL = '../pdfs/P12-1046.pdf';
 var DEFAULT_PDF_NAME;
 var DEFAULT_SCALE_DELTA = 1.1;
 var MIN_SCALE = 0.25;

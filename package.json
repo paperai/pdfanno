@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "anno:prepare": "mkdir -p dist && cp -rf build ./dist/ && cp -rf pages ./dist/",
+    "anno:prepare": "mkdir -p dist && cp -rf build ./dist/ && cp -rf pages ./dist/ && cp -rf pdfs ./dist/",
     "anno:build": "npm run anno:prepare && webpack",
     "anno:watch": "npm run anno:prepare && webpack-dev-server --inline",
     "anno:publish": "npm run anno:build && rm -rf docs/* && cp -rf ./dist/ ./docs/"
