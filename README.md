@@ -1,4 +1,4 @@
-<p align="center"><img src="https://github.com/paperai/paperanno/blob/master/paperanno.png" width="200"></p>
+<p align="center"><img src="https://github.com/paperai/paperanno/blob/master/paperanno.png" width="750"></p>
 
 # paperanno
 paperanno is a browser-based annotation tool for papers.  
