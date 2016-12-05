@@ -6,6 +6,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="./app.bundle.js"></script>
 </head>
 <body>
 <nav class="navbar navbar-inverse">
@@ -26,44 +28,56 @@
 				<form class="form-inline">
 					<div class="form-group">
 						<label for="paper">Paper (.pdf)</label>
-						<input type="file" id="paper">
+						<input type="file" id="paper" accept=".pdf">
 					</div>
 					<div class="form-group">
 						<label for="primary-anno">Primary annotation (.anno)</label>
-						<input type="file" id="primary-anno">
+						<input type="file" id="primary-anno" accept=".anno">
 					</div>
 					<div class="form-group">
 						<label for="annofile">Secondary annotations (.anno)</label>
-						<input type="file" id="secondary-anno" multiple>
+						<input type="file" id="secondary-anno" multiple accept=".anno">
 					</div>
-					<button type="submit" class="btn btn-primary">Update</button>
+					<button type="submit" class="btn btn-primary" id="load">Load</button>
 				</form>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-12 col-sm-12 col-xs-12">
-				<div class="btn-group" role="group">
-					<a class="btn btn-default" href="#">
-    					<i class="fa fa-mouse-pointer"></i>
-  					</a>
-					<a class="btn btn-default" href="#">
-    					<i class="fa fa-pencil"></i>
-  					</a>
-  					<a class="btn btn-default" href="#">
-    					<i class="fa fa-long-arrow-right"></i>
-  					</a>
-					<a class="btn btn-default" href="#">
-    					<i class="fa fa-arrows-h"></i>
-  					</a>
-					<a class="btn btn-default" href="#">
-    					<i class="fa fa-square-o"></i>
-  					</a>
-					<a class="btn btn-default" href="#">
-    					<i class="fa fa-font"></i>
-  					</a>
-				</div>
+                <div class="btn-toolbar" role="toolbar">
+    				<div class="btn-group" role="group">
+    					<a class="btn btn-default active js-tool-btn" href="#" data-type="view">
+        					<i class="fa fa-mouse-pointer"></i>
+      					</a>
+    					<a class="btn btn-default js-tool-btn" href="#" data-type="highlight">
+        					<i class="fa fa-pencil"></i>
+      					</a>
+      					<a class="btn btn-default js-tool-btn" href="#" data-type="arrow">
+        					<i class="fa fa-long-arrow-right"></i>
+      					</a>
+    					<a class="btn btn-default js-tool-btn" href="#" data-type="arrow-two-way">
+        					<i class="fa fa-arrows-h"></i>
+      					</a>
+    					<a class="btn btn-default js-tool-btn" href="#" data-type="rect">
+        					<i class="fa fa-square-o"></i>
+      					</a>
+    					<a class="btn btn-default js-tool-btn" href="#" data-type="text">
+        					<i class="fa fa-font"></i>
+      					</a>
+    				</div>
+                    <div class="btn-group" role="group">
+                        <a class="btn btn-default js-tool-btn2" href="#" data-type="download">
+                            <i class="fa fa-download"></i>
+                        </a>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <a class="btn btn-default js-tool-btn2" href="#" data-type="delete">
+                            DEL
+                        </a>
+                    </div>
+                </div>
 				<div id="viewer">
-					pdf.js
+                    <iframe src="./pages/viewer.html" class="anno-viewer" frameborder="0"></iframe>
 				</div>
 			</div>
 		</div>
