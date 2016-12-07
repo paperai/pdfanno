@@ -207,6 +207,19 @@ export default class StoreAdapter {
     }
   }
 
+  __importDataSecondary(jsonArray) { abstractFunction('importDataSecondary'); }
+  get importDataSecondary() { return this.__importDataSecondary; }
+  set importDataSecondary(fn) {
+    this.__importDataSecondary = function importDataSecondary(jsonArray) {
+      return fn(...arguments).then(success => {
+        if (success) {
+          fireEvent('importSecondary', jsonArray);
+        }
+        return success;
+      });
+    }
+  }
+
   __findAnnotations(documentId, criteria) { abstractFunction('findAnnotations'); }
   get findAnnotations() { return this.__findAnnotations; }
   set findAnnotations(fn) {

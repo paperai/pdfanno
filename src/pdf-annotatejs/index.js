@@ -77,14 +77,34 @@ function renderAnnotations(svg, pageNumber) {
 
 function uploadedAnnotationExists() {
     let item = localStorage.getItem('_pdfanno_pdfanno_upload');
-    return item;
+    let itemSecondary = localStorage.getItem('_pdfanno_pdfanno_upload_second');
+    return item || itemSecondary;
 }
 
 function importUploadedAnnotation() {
-    let annotations = JSON.parse(localStorage.getItem('_pdfanno_pdfanno_upload'));
-    console.log('importUploadedAnnotation:', annotations);
-    let promise = PDFAnnotate.getStoreAdapter().importData(annotations).then(() => {
-        localStorage.removeItem('_pdfanno_pdfanno_upload');
-    });
-    return promise;
+    
+    let actions = [];
+
+    // Primary Annotation.
+    if (localStorage.getItem('_pdfanno_pdfanno_upload')) {
+        let annotations = JSON.parse(localStorage.getItem('_pdfanno_pdfanno_upload'));
+        console.log('importUploadedAnnotation:', annotations);
+        let promise = PDFAnnotate.getStoreAdapter().importData(annotations).then(() => {
+            localStorage.removeItem('_pdfanno_pdfanno_upload');
+        });
+        actions.push(promise);
+    }
+
+    // Seconday Annotations.
+    if (localStorage.getItem('_pdfanno_pdfanno_upload_second')) {
+        let secondAnnotations = JSON.parse(localStorage.getItem('_pdfanno_pdfanno_upload_second'));
+        console.log('secondAnnotations:', secondAnnotations);
+        let promise = PDFAnnotate.getStoreAdapter().importDataSecondary(secondAnnotations).then(() => {
+            // TODO
+            // localStorage.removeItem('_pdfanno_pdfanno_upload_second');
+        });
+        actions.push(promise);
+    }
+
+    return Promise.all(actions);
 }
