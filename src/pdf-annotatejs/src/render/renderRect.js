@@ -3,6 +3,9 @@ import normalizeColor from '../utils/normalizeColor';
 import renderCircle from './renderCircle';
 import { DEFAULT_RADIUS } from './renderCircle';
 
+let rectSecondaryColor = ['green', 'blue', 'yellow'];
+let highlightSecondaryColor = ['blue', 'yellow', 'green'];
+
 /**
  * Create SVGRectElements from an annotation definition.
  * This is used for anntations of type `area` and `highlight`.
@@ -22,12 +25,19 @@ export default function renderRect(a) {
 
 function createHighlight(a) {
 
+  let color;
+  if (a.readOnly) {
+    color = highlightSecondaryColor[a.seq % highlightSecondaryColor.length];
+  } else {
+    color = '#FF0';
+  }
+
   let group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   
   a.rectangles.forEach((r) => {
     let rect = createRect(r);
     rect.setAttribute('fill-opacity', 0.2);
-    rect.setAttribute('fill', normalizeColor(a.color || '#ff0'));
+    rect.setAttribute('fill', color);
     rect.classList.add('anno-highlight');
     group.appendChild(rect);
   });
@@ -45,9 +55,16 @@ function createHighlight(a) {
 
 function createRectBox(a) {
 
+  let color;
+  if(a.readOnly) {
+    color = rectSecondaryColor[a.seq % rectSecondaryColor.length];
+  } else {
+    color = '#f00';
+  }
+
   let rect = createRect(a);
   setAttributes(rect, {
-    stroke: normalizeColor(a.color || '#f00'),
+    stroke: color,
     strokeWidth: 1,
     fill: 'none',
     class : 'anno-rect'

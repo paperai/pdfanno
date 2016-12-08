@@ -3,6 +3,8 @@ import normalizeColor from '../utils/normalizeColor';
 import renderCircle from './renderCircle';
 import { findBezierControlPoint } from '../utils/relation.js';
 
+let arrowSecondaryColor = ['green', 'blue', 'yellow'];
+
 /**
  * Create SVGGElements from an annotation definition.
  * This is used for anntations of type `arrow`.
@@ -18,6 +20,14 @@ export default function renderArrow(a) {
 
 export function createArrow(a, id=null) {
 
+  let color;
+  if (a.readOnly) {
+    color = arrowSecondaryColor[a.seq % arrowSecondaryColor.length];
+  } else {
+    color = '#F00';
+  }
+
+
 // <svg viewBox="0 0 200 200">
 //     <marker id="m_ar" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="strokeWidth" preserveAspectRatio="none" markerWidth="2" markerHeight="3" orient="auto-start-reverse">
 //         <polygon points="0,0 0,10 10,5" fill="red" id="ms"/>
@@ -27,8 +37,8 @@ export function createArrow(a, id=null) {
 
   let group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   setAttributes(group, {
-    fill: normalizeColor(a.color || '#f00'),
-    stroke: normalizeColor(a.color || '#f00'),
+    fill: color,
+    stroke: color,
     'data-highlight1': a.highlight1,
     'data-highlight2': a.highlight2,
     'data-text': a.text
@@ -39,7 +49,7 @@ export function createArrow(a, id=null) {
     viewBox: "0 0 10 10",
     markerWidth: 2,
     markerHeight: 3,
-    fill: normalizeColor(a.color || '#f00'),
+    fill: color,
     id: 'arrowhead',
     orient: "auto-start-reverse"
   });
