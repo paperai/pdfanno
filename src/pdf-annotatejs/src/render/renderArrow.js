@@ -43,6 +43,7 @@ export function createArrow(a, id=null) {
     'data-highlight2': a.highlight2,
     'data-text': a.text
   });
+  group.setAttribute('read-only', a.readOnly === true);
 
   let marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
   setAttributes(marker, {

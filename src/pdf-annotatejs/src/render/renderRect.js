@@ -33,6 +33,7 @@ function createHighlight(a) {
   }
 
   let group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  group.setAttribute('read-only', a.readOnly === true);
   
   a.rectangles.forEach((r) => {
     let rect = createRect(r);
@@ -71,6 +72,8 @@ function createRectBox(a) {
   });
 
   let group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  group.setAttribute('read-only', a.readOnly === true);
+  
   group.appendChild(rect);
 
   return group;

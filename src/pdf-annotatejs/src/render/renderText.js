@@ -57,6 +57,8 @@ export default function renderText(a, svg) {
 
     // Group.
     let group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    group.setAttribute('read-only', a.readOnly === true);
+
     group.appendChild(box);
     group.appendChild(text);
     return group;
