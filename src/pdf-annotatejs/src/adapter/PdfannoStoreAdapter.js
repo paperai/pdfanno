@@ -33,6 +33,31 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
         });
       },
 
+      getSecondaryAnnotations(documentId, pageNumber) {
+        return new Promise((resolve, reject) => {
+
+          let annotations = [];
+          let containers = _getSecondaryContainers();
+          containers.forEach(container => {
+            let tmpAnnotations = (container[documentId] || []).filter(i => {
+              if (pageNumber) {
+                console.log('bbbb:', i);
+                return i.page === pageNumber && i.class === 'Annotation';
+              } else {
+                return true;
+              }
+            });
+            annotations = annotations.concat(tmpAnnotations);
+          });
+
+          resolve({
+            documentId,
+            pageNumber,
+            annotations
+          });
+        });
+      },
+
       getAnnotation(documentId, annotationId) {
         return Promise.resolve(getAnnotations(documentId)[findAnnotation(documentId, annotationId)]);
       },
@@ -245,15 +270,11 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
       },
 
       importDataSecondary(jsonArray) {
-        console.log('importDataSecondary:', jsonArray);
         return new Promise((resolve, reject) => {
 
-          let containers = jsonArray.map(json => {
-            console.log('container:', _createContainerFromJson(json, true));
-            return _createContainerFromJson(json, true);
+          let containers = jsonArray.map((json, index) => {
+            return _createContainerFromJson(json, true, index);
           });
-
-          console.log('map:', containers);
 
           _saveSecondaryContainer(containers);
 
@@ -281,7 +302,7 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
   }
 }
 
-function _createContainerFromJson(json, readOnly=false) {
+function _createContainerFromJson(json, readOnly=false, index=0) {
   let container = {};
 
   for (let documentId in json) {
@@ -304,7 +325,8 @@ function _createContainerFromJson(json, readOnly=false) {
           y      : data[2],
           width  : data[3],
           height : data[4],
-          readOnly
+          readOnly,
+          seq    : index
         });
       
       // Highlight.
@@ -325,7 +347,8 @@ function _createContainerFromJson(json, readOnly=false) {
           color      : '#FFFF00',   // TODO なくてもOK？
           rectangles,
           key        : key,  // tmp for arrow.
-          readOnly
+          readOnly,
+          seq    : index
         });
 
       // Text Independent.
@@ -339,7 +362,8 @@ function _createContainerFromJson(json, readOnly=false) {
           x          : data[1],
           y          : data[2],
           content    : data[3],
-          readOnly
+          readOnly,
+          seq    : index
         });
 
       // Arrow.
@@ -387,7 +411,8 @@ function _createContainerFromJson(json, readOnly=false) {
           x          : textPosition.x,
           y          : textPosition.y,
           content    : data[4],
-          readOnly
+          readOnly,
+          seq    : index
         });
 
         // Add arrow.
@@ -405,7 +430,8 @@ function _createContainerFromJson(json, readOnly=false) {
           highlight1 : highlight1.uuid,
           highlight2 : highlight2.uuid,
           color      : "FF0000",         // TODO 要る？
-          readOnly
+          readOnly,
+          seq    : index
         });
       }
     }
@@ -425,6 +451,17 @@ function _getContainer() {
   return container;
 }
 
+function _getSecondaryContainers() {
+  let containers = localStorage.getItem(LOCALSTORAGE_KEY_SECONDARY);
+  if (!containers) {
+    containers = [];
+    _saveSecondaryContainer(containers);
+  } else {
+    containers = JSON.parse(containers);
+  }
+  return containers;
+}
+
 function _saveContainer(container) {
   localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(container));
 }
@@ -435,8 +472,8 @@ function _saveSecondaryContainer(containers) {
 
 function getAnnotations(documentId) {
 
+  // Primary annotation.
   let container = _getContainer();
-
   let annotations = container[documentId];
   if (!annotations) {
     annotations = [];
@@ -446,6 +483,22 @@ function getAnnotations(documentId) {
 
   return annotations;
 }
+
+function _getSecondaryAnnotations(documentId) {
+
+  let annotations = [];
+
+  let containers = _getSecondaryContainers();
+  containers.forEach(container => {
+    let tmpAnnotations = container[documentId];
+    if (tmpAnnotations) {
+      annotations = annotations.concat(tmpAnnotations);
+    }
+  });
+
+  return annotations;
+}
+
 
 function updateAnnotations(documentId, annotations) {
   let container = _getContainer();

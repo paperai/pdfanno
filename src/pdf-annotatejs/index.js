@@ -53,24 +53,33 @@ window.addEventListener('DOMContentLoaded', function() {
 function renderAnnotations(svg, pageNumber) {
     let documentId = getFileName(PDFView.url);
     PDFAnnotate.getAnnotations(documentId, pageNumber).then(function(annotations) {
+        PDFAnnotate.getStoreAdapter().getSecondaryAnnotations(documentId, pageNumber).then(function(secondaryAnnotations) {
 
-        // Adjust screen scale change.
-        let viewport = PDFView.pdfViewer.getPageView(0).viewport;
-        svg.setAttribute('data-pdf-annotate-viewport', JSON.stringify(viewport));
-        svg.setAttribute('data-pdf-annotate-document', documentId);
-        svg.setAttribute('data-pdf-annotate-page', pageNumber);
-        svg.setAttribute('width', viewport.width);
-        svg.setAttribute('height', viewport.height);
-        svg.style.width = `${viewport.width}px`;
-        svg.style.height = `${viewport.height}px`;
+            // console.log('aaaaaaaaaaaaaaaa', annotations, secondaryAnnotations.annotations);
+            // annotations = annotations.concat(secondaryAnnotations.annotations);
 
-        PDFAnnotate.render(svg, viewport, annotations);
+            annotations.annotations = annotations.annotations.concat(secondaryAnnotations.annotations);
 
-        var event = document.createEvent('CustomEvent');
-        event.initCustomEvent('annotationrendered', true, true, {
-          pageNumber: pageNumber
+            console.log('anno:', annotations);
+
+            // Adjust screen scale change.
+            let viewport = PDFView.pdfViewer.getPageView(0).viewport;
+            svg.setAttribute('data-pdf-annotate-viewport', JSON.stringify(viewport));
+            svg.setAttribute('data-pdf-annotate-document', documentId);
+            svg.setAttribute('data-pdf-annotate-page', pageNumber);
+            svg.setAttribute('width', viewport.width);
+            svg.setAttribute('height', viewport.height);
+            svg.style.width = `${viewport.width}px`;
+            svg.style.height = `${viewport.height}px`;
+
+            PDFAnnotate.render(svg, viewport, annotations);
+
+            var event = document.createEvent('CustomEvent');
+            event.initCustomEvent('annotationrendered', true, true, {
+              pageNumber: pageNumber
+            });
+            window.dispatchEvent(event);
         });
-        window.dispatchEvent(event);
     });
 }
 
