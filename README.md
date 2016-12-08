@@ -16,16 +16,16 @@ paperanno is an extension of the following libraries:
 * [pdf-annotate.js](https://github.com/instructure/pdf-annotate.js/)
 
 ### Install and Build
-First, install [Node.js](https://nodejs.org/) and npm.  
+First, install [Node.js](https://nodejs.org/) and npm. The version of Node.js must be 6+.  
 Then, run the following commands:
 ```
 npm install
-npm run anno:build
+npm run anno:publish
 ```
-where the output is on `dist/`.
+where the output is on `docs/`, and you can access paperanno via `docs/index.html`.  
 
-To run,
+For develop, 
 ```
 npm run anno:watch
 ```
-Then, access http://localhost:8080/dist/index.html in your browser.
+This command starts Webpack Dev Server and you can access  http://localhost:8080/dist/index.html in your browser.
