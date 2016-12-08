@@ -28,4 +28,4 @@ For develop,
 ```
 npm run anno:watch
 ```
-This command starts Webpack Dev Server and you can access  http://localhost:8080/dist/index.html in your browser.
+This command starts Webpack Dev Server and you can access  [http://localhost:8080/dist/index.html](http://localhost:8080/dist/index.html) in your browser.
