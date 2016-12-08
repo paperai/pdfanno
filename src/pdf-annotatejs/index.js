@@ -109,8 +109,7 @@ function importUploadedAnnotation() {
         let secondAnnotations = JSON.parse(localStorage.getItem('_pdfanno_pdfanno_upload_second'));
         console.log('secondAnnotations:', secondAnnotations);
         let promise = PDFAnnotate.getStoreAdapter().importDataSecondary(secondAnnotations).then(() => {
-            // TODO
-            // localStorage.removeItem('_pdfanno_pdfanno_upload_second');
+            localStorage.removeItem('_pdfanno_pdfanno_upload_second');
         });
         actions.push(promise);
     }
