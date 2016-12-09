@@ -167,7 +167,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // Reload pdf.js.
 	        $('#viewer iframe').remove();
-	        $('#viewer').html('<iframe src="../pages/viewer.html" class="anno-viewer" frameborder="0"></iframe>');
+	        $('#viewer').html('<iframe src="./pages/viewer.html" class="anno-viewer" frameborder="0"></iframe>');
 	
 	        // Re-setup.
 	        start('second');
@@ -243,7 +243,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        Array.prototype.forEach.call(files, function (file) {
 	            var fileReader = new FileReader();
 	            fileReader.onload = function (event) {
-	                _secondaryAnnotations.push(event.target.result);
+	                _secondaryAnnotations.push(JSON.parse(event.target.result));
 	            };
 	            fileReader.readAsText(file);
 	        });
@@ -252,24 +252,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function setupLoadButton() {
 	    $('#load').on('click', function (e) {
-	        // TODO セカンダリーの対応.
 	
-	        // Check required.
-	        if (!_paperName) {
-	            return alert('Please specify your PDF file.');
-	        }
-	        if (!_primaryAnnotation) {
-	            return alert('Please specify your primary annotation file.');
-	        }
+	        // // Check required.
+	        // if (!_paperName) {
+	        //     return alert('Please specify your PDF file.');
+	        // }
+	        // if (!_primaryAnnotation) {
+	        //     return alert('Please specify your primary annotation file.');
+	        // }
 	
 	        // Set data.
-	        localStorage.setItem('_pdfanno_pdfname', _paperName);
-	        localStorage.setItem('_pdfanno_pdf', _paperData);
-	        localStorage.setItem('_pdfanno_pdfanno_upload', _primaryAnnotation);
+	        _paperName && localStorage.setItem('_pdfanno_pdfname', _paperName);
+	        _paperData && localStorage.setItem('_pdfanno_pdf', _paperData);
+	        _primaryAnnotation && localStorage.setItem('_pdfanno_pdfanno_upload', _primaryAnnotation);
+	        _secondaryAnnotations && localStorage.setItem('_pdfanno_pdfanno_upload_second', JSON.stringify(_secondaryAnnotations));
 	
 	        // Reload pdf.js.
 	        $('#viewer iframe').remove();
-	        $('#viewer').html('<iframe src="../pages/viewer.html" class="anno-viewer" frameborder="0"></iframe>');
+	        $('#viewer').html('<iframe src="./pages/viewer.html" class="anno-viewer" frameborder="0"></iframe>');
 	
 	        // Re-setup.
 	        start('second');
