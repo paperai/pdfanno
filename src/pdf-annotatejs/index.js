@@ -39,7 +39,6 @@ window.addEventListener('DOMContentLoaded', function() {
 
         // Import user uploading annotation, if exists.
         if (uploadedAnnotationExists()) {
-            console.log(ev.detail.pageNumber, 'import user annotation');
             importUploadedAnnotation().then(() => {
                 renderAnnotations(svg, ev.detail.pageNumber);
             });
@@ -53,38 +52,64 @@ window.addEventListener('DOMContentLoaded', function() {
 function renderAnnotations(svg, pageNumber) {
     let documentId = getFileName(PDFView.url);
     PDFAnnotate.getAnnotations(documentId, pageNumber).then(function(annotations) {
+        PDFAnnotate.getStoreAdapter().getSecondaryAnnotations(documentId, pageNumber).then(function(secondaryAnnotations) {
 
-        // Adjust screen scale change.
-        let viewport = PDFView.pdfViewer.getPageView(0).viewport;
-        svg.setAttribute('data-pdf-annotate-viewport', JSON.stringify(viewport));
-        svg.setAttribute('data-pdf-annotate-document', documentId);
-        svg.setAttribute('data-pdf-annotate-page', pageNumber);
-        svg.setAttribute('width', viewport.width);
-        svg.setAttribute('height', viewport.height);
-        svg.style.width = `${viewport.width}px`;
-        svg.style.height = `${viewport.height}px`;
+            // Primary + Secondary annotations.
+            annotations.annotations = annotations.annotations.concat(secondaryAnnotations.annotations);
 
-        PDFAnnotate.render(svg, viewport, annotations);
+            // Adjust screen scale change.
+            let viewport = PDFView.pdfViewer.getPageView(0).viewport;
+            svg.setAttribute('data-pdf-annotate-viewport', JSON.stringify(viewport));
+            svg.setAttribute('data-pdf-annotate-document', documentId);
+            svg.setAttribute('data-pdf-annotate-page', pageNumber);
+            svg.setAttribute('width', viewport.width);
+            svg.setAttribute('height', viewport.height);
+            svg.style.width = `${viewport.width}px`;
+            svg.style.height = `${viewport.height}px`;
 
-        var event = document.createEvent('CustomEvent');
-        event.initCustomEvent('annotationrendered', true, true, {
-          pageNumber: pageNumber
+            PDFAnnotate.render(svg, viewport, annotations);
+
+            var event = document.createEvent('CustomEvent');
+            event.initCustomEvent('annotationrendered', true, true, {
+              pageNumber: pageNumber
+            });
+            window.dispatchEvent(event);
         });
-        window.dispatchEvent(event);
     });
 }
 
 
 function uploadedAnnotationExists() {
     let item = localStorage.getItem('_pdfanno_pdfanno_upload');
-    return item;
+    let itemSecondary = localStorage.getItem('_pdfanno_pdfanno_upload_second');
+    return item || itemSecondary;
 }
 
 function importUploadedAnnotation() {
-    let annotations = JSON.parse(localStorage.getItem('_pdfanno_pdfanno_upload'));
-    console.log('importUploadedAnnotation:', annotations);
-    let promise = PDFAnnotate.getStoreAdapter().importData(annotations).then(() => {
-        localStorage.removeItem('_pdfanno_pdfanno_upload');
-    });
-    return promise;
+    
+    let actions = [];
+
+    // Primary Annotation.
+    if (localStorage.getItem('_pdfanno_pdfanno_upload')) {
+        console.log('LOAD PRIMARY');
+        let annotations = JSON.parse(localStorage.getItem('_pdfanno_pdfanno_upload'));
+        console.log('importUploadedAnnotation:', annotations);
+        let promise = PDFAnnotate.getStoreAdapter().importData(annotations).then(() => {
+            localStorage.removeItem('_pdfanno_pdfanno_upload');
+        });
+        actions.push(promise);
+    }
+
+    // Seconday Annotations.
+    if (localStorage.getItem('_pdfanno_pdfanno_upload_second')) {
+        console.log('LOAD SECONDARY');
+        let secondAnnotations = JSON.parse(localStorage.getItem('_pdfanno_pdfanno_upload_second'));
+        console.log('secondAnnotations:', secondAnnotations);
+        let promise = PDFAnnotate.getStoreAdapter().importDataSecondary(secondAnnotations).then(() => {
+            localStorage.removeItem('_pdfanno_pdfanno_upload_second');
+        });
+        actions.push(promise);
+    }
+
+    return Promise.all(actions);
 }

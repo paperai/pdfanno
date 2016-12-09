@@ -110,7 +110,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // Import user uploading annotation, if exists.
 	        if (uploadedAnnotationExists()) {
-	            console.log(ev.detail.pageNumber, 'import user annotation');
 	            importUploadedAnnotation().then(function () {
 	                renderAnnotations(svg, ev.detail.pageNumber);
 	            });
@@ -123,39 +122,65 @@ return /******/ (function(modules) { // webpackBootstrap
 	function renderAnnotations(svg, pageNumber) {
 	    var documentId = getFileName(PDFView.url);
 	    PDFAnnotate.getAnnotations(documentId, pageNumber).then(function (annotations) {
+	        PDFAnnotate.getStoreAdapter().getSecondaryAnnotations(documentId, pageNumber).then(function (secondaryAnnotations) {
 	
-	        // Adjust screen scale change.
-	        var viewport = PDFView.pdfViewer.getPageView(0).viewport;
-	        svg.setAttribute('data-pdf-annotate-viewport', JSON.stringify(viewport));
-	        svg.setAttribute('data-pdf-annotate-document', documentId);
-	        svg.setAttribute('data-pdf-annotate-page', pageNumber);
-	        svg.setAttribute('width', viewport.width);
-	        svg.setAttribute('height', viewport.height);
-	        svg.style.width = viewport.width + 'px';
-	        svg.style.height = viewport.height + 'px';
+	            // Primary + Secondary annotations.
+	            annotations.annotations = annotations.annotations.concat(secondaryAnnotations.annotations);
 	
-	        PDFAnnotate.render(svg, viewport, annotations);
+	            // Adjust screen scale change.
+	            var viewport = PDFView.pdfViewer.getPageView(0).viewport;
+	            svg.setAttribute('data-pdf-annotate-viewport', JSON.stringify(viewport));
+	            svg.setAttribute('data-pdf-annotate-document', documentId);
+	            svg.setAttribute('data-pdf-annotate-page', pageNumber);
+	            svg.setAttribute('width', viewport.width);
+	            svg.setAttribute('height', viewport.height);
+	            svg.style.width = viewport.width + 'px';
+	            svg.style.height = viewport.height + 'px';
 	
-	        var event = document.createEvent('CustomEvent');
-	        event.initCustomEvent('annotationrendered', true, true, {
-	            pageNumber: pageNumber
+	            PDFAnnotate.render(svg, viewport, annotations);
+	
+	            var event = document.createEvent('CustomEvent');
+	            event.initCustomEvent('annotationrendered', true, true, {
+	                pageNumber: pageNumber
+	            });
+	            window.dispatchEvent(event);
 	        });
-	        window.dispatchEvent(event);
 	    });
 	}
 	
 	function uploadedAnnotationExists() {
 	    var item = localStorage.getItem('_pdfanno_pdfanno_upload');
-	    return item;
+	    var itemSecondary = localStorage.getItem('_pdfanno_pdfanno_upload_second');
+	    return item || itemSecondary;
 	}
 	
 	function importUploadedAnnotation() {
-	    var annotations = JSON.parse(localStorage.getItem('_pdfanno_pdfanno_upload'));
-	    console.log('importUploadedAnnotation:', annotations);
-	    var promise = PDFAnnotate.getStoreAdapter().importData(annotations).then(function () {
-	        localStorage.removeItem('_pdfanno_pdfanno_upload');
-	    });
-	    return promise;
+	
+	    var actions = [];
+	
+	    // Primary Annotation.
+	    if (localStorage.getItem('_pdfanno_pdfanno_upload')) {
+	        console.log('LOAD PRIMARY');
+	        var annotations = JSON.parse(localStorage.getItem('_pdfanno_pdfanno_upload'));
+	        console.log('importUploadedAnnotation:', annotations);
+	        var promise = PDFAnnotate.getStoreAdapter().importData(annotations).then(function () {
+	            localStorage.removeItem('_pdfanno_pdfanno_upload');
+	        });
+	        actions.push(promise);
+	    }
+	
+	    // Seconday Annotations.
+	    if (localStorage.getItem('_pdfanno_pdfanno_upload_second')) {
+	        console.log('LOAD SECONDARY');
+	        var secondAnnotations = JSON.parse(localStorage.getItem('_pdfanno_pdfanno_upload_second'));
+	        console.log('secondAnnotations:', secondAnnotations);
+	        var _promise = PDFAnnotate.getStoreAdapter().importDataSecondary(secondAnnotations).then(function () {
+	            localStorage.removeItem('_pdfanno_pdfanno_upload_second');
+	        });
+	        actions.push(_promise);
+	    }
+	
+	    return Promise.all(actions);
 	}
 	module.exports = exports['default'];
 
@@ -10847,6 +10872,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // Copy each function from definition if it is a function we know about
 	    Object.keys(definition).forEach(function (key) {
+	      // console.log('key=', key, typeof definition[key] === 'function', typeof this[key] === 'function');
 	      if (typeof definition[key] === 'function' && typeof _this[key] === 'function') {
 	        _this[key] = definition[key];
 	      }
@@ -10866,6 +10892,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '__getAnnotations',
 	    value: function __getAnnotations(documentId, pageNumber) {
 	      (0, _abstractFunction2.default)('getAnnotations');
+	    }
+	  }, {
+	    key: '__getSecondaryAnnotations',
+	    value: function __getSecondaryAnnotations(documentId, pageNumber) {
+	      (0, _abstractFunction2.default)('getSecondaryAnnotations');
 	    }
 	  }, {
 	    key: 'getAnnotation',
@@ -10989,6 +11020,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      (0, _abstractFunction2.default)('importData');
 	    }
 	  }, {
+	    key: '__importDataSecondary',
+	    value: function __importDataSecondary(jsonArray) {
+	      (0, _abstractFunction2.default)('importDataSecondary');
+	    }
+	  }, {
 	    key: '__findAnnotations',
 	    value: function __findAnnotations(documentId, criteria) {
 	      (0, _abstractFunction2.default)('findAnnotations');
@@ -11000,6 +11036,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	    set: function set(fn) {
 	      this.__getAnnotations = function getAnnotations(documentId, pageNumber) {
+	        return fn.apply(undefined, arguments).then(function (annotations) {
+	          // TODO may be best to have this happen on the server
+	          if (annotations.annotations) {
+	            annotations.annotations.forEach(function (a) {
+	              a.documentId = documentId;
+	            });
+	          }
+	          return annotations;
+	        });
+	      };
+	    }
+	  }, {
+	    key: 'getSecondaryAnnotations',
+	    get: function get() {
+	      return this.__getSecondaryAnnotations;
+	    },
+	    set: function set(fn) {
+	      this.__getSecondaryAnnotations = function getSecondaryAnnotations(documentId, pageNumber) {
 	        return fn.apply(undefined, arguments).then(function (annotations) {
 	          // TODO may be best to have this happen on the server
 	          if (annotations.annotations) {
@@ -11133,6 +11187,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return fn.apply(undefined, arguments).then(function (success) {
 	          if (success) {
 	            (0, _event.fireEvent)('import', json);
+	          }
+	          return success;
+	        });
+	      };
+	    }
+	  }, {
+	    key: 'importDataSecondary',
+	    get: function get() {
+	      return this.__importDataSecondary;
+	    },
+	    set: function set(fn) {
+	      this.__importDataSecondary = function importDataSecondary(jsonArray) {
+	        return fn.apply(undefined, arguments).then(function (success) {
+	          if (success) {
+	            (0, _event.fireEvent)('importSecondary', jsonArray);
 	          }
 	          return success;
 	        });
@@ -12201,6 +12270,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	var LOCALSTORAGE_KEY = '_pdfanno_pdfanno';
+	var LOCALSTORAGE_KEY_SECONDARY = '_pdfanno_pdfanno_secondary';
 	
 	/**
 	  Implmenetation of StoreAdapter for PDFAnno.
@@ -12221,6 +12291,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	            } else {
 	              return true;
 	            }
+	          });
+	
+	          resolve({
+	            documentId: documentId,
+	            pageNumber: pageNumber,
+	            annotations: annotations
+	          });
+	        });
+	      },
+	      getSecondaryAnnotations: function getSecondaryAnnotations(documentId, pageNumber) {
+	        return new Promise(function (resolve, reject) {
+	
+	          var annotations = [];
+	          var containers = _getSecondaryContainers();
+	          containers.forEach(function (container) {
+	            var tmpAnnotations = (container[documentId] || []).filter(function (i) {
+	              if (pageNumber) {
+	                console.log('bbbb:', i);
+	                return i.page === pageNumber && i.class === 'Annotation';
+	              } else {
+	                return true;
+	              }
+	            });
+	            annotations = annotations.concat(tmpAnnotations);
 	          });
 	
 	          resolve({
@@ -12409,141 +12503,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	      importData: function importData(json) {
 	        return new Promise(function (resolve, reject) {
 	
-	          console.log('importData:', json);
+	          var container = _createContainerFromJson(json);
 	
-	          var container = {};
-	
-	          for (var documentId in json) {
-	
-	            var _annotations = [];
-	            container[documentId] = _annotations;
-	
-	            var _loop2 = function _loop2(key) {
-	
-	              var data = json[documentId][key];
-	
-	              // Rect.
-	              if (key.indexOf('rect') === 0) {
-	                _annotations.push({
-	                  class: 'Annotation',
-	                  type: 'area',
-	                  uuid: (0, _uuid2.default)(),
-	                  page: data[0],
-	                  x: data[1],
-	                  y: data[2],
-	                  width: data[3],
-	                  height: data[4]
-	                });
-	
-	                // Highlight.
-	              } else if (key.indexOf('span') === 0) {
-	                // console.log('span:', data);
-	                var rectangles = data.slice(0, data.length - 1).map(function (d) {
-	                  return {
-	                    x: d[1],
-	                    y: d[2],
-	                    width: d[3],
-	                    height: d[4]
-	                  };
-	                });
-	                _annotations.push({
-	                  class: 'Annotation',
-	                  type: 'highlight',
-	                  uuid: (0, _uuid2.default)(),
-	                  page: data[0][0],
-	                  color: '#FFFF00', // TODO なくてもOK？
-	                  rectangles: rectangles,
-	                  key: key // tmp for arrow.
-	                });
-	
-	                // Text Independent.
-	              } else if (key.indexOf('text') === 0) {
-	                _annotations.push({
-	                  class: 'Annotation',
-	                  type: 'textbox',
-	                  uuid: (0, _uuid2.default)(),
-	                  page: data[0],
-	                  size: 12, // TODO なくてもOK？
-	                  x: data[1],
-	                  y: data[2],
-	                  content: data[3]
-	                });
-	
-	                // Arrow.
-	              } else if (key.indexOf('rel') === 0) {
-	
-	                // Find highlights.
-	                var highlight1s = _annotations.filter(function (a) {
-	                  return a.key === data[2];
-	                });
-	                var highlight1 = highlight1s[0];
-	                var highlight2s = _annotations.filter(function (a) {
-	                  return a.key === data[3];
-	                });
-	                var highlight2 = highlight2s[0];
-	
-	                console.log('highlight1:', highlight1);
-	                console.log('highlight2:', highlight2);
-	
-	                // Specify startPosition and endPosition.
-	                var x1 = highlight1.rectangles[0].x;
-	                var y1 = highlight1.rectangles[0].y - 5;
-	                var x2 = highlight2.rectangles[0].x;
-	                var y2 = highlight2.rectangles[0].y - 5;
-	
-	                console.log('xy:', x1, y1, x2, y2);
-	
-	                // Specify textbox position.
-	                var svg = document.querySelector('.annotationLayer');
-	                var p = (0, _utils.scaleUp)(svg, { x1: x1, y1: y1, x2: x2, y2: y2 });
-	                var rect = svg.getBoundingClientRect();
-	                p.x1 -= rect.left;
-	                p.y1 -= rect.top;
-	                p.x2 -= rect.left;
-	                p.y2 -= rect.top;
-	                var textPosition = (0, _utils.scaleDown)(svg, (0, _relation.getRelationTextPosition)(svg, p.x1, p.y1, p.x2, p.y2));
-	
-	                // Add textbox and get the uuid of if.
-	                var textId = (0, _uuid2.default)();
-	                _annotations.push({
-	                  class: 'Annotation',
-	                  type: 'textbox',
-	                  uuid: textId,
-	                  page: data[0],
-	                  size: 12, // TODO なくてもOK？
-	                  x: textPosition.x,
-	                  y: textPosition.y,
-	                  content: data[4]
-	                });
-	
-	                // Add arrow.
-	                _annotations.push({
-	                  class: 'Annotation',
-	                  type: 'arrow',
-	                  direction: data[1],
-	                  uuid: (0, _uuid2.default)(),
-	                  page: data[0],
-	                  x1: x1,
-	                  y1: y1,
-	                  x2: x2,
-	                  y2: y2,
-	                  text: textId,
-	                  highlight1: highlight1.uuid,
-	                  highlight2: highlight2.uuid,
-	                  color: "FF0000" // TODO 要る？
-	                });
-	              }
-	            };
-	
-	            for (var key in json[documentId]) {
-	              _loop2(key);
-	            }
-	          }
-	
-	          console.log(container);
-	
-	          // Save it.
 	          _saveContainer(container);
+	
+	          resolve();
+	        });
+	      },
+	      importDataSecondary: function importDataSecondary(jsonArray) {
+	        return new Promise(function (resolve, reject) {
+	
+	          var containers = jsonArray.map(function (json, index) {
+	            return _createContainerFromJson(json, true, index);
+	          });
+	
+	          _saveSecondaryContainer(containers);
 	
 	          resolve();
 	        });
@@ -12574,6 +12548,151 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = PdfannoStoreAdapter;
 	
 	
+	function _createContainerFromJson(json) {
+	  var readOnly = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+	  var index = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+	
+	  var container = {};
+	
+	  for (var documentId in json) {
+	
+	    var _annotations = [];
+	    container[documentId] = _annotations;
+	
+	    var _loop2 = function _loop2(key) {
+	
+	      var data = json[documentId][key];
+	
+	      // Rect.
+	      if (key.indexOf('rect') === 0) {
+	        _annotations.push({
+	          class: 'Annotation',
+	          type: 'area',
+	          uuid: (0, _uuid2.default)(),
+	          page: data[0],
+	          x: data[1],
+	          y: data[2],
+	          width: data[3],
+	          height: data[4],
+	          readOnly: readOnly,
+	          seq: index
+	        });
+	
+	        // Highlight.
+	      } else if (key.indexOf('span') === 0) {
+	        var rectangles = data.slice(0, data.length - 1).map(function (d) {
+	          return {
+	            x: d[1],
+	            y: d[2],
+	            width: d[3],
+	            height: d[4]
+	          };
+	        });
+	        _annotations.push({
+	          class: 'Annotation',
+	          type: 'highlight',
+	          uuid: (0, _uuid2.default)(),
+	          page: data[0][0],
+	          color: '#FFFF00', // TODO なくてもOK？
+	          rectangles: rectangles,
+	          key: key, // tmp for arrow.
+	          readOnly: readOnly,
+	          seq: index
+	        });
+	
+	        // Text Independent.
+	      } else if (key.indexOf('text') === 0) {
+	        _annotations.push({
+	          class: 'Annotation',
+	          type: 'textbox',
+	          uuid: (0, _uuid2.default)(),
+	          page: data[0],
+	          size: 12, // TODO なくてもOK？
+	          x: data[1],
+	          y: data[2],
+	          content: data[3],
+	          readOnly: readOnly,
+	          seq: index
+	        });
+	
+	        // Arrow.
+	      } else if (key.indexOf('rel') === 0) {
+	
+	        // Find highlights.
+	        var highlight1s = _annotations.filter(function (a) {
+	          return a.key === data[2];
+	        });
+	        var highlight1 = highlight1s[0];
+	        var highlight2s = _annotations.filter(function (a) {
+	          return a.key === data[3];
+	        });
+	        var highlight2 = highlight2s[0];
+	
+	        console.log('highlight1:', highlight1);
+	        console.log('highlight2:', highlight2);
+	
+	        // Specify startPosition and endPosition.
+	        var x1 = highlight1.rectangles[0].x;
+	        var y1 = highlight1.rectangles[0].y - 5;
+	        var x2 = highlight2.rectangles[0].x;
+	        var y2 = highlight2.rectangles[0].y - 5;
+	
+	        console.log('xy:', x1, y1, x2, y2);
+	
+	        // Specify textbox position.
+	        var svg = document.querySelector('.annotationLayer');
+	        var p = (0, _utils.scaleUp)(svg, { x1: x1, y1: y1, x2: x2, y2: y2 });
+	        var rect = svg.getBoundingClientRect();
+	        p.x1 -= rect.left;
+	        p.y1 -= rect.top;
+	        p.x2 -= rect.left;
+	        p.y2 -= rect.top;
+	        var textPosition = (0, _utils.scaleDown)(svg, (0, _relation.getRelationTextPosition)(svg, p.x1, p.y1, p.x2, p.y2));
+	
+	        // Add textbox and get the uuid of if.
+	        var textId = (0, _uuid2.default)();
+	        _annotations.push({
+	          class: 'Annotation',
+	          type: 'textbox',
+	          uuid: textId,
+	          page: data[0],
+	          size: 12, // TODO なくてもOK？
+	          x: textPosition.x,
+	          y: textPosition.y,
+	          content: data[4],
+	          readOnly: readOnly,
+	          seq: index
+	        });
+	
+	        // Add arrow.
+	        _annotations.push({
+	          class: 'Annotation',
+	          type: 'arrow',
+	          direction: data[1],
+	          uuid: (0, _uuid2.default)(),
+	          page: data[0],
+	          x1: x1,
+	          y1: y1,
+	          x2: x2,
+	          y2: y2,
+	          text: textId,
+	          highlight1: highlight1.uuid,
+	          highlight2: highlight2.uuid,
+	          color: "FF0000", // TODO 要る？
+	          readOnly: readOnly,
+	          seq: index
+	        });
+	      }
+	    };
+	
+	    for (var key in json[documentId]) {
+	      _loop2(key);
+	    }
+	  }
+	
+	  return container;
+	}
+	
 	function _getContainer() {
 	  var container = localStorage.getItem(LOCALSTORAGE_KEY);
 	  if (!container) {
@@ -12585,20 +12704,50 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return container;
 	}
 	
+	function _getSecondaryContainers() {
+	  var containers = localStorage.getItem(LOCALSTORAGE_KEY_SECONDARY);
+	  if (!containers) {
+	    containers = [];
+	    _saveSecondaryContainer(containers);
+	  } else {
+	    containers = JSON.parse(containers);
+	  }
+	  return containers;
+	}
+	
 	function _saveContainer(container) {
 	  localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(container));
 	}
 	
+	function _saveSecondaryContainer(containers) {
+	  localStorage.setItem(LOCALSTORAGE_KEY_SECONDARY, JSON.stringify(containers));
+	}
+	
 	function _getAnnotations(documentId) {
 	
+	  // Primary annotation.
 	  var container = _getContainer();
-	
 	  var annotations = container[documentId];
 	  if (!annotations) {
 	    annotations = [];
 	    container[documentId] = [];
 	    _saveContainer(container);
 	  }
+	
+	  return annotations;
+	}
+	
+	function _getSecondaryAnnotations(documentId) {
+	
+	  var annotations = [];
+	
+	  var containers = _getSecondaryContainers();
+	  containers.forEach(function (container) {
+	    var tmpAnnotations = container[documentId];
+	    if (tmpAnnotations) {
+	      annotations = annotations.concat(tmpAnnotations);
+	    }
+	  });
 	
 	  return annotations;
 	}
@@ -13367,6 +13516,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
+	var rectSecondaryColor = ['green', 'blue', 'purple'];
+	var highlightSecondaryColor = ['green', 'blue', 'purple'];
+	
 	/**
 	 * Create SVGRectElements from an annotation definition.
 	 * This is used for anntations of type `area` and `highlight`.
@@ -13385,12 +13537,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function createHighlight(a) {
 	
+	  var color = void 0;
+	  if (a.readOnly) {
+	    color = highlightSecondaryColor[a.seq % highlightSecondaryColor.length];
+	  } else {
+	    color = '#FF0';
+	  }
+	
 	  var group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+	  group.setAttribute('read-only', a.readOnly === true);
 	
 	  a.rectangles.forEach(function (r) {
 	    var rect = createRect(r);
 	    rect.setAttribute('fill-opacity', 0.2);
-	    rect.setAttribute('fill', (0, _normalizeColor2.default)(a.color || '#ff0'));
+	    rect.setAttribute('fill', color);
 	    rect.classList.add('anno-highlight');
 	    group.appendChild(rect);
 	  });
@@ -13408,15 +13568,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function createRectBox(a) {
 	
+	  var color = void 0;
+	  if (a.readOnly) {
+	    color = rectSecondaryColor[a.seq % rectSecondaryColor.length];
+	  } else {
+	    color = '#f00';
+	  }
+	
 	  var rect = createRect(a);
 	  (0, _setAttributes2.default)(rect, {
-	    stroke: (0, _normalizeColor2.default)(a.color || '#f00'),
+	    stroke: color,
 	    strokeWidth: 1,
 	    fill: 'none',
 	    class: 'anno-rect'
 	  });
 	
 	  var group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+	  group.setAttribute('read-only', a.readOnly === true);
+	
 	  group.appendChild(rect);
 	
 	  return group;
@@ -13550,6 +13719,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var PADDING = 0;
 	
+	var textSecondaryColor = ['green', 'blue', 'purple'];
+	
 	function getRect(text, svg) {
 	    svg.appendChild(text);
 	    var rect = text.getBoundingClientRect();
@@ -13566,12 +13737,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function renderText(a, svg) {
 	
+	    var color = void 0;
+	    if (a.readOnly) {
+	        color = textSecondaryColor[a.seq % textSecondaryColor.length];
+	    } else {
+	        color = '#F00';
+	    }
+	
 	    // Text.
 	    var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
 	    (0, _setAttributes2.default)(text, {
 	        x: a.x,
 	        y: a.y + parseInt(a.size, 10),
-	        fill: (0, _normalizeColor2.default)(a.color || '#FF0000'),
+	        fill: color,
 	        fontSize: a.size
 	    });
 	    text.innerHTML = a.content;
@@ -13585,22 +13763,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        width: rect.width + PADDING * 2,
 	        height: rect.height + PADDING * 2,
 	        fill: '#FFFFFF',
-	        // fillOpacity: 0.9
 	        class: 'anno-text'
 	    });
 	
-	    // Bounding circle.
-	    // let circle = renderCircle({
-	    //   x: a.x,
-	    //   y: a.y - DEFAULT_RADIUS,
-	    //   type: 'boundingCircle'
-	    // });
-	
 	    // Group.
 	    var group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+	    group.setAttribute('read-only', a.readOnly === true);
+	
 	    group.appendChild(box);
 	    group.appendChild(text);
-	    // group.appendChild(circle);
 	    return group;
 	}
 	module.exports = exports['default'];
@@ -13633,6 +13804,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
+	var arrowSecondaryColor = ['green', 'blue', 'purple'];
+	
 	/**
 	 * Create SVGGElements from an annotation definition.
 	 * This is used for anntations of type `arrow`.
@@ -13650,6 +13823,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var id = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 	
 	
+	  var color = void 0;
+	  if (a.readOnly) {
+	    color = arrowSecondaryColor[a.seq % arrowSecondaryColor.length];
+	  } else {
+	    color = '#F00';
+	  }
+	
 	  // <svg viewBox="0 0 200 200">
 	  //     <marker id="m_ar" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="strokeWidth" preserveAspectRatio="none" markerWidth="2" markerHeight="3" orient="auto-start-reverse">
 	  //         <polygon points="0,0 0,10 10,5" fill="red" id="ms"/>
@@ -13659,19 +13839,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  var group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 	  (0, _setAttributes2.default)(group, {
-	    fill: (0, _normalizeColor2.default)(a.color || '#f00'),
-	    stroke: (0, _normalizeColor2.default)(a.color || '#f00'),
+	    fill: color,
+	    stroke: color,
 	    'data-highlight1': a.highlight1,
 	    'data-highlight2': a.highlight2,
 	    'data-text': a.text
 	  });
+	  group.setAttribute('read-only', a.readOnly === true);
 	
 	  var marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
 	  (0, _setAttributes2.default)(marker, {
 	    viewBox: "0 0 10 10",
 	    markerWidth: 2,
 	    markerHeight: 3,
-	    fill: (0, _normalizeColor2.default)(a.color || '#f00'),
+	    fill: color,
 	    id: 'arrowhead',
 	    orient: "auto-start-reverse"
 	  });
@@ -16175,7 +16356,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    x2: lines[1][0],
 	    y2: lines[1][1],
 	    type: 'arrow',
-	    color: 'FF0000',
 	    direction: _arrowType
 	  });
 	}
@@ -16187,16 +16367,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  svg = document.querySelector('#pageContainer' + PDFView.page).querySelector('svg');
 	
-	  // Save original style.
-	  forEach.call(svg.querySelectorAll('[data-pdf-annotate-type="highlight"] rect'), function (rect) {
-	    rect.setAttribute('data-original-fill', rect.getAttribute('fill'));
-	    rect.setAttribute('data-original-fill-opacity', rect.getAttribute('fill-opacity'));
-	  });
-	
 	  // Collect boundingCircles for highlight.
 	  boundingCircles = [];
 	  forEach.call(svg.querySelectorAll('g > [type="boundingCircle"]'), function (boundingCircle) {
-	    boundingCircles.push(boundingCircle);
+	    if ((0, _jquery2.default)(boundingCircle).closest('g').attr('read-only') !== 'true') {
+	      boundingCircles.push(boundingCircle);
+	    } else {
+	      (0, _jquery2.default)(boundingCircle).hide();
+	    }
 	  });
 	}
 	
@@ -16213,14 +16391,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	function deleteBoundingBoxes() {
-	
-	  // Restore original style.
-	  forEach.call(svg.querySelectorAll('[data-pdf-annotate-type="highlight"] rect'), function (rect) {
-	    rect.setAttribute('fill', rect.getAttribute('data-original-fill'));
-	    rect.setAttribute('fill-opacity', rect.getAttribute('data-original-fill-opacity'));
-	  });
-	
 	  boundingCircles = [];
+	
+	  // Collect boundingCircles for highlight.
+	  forEach.call(svg.querySelectorAll('g > [type="boundingCircle"]'), function (boundingCircle) {
+	    if ((0, _jquery2.default)(boundingCircle).closest('g').attr('read-only') === 'true') {
+	      (0, _jquery2.default)(boundingCircle).show();
+	    }
+	  });
 	}
 	
 	/**
@@ -16315,7 +16493,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function handleDoubleClick(e) {
 	
-	    var component = findHitElement(e);
+	    var component = findHitElement(e, true);
 	    if (component && isTextComponent(component)) {
 	
 	        // Add text input filed.
@@ -16391,7 +16569,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    rectDraggingWillStart = false;
 	
 	    // Set component state to selected if exists.
-	    var element = findHitElement(e);
+	    var element = findHitElement(e, true);
 	    if (element) {
 	        var g = element.parentNode;
 	        if (g.getAttribute('data-selected') === 'true') {
@@ -16407,7 +16585,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function handleDocumentMousedown(e) {
 	
 	    // Start rect dragging if exists.
-	    var component = findHitElement(e);
+	    var component = findHitElement(e, true);
 	    if (component && isRectComponent(component)) {
 	        rectDraggingWillStart = true;
 	        rectDraggingComponent = component;
@@ -16674,6 +16852,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	function findHitElement(e) {
+	    var canEdit = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+	
 	
 	    var svg = (0, _utils.findSVGAtPoint)(e.clientX, e.clientY);
 	    if (!svg) {
@@ -16686,28 +16866,56 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // highlight.
 	    for (var i = 0; i < monitoringCircles.length; i++) {
 	        if (isHit(point, monitoringCircles[i], 'boundingCircle')) {
-	            return monitoringCircles[i];
+	            if (canEdit) {
+	                var readOnly = (0, _jquery2.default)(monitoringCircles[i]).closest('g').attr('read-only') === 'true';
+	                if (!readOnly) {
+	                    return monitoringCircles[i];
+	                }
+	            } else {
+	                return monitoringCircles[i];
+	            }
 	        }
 	    }
 	
 	    // rect.
 	    for (var _i = 0; _i < monitoringRects.length; _i++) {
 	        if (isHit(point, monitoringRects[_i], 'rect')) {
-	            return monitoringRects[_i];
+	            if (canEdit) {
+	                var _readOnly = (0, _jquery2.default)(monitoringRects[_i]).closest('g').attr('read-only') === 'true';
+	                if (!_readOnly) {
+	                    return monitoringRects[_i];
+	                }
+	            } else {
+	                return monitoringRects[_i];
+	            }
 	        }
 	    }
 	
 	    // textbox.
 	    for (var _i2 = 0; _i2 < monitoringTexts.length; _i2++) {
 	        if (isHit(point, monitoringTexts[_i2], 'text')) {
-	            return monitoringTexts[_i2];
+	            if (canEdit) {
+	                var _readOnly2 = (0, _jquery2.default)(monitoringTexts[_i2]).closest('g').attr('read-only') === 'true';
+	                if (!_readOnly2) {
+	                    return monitoringTexts[_i2];
+	                }
+	            } else {
+	                return monitoringTexts[_i2];
+	            }
 	        }
 	    }
 	
 	    // arrow.
 	    for (var _i3 = 0; _i3 < monitoringArrows.length; _i3++) {
 	        if (isHit(point, monitoringArrows[_i3], 'arrow')) {
-	            return monitoringArrows[_i3];
+	            if (canEdit) {
+	                var _readOnly3 = (0, _jquery2.default)(monitoringArrows[_i3]).closest('g').attr('read-only') === 'true';
+	                if (!_readOnly3) {
+	                    return monitoringArrows[_i3];
+	                }
+	            } else {
+	                return monitoringArrows[_i3];
+	            }
 	        }
 	    }
 	}
@@ -16728,17 +16936,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var left = parseFloat(element.getAttribute('x'));
 	        var right = left + parseFloat(element.getAttribute('width'));
 	
-	        var _x = pos.x;
+	        var _x2 = pos.x;
 	        var _y = pos.y;
 	        return (
 	            // left
-	            left - 2 <= _x && _x <= left + 2 && top <= _y && _y <= bottom ||
+	            left - 2 <= _x2 && _x2 <= left + 2 && top <= _y && _y <= bottom ||
 	            // right
-	            right - 2 <= _x && _x <= right + 2 && top <= _y && _y <= bottom
+	            right - 2 <= _x2 && _x2 <= right + 2 && top <= _y && _y <= bottom
 	            // top
-	            || left <= _x && _x <= right && top - 2 <= _y && _y <= top + 2
+	            || left <= _x2 && _x2 <= right && top - 2 <= _y && _y <= top + 2
 	            // bottom
-	            || left <= _x && _x <= right && bottom - 2 <= _y && _y <= bottom + 2
+	            || left <= _x2 && _x2 <= right && bottom - 2 <= _y && _y <= bottom + 2
 	        );
 	        // return left <= pos.x && pos.x <= right && top <= pos.y && pos.y <= bottom;        
 	    }

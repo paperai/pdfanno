@@ -11,6 +11,7 @@ export default class StoreAdapter {
   constructor(definition = {}) {
     // Copy each function from definition if it is a function we know about
     Object.keys(definition).forEach((key) => {
+      // console.log('key=', key, typeof definition[key] === 'function', typeof this[key] === 'function');
       if (typeof definition[key] === 'function' &&
           typeof this[key] === 'function') {
         this[key] = definition[key];
@@ -29,6 +30,22 @@ export default class StoreAdapter {
   get getAnnotations() { return this.__getAnnotations; }
   set getAnnotations(fn) {
     this.__getAnnotations = function getAnnotations(documentId, pageNumber) {
+      return fn(...arguments).then((annotations) => {
+        // TODO may be best to have this happen on the server
+        if (annotations.annotations) {
+          annotations.annotations.forEach((a) => {
+            a.documentId = documentId;
+          });
+        }
+        return annotations;
+      });
+    };
+  }
+
+  __getSecondaryAnnotations(documentId, pageNumber) { abstractFunction('getSecondaryAnnotations'); }
+  get getSecondaryAnnotations() { return this.__getSecondaryAnnotations; }
+  set getSecondaryAnnotations(fn) {
+    this.__getSecondaryAnnotations = function getSecondaryAnnotations(documentId, pageNumber) {
       return fn(...arguments).then((annotations) => {
         // TODO may be best to have this happen on the server
         if (annotations.annotations) {
@@ -201,6 +218,19 @@ export default class StoreAdapter {
       return fn(...arguments).then(success => {
         if (success) {
           fireEvent('import', json);
+        }
+        return success;
+      });
+    }
+  }
+
+  __importDataSecondary(jsonArray) { abstractFunction('importDataSecondary'); }
+  get importDataSecondary() { return this.__importDataSecondary; }
+  set importDataSecondary(fn) {
+    this.__importDataSecondary = function importDataSecondary(jsonArray) {
+      return fn(...arguments).then(success => {
+        if (success) {
+          fireEvent('importSecondary', jsonArray);
         }
         return success;
       });

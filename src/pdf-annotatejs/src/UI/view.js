@@ -31,7 +31,7 @@ let rectDraggingStartPos = null;
 
 function handleDoubleClick(e) {
 
-    let component = findHitElement(e);
+    let component = findHitElement(e, true);
     if (component && isTextComponent(component)) {
 
         // Add text input filed.
@@ -98,7 +98,7 @@ function handleDocumentMouseup(e) {
     rectDraggingWillStart = false;
 
     // Set component state to selected if exists.
-    let element = findHitElement(e);
+    let element = findHitElement(e, true);
     if (element) {
         let g = element.parentNode;
         if (g.getAttribute('data-selected') === 'true') {
@@ -114,7 +114,7 @@ function handleDocumentMouseup(e) {
 function handleDocumentMousedown(e) {
 
     // Start rect dragging if exists.
-    let component = findHitElement(e);
+    let component = findHitElement(e, true);
     if (component && isRectComponent(component)) {
         rectDraggingWillStart = true;
         rectDraggingComponent = component;
@@ -394,7 +394,7 @@ function setComponentVisibility(component, opacity) {
     }
 }
 
-function findHitElement(e) {
+function findHitElement(e, canEdit=false) {
 
     let svg = findSVGAtPoint(e.clientX, e.clientY);
     if (!svg) {
@@ -407,28 +407,56 @@ function findHitElement(e) {
     // highlight.
     for (let i = 0; i < monitoringCircles.length; i++) {
         if (isHit(point, monitoringCircles[i], 'boundingCircle')) {
-            return monitoringCircles[i];
+            if (canEdit) {
+                let readOnly = $(monitoringCircles[i]).closest('g').attr('read-only') === 'true';
+                if (!readOnly) {
+                    return monitoringCircles[i];
+                }
+            } else {
+                return monitoringCircles[i];                
+            }
         }
     }
 
     // rect.
     for (let i = 0; i < monitoringRects.length; i++) {
         if (isHit(point, monitoringRects[i], 'rect')) {
-            return monitoringRects[i];
+            if (canEdit) {
+                let readOnly = $(monitoringRects[i]).closest('g').attr('read-only') === 'true';
+                if (!readOnly) {
+                    return monitoringRects[i];
+                }
+            } else {
+                return monitoringRects[i];                
+            }
         }
     }
 
     // textbox.
     for (let i = 0; i < monitoringTexts.length; i++) {
         if (isHit(point, monitoringTexts[i], 'text')) {
-            return monitoringTexts[i];
+            if (canEdit) {
+                let readOnly = $(monitoringTexts[i]).closest('g').attr('read-only') === 'true';
+                if (!readOnly) {
+                    return monitoringTexts[i];
+                }
+            } else {
+                return monitoringTexts[i];                
+            }
         }
     }
 
     // arrow.
     for (let i = 0; i < monitoringArrows.length; i++) {
         if (isHit(point, monitoringArrows[i], 'arrow')) {
-            return monitoringArrows[i];
+            if (canEdit) {
+                let readOnly = $(monitoringArrows[i]).closest('g').attr('read-only') === 'true';
+                if (!readOnly) {
+                    return monitoringArrows[i];
+                }
+            } else {
+                return monitoringArrows[i];                
+            }
         }
     }
 }

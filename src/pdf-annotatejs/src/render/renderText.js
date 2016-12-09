@@ -5,6 +5,8 @@ import { DEFAULT_RADIUS } from './renderCircle';
 
 const PADDING = 0;
 
+let textSecondaryColor = ['green', 'blue', 'purple'];
+
 
 function getRect(text, svg) {
     svg.appendChild(text);
@@ -24,12 +26,19 @@ function getRect(text, svg) {
  */
 export default function renderText(a, svg) {
 
+    let color;
+    if (a.readOnly) {
+      color = textSecondaryColor[a.seq % textSecondaryColor.length];
+    } else {
+      color = '#F00';
+    }
+
     // Text.
     let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     setAttributes(text, {
         x: a.x,
         y: a.y + parseInt(a.size, 10),
-        fill: normalizeColor(a.color || '#FF0000'),
+        fill: color,
         fontSize: a.size
     });
     text.innerHTML = a.content;
@@ -43,21 +52,14 @@ export default function renderText(a, svg) {
       width: rect.width + PADDING*2,
       height: rect.height + PADDING*2,
       fill: '#FFFFFF',
-      // fillOpacity: 0.9
       class : 'anno-text'
     });
 
-    // Bounding circle.
-    // let circle = renderCircle({
-    //   x: a.x,
-    //   y: a.y - DEFAULT_RADIUS,
-    //   type: 'boundingCircle'
-    // });
-
     // Group.
     let group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    group.setAttribute('read-only', a.readOnly === true);
+
     group.appendChild(box);
     group.appendChild(text);
-    // group.appendChild(circle);
     return group;
 }
