@@ -267,7 +267,6 @@ function saveArrow(x, y) {
     x2: lines[1][0],
     y2: lines[1][1],
     type: 'arrow',
-    color: 'FF0000',
     direction : _arrowType
   });
 }
@@ -281,16 +280,14 @@ function showBoundingBox() {
               .querySelector('#pageContainer' + PDFView.page)
               .querySelector('svg');
 
-  // Save original style.
-  forEach.call(svg.querySelectorAll('[data-pdf-annotate-type="highlight"] rect'), rect => {
-    rect.setAttribute('data-original-fill', rect.getAttribute('fill'));
-    rect.setAttribute('data-original-fill-opacity', rect.getAttribute('fill-opacity'));
-  });
-
   // Collect boundingCircles for highlight.
   boundingCircles = [];
   forEach.call(svg.querySelectorAll('g > [type="boundingCircle"]'), boundingCircle => {
-    boundingCircles.push(boundingCircle);
+    if ($(boundingCircle).closest('g').attr('read-only') !== 'true') {
+      boundingCircles.push(boundingCircle);
+    } else {
+      $(boundingCircle).closest('g').hide();
+    }
   });
 
 }
@@ -308,14 +305,16 @@ function enableTextlayer() {
 }
 
 function deleteBoundingBoxes() {
+  boundingCircles = [];
 
-  // Restore original style.
-  forEach.call(svg.querySelectorAll('[data-pdf-annotate-type="highlight"] rect'), rect => {
-      rect.setAttribute('fill', rect.getAttribute('data-original-fill'));
-      rect.setAttribute('fill-opacity', rect.getAttribute('data-original-fill-opacity'));
+  // Collect boundingCircles for highlight.
+  forEach.call(svg.querySelectorAll('g > [type="boundingCircle"]'), boundingCircle => {
+    if ($(boundingCircle).closest('g').attr('read-only') === 'true') {
+      $(boundingCircle).closest('g').show();
+    }
   });
 
-  boundingCircles = [];
+
 }
 
 /**
