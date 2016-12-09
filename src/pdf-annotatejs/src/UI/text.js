@@ -85,9 +85,6 @@ function handleInputBlur() {
 function handleInputKeyup(e) {
   if (e.keyCode === 27) {
     closeInput();
-  // FIXME: Not Work On Input Japanese.
-  // } else if (e.keyCode === 13) {
-  //   saveText();
   }
 }
 
