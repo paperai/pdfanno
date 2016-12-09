@@ -134,11 +134,9 @@ export default function appendChild(svg, annotation, viewport) {
     case 'drawing':
       child = renderPath(annotation);
       break;
-    // **extension**
     case'arrow':
       child = renderArrow(annotation);
       break;
-    // **extension**
     case'circle':
       child = renderCircle(annotation);
       break;
@@ -151,17 +149,8 @@ export default function appendChild(svg, annotation, viewport) {
     child.setAttribute('data-pdf-annotate-id', annotation.uuid);
     child.setAttribute('data-pdf-annotate-type', annotation.type);
     child.setAttribute('aria-hidden', true);
-    if (annotation.relId) {
-      child.setAttribute('data-rel-id', annotation.relId);
-    }
-
     svg.appendChild(transform(child, viewport));
   }
 
-  // if (point) {
-  //   return [child, point];
-  // } else {
-  //   return child;
-  // }
   return child;
 }

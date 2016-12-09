@@ -176,10 +176,6 @@ function handleDocumentMouseup(e) {
     highlight2 : endBoundingCircle.parentNode.getAttribute('data-pdf-annotate-id'),
   };
 
-  // Relation Id.
-  // let relId = uuid();
-  // annotation.relId = relId;
-
   let { documentId, pageNumber } = getMetadata(svg);
   PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation)
     .then((annotation) => {
@@ -207,6 +203,11 @@ function showTextInput(start, end, arrowAnnotation) {
     let element = document.querySelector('.annotationLayer');
     let documentId = element.getAttribute('data-pdf-annotate-document');  // 共通化
     PDFJSAnnotate.getStoreAdapter().editAnnotation(documentId, arrowAnnotation.uuid, arrowAnnotation);
+
+    // Update UI.
+    console.log('arrow:', $(`[data-pdf-annotate-id="${arrowAnnotation.uuid}"]`));
+    $(`[data-pdf-annotate-id="${arrowAnnotation.uuid}"]`).attr('data-text', textAnnotation.uuid);
+
   });
 }
 
