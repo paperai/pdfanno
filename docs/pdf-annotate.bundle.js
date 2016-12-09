@@ -10872,7 +10872,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // Copy each function from definition if it is a function we know about
 	    Object.keys(definition).forEach(function (key) {
-	      // console.log('key=', key, typeof definition[key] === 'function', typeof this[key] === 'function');
 	      if (typeof definition[key] === 'function' && typeof _this[key] === 'function') {
 	        _this[key] = definition[key];
 	      }
@@ -13134,11 +13133,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    case 'drawing':
 	      child = (0, _renderPath2.default)(annotation);
 	      break;
-	    // **extension**
 	    case 'arrow':
 	      child = (0, _renderArrow2.default)(annotation);
 	      break;
-	    // **extension**
 	    case 'circle':
 	      child = (0, _renderCircle2.default)(annotation);
 	      break;
@@ -13151,18 +13148,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    child.setAttribute('data-pdf-annotate-id', annotation.uuid);
 	    child.setAttribute('data-pdf-annotate-type', annotation.type);
 	    child.setAttribute('aria-hidden', true);
-	    if (annotation.relId) {
-	      child.setAttribute('data-rel-id', annotation.relId);
-	    }
-	
 	    svg.appendChild(transform(child, viewport));
 	  }
 	
-	  // if (point) {
-	  //   return [child, point];
-	  // } else {
-	  //   return child;
-	  // }
 	  return child;
 	}
 
@@ -15692,9 +15680,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	function handleInputKeyup(e) {
 	  if (e.keyCode === 27) {
 	    closeInput();
-	    // FIXME: Not Work On Input Japanese.
-	    // } else if (e.keyCode === 13) {
-	    //   saveText();
 	  }
 	}
 	
@@ -16263,10 +16248,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    highlight2: endBoundingCircle.parentNode.getAttribute('data-pdf-annotate-id')
 	  };
 	
-	  // Relation Id.
-	  // let relId = uuid();
-	  // annotation.relId = relId;
-	
 	  var _getMetadata = (0, _utils.getMetadata)(svg),
 	      documentId = _getMetadata.documentId,
 	      pageNumber = _getMetadata.pageNumber;
@@ -16296,6 +16277,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var element = document.querySelector('.annotationLayer');
 	    var documentId = element.getAttribute('data-pdf-annotate-document'); // 共通化
 	    _PDFJSAnnotate2.default.getStoreAdapter().editAnnotation(documentId, arrowAnnotation.uuid, arrowAnnotation);
+	
+	    // Update UI.
+	    console.log('arrow:', (0, _jquery2.default)('[data-pdf-annotate-id="' + arrowAnnotation.uuid + '"]'));
+	    (0, _jquery2.default)('[data-pdf-annotate-id="' + arrowAnnotation.uuid + '"]').attr('data-text', textAnnotation.uuid);
 	  });
 	}
 	
@@ -16824,7 +16809,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Also set to relation items.
 	    var documentId = g.parentNode.getAttribute('data-pdf-annotate-document');
 	    var uuid = g.getAttribute('data-pdf-annotate-id');
-	    var relId = g.getAttribute('data-rel-id');
 	    var type = g.getAttribute('data-pdf-annotate-type');
 	
 	    if (type === 'arrow') {
