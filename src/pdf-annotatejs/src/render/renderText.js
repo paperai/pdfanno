@@ -5,7 +5,7 @@ import { DEFAULT_RADIUS } from './renderCircle';
 
 const PADDING = 0;
 
-let textSecondaryColor = ['green', 'blue', 'yellow'];
+let textSecondaryColor = ['green', 'blue', 'purple'];
 
 
 function getRect(text, svg) {

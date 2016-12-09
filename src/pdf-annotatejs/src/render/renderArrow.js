@@ -3,7 +3,7 @@ import normalizeColor from '../utils/normalizeColor';
 import renderCircle from './renderCircle';
 import { findBezierControlPoint } from '../utils/relation.js';
 
-let arrowSecondaryColor = ['green', 'blue', 'yellow'];
+let arrowSecondaryColor = ['green', 'blue', 'purple'];
 
 /**
  * Create SVGGElements from an annotation definition.

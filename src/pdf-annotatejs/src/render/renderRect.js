@@ -3,8 +3,8 @@ import normalizeColor from '../utils/normalizeColor';
 import renderCircle from './renderCircle';
 import { DEFAULT_RADIUS } from './renderCircle';
 
-let rectSecondaryColor = ['green', 'blue', 'yellow'];
-let highlightSecondaryColor = ['blue', 'yellow', 'green'];
+let rectSecondaryColor = ['green', 'blue', 'purple'];
+let highlightSecondaryColor = ['green', 'blue', 'purple'];
 
 /**
  * Create SVGRectElements from an annotation definition.
