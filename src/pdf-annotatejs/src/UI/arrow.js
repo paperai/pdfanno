@@ -176,10 +176,6 @@ function handleDocumentMouseup(e) {
     highlight2 : endBoundingCircle.parentNode.getAttribute('data-pdf-annotate-id'),
   };
 
-  // Relation Id.
-  // let relId = uuid();
-  // annotation.relId = relId;
-
   let { documentId, pageNumber } = getMetadata(svg);
   PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation)
     .then((annotation) => {

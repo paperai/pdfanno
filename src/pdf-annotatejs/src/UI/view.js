@@ -364,7 +364,6 @@ function setComponentVisibility(component, opacity) {
     // Also set to relation items.
     let documentId = g.parentNode.getAttribute('data-pdf-annotate-document');
     let uuid = g.getAttribute('data-pdf-annotate-id');
-    let relId = g.getAttribute('data-rel-id');
     let type = g.getAttribute('data-pdf-annotate-type');
 
     if (type === 'arrow') {
