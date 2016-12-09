@@ -39,7 +39,6 @@ window.addEventListener('DOMContentLoaded', function() {
 
         // Import user uploading annotation, if exists.
         if (uploadedAnnotationExists()) {
-            console.log(ev.detail.pageNumber, 'import user annotation');
             importUploadedAnnotation().then(() => {
                 renderAnnotations(svg, ev.detail.pageNumber);
             });
@@ -55,12 +54,8 @@ function renderAnnotations(svg, pageNumber) {
     PDFAnnotate.getAnnotations(documentId, pageNumber).then(function(annotations) {
         PDFAnnotate.getStoreAdapter().getSecondaryAnnotations(documentId, pageNumber).then(function(secondaryAnnotations) {
 
-            // console.log('aaaaaaaaaaaaaaaa', annotations, secondaryAnnotations.annotations);
-            // annotations = annotations.concat(secondaryAnnotations.annotations);
-
+            // Primary + Secondary annotations.
             annotations.annotations = annotations.annotations.concat(secondaryAnnotations.annotations);
-
-            console.log('anno:', annotations);
 
             // Adjust screen scale change.
             let viewport = PDFView.pdfViewer.getPageView(0).viewport;
@@ -96,6 +91,7 @@ function importUploadedAnnotation() {
 
     // Primary Annotation.
     if (localStorage.getItem('_pdfanno_pdfanno_upload')) {
+        console.log('LOAD PRIMARY');
         let annotations = JSON.parse(localStorage.getItem('_pdfanno_pdfanno_upload'));
         console.log('importUploadedAnnotation:', annotations);
         let promise = PDFAnnotate.getStoreAdapter().importData(annotations).then(() => {
@@ -106,6 +102,7 @@ function importUploadedAnnotation() {
 
     // Seconday Annotations.
     if (localStorage.getItem('_pdfanno_pdfanno_upload_second')) {
+        console.log('LOAD SECONDARY');
         let secondAnnotations = JSON.parse(localStorage.getItem('_pdfanno_pdfanno_upload_second'));
         console.log('secondAnnotations:', secondAnnotations);
         let promise = PDFAnnotate.getStoreAdapter().importDataSecondary(secondAnnotations).then(() => {

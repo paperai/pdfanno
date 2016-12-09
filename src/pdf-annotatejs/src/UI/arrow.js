@@ -286,7 +286,7 @@ function showBoundingBox() {
     if ($(boundingCircle).closest('g').attr('read-only') !== 'true') {
       boundingCircles.push(boundingCircle);
     } else {
-      $(boundingCircle).closest('g').hide();
+      $(boundingCircle).hide();
     }
   });
 
@@ -310,7 +310,7 @@ function deleteBoundingBoxes() {
   // Collect boundingCircles for highlight.
   forEach.call(svg.querySelectorAll('g > [type="boundingCircle"]'), boundingCircle => {
     if ($(boundingCircle).closest('g').attr('read-only') === 'true') {
-      $(boundingCircle).closest('g').show();
+      $(boundingCircle).show();
     }
   });
 

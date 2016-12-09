@@ -11,7 +11,7 @@ export default class StoreAdapter {
   constructor(definition = {}) {
     // Copy each function from definition if it is a function we know about
     Object.keys(definition).forEach((key) => {
-      console.log('key=', key, typeof definition[key] === 'function', typeof this[key] === 'function');
+      // console.log('key=', key, typeof definition[key] === 'function', typeof this[key] === 'function');
       if (typeof definition[key] === 'function' &&
           typeof this[key] === 'function') {
         this[key] = definition[key];
