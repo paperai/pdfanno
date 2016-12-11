@@ -233,6 +233,12 @@ function deleteSelectedAnnotations() {
             });
 
         } else if (type === 'highlight') {
+            // Span text.
+            let textId = $(g).attr('data-text');
+            if (textId) {
+                annotationIds.push(textId);
+            }
+            // Arrow relations.
             let criteria = {
                 type       : 'arrow',
                 highlight1 : annotationId
@@ -254,6 +260,8 @@ function deleteSelectedAnnotations() {
                     deleteAnnotation(documentId, annotationIds, initializeMonitoringAnnotations);
                 });
             });
+            
+
         
         } else {
             deleteAnnotation(documentId, annotationIds, initializeMonitoringAnnotations);
@@ -396,10 +404,10 @@ function setComponentVisibility(component, opacity) {
                 let $g = $(`g[data-pdf-annotate-id="${textId}"]`);
                 if (opacity === OPACITY_VISIBLE) {
                     $g.find('rect').addClass('--hover');
-                    $g[0].style.opacity = opacity;
+                    $g.css('opacity', opacity);
                 } else {
                     $g.find('rect').removeClass('--hover');
-                    $g[0].style.opacity = opacity;
+                    $g.css('opacity', opacity);
                 }
             }
 
