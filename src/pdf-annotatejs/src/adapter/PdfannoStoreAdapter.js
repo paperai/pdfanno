@@ -359,26 +359,18 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
           let svg = document.querySelector('.annotationLayer');
 
           let x = rectangles[0].x;
-          let y = rectangles[0].y - 20; // 5 = circle'radius(3px) + input height(14px) + α
-          let rect = svg.getBoundingClientRect();
-          console.log('x,y1=', x, y);
-
-          // x = scaleUp(svg, {x}).x + rect.left;
-          // y = scaleUp(svg, {y}).y + rect.top;
-
-          console.log('x,y2=', x, y);
+          let y = rectangles[0].y - 20; // 20 = circle'radius(3px) + input height(14px) + α
 
           annotations.push({
             class      : 'Annotation',
             type       : 'textbox',
             uuid       : textId,
             page       : data[0][0],
-            size       : 12,          // TODO なくてもOK？
             x          : x,
             y          : y,
             content    : spanText,
             readOnly,
-            seq    : index
+            seq        : index
           });
         }
         annotations.push({
@@ -401,7 +393,6 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
           type       : 'textbox',
           uuid       : uuid(),
           page       : data[0],
-          size       : 12,          // TODO なくてもOK？
           x          : data[1],
           y          : data[2],
           content    : data[3],
@@ -421,9 +412,6 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
           return a.key === data[3];
         });
         let highlight2 = highlight2s[0];
-
-        console.log('highlight1:', highlight1);
-        console.log('highlight2:', highlight2);
 
         // Specify startPosition and endPosition.
         let x1 = highlight1.rectangles[0].x;
@@ -450,7 +438,6 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
           type       : 'textbox',
           uuid       : textId,
           page       : data[0],
-          size       : 12,          // TODO なくてもOK？
           x          : textPosition.x,
           y          : textPosition.y,
           content    : data[4],

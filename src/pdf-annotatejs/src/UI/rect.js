@@ -229,7 +229,7 @@ function saveRect(type, rects, color) {
     if (type === 'highlight') {
 
       let x = annotation.rectangles[0].x;
-      let y = annotation.rectangles[0].y - 20; // 5 = circle'radius(3px) + input height(14px) + α
+      let y = annotation.rectangles[0].y - 20; // 20 = circle'radius(3px) + input height(14px) + α
       let rect = svg.getBoundingClientRect();
 
       x = scaleUp(svg, {x}).x + rect.left;
@@ -241,11 +241,9 @@ function saveRect(type, rects, color) {
         annotation.text = textAnnotation.uuid;
 
         // Update data.
-        let element = document.querySelector('.annotationLayer');
         PDFJSAnnotate.getStoreAdapter().editAnnotation(documentId, annotation.uuid, annotation);
 
         // Update UI.
-        console.log('highlight:', $(`[data-pdf-annotate-id="${annotation.uuid}"]`));
         $(`[data-pdf-annotate-id="${annotation.uuid}"]`).attr('data-text', textAnnotation.uuid);
       });
     }

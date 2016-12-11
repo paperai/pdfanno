@@ -4,6 +4,7 @@ import renderCircle from './renderCircle';
 import { DEFAULT_RADIUS } from './renderCircle';
 
 const PADDING = 0;
+const FONT_SIZE = 12;
 
 let textSecondaryColor = ['green', 'blue', 'purple'];
 
@@ -37,9 +38,9 @@ export default function renderText(a, svg) {
     let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     setAttributes(text, {
         x: a.x,
-        y: a.y + parseInt(a.size, 10),
+        y: a.y + parseInt(FONT_SIZE, 10),
         fill: color,
-        fontSize: a.size
+        fontSize: FONT_SIZE
     });
     text.innerHTML = a.content;
 
