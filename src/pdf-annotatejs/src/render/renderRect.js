@@ -34,6 +34,7 @@ function createHighlight(a) {
 
   let group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   group.setAttribute('read-only', a.readOnly === true);
+  group.setAttribute('data-text', a.text);
   
   a.rectangles.forEach((r) => {
     let rect = createRect(r);

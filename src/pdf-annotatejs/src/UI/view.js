@@ -360,7 +360,6 @@ function setComponentVisibility(component, opacity) {
         $(g).find('path').removeClass('--hover');
     }
 
-
     // Also set to relation items.
     let documentId = g.parentNode.getAttribute('data-pdf-annotate-document');
     let uuid = g.getAttribute('data-pdf-annotate-id');
@@ -390,6 +389,21 @@ function setComponentVisibility(component, opacity) {
                 setComponentVisibility(arrowElement, opacity);
             });
         });
+
+        if (type === 'highlight') {
+            let textId = $(g).attr('data-text');
+            if (textId) {
+                let $g = $(`g[data-pdf-annotate-id="${textId}"]`);
+                if (opacity === OPACITY_VISIBLE) {
+                    $g.find('rect').addClass('--hover');
+                    $g[0].style.opacity = opacity;
+                } else {
+                    $g.find('rect').removeClass('--hover');
+                    $g[0].style.opacity = opacity;
+                }
+            }
+
+        }
     }
 }
 
