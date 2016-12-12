@@ -3,20 +3,29 @@ import normalizeColor from '../utils/normalizeColor';
 import renderCircle from './renderCircle';
 import { DEFAULT_RADIUS } from './renderCircle';
 
-const PADDING = 0;
-const FONT_SIZE = 12;
+/**
+ * Default font size for Text.
+ */
+const DEFAULT_FONT_SIZE = 12;
 
+/**
+ * Annotation colors for secondary annotations.
+ */
 let textSecondaryColor = ['green', 'blue', 'purple'];
 
-
+/**
+ * Calculate boundingClientRect that is needed for rendering text.
+ * 
+ * @param {String} text - A text to be renderd.
+ * @param {SVGElement} svg - svgHTMLElement to be used for rendering text.
+ * @return {Object} A boundingBox of text element.
+ */
 function getRect(text, svg) {
     svg.appendChild(text);
     let rect = text.getBoundingClientRect();
     text.parentNode.removeChild(text);
     return rect;
 }
-
-
 
 /**
  * Create SVGTextElement from an annotation definition.
@@ -38,9 +47,9 @@ export default function renderText(a, svg) {
     let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     setAttributes(text, {
         x: a.x,
-        y: a.y + parseInt(FONT_SIZE, 10),
+        y: a.y + parseInt(DEFAULT_FONT_SIZE, 10),
         fill: color,
-        fontSize: FONT_SIZE
+        fontSize: DEFAULT_FONT_SIZE
     });
     text.innerHTML = a.content;
 
@@ -48,10 +57,10 @@ export default function renderText(a, svg) {
     let box = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
     let rect = getRect(text, svg);
     setAttributes(box, {
-      x: a.x - PADDING,
-      y: a.y - PADDING,
-      width: rect.width + PADDING*2,
-      height: rect.height + PADDING*2,
+      x: a.x,
+      y: a.y,
+      width: rect.width,
+      height: rect.height,
       fill: '#FFFFFF',
       class : 'anno-text'
     });
