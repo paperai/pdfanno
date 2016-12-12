@@ -194,6 +194,7 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
               // Highlight.
               } else if (annotation.type === 'highlight') {
                 let data = [];
+                // rectangles.
                 annotation.rectangles.forEach(rectangle => {
                   data.push([
                     annotation.page,
@@ -203,7 +204,18 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                     rectangle.height
                   ]);
                 });
-                data.push('spanのテキスト'); // The data that will be added in future.
+                // span text.
+                let text = '';
+                if (annotation.text) {
+                  let texts = container[documentId].filter(a => {
+                    return a.uuid === annotation.text;
+                  });
+                  if (texts.length > 0) {
+                    text = texts[0].content;
+                  }
+                }
+                data.push(text);
+
                 let key = `span-${indexSpan++}`;
                 annotations[key] = data;
 
@@ -235,12 +247,11 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
               // Textbox independent.
               } else if (annotation.type === 'textbox') {
 
-                console.log(annotation.content, annotation.uuid);
-
-                let relArrows = container[documentId].filter(a => {
+                let rels = container[documentId].filter(a => {
+                  // relation for arrow or highlight.
                   return a.text === annotation.uuid;
                 });
-                if (relArrows.length === 0) {
+                if (rels.length === 0) {
                   console.log('text:', annotation.content);
                   annotations[`text-${indexText++}`] = [
                     annotation.page,
@@ -331,6 +342,7 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
       
       // Highlight.
       } else if (key.indexOf('span') === 0) {
+        // rectangles.
         let rectangles = data.slice(0, data.length-1).map(d => {
           return {
             x      : d[1],
@@ -339,6 +351,28 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
             height : d[4]
           }
         });
+        // span text.
+        let spanText = data[data.length-1];
+        let textId = null;
+        if (spanText) {
+          textId = uuid();
+          let svg = document.querySelector('.annotationLayer');
+
+          let x = rectangles[0].x;
+          let y = rectangles[0].y - 20; // 20 = circle'radius(3px) + input height(14px) + α
+
+          annotations.push({
+            class      : 'Annotation',
+            type       : 'textbox',
+            uuid       : textId,
+            page       : data[0][0],
+            x          : x,
+            y          : y,
+            content    : spanText,
+            readOnly,
+            seq        : index
+          });
+        }
         annotations.push({
           class      : 'Annotation',
           type       : 'highlight',
@@ -346,6 +380,7 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
           page       : data[0][0],
           color      : '#FFFF00',   // TODO なくてもOK？
           rectangles,
+          text       : textId,
           key        : key,  // tmp for arrow.
           readOnly,
           seq    : index
@@ -358,7 +393,6 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
           type       : 'textbox',
           uuid       : uuid(),
           page       : data[0],
-          size       : 12,          // TODO なくてもOK？
           x          : data[1],
           y          : data[2],
           content    : data[3],
@@ -378,9 +412,6 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
           return a.key === data[3];
         });
         let highlight2 = highlight2s[0];
-
-        console.log('highlight1:', highlight1);
-        console.log('highlight2:', highlight2);
 
         // Specify startPosition and endPosition.
         let x1 = highlight1.rectangles[0].x;
@@ -407,7 +438,6 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
           type       : 'textbox',
           uuid       : textId,
           page       : data[0],
-          size       : 12,          // TODO なくてもOK？
           x          : textPosition.x,
           y          : textPosition.y,
           content    : data[4],

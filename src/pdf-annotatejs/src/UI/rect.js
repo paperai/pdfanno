@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import PDFJSAnnotate from '../PDFJSAnnotate';
 import appendChild from '../render/appendChild';
 import {
@@ -10,6 +11,7 @@ import {
   scaleDown,
   scaleUp
 } from './utils';
+import { addInputField } from './text';
 
 let _enabled = false;
 let _type;
@@ -220,10 +222,33 @@ function saveRect(type, rects, color) {
   let { documentId, pageNumber } = getMetadata(svg);
 
   // Add the annotation
-  PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation)
-    .then((annotation) => {
-      appendChild(svg, annotation);
-    });
+  PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation).then((annotation) => {
+    appendChild(svg, annotation);
+
+    // Add an input field.
+    if (type === 'highlight') {
+
+      let x = annotation.rectangles[0].x;
+      let y = annotation.rectangles[0].y - 20; // 20 = circle'radius(3px) + input height(14px) + α
+      let rect = svg.getBoundingClientRect();
+
+      x = scaleUp(svg, {x}).x + rect.left;
+      y = scaleUp(svg, {y}).y + rect.top;
+
+      addInputField(x, y, null, null, (textAnnotation) => {
+
+        // Set relation between arrow and text.
+        annotation.text = textAnnotation.uuid;
+
+        // Update data.
+        PDFJSAnnotate.getStoreAdapter().editAnnotation(documentId, annotation.uuid, annotation);
+
+        // Update UI.
+        $(`[data-pdf-annotate-id="${annotation.uuid}"]`).attr('data-text', textAnnotation.uuid);
+      });
+    }
+
+  });
 }
 
 /**
