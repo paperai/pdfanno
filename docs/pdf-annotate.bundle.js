@@ -12446,10 +12446,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	              } else if (annotation.type === 'highlight') {
 	                (function () {
 	                  var data = [];
+	                  // rectangles.
 	                  annotation.rectangles.forEach(function (rectangle) {
 	                    data.push([annotation.page, rectangle.x, rectangle.y, rectangle.width, rectangle.height]);
 	                  });
-	                  data.push('spanのテキスト'); // The data that will be added in future.
+	                  // span text.
+	                  var text = '';
+	                  if (annotation.text) {
+	                    var texts = container[documentId].filter(function (a) {
+	                      return a.uuid === annotation.text;
+	                    });
+	                    if (texts.length > 0) {
+	                      text = texts[0].content;
+	                    }
+	                  }
+	                  data.push(text);
+	
 	                  var key = 'span-' + indexSpan++;
 	                  annotations[key] = data;
 	
@@ -12479,12 +12491,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                // Textbox independent.
 	              } else if (annotation.type === 'textbox') {
 	
-	                console.log(annotation.content, annotation.uuid);
-	
-	                var relArrows = container[documentId].filter(function (a) {
+	                var rels = container[documentId].filter(function (a) {
+	                  // relation for arrow or highlight.
 	                  return a.text === annotation.uuid;
 	                });
-	                if (relArrows.length === 0) {
+	                if (rels.length === 0) {
 	                  console.log('text:', annotation.content);
 	                  annotations['text-' + indexText++] = [annotation.page, annotation.x, annotation.y, annotation.content];
 	                }
@@ -12579,6 +12590,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // Highlight.
 	      } else if (key.indexOf('span') === 0) {
+	        // rectangles.
 	        var rectangles = data.slice(0, data.length - 1).map(function (d) {
 	          return {
 	            x: d[1],
@@ -12587,6 +12599,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	            height: d[4]
 	          };
 	        });
+	        // span text.
+	        var spanText = data[data.length - 1];
+	        var textId = null;
+	        if (spanText) {
+	          textId = (0, _uuid2.default)();
+	          var svg = document.querySelector('.annotationLayer');
+	
+	          var x = rectangles[0].x;
+	          var y = rectangles[0].y - 20; // 20 = circle'radius(3px) + input height(14px) + α
+	
+	          _annotations.push({
+	            class: 'Annotation',
+	            type: 'textbox',
+	            uuid: textId,
+	            page: data[0][0],
+	            x: x,
+	            y: y,
+	            content: spanText,
+	            readOnly: readOnly,
+	            seq: index
+	          });
+	        }
 	        _annotations.push({
 	          class: 'Annotation',
 	          type: 'highlight',
@@ -12594,6 +12628,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          page: data[0][0],
 	          color: '#FFFF00', // TODO なくてもOK？
 	          rectangles: rectangles,
+	          text: textId,
 	          key: key, // tmp for arrow.
 	          readOnly: readOnly,
 	          seq: index
@@ -12606,7 +12641,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	          type: 'textbox',
 	          uuid: (0, _uuid2.default)(),
 	          page: data[0],
-	          size: 12, // TODO なくてもOK？
 	          x: data[1],
 	          y: data[2],
 	          content: data[3],
@@ -12627,9 +12661,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 	        var highlight2 = highlight2s[0];
 	
-	        console.log('highlight1:', highlight1);
-	        console.log('highlight2:', highlight2);
-	
 	        // Specify startPosition and endPosition.
 	        var x1 = highlight1.rectangles[0].x;
 	        var y1 = highlight1.rectangles[0].y - 5;
@@ -12639,23 +12670,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	        console.log('xy:', x1, y1, x2, y2);
 	
 	        // Specify textbox position.
-	        var svg = document.querySelector('.annotationLayer');
-	        var p = (0, _utils.scaleUp)(svg, { x1: x1, y1: y1, x2: x2, y2: y2 });
-	        var rect = svg.getBoundingClientRect();
+	        var _svg = document.querySelector('.annotationLayer');
+	        var p = (0, _utils.scaleUp)(_svg, { x1: x1, y1: y1, x2: x2, y2: y2 });
+	        var rect = _svg.getBoundingClientRect();
 	        p.x1 -= rect.left;
 	        p.y1 -= rect.top;
 	        p.x2 -= rect.left;
 	        p.y2 -= rect.top;
-	        var textPosition = (0, _utils.scaleDown)(svg, (0, _relation.getRelationTextPosition)(svg, p.x1, p.y1, p.x2, p.y2));
+	        var textPosition = (0, _utils.scaleDown)(_svg, (0, _relation.getRelationTextPosition)(_svg, p.x1, p.y1, p.x2, p.y2));
 	
 	        // Add textbox and get the uuid of if.
-	        var textId = (0, _uuid2.default)();
+	        var _textId = (0, _uuid2.default)();
 	        _annotations.push({
 	          class: 'Annotation',
 	          type: 'textbox',
-	          uuid: textId,
+	          uuid: _textId,
 	          page: data[0],
-	          size: 12, // TODO なくてもOK？
 	          x: textPosition.x,
 	          y: textPosition.y,
 	          content: data[4],
@@ -12674,7 +12704,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          y1: y1,
 	          x2: x2,
 	          y2: y2,
-	          text: textId,
+	          text: _textId,
 	          highlight1: highlight1.uuid,
 	          highlight2: highlight2.uuid,
 	          color: "FF0000", // TODO 要る？
@@ -13534,6 +13564,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  var group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 	  group.setAttribute('read-only', a.readOnly === true);
+	  group.setAttribute('data-text', a.text);
 	
 	  a.rectangles.forEach(function (r) {
 	    var rect = createRect(r);
@@ -13687,7 +13718,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.default = renderText;
 	
@@ -13705,15 +13736,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var PADDING = 0;
+	/**
+	 * Default font size for Text.
+	 */
+	var DEFAULT_FONT_SIZE = 12;
 	
+	/**
+	 * Annotation colors for secondary annotations.
+	 */
 	var textSecondaryColor = ['green', 'blue', 'purple'];
 	
+	/**
+	 * Calculate boundingClientRect that is needed for rendering text.
+	 * 
+	 * @param {String} text - A text to be renderd.
+	 * @param {SVGElement} svg - svgHTMLElement to be used for rendering text.
+	 * @return {Object} A boundingBox of text element.
+	 */
 	function getRect(text, svg) {
-	    svg.appendChild(text);
-	    var rect = text.getBoundingClientRect();
-	    text.parentNode.removeChild(text);
-	    return rect;
+	  svg.appendChild(text);
+	  var rect = text.getBoundingClientRect();
+	  text.parentNode.removeChild(text);
+	  return rect;
 	}
 	
 	/**
@@ -13725,42 +13769,42 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function renderText(a, svg) {
 	
-	    var color = void 0;
-	    if (a.readOnly) {
-	        color = textSecondaryColor[a.seq % textSecondaryColor.length];
-	    } else {
-	        color = '#F00';
-	    }
+	  var color = void 0;
+	  if (a.readOnly) {
+	    color = textSecondaryColor[a.seq % textSecondaryColor.length];
+	  } else {
+	    color = '#F00';
+	  }
 	
-	    // Text.
-	    var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-	    (0, _setAttributes2.default)(text, {
-	        x: a.x,
-	        y: a.y + parseInt(a.size, 10),
-	        fill: color,
-	        fontSize: a.size
-	    });
-	    text.innerHTML = a.content;
+	  // Text.
+	  var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+	  (0, _setAttributes2.default)(text, {
+	    x: a.x,
+	    y: a.y + parseInt(DEFAULT_FONT_SIZE, 10),
+	    fill: color,
+	    fontSize: DEFAULT_FONT_SIZE
+	  });
+	  text.innerHTML = a.content;
 	
-	    // Background.
-	    var box = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-	    var rect = getRect(text, svg);
-	    (0, _setAttributes2.default)(box, {
-	        x: a.x - PADDING,
-	        y: a.y - PADDING,
-	        width: rect.width + PADDING * 2,
-	        height: rect.height + PADDING * 2,
-	        fill: '#FFFFFF',
-	        class: 'anno-text'
-	    });
+	  // Background.
+	  var box = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+	  var rect = getRect(text, svg);
+	  (0, _setAttributes2.default)(box, {
+	    x: a.x,
+	    y: a.y,
+	    width: rect.width,
+	    height: rect.height,
+	    fill: '#FFFFFF',
+	    class: 'anno-text'
+	  });
 	
-	    // Group.
-	    var group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-	    group.setAttribute('read-only', a.readOnly === true);
+	  // Group.
+	  var group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+	  group.setAttribute('read-only', a.readOnly === true);
 	
-	    group.appendChild(box);
-	    group.appendChild(text);
-	    return group;
+	  group.appendChild(box);
+	  group.appendChild(text);
+	  return group;
 	}
 	module.exports = exports['default'];
 
@@ -15307,6 +15351,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.enableRect = enableRect;
 	exports.disableRect = disableRect;
 	
+	var _jquery = __webpack_require__(6);
+	
+	var _jquery2 = _interopRequireDefault(_jquery);
+	
 	var _PDFJSAnnotate = __webpack_require__(7);
 	
 	var _PDFJSAnnotate2 = _interopRequireDefault(_PDFJSAnnotate);
@@ -15316,6 +15364,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _appendChild2 = _interopRequireDefault(_appendChild);
 	
 	var _utils = __webpack_require__(12);
+	
+	var _text = __webpack_require__(43);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -15536,6 +15586,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  _PDFJSAnnotate2.default.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation).then(function (annotation) {
 	    (0, _appendChild2.default)(svg, annotation);
+	
+	    // Add an input field.
+	    if (type === 'highlight') {
+	
+	      var x = annotation.rectangles[0].x;
+	      var y = annotation.rectangles[0].y - 20; // 20 = circle'radius(3px) + input height(14px) + α
+	      var _rect = svg.getBoundingClientRect();
+	
+	      x = (0, _utils.scaleUp)(svg, { x: x }).x + _rect.left;
+	      y = (0, _utils.scaleUp)(svg, { y: y }).y + _rect.top;
+	
+	      (0, _text.addInputField)(x, y, null, null, function (textAnnotation) {
+	
+	        // Set relation between arrow and text.
+	        annotation.text = textAnnotation.uuid;
+	
+	        // Update data.
+	        _PDFJSAnnotate2.default.getStoreAdapter().editAnnotation(documentId, annotation.uuid, annotation);
+	
+	        // Update UI.
+	        (0, _jquery2.default)('[data-pdf-annotate-id="' + annotation.uuid + '"]').attr('data-text', textAnnotation.uuid);
+	      });
+	    }
 	  });
 	}
 	
@@ -16686,6 +16759,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	                deleteAnnotation(documentId, annotationIds, initializeMonitoringAnnotations);
 	            });
 	        } else if (type === 'highlight') {
+	            // Span text.
+	            var textId = (0, _jquery2.default)(g).attr('data-text');
+	            if (textId) {
+	                annotationIds.push(textId);
+	            }
+	            // Arrow relations.
 	            var _criteria2 = {
 	                type: 'arrow',
 	                highlight1: annotationId
@@ -16832,6 +16911,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	                setComponentVisibility(arrowElement, opacity);
 	            });
 	        });
+	
+	        if (type === 'highlight') {
+	            var textId = (0, _jquery2.default)(g).attr('data-text');
+	            if (textId) {
+	                var $g = (0, _jquery2.default)('g[data-pdf-annotate-id="' + textId + '"]');
+	                if (opacity === OPACITY_VISIBLE) {
+	                    $g.find('rect').addClass('--hover');
+	                    $g.css('opacity', opacity);
+	                } else {
+	                    $g.find('rect').removeClass('--hover');
+	                    $g.css('opacity', opacity);
+	                }
+	            }
+	        }
 	    }
 	}
 	
