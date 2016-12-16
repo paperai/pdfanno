@@ -6,6 +6,8 @@ import {
 } from '../UI/utils';
 import { getRelationTextPosition } from '../utils/relation.js';
 
+import ANNO_VERSION from '../version';
+
 const LOCALSTORAGE_KEY = '_pdfanno_pdfanno';
 const LOCALSTORAGE_KEY_SECONDARY = '_pdfanno_pdfanno_secondary';
 
@@ -167,6 +169,9 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
 
           let dataExport = {};
 
+          // Set version.
+          dataExport.version = ANNO_VERSION;
+
           // Every documents.
           let container = _getContainer();
           for (let documentId in container) {
@@ -271,6 +276,9 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
 
       importData(json) {
         return new Promise((resolve, reject) => {
+
+          // Delete version.
+          delete json.version;
 
           let container = _createContainerFromJson(json);
 
