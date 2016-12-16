@@ -1,6 +1,6 @@
 {
   "name": "paperanno",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -42,6 +42,7 @@
     "create-stylesheet": "^0.3.0",
     "express": "^4.14.0",
     "jquery": "^3.1.1",
+    "json-loader": "^0.5.4",
     "requirejs": "^2.3.2"
   }
 }
