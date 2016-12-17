@@ -83,10 +83,10 @@ export function createArrow(a, id=null) {
   */
   let arrow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
   setAttributes(arrow, {
-    d: `M ${a.x1} ${a.y1} Q ${control.x} ${control.y} ${a.x2} ${a.y2}`,
-    strokeWidth: 1,
-    fill: 'none',
-    class : 'anno-arrow'
+    d           : `M ${a.x1} ${a.y1} Q ${control.x} ${control.y} ${a.x2} ${a.y2}`,
+    strokeWidth : 1,
+    fill        : 'none',
+    class       : 'anno-arrow'
   });
 
   // Triangle for the end point.

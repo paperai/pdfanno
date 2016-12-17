@@ -29,6 +29,14 @@ function handleDocumentMouseup(e) {
   addInputField(e.clientX, e.clientY);
 }
 
+/**
+ * Show an input field for adding a text annotation.
+ *
+ * @param {Number} x - The x-axis position to show.
+ * @param {Number} y - The y-axis position to show.
+ * @param {String} selfId - The annotation id used for registration.
+ * @param {Function} finishCallback - The callback function will be called after registration.
+ */
 export function addInputField(x, y, selfId=null, text=null, finishCallback=null) {
   input = document.createElement('input');
   input.setAttribute('id', 'pdf-annotate-text-input');
@@ -71,14 +79,15 @@ export function addInputField(x, y, selfId=null, text=null, finishCallback=null)
 }
 
 /**
- * Handle input.blur event
+ * Handle input.blur event.
  */
 function handleInputBlur() {
+  console.log('handleInputBlur');
   saveText();
 }
 
 /**
- * Handle input.keyup event
+ * Handle input.keyup event.
  *
  * @param {Event} e The DOM event to handle
  */
@@ -89,7 +98,7 @@ function handleInputKeyup(e) {
 }
 
 /**
- * Save a text annotation from input
+ * Save a text annotation from input.
  */
 function saveText() {
   if (input.value.trim().length > 0) {
@@ -134,14 +143,17 @@ function saveText() {
       });
 
     addInputHistory(content);
+  
+  } else {
+    closeInput();
   }
   
 }
 
 /**
- * Close the input
+ * Close the input.
  */
-function closeInput(textAnnotation) {
+export function closeInput(textAnnotation) {
   
   if (input) {
     input.removeEventListener('blur', handleInputBlur);

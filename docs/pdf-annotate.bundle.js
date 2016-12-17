@@ -12492,6 +12492,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                });
 	                if (texts.length > 0) {
 	                  _data.push(texts[0].content);
+	                } else {
+	                  _data.push('');
 	                }
 	                annotations['rel-' + indexRel++] = _data;
 	
@@ -12690,18 +12692,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var textPosition = (0, _utils.scaleDown)(_svg, (0, _relation.getRelationTextPosition)(_svg, p.x1, p.y1, p.x2, p.y2));
 	
 	        // Add textbox and get the uuid of if.
-	        var _textId = (0, _uuid2.default)();
-	        _annotations.push({
-	          class: 'Annotation',
-	          type: 'textbox',
-	          uuid: _textId,
-	          page: data[0],
-	          x: textPosition.x,
-	          y: textPosition.y,
-	          content: data[4],
-	          readOnly: readOnly,
-	          seq: index
-	        });
+	        var _textId = null;
+	        if (data[4]) {
+	          _textId = (0, _uuid2.default)();
+	          _annotations.push({
+	            class: 'Annotation',
+	            type: 'textbox',
+	            uuid: _textId,
+	            page: data[0],
+	            x: textPosition.x,
+	            y: textPosition.y,
+	            content: data[4],
+	            readOnly: readOnly,
+	            seq: index
+	          });
+	        }
 	
 	        // Add arrow.
 	        _annotations.push({
@@ -13996,22 +14001,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var arrow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
 	  (0, _setAttributes2.default)(arrow, {
 	    d: 'M ' + a.x1 + ' ' + a.y1 + ' Q ' + control.x + ' ' + control.y + ' ' + a.x2 + ' ' + a.y2,
-	    // stroke: normalizeColor(a.color || '#f00'),
 	    strokeWidth: 1,
 	    fill: 'none',
-	    markerEnd: 'url(#arrowhead)',
 	    class: 'anno-arrow'
 	  });
 	
+	  // Triangle for the end point.
+	  if (a.direction === 'one-way' || a.direction === 'two-way') {
+	    arrow.setAttribute('marker-end', 'url(#arrowhead)');
+	  }
+	
+	  // Triangle for the start point.
 	  if (a.direction === 'two-way') {
 	    arrow.setAttribute('marker-start', 'url(#arrowhead)');
 	  }
 	
 	  if (id) {
-	    (0, _setAttributes2.default)(arrow, {
-	      id: id
-	    });
+	    (0, _setAttributes2.default)(arrow, { id: id });
 	  }
+	
 	  group.appendChild(arrow);
 	
 	  return group;
@@ -14033,23 +14041,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  // Verticale.
 	  if (x1 === x2) {
-	    // annotation.y1 += RADIUS * sign(y2 - y1);
 	    annotation.y2 += RADIUS * sign(y1 - y2);
 	    return annotation;
 	  }
 	
 	  // Horizonal.
 	  if (y1 === y2) {
-	    // annotation.x1 += RADIUS * sign(x2 - x1);
 	    annotation.x2 += RADIUS * sign(x1 - x2);
 	    return annotation;
 	  }
 	
 	  var grad = (y1 - y2) / (x1 - x2);
 	  var theta = Math.atan(grad);
-	  // annotation.x1 += RADIUS * Math.cos(theta) * sign(x2 - x1);
 	  annotation.x2 += RADIUS * Math.cos(theta) * sign(x1 - x2);
-	  // annotation.y1 += RADIUS * Math.sin(theta) * sign(y2 - y1);
 	  annotation.y2 += RADIUS * Math.sin(theta) * sign(y1 - y2);
 	  return annotation;
 	}
@@ -15680,6 +15684,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      (0, _text.addInputField)(x, y, null, null, function (textAnnotation) {
 	
+	        if (!textAnnotation) {
+	          return;
+	        }
+	
 	        // Set relation between arrow and text.
 	        annotation.text = textAnnotation.uuid;
 	
@@ -15736,6 +15744,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 	
 	exports.addInputField = addInputField;
+	exports.closeInput = closeInput;
 	exports.setText = setText;
 	exports.enableText = enableText;
 	exports.disableText = disableText;
@@ -15774,6 +15783,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  addInputField(e.clientX, e.clientY);
 	}
 	
+	/**
+	 * Show an input field for adding a text annotation.
+	 *
+	 * @param {Number} x - The x-axis position to show.
+	 * @param {Number} y - The y-axis position to show.
+	 * @param {String} selfId - The annotation id used for registration.
+	 * @param {Function} finishCallback - The callback function will be called after registration.
+	 */
 	function addInputField(x, y) {
 	  var selfId = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 	  var text = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
@@ -15820,14 +15837,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	/**
-	 * Handle input.blur event
+	 * Handle input.blur event.
 	 */
 	function handleInputBlur() {
+	  console.log('handleInputBlur');
 	  saveText();
 	}
 	
 	/**
-	 * Handle input.keyup event
+	 * Handle input.keyup event.
 	 *
 	 * @param {Event} e The DOM event to handle
 	 */
@@ -15838,7 +15856,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	/**
-	 * Save a text annotation from input
+	 * Save a text annotation from input.
 	 */
 	function saveText() {
 	  if (input.value.trim().length > 0) {
@@ -15892,11 +15910,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }();
 	
 	    if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+	  } else {
+	    closeInput();
 	  }
 	}
 	
 	/**
-	 * Close the input
+	 * Close the input.
 	 */
 	function closeInput(textAnnotation) {
 	
@@ -16423,6 +16443,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var textPosition = (0, _relation.getRelationTextPosition)(svg, start.x, start.y, end.x, end.y);
 	
 	  (0, _text.addInputField)(textPosition.x, textPosition.y, null, null, function (textAnnotation) {
+	
+	    if (!textAnnotation) {
+	      return;
+	    }
 	
 	    // Set relation between arrow and text.
 	    arrowAnnotation.text = textAnnotation.uuid;

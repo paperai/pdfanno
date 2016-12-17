@@ -111,6 +111,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            window.iframeWindow.PDFAnnotate.UI.enableArrow('one-way');
 	        } else if (type === 'arrow-two-way') {
 	            window.iframeWindow.PDFAnnotate.UI.enableArrow('two-way');
+	        } else if (type === 'link') {
+	            window.iframeWindow.PDFAnnotate.UI.enableArrow('link');
 	        } else if (type === 'rect') {
 	            window.iframeWindow.PDFAnnotate.UI.enableRect('area');
 	        } else if (type === 'text') {
@@ -252,14 +254,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function setupLoadButton() {
 	    $('#load').on('click', function (e) {
-	
-	        // // Check required.
-	        // if (!_paperName) {
-	        //     return alert('Please specify your PDF file.');
-	        // }
-	        // if (!_primaryAnnotation) {
-	        //     return alert('Please specify your primary annotation file.');
-	        // }
 	
 	        // Set data.
 	        _paperName && localStorage.setItem('_pdfanno_pdfname', _paperName);

@@ -246,6 +246,8 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                 });
                 if (texts.length > 0) {
                   data.push(texts[0].content);
+                } else {
+                  data.push('');
                 }
                 annotations[`rel-${indexRel++}`] = data;
 
@@ -440,18 +442,21 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
         let textPosition = scaleDown(svg, getRelationTextPosition(svg, p.x1, p.y1, p.x2, p.y2));
 
         // Add textbox and get the uuid of if.
-        let textId = uuid();
-        annotations.push({
-          class      : 'Annotation',
-          type       : 'textbox',
-          uuid       : textId,
-          page       : data[0],
-          x          : textPosition.x,
-          y          : textPosition.y,
-          content    : data[4],
-          readOnly,
-          seq    : index
-        });
+        let textId = null;
+        if (data[4]) {
+          textId = uuid();
+          annotations.push({
+            class      : 'Annotation',
+            type       : 'textbox',
+            uuid       : textId,
+            page       : data[0],
+            x          : textPosition.x,
+            y          : textPosition.y,
+            content    : data[4],
+            readOnly,
+            seq    : index
+          });          
+        }
 
         // Add arrow.
         annotations.push({
