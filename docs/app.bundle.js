@@ -60,15 +60,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	__webpack_require__(2);
 	
 	/**
+	 * Resize the height of PDFViewer adjusting to the window.
+	 */
+	function resizeHandler() {
+	    var height = $(window).innerHeight() - $('#viewer').offset().top;
+	    $('#viewer iframe').css('height', height + "px");
+	}
+	
+	/**
 	    Adjust the height of viewer according to window height.
 	*/
 	function adjustViewerSize() {
-	
-	    function resizeHandler() {
-	        var height = $(window).innerHeight() - $('#viewer').offset().top;
-	        $('#viewer iframe').css('height', height + "px");
-	    }
-	
+	    window.removeEventListener('resize', resizeHandler);
 	    window.addEventListener('resize', resizeHandler);
 	    resizeHandler();
 	}
@@ -111,16 +114,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            window.iframeWindow.PDFAnnotate.UI.enableArrow('one-way');
 	        } else if (type === 'arrow-two-way') {
 	            window.iframeWindow.PDFAnnotate.UI.enableArrow('two-way');
+	        } else if (type === 'link') {
+	            window.iframeWindow.PDFAnnotate.UI.enableArrow('link');
 	        } else if (type === 'rect') {
 	            window.iframeWindow.PDFAnnotate.UI.enableRect('area');
 	        } else if (type === 'text') {
 	            window.iframeWindow.PDFAnnotate.UI.enableText();
-	        } else if (type === 'download') {
-	            window.iframeWindow.PDFAnnotate.UI.enableViewMode();
-	            downloadAnnotation();
-	        } else if (type === 'delete') {
-	            window.iframeWindow.PDFAnnotate.UI.enableViewMode();
-	            deleteAnnotation();
 	        }
 	
 	        return false;
@@ -136,7 +135,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (type === 'download') {
 	            downloadAnnotation();
 	        } else if (type === 'delete') {
-	            deleteAnnotation();
+	            deleteAllAnnotations();
 	        }
 	
 	        return false;
@@ -148,7 +147,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	function downloadAnnotation() {
 	
 	    window.iframeWindow.PDFAnnotate.getStoreAdapter().exportData().then(function (annotations) {
-	        console.log('annotations:', annotations);
 	        annotations = JSON.stringify(annotations, null, '\t');
 	        var blob = new Blob([annotations]);
 	        var blobURL = window.URL.createObjectURL(blob);
@@ -161,7 +159,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	}
 	
-	function deleteAnnotation() {
+	/**
+	 * Delete all annotations.
+	 */
+	function deleteAllAnnotations() {
 	    var documentId = window.iframeWindow.getFileName(window.iframeWindow.PDFView.url);
 	    window.iframeWindow.PDFAnnotate.getStoreAdapter().deleteAnnotations(documentId).then(function () {
 	
@@ -169,8 +170,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        $('#viewer iframe').remove();
 	        $('#viewer').html('<iframe src="./pages/viewer.html" class="anno-viewer" frameborder="0"></iframe>');
 	
-	        // Re-setup.
-	        start('second');
+	        // Restart.
+	        startApplication();
 	    });
 	}
 	
@@ -193,7 +194,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	*/
 	function setupPaperButton() {
 	
-	    $('#paper').on('change', function (e) {
+	    $('#paper').off('change').on('change', function (e) {
 	
 	        var files = e.target.files;
 	        if (!files || files.length === 0) {
@@ -212,7 +213,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function setupPrimaryAnnotationButton() {
 	
 	    // The primary annotations.
-	    $('#primary-anno').on('change', function (e) {
+	    $('#primary-anno').off('change').on('change', function (e) {
 	
 	        var files = e.target.files;
 	        if (!files || files.length === 0) {
@@ -231,7 +232,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function setupSecondaryAnnotationButton() {
 	    // The secondary annotations.
-	    $('#secondary-anno').on('change', function (e) {
+	    $('#secondary-anno').off('change').on('change', function (e) {
 	
 	        var files = e.target.files;
 	        if (!files || files.length === 0) {
@@ -251,15 +252,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	function setupLoadButton() {
-	    $('#load').on('click', function (e) {
-	
-	        // // Check required.
-	        // if (!_paperName) {
-	        //     return alert('Please specify your PDF file.');
-	        // }
-	        // if (!_primaryAnnotation) {
-	        //     return alert('Please specify your primary annotation file.');
-	        // }
+	    $('#load').off('click').on('click', function (e) {
 	
 	        // Set data.
 	        _paperName && localStorage.setItem('_pdfanno_pdfname', _paperName);
@@ -272,13 +265,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        $('#viewer').html('<iframe src="./pages/viewer.html" class="anno-viewer" frameborder="0"></iframe>');
 	
 	        // Re-setup.
-	        start('second');
+	        startApplication();
 	    });
 	}
 	
-	function start() {
-	    var execMode = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'first';
-	
+	function startApplication() {
 	
 	    // Alias for convenience.
 	    window.iframeWindow = $('#viewer iframe').get(0).contentWindow;
@@ -288,13 +279,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // Adjust the height of viewer.
 	        adjustViewerSize();
 	
-	        if (execMode === 'first') {
-	            // Initialize tool buttons' behavior.
-	            initializeAnnoToolButtons();
+	        // Initialize tool buttons' behavior.
+	        initializeAnnoToolButtons();
 	
-	            // Set the behaviors of file inputs.
-	            initializeFileUploader();
-	        }
+	        // Set the behaviors of file inputs.
+	        initializeFileUploader();
 	    });
 	
 	    iframeWindow.addEventListener('annotationrendered', function (ev) {
@@ -311,7 +300,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    The entry point.
 	*/
 	window.addEventListener('DOMContentLoaded', function (e) {
-	    start();
+	    startApplication();
 	});
 
 /***/ },

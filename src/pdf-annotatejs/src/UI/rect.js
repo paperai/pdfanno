@@ -237,6 +237,10 @@ function saveRect(type, rects, color) {
 
       addInputField(x, y, null, null, (textAnnotation) => {
 
+        if (!textAnnotation) {
+          return;
+        }
+
         // Set relation between arrow and text.
         annotation.text = textAnnotation.uuid;
 

@@ -83,25 +83,27 @@ export function createArrow(a, id=null) {
   */
   let arrow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
   setAttributes(arrow, {
-    d: `M ${a.x1} ${a.y1} Q ${control.x} ${control.y} ${a.x2} ${a.y2}`,
-    // stroke: normalizeColor(a.color || '#f00'),
-    strokeWidth: 1,
-    fill: 'none',
-    markerEnd: 'url(#arrowhead)',
-    class : 'anno-arrow'
+    d           : `M ${a.x1} ${a.y1} Q ${control.x} ${control.y} ${a.x2} ${a.y2}`,
+    strokeWidth : 1,
+    fill        : 'none',
+    class       : 'anno-arrow'
   });
 
+  // Triangle for the end point.
+  if (a.direction === 'one-way' || a.direction === 'two-way') {
+    arrow.setAttribute('marker-end', 'url(#arrowhead)');
+  }
+
+  // Triangle for the start point.
   if (a.direction === 'two-way') {
     arrow.setAttribute('marker-start', 'url(#arrowhead)');
   }
 
   if (id) {
-    setAttributes(arrow, {
-      id: id
-    });
+    setAttributes(arrow, { id : id });
   }
-  group.appendChild(arrow);
 
+  group.appendChild(arrow);
 
   return group;
 }
@@ -122,23 +124,19 @@ function adjustStartEndPoint(annotation) {
 
   // Verticale.
   if (x1 === x2) {
-    // annotation.y1 += RADIUS * sign(y2 - y1);
     annotation.y2 += RADIUS * sign(y1 - y2);
     return annotation;
   }
 
   // Horizonal.
   if (y1 === y2) {
-    // annotation.x1 += RADIUS * sign(x2 - x1);
     annotation.x2 += RADIUS * sign(x1 - x2);
     return annotation;
   }
 
   let grad  = (y1-y2) / (x1-x2);
   let theta = Math.atan(grad);
-  // annotation.x1 += RADIUS * Math.cos(theta) * sign(x2 - x1);
   annotation.x2 += RADIUS * Math.cos(theta) * sign(x1 - x2);
-  // annotation.y1 += RADIUS * Math.sin(theta) * sign(y2 - y1);
   annotation.y2 += RADIUS * Math.sin(theta) * sign(y1 - y2);
   return annotation;
 

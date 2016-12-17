@@ -2,15 +2,18 @@ require("file?name=dist/index.html!./index.html");
 require("!style!css!./app.css");
 
 /**
+ * Resize the height of PDFViewer adjusting to the window.
+ */
+function resizeHandler() {
+    let height = $(window).innerHeight() - $('#viewer').offset().top;
+    $('#viewer iframe').css('height', `${height}px`);
+}
+
+/**
     Adjust the height of viewer according to window height.
 */
 function adjustViewerSize() {
-
-    function resizeHandler() {
-        let height = $(window).innerHeight() - $('#viewer').offset().top;
-        $('#viewer iframe').css('height', `${height}px`);
-    }
-
+    window.removeEventListener('resize', resizeHandler);
     window.addEventListener('resize', resizeHandler);
     resizeHandler();
 }
@@ -57,19 +60,14 @@ function initializeAnnoToolButtons() {
         } else if (type === 'arrow-two-way') {
             window.iframeWindow.PDFAnnotate.UI.enableArrow('two-way');
 
+        } else if (type === 'link') {
+            window.iframeWindow.PDFAnnotate.UI.enableArrow('link');
+
         } else if (type === 'rect') {
             window.iframeWindow.PDFAnnotate.UI.enableRect('area');
         
         } else if (type === 'text') {
             window.iframeWindow.PDFAnnotate.UI.enableText();
-        
-        } else if (type === 'download') {
-            window.iframeWindow.PDFAnnotate.UI.enableViewMode();
-            downloadAnnotation();
-        
-        } else if (type === 'delete') {
-            window.iframeWindow.PDFAnnotate.UI.enableViewMode();
-            deleteAnnotation();            
         }
 
         return false;
@@ -86,12 +84,11 @@ function initializeAnnoToolButtons() {
             downloadAnnotation();
         
         } else if (type === 'delete') {
-            deleteAnnotation();            
+            deleteAllAnnotations();            
         }
 
         return false;
     });
-
 
     $('.js-tool-btn[data-type="view"]').click();
 }
@@ -99,7 +96,6 @@ function initializeAnnoToolButtons() {
 function downloadAnnotation() {
 
     window.iframeWindow.PDFAnnotate.getStoreAdapter().exportData().then(annotations => {
-        console.log('annotations:', annotations);
         annotations = JSON.stringify(annotations, null, '\t');
         let blob = new Blob([annotations]);
         let blobURL = window.URL.createObjectURL(blob);
@@ -112,7 +108,10 @@ function downloadAnnotation() {
     });
 }
 
-function deleteAnnotation() {
+/**
+ * Delete all annotations.
+ */
+function deleteAllAnnotations() {
     let documentId = window.iframeWindow.getFileName(window.iframeWindow.PDFView.url);
     window.iframeWindow.PDFAnnotate.getStoreAdapter().deleteAnnotations(documentId).then(() => {
         
@@ -120,8 +119,8 @@ function deleteAnnotation() {
         $('#viewer iframe').remove();
         $('#viewer').html('<iframe src="./pages/viewer.html" class="anno-viewer" frameborder="0"></iframe>');
 
-        // Re-setup.
-        start('second');
+        // Restart.
+        startApplication();
     });
 }
 
@@ -144,7 +143,7 @@ function initializeFileUploader() {
 */
 function setupPaperButton() {
 
-    $('#paper').on('change', e => {
+    $('#paper').off('change').on('change', e => {
         
         let files = e.target.files;
         if (!files || files.length === 0) {
@@ -163,7 +162,7 @@ function setupPaperButton() {
 function setupPrimaryAnnotationButton() {
 
     // The primary annotations.
-    $('#primary-anno').on('change', e => {
+    $('#primary-anno').off('change').on('change', e => {
 
         let files = e.target.files;
         if (!files || files.length === 0) {
@@ -183,7 +182,7 @@ function setupPrimaryAnnotationButton() {
 
 function setupSecondaryAnnotationButton() {
     // The secondary annotations.
-    $('#secondary-anno').on('change', e => {
+    $('#secondary-anno').off('change').on('change', e => {
 
         let files = e.target.files;
         if (!files || files.length === 0) {
@@ -203,15 +202,7 @@ function setupSecondaryAnnotationButton() {
 }
 
 function setupLoadButton() {
-    $('#load').on('click', e => {
-
-        // // Check required.
-        // if (!_paperName) {
-        //     return alert('Please specify your PDF file.');
-        // }
-        // if (!_primaryAnnotation) {
-        //     return alert('Please specify your primary annotation file.');
-        // }
+    $('#load').off('click').on('click', e => {
 
         // Set data.
         _paperName && localStorage.setItem('_pdfanno_pdfname', _paperName);
@@ -224,11 +215,11 @@ function setupLoadButton() {
         $('#viewer').html('<iframe src="./pages/viewer.html" class="anno-viewer" frameborder="0"></iframe>');
 
         // Re-setup.
-        start('second');
+        startApplication();
     });
 }
 
-function start(execMode='first') {
+function startApplication() {
 
     // Alias for convenience.
     window.iframeWindow = $('#viewer iframe').get(0).contentWindow;
@@ -238,13 +229,11 @@ function start(execMode='first') {
         // Adjust the height of viewer.
         adjustViewerSize();
 
-        if (execMode === 'first') {
-            // Initialize tool buttons' behavior.
-            initializeAnnoToolButtons();
+        // Initialize tool buttons' behavior.
+        initializeAnnoToolButtons();
 
-            // Set the behaviors of file inputs.
-            initializeFileUploader();            
-        }
+        // Set the behaviors of file inputs.
+        initializeFileUploader();            
     });
 
     iframeWindow.addEventListener('annotationrendered', (ev) => {
@@ -261,5 +250,5 @@ function start(execMode='first') {
     The entry point.
 */
 window.addEventListener('DOMContentLoaded', e => {
-    start();
+    startApplication();
 });

@@ -196,6 +196,10 @@ function showTextInput(start, end, arrowAnnotation) {
 
   addInputField(textPosition.x, textPosition.y, null, null, (textAnnotation) => {
 
+    if (!textAnnotation) {
+      return;
+    }
+
     // Set relation between arrow and text.
     arrowAnnotation.text = textAnnotation.uuid;
 
