@@ -1,6 +1,9 @@
 require("!style!css!./pdf-annotate.css");
 import $ from 'jquery';
 
+// import { svgLayerId } from './consts';
+
+
 // The entry point of window.xxx.
 // (setting from webpack.config.js)
 import PDFJSAnnotate from './src/PDFJSAnnotate';
@@ -13,6 +16,7 @@ window.addEventListener('DOMContentLoaded', function() {
     // Setup Storage.
     PDFAnnotate.setStoreAdapter(new PDFAnnotate.PdfannoStoreAdapter());
 
+    // TODO remove.
     // Settings.
     let textSize = 12;
     let textColor = '#FF0000';
@@ -21,33 +25,89 @@ window.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('pagerendered', function(ev) {
         console.log('pagerendered:', ev.detail.pageNumber);
 
-        // Create SVG layer.
-        let $textLayer = $(ev.target).find('.textLayer');
-        let $svg = $('<svg class="annotationLayer"/>');
-        $svg.insertBefore($textLayer);
-        let svg = $svg.get(0);
+        renderAnno();
 
-        let documentId = getFileName(PDFView.url);
-        let viewport = PDFView.pdfViewer.getPageView(0).viewport;
-        svg.setAttribute('data-pdf-annotate-viewport', JSON.stringify(viewport));
-        svg.setAttribute('data-pdf-annotate-document', documentId);
-        svg.setAttribute('data-pdf-annotate-page', pageNumber);
-        svg.setAttribute('width', viewport.width);
-        svg.setAttribute('height', viewport.height);
-        svg.style.width = `${viewport.width}px`;
-        svg.style.height = `${viewport.height}px`;
+        // // Create SVG layer.
+        // let $textLayer = $(ev.target).find('.textLayer');
+        // let $svg = $('<svg class="annotationLayer"/>');
+        // $svg.insertBefore($textLayer);
+        // let svg = $svg.get(0);
 
-        // Import user uploading annotation, if exists.
-        if (uploadedAnnotationExists()) {
-            importUploadedAnnotation().then(() => {
-                renderAnnotations(svg, ev.detail.pageNumber);
-            });
-        } else {
-            renderAnnotations(svg, ev.detail.pageNumber);
-        }
+        // let documentId = getFileName(PDFView.url);
+        // let viewport = PDFView.pdfViewer.getPageView(0).viewport;
+        // svg.setAttribute('data-pdf-annotate-viewport', JSON.stringify(viewport));
+        // svg.setAttribute('data-pdf-annotate-document', documentId);
+        // svg.setAttribute('data-pdf-annotate-page', pageNumber);
+        // svg.setAttribute('width', viewport.width);
+        // svg.setAttribute('height', viewport.height);
+        // svg.style.width = `${viewport.width}px`;
+        // svg.style.height = `${viewport.height}px`;
+
+        // // Import user uploading annotation, if exists.
+        // if (uploadedAnnotationExists()) {
+        //     importUploadedAnnotation().then(() => {
+        //         renderAnnotations(svg, ev.detail.pageNumber);
+        //     });
+        // } else {
+        //     renderAnnotations(svg, ev.detail.pageNumber);
+        // }
     });
 
 });
+
+function renderAnno() {
+
+    // TODO make it a global const.
+    const svgLayerId = 'annoLayer';
+
+    // Check already exists.
+    if ($('#' + svgLayerId).length > 0) {
+        return;
+    }
+
+    // Add an annotation layer.
+    let $annoLayer = $(`<svg id="${svgLayerId}"/>`).css({   // TODO CSSClass.
+        position : 'absolute',
+        top      : '0px',
+        left     : '0px',
+        width    : '100%',
+        height   : $('#viewer').height() + 'px',
+        visibility : 'hidden'
+    });
+    $('#viewerContainer').append($annoLayer);
+
+    // Create SVG layer.
+    // let $textLayer = $(ev.target).find('.textLayer');
+    // let $svg = $('<svg class="annotationLayer"/>');
+    // $svg.insertBefore($textLayer);
+
+    let svg = $annoLayer.get(0);
+    let documentId = getFileName(PDFView.url);
+    let viewport = PDFView.pdfViewer.getPageView(0).viewport;
+    svg.setAttribute('data-pdf-annotate-viewport', JSON.stringify(viewport));
+    svg.setAttribute('data-pdf-annotate-document', documentId);
+    // svg.setAttribute('data-pdf-annotate-page', pageNumber);
+    svg.setAttribute('data-pdf-annotate-page', 1);
+    // svg.setAttribute('width', viewport.width);
+    // svg.setAttribute('height', viewport.height);
+    // svg.style.width = `${viewport.width}px`;
+    // svg.style.height = `${viewport.height}px`;
+
+    // Import user uploading annotation, if exists.
+    if (uploadedAnnotationExists()) {
+        importUploadedAnnotation().then(() => {
+            // renderAnnotations(svg, ev.detail.pageNumber);
+            renderAnnotations(svg, 1);
+        });
+    } else {
+        // renderAnnotations(svg, ev.detail.pageNumber);
+        renderAnnotations(svg, 1);
+    }
+
+
+}
+
+
 
 function renderAnnotations(svg, pageNumber) {
     let documentId = getFileName(PDFView.url);

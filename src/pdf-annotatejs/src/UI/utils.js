@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import createStyleSheet from 'create-stylesheet';
 
 export const BORDER_COLOR = '#00BFFF';
@@ -40,19 +41,38 @@ export function findSVGContainer(node) {
  * @return {SVGElement} The container SVG or null if one can't be found
  */
 export function findSVGAtPoint(x, y) {
-  let elements = document.querySelectorAll('svg[data-pdf-annotate-container="true"]');
 
-  for (let i=0, l=elements.length; i<l; i++) {
-    let el = elements[i];
-    let rect = el.getBoundingClientRect();
+  // TODO make it a global const.
+  const svgLayerId = 'annoLayer';
 
-    if (pointIntersectsRect(x, y, rect)) {
+  let el = document.getElementById(svgLayerId);
+  if (!el) {
+    return;
+  }
 
-      return el;
-    }
+  let rect = el.getBoundingClientRect();
+
+  if (pointIntersectsRect(x, y, rect)) {
+
+    return el;
   }
 
   return null;
+
+
+  // let elements = document.querySelectorAll('svg[data-pdf-annotate-container="true"]');
+
+  // for (let i=0, l=elements.length; i<l; i++) {
+  //   let el = elements[i];
+  //   let rect = el.getBoundingClientRect();
+
+  //   if (pointIntersectsRect(x, y, rect)) {
+
+  //     return el;
+  //   }
+  // }
+
+  // return null;
 }
 
 /**
@@ -308,3 +328,22 @@ export function getMetadata(svg) {
     viewport: JSON.parse(svg.getAttribute('data-pdf-annotate-viewport'))
   };
 }
+
+export function getXY(e) {
+
+  let rect = $('#annoLayer')[0].getBoundingClientRect();
+
+  // let x = e.clientX - rect.left;
+  // let y = $('#annoLayer').scrollTop() + e.clientY - rect.top;
+
+  let x = e.clientX - rect.left;
+  let y = e.clientY + $('#annoLayer').scrollTop() - rect.top;
+
+  return { x, y }
+}
+
+export function getSVG() {
+  return $('#annoLayer')[0];
+}
+
+
