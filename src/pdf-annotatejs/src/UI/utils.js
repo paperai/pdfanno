@@ -347,8 +347,10 @@ export function getXY(e) {
   return { x, y }
 }
 
-export function getSVG() {
-  return $('#annoLayer')[0];
+export function getSVGLayer() {
+  return document.getElementById('annoLayer');
 }
 
-
+export function getViewerContainer() {
+  return document.getElementById('viewerContainer');
+}

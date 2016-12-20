@@ -22,37 +22,12 @@ window.addEventListener('DOMContentLoaded', function() {
     let textColor = '#FF0000';
     PDFAnnotate.UI.setText(textSize, textColor);
 
-    window.addEventListener('pagerendered', function(ev) {
-        console.log('pagerendered:', ev.detail.pageNumber);
 
-        renderAnno();
+});
 
-        // // Create SVG layer.
-        // let $textLayer = $(ev.target).find('.textLayer');
-        // let $svg = $('<svg class="annotationLayer"/>');
-        // $svg.insertBefore($textLayer);
-        // let svg = $svg.get(0);
-
-        // let documentId = getFileName(PDFView.url);
-        // let viewport = PDFView.pdfViewer.getPageView(0).viewport;
-        // svg.setAttribute('data-pdf-annotate-viewport', JSON.stringify(viewport));
-        // svg.setAttribute('data-pdf-annotate-document', documentId);
-        // svg.setAttribute('data-pdf-annotate-page', pageNumber);
-        // svg.setAttribute('width', viewport.width);
-        // svg.setAttribute('height', viewport.height);
-        // svg.style.width = `${viewport.width}px`;
-        // svg.style.height = `${viewport.height}px`;
-
-        // // Import user uploading annotation, if exists.
-        // if (uploadedAnnotationExists()) {
-        //     importUploadedAnnotation().then(() => {
-        //         renderAnnotations(svg, ev.detail.pageNumber);
-        //     });
-        // } else {
-        //     renderAnnotations(svg, ev.detail.pageNumber);
-        // }
-    });
-
+window.addEventListener('pagerendered', function(ev) {
+    console.log('pagerendered:', ev.detail.pageNumber);
+    renderAnno();
 });
 
 function renderAnno() {
@@ -76,38 +51,22 @@ function renderAnno() {
     });
     $('#viewerContainer').append($annoLayer);
 
-    // Create SVG layer.
-    // let $textLayer = $(ev.target).find('.textLayer');
-    // let $svg = $('<svg class="annotationLayer"/>');
-    // $svg.insertBefore($textLayer);
-
     let svg = $annoLayer.get(0);
     let documentId = getFileName(PDFView.url);
     let viewport = PDFView.pdfViewer.getPageView(0).viewport;
     svg.setAttribute('data-pdf-annotate-viewport', JSON.stringify(viewport));
     svg.setAttribute('data-pdf-annotate-document', documentId);
-    // svg.setAttribute('data-pdf-annotate-page', pageNumber);
     svg.setAttribute('data-pdf-annotate-page', 1);
-    // svg.setAttribute('width', viewport.width);
-    // svg.setAttribute('height', viewport.height);
-    // svg.style.width = `${viewport.width}px`;
-    // svg.style.height = `${viewport.height}px`;
 
     // Import user uploading annotation, if exists.
     if (uploadedAnnotationExists()) {
         importUploadedAnnotation().then(() => {
-            // renderAnnotations(svg, ev.detail.pageNumber);
             renderAnnotations(svg, 1);
         });
     } else {
-        // renderAnnotations(svg, ev.detail.pageNumber);
         renderAnnotations(svg, 1);
     }
-
-
 }
-
-
 
 function renderAnnotations(svg, pageNumber) {
     let documentId = getFileName(PDFView.url);
@@ -117,16 +76,8 @@ function renderAnnotations(svg, pageNumber) {
             // Primary + Secondary annotations.
             annotations.annotations = annotations.annotations.concat(secondaryAnnotations.annotations);
 
-            // Adjust screen scale change.
+            // Render annotations.
             let viewport = PDFView.pdfViewer.getPageView(0).viewport;
-            // svg.setAttribute('data-pdf-annotate-viewport', JSON.stringify(viewport));
-            // svg.setAttribute('data-pdf-annotate-document', documentId);
-            // svg.setAttribute('data-pdf-annotate-page', pageNumber);
-            // svg.setAttribute('width', viewport.width);
-            // svg.setAttribute('height', viewport.height);
-            // svg.style.width = `${viewport.width}px`;
-            // svg.style.height = `${viewport.height}px`;
-
             PDFAnnotate.render(svg, viewport, annotations);
 
             var event = document.createEvent('CustomEvent');
@@ -137,7 +88,6 @@ function renderAnnotations(svg, pageNumber) {
         });
     });
 }
-
 
 function uploadedAnnotationExists() {
     let item = localStorage.getItem('_pdfanno_pdfanno_upload');
