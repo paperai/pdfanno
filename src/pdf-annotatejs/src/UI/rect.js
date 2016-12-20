@@ -34,7 +34,6 @@ function getSelectionRects() {
     if (rects.length > 0 &&
         rects[0].width > 0 &&
         rects[0].height > 0) {
-      console.log('getSelectionRects:', rects);
       return rects;
     }
   } catch (e) {}
@@ -53,24 +52,14 @@ function handleDocumentMousedown(e) {
     return;
   }
 
-  // let rect = svg.getBoundingClientRect();
-  // console.log('rect:', rect);
-  // originY = e.clientY;
-  // originX = e.clientX;
-
   let { x, y } = getXY(e);
   originX = x;
   originY = y;
 
-
-
   overlay = document.createElement('div');
   overlay.style.position = 'absolute';
-  // overlay.style.top = `${originY - rect.top}px`;
-  // overlay.style.left = `${originX - rect.left}px`;
   overlay.style.top = `${originY}px`;
   overlay.style.left = `${originX}px`;
-
   overlay.style.border = `2px solid ${BORDER_COLOR}`;
   overlay.style.boxSizing = 'border-box';
   svg.parentNode.appendChild(overlay);
@@ -85,14 +74,8 @@ function handleDocumentMousedown(e) {
  * @param {Event} e The DOM event to handle
  */
 function handleDocumentMousemove(e) {
-  // let svg = overlay.parentNode.querySelector('svg.annotationLayer');
 
   let { x : curX, y : curY } = getXY(e);
-
-
-
-  // let svg = document.getElementById('annoLayer'); // TODO make it const.
-  // let rect = svg.getBoundingClientRect();
 
   let x      = Math.min(originX, curX);
   let y      = Math.min(originY, curY);
@@ -123,7 +106,6 @@ function handleDocumentMouseup(e) {
       };
     }));
   } else if (_type === 'area' && overlay) {
-    // let svg = overlay.parentNode.querySelector('svg.annotationLayer');
     let svg = document.getElementById('annoLayer'); // TODO make it const.
     let rect = svg.getBoundingClientRect();
     saveRect(_type, [{
