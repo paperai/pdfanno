@@ -432,7 +432,8 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
         console.log('xy:', x1, y1, x2, y2);
 
         // Specify textbox position.
-        let svg = document.querySelector('.annotationLayer');
+        // let svg = document.querySelector('.annotationLayer');
+        let svg = document.getElementById('annoLayer'); // TODO make it const.
         let p = scaleUp(svg, { x1, y1, x2, y2 });
         let rect = svg.getBoundingClientRect();
         p.x1 -= rect.left;

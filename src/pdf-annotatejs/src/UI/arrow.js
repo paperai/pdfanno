@@ -204,7 +204,8 @@ function showTextInput(start, end, arrowAnnotation) {
     arrowAnnotation.text = textAnnotation.uuid;
 
     // Update.
-    let element = document.querySelector('.annotationLayer');
+    // let element = document.querySelector('.annotationLayer');
+    let element = document.getElementById('annoLayer'); // TODO make it const.
     let documentId = element.getAttribute('data-pdf-annotate-document');  // 共通化
     PDFJSAnnotate.getStoreAdapter().editAnnotation(documentId, arrowAnnotation.uuid, arrowAnnotation);
 
@@ -281,9 +282,11 @@ function saveArrow(x, y) {
 */
 function showBoundingBox() {
 
-  svg = document
-              .querySelector('#pageContainer' + PDFView.page)
-              .querySelector('svg');
+  // svg = document
+  //             .querySelector('#pageContainer' + PDFView.page)
+  //             .querySelector('svg');
+
+  svg = document.getElementById('annoLayer'); // TODO make it const.
 
   // Collect boundingCircles for highlight.
   boundingCircles = [];

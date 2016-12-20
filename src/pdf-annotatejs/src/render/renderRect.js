@@ -50,6 +50,7 @@ function createHighlight(a) {
     y    : rect.y - DEFAULT_RADIUS,
     type : 'boundingCircle'
   });
+  group.style.visibility = 'visible';
   group.appendChild(circle);
 
   return group;
@@ -74,6 +75,7 @@ function createRectBox(a) {
 
   let group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   group.setAttribute('read-only', a.readOnly === true);
+  group.style.visibility = 'visible';
   
   group.appendChild(rect);
 
