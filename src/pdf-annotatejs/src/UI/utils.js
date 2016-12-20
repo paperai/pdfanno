@@ -336,8 +336,13 @@ export function getXY(e) {
   // let x = e.clientX - rect.left;
   // let y = $('#annoLayer').scrollTop() + e.clientY - rect.top;
 
-  let x = e.clientX - rect.left;
+  // let x = e.clientX - rect.left;
   let y = e.clientY + $('#annoLayer').scrollTop() - rect.top;
+
+  let x = e.clientX - rect.left;
+  // let y = e.clientY - rect.top;
+
+  console.log('e.client:', e.clientX, e.clientY);
 
   return { x, y }
 }

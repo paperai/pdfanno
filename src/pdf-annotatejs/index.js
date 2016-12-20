@@ -119,13 +119,13 @@ function renderAnnotations(svg, pageNumber) {
 
             // Adjust screen scale change.
             let viewport = PDFView.pdfViewer.getPageView(0).viewport;
-            svg.setAttribute('data-pdf-annotate-viewport', JSON.stringify(viewport));
-            svg.setAttribute('data-pdf-annotate-document', documentId);
-            svg.setAttribute('data-pdf-annotate-page', pageNumber);
-            svg.setAttribute('width', viewport.width);
-            svg.setAttribute('height', viewport.height);
-            svg.style.width = `${viewport.width}px`;
-            svg.style.height = `${viewport.height}px`;
+            // svg.setAttribute('data-pdf-annotate-viewport', JSON.stringify(viewport));
+            // svg.setAttribute('data-pdf-annotate-document', documentId);
+            // svg.setAttribute('data-pdf-annotate-page', pageNumber);
+            // svg.setAttribute('width', viewport.width);
+            // svg.setAttribute('height', viewport.height);
+            // svg.style.width = `${viewport.width}px`;
+            // svg.style.height = `${viewport.height}px`;
 
             PDFAnnotate.render(svg, viewport, annotations);
 

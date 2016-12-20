@@ -97,7 +97,7 @@ function handleDocumentMousemove(e) {
   let x      = Math.min(originX, curX);
   let y      = Math.min(originY, curY);
   let width  = Math.abs(originX - curX);
-  let height = Math.abs(originY - e.clientY);
+  let height = Math.abs(originY - curY);
 
   overlay.style.left   = x + 'px';
   overlay.style.top    = y + 'px';
