@@ -259,9 +259,8 @@ function saveRect(type, rects, color) {
 /**
  * Enable rect behavior
  */
-export function enableRect() {
-  // _type = type;
-  _type = 'area';
+export function enableHighlight() {
+  _type = 'highlight';
   
   if (_enabled) { return; }
 
@@ -274,7 +273,7 @@ export function enableRect() {
 /**
  * Disable rect behavior
  */
-export function disableRect() {
+export function disableHighlight() {
   if (!_enabled) { return; }
 
   _enabled = false;
