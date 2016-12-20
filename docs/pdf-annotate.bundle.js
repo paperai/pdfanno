@@ -70,7 +70,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	__webpack_require__(51);
+	__webpack_require__(54);
+	
+	// import { svgLayerId } from './consts';
+	
 	
 	// The entry point of window.xxx.
 	// (setting from webpack.config.js)
@@ -84,40 +87,55 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Setup Storage.
 	    PDFAnnotate.setStoreAdapter(new PDFAnnotate.PdfannoStoreAdapter());
 	
+	    // TODO remove.
 	    // Settings.
 	    var textSize = 12;
 	    var textColor = '#FF0000';
 	    PDFAnnotate.UI.setText(textSize, textColor);
-	
-	    window.addEventListener('pagerendered', function (ev) {
-	        console.log('pagerendered:', ev.detail.pageNumber);
-	
-	        // Create SVG layer.
-	        var $textLayer = (0, _jquery2.default)(ev.target).find('.textLayer');
-	        var $svg = (0, _jquery2.default)('<svg class="annotationLayer"/>');
-	        $svg.insertBefore($textLayer);
-	        var svg = $svg.get(0);
-	
-	        var documentId = getFileName(PDFView.url);
-	        var viewport = PDFView.pdfViewer.getPageView(0).viewport;
-	        svg.setAttribute('data-pdf-annotate-viewport', JSON.stringify(viewport));
-	        svg.setAttribute('data-pdf-annotate-document', documentId);
-	        svg.setAttribute('data-pdf-annotate-page', pageNumber);
-	        svg.setAttribute('width', viewport.width);
-	        svg.setAttribute('height', viewport.height);
-	        svg.style.width = viewport.width + 'px';
-	        svg.style.height = viewport.height + 'px';
-	
-	        // Import user uploading annotation, if exists.
-	        if (uploadedAnnotationExists()) {
-	            importUploadedAnnotation().then(function () {
-	                renderAnnotations(svg, ev.detail.pageNumber);
-	            });
-	        } else {
-	            renderAnnotations(svg, ev.detail.pageNumber);
-	        }
-	    });
 	});
+	
+	window.addEventListener('pagerendered', function (ev) {
+	    console.log('pagerendered:', ev.detail.pageNumber);
+	    renderAnno();
+	});
+	
+	function renderAnno() {
+	
+	    // TODO make it a global const.
+	    var svgLayerId = 'annoLayer';
+	
+	    // Check already exists.
+	    if ((0, _jquery2.default)('#' + svgLayerId).length > 0) {
+	        return;
+	    }
+	
+	    // Add an annotation layer.
+	    var $annoLayer = (0, _jquery2.default)('<svg id="' + svgLayerId + '"/>').css({ // TODO CSSClass.
+	        position: 'absolute',
+	        top: '0px',
+	        left: '0px',
+	        width: '100%',
+	        height: (0, _jquery2.default)('#viewer').height() + 'px',
+	        visibility: 'hidden'
+	    });
+	    (0, _jquery2.default)('#viewerContainer').append($annoLayer);
+	
+	    var svg = $annoLayer.get(0);
+	    var documentId = getFileName(PDFView.url);
+	    var viewport = PDFView.pdfViewer.getPageView(0).viewport;
+	    svg.setAttribute('data-pdf-annotate-viewport', JSON.stringify(viewport));
+	    svg.setAttribute('data-pdf-annotate-document', documentId);
+	    svg.setAttribute('data-pdf-annotate-page', 1);
+	
+	    // Import user uploading annotation, if exists.
+	    if (uploadedAnnotationExists()) {
+	        importUploadedAnnotation().then(function () {
+	            renderAnnotations(svg, 1);
+	        });
+	    } else {
+	        renderAnnotations(svg, 1);
+	    }
+	}
 	
 	function renderAnnotations(svg, pageNumber) {
 	    var documentId = getFileName(PDFView.url);
@@ -127,16 +145,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // Primary + Secondary annotations.
 	            annotations.annotations = annotations.annotations.concat(secondaryAnnotations.annotations);
 	
-	            // Adjust screen scale change.
+	            // Render annotations.
 	            var viewport = PDFView.pdfViewer.getPageView(0).viewport;
-	            svg.setAttribute('data-pdf-annotate-viewport', JSON.stringify(viewport));
-	            svg.setAttribute('data-pdf-annotate-document', documentId);
-	            svg.setAttribute('data-pdf-annotate-page', pageNumber);
-	            svg.setAttribute('width', viewport.width);
-	            svg.setAttribute('height', viewport.height);
-	            svg.style.width = viewport.width + 'px';
-	            svg.style.height = viewport.height + 'px';
-	
 	            PDFAnnotate.render(svg, viewport, annotations);
 	
 	            var event = document.createEvent('CustomEvent');
@@ -10753,7 +10763,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	__webpack_require__(49);
+	__webpack_require__(52);
 	
 	exports.default = {
 	  /**
@@ -11660,6 +11670,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.disableUserSelect = disableUserSelect;
 	exports.enableUserSelect = enableUserSelect;
 	exports.getMetadata = getMetadata;
+	exports.getXY = getXY;
+	exports.getSVGLayer = getSVGLayer;
+	exports.getViewerContainer = getViewerContainer;
+	
+	var _jquery = __webpack_require__(6);
+	
+	var _jquery2 = _interopRequireDefault(_jquery);
 	
 	var _createStylesheet = __webpack_require__(13);
 	
@@ -11705,19 +11722,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @return {SVGElement} The container SVG or null if one can't be found
 	 */
 	function findSVGAtPoint(x, y) {
-	  var elements = document.querySelectorAll('svg[data-pdf-annotate-container="true"]');
 	
-	  for (var i = 0, l = elements.length; i < l; i++) {
-	    var el = elements[i];
-	    var rect = el.getBoundingClientRect();
+	  // TODO make it a global const.
+	  var svgLayerId = 'annoLayer';
 	
-	    if (pointIntersectsRect(x, y, rect)) {
+	  var el = document.getElementById(svgLayerId);
+	  if (!el) {
+	    return;
+	  }
 	
-	      return el;
-	    }
+	  var rect = el.getBoundingClientRect();
+	
+	  if (pointIntersectsRect(x, y, rect)) {
+	
+	    return el;
 	  }
 	
 	  return null;
+	
+	  // let elements = document.querySelectorAll('svg[data-pdf-annotate-container="true"]');
+	
+	  // for (let i=0, l=elements.length; i<l; i++) {
+	  //   let el = elements[i];
+	  //   let rect = el.getBoundingClientRect();
+	
+	  //   if (pointIntersectsRect(x, y, rect)) {
+	
+	  //     return el;
+	  //   }
+	  // }
+	
+	  // return null;
 	}
 	
 	/**
@@ -12001,6 +12036,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	    pageNumber: parseInt(svg.getAttribute('data-pdf-annotate-page'), 10),
 	    viewport: JSON.parse(svg.getAttribute('data-pdf-annotate-viewport'))
 	  };
+	}
+	
+	function getXY(e) {
+	
+	  var rect = (0, _jquery2.default)('#annoLayer')[0].getBoundingClientRect();
+	
+	  // let x = e.clientX - rect.left;
+	  // let y = $('#annoLayer').scrollTop() + e.clientY - rect.top;
+	
+	  // let x = e.clientX - rect.left;
+	  var y = e.clientY + (0, _jquery2.default)('#annoLayer').scrollTop() - rect.top;
+	
+	  var x = e.clientX - rect.left;
+	  // let y = e.clientY - rect.top;
+	
+	  console.log('e.client:', e.clientX, e.clientY);
+	
+	  return { x: x, y: y };
+	}
+	
+	function getSVGLayer() {
+	  return document.getElementById('annoLayer');
+	}
+	
+	function getViewerContainer() {
+	  return document.getElementById('viewerContainer');
 	}
 
 /***/ },
@@ -12682,7 +12743,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        console.log('xy:', x1, y1, x2, y2);
 	
 	        // Specify textbox position.
-	        var _svg = document.querySelector('.annotationLayer');
+	        // let svg = document.querySelector('.annotationLayer');
+	        var _svg = document.getElementById('annoLayer'); // TODO make it const.
 	        var p = (0, _utils.scaleUp)(_svg, { x1: x1, y1: y1, x2: x2, y2: y2 });
 	        var rect = _svg.getBoundingClientRect();
 	        p.x1 -= rect.left;
@@ -12980,13 +13042,15 @@ return /******/ (function(modules) { // webpackBootstrap
 		"homepage": "https://github.com/paperai/paperanno#readme",
 		"devDependencies": {
 			"babel-cli": "^6.14.0",
-			"babel-core": "6.7.4",
+			"babel-core": "^6.21.0",
 			"babel-loader": "6.2.4",
 			"babel-plugin-add-module-exports": "^0.2.1",
 			"babel-preset-es2015": "^6.6.0",
+			"babel-preset-stage-1": "^6.16.0",
 			"copy": "^0.3.0",
 			"cpr": "^2.0.0",
 			"css-loader": "^0.25.0",
+			"deep-assign": "^2.0.0",
 			"file-loader": "^0.9.0",
 			"fs-extra": "^1.0.0",
 			"gulp": "^3.9.1",
@@ -13666,6 +13730,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    y: rect.y - _renderCircle.DEFAULT_RADIUS,
 	    type: 'boundingCircle'
 	  });
+	  group.style.visibility = 'visible';
 	  group.appendChild(circle);
 	
 	  return group;
@@ -13690,6 +13755,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  var group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 	  group.setAttribute('read-only', a.readOnly === true);
+	  group.style.visibility = 'visible';
 	
 	  group.appendChild(rect);
 	
@@ -13887,6 +13953,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // Group.
 	  var group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 	  group.setAttribute('read-only', a.readOnly === true);
+	  group.style.visibility = 'visible';
 	
 	  group.appendChild(box);
 	  group.appendChild(text);
@@ -13963,6 +14030,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    'data-highlight2': a.highlight2,
 	    'data-text': a.text
 	  });
+	  group.style.visibility = 'visible';
 	  group.setAttribute('read-only', a.readOnly === true);
 	
 	  var marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
@@ -14664,13 +14732,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _rect = __webpack_require__(44);
 	
-	var _text = __webpack_require__(45);
+	var _highlight = __webpack_require__(48);
 	
-	var _page = __webpack_require__(46);
+	var _text = __webpack_require__(47);
 	
-	var _arrow = __webpack_require__(47);
+	var _page = __webpack_require__(49);
 	
-	var _view = __webpack_require__(48);
+	var _arrow = __webpack_require__(50);
+	
+	var _view = __webpack_require__(51);
 	
 	// extends.
 	exports.default = {
@@ -14679,6 +14749,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  disablePen: _pen.disablePen, enablePen: _pen.enablePen, setPen: _pen.setPen,
 	  disablePoint: _point.disablePoint, enablePoint: _point.enablePoint,
 	  disableRect: _rect.disableRect, enableRect: _rect.enableRect,
+	  disableHighlight: _highlight.disableHighlight, enableHighlight: _highlight.enableHighlight,
 	  disableText: _text.disableText, enableText: _text.enableText, setText: _text.setText,
 	  createPage: _page.createPage, renderPage: _page.renderPage,
 	
@@ -15440,6 +15511,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _jquery2 = _interopRequireDefault(_jquery);
 	
+	var _deepAssign = __webpack_require__(45);
+	
+	var _deepAssign2 = _interopRequireDefault(_deepAssign);
+	
 	var _PDFJSAnnotate = __webpack_require__(7);
 	
 	var _PDFJSAnnotate2 = _interopRequireDefault(_PDFJSAnnotate);
@@ -15450,36 +15525,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(12);
 	
-	var _text = __webpack_require__(45);
+	var _text = __webpack_require__(47);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+	var _type = 'area';
 	
 	var _enabled = false;
-	var _type = void 0;
 	var overlay = void 0;
 	var originY = void 0;
 	var originX = void 0;
-	
-	/**
-	 * Get the current window selection as rects
-	 *
-	 * @return {Array} An Array of rects
-	 */
-	function getSelectionRects() {
-	  try {
-	    var selection = window.getSelection();
-	    var range = selection.getRangeAt(0);
-	    var rects = range.getClientRects();
-	
-	    if (rects.length > 0 && rects[0].width > 0 && rects[0].height > 0) {
-	      return rects;
-	    }
-	  } catch (e) {}
-	
-	  return null;
-	}
 	
 	/**
 	 * Handle document.mousedown event
@@ -15487,25 +15542,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {Event} e The DOM event to handle
 	 */
 	function handleDocumentMousedown(e) {
-	  var svg = void 0;
-	  if (_type !== 'area' || !(svg = (0, _utils.findSVGAtPoint)(e.clientX, e.clientY))) {
-	    return;
-	  }
+	  var _getXY = (0, _utils.getXY)(e),
+	      x = _getXY.x,
+	      y = _getXY.y;
 	
-	  var rect = svg.getBoundingClientRect();
-	  originY = e.clientY;
-	  originX = e.clientX;
+	  originX = x;
+	  originY = y;
 	
 	  overlay = document.createElement('div');
 	  overlay.style.position = 'absolute';
-	  overlay.style.top = originY - rect.top + 'px';
-	  overlay.style.left = originX - rect.left + 'px';
+	  overlay.style.top = originY + 'px';
+	  overlay.style.left = originX + 'px';
 	  overlay.style.border = '2px solid ' + _utils.BORDER_COLOR;
 	  overlay.style.boxSizing = 'border-box';
-	  svg.parentNode.appendChild(overlay);
+	  (0, _utils.getViewerContainer)().appendChild(overlay);
 	
 	  document.addEventListener('mousemove', handleDocumentMousemove);
-	  (0, _utils.disableUserSelect)();
 	}
 	
 	/**
@@ -15514,13 +15566,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {Event} e The DOM event to handle
 	 */
 	function handleDocumentMousemove(e) {
-	  var svg = overlay.parentNode.querySelector('svg.annotationLayer');
-	  var rect = svg.getBoundingClientRect();
+	  var _getXY2 = (0, _utils.getXY)(e),
+	      curX = _getXY2.x,
+	      curY = _getXY2.y;
 	
-	  var x = Math.min(originX, e.clientX) - rect.left;
-	  var y = Math.min(originY, e.clientY) - rect.top;
-	  var width = Math.abs(originX - e.clientX);
-	  var height = Math.abs(originY - e.clientY);
+	  var x = Math.min(originX, curX);
+	  var y = Math.min(originY, curY);
+	  var width = Math.abs(originX - curX);
+	  var height = Math.abs(originY - curY);
 	
 	  overlay.style.left = x + 'px';
 	  overlay.style.top = y + 'px';
@@ -15534,178 +15587,53 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {Event} e The DOM event to handle
 	 */
 	function handleDocumentMouseup(e) {
-	  var rects = void 0;
-	  if (_type !== 'area' && (rects = getSelectionRects())) {
-	    var svg = (0, _utils.findSVGAtPoint)(rects[0].left, rects[0].top);
-	    saveRect(_type, [].concat(_toConsumableArray(rects)).map(function (r) {
-	      return {
-	        top: r.top,
-	        left: r.left,
-	        width: r.width,
-	        height: r.height
-	      };
-	    }));
-	  } else if (_type === 'area' && overlay) {
-	    var _svg = overlay.parentNode.querySelector('svg.annotationLayer');
-	    var rect = _svg.getBoundingClientRect();
-	    saveRect(_type, [{
-	      top: parseInt(overlay.style.top, 10) + rect.top,
-	      left: parseInt(overlay.style.left, 10) + rect.left,
-	      width: parseInt(overlay.style.width, 10),
-	      height: parseInt(overlay.style.height, 10)
-	    }]);
 	
-	    overlay.parentNode.removeChild(overlay);
-	    overlay = null;
-	
-	    document.removeEventListener('mousemove', handleDocumentMousemove);
-	    (0, _utils.enableUserSelect)();
-	  }
-	
-	  if (_type === 'highlight') {
-	    removeSelection();
-	  }
-	}
-	
-	function removeSelection() {
-	  var selection = window.getSelection();
-	  // Firefox
-	  selection.removeAllRanges && selection.removeAllRanges();
-	  // Chrome
-	  selection.empty && selection.empty();
-	}
-	
-	/**
-	 * Handle document.keyup event
-	 *
-	 * @param {Event} e The DOM event to handle
-	 */
-	function handleDocumentKeyup(e) {
-	  // Cancel rect if Esc is pressed
-	  if (e.keyCode === 27) {
-	    removeSelection();
-	    if (overlay && overlay.parentNode) {
-	      overlay.parentNode.removeChild(overlay);
-	      overlay = null;
-	      document.removeEventListener('mousemove', handleDocumentMousemove);
-	    }
-	  }
-	}
-	
-	/**
-	 * Save a rect annotation
-	 *
-	 * @param {String} type The type of rect (area, highlight, strikeout)
-	 * @param {Array} rects The rects to use for annotation
-	 * @param {String} color The color of the rects
-	 */
-	function saveRect(type, rects, color) {
-	  var svg = (0, _utils.findSVGAtPoint)(rects[0].left, rects[0].top);
-	  var node = void 0;
-	  var annotation = void 0;
-	
-	  if (!svg) {
+	  if (!overlay) {
 	    return;
 	  }
 	
-	  var boundingRect = svg.getBoundingClientRect();
+	  saveRect({
+	    x: parseInt(overlay.style.left, 10),
+	    y: parseInt(overlay.style.top, 10),
+	    width: parseInt(overlay.style.width, 10),
+	    height: parseInt(overlay.style.height, 10)
+	  });
 	
-	  if (!color) {
-	    if (type === 'highlight') {
-	      color = 'FFFF00';
-	    } else if (type === 'strikeout') {
-	      color = 'FF0000';
-	    }
-	  }
+	  (0, _jquery2.default)(overlay).remove();
+	  overlay = null;
 	
-	  // Initialize the annotation
-	  annotation = {
-	    type: type,
-	    color: color,
-	    rectangles: [].concat(_toConsumableArray(rects)).map(function (r) {
-	      var offset = 0;
+	  document.removeEventListener('mousemove', handleDocumentMousemove);
+	}
 	
-	      if (type === 'strikeout') {
-	        offset = r.height / 2;
-	      }
-	      if (type === 'highlight') {
-	        return (0, _utils.scaleDown)(svg, {
-	          y: r.top + offset - boundingRect.top,
-	          x: r.left - boundingRect.left,
-	          width: r.width,
-	          height: r.height
-	        });
-	      }
-	      return (0, _utils.scaleDown)(svg, {
-	        y: r.top + offset - boundingRect.top,
-	        x: r.left - boundingRect.left,
-	        width: r.width,
-	        height: r.height
-	      });
-	    }).filter(function (r) {
-	      return r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1;
-	    })
-	  };
+	/**
+	 * Save a rect annotation.
+	 *
+	 * @param {Object} rect - The rect to use for annotation.
+	 */
+	function saveRect(rect) {
 	
-	  // Short circuit if no rectangles exist
-	  if (annotation.rectangles.length === 0) {
-	    return;
-	  }
+	  var svg = (0, _utils.getSVGLayer)();
 	
-	  // Special treatment for area as it only supports a single rect
-	  if (type === 'area') {
-	    var rect = annotation.rectangles[0];
-	    delete annotation.rectangles;
-	    annotation.x = rect.x;
-	    annotation.y = rect.y;
-	    annotation.width = rect.width;
-	    annotation.height = rect.height;
-	  }
+	  var annotation = (0, _deepAssign2.default)((0, _utils.scaleDown)(svg, rect), {
+	    type: _type
+	  });
 	
 	  var _getMetadata = (0, _utils.getMetadata)(svg),
 	      documentId = _getMetadata.documentId,
 	      pageNumber = _getMetadata.pageNumber;
 	
-	  // Add the annotation
+	  // Save.
 	
 	
 	  _PDFJSAnnotate2.default.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation).then(function (annotation) {
 	    (0, _appendChild2.default)(svg, annotation);
-	
-	    // Add an input field.
-	    if (type === 'highlight') {
-	
-	      var x = annotation.rectangles[0].x;
-	      var y = annotation.rectangles[0].y - 20; // 20 = circle'radius(3px) + input height(14px) + α
-	      var _rect = svg.getBoundingClientRect();
-	
-	      x = (0, _utils.scaleUp)(svg, { x: x }).x + _rect.left;
-	      y = (0, _utils.scaleUp)(svg, { y: y }).y + _rect.top;
-	
-	      (0, _text.addInputField)(x, y, null, null, function (textAnnotation) {
-	
-	        if (!textAnnotation) {
-	          return;
-	        }
-	
-	        // Set relation between arrow and text.
-	        annotation.text = textAnnotation.uuid;
-	
-	        // Update data.
-	        _PDFJSAnnotate2.default.getStoreAdapter().editAnnotation(documentId, annotation.uuid, annotation);
-	
-	        // Update UI.
-	        (0, _jquery2.default)('[data-pdf-annotate-id="' + annotation.uuid + '"]').attr('data-text', textAnnotation.uuid);
-	      });
-	    }
 	  });
 	}
 	
 	/**
 	 * Enable rect behavior
 	 */
-	function enableRect(type) {
-	  _type = type;
+	function enableRect() {
 	
 	  if (_enabled) {
 	    return;
@@ -15714,13 +15642,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _enabled = true;
 	  document.addEventListener('mouseup', handleDocumentMouseup);
 	  document.addEventListener('mousedown', handleDocumentMousedown);
-	  document.addEventListener('keyup', handleDocumentKeyup);
+	
+	  (0, _utils.disableUserSelect)();
 	}
 	
 	/**
 	 * Disable rect behavior
 	 */
 	function disableRect() {
+	
 	  if (!_enabled) {
 	    return;
 	  }
@@ -15728,11 +15658,97 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _enabled = false;
 	  document.removeEventListener('mouseup', handleDocumentMouseup);
 	  document.removeEventListener('mousedown', handleDocumentMousedown);
-	  document.removeEventListener('keyup', handleDocumentKeyup);
+	
+	  (0, _utils.enableUserSelect)();
 	}
 
 /***/ },
 /* 45 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var isObj = __webpack_require__(46);
+	var hasOwnProperty = Object.prototype.hasOwnProperty;
+	var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+	
+	function toObject(val) {
+		if (val === null || val === undefined) {
+			throw new TypeError('Sources cannot be null or undefined');
+		}
+	
+		return Object(val);
+	}
+	
+	function assignKey(to, from, key) {
+		var val = from[key];
+	
+		if (val === undefined || val === null) {
+			return;
+		}
+	
+		if (hasOwnProperty.call(to, key)) {
+			if (to[key] === undefined || to[key] === null) {
+				throw new TypeError('Cannot convert undefined or null to object (' + key + ')');
+			}
+		}
+	
+		if (!hasOwnProperty.call(to, key) || !isObj(val)) {
+			to[key] = val;
+		} else {
+			to[key] = assign(Object(to[key]), from[key]);
+		}
+	}
+	
+	function assign(to, from) {
+		if (to === from) {
+			return to;
+		}
+	
+		from = Object(from);
+	
+		for (var key in from) {
+			if (hasOwnProperty.call(from, key)) {
+				assignKey(to, from, key);
+			}
+		}
+	
+		if (Object.getOwnPropertySymbols) {
+			var symbols = Object.getOwnPropertySymbols(from);
+	
+			for (var i = 0; i < symbols.length; i++) {
+				if (propIsEnumerable.call(from, symbols[i])) {
+					assignKey(to, from, symbols[i]);
+				}
+			}
+		}
+	
+		return to;
+	}
+	
+	module.exports = function deepAssign(target) {
+		target = toObject(target);
+	
+		for (var s = 1; s < arguments.length; s++) {
+			assign(target, arguments[s]);
+		}
+	
+		return target;
+	};
+
+
+/***/ },
+/* 46 */
+/***/ function(module, exports) {
+
+	'use strict';
+	module.exports = function (x) {
+		var type = typeof x;
+		return x !== null && (type === 'object' || type === 'function');
+	};
+
+
+/***/ },
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -15995,7 +16011,188 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 46 */
+/* 48 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.enableHighlight = enableHighlight;
+	exports.disableHighlight = disableHighlight;
+	
+	var _jquery = __webpack_require__(6);
+	
+	var _jquery2 = _interopRequireDefault(_jquery);
+	
+	var _PDFJSAnnotate = __webpack_require__(7);
+	
+	var _PDFJSAnnotate2 = _interopRequireDefault(_PDFJSAnnotate);
+	
+	var _appendChild = __webpack_require__(21);
+	
+	var _appendChild2 = _interopRequireDefault(_appendChild);
+	
+	var _utils = __webpack_require__(12);
+	
+	var _text = __webpack_require__(47);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+	
+	var _type = 'highlight';
+	
+	var _enabled = false;
+	var overlay = void 0;
+	var originY = void 0;
+	var originX = void 0;
+	
+	/**
+	 * Get the current window selection as rects
+	 *
+	 * @return {Array} An Array of rects
+	 */
+	function getSelectionRects() {
+	  try {
+	    var selection = window.getSelection();
+	    var range = selection.getRangeAt(0);
+	    var rects = range.getClientRects();
+	
+	    if (rects.length > 0 && rects[0].width > 0 && rects[0].height > 0) {
+	      return rects;
+	    }
+	  } catch (e) {}
+	
+	  return null;
+	}
+	
+	/**
+	 * Handle document.mouseup event
+	 *
+	 * @param {Event} e The DOM event to handle
+	 */
+	function handleDocumentMouseup(e) {
+	
+	  var rects = getSelectionRects();
+	  if (rects) {
+	    var svg = (0, _utils.getSVGLayer)();
+	    saveRect([].concat(_toConsumableArray(rects)).map(function (r) {
+	      return {
+	        top: r.top,
+	        left: r.left,
+	        width: r.width,
+	        height: r.height
+	      };
+	    }));
+	  }
+	
+	  removeSelection();
+	}
+	
+	function removeSelection() {
+	  var selection = window.getSelection();
+	  // Firefox
+	  selection.removeAllRanges && selection.removeAllRanges();
+	  // Chrome
+	  selection.empty && selection.empty();
+	}
+	
+	/**
+	 * Save a rect annotation
+	 *
+	 * @param {String} type The type of rect (area, highlight, strikeout)
+	 * @param {Array} rects The rects to use for annotation
+	 * @param {String} color The color of the rects
+	 */
+	function saveRect(rects) {
+	
+	  var svg = (0, _utils.getSVGLayer)();
+	  var node = void 0;
+	  var annotation = void 0;
+	
+	  var boundingRect = svg.getBoundingClientRect();
+	
+	  // Initialize the annotation
+	  annotation = {
+	    type: _type,
+	    rectangles: [].concat(_toConsumableArray(rects)).map(function (r) {
+	      return (0, _utils.scaleDown)(svg, {
+	        x: r.left - boundingRect.left,
+	        y: r.top - boundingRect.top,
+	        width: r.width,
+	        height: r.height
+	      });
+	    }).filter(function (r) {
+	      return r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1;
+	    })
+	  };
+	
+	  var _getMetadata = (0, _utils.getMetadata)(svg),
+	      documentId = _getMetadata.documentId,
+	      pageNumber = _getMetadata.pageNumber;
+	
+	  // Add the annotation
+	
+	
+	  _PDFJSAnnotate2.default.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation).then(function (annotation) {
+	    (0, _appendChild2.default)(svg, annotation);
+	
+	    // Add an input field.
+	    var x = annotation.rectangles[0].x;
+	    var y = annotation.rectangles[0].y - 20; // 20 = circle'radius(3px) + input height(14px) + α
+	    var rect = svg.getBoundingClientRect();
+	
+	    x = (0, _utils.scaleUp)(svg, { x: x }).x + rect.left;
+	    y = (0, _utils.scaleUp)(svg, { y: y }).y + rect.top;
+	
+	    (0, _text.addInputField)(x, y, null, null, function (textAnnotation) {
+	
+	      if (!textAnnotation) {
+	        return;
+	      }
+	
+	      // Set relation between arrow and text.
+	      annotation.text = textAnnotation.uuid;
+	
+	      // Update data.
+	      _PDFJSAnnotate2.default.getStoreAdapter().editAnnotation(documentId, annotation.uuid, annotation);
+	
+	      // Update UI.
+	      (0, _jquery2.default)('[data-pdf-annotate-id="' + annotation.uuid + '"]').attr('data-text', textAnnotation.uuid);
+	    });
+	  });
+	}
+	
+	/**
+	 * Enable rect behavior
+	 */
+	function enableHighlight() {
+	
+	  if (_enabled) {
+	    return;
+	  }
+	
+	  _enabled = true;
+	  document.addEventListener('mouseup', handleDocumentMouseup);
+	}
+	
+	/**
+	 * Disable rect behavior
+	 */
+	function disableHighlight() {
+	
+	  if (!_enabled) {
+	    return;
+	  }
+	
+	  _enabled = false;
+	  document.removeEventListener('mouseup', handleDocumentMouseup);
+	}
+
+/***/ },
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -16225,7 +16422,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 47 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -16252,7 +16449,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _relation = __webpack_require__(17);
 	
-	var _text = __webpack_require__(45);
+	var _text = __webpack_require__(47);
 	
 	var _uuid = __webpack_require__(15);
 	
@@ -16452,7 +16649,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    arrowAnnotation.text = textAnnotation.uuid;
 	
 	    // Update.
-	    var element = document.querySelector('.annotationLayer');
+	    // let element = document.querySelector('.annotationLayer');
+	    var element = document.getElementById('annoLayer'); // TODO make it const.
 	    var documentId = element.getAttribute('data-pdf-annotate-document'); // 共通化
 	    _PDFJSAnnotate2.default.getStoreAdapter().editAnnotation(documentId, arrowAnnotation.uuid, arrowAnnotation);
 	
@@ -16528,7 +16726,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	*/
 	function showBoundingBox() {
 	
-	  svg = document.querySelector('#pageContainer' + PDFView.page).querySelector('svg');
+	  // svg = document
+	  //             .querySelector('#pageContainer' + PDFView.page)
+	  //             .querySelector('svg');
+	
+	  svg = document.getElementById('annoLayer'); // TODO make it const.
 	
 	  // Collect boundingCircles for highlight.
 	  boundingCircles = [];
@@ -16609,7 +16811,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 48 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -16630,7 +16832,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(12);
 	
-	var _text = __webpack_require__(45);
+	var _text = __webpack_require__(47);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -17284,13 +17486,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 49 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(50);
+	var content = __webpack_require__(53);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(5)(content, {});
@@ -17310,7 +17512,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 50 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(4)();
@@ -17324,13 +17526,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 51 */
+/* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(52);
+	var content = __webpack_require__(55);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(5)(content, {});
@@ -17350,7 +17552,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 52 */
+/* 55 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(4)();
