@@ -1,3 +1,4 @@
+import assign from 'deep-assign';
 import uuid from '../utils/uuid';
 import StoreAdapter from './StoreAdapter';
 import {
@@ -41,7 +42,8 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
           let annotations = [];
           let containers = _getSecondaryContainers();
           containers.forEach(container => {
-            let tmpAnnotations = (container[documentId] || []).filter(i => {
+            // TODO refactoring. same thing exists.
+            let tmpAnnotations = ((container[documentId] || {}).annotations || []).filter(i => {
               if (pageNumber) {
                 console.log('bbbb:', i);
                 return i.page === pageNumber && i.class === 'Annotation';
@@ -181,10 +183,11 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
             let indexSpan = 1;
             let indexRel  = 1;
             let indexText = 1;
-            let annotations = {};
+            let meta = container[documentId].meta;
+            let annotations = { meta };
             dataExport[documentId] = annotations;
 
-            container[documentId].forEach(annotation => {
+            container[documentId].annotations.forEach(annotation => {
 
               // Rect
               if (annotation.type === 'area') {
@@ -212,7 +215,8 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                 // span text.
                 let text = '';
                 if (annotation.text) {
-                  let texts = container[documentId].filter(a => {
+                  // TODO use `getAnnotations` instead.
+                  let texts = container[documentId].annotations.filter(a => {
                     return a.uuid === annotation.text;
                   });
                   if (texts.length > 0) {
@@ -233,15 +237,15 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                   annotation.page,
                   annotation.direction,
                 ];
-                let highlight1s = container[documentId].filter(a => {
+                let highlight1s = container[documentId].annotations.filter(a => {
                   return a.uuid === annotation.highlight1;
                 });
                 data.push(highlight1s[0].key);
-                let highlight2s = container[documentId].filter(a => {
+                let highlight2s = container[documentId].annotations.filter(a => {
                   return a.uuid === annotation.highlight2;
                 });
                 data.push(highlight2s[0].key);
-                let texts = container[documentId].filter(a => {
+                let texts = container[documentId].annotations.filter(a => {
                   return a.uuid === annotation.text;
                 });
                 if (texts.length > 0) {
@@ -254,7 +258,7 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
               // Textbox independent.
               } else if (annotation.type === 'textbox') {
 
-                let rels = container[documentId].filter(a => {
+                let rels = container[documentId].annotations.filter(a => {
                   // relation for arrow or highlight.
                   return a.text === annotation.uuid;
                 });
@@ -328,10 +332,15 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
 
   for (let documentId in json) {
 
+    let meta = json[documentId].meta;
     let annotations = [];
-    container[documentId] = annotations;
+    container[documentId] = { meta, annotations };
 
     for (let key in json[documentId]) {
+
+      if (key === 'meta') {
+        continue;
+      }
 
       let data = json[documentId][key];
 
@@ -498,8 +507,9 @@ function _getContainer() {
 function _getSecondaryContainers() {
   let containers = localStorage.getItem(LOCALSTORAGE_KEY_SECONDARY);
   if (!containers) {
-    containers = [];
-    _saveSecondaryContainer(containers);
+    // containers = [];
+    // _saveSecondaryContainer(containers);
+    return [];
   } else {
     containers = JSON.parse(containers);
   }
@@ -515,17 +525,10 @@ function _saveSecondaryContainer(containers) {
 }
 
 function getAnnotations(documentId) {
-
   // Primary annotation.
   let container = _getContainer();
-  let annotations = container[documentId];
-  if (!annotations) {
-    annotations = [];
-    container[documentId] = [];
-    _saveContainer(container);
-  }
-
-  return annotations;
+  let annotations = (container[documentId] || {}).annotations;
+  return annotations || [];
 }
 
 function _getSecondaryAnnotations(documentId) {
@@ -534,7 +537,7 @@ function _getSecondaryAnnotations(documentId) {
 
   let containers = _getSecondaryContainers();
   containers.forEach(container => {
-    let tmpAnnotations = container[documentId];
+    let tmpAnnotations = (container[documentId] || {}).annotations;
     if (tmpAnnotations) {
       annotations = annotations.concat(tmpAnnotations);
     }
@@ -545,8 +548,12 @@ function _getSecondaryAnnotations(documentId) {
 
 
 function updateAnnotations(documentId, annotations) {
+
+  let viewBox = PDFView.pdfViewer.getPageView(0).viewport.viewBox;
+  let meta = { w : viewBox[2], h : viewBox[3] };
+
   let container = _getContainer();
-  container[documentId] = annotations;
+  container[documentId] = { meta, annotations };
   _saveContainer(container);
 }
 
