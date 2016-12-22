@@ -194,7 +194,7 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                 let { pageNumber, y } = convertToExportY(annotation.y, meta);
                 annotations[`rect-${indexRect++}`] = [
                   pageNumber,
-                  annotation.x,
+                  convertToExportX(annotation.x),
                   y,
                   annotation.width,
                   annotation.height
@@ -208,7 +208,7 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                   let { pageNumber, y } = convertToExportY(rectangle.y, meta);
                   data.push([
                     pageNumber,
-                    rectangle.x,
+                    convertToExportX(rectangle.x),
                     y,
                     rectangle.width,
                     rectangle.height
@@ -269,7 +269,7 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                   console.log('text:', annotation.content);
                   annotations[`text-${indexText++}`] = [
                     annotation.page,
-                    annotation.x,
+                    convertToExportX(annotation.x),
                     y,
                     annotation.content
                   ];
@@ -357,7 +357,7 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
           type   : 'area',
           uuid   : uuid(),
           page   : 1,
-          x      : data[1],
+          x      : convertFromExportX(data[1]),
           y,
           width  : data[3],
           height : data[4],
@@ -374,7 +374,7 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
           let y = convertFromExportY(pageNumber, yInJson, meta);
           console.log('span:', y, yInJson);
           return {
-            x      : d[1],
+            x      : convertFromExportX(d[1]),
             y,
             width  : d[3],
             height : d[4]
@@ -387,7 +387,7 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
           textId = uuid();
           let svg = document.querySelector('.annotationLayer');
 
-          let x = rectangles[0].x;
+          let x = convertFromExportX(rectangles[0].x);
           let y = rectangles[0].y - 20; // 20 = circle'radius(3px) + input height(14px) + α
 
           let pageNumber = data[0][0];
@@ -400,7 +400,7 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
             type       : 'textbox',
             uuid       : textId,
             page       : 1,
-            x          : x,
+            x          : convertFromExportX(x),
             y,
             content    : spanText,
             readOnly,
@@ -431,7 +431,7 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
           type       : 'textbox',
           uuid       : uuid(),
           page       : 1,
-          x          : data[1],
+          x          : convertFromExportX(data[1]),
           y,
           content    : data[3],
           readOnly,
@@ -484,7 +484,7 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
             type       : 'textbox',
             uuid       : textId,
             page       : data[0],
-            x          : textPosition.x,
+            x          : convertFromExportX(textPosition.x),
             y,
             content    : data[4],
             readOnly,
@@ -493,8 +493,6 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
         }
 
         let pageNumber = data[0];
-        y1 = convertFromExportY(pageNumber, y1, meta);
-        y2 = convertFromExportY(pageNumber, y2, meta);
 
         // Add arrow.
         annotations.push({
@@ -602,7 +600,7 @@ const paddingBetweenPages = 10; // Maybe...
 
 function convertToExportY(y, meta) {
 
-  // y -= paddingTop;
+  y -= paddingTop;
 
   let pageNumber = Math.floor(y / meta.h) + 1;
   let yInPage = y - (pageNumber-1) * (meta.h + paddingBetweenPages);
@@ -612,10 +610,18 @@ function convertToExportY(y, meta) {
 
 function convertFromExportY(pageNumber, yInPage, meta) {
 
-  // let y = yInPage + paddingTop;
-  let y = yInPage;
+  let y = yInPage + paddingTop;
 
   y += (pageNumber - 1) * (meta.h + paddingBetweenPages);
 
   return y;
+}
+
+const paddingLeft = 20;
+
+function convertToExportX(x) {
+  return x - paddingLeft;
+}
+function convertFromExportX(x) {
+  return x + paddingLeft;
 }
