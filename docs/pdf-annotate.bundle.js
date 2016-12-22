@@ -120,9 +120,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	        left: '0px',
 	        width: '100%',
 	        height: (0, _jquery2.default)('#viewer').height() + 'px',
-	        visibility: 'hidden'
+	        visibility: 'hidden',
+	        'z-index': 2
 	    });
-	    (0, _jquery2.default)('#viewerContainer').append($annoLayer);
+	    // Add a tmp layer.
+	    var $tmpLayer = (0, _jquery2.default)('<div id="tmpLayer"/>').css({ // TODO CSSClass.
+	        position: 'absolute',
+	        top: '0px',
+	        left: '0px',
+	        width: '100%',
+	        height: (0, _jquery2.default)('#viewer').height() + 'px',
+	        visibility: 'hidden',
+	        'z-index': 2
+	    });
+	    // $('#viewerContainer').append($annoLayer);
+	    (0, _jquery2.default)('#pageContainer1').css({
+	        position: 'relative'
+	    }).append($annoLayer).append($tmpLayer);
 	
 	    var svg = $annoLayer.get(0);
 	    var documentId = getFileName(PDFView.url);
@@ -11677,6 +11691,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.getXY = getXY;
 	exports.getSVGLayer = getSVGLayer;
 	exports.getViewerContainer = getViewerContainer;
+	exports.getTmpLayer = getTmpLayer;
 	
 	var _jquery = __webpack_require__(6);
 	
@@ -12044,15 +12059,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function getXY(e) {
 	
-	  var rect = (0, _jquery2.default)('#annoLayer')[0].getBoundingClientRect();
+	  var rect1 = (0, _jquery2.default)('#pageContainer1')[0].getBoundingClientRect();
+	  console.log('rect1:', rect1);
+	  var rect2 = (0, _jquery2.default)('#annoLayer')[0].getBoundingClientRect();
+	  console.log('rect2:', rect2);
+	
+	  var rectTop = rect2.top - rect1.top;
+	  var rectLeft = rect2.left - rect1.left;
+	  console.log(rectTop, rectLeft);
 	
 	  // let x = e.clientX - rect.left;
 	  // let y = $('#annoLayer').scrollTop() + e.clientY - rect.top;
 	
 	  // let x = e.clientX - rect.left;
-	  var y = e.clientY + (0, _jquery2.default)('#annoLayer').scrollTop() - rect.top;
+	  // let y = e.clientY + $('#annoLayer').scrollTop() - rect.top;
+	  // let y = e.clientY + $('#annoLayer').scrollTop();
+	  // let y = e.clientY + $('#annoLayer').scrollTop() - rectTop;
+	  var y = e.clientY + (0, _jquery2.default)('#annoLayer').scrollTop() - rect2.top;
 	
-	  var x = e.clientX - rect.left;
+	  // let x = e.clientX - rect.left;
+	  // let x = e.clientX;
+	  // let x = e.clientX - rectLeft;
+	  var x = e.clientX - rect2.left;
 	  // let y = e.clientY - rect.top;
 	
 	  console.log('e.client:', e.clientX, e.clientY);
@@ -12065,7 +12093,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	function getViewerContainer() {
-	  return document.getElementById('viewerContainer');
+	  // return document.getElementById('viewerContainer');
+	  return document.getElementById('pageContainer1');
+	}
+	
+	function getTmpLayer() {
+	  return document.getElementById('tmpLayer');
 	}
 
 /***/ },
@@ -12591,7 +12624,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                      _y = _convertToExportY3.y;
 	
 	                  console.log('text:', annotation.content);
-	                  annotations['text-' + indexText++] = [annotation.page, convertToExportX(annotation.x), _y, annotation.content];
+	                  annotations['text-' + indexText++] = [_pageNumber, convertToExportX(annotation.x), _y, annotation.content];
 	                }
 	              }
 	            });
@@ -12932,7 +12965,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return index;
 	}
 	
-	var paddingTop = 10;
+	var paddingTop = 0;
 	var paddingBetweenPages = 9;
 	
 	function convertToExportY(y, meta) {
@@ -12954,7 +12987,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return y;
 	}
 	
-	var paddingLeft = 19;
+	var paddingLeft = 0;
 	
 	function convertToExportX(x) {
 	  return x - paddingLeft;
@@ -15725,9 +15758,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  overlay.style.position = 'absolute';
 	  overlay.style.top = originY + 'px';
 	  overlay.style.left = originX + 'px';
+	  overlay.style.width = 0;
+	  overlay.style.height = 0;
 	  overlay.style.border = '2px solid ' + _utils.BORDER_COLOR;
 	  overlay.style.boxSizing = 'border-box';
-	  (0, _utils.getViewerContainer)().appendChild(overlay);
+	  overlay.style.visibility = 'visible';
+	  // getViewerContainer().appendChild(overlay);
+	  (0, _utils.getTmpLayer)().appendChild(overlay);
 	
 	  document.addEventListener('mousemove', handleDocumentMousemove);
 	}
@@ -15783,6 +15820,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {Object} rect - The rect to use for annotation.
 	 */
 	function saveRect(rect) {
+	
+	  if (rect.width === 0 || rect.height === 0) {
+	    return;
+	  }
 	
 	  var svg = (0, _utils.getSVGLayer)();
 	

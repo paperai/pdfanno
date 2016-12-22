@@ -331,15 +331,28 @@ export function getMetadata(svg) {
 
 export function getXY(e) {
 
-  let rect = $('#annoLayer')[0].getBoundingClientRect();
+  let rect1 = $('#pageContainer1')[0].getBoundingClientRect();
+  console.log('rect1:', rect1);
+  let rect2 = $('#annoLayer')[0].getBoundingClientRect();
+  console.log('rect2:', rect2);
+
+  let rectTop = rect2.top - rect1.top;
+  let rectLeft = rect2.left - rect1.left;
+  console.log(rectTop, rectLeft);
 
   // let x = e.clientX - rect.left;
   // let y = $('#annoLayer').scrollTop() + e.clientY - rect.top;
 
   // let x = e.clientX - rect.left;
-  let y = e.clientY + $('#annoLayer').scrollTop() - rect.top;
+  // let y = e.clientY + $('#annoLayer').scrollTop() - rect.top;
+  // let y = e.clientY + $('#annoLayer').scrollTop();
+  // let y = e.clientY + $('#annoLayer').scrollTop() - rectTop;
+  let y = e.clientY + $('#annoLayer').scrollTop() - rect2.top;
 
-  let x = e.clientX - rect.left;
+  // let x = e.clientX - rect.left;
+  // let x = e.clientX;
+  // let x = e.clientX - rectLeft;
+  let x = e.clientX - rect2.left;
   // let y = e.clientY - rect.top;
 
   console.log('e.client:', e.clientX, e.clientY);
@@ -352,5 +365,10 @@ export function getSVGLayer() {
 }
 
 export function getViewerContainer() {
-  return document.getElementById('viewerContainer');
+  // return document.getElementById('viewerContainer');
+  return document.getElementById('pageContainer1');
+}
+
+export function getTmpLayer() {
+  return document.getElementById('tmpLayer');
 }

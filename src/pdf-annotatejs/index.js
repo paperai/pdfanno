@@ -51,9 +51,23 @@ function renderAnno() {
         left     : '0px',
         width    : '100%',
         height   : $('#viewer').height() + 'px',
-        visibility : 'hidden'
+        visibility : 'hidden',
+        'z-index'  : 2
     });
-    $('#viewerContainer').append($annoLayer);
+    // Add a tmp layer.
+    let $tmpLayer = $(`<div id="tmpLayer"/>`).css({   // TODO CSSClass.
+        position : 'absolute',
+        top      : '0px',
+        left     : '0px',
+        width    : '100%',
+        height   : $('#viewer').height() + 'px',
+        visibility : 'hidden',
+        'z-index'  : 2
+    });
+    // $('#viewerContainer').append($annoLayer);
+    $('#pageContainer1').css({
+        position : 'relative'
+    }).append($annoLayer).append($tmpLayer);
 
     let svg = $annoLayer.get(0);
     let documentId = getFileName(PDFView.url);

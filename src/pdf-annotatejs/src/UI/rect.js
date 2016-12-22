@@ -13,7 +13,8 @@ import {
   scaleUp,
   getXY,
   getSVGLayer,
-  getViewerContainer
+  getViewerContainer,
+  getTmpLayer
 } from './utils';
 import { addInputField } from './text';
 
@@ -39,9 +40,13 @@ function handleDocumentMousedown(e) {
   overlay.style.position = 'absolute';
   overlay.style.top = `${originY}px`;
   overlay.style.left = `${originX}px`;
+  overlay.style.width = 0;
+  overlay.style.height = 0;
   overlay.style.border = `2px solid ${BORDER_COLOR}`;
   overlay.style.boxSizing = 'border-box';
-  getViewerContainer().appendChild(overlay);
+  overlay.style.visibility = 'visible';
+  // getViewerContainer().appendChild(overlay);
+  getTmpLayer().appendChild(overlay);
   
   document.addEventListener('mousemove', handleDocumentMousemove);
 }
@@ -96,6 +101,11 @@ function handleDocumentMouseup(e) {
  * @param {Object} rect - The rect to use for annotation.
  */
 function saveRect(rect) {
+
+  if (rect.width === 0 || rect.height === 0) {
+    return;
+  }
+
 
   let svg = getSVGLayer();
 

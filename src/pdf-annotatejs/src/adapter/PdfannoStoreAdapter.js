@@ -268,7 +268,7 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                   let { pageNumber, y } = convertToExportY(annotation.y, meta);
                   console.log('text:', annotation.content);
                   annotations[`text-${indexText++}`] = [
-                    annotation.page,
+                    pageNumber,
                     convertToExportX(annotation.x),
                     y,
                     annotation.content
@@ -595,7 +595,7 @@ function findAnnotation(documentId, annotationId) {
   return index;
 }
 
-const paddingTop = 10;
+const paddingTop = 0;
 const paddingBetweenPages = 9;
 
 function convertToExportY(y, meta) {
@@ -617,7 +617,7 @@ function convertFromExportY(pageNumber, yInPage, meta) {
   return y;
 }
 
-const paddingLeft = 19;
+const paddingLeft = 0;
 
 function convertToExportX(x) {
   return x - paddingLeft;
