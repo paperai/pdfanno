@@ -596,7 +596,7 @@ function findAnnotation(documentId, annotationId) {
 }
 
 const paddingTop = 10;
-const paddingBetweenPages = 10; // Maybe...
+const paddingBetweenPages = 9;
 
 function convertToExportY(y, meta) {
 
@@ -617,7 +617,7 @@ function convertFromExportY(pageNumber, yInPage, meta) {
   return y;
 }
 
-const paddingLeft = 20;
+const paddingLeft = 19;
 
 function convertToExportX(x) {
   return x - paddingLeft;
