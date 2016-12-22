@@ -32,6 +32,13 @@ window.addEventListener('pagerendered', function(ev) {
 
 window.addEventListener('resize', function () {
     $('#annoLayer').remove();
+    $('#tmpLayer').remove();
+});
+
+document.getElementById('scaleSelect').addEventListener('change', function() {
+    console.log('scaleChanged');
+    $('#annoLayer').remove();
+    $('#tmpLayer').remove();
 });
 
 function renderAnno() {
@@ -44,13 +51,20 @@ function renderAnno() {
         return;
     }
 
+    let leftMargin = ($('#viewer').width() - $('.page').width()) / 2;
+    console.log('leftMargin:', leftMargin);
+
+    let height = $('#viewer').height();
+
     // Add an annotation layer.
     let $annoLayer = $(`<svg id="${svgLayerId}"/>`).css({   // TODO CSSClass.
         position : 'absolute',
+        // top      : '9px',
         top      : '0px',
-        left     : '0px',
-        width    : '100%',
-        height   : $('#viewer').height() + 'px',
+        left     : `${leftMargin}px`,
+        width    : `calc(100% - ${leftMargin*2}px`,
+        // height   : `${height-9}px`,
+        height   : `${height}px`,
         visibility : 'hidden',
         'z-index'  : 2
     });
@@ -58,9 +72,10 @@ function renderAnno() {
     let $tmpLayer = $(`<div id="tmpLayer"/>`).css({   // TODO CSSClass.
         position : 'absolute',
         top      : '0px',
-        left     : '0px',
-        width    : '100%',
-        height   : $('#viewer').height() + 'px',
+        left     : `${leftMargin}px`,
+        width    : `calc(100% - ${leftMargin*2}px`,
+        // height   : `${height-9}px`,
+        height   : `${height}px`,
         visibility : 'hidden',
         'z-index'  : 2
     });

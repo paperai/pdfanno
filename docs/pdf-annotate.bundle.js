@@ -101,6 +101,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	window.addEventListener('resize', function () {
 	    (0, _jquery2.default)('#annoLayer').remove();
+	    (0, _jquery2.default)('#tmpLayer').remove();
+	});
+	
+	document.getElementById('scaleSelect').addEventListener('change', function () {
+	    console.log('scaleChanged');
+	    (0, _jquery2.default)('#annoLayer').remove();
+	    (0, _jquery2.default)('#tmpLayer').remove();
 	});
 	
 	function renderAnno() {
@@ -113,13 +120,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return;
 	    }
 	
+	    var leftMargin = ((0, _jquery2.default)('#viewer').width() - (0, _jquery2.default)('.page').width()) / 2;
+	    console.log('leftMargin:', leftMargin);
+	
+	    var height = (0, _jquery2.default)('#viewer').height();
+	
 	    // Add an annotation layer.
 	    var $annoLayer = (0, _jquery2.default)('<svg id="' + svgLayerId + '"/>').css({ // TODO CSSClass.
 	        position: 'absolute',
+	        // top      : '9px',
 	        top: '0px',
-	        left: '0px',
-	        width: '100%',
-	        height: (0, _jquery2.default)('#viewer').height() + 'px',
+	        left: leftMargin + 'px',
+	        width: 'calc(100% - ' + leftMargin * 2 + 'px',
+	        // height   : `${height-9}px`,
+	        height: height + 'px',
 	        visibility: 'hidden',
 	        'z-index': 2
 	    });
@@ -127,9 +141,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var $tmpLayer = (0, _jquery2.default)('<div id="tmpLayer"/>').css({ // TODO CSSClass.
 	        position: 'absolute',
 	        top: '0px',
-	        left: '0px',
-	        width: '100%',
-	        height: (0, _jquery2.default)('#viewer').height() + 'px',
+	        left: leftMargin + 'px',
+	        width: 'calc(100% - ' + leftMargin * 2 + 'px',
+	        // height   : `${height-9}px`,
+	        height: height + 'px',
 	        visibility: 'hidden',
 	        'z-index': 2
 	    });
@@ -15975,6 +15990,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.enableText = enableText;
 	exports.disableText = disableText;
 	
+	var _jquery = __webpack_require__(6);
+	
+	var _jquery2 = _interopRequireDefault(_jquery);
+	
 	var _PDFJSAnnotate = __webpack_require__(7);
 	
 	var _PDFJSAnnotate2 = _interopRequireDefault(_PDFJSAnnotate);
@@ -16157,9 +16176,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 	
-	  if (datalist) {
-	    datalist.parentNode.removeChild(datalist);
-	  }
+	  (0, _jquery2.default)(datalist).remove();
 	}
 	
 	function getInputHistories() {
