@@ -30,6 +30,10 @@ window.addEventListener('pagerendered', function(ev) {
     renderAnno();
 });
 
+window.addEventListener('resize', function () {
+    $('#annoLayer').remove();
+});
+
 function renderAnno() {
 
     // TODO make it a global const.
