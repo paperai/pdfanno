@@ -65,7 +65,8 @@ function renderAnno() {
         'z-index'  : 2
     });
     // $('#viewerContainer').append($annoLayer);
-    $('#pageContainer1').css({
+    // $('#pageContainer1').css({
+    $('#viewer').css({
         position : 'relative'
     }).append($annoLayer).append($tmpLayer);
 

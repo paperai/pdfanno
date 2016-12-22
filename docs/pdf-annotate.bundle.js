@@ -134,7 +134,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        'z-index': 2
 	    });
 	    // $('#viewerContainer').append($annoLayer);
-	    (0, _jquery2.default)('#pageContainer1').css({
+	    // $('#pageContainer1').css({
+	    (0, _jquery2.default)('#viewer').css({
 	        position: 'relative'
 	    }).append($annoLayer).append($tmpLayer);
 	
