@@ -232,11 +232,12 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
 
                 // save tmporary for arrow.
                 annotation.key = key;
+                annotation.page = pageNumber;
               
               // Arrow.
               } else if (annotation.type === 'arrow') {
                 let data = [
-                  annotation.page,      // TODO remove?
+                  annotation.page,      // TODO bugfix. always 1.
                   annotation.direction,
                 ];
                 let highlight1s = container[documentId].annotations.filter(a => {
