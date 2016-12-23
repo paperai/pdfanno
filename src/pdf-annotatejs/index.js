@@ -1,7 +1,12 @@
 require("!style!css!./pdf-annotate.css");
 import $ from 'jquery';
 
+// for Convinience.
+window.$ = window.jQuery = $;
+
 // import { svgLayerId } from './consts';
+
+
 
 
 // The entry point of window.xxx.
@@ -41,6 +46,12 @@ document.getElementById('scaleSelect').addEventListener('change', function() {
     $('#tmpLayer').remove();
 });
 
+$('#zoomIn, #zoomOut').on('click', () => {
+    console.log('zoomIn/Out clicked.');
+    $('#annoLayer').remove();
+    $('#tmpLayer').remove();
+});
+
 function renderAnno() {
 
     // TODO make it a global const.
@@ -52,9 +63,16 @@ function renderAnno() {
     }
 
     let leftMargin = ($('#viewer').width() - $('.page').width()) / 2;
+
+    // At window.width < page.width.
+    if (leftMargin < 0) {
+        leftMargin = 9;
+    }
     console.log('leftMargin:', leftMargin);
 
     let height = $('#viewer').height();
+
+    let width = $('.page').width();
 
     // Add an annotation layer.
     let $annoLayer = $(`<svg id="${svgLayerId}"/>`).css({   // TODO CSSClass.
@@ -62,7 +80,8 @@ function renderAnno() {
         // top      : '9px',
         top      : '0px',
         left     : `${leftMargin}px`,
-        width    : `calc(100% - ${leftMargin*2}px`,
+        // width    : `calc(100% - ${leftMargin*2}px`,
+        width    : `${width}px`,
         // height   : `${height-9}px`,
         height   : `${height}px`,
         visibility : 'hidden',
@@ -73,7 +92,8 @@ function renderAnno() {
         position : 'absolute',
         top      : '0px',
         left     : `${leftMargin}px`,
-        width    : `calc(100% - ${leftMargin*2}px`,
+        // width    : `calc(100% - ${leftMargin*2}px`,
+        width    : `${width}px`,
         // height   : `${height-9}px`,
         height   : `${height}px`,
         visibility : 'hidden',

@@ -72,6 +72,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	__webpack_require__(54);
 	
+	
+	// for Convinience.
+	window.$ = window.jQuery = _jquery2.default;
+	
 	// import { svgLayerId } from './consts';
 	
 	
@@ -110,6 +114,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    (0, _jquery2.default)('#tmpLayer').remove();
 	});
 	
+	(0, _jquery2.default)('#zoomIn, #zoomOut').on('click', function () {
+	    console.log('zoomIn/Out clicked.');
+	    (0, _jquery2.default)('#annoLayer').remove();
+	    (0, _jquery2.default)('#tmpLayer').remove();
+	});
+	
 	function renderAnno() {
 	
 	    // TODO make it a global const.
@@ -121,9 +131,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    var leftMargin = ((0, _jquery2.default)('#viewer').width() - (0, _jquery2.default)('.page').width()) / 2;
+	
+	    // At window.width < page.width.
+	    if (leftMargin < 0) {
+	        leftMargin = 9;
+	    }
 	    console.log('leftMargin:', leftMargin);
 	
 	    var height = (0, _jquery2.default)('#viewer').height();
+	
+	    var width = (0, _jquery2.default)('.page').width();
 	
 	    // Add an annotation layer.
 	    var $annoLayer = (0, _jquery2.default)('<svg id="' + svgLayerId + '"/>').css({ // TODO CSSClass.
@@ -131,7 +148,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // top      : '9px',
 	        top: '0px',
 	        left: leftMargin + 'px',
-	        width: 'calc(100% - ' + leftMargin * 2 + 'px',
+	        // width    : `calc(100% - ${leftMargin*2}px`,
+	        width: width + 'px',
 	        // height   : `${height-9}px`,
 	        height: height + 'px',
 	        visibility: 'hidden',
@@ -142,7 +160,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        position: 'absolute',
 	        top: '0px',
 	        left: leftMargin + 'px',
-	        width: 'calc(100% - ' + leftMargin * 2 + 'px',
+	        // width    : `calc(100% - ${leftMargin*2}px`,
+	        width: width + 'px',
 	        // height   : `${height-9}px`,
 	        height: height + 'px',
 	        visibility: 'hidden',
