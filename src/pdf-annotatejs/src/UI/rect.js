@@ -13,7 +13,9 @@ import {
   scaleUp,
   getXY,
   getSVGLayer,
-  getViewerContainer
+  getViewerContainer,
+  getTmpLayer,
+  getCurrentPage
 } from './utils';
 import { addInputField } from './text';
 
@@ -23,6 +25,14 @@ let _enabled = false;
 let overlay;
 let originY;
 let originX;
+
+let enableArea = {
+  page : 0,
+  minX : 0,
+  maxX : 0,
+  minY : 0,
+  maxY : 0
+};
 
 /**
  * Handle document.mousedown event
@@ -35,13 +45,21 @@ function handleDocumentMousedown(e) {
   originX = x;
   originY = y;
 
+  enableArea = getCurrentPage(e);
+  if (!enableArea) {
+    return;
+  }
+
   overlay = document.createElement('div');
   overlay.style.position = 'absolute';
   overlay.style.top = `${originY}px`;
   overlay.style.left = `${originX}px`;
+  overlay.style.width = 0;
+  overlay.style.height = 0;
   overlay.style.border = `2px solid ${BORDER_COLOR}`;
   overlay.style.boxSizing = 'border-box';
-  getViewerContainer().appendChild(overlay);
+  overlay.style.visibility = 'visible';
+  getTmpLayer().appendChild(overlay);
   
   document.addEventListener('mousemove', handleDocumentMousemove);
 }
@@ -55,15 +73,30 @@ function handleDocumentMousemove(e) {
 
   let { x : curX, y : curY } = getXY(e);
 
-  let x      = Math.min(originX, curX);
-  let y      = Math.min(originY, curY);
-  let width  = Math.abs(originX - curX);
-  let height = Math.abs(originY - curY);
+  let x = Math.min(originX, curX);
+  let y = Math.min(originY, curY);
+  let w = Math.abs(originX - curX);
+  let h = Math.abs(originY - curY);
 
+  // Restrict in page.
+  x = Math.min(enableArea.maxX, Math.max(enableArea.minX, x));
+  y = Math.min(enableArea.maxY, Math.max(enableArea.minY, y));
+  if (x > enableArea.minX) {
+    w = Math.min(w, enableArea.maxX - x);
+  } else {
+    w = originX - enableArea.minX;
+  }
+  if (y > enableArea.minY) {
+    h = Math.min(h, enableArea.maxY - y);
+  } else {
+    h = originY - enableArea.minY;
+  }
+
+  // Move and Resize.
   overlay.style.left   = x + 'px';
   overlay.style.top    = y + 'px';
-  overlay.style.width  = width + 'px';
-  overlay.style.height = height + 'px';
+  overlay.style.width  = w + 'px';
+  overlay.style.height = h + 'px';
 }
 
 /**
@@ -96,6 +129,11 @@ function handleDocumentMouseup(e) {
  * @param {Object} rect - The rect to use for annotation.
  */
 function saveRect(rect) {
+
+  if (rect.width === 0 || rect.height === 0) {
+    return;
+  }
+
 
   let svg = getSVGLayer();
 

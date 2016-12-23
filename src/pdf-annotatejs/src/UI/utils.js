@@ -331,18 +331,33 @@ export function getMetadata(svg) {
 
 export function getXY(e) {
 
-  let rect = $('#annoLayer')[0].getBoundingClientRect();
+  let rect1 = $('#pageContainer1')[0].getBoundingClientRect();
+  // console.log('rect1:', rect1);
+  let rect2 = $('#annoLayer')[0].getBoundingClientRect();
+  // console.log('rect2:', rect2);
+
+  let rectTop = rect2.top - rect1.top;
+  let rectLeft = rect2.left - rect1.left;
+  // console.log(rectTop, rectLeft);
 
   // let x = e.clientX - rect.left;
   // let y = $('#annoLayer').scrollTop() + e.clientY - rect.top;
 
   // let x = e.clientX - rect.left;
-  let y = e.clientY + $('#annoLayer').scrollTop() - rect.top;
+  // let y = e.clientY + $('#annoLayer').scrollTop() - rect.top;
+  // let y = e.clientY + $('#annoLayer').scrollTop();
+  // let y = e.clientY + $('#annoLayer').scrollTop() - rectTop;
+  let y = e.clientY + $('#annoLayer').scrollTop() - rect2.top;
 
-  let x = e.clientX - rect.left;
+  // let x = e.clientX - rect.left;
+  // let x = e.clientX;
+  // let x = e.clientX - rectLeft;
+  let x = e.clientX - rect2.left;
   // let y = e.clientY - rect.top;
 
-  console.log('e.client:', e.clientX, e.clientY);
+  // console.log('e.client:', e.clientX, e.clientY, $('#annoLayer').scrollTop());
+
+  // console.log('y:', y, e.clientY, $('#annoLayer').scrollTop(), rect2.top);
 
   return { x, y }
 }
@@ -352,5 +367,62 @@ export function getSVGLayer() {
 }
 
 export function getViewerContainer() {
-  return document.getElementById('viewerContainer');
+  // return document.getElementById('viewerContainer');
+  return document.getElementById('pageContainer1');
+}
+
+export function getTmpLayer() {
+  return document.getElementById('tmpLayer');
+}
+
+export function getCurrentPage(e) {
+
+  let { x, y } = getXY(e);
+
+  let scrollTop = $('#annoLayer')[0].getBoundingClientRect().top;
+  let scrollLeft = $('#annoLayer')[0].getBoundingClientRect().left;
+
+  // let elements = document.querySelectorAll('.page');
+  let elements = document.querySelectorAll('.canvasWrapper');
+
+  for (let i = 0, l = elements.length; i < l; i++) {
+    let el = elements[i];
+    let rect = el.getBoundingClientRect();
+
+    let pageNumber = i + 1;
+
+    // rect.top = $('#annoLayer').scrollTop();
+    // 927
+    let minX = rect.left - scrollLeft;
+    let maxX = rect.right - scrollLeft;
+    let minY = rect.top - scrollTop;// + 9 * pageNumber;    // 9 = margin
+    let maxY = rect.bottom - scrollTop;// + 9 * pageNumber;
+
+    if (minX <= x && x <= maxX && minY <= y && y <= maxY) {
+
+      let page = parseInt(el.parentNode.id.replace('pageContainer', ''));
+
+      console.log('find!!!!', page);
+      // console.log('x', minX <= x && x <= maxX, minX, x, maxX);
+      // console.log('y', minY <= y && y <= maxY, minY, y, maxY);
+
+      return { page, minX, maxX, minY, maxY };
+    }
+
+
+    // if (pointIntersectsRect(x, y, rect)) {
+
+    //   console.log('find!!!', el, rect);
+
+    //   return el;
+    // }
+  }
+
+  console.log('notfound ><...');
+  return null;
+
+
+
+  // TODO
+  return 1;
 }

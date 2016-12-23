@@ -232,11 +232,12 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
 
                 // save tmporary for arrow.
                 annotation.key = key;
+                annotation.page = pageNumber;
               
               // Arrow.
               } else if (annotation.type === 'arrow') {
                 let data = [
-                  annotation.page,      // TODO remove?
+                  annotation.page,      // TODO bugfix. always 1.
                   annotation.direction,
                 ];
                 let highlight1s = container[documentId].annotations.filter(a => {
@@ -268,7 +269,7 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                   let { pageNumber, y } = convertToExportY(annotation.y, meta);
                   console.log('text:', annotation.content);
                   annotations[`text-${indexText++}`] = [
-                    annotation.page,
+                    pageNumber,
                     convertToExportX(annotation.x),
                     y,
                     annotation.content
@@ -595,7 +596,7 @@ function findAnnotation(documentId, annotationId) {
   return index;
 }
 
-const paddingTop = 10;
+const paddingTop = 0;
 const paddingBetweenPages = 9;
 
 function convertToExportY(y, meta) {
@@ -617,7 +618,7 @@ function convertFromExportY(pageNumber, yInPage, meta) {
   return y;
 }
 
-const paddingLeft = 19;
+const paddingLeft = 0;
 
 function convertToExportX(x) {
   return x - paddingLeft;

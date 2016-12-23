@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import PDFJSAnnotate from '../PDFJSAnnotate';
 import appendChild from '../render/appendChild';
 import {
@@ -166,9 +167,7 @@ export function closeInput(textAnnotation) {
     }
   }
 
-  if (datalist) {
-    datalist.parentNode.removeChild(datalist);
-  }
+  $(datalist).remove();
 }
 
 function getInputHistories() {

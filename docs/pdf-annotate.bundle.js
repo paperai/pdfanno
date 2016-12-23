@@ -72,6 +72,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	__webpack_require__(54);
 	
+	
+	// for Convinience.
+	window.$ = window.jQuery = _jquery2.default;
+	
 	// import { svgLayerId } from './consts';
 	
 	
@@ -101,6 +105,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	window.addEventListener('resize', function () {
 	    (0, _jquery2.default)('#annoLayer').remove();
+	    (0, _jquery2.default)('#tmpLayer').remove();
+	});
+	
+	document.getElementById('scaleSelect').addEventListener('change', function () {
+	    console.log('scaleChanged');
+	    (0, _jquery2.default)('#annoLayer').remove();
+	    (0, _jquery2.default)('#tmpLayer').remove();
+	});
+	
+	(0, _jquery2.default)('#zoomIn, #zoomOut').on('click', function () {
+	    console.log('zoomIn/Out clicked.');
+	    (0, _jquery2.default)('#annoLayer').remove();
+	    (0, _jquery2.default)('#tmpLayer').remove();
 	});
 	
 	function renderAnno() {
@@ -113,16 +130,48 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return;
 	    }
 	
+	    var leftMargin = ((0, _jquery2.default)('#viewer').width() - (0, _jquery2.default)('.page').width()) / 2;
+	
+	    // At window.width < page.width.
+	    if (leftMargin < 0) {
+	        leftMargin = 9;
+	    }
+	    console.log('leftMargin:', leftMargin);
+	
+	    var height = (0, _jquery2.default)('#viewer').height();
+	
+	    var width = (0, _jquery2.default)('.page').width();
+	
 	    // Add an annotation layer.
 	    var $annoLayer = (0, _jquery2.default)('<svg id="' + svgLayerId + '"/>').css({ // TODO CSSClass.
 	        position: 'absolute',
+	        // top      : '9px',
 	        top: '0px',
-	        left: '0px',
-	        width: '100%',
-	        height: (0, _jquery2.default)('#viewer').height() + 'px',
-	        visibility: 'hidden'
+	        left: leftMargin + 'px',
+	        // width    : `calc(100% - ${leftMargin*2}px`,
+	        width: width + 'px',
+	        // height   : `${height-9}px`,
+	        height: height + 'px',
+	        visibility: 'hidden',
+	        'z-index': 2
 	    });
-	    (0, _jquery2.default)('#viewerContainer').append($annoLayer);
+	    // Add a tmp layer.
+	    var $tmpLayer = (0, _jquery2.default)('<div id="tmpLayer"/>').css({ // TODO CSSClass.
+	        position: 'absolute',
+	        top: '0px',
+	        left: leftMargin + 'px',
+	        // width    : `calc(100% - ${leftMargin*2}px`,
+	        width: width + 'px',
+	        // height   : `${height-9}px`,
+	        height: height + 'px',
+	        visibility: 'hidden',
+	        'z-index': 2
+	    });
+	    // $('#viewerContainer').append($annoLayer);
+	    // $('#pageContainer1').css({
+	    (0, _jquery2.default)('#viewer').css({
+	        position: 'relative'
+	    }).append($annoLayer).append($tmpLayer);
 	
 	    var svg = $annoLayer.get(0);
 	    var documentId = getFileName(PDFView.url);
@@ -11677,6 +11726,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.getXY = getXY;
 	exports.getSVGLayer = getSVGLayer;
 	exports.getViewerContainer = getViewerContainer;
+	exports.getTmpLayer = getTmpLayer;
+	exports.getCurrentPage = getCurrentPage;
 	
 	var _jquery = __webpack_require__(6);
 	
@@ -12044,18 +12095,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function getXY(e) {
 	
-	  var rect = (0, _jquery2.default)('#annoLayer')[0].getBoundingClientRect();
+	  var rect1 = (0, _jquery2.default)('#pageContainer1')[0].getBoundingClientRect();
+	  // console.log('rect1:', rect1);
+	  var rect2 = (0, _jquery2.default)('#annoLayer')[0].getBoundingClientRect();
+	  // console.log('rect2:', rect2);
+	
+	  var rectTop = rect2.top - rect1.top;
+	  var rectLeft = rect2.left - rect1.left;
+	  // console.log(rectTop, rectLeft);
 	
 	  // let x = e.clientX - rect.left;
 	  // let y = $('#annoLayer').scrollTop() + e.clientY - rect.top;
 	
 	  // let x = e.clientX - rect.left;
-	  var y = e.clientY + (0, _jquery2.default)('#annoLayer').scrollTop() - rect.top;
+	  // let y = e.clientY + $('#annoLayer').scrollTop() - rect.top;
+	  // let y = e.clientY + $('#annoLayer').scrollTop();
+	  // let y = e.clientY + $('#annoLayer').scrollTop() - rectTop;
+	  var y = e.clientY + (0, _jquery2.default)('#annoLayer').scrollTop() - rect2.top;
 	
-	  var x = e.clientX - rect.left;
+	  // let x = e.clientX - rect.left;
+	  // let x = e.clientX;
+	  // let x = e.clientX - rectLeft;
+	  var x = e.clientX - rect2.left;
 	  // let y = e.clientY - rect.top;
 	
-	  console.log('e.client:', e.clientX, e.clientY);
+	  // console.log('e.client:', e.clientX, e.clientY, $('#annoLayer').scrollTop());
+	
+	  // console.log('y:', y, e.clientY, $('#annoLayer').scrollTop(), rect2.top);
 	
 	  return { x: x, y: y };
 	}
@@ -12065,7 +12131,62 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	function getViewerContainer() {
-	  return document.getElementById('viewerContainer');
+	  // return document.getElementById('viewerContainer');
+	  return document.getElementById('pageContainer1');
+	}
+	
+	function getTmpLayer() {
+	  return document.getElementById('tmpLayer');
+	}
+	
+	function getCurrentPage(e) {
+	  var _getXY = getXY(e),
+	      x = _getXY.x,
+	      y = _getXY.y;
+	
+	  var scrollTop = (0, _jquery2.default)('#annoLayer')[0].getBoundingClientRect().top;
+	  var scrollLeft = (0, _jquery2.default)('#annoLayer')[0].getBoundingClientRect().left;
+	
+	  // let elements = document.querySelectorAll('.page');
+	  var elements = document.querySelectorAll('.canvasWrapper');
+	
+	  for (var i = 0, l = elements.length; i < l; i++) {
+	    var el = elements[i];
+	    var rect = el.getBoundingClientRect();
+	
+	    var pageNumber = i + 1;
+	
+	    // rect.top = $('#annoLayer').scrollTop();
+	    // 927
+	    var minX = rect.left - scrollLeft;
+	    var maxX = rect.right - scrollLeft;
+	    var minY = rect.top - scrollTop; // + 9 * pageNumber;    // 9 = margin
+	    var maxY = rect.bottom - scrollTop; // + 9 * pageNumber;
+	
+	    if (minX <= x && x <= maxX && minY <= y && y <= maxY) {
+	
+	      var page = parseInt(el.parentNode.id.replace('pageContainer', ''));
+	
+	      console.log('find!!!!', page);
+	      // console.log('x', minX <= x && x <= maxX, minX, x, maxX);
+	      // console.log('y', minY <= y && y <= maxY, minY, y, maxY);
+	
+	      return { page: page, minX: minX, maxX: maxX, minY: minY, maxY: maxY };
+	    }
+	
+	    // if (pointIntersectsRect(x, y, rect)) {
+	
+	    //   console.log('find!!!', el, rect);
+	
+	    //   return el;
+	    // }
+	  }
+	
+	  console.log('notfound ><...');
+	  return null;
+	
+	  // TODO
+	  return 1;
 	}
 
 /***/ },
@@ -12519,10 +12640,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	              // Rect
 	              if (annotation.type === 'area') {
 	                var _convertToExportY = convertToExportY(annotation.y, meta),
-	                    pageNumber = _convertToExportY.pageNumber,
+	                    _pageNumber = _convertToExportY.pageNumber,
 	                    y = _convertToExportY.y;
 	
-	                annotations['rect-' + indexRect++] = [pageNumber, convertToExportX(annotation.x), y, annotation.width, annotation.height];
+	                annotations['rect-' + indexRect++] = [_pageNumber, convertToExportX(annotation.x), y, annotation.width, annotation.height];
 	
 	                // Highlight.
 	              } else if (annotation.type === 'highlight') {
@@ -12554,11 +12675,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                  // save tmporary for arrow.
 	                  annotation.key = key;
+	                  annotation.page = pageNumber;
 	
 	                  // Arrow.
 	                })();
 	              } else if (annotation.type === 'arrow') {
-	                var _data = [annotation.page, // TODO remove?
+	                var _data = [annotation.page, // TODO bugfix. always 1.
 	                annotation.direction];
 	                var highlight1s = container[documentId].annotations.filter(function (a) {
 	                  return a.uuid === annotation.highlight1;
@@ -12587,11 +12709,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                });
 	                if (rels.length === 0) {
 	                  var _convertToExportY3 = convertToExportY(annotation.y, meta),
-	                      _pageNumber = _convertToExportY3.pageNumber,
+	                      _pageNumber2 = _convertToExportY3.pageNumber,
 	                      _y = _convertToExportY3.y;
 	
 	                  console.log('text:', annotation.content);
-	                  annotations['text-' + indexText++] = [annotation.page, convertToExportX(annotation.x), _y, annotation.content];
+	                  annotations['text-' + indexText++] = [_pageNumber2, convertToExportX(annotation.x), _y, annotation.content];
 	                }
 	              }
 	            });
@@ -12677,9 +12799,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // Rect.
 	      if (key.indexOf('rect') === 0) {
-	        var pageNumber = data[0];
+	        var _pageNumber3 = data[0];
 	        var yInJson = data[2];
-	        var y = convertFromExportY(pageNumber, yInJson, meta);
+	        var y = convertFromExportY(_pageNumber3, yInJson, meta);
 	        annotations.push({
 	          class: 'Annotation',
 	          type: 'area',
@@ -12718,9 +12840,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	          var x = convertFromExportX(rectangles[0].x);
 	          var _y2 = rectangles[0].y - 20; // 20 = circle'radius(3px) + input height(14px) + α
 	
-	          var _pageNumber2 = data[0][0];
+	          var _pageNumber4 = data[0][0];
 	          console.log('spanText:', _y2);
-	          _y2 = convertFromExportY(_pageNumber2, _y2, meta);
+	          _y2 = convertFromExportY(_pageNumber4, _y2, meta);
 	          console.log('spanText:', _y2);
 	
 	          annotations.push({
@@ -12750,9 +12872,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // Text Independent.
 	      } else if (key.indexOf('text') === 0) {
-	        var _pageNumber3 = data[0];
+	        var _pageNumber5 = data[0];
 	        var _yInJson = data[2];
-	        var _y3 = convertFromExportY(_pageNumber3, _yInJson, meta);
+	        var _y3 = convertFromExportY(_pageNumber5, _yInJson, meta);
 	
 	        annotations.push({
 	          class: 'Annotation',
@@ -12802,9 +12924,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var _textId = null;
 	        if (data[4]) {
 	
-	          var _pageNumber5 = data[0];
+	          var _pageNumber7 = data[0];
 	          var _yInJson2 = textPosition.y;
-	          var _y4 = convertFromExportY(_pageNumber5, _yInJson2, meta);
+	          var _y4 = convertFromExportY(_pageNumber7, _yInJson2, meta);
 	
 	          _textId = (0, _uuid2.default)();
 	          annotations.push({
@@ -12820,7 +12942,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          });
 	        }
 	
-	        var _pageNumber4 = data[0];
+	        var _pageNumber6 = data[0];
 	
 	        // Add arrow.
 	        annotations.push({
@@ -12932,7 +13054,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return index;
 	}
 	
-	var paddingTop = 10;
+	var paddingTop = 0;
 	var paddingBetweenPages = 9;
 	
 	function convertToExportY(y, meta) {
@@ -12954,7 +13076,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return y;
 	}
 	
-	var paddingLeft = 19;
+	var paddingLeft = 0;
 	
 	function convertToExportX(x) {
 	  return x - paddingLeft;
@@ -15708,6 +15830,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	var originY = void 0;
 	var originX = void 0;
 	
+	var enableArea = {
+	  page: 0,
+	  minX: 0,
+	  maxX: 0,
+	  minY: 0,
+	  maxY: 0
+	};
+	
 	/**
 	 * Handle document.mousedown event
 	 *
@@ -15721,13 +15851,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	  originX = x;
 	  originY = y;
 	
+	  enableArea = (0, _utils.getCurrentPage)(e);
+	  if (!enableArea) {
+	    return;
+	  }
+	
 	  overlay = document.createElement('div');
 	  overlay.style.position = 'absolute';
 	  overlay.style.top = originY + 'px';
 	  overlay.style.left = originX + 'px';
+	  overlay.style.width = 0;
+	  overlay.style.height = 0;
 	  overlay.style.border = '2px solid ' + _utils.BORDER_COLOR;
 	  overlay.style.boxSizing = 'border-box';
-	  (0, _utils.getViewerContainer)().appendChild(overlay);
+	  overlay.style.visibility = 'visible';
+	  (0, _utils.getTmpLayer)().appendChild(overlay);
 	
 	  document.addEventListener('mousemove', handleDocumentMousemove);
 	}
@@ -15744,13 +15882,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  var x = Math.min(originX, curX);
 	  var y = Math.min(originY, curY);
-	  var width = Math.abs(originX - curX);
-	  var height = Math.abs(originY - curY);
+	  var w = Math.abs(originX - curX);
+	  var h = Math.abs(originY - curY);
 	
+	  // Restrict in page.
+	  x = Math.min(enableArea.maxX, Math.max(enableArea.minX, x));
+	  y = Math.min(enableArea.maxY, Math.max(enableArea.minY, y));
+	  if (x > enableArea.minX) {
+	    w = Math.min(w, enableArea.maxX - x);
+	  } else {
+	    w = originX - enableArea.minX;
+	  }
+	  if (y > enableArea.minY) {
+	    h = Math.min(h, enableArea.maxY - y);
+	  } else {
+	    h = originY - enableArea.minY;
+	  }
+	
+	  // Move and Resize.
 	  overlay.style.left = x + 'px';
 	  overlay.style.top = y + 'px';
-	  overlay.style.width = width + 'px';
-	  overlay.style.height = height + 'px';
+	  overlay.style.width = w + 'px';
+	  overlay.style.height = h + 'px';
 	}
 	
 	/**
@@ -15783,6 +15936,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {Object} rect - The rect to use for annotation.
 	 */
 	function saveRect(rect) {
+	
+	  if (rect.width === 0 || rect.height === 0) {
+	    return;
+	  }
 	
 	  var svg = (0, _utils.getSVGLayer)();
 	
@@ -15851,6 +16008,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.setText = setText;
 	exports.enableText = enableText;
 	exports.disableText = disableText;
+	
+	var _jquery = __webpack_require__(6);
+	
+	var _jquery2 = _interopRequireDefault(_jquery);
 	
 	var _PDFJSAnnotate = __webpack_require__(7);
 	
@@ -16034,9 +16195,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 	
-	  if (datalist) {
-	    datalist.parentNode.removeChild(datalist);
-	  }
+	  (0, _jquery2.default)(datalist).remove();
 	}
 	
 	function getInputHistories() {
