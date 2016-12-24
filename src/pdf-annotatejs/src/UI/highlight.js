@@ -108,6 +108,9 @@ function saveRect(rects) {
 
   // Add the annotation
   PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation).then((annotation) => {
+
+    console.log('annotation:', annotation);
+
     appendChild(svg, annotation);
 
     // Add an input field.

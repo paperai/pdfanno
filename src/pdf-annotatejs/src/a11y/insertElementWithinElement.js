@@ -34,7 +34,8 @@ export default function insertElementWithinElement(el, x, y, pageNumber, insertB
   // text boundary, instead of missing a character by cutting off within.
   x = x + (OFFSET_ADJUST * (insertBefore ? -1 : 1));
 
-  let svg = document.querySelector(`svg[data-pdf-annotate-page="${pageNumber}"]`);
+  // let svg = document.querySelector(`svg[data-pdf-annotate-page="${pageNumber}"]`);
+  let svg = document.querySelector('#annoLayer');
   let left = scaleDown(svg, {left: node.getBoundingClientRect().left}).left - svg.getBoundingClientRect().left;
   let temp = node.cloneNode(true);
   let head = temp.innerHTML.split('');
@@ -82,7 +83,7 @@ export default function insertElementWithinElement(el, x, y, pageNumber, insertB
  * @return {Element} First text layer element found at the point
  */
 function textLayerElementFromPoint(x, y, pageNumber) {
-  let svg = document.querySelector(`svg[data-pdf-annotate-page="${pageNumber}"]`);
+  let svg = document.querySelector('#annoLayer');
   let rect = svg.getBoundingClientRect();
   y = scaleUp(svg, {y}).y + rect.top;
   x = scaleUp(svg, {x}).x + rect.left;

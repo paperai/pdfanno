@@ -14768,7 +14768,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @return {Element} First text layer element found at the point
 	 */
 	function textLayerElementFromPoint(x, y, pageNumber) {
-	  var svg = document.querySelector('svg[data-pdf-annotate-page="' + pageNumber + '"]');
+	  // var svg = document.querySelector('svg[data-pdf-annotate-page="' + pageNumber + '"]');
+	  var svg = document.querySelector('#annoLayer');
 	  var rect = svg.getBoundingClientRect();
 	  y = (0, _utils.scaleUp)(svg, { y: y }).y + rect.top;
 	  x = (0, _utils.scaleUp)(svg, { x: x }).x + rect.left;
