@@ -12479,11 +12479,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      getAnnotations: function getAnnotations(documentId, pageNumber) {
 	        return new Promise(function (resolve, reject) {
 	          var annotations = _getAnnotations(documentId).filter(function (i) {
-	            if (pageNumber) {
-	              return i.page === pageNumber && i.class === 'Annotation';
-	            } else {
-	              return true;
-	            }
+	            // if (pageNumber) {
+	            //   return i.page === pageNumber && i.class === 'Annotation';
+	            // } else {
+	            return true;
+	            // }            
 	          });
 	
 	          resolve({
@@ -12501,14 +12501,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	          containers.forEach(function (container) {
 	            // TODO refactoring. same thing exists.
 	            var tmpAnnotations = ((container[documentId] || {}).annotations || []).filter(function (i) {
-	              if (pageNumber) {
-	                console.log('bbbb:', i);
-	                return i.page === pageNumber && i.class === 'Annotation';
-	              } else {
-	                return true;
-	              }
+	              // if (pageNumber) {
+	              //   return i.page === pageNumber && i.class === 'Annotation';
+	              // } else {
+	              return true;
+	              // }
 	            });
 	            annotations = annotations.concat(tmpAnnotations);
+	          });
+	
+	          // Convert coordinate system.
+	          annotations = annotations.map(function (a) {
+	            return transformToRenderCoordinate(a);
 	          });
 	
 	          resolve({
@@ -12525,23 +12529,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return new Promise(function (resolve, reject) {
 	          annotation.class = 'Annotation';
 	          annotation.uuid = annotation.uuid || (0, _uuid2.default)();
-	          annotation.page = pageNumber;
+	          // annotation.page = pageNumber;
 	
 	          var annotations = _getAnnotations(documentId);
 	          annotations.push(annotation);
+	
 	          updateAnnotations(documentId, annotations);
 	
 	          resolve(annotation);
 	        });
 	      },
 	      addAllAnnotations: function addAllAnnotations(documentId, annotations) {
-	        console.log('addAllAnnotations');
 	        return new Promise(function (resolve, reject) {
 	          updateAnnotations(documentId, annotations);
 	          resolve();
 	        });
 	      },
 	      editAnnotation: function editAnnotation(documentId, annotationId, annotation) {
+	        console.log('editAnnotation:', (0, _deepAssign2.default)({}, annotation));
 	        return new Promise(function (resolve, reject) {
 	          var annotations = _getAnnotations(documentId);
 	          annotations[findAnnotation(documentId, annotationId)] = annotation;
@@ -12631,57 +12636,44 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var indexSpan = 1;
 	            var indexRel = 1;
 	            var indexText = 1;
-	            var meta = container[documentId].meta;
-	            var annotations = { meta: meta };
+	            var annotations = {};
 	            dataExport[documentId] = annotations;
 	
 	            container[documentId].annotations.forEach(function (annotation) {
 	
 	              // Rect
 	              if (annotation.type === 'area') {
-	                var _convertToExportY = convertToExportY(annotation.y, meta),
-	                    _pageNumber = _convertToExportY.pageNumber,
-	                    y = _convertToExportY.y;
-	
-	                annotations['rect-' + indexRect++] = [_pageNumber, convertToExportX(annotation.x), y, annotation.width, annotation.height];
+	                annotations['rect-' + indexRect++] = [annotation.page, annotation.x, annotation.y, annotation.width, annotation.height];
 	
 	                // Highlight.
 	              } else if (annotation.type === 'highlight') {
-	                (function () {
-	                  var data = [];
-	                  // rectangles.
-	                  annotation.rectangles.forEach(function (rectangle) {
-	                    var _convertToExportY2 = convertToExportY(rectangle.y, meta),
-	                        pageNumber = _convertToExportY2.pageNumber,
-	                        y = _convertToExportY2.y;
-	
-	                    data.push([pageNumber, convertToExportX(rectangle.x), y, rectangle.width, rectangle.height]);
+	                // rectangles.
+	                var data = annotation.rectangles.map(function (rectangle) {
+	                  return [rectangle.page, rectangle.x, rectangle.y, rectangle.width, rectangle.height];
+	                });
+	                // span text.
+	                var text = '';
+	                if (annotation.text) {
+	                  // TODO use `getAnnotations` instead.
+	                  var texts = container[documentId].annotations.filter(function (a) {
+	                    return a.uuid === annotation.text;
 	                  });
-	                  // span text.
-	                  var text = '';
-	                  if (annotation.text) {
-	                    // TODO use `getAnnotations` instead.
-	                    var texts = container[documentId].annotations.filter(function (a) {
-	                      return a.uuid === annotation.text;
-	                    });
-	                    if (texts.length > 0) {
-	                      text = texts[0].content;
-	                    }
+	                  if (texts.length > 0) {
+	                    text = texts[0].content;
 	                  }
-	                  data.push(text);
+	                }
+	                data.push(text);
 	
-	                  var key = 'span-' + indexSpan++;
-	                  annotations[key] = data;
+	                var key = 'span-' + indexSpan++;
+	                annotations[key] = data;
 	
-	                  // save tmporary for arrow.
-	                  annotation.key = key;
-	                  annotation.page = pageNumber;
+	                // save tmporary for arrow.
+	                annotation.key = key;
+	                annotation.page = pageNumber;
 	
-	                  // Arrow.
-	                })();
+	                // Arrow.
 	              } else if (annotation.type === 'arrow') {
-	                var _data = [annotation.page, // TODO bugfix. always 1.
-	                annotation.direction];
+	                var _data = [annotation.page1, annotation.direction];
 	                var highlight1s = container[documentId].annotations.filter(function (a) {
 	                  return a.uuid === annotation.highlight1;
 	                });
@@ -12690,11 +12682,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                  return a.uuid === annotation.highlight2;
 	                });
 	                _data.push(highlight2s[0].key);
-	                var texts = container[documentId].annotations.filter(function (a) {
+	                var _texts = container[documentId].annotations.filter(function (a) {
 	                  return a.uuid === annotation.text;
 	                });
-	                if (texts.length > 0) {
-	                  _data.push(texts[0].content);
+	                if (_texts.length > 0) {
+	                  _data.push(_texts[0].content);
 	                } else {
 	                  _data.push('');
 	                }
@@ -12708,12 +12700,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                  return a.text === annotation.uuid;
 	                });
 	                if (rels.length === 0) {
-	                  var _convertToExportY3 = convertToExportY(annotation.y, meta),
-	                      _pageNumber2 = _convertToExportY3.pageNumber,
-	                      _y = _convertToExportY3.y;
-	
-	                  console.log('text:', annotation.content);
-	                  annotations['text-' + indexText++] = [_pageNumber2, convertToExportX(annotation.x), _y, annotation.content];
+	                  annotations['text-' + indexText++] = [annotation.page, annotation.x, annotation.y, annotation.content];
 	                }
 	              }
 	            });
@@ -12783,32 +12770,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  var container = {};
 	
-	  var _loop2 = function _loop2(documentId) {
+	  for (var documentId in json) {
 	
-	    var meta = json[documentId].meta;
-	    var annotations = [];
-	    container[documentId] = { meta: meta, annotations: annotations };
+	    var _annotations = [];
+	    container[documentId] = { annotations: _annotations };
 	
-	    var _loop3 = function _loop3(key) {
-	
-	      if (key === 'meta') {
-	        return 'continue';
-	      }
+	    var _loop2 = function _loop2(key) {
 	
 	      var data = json[documentId][key];
 	
 	      // Rect.
 	      if (key.indexOf('rect') === 0) {
-	        var _pageNumber3 = data[0];
-	        var yInJson = data[2];
-	        var y = convertFromExportY(_pageNumber3, yInJson, meta);
-	        annotations.push({
+	        _annotations.push({
 	          class: 'Annotation',
 	          type: 'area',
 	          uuid: (0, _uuid2.default)(),
-	          page: 1,
-	          x: convertFromExportX(data[1]),
-	          y: y,
+	          page: data[0],
+	          x: data[1],
+	          y: data[2],
 	          width: data[3],
 	          height: data[4],
 	          readOnly: readOnly,
@@ -12819,13 +12798,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      } else if (key.indexOf('span') === 0) {
 	        // rectangles.
 	        var rectangles = data.slice(0, data.length - 1).map(function (d) {
-	          var pageNumber = d[0];
-	          var yInJson = d[2];
-	          var y = convertFromExportY(pageNumber, yInJson, meta);
-	          console.log('span:', y, yInJson);
 	          return {
-	            x: convertFromExportX(d[1]),
-	            y: y,
+	            page: d[0],
+	            x: d[1],
+	            y: d[2],
 	            width: d[3],
 	            height: d[4]
 	          };
@@ -12837,31 +12813,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	          textId = (0, _uuid2.default)();
 	          var svg = document.querySelector('.annotationLayer');
 	
-	          var x = convertFromExportX(rectangles[0].x);
-	          var _y2 = rectangles[0].y - 20; // 20 = circle'radius(3px) + input height(14px) + α
+	          var x = rectangles[0].x;
+	          var y = rectangles[0].y - 20; // 20 = circle'radius(3px) + input height(14px) + α
 	
-	          var _pageNumber4 = data[0][0];
-	          console.log('spanText:', _y2);
-	          _y2 = convertFromExportY(_pageNumber4, _y2, meta);
-	          console.log('spanText:', _y2);
+	          var _pageNumber = data[0][0];
 	
-	          annotations.push({
+	          _annotations.push({
 	            class: 'Annotation',
 	            type: 'textbox',
 	            uuid: textId,
-	            page: 1,
-	            x: convertFromExportX(x),
-	            y: _y2,
+	            page: _pageNumber,
+	            x: x,
+	            y: y,
 	            content: spanText,
 	            readOnly: readOnly,
 	            seq: index
 	          });
 	        }
-	        annotations.push({
+	        _annotations.push({
 	          class: 'Annotation',
 	          type: 'highlight',
 	          uuid: (0, _uuid2.default)(),
-	          page: 1,
+	          page: data[0][0],
 	          color: '#FFFF00', // TODO なくてもOK？
 	          rectangles: rectangles,
 	          text: textId,
@@ -12872,17 +12845,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // Text Independent.
 	      } else if (key.indexOf('text') === 0) {
-	        var _pageNumber5 = data[0];
-	        var _yInJson = data[2];
-	        var _y3 = convertFromExportY(_pageNumber5, _yInJson, meta);
-	
-	        annotations.push({
+	        _annotations.push({
 	          class: 'Annotation',
 	          type: 'textbox',
 	          uuid: (0, _uuid2.default)(),
-	          page: 1,
-	          x: convertFromExportX(data[1]),
-	          y: _y3,
+	          page: data[0],
+	          x: data[1],
+	          y: data[2],
 	          content: data[3],
 	          readOnly: readOnly,
 	          seq: index
@@ -12892,11 +12861,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      } else if (key.indexOf('rel') === 0) {
 	
 	        // Find highlights.
-	        var highlight1s = annotations.filter(function (a) {
+	        var highlight1s = _annotations.filter(function (a) {
 	          return a.key === data[2];
 	        });
 	        var highlight1 = highlight1s[0];
-	        var highlight2s = annotations.filter(function (a) {
+	        var highlight2s = _annotations.filter(function (a) {
 	          return a.key === data[3];
 	        });
 	        var highlight2 = highlight2s[0];
@@ -12907,7 +12876,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var x2 = highlight2.rectangles[0].x;
 	        var y2 = highlight2.rectangles[0].y - 5;
 	
-	        console.log('xy:', x1, y1, x2, y2);
+	        var page1 = highlight1.rectangles[0].page;
+	        var page2 = highlight2.rectangles[0].page;
+	
+	        var textPage = page1;
 	
 	        // Specify textbox position.
 	        // let svg = document.querySelector('.annotationLayer');
@@ -12920,32 +12892,57 @@ return /******/ (function(modules) { // webpackBootstrap
 	        p.y2 -= rect.top;
 	        var textPosition = (0, _utils.scaleDown)(_svg, (0, _relation.getRelationTextPosition)(_svg, p.x1, p.y1, p.x2, p.y2));
 	
+	        if (page1 !== page2) {
+	
+	          console.log('y1,y2=', y1, y2, page1, page2);
+	
+	          var y1Tmp = convertFromExportY(page1, y1);
+	          var y2Tmp = convertFromExportY(page2, y2);
+	
+	          console.log('y1,y2=', y1Tmp, y2Tmp);
+	
+	          // Specify textbox position.
+	          // let svg = document.querySelector('.annotationLayer');
+	          var _svg2 = document.getElementById('annoLayer'); // TODO make it const.
+	          var _p = (0, _utils.scaleUp)(_svg2, { x1: x1, y1Tmp: y1Tmp, x2: x2, y2Tmp: y2Tmp });
+	          var _rect = _svg2.getBoundingClientRect();
+	          _p.x1 -= _rect.left;
+	          _p.y1Tmp -= _rect.top;
+	          _p.x2 -= _rect.left;
+	          _p.y2Tmp -= _rect.top;
+	          textPosition = (0, _utils.scaleDown)(_svg2, (0, _relation.getRelationTextPosition)(_svg2, _p.x1, _p.y1Tmp, _p.x2, _p.y2Tmp));
+	
+	          var _convertToExportY = convertToExportY(textPosition.y),
+	              _y = _convertToExportY.y,
+	              _pageNumber3 = _convertToExportY.pageNumber;
+	
+	          textPosition.y = _y;
+	          textPage = _pageNumber3;
+	        }
+	
 	        // Add textbox and get the uuid of if.
 	        var _textId = null;
-	        if (data[4]) {
-	
-	          var _pageNumber7 = data[0];
-	          var _yInJson2 = textPosition.y;
-	          var _y4 = convertFromExportY(_pageNumber7, _yInJson2, meta);
+	        var textContent = data[4];
+	        if (textContent) {
 	
 	          _textId = (0, _uuid2.default)();
-	          annotations.push({
+	          _annotations.push({
 	            class: 'Annotation',
 	            type: 'textbox',
 	            uuid: _textId,
-	            page: data[0],
-	            x: convertFromExportX(textPosition.x),
-	            y: _y4,
-	            content: data[4],
+	            page: textPage,
+	            x: textPosition.x,
+	            y: textPosition.y,
+	            content: textContent,
 	            readOnly: readOnly,
 	            seq: index
 	          });
 	        }
 	
-	        var _pageNumber6 = data[0];
+	        var _pageNumber2 = data[0];
 	
 	        // Add arrow.
-	        annotations.push({
+	        _annotations.push({
 	          class: 'Annotation',
 	          type: 'arrow',
 	          direction: data[1],
@@ -12955,6 +12952,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	          y1: y1,
 	          x2: x2,
 	          y2: y2,
+	          page1: page1,
+	          page2: page2,
 	          text: _textId,
 	          highlight1: highlight1.uuid,
 	          highlight2: highlight2.uuid,
@@ -12966,17 +12965,116 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	
 	    for (var key in json[documentId]) {
-	      var _ret4 = _loop3(key);
-	
-	      if (_ret4 === 'continue') continue;
+	      _loop2(key);
 	    }
-	  };
-	
-	  for (var documentId in json) {
-	    _loop2(documentId);
 	  }
 	
 	  return container;
+	}
+	
+	function getPageSize() {
+	  var viewBox = PDFView.pdfViewer.getPageView(0).viewport.viewBox;
+	  var size = { width: viewBox[2], height: viewBox[3] };
+	  return size;
+	}
+	
+	function transformToRenderCoordinate(annotation) {
+	
+	  var _type = 'render';
+	
+	  if (annotation.coords === _type) {
+	    return annotation;
+	  }
+	
+	  annotation.coords = _type;
+	
+	  // Copy for avoiding sharing.
+	  annotation = (0, _deepAssign2.default)({}, annotation);
+	
+	  if (annotation.y) {
+	    annotation.y = convertFromExportY(annotation.page, annotation.y);
+	  }
+	
+	  if (annotation.y1) {
+	    annotation.y1 = convertFromExportY(annotation.page1, annotation.y1);
+	  }
+	
+	  if (annotation.y2) {
+	    annotation.y2 = convertFromExportY(annotation.page2, annotation.y2);
+	  }
+	
+	  if (annotation.rectangles) {
+	    // Copy for avoiding sharing.
+	    annotation.rectangles = annotation.rectangles.map(function (a) {
+	      return (0, _deepAssign2.default)({}, a);
+	    });
+	    annotation.rectangles.forEach(function (r) {
+	      r.y = convertFromExportY(r.page, r.y);
+	    });
+	  }
+	
+	  return annotation;
+	}
+	
+	function transformFromRenderCoordinate(annotation) {
+	
+	  var _type = 'saveData';
+	
+	  if (annotation.coords === _type) {
+	    console.log('skip: ', annotation);
+	    return annotation;
+	  }
+	
+	  annotation.coords = _type;
+	
+	  // Copy for avoiding sharing.
+	  annotation = (0, _deepAssign2.default)({}, annotation);
+	
+	  if (annotation.y) {
+	    var _convertToExportY2 = convertToExportY(annotation.y),
+	        y = _convertToExportY2.y,
+	        _pageNumber4 = _convertToExportY2.pageNumber;
+	
+	    annotation.y = y;
+	    annotation.page = _pageNumber4;
+	  }
+	
+	  if (annotation.y1) {
+	    var _convertToExportY3 = convertToExportY(annotation.y1),
+	        _y2 = _convertToExportY3.y,
+	        _pageNumber5 = _convertToExportY3.pageNumber;
+	
+	    annotation.y1 = _y2;
+	    annotation.page1 = _pageNumber5;
+	  }
+	
+	  if (annotation.y2) {
+	    var _convertToExportY4 = convertToExportY(annotation.y2),
+	        _y3 = _convertToExportY4.y,
+	        _pageNumber6 = _convertToExportY4.pageNumber;
+	
+	    annotation.y2 = _y3;
+	    annotation.page2 = _pageNumber6;
+	  }
+	
+	  if (annotation.rectangles) {
+	    // Copy for avoiding sharing.
+	    annotation.rectangles = annotation.rectangles.map(function (a) {
+	      return (0, _deepAssign2.default)({}, a);
+	    });
+	    annotation.rectangles.forEach(function (r) {
+	      var _convertToExportY5 = convertToExportY(r.y),
+	          y = _convertToExportY5.y,
+	          pageNumber = _convertToExportY5.pageNumber;
+	
+	      r.y = y;
+	      r.page = pageNumber;
+	
+	      console.log('rec:', r.y, y, pageNumber);
+	    });
+	  }
+	
+	  return annotation;
 	}
 	
 	function _getContainer() {
@@ -12991,15 +13089,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	function _getSecondaryContainers() {
-	  var containers = localStorage.getItem(LOCALSTORAGE_KEY_SECONDARY);
-	  if (!containers) {
-	    // containers = [];
-	    // _saveSecondaryContainer(containers);
-	    return [];
-	  } else {
-	    containers = JSON.parse(containers);
-	  }
-	  return containers;
+	  var containers = localStorage.getItem(LOCALSTORAGE_KEY_SECONDARY) || '[]';
+	  return JSON.parse(containers);
 	}
 	
 	function _saveContainer(container) {
@@ -13013,8 +13104,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _getAnnotations(documentId) {
 	  // Primary annotation.
 	  var container = _getContainer();
-	  var annotations = (container[documentId] || {}).annotations;
-	  return annotations || [];
+	  var annotations = (container[documentId] || {}).annotations || [];
+	
+	  // transform coordinate system.
+	  annotations = annotations.map(function (a) {
+	    return transformToRenderCoordinate(a);
+	  });
+	
+	  return annotations;
 	}
 	
 	function _getSecondaryAnnotations(documentId) {
@@ -13029,10 +13126,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  });
 	
+	  // transform coordinate system.
+	  annotations = annotations.map(function (a) {
+	    return transformToRenderCoordinate(a);
+	  });
+	
 	  return annotations;
 	}
 	
 	function updateAnnotations(documentId, annotations) {
+	
+	  console.log('updateAnnotations');
+	
+	  // Transform coordinate system.
+	  annotations = annotations.map(function (a) {
+	    return transformFromRenderCoordinate(a);
+	  });
 	
 	  var viewBox = PDFView.pdfViewer.getPageView(0).viewport.viewBox;
 	  var meta = { w: viewBox[2], h: viewBox[3] };
@@ -13059,29 +13168,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function convertToExportY(y, meta) {
 	
+	  meta = getPageSize();
+	
 	  y -= paddingTop;
 	
-	  var pageNumber = Math.floor(y / meta.h) + 1;
-	  var yInPage = y - (pageNumber - 1) * (meta.h + paddingBetweenPages);
+	  var pageNumber = Math.floor(y / meta.height) + 1;
+	  var yInPage = y - (pageNumber - 1) * (meta.height + paddingBetweenPages);
 	
 	  return { pageNumber: pageNumber, y: yInPage };
 	}
 	
 	function convertFromExportY(pageNumber, yInPage, meta) {
 	
+	  meta = getPageSize();
+	
 	  var y = yInPage + paddingTop;
 	
-	  y += (pageNumber - 1) * (meta.h + paddingBetweenPages);
+	  y += (pageNumber - 1) * (meta.height + paddingBetweenPages);
 	
 	  return y;
 	}
 	
 	var paddingLeft = 0;
 	
-	function convertToExportX(x) {
+	function convertToExportX(x, meta) {
 	  return x - paddingLeft;
 	}
-	function convertFromExportX(x) {
+	function convertFromExportX(x, meta) {
 	  return x + paddingLeft;
 	}
 	module.exports = exports['default'];
@@ -14644,7 +14757,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	
 	  // Fall back to inserting between elements
-	  var svg = document.querySelector('svg[data-pdf-annotate-page="' + pageNumber + '"]');
+	  // let svg = document.querySelector(`svg[data-pdf-annotate-page="${pageNumber}"]`);
+	  var svg = document.querySelector('#annoLayer');
 	  var rect = svg.getBoundingClientRect();
 	  var nodes = [].concat(_toConsumableArray(svg.parentNode.querySelectorAll('.textLayer > div')));
 	
@@ -14720,7 +14834,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // text boundary, instead of missing a character by cutting off within.
 	  x = x + OFFSET_ADJUST * (insertBefore ? -1 : 1);
 	
-	  var svg = document.querySelector('svg[data-pdf-annotate-page="' + pageNumber + '"]');
+	  // let svg = document.querySelector(`svg[data-pdf-annotate-page="${pageNumber}"]`);
+	  var svg = document.querySelector('#annoLayer');
 	  var left = (0, _utils.scaleDown)(svg, { left: node.getBoundingClientRect().left }).left - svg.getBoundingClientRect().left;
 	  var temp = node.cloneNode(true);
 	  var head = temp.innerHTML.split('');
@@ -14768,7 +14883,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @return {Element} First text layer element found at the point
 	 */
 	function textLayerElementFromPoint(x, y, pageNumber) {
-	  // var svg = document.querySelector('svg[data-pdf-annotate-page="' + pageNumber + '"]');
 	  var svg = document.querySelector('#annoLayer');
 	  var rect = svg.getBoundingClientRect();
 	  y = (0, _utils.scaleUp)(svg, { y: y }).y + rect.top;
@@ -16384,6 +16498,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	  _PDFJSAnnotate2.default.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation).then(function (annotation) {
+	
+	    console.log('annotation:', annotation);
+	
 	    (0, _appendChild2.default)(svg, annotation);
 	
 	    // Add an input field.
@@ -16400,14 +16517,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return;
 	      }
 	
-	      // Set relation between arrow and text.
-	      annotation.text = textAnnotation.uuid;
+	      // FIXME: cannot stop refarence counter. I wanna use the original `annotation`, but couldn't.
+	      _PDFJSAnnotate2.default.getStoreAdapter().getAnnotation(documentId, annotation.uuid).then(function (annotation) {
 	
-	      // Update data.
-	      _PDFJSAnnotate2.default.getStoreAdapter().editAnnotation(documentId, annotation.uuid, annotation);
+	        // Set relation between arrow and text.
+	        annotation.text = textAnnotation.uuid;
 	
-	      // Update UI.
-	      (0, _jquery2.default)('[data-pdf-annotate-id="' + annotation.uuid + '"]').attr('data-text', textAnnotation.uuid);
+	        // Update data.
+	        _PDFJSAnnotate2.default.getStoreAdapter().editAnnotation(documentId, annotation.uuid, annotation);
+	
+	        // Update UI.
+	        (0, _jquery2.default)('[data-pdf-annotate-id="' + annotation.uuid + '"]').attr('data-text', textAnnotation.uuid);
+	      });
 	    });
 	  });
 	}
@@ -16892,18 +17013,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return;
 	    }
 	
-	    // Set relation between arrow and text.
-	    arrowAnnotation.text = textAnnotation.uuid;
+	    var svg = (0, _utils.getSVGLayer)();
 	
-	    // Update.
-	    // let element = document.querySelector('.annotationLayer');
-	    var element = document.getElementById('annoLayer'); // TODO make it const.
-	    var documentId = element.getAttribute('data-pdf-annotate-document'); // 共通化
-	    _PDFJSAnnotate2.default.getStoreAdapter().editAnnotation(documentId, arrowAnnotation.uuid, arrowAnnotation);
+	    var _getMetadata2 = (0, _utils.getMetadata)(svg),
+	        documentId = _getMetadata2.documentId,
+	        pageNumber = _getMetadata2.pageNumber;
 	
-	    // Update UI.
-	    console.log('arrow:', (0, _jquery2.default)('[data-pdf-annotate-id="' + arrowAnnotation.uuid + '"]'));
-	    (0, _jquery2.default)('[data-pdf-annotate-id="' + arrowAnnotation.uuid + '"]').attr('data-text', textAnnotation.uuid);
+	    // FIXME: cannot stop refarence counter. I wanna use the original `annotation`, but couldn't.
+	
+	
+	    _PDFJSAnnotate2.default.getStoreAdapter().getAnnotation(documentId, arrowAnnotation.uuid).then(function (arrowAnnotation) {
+	
+	      // Set relation between arrow and text.
+	      arrowAnnotation.text = textAnnotation.uuid;
+	
+	      // Update.
+	      // let element = document.querySelector('.annotationLayer');
+	      var element = document.getElementById('annoLayer'); // TODO make it const.
+	      var documentId = element.getAttribute('data-pdf-annotate-document'); // 共通化
+	      _PDFJSAnnotate2.default.getStoreAdapter().editAnnotation(documentId, arrowAnnotation.uuid, arrowAnnotation);
+	
+	      // Update UI.
+	      console.log('arrow:', (0, _jquery2.default)('[data-pdf-annotate-id="' + arrowAnnotation.uuid + '"]'));
+	      (0, _jquery2.default)('[data-pdf-annotate-id="' + arrowAnnotation.uuid + '"]').attr('data-text', textAnnotation.uuid);
+	    });
 	  });
 	}
 	

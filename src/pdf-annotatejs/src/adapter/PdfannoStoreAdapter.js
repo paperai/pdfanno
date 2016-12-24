@@ -28,9 +28,6 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
             // }            
           });
 
-          // Convert coordinate system.
-          annotations = annotations.map(a => transformToRenderCoordinate(a));
-
           resolve({
             documentId,
             pageNumber,
@@ -47,11 +44,11 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
           containers.forEach(container => {
             // TODO refactoring. same thing exists.
             let tmpAnnotations = ((container[documentId] || {}).annotations || []).filter(i => {
-              if (pageNumber) {
-                return i.page === pageNumber && i.class === 'Annotation';
-              } else {
+              // if (pageNumber) {
+              //   return i.page === pageNumber && i.class === 'Annotation';
+              // } else {
                 return true;
-              }
+              // }
             });
             annotations = annotations.concat(tmpAnnotations);
           });
@@ -95,6 +92,7 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
       },
 
       editAnnotation(documentId, annotationId, annotation) {
+        console.log('editAnnotation:', assign({}, annotation));
         return new Promise((resolve, reject) => {
           let annotations = getAnnotations(documentId);
           annotations[findAnnotation(documentId, annotationId)] = annotation;
@@ -409,10 +407,6 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
 
       // Text Independent.
       } else if (key.indexOf('text') === 0) {
-        let pageNumber = data[0];
-        let yInJson = data[2];
-        let y = convertFromExportY(pageNumber, yInJson, meta);
-
         annotations.push({
           class      : 'Annotation',
           type       : 'textbox',
@@ -447,7 +441,7 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
         let page1 = highlight1.rectangles[0].page;
         let page2 = highlight2.rectangles[0].page;
 
-        console.log('xy:', x1, y1, x2, y2, page1, page2);
+        let textPage = page1;
 
         // Specify textbox position.
         // let svg = document.querySelector('.annotationLayer');
@@ -460,6 +454,31 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
         p.y2 -= rect.top;
         let textPosition = scaleDown(svg, getRelationTextPosition(svg, p.x1, p.y1, p.x2, p.y2));
 
+        if (page1 !== page2) {
+
+          console.log('y1,y2=', y1, y2, page1, page2);
+
+          let y1Tmp = convertFromExportY(page1, y1);
+          let y2Tmp = convertFromExportY(page2, y2);
+
+          console.log('y1,y2=', y1Tmp, y2Tmp);
+
+          // Specify textbox position.
+          // let svg = document.querySelector('.annotationLayer');
+          let svg = document.getElementById('annoLayer'); // TODO make it const.
+          let p = scaleUp(svg, { x1, y1Tmp, x2, y2Tmp });
+          let rect = svg.getBoundingClientRect();
+          p.x1 -= rect.left;
+          p.y1Tmp -= rect.top;
+          p.x2 -= rect.left;
+          p.y2Tmp -= rect.top;
+          textPosition = scaleDown(svg, getRelationTextPosition(svg, p.x1, p.y1Tmp, p.x2, p.y2Tmp));
+
+          let { y, pageNumber } = convertToExportY(textPosition.y);
+          textPosition.y = y;
+          textPage = pageNumber;
+        }
+
         // Add textbox and get the uuid of if.
         let textId = null;
         let textContent = data[4];
@@ -470,7 +489,7 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
             class      : 'Annotation',
             type       : 'textbox',
             uuid       : textId,
-            page       : data[0],
+            page       : textPage,
             x          : textPosition.x,
             y          : textPosition.y,
             content    : textContent,
@@ -556,6 +575,7 @@ function transformFromRenderCoordinate(annotation) {
   let _type = 'saveData';
 
   if (annotation.coords === _type) {
+    console.log('skip: ', annotation);
     return annotation;
   }
 
@@ -584,7 +604,6 @@ function transformFromRenderCoordinate(annotation) {
 
   if (annotation.rectangles) {
     // Copy for avoiding sharing.
-    // annotation.rectangles = [...annotation.rectangles];
     annotation.rectangles = annotation.rectangles.map(a => assign({}, a));
     annotation.rectangles.forEach(r => {
       let {y, pageNumber} = convertToExportY(r.y);
@@ -626,8 +645,12 @@ function _saveSecondaryContainer(containers) {
 function getAnnotations(documentId) {
   // Primary annotation.
   let container = _getContainer();
-  let annotations = (container[documentId] || {}).annotations;
-  return annotations || [];
+  let annotations = (container[documentId] || {}).annotations || [];
+
+  // transform coordinate system.
+  annotations = annotations.map(a => transformToRenderCoordinate(a));
+
+  return annotations;
 }
 
 function _getSecondaryAnnotations(documentId) {
@@ -642,11 +665,16 @@ function _getSecondaryAnnotations(documentId) {
     }
   });
 
+  // transform coordinate system.
+  annotations = annotations.map(a => transformToRenderCoordinate(a));
+
   return annotations;
 }
 
 
 function updateAnnotations(documentId, annotations) {
+
+  console.log('updateAnnotations');
 
   // Transform coordinate system.
   annotations = annotations.map(a => transformFromRenderCoordinate(a));
