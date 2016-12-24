@@ -108,6 +108,9 @@ function saveRect(rects) {
 
   // Add the annotation
   PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation).then((annotation) => {
+
+    console.log('annotation:', annotation);
+
     appendChild(svg, annotation);
 
     // Add an input field.
@@ -124,14 +127,19 @@ function saveRect(rects) {
         return;
       }
 
-      // Set relation between arrow and text.
-      annotation.text = textAnnotation.uuid;
+      // FIXME: cannot stop refarence counter. I wanna use the original `annotation`, but couldn't.
+      PDFJSAnnotate.getStoreAdapter().getAnnotation(documentId, annotation.uuid).then(annotation => {
 
-      // Update data.
-      PDFJSAnnotate.getStoreAdapter().editAnnotation(documentId, annotation.uuid, annotation);
+        // Set relation between arrow and text.
+        annotation.text = textAnnotation.uuid;
 
-      // Update UI.
-      $(`[data-pdf-annotate-id="${annotation.uuid}"]`).attr('data-text', textAnnotation.uuid);
+        // Update data.
+        PDFJSAnnotate.getStoreAdapter().editAnnotation(documentId, annotation.uuid, annotation);
+
+        // Update UI.
+        $(`[data-pdf-annotate-id="${annotation.uuid}"]`).attr('data-text', textAnnotation.uuid);
+
+      });
     });
 
   });

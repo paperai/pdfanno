@@ -20,7 +20,8 @@ export default function insertElementWithinChildren(el, x, y, pageNumber) {
   }
 
   // Fall back to inserting between elements
-  let svg = document.querySelector(`svg[data-pdf-annotate-page="${pageNumber}"]`);
+  // let svg = document.querySelector(`svg[data-pdf-annotate-page="${pageNumber}"]`);
+  let svg = document.querySelector('#annoLayer');
   let rect = svg.getBoundingClientRect();
   let nodes = [...svg.parentNode.querySelectorAll('.textLayer > div')];
 

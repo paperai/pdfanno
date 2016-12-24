@@ -21,11 +21,11 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
       getAnnotations(documentId, pageNumber) {
         return new Promise((resolve, reject) => {
           let annotations = getAnnotations(documentId).filter((i) => {
-            if (pageNumber) {
-              return i.page === pageNumber && i.class === 'Annotation';
-            } else {
+            // if (pageNumber) {
+            //   return i.page === pageNumber && i.class === 'Annotation';
+            // } else {
               return true;
-            }            
+            // }            
           });
 
           resolve({
@@ -44,15 +44,17 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
           containers.forEach(container => {
             // TODO refactoring. same thing exists.
             let tmpAnnotations = ((container[documentId] || {}).annotations || []).filter(i => {
-              if (pageNumber) {
-                console.log('bbbb:', i);
-                return i.page === pageNumber && i.class === 'Annotation';
-              } else {
+              // if (pageNumber) {
+              //   return i.page === pageNumber && i.class === 'Annotation';
+              // } else {
                 return true;
-              }
+              // }
             });
             annotations = annotations.concat(tmpAnnotations);
           });
+
+          // Convert coordinate system.
+          annotations = annotations.map(a => transformToRenderCoordinate(a));
 
           resolve({
             documentId,
@@ -70,10 +72,12 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
         return new Promise((resolve, reject) => {
           annotation.class = 'Annotation';
           annotation.uuid = annotation.uuid || uuid();
-          annotation.page = pageNumber;
+          // annotation.page = pageNumber;
 
           let annotations = getAnnotations(documentId);
           annotations.push(annotation);
+
+
           updateAnnotations(documentId, annotations);
 
           resolve(annotation);
@@ -81,7 +85,6 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
       },
 
       addAllAnnotations(documentId, annotations) {
-        console.log('addAllAnnotations');
         return new Promise((resolve, reject) => {
           updateAnnotations(documentId, annotations);
           resolve();
@@ -89,6 +92,7 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
       },
 
       editAnnotation(documentId, annotationId, annotation) {
+        console.log('editAnnotation:', assign({}, annotation));
         return new Promise((resolve, reject) => {
           let annotations = getAnnotations(documentId);
           annotations[findAnnotation(documentId, annotationId)] = annotation;
@@ -183,36 +187,32 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
             let indexSpan = 1;
             let indexRel  = 1;
             let indexText = 1;
-            let meta = container[documentId].meta;
-            let annotations = { meta };
+            let annotations = {};
             dataExport[documentId] = annotations;
 
             container[documentId].annotations.forEach(annotation => {
 
               // Rect
               if (annotation.type === 'area') {
-                let { pageNumber, y } = convertToExportY(annotation.y, meta);
                 annotations[`rect-${indexRect++}`] = [
-                  pageNumber,
-                  convertToExportX(annotation.x),
-                  y,
+                  annotation.page,
+                  annotation.x,
+                  annotation.y,
                   annotation.width,
                   annotation.height
                 ];
 
               // Highlight.
               } else if (annotation.type === 'highlight') {
-                let data = [];
                 // rectangles.
-                annotation.rectangles.forEach(rectangle => {
-                  let { pageNumber, y } = convertToExportY(rectangle.y, meta);
-                  data.push([
-                    pageNumber,
-                    convertToExportX(rectangle.x),
-                    y,
+                let data = annotation.rectangles.map(rectangle => {
+                  return [
+                    rectangle.page,
+                    rectangle.x,
+                    rectangle.y,
                     rectangle.width,
                     rectangle.height
-                  ]);
+                  ];
                 });
                 // span text.
                 let text = '';
@@ -237,7 +237,7 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
               // Arrow.
               } else if (annotation.type === 'arrow') {
                 let data = [
-                  annotation.page,      // TODO bugfix. always 1.
+                  annotation.page1,
                   annotation.direction,
                 ];
                 let highlight1s = container[documentId].annotations.filter(a => {
@@ -266,12 +266,10 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                   return a.text === annotation.uuid;
                 });
                 if (rels.length === 0) {
-                  let { pageNumber, y } = convertToExportY(annotation.y, meta);
-                  console.log('text:', annotation.content);
                   annotations[`text-${indexText++}`] = [
-                    pageNumber,
-                    convertToExportX(annotation.x),
-                    y,
+                    annotation.page,
+                    annotation.x,
+                    annotation.y,
                     annotation.content
                   ];
                 }
@@ -336,30 +334,22 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
 
   for (let documentId in json) {
 
-    let meta = json[documentId].meta;
     let annotations = [];
-    container[documentId] = { meta, annotations };
+    container[documentId] = { annotations };
 
     for (let key in json[documentId]) {
-
-      if (key === 'meta') {
-        continue;
-      }
 
       let data = json[documentId][key];
 
       // Rect.
       if (key.indexOf('rect') === 0) {
-        let pageNumber = data[0];
-        let yInJson = data[2];
-        let y = convertFromExportY(pageNumber, yInJson, meta);
         annotations.push({
           class  : 'Annotation',
           type   : 'area',
           uuid   : uuid(),
-          page   : 1,
-          x      : convertFromExportX(data[1]),
-          y,
+          page   : data[0],
+          x      : data[1],
+          y      : data[2],
           width  : data[3],
           height : data[4],
           readOnly,
@@ -370,13 +360,10 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
       } else if (key.indexOf('span') === 0) {
         // rectangles.
         let rectangles = data.slice(0, data.length-1).map(d => {
-          let pageNumber = d[0];
-          let yInJson = d[2];
-          let y = convertFromExportY(pageNumber, yInJson, meta);
-          console.log('span:', y, yInJson);
           return {
-            x      : convertFromExportX(d[1]),
-            y,
+            page   : d[0],
+            x      : d[1],
+            y      : d[2],
             width  : d[3],
             height : d[4]
           }
@@ -388,20 +375,17 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
           textId = uuid();
           let svg = document.querySelector('.annotationLayer');
 
-          let x = convertFromExportX(rectangles[0].x);
+          let x = rectangles[0].x;
           let y = rectangles[0].y - 20; // 20 = circle'radius(3px) + input height(14px) + α
 
           let pageNumber = data[0][0];
-          console.log('spanText:', y);
-          y = convertFromExportY(pageNumber, y, meta);
-          console.log('spanText:', y);
 
           annotations.push({
             class      : 'Annotation',
             type       : 'textbox',
             uuid       : textId,
-            page       : 1,
-            x          : convertFromExportX(x),
+            page       : pageNumber,
+            x          : x,
             y,
             content    : spanText,
             readOnly,
@@ -412,31 +396,27 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
           class      : 'Annotation',
           type       : 'highlight',
           uuid       : uuid(),
-          page       : 1,
+          page       : data[0][0],
           color      : '#FFFF00',   // TODO なくてもOK？
           rectangles,
           text       : textId,
           key        : key,  // tmp for arrow.
           readOnly,
-          seq    : index
+          seq        : index
         });
 
       // Text Independent.
       } else if (key.indexOf('text') === 0) {
-        let pageNumber = data[0];
-        let yInJson = data[2];
-        let y = convertFromExportY(pageNumber, yInJson, meta);
-
         annotations.push({
           class      : 'Annotation',
           type       : 'textbox',
           uuid       : uuid(),
-          page       : 1,
-          x          : convertFromExportX(data[1]),
-          y,
+          page       : data[0],
+          x          : data[1],
+          y          : data[2],
           content    : data[3],
           readOnly,
-          seq    : index
+          seq        : index
         });
 
       // Arrow.
@@ -458,7 +438,10 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
         let x2 = highlight2.rectangles[0].x;
         let y2 = highlight2.rectangles[0].y - 5;
 
-        console.log('xy:', x1, y1, x2, y2);
+        let page1 = highlight1.rectangles[0].page;
+        let page2 = highlight2.rectangles[0].page;
+
+        let textPage = page1;
 
         // Specify textbox position.
         // let svg = document.querySelector('.annotationLayer');
@@ -471,25 +454,47 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
         p.y2 -= rect.top;
         let textPosition = scaleDown(svg, getRelationTextPosition(svg, p.x1, p.y1, p.x2, p.y2));
 
+        if (page1 !== page2) {
+
+          console.log('y1,y2=', y1, y2, page1, page2);
+
+          let y1Tmp = convertFromExportY(page1, y1);
+          let y2Tmp = convertFromExportY(page2, y2);
+
+          console.log('y1,y2=', y1Tmp, y2Tmp);
+
+          // Specify textbox position.
+          // let svg = document.querySelector('.annotationLayer');
+          let svg = document.getElementById('annoLayer'); // TODO make it const.
+          let p = scaleUp(svg, { x1, y1Tmp, x2, y2Tmp });
+          let rect = svg.getBoundingClientRect();
+          p.x1 -= rect.left;
+          p.y1Tmp -= rect.top;
+          p.x2 -= rect.left;
+          p.y2Tmp -= rect.top;
+          textPosition = scaleDown(svg, getRelationTextPosition(svg, p.x1, p.y1Tmp, p.x2, p.y2Tmp));
+
+          let { y, pageNumber } = convertToExportY(textPosition.y);
+          textPosition.y = y;
+          textPage = pageNumber;
+        }
+
         // Add textbox and get the uuid of if.
         let textId = null;
-        if (data[4]) {
-
-          let pageNumber = data[0];
-          let yInJson = textPosition.y;
-          let y = convertFromExportY(pageNumber, yInJson, meta);
+        let textContent = data[4];
+        if (textContent) {
 
           textId = uuid();
           annotations.push({
             class      : 'Annotation',
             type       : 'textbox',
             uuid       : textId,
-            page       : data[0],
-            x          : convertFromExportX(textPosition.x),
-            y,
-            content    : data[4],
+            page       : textPage,
+            x          : textPosition.x,
+            y          : textPosition.y,
+            content    : textContent,
             readOnly,
-            seq    : index
+            seq        : index
           });          
         }
 
@@ -506,12 +511,14 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
           y1,
           x2,
           y2,
+          page1,
+          page2,
           text       : textId,
           highlight1 : highlight1.uuid,
           highlight2 : highlight2.uuid,
           color      : "FF0000",         // TODO 要る？
           readOnly,
-          seq    : index
+          seq        : index
         });
       }
     }
@@ -519,6 +526,97 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
 
   return container;
 }
+
+function getPageSize() {
+  let viewBox = PDFView.pdfViewer.getPageView(0).viewport.viewBox;
+  let size = { width : viewBox[2], height : viewBox[3] };
+  return size;
+}
+
+function transformToRenderCoordinate(annotation) {
+
+  let _type = 'render';
+
+  if (annotation.coords === _type) {
+    return annotation;
+  }
+
+  annotation.coords = _type;
+
+
+  // Copy for avoiding sharing.
+  annotation = assign({}, annotation);
+
+  if (annotation.y) {
+    annotation.y = convertFromExportY(annotation.page, annotation.y);
+  }
+
+  if (annotation.y1) {
+    annotation.y1 = convertFromExportY(annotation.page1, annotation.y1);
+  }
+
+  if (annotation.y2) {
+    annotation.y2 = convertFromExportY(annotation.page2, annotation.y2);
+  }
+
+  if (annotation.rectangles) {
+    // Copy for avoiding sharing.
+    annotation.rectangles = annotation.rectangles.map(a => assign({}, a));
+    annotation.rectangles.forEach(r => {
+      r.y = convertFromExportY(r.page, r.y);
+    });
+  }
+
+  return annotation;
+}
+
+function transformFromRenderCoordinate(annotation) {
+
+  let _type = 'saveData';
+
+  if (annotation.coords === _type) {
+    console.log('skip: ', annotation);
+    return annotation;
+  }
+
+  annotation.coords = _type;
+
+  // Copy for avoiding sharing.
+  annotation = assign({}, annotation);
+
+  if (annotation.y) {
+    let {y, pageNumber} = convertToExportY(annotation.y);
+    annotation.y = y;
+    annotation.page = pageNumber;
+  }
+
+  if (annotation.y1) {
+    let {y, pageNumber} = convertToExportY(annotation.y1);
+    annotation.y1 = y;
+    annotation.page1 = pageNumber;
+  }
+
+  if (annotation.y2) {
+    let {y, pageNumber} = convertToExportY(annotation.y2);
+    annotation.y2 = y;
+    annotation.page2 = pageNumber;
+  }
+
+  if (annotation.rectangles) {
+    // Copy for avoiding sharing.
+    annotation.rectangles = annotation.rectangles.map(a => assign({}, a));
+    annotation.rectangles.forEach(r => {
+      let {y, pageNumber} = convertToExportY(r.y);
+      r.y = y;
+      r.page = pageNumber;
+
+      console.log('rec:', r.y, y, pageNumber);
+    });
+  }
+
+  return annotation;
+}
+
 
 function _getContainer() {
   let container = localStorage.getItem(LOCALSTORAGE_KEY);
@@ -532,15 +630,8 @@ function _getContainer() {
 }
 
 function _getSecondaryContainers() {
-  let containers = localStorage.getItem(LOCALSTORAGE_KEY_SECONDARY);
-  if (!containers) {
-    // containers = [];
-    // _saveSecondaryContainer(containers);
-    return [];
-  } else {
-    containers = JSON.parse(containers);
-  }
-  return containers;
+  let containers = localStorage.getItem(LOCALSTORAGE_KEY_SECONDARY) || '[]';
+  return JSON.parse(containers);
 }
 
 function _saveContainer(container) {
@@ -554,8 +645,12 @@ function _saveSecondaryContainer(containers) {
 function getAnnotations(documentId) {
   // Primary annotation.
   let container = _getContainer();
-  let annotations = (container[documentId] || {}).annotations;
-  return annotations || [];
+  let annotations = (container[documentId] || {}).annotations || [];
+
+  // transform coordinate system.
+  annotations = annotations.map(a => transformToRenderCoordinate(a));
+
+  return annotations;
 }
 
 function _getSecondaryAnnotations(documentId) {
@@ -570,11 +665,19 @@ function _getSecondaryAnnotations(documentId) {
     }
   });
 
+  // transform coordinate system.
+  annotations = annotations.map(a => transformToRenderCoordinate(a));
+
   return annotations;
 }
 
 
 function updateAnnotations(documentId, annotations) {
+
+  console.log('updateAnnotations');
+
+  // Transform coordinate system.
+  annotations = annotations.map(a => transformFromRenderCoordinate(a));
 
   let viewBox = PDFView.pdfViewer.getPageView(0).viewport.viewBox;
   let meta = { w : viewBox[2], h : viewBox[3] };
@@ -601,28 +704,32 @@ const paddingBetweenPages = 9;
 
 function convertToExportY(y, meta) {
 
+  meta = getPageSize();
+
   y -= paddingTop;
 
-  let pageNumber = Math.floor(y / meta.h) + 1;
-  let yInPage = y - (pageNumber-1) * (meta.h + paddingBetweenPages);
+  let pageNumber = Math.floor(y / meta.height) + 1;
+  let yInPage = y - (pageNumber-1) * (meta.height + paddingBetweenPages);
 
   return { pageNumber, y : yInPage };
 }
 
 function convertFromExportY(pageNumber, yInPage, meta) {
 
+  meta = getPageSize();
+
   let y = yInPage + paddingTop;
 
-  y += (pageNumber - 1) * (meta.h + paddingBetweenPages);
+  y += (pageNumber - 1) * (meta.height + paddingBetweenPages);
 
   return y;
 }
 
 const paddingLeft = 0;
 
-function convertToExportX(x) {
+function convertToExportX(x, meta) {
   return x - paddingLeft;
 }
-function convertFromExportX(x) {
+function convertFromExportX(x, meta) {
   return x + paddingLeft;
 }

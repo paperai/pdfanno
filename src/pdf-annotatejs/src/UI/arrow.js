@@ -7,7 +7,8 @@ import {
   findSVGAtPoint,
   getMetadata,
   scaleDown,
-  scaleUp
+  scaleUp,
+  getSVGLayer
 } from './utils';
 import { getRelationTextPosition } from '../utils/relation.js';
 import { addInputField } from './text';
@@ -200,18 +201,27 @@ function showTextInput(start, end, arrowAnnotation) {
       return;
     }
 
-    // Set relation between arrow and text.
-    arrowAnnotation.text = textAnnotation.uuid;
+    let svg = getSVGLayer();
+    let { documentId, pageNumber } = getMetadata(svg);
 
-    // Update.
-    // let element = document.querySelector('.annotationLayer');
-    let element = document.getElementById('annoLayer'); // TODO make it const.
-    let documentId = element.getAttribute('data-pdf-annotate-document');  // 共通化
-    PDFJSAnnotate.getStoreAdapter().editAnnotation(documentId, arrowAnnotation.uuid, arrowAnnotation);
+    // FIXME: cannot stop refarence counter. I wanna use the original `annotation`, but couldn't.
+    PDFJSAnnotate.getStoreAdapter().getAnnotation(documentId, arrowAnnotation.uuid).then(arrowAnnotation => {
 
-    // Update UI.
-    console.log('arrow:', $(`[data-pdf-annotate-id="${arrowAnnotation.uuid}"]`));
-    $(`[data-pdf-annotate-id="${arrowAnnotation.uuid}"]`).attr('data-text', textAnnotation.uuid);
+      // Set relation between arrow and text.
+      arrowAnnotation.text = textAnnotation.uuid;
+
+      // Update.
+      // let element = document.querySelector('.annotationLayer');
+      let element = document.getElementById('annoLayer'); // TODO make it const.
+      let documentId = element.getAttribute('data-pdf-annotate-document');  // 共通化
+      PDFJSAnnotate.getStoreAdapter().editAnnotation(documentId, arrowAnnotation.uuid, arrowAnnotation);
+
+      // Update UI.
+      console.log('arrow:', $(`[data-pdf-annotate-id="${arrowAnnotation.uuid}"]`));
+      $(`[data-pdf-annotate-id="${arrowAnnotation.uuid}"]`).attr('data-text', textAnnotation.uuid);
+
+    });
+
 
   });
 }
