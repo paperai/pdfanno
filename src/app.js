@@ -108,55 +108,36 @@ function downloadAnnotation() {
     });
 }
 
+function reloadPDFViewer() {
+
+    // Reload pdf.js.
+    $('#viewer iframe').remove();
+    $('#viewer').html('<iframe src="./pages/viewer.html" class="anno-viewer" frameborder="0"></iframe>');
+
+    // Restart.
+    startApplication();
+}
+
 /**
  * Delete all annotations.
  */
 function deleteAllAnnotations() {
     let documentId = window.iframeWindow.getFileName(window.iframeWindow.PDFView.url);
     window.iframeWindow.PDFAnnotate.getStoreAdapter().deleteAnnotations(documentId).then(() => {
-        
-        // Reload pdf.js.
-        $('#viewer iframe').remove();
-        $('#viewer').html('<iframe src="./pages/viewer.html" class="anno-viewer" frameborder="0"></iframe>');
 
-        // Restart.
-        startApplication();
+        reloadPDFViewer();        
     });
 }
 
 /**
     Set the behaviors of file inputs.
 */
-let _paperName = null;
-let _paperData = null;
 let _primaryAnnotation = null;
 let _secondaryAnnotations = [];
 function initializeFileUploader() {
-    setupPaperButton();
     setupPrimaryAnnotationButton();
     setupSecondaryAnnotationButton();
     setupLoadButton();
-}
-
-/**
-    Setup the behavior of the paper button.
-*/
-function setupPaperButton() {
-
-    $('#paper').off('change').on('change', e => {
-        
-        let files = e.target.files;
-        if (!files || files.length === 0) {
-            return;
-        }
-
-        let fileReader = new FileReader();
-        fileReader.onload = event => {
-            _paperName = files[0].name;
-            _paperData = event.target.result;
-        }
-        fileReader.readAsDataURL(files[0]);
-    });
 }
 
 function setupPrimaryAnnotationButton() {
@@ -205,8 +186,6 @@ function setupLoadButton() {
     $('#load').off('click').on('click', e => {
 
         // Set data.
-        _paperName && localStorage.setItem('_pdfanno_pdfname', _paperName);
-        _paperData && localStorage.setItem('_pdfanno_pdf', _paperData);
         _primaryAnnotation && localStorage.setItem('_pdfanno_pdfanno_upload', _primaryAnnotation);
         _secondaryAnnotations && localStorage.setItem('_pdfanno_pdfanno_upload_second', JSON.stringify(_secondaryAnnotations));
 
@@ -217,6 +196,98 @@ function setupLoadButton() {
         // Re-setup.
         startApplication();
     });
+}
+
+// ref: https://github.com/pdfanno/pdfanno/blob/3b8eba716a416ffa3d03edd79352859b4dd9f9e0/src/bk/viewer2js/viewer2.js
+
+function setupPDFDragAndDropLoader() {
+
+    console.log('setupPDFDragAndDropLoader');
+
+    let element = document.querySelector('.js-viewer-root');
+
+    element.removeEventListener('dragenter', handleDragEnter);
+    element.removeEventListener('dragleave', handleDragLeave);
+    element.removeEventListener('dragover', handleDragOver);
+    element.removeEventListener('drop', handleDroppedFile);
+    element.addEventListener('dragenter', handleDragEnter);
+    element.addEventListener('dragleave', handleDragLeave);
+    element.addEventListener('dragover', handleDragOver);
+    element.addEventListener('drop', handleDroppedFile);
+}
+
+function checkFileCompatibility(fileName, ext) {
+    let fragments = fileName.split('.');
+    if (fragments.length < 2) {
+        return false;
+    }
+    return fragments[1].toLowerCase() === ext;
+}
+
+function handleDroppedFile(e) {
+
+    console.log('handleDroppedFile');
+
+    let element = e.target;
+    let file = e.dataTransfer.files[0];
+    console.log('file:', file);
+
+    $('#viewer').removeClass('-active');
+
+    let fileName = file.name;
+
+    // Check compatibility.
+    if (!checkFileCompatibility(fileName, 'pdf')) {
+        alert(`FILE NOT COMPATIBLE. "*.pdf" can be loaded.\n actual = "${fileName}".`);
+        return cancelEvent(e);
+    }
+
+    let fileReader = new FileReader();
+    fileReader.onload = event => {
+        let data = event.target.result;
+        localStorage.setItem('_pdfanno_pdf', data);
+        localStorage.setItem('_pdfanno_pdfname', fileName);
+
+        reloadPDFViewer();
+    }
+    fileReader.readAsDataURL(file);
+
+    return cancelEvent(e);
+}
+
+function handleDragEnter(e) {
+    console.log('handleDragEnter');
+    $('#viewer').addClass('-active');
+    return cancelEvent(e);
+}
+
+function handleDragLeave(e) {
+    console.log('handleDragLeave');
+    $('#viewer').removeClass('-active');
+    return cancelEvent(e);
+}
+
+let timer = null;
+function handleDragOver(e) {
+    console.log('handleDragOver');
+
+    $('#viewer').addClass('-active');
+
+    if (timer) {
+        clearTimeout(timer);
+    }
+    timer = setTimeout(() => {
+        $('#viewer').removeClass('-active');
+        timer = null;
+    }, 1000);
+
+    return cancelEvent(e);
+}
+
+// Cancel handler
+function cancelEvent(e) {
+    e.preventDefault();
+    return false;
 }
 
 function startApplication() {
@@ -233,7 +304,10 @@ function startApplication() {
         initializeAnnoToolButtons();
 
         // Set the behaviors of file inputs.
-        initializeFileUploader();            
+        initializeFileUploader();        
+
+        // Set the event drag & drop for loading a PDF file.
+        setupPDFDragAndDropLoader();    
     });
 
     iframeWindow.addEventListener('annotationrendered', (ev) => {
@@ -244,6 +318,17 @@ function startApplication() {
             window.iframeWindow.PDFAnnotate.UI.enableViewMode();
         }
     });
+
+    iframeWindow.addEventListener('pdfdropped', (ev) => {
+        console.log('pdfdropped', ev.detail.originalEvent.dataTransfer.files[0]);
+        handleDroppedFile(ev.detail.originalEvent);
+    });
+
+    iframeWindow.addEventListener('pdfdragover', (ev) => {
+        console.log('pdfdragover!!!');
+        handleDragOver(ev.detail.originalEvent);
+    });
+
 }
 
 /**

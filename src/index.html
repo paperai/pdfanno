@@ -27,10 +27,6 @@
 			<div class="col-md-12 col-sm-12 col-xs-12 well">
 				<form class="form-inline">
 					<div class="form-group">
-						<label for="paper">Paper (.pdf)</label>
-						<input type="file" id="paper" accept=".pdf">
-					</div>
-					<div class="form-group">
 						<label for="primary-anno">Primary annotation (.anno)</label>
 						<input type="file" id="primary-anno" accept=".anno">
 					</div>
@@ -42,7 +38,7 @@
 				</form>
 			</div>
 		</div>
-		<div class="row">
+		<div class="row js-viewer-root">
 			<div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="btn-toolbar" role="toolbar">
     				<div class="btn-group" role="group">
@@ -79,7 +75,7 @@
                         </a>
                     </div>
                 </div>
-				<div id="viewer">
+				<div id="viewer" class="">
                     <iframe src="./pages/viewer.html" class="anno-viewer" frameborder="0"></iframe>
 				</div>
 			</div>
