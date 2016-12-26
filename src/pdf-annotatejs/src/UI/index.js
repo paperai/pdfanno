@@ -4,7 +4,7 @@ import { disablePen, enablePen, setPen } from './pen';
 import { disablePoint, enablePoint } from './point';
 import { disableRect, enableRect } from './rect';
 import { disableHighlight, enableHighlight } from './highlight';
-import { disableText, enableText, setText } from './text';
+import { disableText, enableText } from './text';
 import { createPage, renderPage } from './page';
 
 // extends.
@@ -18,7 +18,7 @@ export default {
   disablePoint, enablePoint,
   disableRect, enableRect,
   disableHighlight, enableHighlight,
-  disableText, enableText, setText,
+  disableText, enableText,
   createPage, renderPage,
 
   // extends
