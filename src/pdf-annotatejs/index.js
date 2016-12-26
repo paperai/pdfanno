@@ -4,11 +4,6 @@ import $ from 'jquery';
 // for Convinience.
 window.$ = window.jQuery = $;
 
-// import { svgLayerId } from './consts';
-
-
-
-
 // The entry point of window.xxx.
 // (setting from webpack.config.js)
 import PDFJSAnnotate from './src/PDFJSAnnotate';
@@ -20,14 +15,6 @@ window.addEventListener('DOMContentLoaded', function() {
 
     // Setup Storage.
     PDFAnnotate.setStoreAdapter(new PDFAnnotate.PdfannoStoreAdapter());
-
-    // TODO remove.
-    // Settings.
-    let textSize = 12;
-    let textColor = '#FF0000';
-    PDFAnnotate.UI.setText(textSize, textColor);
-
-
 });
 
 window.addEventListener('pagerendered', function(ev) {
