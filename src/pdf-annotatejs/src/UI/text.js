@@ -57,7 +57,11 @@ export function addInputField(x, y, selfId=null, text=null, finishCallback=null)
 
   // This is a dummy form for adding autocomplete candidates at finishing adding/editing.
   // At the time to finish editing, submit via the submit button, then regist an autocomplete content.
-  let $form = $('<form id="autocompleteform" action="./"/>');
+  let $form = $('<form id="autocompleteform" action="./"/>').css({
+    position : 'absolute',
+    top      : '0',
+    left     : '0'
+  });
   $form.on('submit', handleSubmit);
   $form.append('<input type="submit" value="submit"/>'); // needs for Firefox emulating submit event.
   $(document.body).append($form);
@@ -73,6 +77,7 @@ export function addInputField(x, y, selfId=null, text=null, finishCallback=null)
   input.style.left = `${x}px`;
   input.style.fontSize = `${TEXT_SIZE}px`;
   input.style.width = '150px';
+  input.style.zIndex = 2;
 
   if (selfId) {
     input.setAttribute('data-self-id', selfId);
@@ -104,7 +109,6 @@ function handleSubmit(e) {
  * Handle input.blur event.
  */
 function handleInputBlur() {
-  console.log('handleInputBlur');
   saveText();
 }
 
@@ -129,7 +133,7 @@ function saveText() {
 
   let content = input.value.trim();
   if (!content) {
-    closeInput();
+    return closeInput();
   }
 
   let clientX = parseInt(input.style.left, 10);
