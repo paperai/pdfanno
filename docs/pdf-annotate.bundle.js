@@ -80,37 +80,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	// (setting from webpack.config.js)
 	exports.default = _PDFJSAnnotate2.default;
 	
+	// Alias.
 	
 	var PDFAnnotate = _PDFJSAnnotate2.default;
 	
-	window.addEventListener('DOMContentLoaded', function () {
+	// Setup Storage.
+	PDFAnnotate.setStoreAdapter(new PDFAnnotate.PdfannoStoreAdapter());
 	
-	    // Setup Storage.
-	    PDFAnnotate.setStoreAdapter(new PDFAnnotate.PdfannoStoreAdapter());
-	});
-	
+	// The event called at page rendered by pdfjs.
 	window.addEventListener('pagerendered', function (ev) {
 	    console.log('pagerendered:', ev.detail.pageNumber);
 	    renderAnno();
 	});
 	
-	window.addEventListener('resize', function () {
-	    (0, _jquery2.default)('#annoLayer').remove();
-	    (0, _jquery2.default)('#tmpLayer').remove();
-	});
+	// Adapt to scale change.
+	(0, _jquery2.default)(window).on('resize', removeAnnoLayer);
+	(0, _jquery2.default)('#scaleSelect').on('change', removeAnnoLayer);
+	(0, _jquery2.default)('#zoomIn, #zoomOut').on('click', removeAnnoLayer);
 	
-	document.getElementById('scaleSelect').addEventListener('change', function () {
-	    console.log('scaleChanged');
-	    (0, _jquery2.default)('#annoLayer').remove();
-	    (0, _jquery2.default)('#tmpLayer').remove();
-	});
+	/*
+	 * Remove the annotation layer and the temporary rendering layer.
+	 */
+	function removeAnnoLayer() {
+	    (0, _jquery2.default)('#annoLayer, #tmpLayer').remove();
+	}
 	
-	(0, _jquery2.default)('#zoomIn, #zoomOut').on('click', function () {
-	    console.log('zoomIn/Out clicked.');
-	    (0, _jquery2.default)('#annoLayer').remove();
-	    (0, _jquery2.default)('#tmpLayer').remove();
-	});
-	
+	/*
+	 * Render annotations saved in the storage.
+	 */
 	function renderAnno() {
 	
 	    // TODO make it a global const.
@@ -136,12 +133,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Add an annotation layer.
 	    var $annoLayer = (0, _jquery2.default)('<svg id="' + svgLayerId + '"/>').css({ // TODO CSSClass.
 	        position: 'absolute',
-	        // top      : '9px',
 	        top: '0px',
 	        left: leftMargin + 'px',
-	        // width    : `calc(100% - ${leftMargin*2}px`,
 	        width: width + 'px',
-	        // height   : `${height-9}px`,
 	        height: height + 'px',
 	        visibility: 'hidden',
 	        'z-index': 2
@@ -151,15 +145,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        position: 'absolute',
 	        top: '0px',
 	        left: leftMargin + 'px',
-	        // width    : `calc(100% - ${leftMargin*2}px`,
 	        width: width + 'px',
-	        // height   : `${height-9}px`,
 	        height: height + 'px',
 	        visibility: 'hidden',
 	        'z-index': 2
 	    });
-	    // $('#viewerContainer').append($annoLayer);
-	    // $('#pageContainer1').css({
+	
 	    (0, _jquery2.default)('#viewer').css({
 	        position: 'relative'
 	    }).append($annoLayer).append($tmpLayer);
@@ -16180,7 +16171,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  // This is a dummy form for adding autocomplete candidates at finishing adding/editing.
 	  // At the time to finish editing, submit via the submit button, then regist an autocomplete content.
-	  var $form = (0, _jquery2.default)('<form id="autocompleteform" action="./"/>');
+	  var $form = (0, _jquery2.default)('<form id="autocompleteform" action="./"/>').css({
+	    position: 'absolute',
+	    top: '0',
+	    left: '0'
+	  });
 	  $form.on('submit', handleSubmit);
 	  $form.append('<input type="submit" value="submit"/>'); // needs for Firefox emulating submit event.
 	  (0, _jquery2.default)(document.body).append($form);
@@ -16196,6 +16191,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  input.style.left = x + 'px';
 	  input.style.fontSize = TEXT_SIZE + 'px';
 	  input.style.width = '150px';
+	  input.style.zIndex = 2;
 	
 	  if (selfId) {
 	    input.setAttribute('data-self-id', selfId);
@@ -16227,7 +16223,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Handle input.blur event.
 	 */
 	function handleInputBlur() {
-	  console.log('handleInputBlur');
 	  saveText();
 	}
 	
@@ -16252,7 +16247,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  var content = input.value.trim();
 	  if (!content) {
-	    closeInput();
+	    return closeInput();
 	  }
 	
 	  var clientX = parseInt(input.style.left, 10);

@@ -9,36 +9,33 @@ window.$ = window.jQuery = $;
 import PDFJSAnnotate from './src/PDFJSAnnotate';
 export default PDFJSAnnotate;
 
+// Alias.
 let PDFAnnotate = PDFJSAnnotate;
 
-window.addEventListener('DOMContentLoaded', function() {
+// Setup Storage.
+PDFAnnotate.setStoreAdapter(new PDFAnnotate.PdfannoStoreAdapter());
 
-    // Setup Storage.
-    PDFAnnotate.setStoreAdapter(new PDFAnnotate.PdfannoStoreAdapter());
-});
-
+// The event called at page rendered by pdfjs.
 window.addEventListener('pagerendered', function(ev) {
     console.log('pagerendered:', ev.detail.pageNumber);
     renderAnno();
 });
 
-window.addEventListener('resize', function () {
-    $('#annoLayer').remove();
-    $('#tmpLayer').remove();
-});
+// Adapt to scale change.
+$(window).on('resize', removeAnnoLayer);
+$('#scaleSelect').on('change', removeAnnoLayer);
+$('#zoomIn, #zoomOut').on('click', removeAnnoLayer);
 
-document.getElementById('scaleSelect').addEventListener('change', function() {
-    console.log('scaleChanged');
-    $('#annoLayer').remove();
-    $('#tmpLayer').remove();
-});
+/*
+ * Remove the annotation layer and the temporary rendering layer.
+ */
+function removeAnnoLayer() {
+    $('#annoLayer, #tmpLayer').remove();
+}
 
-$('#zoomIn, #zoomOut').on('click', () => {
-    console.log('zoomIn/Out clicked.');
-    $('#annoLayer').remove();
-    $('#tmpLayer').remove();
-});
-
+/*
+ * Render annotations saved in the storage.
+ */
 function renderAnno() {
 
     // TODO make it a global const.
@@ -63,14 +60,11 @@ function renderAnno() {
 
     // Add an annotation layer.
     let $annoLayer = $(`<svg id="${svgLayerId}"/>`).css({   // TODO CSSClass.
-        position : 'absolute',
-        // top      : '9px',
-        top      : '0px',
-        left     : `${leftMargin}px`,
-        // width    : `calc(100% - ${leftMargin*2}px`,
-        width    : `${width}px`,
-        // height   : `${height-9}px`,
-        height   : `${height}px`,
+        position   : 'absolute',
+        top        : '0px',
+        left       : `${leftMargin}px`,
+        width      : `${width}px`,
+        height     : `${height}px`,
         visibility : 'hidden',
         'z-index'  : 2
     });
@@ -79,15 +73,12 @@ function renderAnno() {
         position : 'absolute',
         top      : '0px',
         left     : `${leftMargin}px`,
-        // width    : `calc(100% - ${leftMargin*2}px`,
         width    : `${width}px`,
-        // height   : `${height-9}px`,
         height   : `${height}px`,
         visibility : 'hidden',
         'z-index'  : 2
     });
-    // $('#viewerContainer').append($annoLayer);
-    // $('#pageContainer1').css({
+
     $('#viewer').css({
         position : 'relative'
     }).append($annoLayer).append($tmpLayer);
