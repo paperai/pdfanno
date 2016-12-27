@@ -188,7 +188,6 @@ export function closeInput(textAnnotation) {
   }
 }
 
-
 /**
  * Enable text behavior.
  */
