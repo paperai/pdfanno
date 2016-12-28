@@ -37,3 +37,10 @@
     margin-left: 5px;
     line-height: 1em;
 }
+.anno-select-layout .sp-replacer {
+    padding: 0;
+    border: none;
+}
+.anno-select-layout .sp-dd {
+    display: none;
+}

@@ -29,61 +29,28 @@
             <!-- Annotation Select UI -->
             <div class="row">
                 <div class="col-xs-6">
-                    <input type="radio" name="anno-primary" value="1" checked>
-                    <input type="text" class="js-palette" data-index="1">
-                    <input type="file" accept=".anno" style="">
+                    <input type="radio" name="anno-primary" value="0" checked class="js-anno-radio">
+                    <input type="text" class="js-anno-palette">
+                    <input type="file" accept=".anno" class="js-anno-file">
                 </div>
                 <div class="col-xs-6">
-                    <input type="radio" name="anno-primary" value="2">
-                    <input type="text" class="js-palette" data-index="2">
-                    <input type="file" accept=".anno">
+                    <input type="radio" name="anno-primary" value="1" class="js-anno-radio">
+                    <input type="text" class="js-anno-palette">
+                    <input type="file" accept=".anno" class="js-anno-file">
                 </div>
             </div>
             <div class="row">
                 <div class="col-xs-6">
-                    <input type="radio" name="anno-primary" value="3">
-                    <input type="text" class="js-palette" data-index="3">
-                    <input type="file" accept=".anno">
+                    <input type="radio" name="anno-primary" value="2" class="js-anno-radio">
+                    <input type="text" class="js-anno-palette">
+                    <input type="file" accept=".anno" class="js-anno-file">
                 </div>
                 <div class="col-xs-6">
-                    <input type="radio" name="anno-primary" value="4">
-                    <input type="text" class="js-palette" data-index="4">
-                    <input type="file" accept=".anno">
+                    <input type="radio" name="anno-primary" value="3" class="js-anno-radio">
+                    <input type="text" class="js-anno-palette">
+                    <input type="file" accept=".anno" class="js-anno-file">
                 </div>
             </div>
-
-            <!--TMP-->
-            <script>
-                $('.js-palette').spectrum({
-                    showPaletteOnly: true,
-                    showPalette:true,
-                    hideAfterPaletteSelect:true,
-                    color: 'blanchedalmond',
-                    palette: [
-                        ['black', 'white', 'blanchedalmond',
-                        'rgb(255, 128, 0);', 'hsv 100 70 50'],
-                        ['red', 'yellow', 'green', 'blue', 'violet']
-                    ]
-                });
-                $('.js-palette').eq(0).spectrum('set', 'red');
-                $('.js-palette').eq(1).spectrum('set', 'green');
-                $('.js-palette').eq(2).spectrum('set', 'blue');
-                $('.js-palette').eq(3).spectrum('set', 'violet');
-                $('.js-palette').on('change', function() {
-                    console.log('js-palette changed.');
-                });
-            </script>
-            <!-- Override style -->
-            <style>
-                .sp-replacer {
-                    padding: 0;
-                    border: none;
-                }
-                .sp-dd {
-                    display: none;
-                }
-            </style>
-
 
 
 <!-- 			<div class="col-md-12 col-sm-12 col-xs-12 well">

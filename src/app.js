@@ -290,6 +290,81 @@ function cancelEvent(e) {
     return false;
 }
 
+/**
+ * Setup the UI for loading and selecting annotations.
+ */
+function setupAnnotationSelectUI() {
+
+    // Setup colorPickers.
+    $('.js-anno-palette').spectrum({
+        showPaletteOnly        : true,
+        showPalette            : true,
+        hideAfterPaletteSelect : true,
+        palette                : [
+            ['black', 'white', 'blanchedalmond', 'rgb(255, 128, 0)', 'hsv 100 70 50'],
+            ['red', 'yellow', 'green', 'blue', 'violet']
+        ]
+    });
+    // Set initial color.
+    $('.js-anno-palette').eq(0).spectrum('set', 'red');
+    $('.js-anno-palette').eq(1).spectrum('set', 'green');
+    $('.js-anno-palette').eq(2).spectrum('set', 'blue');
+    $('.js-anno-palette').eq(3).spectrum('set', 'violet');
+
+    // Setup behavior.
+    $('.js-anno-radio, .js-anno-palette, .js-anno-file').on('change', displayAnnotation);
+}
+
+/**
+ * Load annotation data and display.
+ */
+function displayAnnotation() {
+    console.log('displayAnnotation');
+
+    // Primary annotation index.
+    let primaryIndex = parseInt($('.js-anno-radio:checked').val(), 10);
+    console.log(primaryIndex);
+    
+    // Annotation color.
+    let color1 = $('.js-anno-palette').eq(0).spectrum('get').toHex();
+    let color2 = $('.js-anno-palette').eq(1).spectrum('get').toHex();
+    let color3 = $('.js-anno-palette').eq(2).spectrum('get').toHex();
+    let color4 = $('.js-anno-palette').eq(3).spectrum('get').toHex();
+    console.log(color1, color2, color3, color4);
+
+    // Annotation files.
+    let actions = [];
+    $('.js-anno-file').each(function() {
+        let files = this.files;
+
+        actions.push(new Promise((resolve, reject) => {
+
+            if (files.length === 0) {
+                return resolve(null);
+            }
+
+            let fileReader = new FileReader();
+            fileReader.onload = event => {
+                let annotation = event.target.result;
+                // TODO JSON scheme check.
+                resolve(JSON.parse(annotation));
+            }
+            fileReader.readAsText(files[0]);
+        }));
+    });
+    Promise.all(actions).then((annotations) => {
+        console.log(annotations);
+
+        let isZero = (annotations.filter(a => a !== null).length === 0);
+        if (isZero) {
+            console.log('isZero');
+            return;
+        }
+    });
+}
+
+
+
 function startApplication() {
 
     // Alias for convenience.
@@ -329,6 +404,8 @@ function startApplication() {
         handleDragOver(ev.detail.originalEvent);
     });
 
+    // Setup the annotation load and select UI.
+    setupAnnotationSelectUI();
 }
 
 /**
