@@ -3,28 +3,43 @@ import PDFJSAnnotate from '../PDFJSAnnotate';
 import appendChild from '../render/appendChild';
 import {
   BORDER_COLOR,
-  findSVGAtPoint,
   getMetadata,
-  scaleDown
+  scaleDown,
+  getSVGLayer
 } from './utils';
 
-const LSKEY_INPUT_HISTORY = '_pdfanno_inputhistory';
+/**
+ * The text size at editing.
+ */
+const TEXT_SIZE = 12;
 
+/**
+ * The text color at editing.
+ */
+const TEXT_COLOR = '#FF0000';
+
+/**
+ * The status of text annotation UI.
+ */
 let _enabled = false;
-let input;
-let _textSize;
-let _textColor;
 
-let datalist;
+/*
+ * The input field for adding/editing a text.
+ */
+let input = null;
 
+/*
+ * The callback called at finishing to add/edit a text.
+ */
 let _finishCallback = null;
+
 /**
  * Handle document.mouseup event
  *
  * @param {Event} e The DOM event to handle
  */
 function handleDocumentMouseup(e) {
-  if (input || !findSVGAtPoint(e.clientX, e.clientY)) {
+  if (input) {
     return;
   }
   addInputField(e.clientX, e.clientY);
@@ -39,16 +54,30 @@ function handleDocumentMouseup(e) {
  * @param {Function} finishCallback - The callback function will be called after registration.
  */
 export function addInputField(x, y, selfId=null, text=null, finishCallback=null) {
+
+  // This is a dummy form for adding autocomplete candidates at finishing adding/editing.
+  // At the time to finish editing, submit via the submit button, then regist an autocomplete content.
+  let $form = $('<form id="autocompleteform" action="./"/>').css({
+    position : 'absolute',
+    top      : '0',
+    left     : '0'
+  });
+  $form.on('submit', handleSubmit);
+  $form.append('<input type="submit" value="submit"/>'); // needs for Firefox emulating submit event.
+  $(document.body).append($form);
+
   input = document.createElement('input');
   input.setAttribute('id', 'pdf-annotate-text-input');
   input.setAttribute('placeholder', 'Enter text');
+  input.setAttribute('name', 'paperannotext');
   input.style.border = `3px solid ${BORDER_COLOR}`;
   input.style.borderRadius = '3px';
   input.style.position = 'absolute';
   input.style.top = `${y}px`;
   input.style.left = `${x}px`;
-  input.style.fontSize = `${_textSize}px`;
+  input.style.fontSize = `${TEXT_SIZE}px`;
   input.style.width = '150px';
+  input.style.zIndex = 2;
 
   if (selfId) {
     input.setAttribute('data-self-id', selfId);
@@ -63,33 +92,28 @@ export function addInputField(x, y, selfId=null, text=null, finishCallback=null)
   input.addEventListener('blur', handleInputBlur);
   input.addEventListener('keyup', handleInputKeyup);
 
-  document.body.appendChild(input);
+  $form.append(input);
   input.focus();
+}
 
-  // AutoComplete.
-  input.autocomplete = 'on';
-  input.setAttribute('list', 'mylist');
-  datalist = document.createElement('datalist');
-  datalist.id = 'mylist';
-  getInputHistories().forEach(text => {
-    let option = document.createElement('option');
-    option.value = text;
-    datalist.appendChild(option);
-  });
-  document.body.appendChild(datalist);
+/*
+ * Handle form.submit event.
+ * @param {Event} e - Submit event.
+ */
+function handleSubmit(e) {
+  e.preventDefault();
+  return false;
 }
 
 /**
  * Handle input.blur event.
  */
 function handleInputBlur() {
-  console.log('handleInputBlur');
   saveText();
 }
 
 /**
  * Handle input.keyup event.
- *
  * @param {Event} e The DOM event to handle
  */
 function handleInputKeyup(e) {
@@ -102,107 +126,70 @@ function handleInputKeyup(e) {
  * Save a text annotation from input.
  */
 function saveText() {
-  if (input.value.trim().length > 0) {
-    let clientX = parseInt(input.style.left, 10);
-    let clientY = parseInt(input.style.top, 10);
-    let svg = findSVGAtPoint(clientX, clientY);
-    if (!svg) {
-      return;
-    }
 
-    let content = input.value.trim();
-    if (!content) {
-      return;
-    }
-
-    let { documentId, pageNumber } = getMetadata(svg);
-    let rect = svg.getBoundingClientRect();
-    let annotation = Object.assign({
-        type: 'textbox',
-        size: _textSize,
-        color: _textColor,
-        content: content
-      }, scaleDown(svg, {
-        x: clientX - rect.left,
-        y: clientY -  rect.top,
-        width: input.offsetWidth,
-        height: input.offsetHeight
-      })
-    );
-
-    // RelationId.
-    let selfId = input.getAttribute('data-self-id');
-    if (selfId) {
-      annotation.uuid = selfId;
-    }
-
-    PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation)
-      .then((annotation) => {
-        appendChild(svg, annotation);
-
-        closeInput(annotation);
-      });
-
-    addInputHistory(content);
-  
-  } else {
-    closeInput();
+  if (!input) {
+    return;
   }
+
+  let content = input.value.trim();
+  if (!content) {
+    return closeInput();
+  }
+
+  let clientX = parseInt(input.style.left, 10);
+  let clientY = parseInt(input.style.top, 10);
+  let svg = getSVGLayer();
+
+  let { documentId, pageNumber } = getMetadata(svg);
+  let rect = svg.getBoundingClientRect();
+  let annotation = Object.assign({
+      type    : 'textbox',
+      content : content
+    }, scaleDown(svg, {
+      x      : clientX - rect.left,
+      y      : clientY -  rect.top,
+      width  : input.offsetWidth,
+      height : input.offsetHeight
+    })
+  );
+
+  // RelationId.
+  let selfId = input.getAttribute('data-self-id');
+  if (selfId) {
+    annotation.uuid = selfId;
+  }
+
+  PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation)
+    .then((annotation) => {
+      appendChild(svg, annotation);
+
+      // Add an autocomplete candidate. (Firefox, Chrome)
+      $('#autocompleteform [type="submit"]').click();
+
+      closeInput(annotation);
+    });
   
 }
 
 /**
  * Close the input.
+ * @param {Object} textAnnotation - the annotation registerd.
  */
 export function closeInput(textAnnotation) {
   
   if (input) {
-    input.removeEventListener('blur', handleInputBlur);
-    input.removeEventListener('keyup', handleInputKeyup);
-    document.body.removeChild(input);
+    
+    $(input).parents('form').remove();
     input = null;
 
     if (_finishCallback) {
       _finishCallback(textAnnotation);
     }
   }
-
-  $(datalist).remove();
-}
-
-function getInputHistories() {
-  let histories = localStorage.getItem(LSKEY_INPUT_HISTORY);
-  if (!histories) {
-    histories = '[]';
-  }
-  return JSON.parse(histories);  
-}
-
-function addInputHistory(text) {
-  let histories = getInputHistories();
-  histories.unshift(text);
-  histories = histories.slice(0, 15); // Max size for histories (this is temporary).
-  // Make as unique.
-  histories = histories.filter((value, index, self) => {
-    return self.indexOf(value) === index;
-  });
-  localStorage.setItem(LSKEY_INPUT_HISTORY, JSON.stringify(histories));
 }
 
 /**
- * Set the text attributes
- *
- * @param {Number} textSize The size of the text
- * @param {String} textColor The color of the text
- */
-export function setText(textSize = 12, textColor = '000000') {
-  _textSize = parseInt(textSize, 10);
-  _textColor = textColor;
-}
-
-
-/**
- * Enable text behavior
+ * Enable text behavior.
  */
 export function enableText() {
   if (_enabled) { return; }
@@ -211,9 +198,8 @@ export function enableText() {
   document.addEventListener('mouseup', handleDocumentMouseup);
 }
 
-
 /**
- * Disable text behavior
+ * Disable text behavior.
  */
 export function disableText() {
   if (!_enabled) { return; }
@@ -222,4 +208,3 @@ export function disableText() {
   document.removeEventListener('mouseup', handleDocumentMouseup);
   closeInput();
 }
-

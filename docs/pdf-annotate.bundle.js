@@ -76,50 +76,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	// for Convinience.
 	window.$ = window.jQuery = _jquery2.default;
 	
-	// import { svgLayerId } from './consts';
-	
-	
 	// The entry point of window.xxx.
 	// (setting from webpack.config.js)
 	exports.default = _PDFJSAnnotate2.default;
 	
+	// Alias.
 	
 	var PDFAnnotate = _PDFJSAnnotate2.default;
 	
-	window.addEventListener('DOMContentLoaded', function () {
+	// Setup Storage.
+	PDFAnnotate.setStoreAdapter(new PDFAnnotate.PdfannoStoreAdapter());
 	
-	    // Setup Storage.
-	    PDFAnnotate.setStoreAdapter(new PDFAnnotate.PdfannoStoreAdapter());
-	
-	    // TODO remove.
-	    // Settings.
-	    var textSize = 12;
-	    var textColor = '#FF0000';
-	    PDFAnnotate.UI.setText(textSize, textColor);
-	});
-	
+	// The event called at page rendered by pdfjs.
 	window.addEventListener('pagerendered', function (ev) {
 	    console.log('pagerendered:', ev.detail.pageNumber);
 	    renderAnno();
 	});
 	
-	window.addEventListener('resize', function () {
-	    (0, _jquery2.default)('#annoLayer').remove();
-	    (0, _jquery2.default)('#tmpLayer').remove();
-	});
+	// Adapt to scale change.
+	(0, _jquery2.default)(window).on('resize', removeAnnoLayer);
+	(0, _jquery2.default)('#scaleSelect').on('change', removeAnnoLayer);
+	(0, _jquery2.default)('#zoomIn, #zoomOut').on('click', removeAnnoLayer);
 	
-	document.getElementById('scaleSelect').addEventListener('change', function () {
-	    console.log('scaleChanged');
-	    (0, _jquery2.default)('#annoLayer').remove();
-	    (0, _jquery2.default)('#tmpLayer').remove();
-	});
+	/*
+	 * Remove the annotation layer and the temporary rendering layer.
+	 */
+	function removeAnnoLayer() {
+	    (0, _jquery2.default)('#annoLayer, #tmpLayer').remove();
+	}
 	
-	(0, _jquery2.default)('#zoomIn, #zoomOut').on('click', function () {
-	    console.log('zoomIn/Out clicked.');
-	    (0, _jquery2.default)('#annoLayer').remove();
-	    (0, _jquery2.default)('#tmpLayer').remove();
-	});
-	
+	/*
+	 * Render annotations saved in the storage.
+	 */
 	function renderAnno() {
 	
 	    // TODO make it a global const.
@@ -145,12 +133,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Add an annotation layer.
 	    var $annoLayer = (0, _jquery2.default)('<svg id="' + svgLayerId + '"/>').css({ // TODO CSSClass.
 	        position: 'absolute',
-	        // top      : '9px',
 	        top: '0px',
 	        left: leftMargin + 'px',
-	        // width    : `calc(100% - ${leftMargin*2}px`,
 	        width: width + 'px',
-	        // height   : `${height-9}px`,
 	        height: height + 'px',
 	        visibility: 'hidden',
 	        'z-index': 2
@@ -160,15 +145,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        position: 'absolute',
 	        top: '0px',
 	        left: leftMargin + 'px',
-	        // width    : `calc(100% - ${leftMargin*2}px`,
 	        width: width + 'px',
-	        // height   : `${height-9}px`,
 	        height: height + 'px',
 	        visibility: 'hidden',
 	        'z-index': 2
 	    });
-	    // $('#viewerContainer').append($annoLayer);
-	    // $('#pageContainer1').css({
+	
 	    (0, _jquery2.default)('#viewer').css({
 	        position: 'relative'
 	    }).append($annoLayer).append($tmpLayer);
@@ -15159,7 +15141,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  disablePoint: _point.disablePoint, enablePoint: _point.enablePoint,
 	  disableRect: _rect.disableRect, enableRect: _rect.enableRect,
 	  disableHighlight: _highlight.disableHighlight, enableHighlight: _highlight.enableHighlight,
-	  disableText: _text.disableText, enableText: _text.enableText, setText: _text.setText,
+	  disableText: _text.disableText, enableText: _text.enableText,
 	  createPage: _page.createPage, renderPage: _page.renderPage,
 	
 	  // extends
@@ -16115,12 +16097,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-	
 	exports.addInputField = addInputField;
 	exports.closeInput = closeInput;
-	exports.setText = setText;
 	exports.enableText = enableText;
 	exports.disableText = disableText;
 	
@@ -16140,23 +16118,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var LSKEY_INPUT_HISTORY = '_pdfanno_inputhistory';
+	/**
+	 * The text size at editing.
+	 */
+	var TEXT_SIZE = 12;
 	
+	/**
+	 * The text color at editing.
+	 */
+	var TEXT_COLOR = '#FF0000';
+	
+	/**
+	 * The status of text annotation UI.
+	 */
 	var _enabled = false;
-	var input = void 0;
-	var _textSize = void 0;
-	var _textColor = void 0;
 	
-	var datalist = void 0;
+	/*
+	 * The input field for adding/editing a text.
+	 */
+	var input = null;
 	
+	/*
+	 * The callback called at finishing to add/edit a text.
+	 */
 	var _finishCallback = null;
+	
 	/**
 	 * Handle document.mouseup event
 	 *
 	 * @param {Event} e The DOM event to handle
 	 */
 	function handleDocumentMouseup(e) {
-	  if (input || !(0, _utils.findSVGAtPoint)(e.clientX, e.clientY)) {
+	  if (input) {
 	    return;
 	  }
 	  addInputField(e.clientX, e.clientY);
@@ -16175,16 +16168,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var text = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 	  var finishCallback = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
 	
+	
+	  // This is a dummy form for adding autocomplete candidates at finishing adding/editing.
+	  // At the time to finish editing, submit via the submit button, then regist an autocomplete content.
+	  var $form = (0, _jquery2.default)('<form id="autocompleteform" action="./"/>').css({
+	    position: 'absolute',
+	    top: '0',
+	    left: '0'
+	  });
+	  $form.on('submit', handleSubmit);
+	  $form.append('<input type="submit" value="submit"/>'); // needs for Firefox emulating submit event.
+	  (0, _jquery2.default)(document.body).append($form);
+	
 	  input = document.createElement('input');
 	  input.setAttribute('id', 'pdf-annotate-text-input');
 	  input.setAttribute('placeholder', 'Enter text');
+	  input.setAttribute('name', 'paperannotext');
 	  input.style.border = '3px solid ' + _utils.BORDER_COLOR;
 	  input.style.borderRadius = '3px';
 	  input.style.position = 'absolute';
 	  input.style.top = y + 'px';
 	  input.style.left = x + 'px';
-	  input.style.fontSize = _textSize + 'px';
+	  input.style.fontSize = TEXT_SIZE + 'px';
 	  input.style.width = '150px';
+	  input.style.zIndex = 2;
 	
 	  if (selfId) {
 	    input.setAttribute('data-self-id', selfId);
@@ -16199,33 +16206,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	  input.addEventListener('blur', handleInputBlur);
 	  input.addEventListener('keyup', handleInputKeyup);
 	
-	  document.body.appendChild(input);
+	  $form.append(input);
 	  input.focus();
+	}
 	
-	  // AutoComplete.
-	  input.autocomplete = 'on';
-	  input.setAttribute('list', 'mylist');
-	  datalist = document.createElement('datalist');
-	  datalist.id = 'mylist';
-	  getInputHistories().forEach(function (text) {
-	    var option = document.createElement('option');
-	    option.value = text;
-	    datalist.appendChild(option);
-	  });
-	  document.body.appendChild(datalist);
+	/*
+	 * Handle form.submit event.
+	 * @param {Event} e - Submit event.
+	 */
+	function handleSubmit(e) {
+	  e.preventDefault();
+	  return false;
 	}
 	
 	/**
 	 * Handle input.blur event.
 	 */
 	function handleInputBlur() {
-	  console.log('handleInputBlur');
 	  saveText();
 	}
 	
 	/**
 	 * Handle input.keyup event.
-	 *
 	 * @param {Event} e The DOM event to handle
 	 */
 	function handleInputKeyup(e) {
@@ -16238,116 +16240,70 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Save a text annotation from input.
 	 */
 	function saveText() {
-	  if (input.value.trim().length > 0) {
-	    var _ret = function () {
-	      var clientX = parseInt(input.style.left, 10);
-	      var clientY = parseInt(input.style.top, 10);
-	      var svg = (0, _utils.findSVGAtPoint)(clientX, clientY);
-	      if (!svg) {
-	        return {
-	          v: void 0
-	        };
-	      }
 	
-	      var content = input.value.trim();
-	      if (!content) {
-	        return {
-	          v: void 0
-	        };
-	      }
-	
-	      var _getMetadata = (0, _utils.getMetadata)(svg),
-	          documentId = _getMetadata.documentId,
-	          pageNumber = _getMetadata.pageNumber;
-	
-	      var rect = svg.getBoundingClientRect();
-	      var annotation = Object.assign({
-	        type: 'textbox',
-	        size: _textSize,
-	        color: _textColor,
-	        content: content
-	      }, (0, _utils.scaleDown)(svg, {
-	        x: clientX - rect.left,
-	        y: clientY - rect.top,
-	        width: input.offsetWidth,
-	        height: input.offsetHeight
-	      }));
-	
-	      // RelationId.
-	      var selfId = input.getAttribute('data-self-id');
-	      if (selfId) {
-	        annotation.uuid = selfId;
-	      }
-	
-	      _PDFJSAnnotate2.default.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation).then(function (annotation) {
-	        (0, _appendChild2.default)(svg, annotation);
-	
-	        closeInput(annotation);
-	      });
-	
-	      addInputHistory(content);
-	    }();
-	
-	    if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
-	  } else {
-	    closeInput();
+	  if (!input) {
+	    return;
 	  }
+	
+	  var content = input.value.trim();
+	  if (!content) {
+	    return closeInput();
+	  }
+	
+	  var clientX = parseInt(input.style.left, 10);
+	  var clientY = parseInt(input.style.top, 10);
+	  var svg = (0, _utils.getSVGLayer)();
+	
+	  var _getMetadata = (0, _utils.getMetadata)(svg),
+	      documentId = _getMetadata.documentId,
+	      pageNumber = _getMetadata.pageNumber;
+	
+	  var rect = svg.getBoundingClientRect();
+	  var annotation = Object.assign({
+	    type: 'textbox',
+	    content: content
+	  }, (0, _utils.scaleDown)(svg, {
+	    x: clientX - rect.left,
+	    y: clientY - rect.top,
+	    width: input.offsetWidth,
+	    height: input.offsetHeight
+	  }));
+	
+	  // RelationId.
+	  var selfId = input.getAttribute('data-self-id');
+	  if (selfId) {
+	    annotation.uuid = selfId;
+	  }
+	
+	  _PDFJSAnnotate2.default.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation).then(function (annotation) {
+	    (0, _appendChild2.default)(svg, annotation);
+	
+	    // Add an autocomplete candidate. (Firefox, Chrome)
+	    (0, _jquery2.default)('#autocompleteform [type="submit"]').click();
+	
+	    closeInput(annotation);
+	  });
 	}
 	
 	/**
 	 * Close the input.
+	 * @param {Object} textAnnotation - the annotation registerd.
 	 */
 	function closeInput(textAnnotation) {
 	
 	  if (input) {
-	    input.removeEventListener('blur', handleInputBlur);
-	    input.removeEventListener('keyup', handleInputKeyup);
-	    document.body.removeChild(input);
+	
+	    (0, _jquery2.default)(input).parents('form').remove();
 	    input = null;
 	
 	    if (_finishCallback) {
 	      _finishCallback(textAnnotation);
 	    }
 	  }
-	
-	  (0, _jquery2.default)(datalist).remove();
-	}
-	
-	function getInputHistories() {
-	  var histories = localStorage.getItem(LSKEY_INPUT_HISTORY);
-	  if (!histories) {
-	    histories = '[]';
-	  }
-	  return JSON.parse(histories);
-	}
-	
-	function addInputHistory(text) {
-	  var histories = getInputHistories();
-	  histories.unshift(text);
-	  histories = histories.slice(0, 15); // Max size for histories (this is temporary).
-	  // Make as unique.
-	  histories = histories.filter(function (value, index, self) {
-	    return self.indexOf(value) === index;
-	  });
-	  localStorage.setItem(LSKEY_INPUT_HISTORY, JSON.stringify(histories));
 	}
 	
 	/**
-	 * Set the text attributes
-	 *
-	 * @param {Number} textSize The size of the text
-	 * @param {String} textColor The color of the text
-	 */
-	function setText() {
-	  var textSize = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 12;
-	  var textColor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '000000';
-	
-	  _textSize = parseInt(textSize, 10);
-	  _textColor = textColor;
-	}
-	
-	/**
-	 * Enable text behavior
+	 * Enable text behavior.
 	 */
 	function enableText() {
 	  if (_enabled) {
@@ -16359,7 +16315,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	/**
-	 * Disable text behavior
+	 * Disable text behavior.
 	 */
 	function disableText() {
 	  if (!_enabled) {
