@@ -7,6 +7,8 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.0/spectrum.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.0/spectrum.min.css">
     <script type="text/javascript" src="./app.bundle.js"></script>
 </head>
 <body>
@@ -23,8 +25,68 @@
 </nav>
 <div class="main">
 	<div class="container-fluid">
-		<div class="row">
-			<div class="col-md-12 col-sm-12 col-xs-12 well">
+		<div class="row well anno-select-layout">
+            <!-- Annotation Select UI -->
+            <div class="row">
+                <div class="col-xs-6">
+                    <input type="radio" name="anno-primary" value="1" checked>
+                    <input type="text" class="js-palette" data-index="1">
+                    <input type="file" accept=".anno" style="">
+                </div>
+                <div class="col-xs-6">
+                    <input type="radio" name="anno-primary" value="2">
+                    <input type="text" class="js-palette" data-index="2">
+                    <input type="file" accept=".anno">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6">
+                    <input type="radio" name="anno-primary" value="3">
+                    <input type="text" class="js-palette" data-index="3">
+                    <input type="file" accept=".anno">
+                </div>
+                <div class="col-xs-6">
+                    <input type="radio" name="anno-primary" value="4">
+                    <input type="text" class="js-palette" data-index="4">
+                    <input type="file" accept=".anno">
+                </div>
+            </div>
+
+            <!--TMP-->
+            <script>
+                $('.js-palette').spectrum({
+                    showPaletteOnly: true,
+                    showPalette:true,
+                    hideAfterPaletteSelect:true,
+                    color: 'blanchedalmond',
+                    palette: [
+                        ['black', 'white', 'blanchedalmond',
+                        'rgb(255, 128, 0);', 'hsv 100 70 50'],
+                        ['red', 'yellow', 'green', 'blue', 'violet']
+                    ]
+                });
+                $('.js-palette').eq(0).spectrum('set', 'red');
+                $('.js-palette').eq(1).spectrum('set', 'green');
+                $('.js-palette').eq(2).spectrum('set', 'blue');
+                $('.js-palette').eq(3).spectrum('set', 'violet');
+                $('.js-palette').on('change', function() {
+                    console.log('js-palette changed.');
+                });
+            </script>
+            <!-- Override style -->
+            <style>
+                .sp-replacer {
+                    padding: 0;
+                    border: none;
+                }
+                .sp-dd {
+                    display: none;
+                }
+            </style>
+
+
+
+<!-- 			<div class="col-md-12 col-sm-12 col-xs-12 well">
 				<form class="form-inline">
 					<div class="form-group">
 						<label for="primary-anno">Primary annotation (.anno)</label>
@@ -36,7 +98,7 @@
 					</div>
 					<button type="submit" class="btn btn-primary" id="load">Load</button>
 				</form>
-			</div>
+			</div> -->
 		</div>
 		<div class="row js-viewer-root">
 			<div class="col-md-12 col-sm-12 col-xs-12">

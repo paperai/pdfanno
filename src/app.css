@@ -21,3 +21,19 @@
     background: rgba(0, 0, 255, 0.3);
     content: " ";
 }
+
+/**
+ * Annotation Select UI Layout.
+ */
+.anno-select-layout {}
+.anno-select-layout .row:first-child {
+    margin-bottom: 10px;
+}
+.anno-select-layout [type="radio"] {
+    margin-right: 5px;
+}
+.anno-select-layout [type="file"] {
+    display: inline-block;
+    margin-left: 5px;
+    line-height: 1em;
+}
