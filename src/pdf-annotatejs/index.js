@@ -12,6 +12,11 @@ export default PDFJSAnnotate;
 // Alias.
 let PDFAnnotate = PDFJSAnnotate;
 
+
+
+
+
+
 // Setup Storage.
 PDFAnnotate.setStoreAdapter(new PDFAnnotate.PdfannoStoreAdapter());
 

@@ -326,11 +326,12 @@ function displayAnnotation() {
     console.log(primaryIndex);
     
     // Annotation color.
-    let color1 = $('.js-anno-palette').eq(0).spectrum('get').toHex();
-    let color2 = $('.js-anno-palette').eq(1).spectrum('get').toHex();
-    let color3 = $('.js-anno-palette').eq(2).spectrum('get').toHex();
-    let color4 = $('.js-anno-palette').eq(3).spectrum('get').toHex();
-    console.log(color1, color2, color3, color4);
+    let colors = [
+        $('.js-anno-palette').eq(0).spectrum('get').toHexString(),
+        $('.js-anno-palette').eq(1).spectrum('get').toHexString(),
+        $('.js-anno-palette').eq(2).spectrum('get').toHexString(),
+        $('.js-anno-palette').eq(3).spectrum('get').toHexString()
+    ];
 
     // Annotation files.
     let actions = [];
@@ -355,11 +356,37 @@ function displayAnnotation() {
     Promise.all(actions).then((annotations) => {
         console.log(annotations);
 
-        let isZero = (annotations.filter(a => a !== null).length === 0);
-        if (isZero) {
-            console.log('isZero');
-            return;
-        }
+        // let isZero = (annotations.map(a => a !== null).length === 0);
+        // if (isZero) {
+        //     console.log('isZero');
+        //     return;
+        // }
+
+        annotations = annotations.map(a => {
+            return a ? a : {};
+        });
+
+        console.log(annotations);
+
+        // Create import data.
+        let data = {
+            num     : 4,
+            primary : primaryIndex,
+            colors,
+            annotations
+        };
+
+        // Pass the data to pdf-annotatejs.
+        window.iframeWindow.PDFAnnotate.getStoreAdapter().importAnnotations(data).then(result => {
+
+            console.log('Done:', result);
+
+            // TODO Re-render annotations.
+            reloadPDFViewer();
+
+            // TODO set the mode to viewMode.
+            $('.js-tool-btn[data-type="view"]').click();
+        });
     });
 }
 

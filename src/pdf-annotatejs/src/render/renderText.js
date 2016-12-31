@@ -36,11 +36,13 @@ function getRect(text, svg) {
  */
 export default function renderText(a, svg) {
 
-    let color;
-    if (a.readOnly) {
-      color = textSecondaryColor[a.seq % textSecondaryColor.length];
-    } else {
-      color = '#F00';
+    let color = a.color;
+    if (!color) {
+      if (a.readOnly) {
+        color = textSecondaryColor[a.seq % textSecondaryColor.length];
+      } else {
+        color = '#F00';
+      }      
     }
 
     // Text.
