@@ -313,12 +313,35 @@ function setupAnnotationSelectUI() {
 
     // Setup behavior.
     $('.js-anno-radio, .js-anno-palette, .js-anno-file').on('change', displayAnnotation);
+    $('.js-anno-file').on('click', handleClickFileInput);
+}
+
+/**
+ * The data which has annotations, colors, primaryIndex.
+ */
+let paperData = null;
+/**
+ * Detect a click event on file inputs.
+ * This is for confirm to override the file which user already selected.
+ */
+function handleClickFileInput(e) {
+
+    let target = e.target.getAttribute('name');    
+    let index  = parseInt(e.target.getAttribute('data-index'));
+
+    if (paperData && paperData.annotations[index]) {
+        let userAnswer = confirm('Are you sure to load a new pdf file? Please save your current annotations.');
+        if (!userAnswer) {
+            e.preventDefault();
+            return false;
+        }
+    }
 }
 
 /**
  * Load annotation data and display.
  */
-function displayAnnotation() {
+function displayAnnotation(e) {    
     console.log('displayAnnotation');
 
     // Primary annotation index.
@@ -356,12 +379,6 @@ function displayAnnotation() {
     Promise.all(actions).then((annotations) => {
         console.log(annotations);
 
-        // let isZero = (annotations.map(a => a !== null).length === 0);
-        // if (isZero) {
-        //     console.log('isZero');
-        //     return;
-        // }
-
         annotations = annotations.map(a => {
             return a ? a : {};
         });
@@ -369,7 +386,7 @@ function displayAnnotation() {
         console.log(annotations);
 
         // Create import data.
-        let data = {
+        paperData = {
             num     : 4,
             primary : primaryIndex,
             colors,
@@ -377,7 +394,7 @@ function displayAnnotation() {
         };
 
         // Pass the data to pdf-annotatejs.
-        window.iframeWindow.PDFAnnotate.getStoreAdapter().importAnnotations(data).then(result => {
+        window.iframeWindow.PDFAnnotate.getStoreAdapter().importAnnotations(paperData).then(result => {
 
             console.log('Done:', result);
 
