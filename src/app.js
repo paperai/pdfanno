@@ -430,6 +430,16 @@ function startApplication() {
         console.log('pdfdragover!!!');
         handleDragOver(ev.detail.originalEvent);
     });
+}
+
+/**
+ * Initialize PAPERANNO application.
+ * This is called only once at launch.
+ */
+function initApplication() {
+
+    // Start application.
+    startApplication();
 
     // Setup the annotation load and select UI.
     setupAnnotationSelectUI();
@@ -439,5 +449,5 @@ function startApplication() {
     The entry point.
 */
 window.addEventListener('DOMContentLoaded', e => {
-    startApplication();
+    initApplication();
 });
