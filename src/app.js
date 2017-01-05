@@ -335,7 +335,8 @@ function handleClickFileInput(e) {
     let target = e.target.getAttribute('name');    
     let index  = parseInt(e.target.getAttribute('data-index'));
 
-    if (paperData && paperData.annotations[index]) {
+    // Not empty.
+    if (paperData && paperData.annotations[index] && Object.keys(paperData.annotations[index]).length > 0) {
         let userAnswer = confirm('Are you sure to load a new pdf file? Please save your current annotations.');
         if (!userAnswer) {
             e.preventDefault();
@@ -349,6 +350,8 @@ function handleClickFileInput(e) {
  */
 function displayAnnotation(e) {    
     console.log('displayAnnotation');
+
+    let updateTarget = $(e.target).attr('name');
 
     // Primary annotation index.
     let primaryIndex = parseInt($('.js-anno-radio:checked').val(), 10);
@@ -396,7 +399,8 @@ function displayAnnotation(e) {
             num     : 4,
             primary : primaryIndex,
             colors,
-            annotations
+            annotations,
+            updateTarget
         };
 
         // Pass the data to pdf-annotatejs.
@@ -487,5 +491,12 @@ function initApplication() {
     The entry point.
 */
 window.addEventListener('DOMContentLoaded', e => {
+
+    // Delete prev annotations.
+    if (location.search.indexOf('debug') === -1) {
+        const LOCALSTORAGE_KEY2 = '_pdfanno_containers';
+        localStorage.removeItem(LOCALSTORAGE_KEY2);        
+    }
+
     initApplication();
 });
