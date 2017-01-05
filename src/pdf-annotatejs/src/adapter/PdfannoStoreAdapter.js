@@ -296,10 +296,15 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
           console.log('importAnnotations:', data);
 
           let containers = data.annotations.map((a, i) => {
+            
             let color = data.colors[i];
             let isPrimary = (i === data.primary);
-            console.log('isPrimary', i, data.primary, isPrimary);
-            return _createContainerFromJson2(a, color, isPrimary);
+            let visible = data.visibilities[i];
+
+            if (visible) {
+              return _createContainerFromJson2(a, color, isPrimary);              
+            }
+
           }).filter(c => {
             return c;
           });

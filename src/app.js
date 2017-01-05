@@ -322,7 +322,7 @@ function setupAnnotationSelectUI() {
     $('.js-anno-palette').eq(3).spectrum('set', 'violet');
 
     // Setup behavior.
-    $('.js-anno-radio, .js-anno-palette, .js-anno-file').on('change', displayAnnotation);
+    $('.js-anno-radio, .js-anno-visibility, .js-anno-palette, .js-anno-file').on('change', displayAnnotation);
 }
 
 /**
@@ -340,7 +340,14 @@ function displayAnnotation(e) {
 
     // Primary annotation index.
     let primaryIndex = parseInt($('.js-anno-radio:checked').val(), 10);
-    console.log(primaryIndex);
+
+    // Visibilities.
+    let visibilities = [
+        $('.js-anno-visibility').eq(0).is(':checked'),
+        $('.js-anno-visibility').eq(1).is(':checked'),
+        $('.js-anno-visibility').eq(2).is(':checked'),
+        $('.js-anno-visibility').eq(3).is(':checked'),
+    ];
     
     // Annotation color.
     let colors = [
@@ -383,6 +390,7 @@ function displayAnnotation(e) {
         paperData = {
             num     : 4,
             primary : primaryIndex,
+            visibilities,
             colors,
             annotations,
             updateTarget
