@@ -43,7 +43,6 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
 
           let annotations = [];
           let containers = _getSecondaryContainers();
-          console.log('aaaaaaaaaaa:', containers);
           containers.forEach(container => {
             // TODO refactoring. same thing exists.
             let tmpAnnotations = ((container[documentId] || {}).annotations || []).filter(i => {

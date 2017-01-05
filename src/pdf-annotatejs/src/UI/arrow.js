@@ -172,7 +172,6 @@ function handleDocumentMouseup(e) {
     y2: endPos.y,
     type : 'arrow',
     direction : _arrowType,
-    color : 'FF0000',
     highlight1 : startBoundingCircle.parentNode.getAttribute('data-pdf-annotate-id'),
     highlight2 : endBoundingCircle.parentNode.getAttribute('data-pdf-annotate-id'),
   };

@@ -57,7 +57,6 @@ function renderAnno() {
     if (leftMargin < 0) {
         leftMargin = 9;
     }
-    console.log('leftMargin:', leftMargin);
 
     let height = $('#viewer').height();
 
@@ -107,15 +106,11 @@ function renderAnno() {
 
 function renderAnnotations(svg, pageNumber) {
     let documentId = getFileName(PDFView.url);
-    console.log('documentId:', documentId);
     PDFAnnotate.getAnnotations(documentId, pageNumber).then(function(annotations) {
         PDFAnnotate.getStoreAdapter().getSecondaryAnnotations(documentId, pageNumber).then(function(secondaryAnnotations) {
 
             // Primary + Secondary annotations.
             annotations.annotations = annotations.annotations.concat(secondaryAnnotations.annotations);
-
-            console.log('annotations1:', annotations);
-            console.log('annotations2:', secondaryAnnotations);
 
             // Render annotations.
             let viewport = PDFView.pdfViewer.getPageView(0).viewport;
@@ -168,18 +163,7 @@ function importUploadedAnnotation() {
 
 function setupPDFDragAndDropLoader() {
 
-    console.log('setupPDFDragAndDropLoader');
-
     let element = document.querySelector('body');
-
-    // element.removeEventListener('dragenter', handleDragEnter);
-    // element.removeEventListener('dragleave', handleDragLeave);
-    // element.removeEventListener('dragover', handleDragOver);
-    // element.removeEventListener('drop', handleDroppedFile);
-    // element.addEventListener('dragenter', handleDragEnter);
-    // element.addEventListener('dragleave', handleDragLeave);
-    // element.addEventListener('dragover', handleDragOver);
-    // element.addEventListener('drop', handleDroppedFile);
 
     $(element).off('dragenter', handleDragEnter);
     $(element).off('dragleave', handleDragLeave);
@@ -193,8 +177,6 @@ function setupPDFDragAndDropLoader() {
 setupPDFDragAndDropLoader();
 
 function handleDroppedFile(e) {
-
-    console.log('eeeeeeeeee:', e);
 
     var event = document.createEvent('CustomEvent');
     event.initCustomEvent('pdfdropped', true, true, { originalEvent: e.originalEvent });

@@ -210,8 +210,6 @@ function setupLoadButton() {
 
 function setupPDFDragAndDropLoader() {
 
-    console.log('setupPDFDragAndDropLoader');
-
     let element = document.querySelector('.js-viewer-root');
 
     element.removeEventListener('dragenter', handleDragEnter);
