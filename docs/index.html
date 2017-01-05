@@ -7,6 +7,8 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.0/spectrum.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.0/spectrum.min.css">
     <script type="text/javascript" src="./app.bundle.js"></script>
 </head>
 <body>
@@ -23,13 +25,36 @@
 </nav>
 <div class="main">
 	<div class="container-fluid">
-		<div class="row">
-			<div class="col-md-12 col-sm-12 col-xs-12 well">
+		<div class="row well anno-select-layout">
+            <!-- Annotation Select UI -->
+            <div class="row">
+                <div class="col-xs-6">
+                    <input type="radio" name="primary" value="0" checked class="js-anno-radio"  autocomplete="off">
+                    <input type="text"  name="color" class="js-anno-palette"  autocomplete="off">
+                    <input type="file"  name="annotation" accept=".anno" class="js-anno-file" data-index="0"  autocomplete="off">
+                </div>
+                <div class="col-xs-6">
+                    <input type="radio" name="primary" value="1" class="js-anno-radio"  autocomplete="off">
+                    <input type="text"  name="color" class="js-anno-palette"  autocomplete="off">
+                    <input type="file"  name="annotation" accept=".anno" class="js-anno-file" data-index="1"  autocomplete="off">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6">
+                    <input type="radio" name="primary" value="2" class="js-anno-radio"  autocomplete="off">
+                    <input type="text"  name="color" class="js-anno-palette"  autocomplete="off">
+                    <input type="file"  name="annotation" accept=".anno" class="js-anno-file" data-index="2" autocomplete="off">
+                </div>
+                <div class="col-xs-6">
+                    <input type="radio" name="primary" value="3" class="js-anno-radio" autocomplete="off">
+                    <input type="text"  name="color" class="js-anno-palette" autocomplete="off">
+                    <input type="file"  name="annotation" accept=".anno" class="js-anno-file" data-index="3" autocomplete="off">
+                </div>
+            </div>
+
+
+<!-- 			<div class="col-md-12 col-sm-12 col-xs-12 well">
 				<form class="form-inline">
-					<div class="form-group">
-						<label for="paper">Paper (.pdf)</label>
-						<input type="file" id="paper" accept=".pdf">
-					</div>
 					<div class="form-group">
 						<label for="primary-anno">Primary annotation (.anno)</label>
 						<input type="file" id="primary-anno" accept=".anno">
@@ -40,9 +65,9 @@
 					</div>
 					<button type="submit" class="btn btn-primary" id="load">Load</button>
 				</form>
-			</div>
+			</div> -->
 		</div>
-		<div class="row">
+		<div class="row js-viewer-root">
 			<div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="btn-toolbar" role="toolbar">
     				<div class="btn-group" role="group">
@@ -79,7 +104,7 @@
                         </a>
                     </div>
                 </div>
-				<div id="viewer">
+				<div id="viewer" class="">
                     <iframe src="./pages/viewer.html" class="anno-viewer" frameborder="0"></iframe>
 				</div>
 			</div>

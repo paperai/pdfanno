@@ -157,57 +157,46 @@ return /******/ (function(modules) { // webpackBootstrap
 	        a.click();
 	        a.parentNode.removeChild(a);
 	    });
+	
+	    unlistenWindowLeaveEvent();
+	}
+	
+	function reloadPDFViewer() {
+	
+	    // Reload pdf.js.
+	    $('#viewer iframe').remove();
+	    $('#viewer').html('<iframe src="./pages/viewer.html" class="anno-viewer" frameborder="0"></iframe>');
+	
+	    // Restart.
+	    startApplication();
 	}
 	
 	/**
 	 * Delete all annotations.
 	 */
 	function deleteAllAnnotations() {
+	
+	    var userAnswer = window.confirm('alert message: "Are you sure to clear the current annotations?"');
+	    if (!userAnswer) {
+	        return;
+	    }
+	
 	    var documentId = window.iframeWindow.getFileName(window.iframeWindow.PDFView.url);
 	    window.iframeWindow.PDFAnnotate.getStoreAdapter().deleteAnnotations(documentId).then(function () {
 	
-	        // Reload pdf.js.
-	        $('#viewer iframe').remove();
-	        $('#viewer').html('<iframe src="./pages/viewer.html" class="anno-viewer" frameborder="0"></iframe>');
-	
-	        // Restart.
-	        startApplication();
+	        reloadPDFViewer();
 	    });
 	}
 	
 	/**
 	    Set the behaviors of file inputs.
 	*/
-	var _paperName = null;
-	var _paperData = null;
 	var _primaryAnnotation = null;
 	var _secondaryAnnotations = [];
 	function initializeFileUploader() {
-	    setupPaperButton();
 	    setupPrimaryAnnotationButton();
 	    setupSecondaryAnnotationButton();
 	    setupLoadButton();
-	}
-	
-	/**
-	    Setup the behavior of the paper button.
-	*/
-	function setupPaperButton() {
-	
-	    $('#paper').off('change').on('change', function (e) {
-	
-	        var files = e.target.files;
-	        if (!files || files.length === 0) {
-	            return;
-	        }
-	
-	        var fileReader = new FileReader();
-	        fileReader.onload = function (event) {
-	            _paperName = files[0].name;
-	            _paperData = event.target.result;
-	        };
-	        fileReader.readAsDataURL(files[0]);
-	    });
 	}
 	
 	function setupPrimaryAnnotationButton() {
@@ -255,8 +244,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    $('#load').off('click').on('click', function (e) {
 	
 	        // Set data.
-	        _paperName && localStorage.setItem('_pdfanno_pdfname', _paperName);
-	        _paperData && localStorage.setItem('_pdfanno_pdf', _paperData);
 	        _primaryAnnotation && localStorage.setItem('_pdfanno_pdfanno_upload', _primaryAnnotation);
 	        _secondaryAnnotations && localStorage.setItem('_pdfanno_pdfanno_upload_second', JSON.stringify(_secondaryAnnotations));
 	
@@ -267,6 +254,221 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // Re-setup.
 	        startApplication();
 	    });
+	}
+	
+	// ref: https://github.com/pdfanno/pdfanno/blob/3b8eba716a416ffa3d03edd79352859b4dd9f9e0/src/bk/viewer2js/viewer2.js
+	
+	function setupPDFDragAndDropLoader() {
+	
+	    console.log('setupPDFDragAndDropLoader');
+	
+	    var element = document.querySelector('.js-viewer-root');
+	
+	    element.removeEventListener('dragenter', handleDragEnter);
+	    element.removeEventListener('dragleave', handleDragLeave);
+	    element.removeEventListener('dragover', handleDragOver);
+	    element.removeEventListener('drop', handleDroppedFile);
+	    element.addEventListener('dragenter', handleDragEnter);
+	    element.addEventListener('dragleave', handleDragLeave);
+	    element.addEventListener('dragover', handleDragOver);
+	    element.addEventListener('drop', handleDroppedFile);
+	}
+	
+	function checkFileCompatibility(fileName, ext) {
+	    var fragments = fileName.split('.');
+	    if (fragments.length < 2) {
+	        return false;
+	    }
+	    return fragments[1].toLowerCase() === ext;
+	}
+	
+	function handleDroppedFile(e) {
+	
+	    console.log('handleDroppedFile');
+	
+	    var element = e.target;
+	    var file = e.dataTransfer.files[0];
+	    console.log('file:', file);
+	
+	    $('#viewer').removeClass('-active');
+	
+	    var fileName = file.name;
+	
+	    // Check compatibility.
+	    if (!checkFileCompatibility(fileName, 'pdf')) {
+	        alert("FILE NOT COMPATIBLE. \"*.pdf\" can be loaded.\n actual = \"" + fileName + "\".");
+	        return cancelEvent(e);
+	    }
+	
+	    var fileReader = new FileReader();
+	    fileReader.onload = function (event) {
+	        var data = event.target.result;
+	        localStorage.setItem('_pdfanno_pdf', data);
+	        localStorage.setItem('_pdfanno_pdfname', fileName);
+	
+	        reloadPDFViewer();
+	    };
+	    fileReader.readAsDataURL(file);
+	
+	    return cancelEvent(e);
+	}
+	
+	function handleDragEnter(e) {
+	    console.log('handleDragEnter');
+	    $('#viewer').addClass('-active');
+	    return cancelEvent(e);
+	}
+	
+	function handleDragLeave(e) {
+	    console.log('handleDragLeave');
+	    $('#viewer').removeClass('-active');
+	    return cancelEvent(e);
+	}
+	
+	var timer = null;
+	function handleDragOver(e) {
+	    console.log('handleDragOver');
+	
+	    $('#viewer').addClass('-active');
+	
+	    if (timer) {
+	        clearTimeout(timer);
+	    }
+	    timer = setTimeout(function () {
+	        $('#viewer').removeClass('-active');
+	        timer = null;
+	    }, 1000);
+	
+	    return cancelEvent(e);
+	}
+	
+	// Cancel handler
+	function cancelEvent(e) {
+	    e.preventDefault();
+	    return false;
+	}
+	
+	/**
+	 * Setup the UI for loading and selecting annotations.
+	 */
+	function setupAnnotationSelectUI() {
+	
+	    // Setup colorPickers.
+	    $('.js-anno-palette').spectrum({
+	        showPaletteOnly: true,
+	        showPalette: true,
+	        hideAfterPaletteSelect: true,
+	        palette: [['black', 'white', 'blanchedalmond', 'rgb(255, 128, 0)', 'hsv 100 70 50'], ['red', 'yellow', 'green', 'blue', 'violet']]
+	    });
+	    // Set initial color.
+	    $('.js-anno-palette').eq(0).spectrum('set', 'red');
+	    $('.js-anno-palette').eq(1).spectrum('set', 'green');
+	    $('.js-anno-palette').eq(2).spectrum('set', 'blue');
+	    $('.js-anno-palette').eq(3).spectrum('set', 'violet');
+	
+	    // Setup behavior.
+	    $('.js-anno-radio, .js-anno-palette, .js-anno-file').on('change', displayAnnotation);
+	    $('.js-anno-file').on('click', handleClickFileInput);
+	}
+	
+	/**
+	 * The data which has annotations, colors, primaryIndex.
+	 */
+	var paperData = null;
+	/**
+	 * Detect a click event on file inputs.
+	 * This is for confirm to override the file which user already selected.
+	 */
+	function handleClickFileInput(e) {
+	
+	    var target = e.target.getAttribute('name');
+	    var index = parseInt(e.target.getAttribute('data-index'));
+	
+	    // Not empty.
+	    if (paperData && paperData.annotations[index] && Object.keys(paperData.annotations[index]).length > 0) {
+	        var userAnswer = confirm('Are you sure to load a new pdf file? Please save your current annotations.');
+	        if (!userAnswer) {
+	            e.preventDefault();
+	            return false;
+	        }
+	    }
+	}
+	
+	/**
+	 * Load annotation data and display.
+	 */
+	function displayAnnotation(e) {
+	    console.log('displayAnnotation');
+	
+	    var updateTarget = $(e.target).attr('name');
+	
+	    // Primary annotation index.
+	    var primaryIndex = parseInt($('.js-anno-radio:checked').val(), 10);
+	    console.log(primaryIndex);
+	
+	    // Annotation color.
+	    var colors = [$('.js-anno-palette').eq(0).spectrum('get').toHexString(), $('.js-anno-palette').eq(1).spectrum('get').toHexString(), $('.js-anno-palette').eq(2).spectrum('get').toHexString(), $('.js-anno-palette').eq(3).spectrum('get').toHexString()];
+	
+	    // Annotation files.
+	    var actions = [];
+	    $('.js-anno-file').each(function () {
+	        var files = this.files;
+	
+	        actions.push(new Promise(function (resolve, reject) {
+	
+	            if (files.length === 0) {
+	                return resolve(null);
+	            }
+	
+	            var fileReader = new FileReader();
+	            fileReader.onload = function (event) {
+	                var annotation = event.target.result;
+	                // TODO JSON scheme check.
+	                resolve(JSON.parse(annotation));
+	            };
+	            fileReader.readAsText(files[0]);
+	        }));
+	    });
+	    Promise.all(actions).then(function (annotations) {
+	        console.log(annotations);
+	
+	        annotations = annotations.map(function (a) {
+	            return a ? a : {};
+	        });
+	
+	        console.log(annotations);
+	
+	        // Create import data.
+	        paperData = {
+	            num: 4,
+	            primary: primaryIndex,
+	            colors: colors,
+	            annotations: annotations,
+	            updateTarget: updateTarget
+	        };
+	
+	        // Pass the data to pdf-annotatejs.
+	        window.iframeWindow.PDFAnnotate.getStoreAdapter().importAnnotations(paperData).then(function (result) {
+	
+	            console.log('Done:', result);
+	
+	            // TODO Re-render annotations.
+	            reloadPDFViewer();
+	
+	            // TODO set the mode to viewMode.
+	            $('.js-tool-btn[data-type="view"]').click();
+	        });
+	    });
+	}
+	
+	function listenWindowLeaveEvent() {
+	    $(window).off('beforeunload').on('beforeunload', function () {
+	        return 'You don\'t save the annotations yet.\nAre you sure to leave ?';
+	    });
+	}
+	
+	function unlistenWindowLeaveEvent() {
+	    $(window).off('beforeunload');
 	}
 	
 	function startApplication() {
@@ -284,6 +486,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // Set the behaviors of file inputs.
 	        initializeFileUploader();
+	
+	        // Set the event drag & drop for loading a PDF file.
+	        setupPDFDragAndDropLoader();
+	
+	        unlistenWindowLeaveEvent();
 	    });
 	
 	    iframeWindow.addEventListener('annotationrendered', function (ev) {
@@ -294,13 +501,48 @@ return /******/ (function(modules) { // webpackBootstrap
 	            window.iframeWindow.PDFAnnotate.UI.enableViewMode();
 	        }
 	    });
+	
+	    iframeWindow.addEventListener('pdfdropped', function (ev) {
+	        console.log('pdfdropped', ev.detail.originalEvent.dataTransfer.files[0]);
+	        handleDroppedFile(ev.detail.originalEvent);
+	    });
+	
+	    iframeWindow.addEventListener('pdfdragover', function (ev) {
+	        console.log('pdfdragover!!!');
+	        handleDragOver(ev.detail.originalEvent);
+	    });
+	
+	    iframeWindow.addEventListener('annotationUpdated', function () {
+	        console.log('annotationUpdated');
+	        listenWindowLeaveEvent();
+	    });
+	}
+	
+	/**
+	 * Initialize PAPERANNO application.
+	 * This is called only once at launch.
+	 */
+	function initApplication() {
+	
+	    // Start application.
+	    startApplication();
+	
+	    // Setup the annotation load and select UI.
+	    setupAnnotationSelectUI();
 	}
 	
 	/**
 	    The entry point.
 	*/
 	window.addEventListener('DOMContentLoaded', function (e) {
-	    startApplication();
+	
+	    // Delete prev annotations.
+	    if (location.search.indexOf('debug') === -1) {
+	        var LOCALSTORAGE_KEY2 = '_pdfanno_containers';
+	        localStorage.removeItem(LOCALSTORAGE_KEY2);
+	    }
+	
+	    initApplication();
 	});
 
 /***/ },
@@ -344,7 +586,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, "@charset 'utf-8';\n\n\n.anno-viewer {\n    width: 100%;\n    height: 500px;\n}", ""]);
+	exports.push([module.id, "@charset 'utf-8';\n\n\n.anno-viewer {\n    width: 100%;\n    height: 500px;\n}\n\n/**\n    PDF Drag and Drop UI.\n*/\n#viewer {\n    position: relative;\n}\n#viewer.-active:after {\n    position: absolute;\n    top: 0;\n    left: 0;\n    width: 100%;\n    height: 100%;\n    background: rgba(0, 0, 255, 0.3);\n    content: \" \";\n}\n\n/**\n * Annotation Select UI Layout.\n */\n.anno-select-layout {}\n.anno-select-layout .row:first-child {\n    margin-bottom: 10px;\n}\n.anno-select-layout [type=\"radio\"] {\n    margin-right: 5px;\n}\n.anno-select-layout [type=\"file\"] {\n    display: inline-block;\n    margin-left: 5px;\n    line-height: 1em;\n}\n.anno-select-layout .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-select-layout .sp-dd {\n    display: none;\n}", ""]);
 	
 	// exports
 
