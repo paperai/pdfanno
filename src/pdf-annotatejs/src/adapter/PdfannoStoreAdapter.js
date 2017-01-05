@@ -43,6 +43,7 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
 
           let annotations = [];
           let containers = _getSecondaryContainers();
+          console.log('aaaaaaaaaaa:', containers);
           containers.forEach(container => {
             // TODO refactoring. same thing exists.
             let tmpAnnotations = ((container[documentId] || {}).annotations || []).filter(i => {
@@ -858,7 +859,7 @@ function transformFromRenderCoordinate(annotation) {
 }
 
 function _getContainers() {
-  let containers = JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY2), '[]');
+  let containers = JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY2) || '[]');
   return containers;
 }
 
@@ -873,15 +874,6 @@ function _getContainer() {
   } else {    
     return {};
   }
-
-  // let container = localStorage.getItem(LOCALSTORAGE_KEY);
-  // if (!container) {
-  //   container = {};
-  //   _saveContainer(container);
-  // } else {
-  //   container = JSON.parse(container);
-  // }
-  // return container;
 }
 
 function _getSecondaryContainers() {
@@ -939,6 +931,7 @@ function _getSecondaryAnnotations(documentId) {
   let annotations = [];
 
   let containers = _getSecondaryContainers();
+
   containers.forEach(container => {
     let tmpAnnotations = (container[documentId] || {}).annotations;
     if (tmpAnnotations) {

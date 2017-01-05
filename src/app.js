@@ -106,6 +106,8 @@ function downloadAnnotation() {
         a.click();
         a.parentNode.removeChild(a);
     });
+
+    unlistenWindowLeaveEvent();
 }
 
 function reloadPDFViewer() {

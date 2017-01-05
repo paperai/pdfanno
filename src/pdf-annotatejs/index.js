@@ -107,11 +107,15 @@ function renderAnno() {
 
 function renderAnnotations(svg, pageNumber) {
     let documentId = getFileName(PDFView.url);
+    console.log('documentId:', documentId);
     PDFAnnotate.getAnnotations(documentId, pageNumber).then(function(annotations) {
         PDFAnnotate.getStoreAdapter().getSecondaryAnnotations(documentId, pageNumber).then(function(secondaryAnnotations) {
 
             // Primary + Secondary annotations.
             annotations.annotations = annotations.annotations.concat(secondaryAnnotations.annotations);
+
+            console.log('annotations1:', annotations);
+            console.log('annotations2:', secondaryAnnotations);
 
             // Render annotations.
             let viewport = PDFView.pdfViewer.getPageView(0).viewport;
