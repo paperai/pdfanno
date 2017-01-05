@@ -125,7 +125,7 @@ function reloadPDFViewer() {
  */
 function deleteAllAnnotations() {
 
-    let userAnswer = window.confirm('alert message: "Are you sure to clear the current annotations?"');
+    let userAnswer = window.confirm('Are you sure to clear the current annotations?');
     if (!userAnswer) {
         return;
     }
@@ -232,7 +232,11 @@ function checkFileCompatibility(fileName, ext) {
 
 function handleDroppedFile(e) {
 
-    console.log('handleDroppedFile');
+    // Confirm override.
+    let userAnswer = window.confirm('Are you sure to load a new pdf file? Please save your current annotations.');
+    if (!userAnswer) {
+        return cancelEvent(e);
+    }
 
     let element = e.target;
     let file = e.dataTransfer.files[0];
@@ -319,31 +323,12 @@ function setupAnnotationSelectUI() {
 
     // Setup behavior.
     $('.js-anno-radio, .js-anno-palette, .js-anno-file').on('change', displayAnnotation);
-    $('.js-anno-file').on('click', handleClickFileInput);
 }
 
 /**
  * The data which has annotations, colors, primaryIndex.
  */
 let paperData = null;
-/**
- * Detect a click event on file inputs.
- * This is for confirm to override the file which user already selected.
- */
-function handleClickFileInput(e) {
-
-    let target = e.target.getAttribute('name');    
-    let index  = parseInt(e.target.getAttribute('data-index'));
-
-    // Not empty.
-    if (paperData && paperData.annotations[index] && Object.keys(paperData.annotations[index]).length > 0) {
-        let userAnswer = confirm('Are you sure to load a new pdf file? Please save your current annotations.');
-        if (!userAnswer) {
-            e.preventDefault();
-            return false;
-        }
-    }
-}
 
 /**
  * Load annotation data and display.
