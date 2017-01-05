@@ -12,6 +12,8 @@ import ANNO_VERSION from '../version';
 const LOCALSTORAGE_KEY = '_pdfanno_pdfanno';
 const LOCALSTORAGE_KEY_SECONDARY = '_pdfanno_pdfanno_secondary';
 
+const LOCALSTORAGE_KEY2 = '_pdfanno_containers';
+
 /**
   Implmenetation of StoreAdapter for PDFAnno.
 */
@@ -41,6 +43,7 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
 
           let annotations = [];
           let containers = _getSecondaryContainers();
+          console.log('aaaaaaaaaaa:', containers);
           containers.forEach(container => {
             // TODO refactoring. same thing exists.
             let tmpAnnotations = ((container[documentId] || {}).annotations || []).filter(i => {
@@ -177,10 +180,15 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
 
           // Set version.
           dataExport.version = ANNO_VERSION;
+          console.log('version:', dataExport.version, ANNO_VERSION);
 
           // Every documents.
           let container = _getContainer();
           for (let documentId in container) {
+
+            if (!container[documentId].annotations || container[documentId].annotations.length === 0) {
+              continue;
+            }
 
             // Every annotations.
             let indexRect = 1;
@@ -189,6 +197,8 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
             let indexText = 1;
             let annotations = {};
             dataExport[documentId] = annotations;
+
+            console.log('annos:', container, documentId, container[documentId].annotations);
 
             container[documentId].annotations.forEach(annotation => {
 
@@ -282,6 +292,28 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
         });
       },
 
+      importAnnotations(data) {
+        return new Promise((resolve, reject) => {
+          console.log('importAnnotations:', data);
+
+          let containers = data.annotations.map((a, i) => {
+            let color = data.colors[i];
+            let isPrimary = (i === data.primary);
+            console.log('isPrimary', i, data.primary, isPrimary);
+            return _createContainerFromJson2(a, color, isPrimary);
+          }).filter(c => {
+            return c;
+          });
+
+          console.log('containers:', containers);
+
+          _saveContainers(containers);
+
+          resolve(true);
+
+        });
+      },
+
       importData(json) {
         return new Promise((resolve, reject) => {
 
@@ -328,6 +360,215 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
     });
   }
 }
+
+function _createContainerFromJson2(json, color, isPrimary) {
+
+  if (!json) {
+    return null;
+  }
+
+  let readOnly = !isPrimary;
+
+  let container = {};
+
+  container.isPrimary = isPrimary;
+
+  for (let documentId in json) {
+
+    let annotations = [];
+    container[documentId] = { annotations };
+
+    for (let key in json[documentId]) {
+
+      let data = json[documentId][key];
+
+      // Rect.
+      if (key.indexOf('rect') === 0) {
+        annotations.push({
+          class  : 'Annotation',
+          type   : 'area',
+          uuid   : uuid(),
+          page   : data[0],
+          x      : data[1],
+          y      : data[2],
+          width  : data[3],
+          height : data[4],
+          readOnly,
+          color
+        });
+      
+      // Highlight.
+      } else if (key.indexOf('span') === 0) {
+        // rectangles.
+        let rectangles = data.slice(0, data.length-1).map(d => {
+          return {
+            page   : d[0],
+            x      : d[1],
+            y      : d[2],
+            width  : d[3],
+            height : d[4]
+          }
+        });
+        // span text.
+        let spanText = data[data.length-1];
+        let textId = null;
+        if (spanText) {
+          textId = uuid();
+          let svg = document.querySelector('.annotationLayer');
+
+          let x = rectangles[0].x;
+          let y = rectangles[0].y - 20; // 20 = circle'radius(3px) + input height(14px) + α
+
+          let pageNumber = data[0][0];
+
+          annotations.push({
+            class      : 'Annotation',
+            type       : 'textbox',
+            uuid       : textId,
+            page       : pageNumber,
+            x          : x,
+            y,
+            content    : spanText,
+            readOnly,
+            color
+          });
+        }
+        annotations.push({
+          class      : 'Annotation',
+          type       : 'highlight',
+          uuid       : uuid(),
+          page       : data[0][0],
+          color      : '#FFFF00',   // TODO なくてもOK？
+          rectangles,
+          text       : textId,
+          key        : key,  // tmp for arrow.
+          readOnly,
+          color
+        });
+
+      // Text Independent.
+      } else if (key.indexOf('text') === 0) {
+        annotations.push({
+          class      : 'Annotation',
+          type       : 'textbox',
+          uuid       : uuid(),
+          page       : data[0],
+          x          : data[1],
+          y          : data[2],
+          content    : data[3],
+          readOnly,
+          color
+        });
+
+      // Arrow.
+      } else if (key.indexOf('rel') === 0) {
+
+        // Find highlights.
+        let highlight1s = annotations.filter(a => {
+          return a.key === data[2];
+        });
+        let highlight1 = highlight1s[0];
+        let highlight2s = annotations.filter(a => {
+          return a.key === data[3];
+        });
+        let highlight2 = highlight2s[0];
+
+        // Specify startPosition and endPosition.
+        let x1 = highlight1.rectangles[0].x;
+        let y1 = highlight1.rectangles[0].y - 5;
+        let x2 = highlight2.rectangles[0].x;
+        let y2 = highlight2.rectangles[0].y - 5;
+
+        let page1 = highlight1.rectangles[0].page;
+        let page2 = highlight2.rectangles[0].page;
+
+        let textPage = page1;
+
+        // Specify textbox position.
+        // let svg = document.querySelector('.annotationLayer');
+        let svg = document.getElementById('annoLayer'); // TODO make it const.
+        let p = scaleUp(svg, { x1, y1, x2, y2 });
+        let rect = svg.getBoundingClientRect();
+        p.x1 -= rect.left;
+        p.y1 -= rect.top;
+        p.x2 -= rect.left;
+        p.y2 -= rect.top;
+        let textPosition = scaleDown(svg, getRelationTextPosition(svg, p.x1, p.y1, p.x2, p.y2));
+
+        if (page1 !== page2) {
+
+          console.log('y1,y2=', y1, y2, page1, page2);
+
+          let y1Tmp = convertFromExportY(page1, y1);
+          let y2Tmp = convertFromExportY(page2, y2);
+
+          console.log('y1,y2=', y1Tmp, y2Tmp);
+
+          // Specify textbox position.
+          // let svg = document.querySelector('.annotationLayer');
+          let svg = document.getElementById('annoLayer'); // TODO make it const.
+          let p = scaleUp(svg, { x1, y1Tmp, x2, y2Tmp });
+          let rect = svg.getBoundingClientRect();
+          p.x1 -= rect.left;
+          p.y1Tmp -= rect.top;
+          p.x2 -= rect.left;
+          p.y2Tmp -= rect.top;
+          textPosition = scaleDown(svg, getRelationTextPosition(svg, p.x1, p.y1Tmp, p.x2, p.y2Tmp));
+
+          let { y, pageNumber } = convertToExportY(textPosition.y);
+          textPosition.y = y;
+          textPage = pageNumber;
+        }
+
+        // Add textbox and get the uuid of if.
+        let textId = null;
+        let textContent = data[4];
+        if (textContent) {
+
+          textId = uuid();
+          annotations.push({
+            class      : 'Annotation',
+            type       : 'textbox',
+            uuid       : textId,
+            page       : textPage,
+            x          : textPosition.x,
+            y          : textPosition.y,
+            content    : textContent,
+            readOnly,
+            color
+          });          
+        }
+
+        let pageNumber = data[0];
+
+        // Add arrow.
+        annotations.push({
+          class      : 'Annotation',
+          type       : 'arrow',
+          direction  : data[1],
+          uuid       : uuid(),
+          page       : data[0],
+          x1,
+          y1,
+          x2,
+          y2,
+          page1,
+          page2,
+          text       : textId,
+          highlight1 : highlight1.uuid,
+          highlight2 : highlight2.uuid,
+          color      : "FF0000",         // TODO 要る？
+          readOnly,
+          color
+        });
+      }
+    }
+  }
+
+  return container;  
+
+}
+
 
 function _createContainerFromJson(json, readOnly=false, index=0) {
   let container = {};
@@ -617,25 +858,57 @@ function transformFromRenderCoordinate(annotation) {
   return annotation;
 }
 
+function _getContainers() {
+  let containers = JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY2) || '[]');
+  return containers;
+}
 
 function _getContainer() {
-  let container = localStorage.getItem(LOCALSTORAGE_KEY);
-  if (!container) {
-    container = {};
-    _saveContainer(container);
-  } else {
-    container = JSON.parse(container);
+
+  let containers = _getContainers().filter(c => {
+    return c.isPrimary;
+  });
+
+  if (containers.length > 0) {
+    return containers[0];
+  } else {    
+    return {};
   }
-  return container;
 }
 
 function _getSecondaryContainers() {
-  let containers = localStorage.getItem(LOCALSTORAGE_KEY_SECONDARY) || '[]';
-  return JSON.parse(containers);
+
+  let containers = _getContainers().filter(c => {
+    return !c.isPrimary;
+  });
+
+  if (containers.length > 0) {
+    return containers;
+  } else {    
+    return [];
+  }
+
+  // let containers = localStorage.getItem(LOCALSTORAGE_KEY_SECONDARY) || '[]';
+  // return JSON.parse(containers);
 }
 
 function _saveContainer(container) {
-  localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(container));
+
+  container.isPrimary = true;
+
+  let containers = _getContainers().filter(c => {
+    return c.isPrimary === false;
+  });
+
+  containers = containers.concat([container]);
+
+  _saveContainers(containers);
+
+  // localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(container));
+}
+
+function _saveContainers(containers) {
+  localStorage.setItem(LOCALSTORAGE_KEY2, JSON.stringify(containers));
 }
 
 function _saveSecondaryContainer(containers) {
@@ -658,6 +931,7 @@ function _getSecondaryAnnotations(documentId) {
   let annotations = [];
 
   let containers = _getSecondaryContainers();
+
   containers.forEach(container => {
     let tmpAnnotations = (container[documentId] || {}).annotations;
     if (tmpAnnotations) {
@@ -680,11 +954,18 @@ function updateAnnotations(documentId, annotations) {
   annotations = annotations.map(a => transformFromRenderCoordinate(a));
 
   let viewBox = PDFView.pdfViewer.getPageView(0).viewport.viewBox;
+
+  // TODO remove.
   let meta = { w : viewBox[2], h : viewBox[3] };
 
   let container = _getContainer();
   container[documentId] = { meta, annotations };
   _saveContainer(container);
+
+  // Notifiy.
+  var event = document.createEvent('CustomEvent');
+  event.initCustomEvent('annotationUpdated', true, true, {});
+  window.dispatchEvent(event);
 }
 
 function findAnnotation(documentId, annotationId) {

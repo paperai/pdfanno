@@ -210,6 +210,22 @@ export default class StoreAdapter {
     }
   }
 
+  __importAnnotations(data) { abstractFunction('importAnnotations'); }
+  get importAnnotations() { return this.__importAnnotations; }
+  set importAnnotations(fn) {
+    this.__importAnnotations = function importAnnotations(json) {
+      return fn(...arguments).then(success => {
+        if (success) {
+          fireEvent('importAnnotations', json);
+        }
+        return success;
+      });
+    }
+  }
+
+  /**
+   * @Duplicated.
+   */
   __importData(json) { abstractFunction('importData'); }
   get importData() { return this.__importData; }
   set importData(fn) {
@@ -223,6 +239,9 @@ export default class StoreAdapter {
     }
   }
 
+  /**
+   * @Duplicated.
+   */
   __importDataSecondary(jsonArray) { abstractFunction('importDataSecondary'); }
   get importDataSecondary() { return this.__importDataSecondary; }
   set importDataSecondary(fn) {

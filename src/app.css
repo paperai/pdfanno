@@ -5,3 +5,42 @@
     width: 100%;
     height: 500px;
 }
+
+/**
+    PDF Drag and Drop UI.
+*/
+#viewer {
+    position: relative;
+}
+#viewer.-active:after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 255, 0.3);
+    content: " ";
+}
+
+/**
+ * Annotation Select UI Layout.
+ */
+.anno-select-layout {}
+.anno-select-layout .row:first-child {
+    margin-bottom: 10px;
+}
+.anno-select-layout [type="radio"] {
+    margin-right: 5px;
+}
+.anno-select-layout [type="file"] {
+    display: inline-block;
+    margin-left: 5px;
+    line-height: 1em;
+}
+.anno-select-layout .sp-replacer {
+    padding: 0;
+    border: none;
+}
+.anno-select-layout .sp-dd {
+    display: none;
+}

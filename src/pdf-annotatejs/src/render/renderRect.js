@@ -25,11 +25,13 @@ export default function renderRect(a) {
 
 function createHighlight(a) {
 
-  let color;
-  if (a.readOnly) {
-    color = highlightSecondaryColor[a.seq % highlightSecondaryColor.length];
-  } else {
-    color = '#FF0';
+  let color = a.color;
+  if (!color) {
+    if (a.readOnly) {
+      color = highlightSecondaryColor[a.seq % highlightSecondaryColor.length];
+    } else {
+      color = '#FF0';
+    }    
   }
 
   let group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -58,11 +60,13 @@ function createHighlight(a) {
 
 function createRectBox(a) {
 
-  let color;
-  if(a.readOnly) {
-    color = rectSecondaryColor[a.seq % rectSecondaryColor.length];
-  } else {
-    color = '#f00';
+  let color = a.color;
+  if (!color) {
+    if(a.readOnly) {
+      color = rectSecondaryColor[a.seq % rectSecondaryColor.length];
+    } else {
+      color = '#f00';
+    }    
   }
 
   let rect = createRect(a);

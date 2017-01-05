@@ -20,11 +20,13 @@ export default function renderArrow(a) {
 
 export function createArrow(a, id=null) {
 
-  let color;
-  if (a.readOnly) {
-    color = arrowSecondaryColor[a.seq % arrowSecondaryColor.length];
-  } else {
-    color = '#F00';
+  let color = a.color;
+  if (!color) {
+    if (a.readOnly) {
+      color = arrowSecondaryColor[a.seq % arrowSecondaryColor.length];
+    } else {
+      color = '#F00';
+    }    
   }
 
 
