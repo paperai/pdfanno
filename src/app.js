@@ -122,6 +122,12 @@ function reloadPDFViewer() {
  * Delete all annotations.
  */
 function deleteAllAnnotations() {
+
+    let userAnswer = window.confirm('alert message: "Are you sure to clear the current annotations?"');
+    if (!userAnswer) {
+        return;
+    }
+
     let documentId = window.iframeWindow.getFileName(window.iframeWindow.PDFView.url);
     window.iframeWindow.PDFAnnotate.getStoreAdapter().deleteAnnotations(documentId).then(() => {
 
