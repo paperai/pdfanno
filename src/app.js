@@ -413,7 +413,15 @@ function displayAnnotation(e) {
     });
 }
 
+function listenWindowLeaveEvent() {
+    $(window).off('beforeunload').on('beforeunload', () => {
+        return 'You don\'t save the annotations yet.\nAre you sure to leave ?';
+    });
+}
 
+function unlistenWindowLeaveEvent() {
+    $(window).off('beforeunload');
+}
 
 function startApplication() {
 
@@ -432,7 +440,9 @@ function startApplication() {
         initializeFileUploader();        
 
         // Set the event drag & drop for loading a PDF file.
-        setupPDFDragAndDropLoader();    
+        setupPDFDragAndDropLoader();
+
+        unlistenWindowLeaveEvent();
     });
 
     iframeWindow.addEventListener('annotationrendered', (ev) => {
@@ -452,6 +462,11 @@ function startApplication() {
     iframeWindow.addEventListener('pdfdragover', (ev) => {
         console.log('pdfdragover!!!');
         handleDragOver(ev.detail.originalEvent);
+    });
+
+    iframeWindow.addEventListener('annotationUpdated', () => {
+        console.log('annotationUpdated');
+        listenWindowLeaveEvent();
     });
 }
 

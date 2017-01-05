@@ -968,6 +968,11 @@ function updateAnnotations(documentId, annotations) {
   let container = _getContainer();
   container[documentId] = { meta, annotations };
   _saveContainer(container);
+
+  // Notifiy.
+  var event = document.createEvent('CustomEvent');
+  event.initCustomEvent('annotationUpdated', true, true, {});
+  window.dispatchEvent(event);
 }
 
 function findAnnotation(documentId, annotationId) {
