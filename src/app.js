@@ -307,8 +307,8 @@ function setupAnnotationSelectUI() {
         showPalette            : true,
         hideAfterPaletteSelect : true,
         palette                : [
-            ['black', 'white', 'blanchedalmond', 'rgb(255, 128, 0)', 'hsv 100 70 50'],
-            ['red', 'yellow', 'green', 'blue', 'violet']
+            ['blanchedalmond', 'rgb(255, 128, 0)', 'hsv 100 70 50', 'yellow'],
+            ['red', 'green', 'blue', 'violet']
         ]
     });
     // Set initial color.
