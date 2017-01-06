@@ -29,6 +29,8 @@ export function createArrow(a, id=null) {
     }    
   }
 
+  console.log('color:', color);
+
 
 // <svg viewBox="0 0 200 200">
 //     <marker id="m_ar" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="strokeWidth" preserveAspectRatio="none" markerWidth="2" markerHeight="3" orient="auto-start-reverse">
@@ -87,6 +89,7 @@ export function createArrow(a, id=null) {
   let arrow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
   setAttributes(arrow, {
     d           : `M ${a.x1} ${a.y1} Q ${control.x} ${control.y} ${a.x2} ${a.y2}`,
+    stroke      : color,
     strokeWidth : 1,
     fill        : 'none',
     class       : 'anno-arrow'
@@ -107,6 +110,8 @@ export function createArrow(a, id=null) {
   }
 
   group.appendChild(arrow);
+
+  console.log('createArrow:', group);
 
   return group;
 }

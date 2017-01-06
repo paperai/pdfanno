@@ -124,7 +124,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (leftMargin < 0) {
 	        leftMargin = 9;
 	    }
-	    console.log('leftMargin:', leftMargin);
 	
 	    var height = (0, _jquery2.default)('#viewer').height();
 	
@@ -174,15 +173,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function renderAnnotations(svg, pageNumber) {
 	    var documentId = getFileName(PDFView.url);
-	    console.log('documentId:', documentId);
 	    PDFAnnotate.getAnnotations(documentId, pageNumber).then(function (annotations) {
 	        PDFAnnotate.getStoreAdapter().getSecondaryAnnotations(documentId, pageNumber).then(function (secondaryAnnotations) {
 	
 	            // Primary + Secondary annotations.
 	            annotations.annotations = annotations.annotations.concat(secondaryAnnotations.annotations);
-	
-	            console.log('annotations1:', annotations);
-	            console.log('annotations2:', secondaryAnnotations);
 	
 	            // Render annotations.
 	            var viewport = PDFView.pdfViewer.getPageView(0).viewport;
@@ -234,18 +229,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function setupPDFDragAndDropLoader() {
 	
-	    console.log('setupPDFDragAndDropLoader');
-	
 	    var element = document.querySelector('body');
-	
-	    // element.removeEventListener('dragenter', handleDragEnter);
-	    // element.removeEventListener('dragleave', handleDragLeave);
-	    // element.removeEventListener('dragover', handleDragOver);
-	    // element.removeEventListener('drop', handleDroppedFile);
-	    // element.addEventListener('dragenter', handleDragEnter);
-	    // element.addEventListener('dragleave', handleDragLeave);
-	    // element.addEventListener('dragover', handleDragOver);
-	    // element.addEventListener('drop', handleDroppedFile);
 	
 	    (0, _jquery2.default)(element).off('dragenter', handleDragEnter);
 	    (0, _jquery2.default)(element).off('dragleave', handleDragLeave);
@@ -260,7 +244,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function handleDroppedFile(e) {
 	
-	    console.log('eeeeeeeeee:', e);
+	    console.log('bbbbbbbbbbbbb');
 	
 	    var event = document.createEvent('CustomEvent');
 	    event.initCustomEvent('pdfdropped', true, true, { originalEvent: e.originalEvent });
@@ -288,6 +272,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	function handleDragOver(e) {
+	
+	    // This is the setting to allow D&D for Firefox.
+	    // @see https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/effectAllowed
+	    e.originalEvent.dataTransfer.effectAllowed = 'move';
 	
 	    var event = document.createEvent('CustomEvent');
 	    event.initCustomEvent('pdfdragover', true, true, { originalEvent: e });
@@ -12588,7 +12576,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	          var annotations = [];
 	          var containers = _getSecondaryContainers();
-	          console.log('aaaaaaaaaaa:', containers);
 	          containers.forEach(function (container) {
 	            // TODO refactoring. same thing exists.
 	            var tmpAnnotations = ((container[documentId] || {}).annotations || []).filter(function (i) {
@@ -12818,10 +12805,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	          console.log('importAnnotations:', data);
 	
 	          var containers = data.annotations.map(function (a, i) {
+	
 	            var color = data.colors[i];
 	            var isPrimary = i === data.primary;
-	            console.log('isPrimary', i, data.primary, isPrimary);
-	            return _createContainerFromJson2(a, color, isPrimary);
+	            var visible = data.visibilities[i];
+	
+	            if (visible) {
+	              return _createContainerFromJson2(a, color, isPrimary);
+	            }
 	          }).filter(function (c) {
 	            return c;
 	          });
@@ -14803,6 +14794,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 	
+	  console.log('color:', color);
+	
 	  // <svg viewBox="0 0 200 200">
 	  //     <marker id="m_ar" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="strokeWidth" preserveAspectRatio="none" markerWidth="2" markerHeight="3" orient="auto-start-reverse">
 	  //         <polygon points="0,0 0,10 10,5" fill="red" id="ms"/>
@@ -14857,6 +14850,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var arrow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
 	  (0, _setAttributes2.default)(arrow, {
 	    d: 'M ' + a.x1 + ' ' + a.y1 + ' Q ' + control.x + ' ' + control.y + ' ' + a.x2 + ' ' + a.y2,
+	    stroke: color,
 	    strokeWidth: 1,
 	    fill: 'none',
 	    class: 'anno-arrow'
@@ -14877,6 +14871,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	
 	  group.appendChild(arrow);
+	
+	  console.log('createArrow:', group);
 	
 	  return group;
 	}
@@ -17337,7 +17333,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    y2: endPos.y,
 	    type: 'arrow',
 	    direction: _arrowType,
-	    color: 'FF0000',
 	    highlight1: startBoundingCircle.parentNode.getAttribute('data-pdf-annotate-id'),
 	    highlight2: endBoundingCircle.parentNode.getAttribute('data-pdf-annotate-id')
 	  };

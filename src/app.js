@@ -125,7 +125,7 @@ function reloadPDFViewer() {
  */
 function deleteAllAnnotations() {
 
-    let userAnswer = window.confirm('alert message: "Are you sure to clear the current annotations?"');
+    let userAnswer = window.confirm('Are you sure to clear the current annotations?');
     if (!userAnswer) {
         return;
     }
@@ -206,11 +206,7 @@ function setupLoadButton() {
     });
 }
 
-// ref: https://github.com/pdfanno/pdfanno/blob/3b8eba716a416ffa3d03edd79352859b4dd9f9e0/src/bk/viewer2js/viewer2.js
-
 function setupPDFDragAndDropLoader() {
-
-    console.log('setupPDFDragAndDropLoader');
 
     let element = document.querySelector('.js-viewer-root');
 
@@ -234,7 +230,15 @@ function checkFileCompatibility(fileName, ext) {
 
 function handleDroppedFile(e) {
 
-    console.log('handleDroppedFile');
+    // Confirm override.
+    let userAnswer = window.confirm('Are you sure to load a new pdf file? Please save your current annotations.');
+    if (!userAnswer) {
+        return cancelEvent(e);
+    }
+
+    e = e.originalEvent || e;
+
+    console.log('aaaaaaaaaaa', e, e.dataTransfer);
 
     let element = e.target;
     let file = e.dataTransfer.files[0];
@@ -277,8 +281,29 @@ function handleDragLeave(e) {
 
 let timer = null;
 function handleDragOver(e) {
-    console.log('handleDragOver');
 
+    e = e.originalEvent || e;
+
+    console.log('handleDragOver', e.dataTransfer);
+
+    // This is the setting to allow D&D for Firefox.
+    // @see https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/effectAllowed
+    e.dataTransfer.effectAllowed = 'move';
+
+    // $('#viewer').addClass('-active');
+
+    // if (timer) {
+    //     clearTimeout(timer);
+    // }
+    // timer = setTimeout(() => {
+    //     $('#viewer').removeClass('-active');
+    //     timer = null;
+    // }, 1000);
+
+    return cancelEvent(e);
+}
+
+function handleDragOverFromViewer() {
     $('#viewer').addClass('-active');
 
     if (timer) {
@@ -288,8 +313,6 @@ function handleDragOver(e) {
         $('#viewer').removeClass('-active');
         timer = null;
     }, 1000);
-
-    return cancelEvent(e);
 }
 
 // Cancel handler
@@ -309,8 +332,8 @@ function setupAnnotationSelectUI() {
         showPalette            : true,
         hideAfterPaletteSelect : true,
         palette                : [
-            ['black', 'white', 'blanchedalmond', 'rgb(255, 128, 0)', 'hsv 100 70 50'],
-            ['red', 'yellow', 'green', 'blue', 'violet']
+            ['blanchedalmond', 'rgb(255, 128, 0)', 'hsv 100 70 50', 'yellow'],
+            ['red', 'green', 'blue', 'violet']
         ]
     });
     // Set initial color.
@@ -320,32 +343,13 @@ function setupAnnotationSelectUI() {
     $('.js-anno-palette').eq(3).spectrum('set', 'violet');
 
     // Setup behavior.
-    $('.js-anno-radio, .js-anno-palette, .js-anno-file').on('change', displayAnnotation);
-    $('.js-anno-file').on('click', handleClickFileInput);
+    $('.js-anno-radio, .js-anno-visibility, .js-anno-palette, .js-anno-file').on('change', displayAnnotation);
 }
 
 /**
  * The data which has annotations, colors, primaryIndex.
  */
 let paperData = null;
-/**
- * Detect a click event on file inputs.
- * This is for confirm to override the file which user already selected.
- */
-function handleClickFileInput(e) {
-
-    let target = e.target.getAttribute('name');    
-    let index  = parseInt(e.target.getAttribute('data-index'));
-
-    // Not empty.
-    if (paperData && paperData.annotations[index] && Object.keys(paperData.annotations[index]).length > 0) {
-        let userAnswer = confirm('Are you sure to load a new pdf file? Please save your current annotations.');
-        if (!userAnswer) {
-            e.preventDefault();
-            return false;
-        }
-    }
-}
 
 /**
  * Load annotation data and display.
@@ -357,7 +361,14 @@ function displayAnnotation(e) {
 
     // Primary annotation index.
     let primaryIndex = parseInt($('.js-anno-radio:checked').val(), 10);
-    console.log(primaryIndex);
+
+    // Visibilities.
+    let visibilities = [
+        $('.js-anno-visibility').eq(0).is(':checked'),
+        $('.js-anno-visibility').eq(1).is(':checked'),
+        $('.js-anno-visibility').eq(2).is(':checked'),
+        $('.js-anno-visibility').eq(3).is(':checked'),
+    ];
     
     // Annotation color.
     let colors = [
@@ -400,6 +411,7 @@ function displayAnnotation(e) {
         paperData = {
             num     : 4,
             primary : primaryIndex,
+            visibilities,
             colors,
             annotations,
             updateTarget
@@ -467,7 +479,7 @@ function startApplication() {
 
     iframeWindow.addEventListener('pdfdragover', (ev) => {
         console.log('pdfdragover!!!');
-        handleDragOver(ev.detail.originalEvent);
+        // handleDragOverFromViewer(ev.detail.originalEvent);
     });
 
     iframeWindow.addEventListener('annotationUpdated', () => {

@@ -25,16 +25,19 @@
 </nav>
 <div class="main">
 	<div class="container-fluid">
+
+        <!-- Annotation Select UI -->
 		<div class="row well anno-select-layout">
-            <!-- Annotation Select UI -->
             <div class="row">
                 <div class="col-xs-6">
                     <input type="radio" name="primary" value="0" checked class="js-anno-radio"  autocomplete="off">
+                    <input type="checkbox" name="visibility" value="0" checked class="js-anno-visibility"/>
                     <input type="text"  name="color" class="js-anno-palette"  autocomplete="off">
                     <input type="file"  name="annotation" accept=".anno" class="js-anno-file" data-index="0"  autocomplete="off">
                 </div>
                 <div class="col-xs-6">
                     <input type="radio" name="primary" value="1" class="js-anno-radio"  autocomplete="off">
+                    <input type="checkbox" name="visibility" value="1" checked class="js-anno-visibility"/>
                     <input type="text"  name="color" class="js-anno-palette"  autocomplete="off">
                     <input type="file"  name="annotation" accept=".anno" class="js-anno-file" data-index="1"  autocomplete="off">
                 </div>
@@ -42,31 +45,20 @@
             <div class="row">
                 <div class="col-xs-6">
                     <input type="radio" name="primary" value="2" class="js-anno-radio"  autocomplete="off">
+                    <input type="checkbox" name="visibility" value="2" checked class="js-anno-visibility"/>
                     <input type="text"  name="color" class="js-anno-palette"  autocomplete="off">
                     <input type="file"  name="annotation" accept=".anno" class="js-anno-file" data-index="2" autocomplete="off">
                 </div>
                 <div class="col-xs-6">
                     <input type="radio" name="primary" value="3" class="js-anno-radio" autocomplete="off">
+                    <input type="checkbox" name="visibility" value="3" checked class="js-anno-visibility"/>
                     <input type="text"  name="color" class="js-anno-palette" autocomplete="off">
                     <input type="file"  name="annotation" accept=".anno" class="js-anno-file" data-index="3" autocomplete="off">
                 </div>
             </div>
-
-
-<!-- 			<div class="col-md-12 col-sm-12 col-xs-12 well">
-				<form class="form-inline">
-					<div class="form-group">
-						<label for="primary-anno">Primary annotation (.anno)</label>
-						<input type="file" id="primary-anno" accept=".anno">
-					</div>
-					<div class="form-group">
-						<label for="annofile">Secondary annotations (.anno)</label>
-						<input type="file" id="secondary-anno" multiple accept=".anno">
-					</div>
-					<button type="submit" class="btn btn-primary" id="load">Load</button>
-				</form>
-			</div> -->
 		</div>
+
+        <!-- Annotation Tools -->
 		<div class="row js-viewer-root">
 			<div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="btn-toolbar" role="toolbar">
