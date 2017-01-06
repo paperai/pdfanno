@@ -176,7 +176,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function deleteAllAnnotations() {
 	
-	    var userAnswer = window.confirm('alert message: "Are you sure to clear the current annotations?"');
+	    var userAnswer = window.confirm('Are you sure to clear the current annotations?');
 	    if (!userAnswer) {
 	        return;
 	    }
@@ -256,11 +256,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	}
 	
-	// ref: https://github.com/pdfanno/pdfanno/blob/3b8eba716a416ffa3d03edd79352859b4dd9f9e0/src/bk/viewer2js/viewer2.js
-	
 	function setupPDFDragAndDropLoader() {
-	
-	    console.log('setupPDFDragAndDropLoader');
 	
 	    var element = document.querySelector('.js-viewer-root');
 	
@@ -284,7 +280,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function handleDroppedFile(e) {
 	
-	    console.log('handleDroppedFile');
+	    // Confirm override.
+	    var userAnswer = window.confirm('Are you sure to load a new pdf file? Please save your current annotations.');
+	    if (!userAnswer) {
+	        return cancelEvent(e);
+	    }
+	
+	    e = e.originalEvent || e;
+	
+	    console.log('aaaaaaaaaaa', e, e.dataTransfer);
 	
 	    var element = e.target;
 	    var file = e.dataTransfer.files[0];
@@ -327,8 +331,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var timer = null;
 	function handleDragOver(e) {
-	    console.log('handleDragOver');
 	
+	    e = e.originalEvent || e;
+	
+	    console.log('handleDragOver', e.dataTransfer);
+	
+	    // This is the setting to allow D&D for Firefox.
+	    // @see https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/effectAllowed
+	    e.dataTransfer.effectAllowed = 'move';
+	
+	    // $('#viewer').addClass('-active');
+	
+	    // if (timer) {
+	    //     clearTimeout(timer);
+	    // }
+	    // timer = setTimeout(() => {
+	    //     $('#viewer').removeClass('-active');
+	    //     timer = null;
+	    // }, 1000);
+	
+	    return cancelEvent(e);
+	}
+	
+	function handleDragOverFromViewer() {
 	    $('#viewer').addClass('-active');
 	
 	    if (timer) {
@@ -338,8 +363,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        $('#viewer').removeClass('-active');
 	        timer = null;
 	    }, 1000);
-	
-	    return cancelEvent(e);
 	}
 	
 	// Cancel handler
@@ -358,7 +381,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        showPaletteOnly: true,
 	        showPalette: true,
 	        hideAfterPaletteSelect: true,
-	        palette: [['black', 'white', 'blanchedalmond', 'rgb(255, 128, 0)', 'hsv 100 70 50'], ['red', 'yellow', 'green', 'blue', 'violet']]
+	        palette: [['blanchedalmond', 'rgb(255, 128, 0)', 'hsv 100 70 50', 'yellow'], ['red', 'green', 'blue', 'violet']]
 	    });
 	    // Set initial color.
 	    $('.js-anno-palette').eq(0).spectrum('set', 'red');
@@ -367,32 +390,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    $('.js-anno-palette').eq(3).spectrum('set', 'violet');
 	
 	    // Setup behavior.
-	    $('.js-anno-radio, .js-anno-palette, .js-anno-file').on('change', displayAnnotation);
-	    $('.js-anno-file').on('click', handleClickFileInput);
+	    $('.js-anno-radio, .js-anno-visibility, .js-anno-palette, .js-anno-file').on('change', displayAnnotation);
 	}
 	
 	/**
 	 * The data which has annotations, colors, primaryIndex.
 	 */
 	var paperData = null;
-	/**
-	 * Detect a click event on file inputs.
-	 * This is for confirm to override the file which user already selected.
-	 */
-	function handleClickFileInput(e) {
-	
-	    var target = e.target.getAttribute('name');
-	    var index = parseInt(e.target.getAttribute('data-index'));
-	
-	    // Not empty.
-	    if (paperData && paperData.annotations[index] && Object.keys(paperData.annotations[index]).length > 0) {
-	        var userAnswer = confirm('Are you sure to load a new pdf file? Please save your current annotations.');
-	        if (!userAnswer) {
-	            e.preventDefault();
-	            return false;
-	        }
-	    }
-	}
 	
 	/**
 	 * Load annotation data and display.
@@ -404,7 +408,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // Primary annotation index.
 	    var primaryIndex = parseInt($('.js-anno-radio:checked').val(), 10);
-	    console.log(primaryIndex);
+	
+	    // Visibilities.
+	    var visibilities = [$('.js-anno-visibility').eq(0).is(':checked'), $('.js-anno-visibility').eq(1).is(':checked'), $('.js-anno-visibility').eq(2).is(':checked'), $('.js-anno-visibility').eq(3).is(':checked')];
 	
 	    // Annotation color.
 	    var colors = [$('.js-anno-palette').eq(0).spectrum('get').toHexString(), $('.js-anno-palette').eq(1).spectrum('get').toHexString(), $('.js-anno-palette').eq(2).spectrum('get').toHexString(), $('.js-anno-palette').eq(3).spectrum('get').toHexString()];
@@ -442,6 +448,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        paperData = {
 	            num: 4,
 	            primary: primaryIndex,
+	            visibilities: visibilities,
 	            colors: colors,
 	            annotations: annotations,
 	            updateTarget: updateTarget
@@ -509,7 +516,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    iframeWindow.addEventListener('pdfdragover', function (ev) {
 	        console.log('pdfdragover!!!');
-	        handleDragOver(ev.detail.originalEvent);
+	        // handleDragOverFromViewer(ev.detail.originalEvent);
 	    });
 	
 	    iframeWindow.addEventListener('annotationUpdated', function () {
@@ -586,7 +593,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, "@charset 'utf-8';\n\n\n.anno-viewer {\n    width: 100%;\n    height: 500px;\n}\n\n/**\n    PDF Drag and Drop UI.\n*/\n#viewer {\n    position: relative;\n}\n#viewer.-active:after {\n    position: absolute;\n    top: 0;\n    left: 0;\n    width: 100%;\n    height: 100%;\n    background: rgba(0, 0, 255, 0.3);\n    content: \" \";\n}\n\n/**\n * Annotation Select UI Layout.\n */\n.anno-select-layout {}\n.anno-select-layout .row:first-child {\n    margin-bottom: 10px;\n}\n.anno-select-layout [type=\"radio\"] {\n    margin-right: 5px;\n}\n.anno-select-layout [type=\"file\"] {\n    display: inline-block;\n    margin-left: 5px;\n    line-height: 1em;\n}\n.anno-select-layout .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-select-layout .sp-dd {\n    display: none;\n}", ""]);
+	exports.push([module.id, "@charset 'utf-8';\n\n\n.anno-viewer {\n    width: 100%;\n    height: 500px;\n}\n\n/**\n    PDF Drag and Drop UI.\n*/\n/*#viewer {\n    position: relative;\n}\n#viewer.-active:after {\n    position: absolute;\n    top: 0;\n    left: 0;\n    width: 100%;\n    height: 100%;\n    background: rgba(0, 0, 255, 0.3);\n    content: \" \";\n}*/\n\n/**\n * Annotation Select UI Layout.\n */\n.anno-select-layout {}\n.anno-select-layout .row:first-child {\n    margin-bottom: 10px;\n}\n.anno-select-layout [type=\"radio\"] {\n    margin-right: 5px;\n}\n.anno-select-layout [type=\"file\"] {\n    display: inline-block;\n    margin-left: 5px;\n    line-height: 1em;\n}\n.anno-select-layout .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-select-layout .sp-dd {\n    display: none;\n}", ""]);
 	
 	// exports
 

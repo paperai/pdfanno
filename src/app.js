@@ -206,8 +206,6 @@ function setupLoadButton() {
     });
 }
 
-// ref: https://github.com/pdfanno/pdfanno/blob/3b8eba716a416ffa3d03edd79352859b4dd9f9e0/src/bk/viewer2js/viewer2.js
-
 function setupPDFDragAndDropLoader() {
 
     let element = document.querySelector('.js-viewer-root');
@@ -237,6 +235,10 @@ function handleDroppedFile(e) {
     if (!userAnswer) {
         return cancelEvent(e);
     }
+
+    e = e.originalEvent || e;
+
+    console.log('aaaaaaaaaaa', e, e.dataTransfer);
 
     let element = e.target;
     let file = e.dataTransfer.files[0];
@@ -279,8 +281,29 @@ function handleDragLeave(e) {
 
 let timer = null;
 function handleDragOver(e) {
-    console.log('handleDragOver');
 
+    e = e.originalEvent || e;
+
+    console.log('handleDragOver', e.dataTransfer);
+
+    // This is the setting to allow D&D for Firefox.
+    // @see https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/effectAllowed
+    e.dataTransfer.effectAllowed = 'move';
+
+    // $('#viewer').addClass('-active');
+
+    // if (timer) {
+    //     clearTimeout(timer);
+    // }
+    // timer = setTimeout(() => {
+    //     $('#viewer').removeClass('-active');
+    //     timer = null;
+    // }, 1000);
+
+    return cancelEvent(e);
+}
+
+function handleDragOverFromViewer() {
     $('#viewer').addClass('-active');
 
     if (timer) {
@@ -290,8 +313,6 @@ function handleDragOver(e) {
         $('#viewer').removeClass('-active');
         timer = null;
     }, 1000);
-
-    return cancelEvent(e);
 }
 
 // Cancel handler
@@ -458,7 +479,7 @@ function startApplication() {
 
     iframeWindow.addEventListener('pdfdragover', (ev) => {
         console.log('pdfdragover!!!');
-        handleDragOver(ev.detail.originalEvent);
+        // handleDragOverFromViewer(ev.detail.originalEvent);
     });
 
     iframeWindow.addEventListener('annotationUpdated', () => {

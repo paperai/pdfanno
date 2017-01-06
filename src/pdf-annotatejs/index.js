@@ -178,6 +178,8 @@ setupPDFDragAndDropLoader();
 
 function handleDroppedFile(e) {
 
+    console.log('bbbbbbbbbbbbb');
+
     var event = document.createEvent('CustomEvent');
     event.initCustomEvent('pdfdropped', true, true, { originalEvent: e.originalEvent });
     window.dispatchEvent(event);
@@ -204,6 +206,10 @@ function handleDragLeave(e) {
 }
 
 function handleDragOver(e) {
+
+    // This is the setting to allow D&D for Firefox.
+    // @see https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/effectAllowed
+    e.originalEvent.dataTransfer.effectAllowed = 'move';
 
     var event = document.createEvent('CustomEvent');
     event.initCustomEvent('pdfdragover', true, true, { originalEvent: e });
