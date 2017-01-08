@@ -120,25 +120,25 @@ export default function appendChild(svg, annotation, viewport) {
     case 'area':
     case 'highlight':
     case 'boundingBox':   // **extension**
-      child = renderRect(annotation);
+      child = renderRect(annotation, svg);
       break;
     case 'strikeout':
-      child = renderLine(annotation);
+      child = renderLine(annotation, svg);
       break;
     case 'point':
-      child = renderPoint(annotation);
+      child = renderPoint(annotation, svg);
       break;
     case 'textbox':
       child = renderText(annotation, svg);
       break;
     case 'drawing':
-      child = renderPath(annotation);
+      child = renderPath(annotation, svg);
       break;
     case'arrow':
-      child = renderArrow(annotation);
+      child = renderArrow(annotation, svg);
       break;
     case'circle':
-      child = renderCircle(annotation);
+      child = renderCircle(annotation, svg);
       break;
   }
 

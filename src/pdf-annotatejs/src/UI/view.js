@@ -187,6 +187,14 @@ function moveRectComponent(svg, startPos, currentPos, rect) {
 
     rect.setAttribute('x', originalX - diff.x);
     rect.setAttribute('y', originalY - diff.y);
+
+    // Move related text.
+    // let textId = $(rect).parents('g').data('text');
+    // let $text = $(`[data-pdf-annotate-id="${textId}"]`);
+    // if (!$text.data('original-x')) {
+    //     $text.data('original-x', $text.)
+    // }
+
 }
 
 /**
@@ -339,7 +347,13 @@ function isArrowComponent(component) {
 function setComponentVisibility(component, opacity) {
     console.log('setComponentVisibility', component.tagName, opacity);
 
-    let g = (component.tagName.toLowerCase() === 'g' ? component : component.parentNode);
+    // let g = (component.tagName.toLowerCase() === 'g' ? component : component.parentNode);
+    let g;
+    if (component.tagName.toLowerCase() === 'g') {
+        g = component;
+    } else {
+        g = $(component).parents('g[data-pdf-annotate-id]')[0];
+    }
 
     g.style.opacity = opacity;
 
@@ -590,19 +604,19 @@ function initializeMonitoringAnnotations() {
     monitoringCircles = [];
 
     // Components for monitoring.
-    forEach.call(document.querySelectorAll('svg > g > [type="boundingCircle"]'), boundingCircle => {
+    forEach.call(document.querySelectorAll('svg [type="boundingCircle"]'), boundingCircle => {
         monitoringCircles.push(boundingCircle);
     });
     // Rects.
-    forEach.call(document.querySelectorAll('svg > [data-pdf-annotate-type="area"] > rect'), rect => {
+    forEach.call(document.querySelectorAll('svg [data-pdf-annotate-type="area"] > rect'), rect => {
         monitoringRects.push(rect);
     });
     // Texts.
-    forEach.call(document.querySelectorAll('svg > [data-pdf-annotate-type="textbox"] > rect'), rect => {
+    forEach.call(document.querySelectorAll('svg [data-pdf-annotate-type="textbox"] > rect'), rect => {
         monitoringTexts.push(rect);
     });
     // Arrows.
-    forEach.call(document.querySelectorAll('svg > [data-pdf-annotate-type="arrow"] > path'), path => {
+    forEach.call(document.querySelectorAll('svg [data-pdf-annotate-type="arrow"] > path'), path => {
         monitoringArrows.push(path);
     });
 }

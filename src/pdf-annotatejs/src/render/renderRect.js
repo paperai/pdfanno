@@ -1,7 +1,10 @@
+import uuid from '../utils/uuid';
 import setAttributes from '../utils/setAttributes';
 import normalizeColor from '../utils/normalizeColor';
 import renderCircle from './renderCircle';
 import { DEFAULT_RADIUS } from './renderCircle';
+
+import renderText from './renderText';
 
 let rectSecondaryColor = ['green', 'blue', 'purple'];
 let highlightSecondaryColor = ['green', 'blue', 'purple'];
@@ -13,17 +16,17 @@ let highlightSecondaryColor = ['green', 'blue', 'purple'];
  * @param {Object} a The annotation definition
  * @return {SVGGElement|SVGRectElement} A group of all rects to be rendered
  */
-export default function renderRect(a) {
+export default function renderRect(a, svg) {
 
   if (a.type === 'highlight') {
-    return createHighlight(a);
+    return createHighlight(a, svg);
 
   } else {
-    return createRectBox(a);
+    return createRectBox(a, svg);
   }
 }
 
-function createHighlight(a) {
+function createHighlight(a, svg) {
 
   let color = a.color;
   if (!color) {
@@ -58,7 +61,9 @@ function createHighlight(a) {
   return group;
 }
 
-function createRectBox(a) {
+function createRectBox(a, svg) {
+
+  console.log('createRectBox:', a);
 
   let color = a.color;
   if (!color) {
@@ -69,6 +74,10 @@ function createRectBox(a) {
     }    
   }
 
+  let group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  group.setAttribute('read-only', a.readOnly === true);
+  group.style.visibility = 'visible';
+
   let rect = createRect(a);
   setAttributes(rect, {
     stroke: color,
@@ -76,14 +85,30 @@ function createRectBox(a) {
     fill: 'none',
     class : 'anno-rect'
   });
-
-  let group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-  group.setAttribute('read-only', a.readOnly === true);
-  group.style.visibility = 'visible';
-  
   group.appendChild(rect);
 
+  if (a.text) {
+
+    let textAnnotation = {
+      x : a.x,
+      y : a.y - 20,
+      color,
+      content : a.text
+    };
+    let text = renderText(textAnnotation, svg);
+    text.setAttribute('data-pdf-annotate-type', 'textbox');
+    group.appendChild(text);
+
+    text.setAttribute('data-rect-id', a.uuid);
+    let textId = uuid();
+    text.setAttribute('data-pdf-annotate-id', textId);
+    group.setAttribute('data-text-id', textId);
+  }
+
+  // svg.appendChild(group);
+
   return group;
+  // return svg;
 }
 
 

@@ -33,6 +33,8 @@ let input = null;
  */
 let _finishCallback = null;
 
+let _returnType = null;
+
 /**
  * Handle document.mouseup event
  *
@@ -53,7 +55,7 @@ function handleDocumentMouseup(e) {
  * @param {String} selfId - The annotation id used for registration.
  * @param {Function} finishCallback - The callback function will be called after registration.
  */
-export function addInputField(x, y, selfId=null, text=null, finishCallback=null) {
+export function addInputField(x, y, selfId=null, text=null, finishCallback=null, returnType='annotation') {
 
   // This is a dummy form for adding autocomplete candidates at finishing adding/editing.
   // At the time to finish editing, submit via the submit button, then regist an autocomplete content.
@@ -88,6 +90,8 @@ export function addInputField(x, y, selfId=null, text=null, finishCallback=null)
   }
 
   _finishCallback = finishCallback;
+
+  _returnType = returnType;
 
   input.addEventListener('blur', handleInputBlur);
   input.addEventListener('keyup', handleInputKeyup);
@@ -159,15 +163,21 @@ function saveText() {
     annotation.uuid = selfId;
   }
 
-  PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation)
-    .then((annotation) => {
-      appendChild(svg, annotation);
+  // Add an autocomplete candidate. (Firefox, Chrome)
+  $('#autocompleteform [type="submit"]').click();
 
-      // Add an autocomplete candidate. (Firefox, Chrome)
-      $('#autocompleteform [type="submit"]').click();
+  if (_returnType === 'annotation') {
+    PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation)
+      .then((annotation) => {
+        appendChild(svg, annotation);
 
-      closeInput(annotation);
-    });
+
+        closeInput(annotation);
+    });    
+  
+  } else {
+    closeInput(content);
+  }
   
 }
 
@@ -175,7 +185,7 @@ function saveText() {
  * Close the input.
  * @param {Object} textAnnotation - the annotation registerd.
  */
-export function closeInput(textAnnotation) {
+export function closeInput(textAnnotationOrText) {
   
   if (input) {
     
@@ -183,9 +193,13 @@ export function closeInput(textAnnotation) {
     input = null;
 
     if (_finishCallback) {
-      _finishCallback(textAnnotation);
+      _finishCallback(textAnnotationOrText);
     }
   }
+
+  _finishCallback = null;
+  _returnType = null;
+
 }
 
 /**
