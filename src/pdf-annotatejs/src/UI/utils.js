@@ -322,6 +322,7 @@ export function enableUserSelect() {
  * @param {SVGElement} svg The SVG container to get metadata for
  */
 export function getMetadata(svg) {
+  svg = svg || getSVGLayer();
   return {
     documentId: svg.getAttribute('data-pdf-annotate-document'),
     pageNumber: parseInt(svg.getAttribute('data-pdf-annotate-page'), 10),

@@ -787,7 +787,7 @@ function getPageSize() {
 
 function transformToRenderCoordinate(annotation) {
 
-  console.log('transformToRenderCoordinate:', annotation);
+  // console.log('transformToRenderCoordinate:', annotation);
 
   let _type = 'render';
 

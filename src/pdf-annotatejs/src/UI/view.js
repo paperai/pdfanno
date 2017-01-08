@@ -9,6 +9,9 @@ import {
   scaleUp
 } from './utils';
 import { addInputField } from './text';
+import RectAnnotation from '../annotation/rect';
+
+
 let filter  = Array.prototype.filter;
 let forEach = Array.prototype.forEach;
 
@@ -21,6 +24,8 @@ let monitoringRects = [];   // rect
 let monitoringTexts = [];   // textbox
 let monitoringArrows = [];  // arrow
 let monitoringCircles = []; // boundingCircle for highlight.
+
+let rects = [];
 
 let hitComponent = null;
 
@@ -604,21 +609,32 @@ function initializeMonitoringAnnotations() {
     monitoringCircles = [];
 
     // Components for monitoring.
-    forEach.call(document.querySelectorAll('svg [type="boundingCircle"]'), boundingCircle => {
+    forEach.call(document.querySelectorAll('svg > [type="boundingCircle"]'), boundingCircle => {
         monitoringCircles.push(boundingCircle);
     });
-    // Rects.
-    forEach.call(document.querySelectorAll('svg [data-pdf-annotate-type="area"] > rect'), rect => {
-        monitoringRects.push(rect);
-    });
     // Texts.
-    forEach.call(document.querySelectorAll('svg [data-pdf-annotate-type="textbox"] > rect'), rect => {
+    forEach.call(document.querySelectorAll('svg > [data-pdf-annotate-type="textbox"] > rect'), rect => {
         monitoringTexts.push(rect);
     });
     // Arrows.
-    forEach.call(document.querySelectorAll('svg [data-pdf-annotate-type="arrow"] > path'), path => {
+    forEach.call(document.querySelectorAll('svg > [data-pdf-annotate-type="arrow"] > path'), path => {
         monitoringArrows.push(path);
     });
+
+
+    // Rects.
+    let rects = window.annotationContainer.getAllAnnotations().filter(a => {
+        return a.type === 'area';
+    });
+    rects.forEach(r => {
+        r.enableHoverEvent();
+    });
+
+
+
+
+
+
 }
 
 function enableMouseListening() {
