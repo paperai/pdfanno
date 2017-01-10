@@ -59,9 +59,9 @@ export default class RectAnnotation extends AbstractAnnotation {
         window.annotationContainer.remove(this);
     }
 
-    createAnnotation(a = {}) {
+    createAnnotation() {
         // TODO Refactring.
-        return assign({}, a, {
+        return {
             uuid   : this.uuid,
             type   : this.type,
             x      : this.x,
@@ -69,8 +69,9 @@ export default class RectAnnotation extends AbstractAnnotation {
             width  : this.width,
             height : this.height,
             text   : this.text,
-            color  : this.color
-        });
+            color  : this.color,
+            readyOnly : this.readOnly
+        };
     }
 
     save() {
@@ -80,6 +81,7 @@ export default class RectAnnotation extends AbstractAnnotation {
             if (a) {
                 // update.
                 a = this.createAnnotation(a);
+                console.log('save:', a);
                 PDFJSAnnotate.getStoreAdapter().editAnnotation(documentId, this.uuid, a);
             } else {
                 // insert.
