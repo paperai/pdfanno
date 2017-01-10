@@ -36,10 +36,11 @@ export default function render(svg, viewport, data) {
     }
 
     // Append annotation to svg
+    let elements = [];
     data.annotations.forEach((a) => {
-      appendChild(svg, a, viewport);
+      elements.push(appendChild(svg, a, viewport));
     });
 
-    resolve(svg);
+    resolve(svg, elements);
   });
 }

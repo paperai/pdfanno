@@ -18,6 +18,7 @@ import {
   getCurrentPage
 } from './utils';
 import { addInputField } from './text';
+import RectAnnotation from '../annotation/rect';
 
 const _type = 'area';
 
@@ -145,7 +146,83 @@ function saveRect(rect) {
 
   // Save.
   PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation).then((annotation) => {
-    appendChild(svg, annotation);
+
+    console.log('bbbbbbbbb:', annotation);
+
+    // appendChild(svg, annotation);
+
+    let rectAnnotation = RectAnnotation.newInstance(annotation);
+    rectAnnotation.render();
+    window.annotationContainer.add(rectAnnotation);    
+
+    // Add an input field.
+    let x = annotation.x;
+    let y = annotation.y - 20; // 20 = circle'radius(3px) + input height(14px) + α
+    let rect = svg.getBoundingClientRect();
+
+    x = scaleUp(svg, {x}).x + rect.left;
+    y = scaleUp(svg, {y}).y + rect.top;
+
+    addInputField(x, y, null, null, (text) => {
+
+      console.log('text: ', text);
+
+      if (!text) {
+        return;
+      }
+
+      annotation.text = text;
+
+      // Create a text annotation.
+      // $(`[data-pdf-annotate-id="${annotation.uuid}"]`).remove();
+      // TODO
+      // let $elmenet = appendChild(svg, annotation);
+
+      // Update data.
+      PDFJSAnnotate.getStoreAdapter().editAnnotation(documentId, annotation.uuid, annotation);
+
+
+      rectAnnotation.text = text;
+      rectAnnotation.render();
+
+
+      // Save and Update.
+
+
+      // // Move the text into the rect svg group.
+      // let $text = $(`[data-pdf-annotate-id="${textAnnotation.uuid}"]`);
+      // $(`[data-pdf-annotate-id="${annotation.uuid}"]`).append($text.children());
+      // $text.remove();
+      // // Delete text annotation.
+      // PDFJSAnnotate.getStoreAdapter().deleteAnnotation(documentId, textAnnotation.uuid);
+
+      // 設計変更
+      // =================================
+      // ラベルアノテーションは、いろんなアノテーションに付属する感じ。
+      // 各種アノテーションを追加したのちに、インプットフィールドを用意。
+      // 入力が終わったら、annotationではなく、テキスト文字自体をコールバックに戻すようにする。
+      // 受け取った値をDBに保存し、またレンダリングも行う（自身のアノテーションのg内に）。
+
+
+      // これが良さそうだったら、ハイライト、arrow、にも設計を展開する。
+
+
+      // // FIXME: cannot stop refarence counter. I wanna use the original `annotation`, but couldn't.
+      // PDFJSAnnotate.getStoreAdapter().getAnnotation(documentId, annotation.uuid).then(annotation => {
+
+      //   // Set relation between arrow and text.
+      //   annotation.text = textAnnotation.uuid;
+
+      //   // Update data.
+      //   PDFJSAnnotate.getStoreAdapter().editAnnotation(documentId, annotation.uuid, annotation);
+
+      //   // Update UI.
+      //   $(`[data-pdf-annotate-id="${annotation.uuid}"]`).attr('data-text', textAnnotation.uuid);
+
+      // });
+
+    }, 'text');
+
   });
 }
 

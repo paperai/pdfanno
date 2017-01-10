@@ -9,6 +9,9 @@ import {
   scaleUp
 } from './utils';
 import { addInputField } from './text';
+import RectAnnotation from '../annotation/rect';
+
+
 let filter  = Array.prototype.filter;
 let forEach = Array.prototype.forEach;
 
@@ -21,6 +24,8 @@ let monitoringRects = [];   // rect
 let monitoringTexts = [];   // textbox
 let monitoringArrows = [];  // arrow
 let monitoringCircles = []; // boundingCircle for highlight.
+
+let rects = [];
 
 let hitComponent = null;
 
@@ -159,6 +164,7 @@ function handleDocumentMousemove(e) {
 }
 
 function handleDocumentKeydown(e) {
+    console.log('handleDocumentKeydown')
     // Delete or BackSpace.
     if (e.keyCode == 46 || e.keyCode == 8) {
         e.preventDefault();
@@ -187,12 +193,25 @@ function moveRectComponent(svg, startPos, currentPos, rect) {
 
     rect.setAttribute('x', originalX - diff.x);
     rect.setAttribute('y', originalY - diff.y);
+
+    // Move related text.
+    // let textId = $(rect).parents('g').data('text');
+    // let $text = $(`[data-pdf-annotate-id="${textId}"]`);
+    // if (!$text.data('original-x')) {
+    //     $text.data('original-x', $text.)
+    // }
+
 }
 
 /**
  * Delete annotations selected.
  */
 function deleteSelectedAnnotations() {
+
+    // New type.
+    window.annotationContainer.getAllAnnotations().forEach(r => {
+        r.deleteSelectedAnnotation();
+    });
 
     let annotationIds = [];
     let documentId = document.querySelector('svg').getAttribute('data-pdf-annotate-document');
@@ -339,7 +358,13 @@ function isArrowComponent(component) {
 function setComponentVisibility(component, opacity) {
     console.log('setComponentVisibility', component.tagName, opacity);
 
-    let g = (component.tagName.toLowerCase() === 'g' ? component : component.parentNode);
+    // let g = (component.tagName.toLowerCase() === 'g' ? component : component.parentNode);
+    let g;
+    if (component.tagName.toLowerCase() === 'g') {
+        g = component;
+    } else {
+        g = $(component).parents('g[data-pdf-annotate-id]')[0];
+    }
 
     g.style.opacity = opacity;
 
@@ -590,12 +615,8 @@ function initializeMonitoringAnnotations() {
     monitoringCircles = [];
 
     // Components for monitoring.
-    forEach.call(document.querySelectorAll('svg > g > [type="boundingCircle"]'), boundingCircle => {
+    forEach.call(document.querySelectorAll('svg > [type="boundingCircle"]'), boundingCircle => {
         monitoringCircles.push(boundingCircle);
-    });
-    // Rects.
-    forEach.call(document.querySelectorAll('svg > [data-pdf-annotate-type="area"] > rect'), rect => {
-        monitoringRects.push(rect);
     });
     // Texts.
     forEach.call(document.querySelectorAll('svg > [data-pdf-annotate-type="textbox"] > rect'), rect => {
@@ -605,6 +626,22 @@ function initializeMonitoringAnnotations() {
     forEach.call(document.querySelectorAll('svg > [data-pdf-annotate-type="arrow"] > path'), path => {
         monitoringArrows.push(path);
     });
+
+
+    // Rects.
+    // let rects = window.annotationContainer.getAllAnnotations().filter(a => {
+    //     return a.type === 'area';
+    // });
+    // rects.forEach(r => {
+    //     r.enableViewMode();
+    // });
+
+    window.annotationContainer.getAllAnnotations().forEach(r => {
+        r.enableViewMode();
+    });
+
+
+
 }
 
 function enableMouseListening() {
@@ -625,6 +662,10 @@ function disableMouseListening() {
     monitoringRects = [];
     monitoringArrows = [];
     monitoringCircles = [];
+
+    window.annotationContainer.getAllAnnotations().forEach(r => {
+        r.disableViewMode();
+    });
 
     document.removeEventListener('mousedown', handleDocumentMousedown);
     document.removeEventListener('mousemove', handleDocumentMousemove);

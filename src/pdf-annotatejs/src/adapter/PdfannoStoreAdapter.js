@@ -71,6 +71,9 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
       },
 
       addAnnotation(documentId, pageNumber, annotation) {
+
+        console.log('addAnnotation1:', annotation);
+
         return new Promise((resolve, reject) => {
           annotation.class = 'Annotation';
           annotation.uuid = annotation.uuid || uuid();
@@ -81,6 +84,8 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
 
 
           updateAnnotations(documentId, annotations);
+
+          console.log('addAnnotation2:', annotation);
 
           resolve(annotation);
         });
@@ -94,7 +99,6 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
       },
 
       editAnnotation(documentId, annotationId, annotation) {
-        console.log('editAnnotation:', assign({}, annotation));
         return new Promise((resolve, reject) => {
           let annotations = getAnnotations(documentId);
           annotations[findAnnotation(documentId, annotationId)] = annotation;
@@ -208,7 +212,8 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                   annotation.x,
                   annotation.y,
                   annotation.width,
-                  annotation.height
+                  annotation.height,
+                  annotation.text
                 ];
 
               // Highlight.
@@ -397,6 +402,7 @@ function _createContainerFromJson2(json, color, isPrimary) {
           y      : data[2],
           width  : data[3],
           height : data[4],
+          text   : data[5],
           readOnly,
           color
         });
@@ -780,6 +786,8 @@ function getPageSize() {
 
 function transformToRenderCoordinate(annotation) {
 
+  // console.log('transformToRenderCoordinate:', annotation);
+
   let _type = 'render';
 
   if (annotation.coords === _type) {
@@ -824,10 +832,10 @@ function transformFromRenderCoordinate(annotation) {
     return annotation;
   }
 
-  annotation.coords = _type;
-
   // Copy for avoiding sharing.
   annotation = assign({}, annotation);
+
+  annotation.coords = _type;
 
   if (annotation.y) {
     let {y, pageNumber} = convertToExportY(annotation.y);
@@ -951,8 +959,6 @@ function _getSecondaryAnnotations(documentId) {
 
 
 function updateAnnotations(documentId, annotations) {
-
-  console.log('updateAnnotations');
 
   // Transform coordinate system.
   annotations = annotations.map(a => transformFromRenderCoordinate(a));

@@ -228,6 +228,12 @@ export function getAnnotationRect(el) {
  * @return {Object} A copy of `rect` with values scaled up
  */
 export function scaleUp(svg, rect) {
+
+  if (arguments.length === 1) {
+    rect = svg;
+    svg = getSVGLayer();
+  }
+
   let result = {};
   let { viewport } = getMetadata(svg);
 
@@ -246,6 +252,12 @@ export function scaleUp(svg, rect) {
  * @return {Object} A copy of `rect` with values scaled down
  */
 export function scaleDown(svg, rect) {
+
+  if (arguments.length === 1) {
+    rect = svg;
+    svg = getSVGLayer();
+  }
+
   let result = {};
   let { viewport } = getMetadata(svg);
 
@@ -322,6 +334,7 @@ export function enableUserSelect() {
  * @param {SVGElement} svg The SVG container to get metadata for
  */
 export function getMetadata(svg) {
+  svg = svg || getSVGLayer();
   return {
     documentId: svg.getAttribute('data-pdf-annotate-document'),
     pageNumber: parseInt(svg.getAttribute('data-pdf-annotate-page'), 10),

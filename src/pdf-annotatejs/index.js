@@ -1,6 +1,7 @@
 require("!style!css!./pdf-annotate.css");
 import $ from 'jquery';
 
+
 // for Convinience.
 window.$ = window.jQuery = $;
 
@@ -13,9 +14,12 @@ export default PDFJSAnnotate;
 let PDFAnnotate = PDFJSAnnotate;
 
 
+import AnnotationContainer from './src/annotation/container';
+window.annotationContainer = new AnnotationContainer();
 
+import RectAnnotation from './src/annotation/rect';
 
-
+import appendChild from './src/render/appendChild';
 
 // Setup Storage.
 PDFAnnotate.setStoreAdapter(new PDFAnnotate.PdfannoStoreAdapter());
@@ -114,13 +118,41 @@ function renderAnnotations(svg, pageNumber) {
 
             // Render annotations.
             let viewport = PDFView.pdfViewer.getPageView(0).viewport;
-            PDFAnnotate.render(svg, viewport, annotations);
+            // PDFAnnotate.render(svg, viewport, annotations).then((svg, elements) => {
+
+            //     for (let i = 0; i < annotations.length; i++) {
+
+            //     }
+
+
+            //     // var event = document.createEvent('CustomEvent');
+            //     // event.initCustomEvent('annotationrendered', true, true, {
+            //     //   pageNumber: pageNumber
+            //     // });
+            //     // window.dispatchEvent(event);
+
+            // });
+
+            annotations.annotations.forEach(a => {
+
+                if (a.type === 'area') {
+                    let rect = RectAnnotation.newInstance(a);
+                    rect.render();
+                    window.annotationContainer.add(rect);
+                
+                } else {
+                    appendChild(svg, a);
+                }
+            });
+
+
 
             var event = document.createEvent('CustomEvent');
             event.initCustomEvent('annotationrendered', true, true, {
               pageNumber: pageNumber
             });
             window.dispatchEvent(event);
+
         });
     });
 }
