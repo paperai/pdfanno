@@ -114,7 +114,7 @@ function saveRect(rects) {
     appendChild(svg, annotation);
 
     // Add an input field.
-    let x = annotation.rectangles[0].x;
+    let x = annotation.rectangles[0].x + 5;  // 5 = boundingRadius(3) + 2
     let y = annotation.rectangles[0].y - 20; // 20 = circle'radius(3px) + input height(14px) + α
     let rect = svg.getBoundingClientRect();
 

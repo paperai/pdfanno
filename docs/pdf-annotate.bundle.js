@@ -17565,6 +17565,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function setSelectedVisibility(component, state) {
 	
+	    console.log('setSelectedVisibility:', component);
+	
 	    var $g = (0, _jquery2.default)(component.tagName.toLowerCase() === 'g' ? component : component.parentNode);
 	
 	    // For highlight, rect, text, arrow.
@@ -17865,7 +17867,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    monitoringCircles = [];
 	
 	    // Components for monitoring.
-	    forEach.call(document.querySelectorAll('svg > [type="boundingCircle"]'), function (boundingCircle) {
+	    forEach.call(document.querySelectorAll('svg > g > [type="boundingCircle"]'), function (boundingCircle) {
 	        monitoringCircles.push(boundingCircle);
 	    });
 	    // Texts.
@@ -17876,6 +17878,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    forEach.call(document.querySelectorAll('svg > [data-pdf-annotate-type="arrow"] > path'), function (path) {
 	        monitoringArrows.push(path);
 	    });
+	    // // Highlights.
+	    // forEach.call(document.querySelectorAll('svg > [data-pdf-annotate-type="highlight"] > rect'), rect => {
+	    //     monitoringRects.push(rect);
+	    // });
+	
 	
 	    // Rects.
 	    // let rects = window.annotationContainer.getAllAnnotations().filter(a => {
@@ -18131,7 +18138,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    (0, _appendChild2.default)(svg, annotation);
 	
 	    // Add an input field.
-	    var x = annotation.rectangles[0].x;
+	    var x = annotation.rectangles[0].x + 5; // 5 = boundingRadius(3) + 2
 	    var y = annotation.rectangles[0].y - 20; // 20 = circle'radius(3px) + input height(14px) + α
 	    var rect = svg.getBoundingClientRect();
 	
