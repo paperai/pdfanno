@@ -306,6 +306,8 @@ function deleteAnnotation(documentId, ids, callback) {
 }
 
 function setSelectedVisibility(component, state) {
+
+    console.log('setSelectedVisibility:', component);
     
     let $g = $(component.tagName.toLowerCase() === 'g' ? component : component.parentNode);
 
@@ -615,7 +617,7 @@ function initializeMonitoringAnnotations() {
     monitoringCircles = [];
 
     // Components for monitoring.
-    forEach.call(document.querySelectorAll('svg > [type="boundingCircle"]'), boundingCircle => {
+    forEach.call(document.querySelectorAll('svg > g > [type="boundingCircle"]'), boundingCircle => {
         monitoringCircles.push(boundingCircle);
     });
     // Texts.
@@ -626,6 +628,10 @@ function initializeMonitoringAnnotations() {
     forEach.call(document.querySelectorAll('svg > [data-pdf-annotate-type="arrow"] > path'), path => {
         monitoringArrows.push(path);
     });
+    // // Highlights.
+    // forEach.call(document.querySelectorAll('svg > [data-pdf-annotate-type="highlight"] > rect'), rect => {
+    //     monitoringRects.push(rect);
+    // });
 
 
     // Rects.
