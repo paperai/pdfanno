@@ -3,6 +3,7 @@ import renderLine from './renderLine';
 import renderPath from './renderPath';
 import renderPoint from './renderPoint';
 import renderRect from './renderRect';
+import renderHighlight from './renderHighlight';
 import renderText from './renderText';
 // **extention**
 import renderArrow from './renderArrow';
@@ -118,13 +119,15 @@ export default function appendChild(svg, annotation, viewport) {
   let child, point;
   switch (annotation.type) {
     case 'area':
-    case 'highlight':
-    case 'boundingBox':   // **extension**
+    case 'boundingBox':
       child = renderRect(annotation, svg);
       break;
-    case 'strikeout':
-      child = renderLine(annotation, svg);
+    case 'highlight':
+      child = renderHighlight(annotation, svg);
       break;
+    // case 'strikeout':
+    //   child = renderLine(annotation, svg);
+    //   break;
     case 'point':
       child = renderPoint(annotation, svg);
       break;
