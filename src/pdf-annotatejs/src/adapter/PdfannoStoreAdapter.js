@@ -99,7 +99,6 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
       },
 
       editAnnotation(documentId, annotationId, annotation) {
-        console.log('editAnnotation:', assign({}, annotation));
         return new Promise((resolve, reject) => {
           let annotations = getAnnotations(documentId);
           annotations[findAnnotation(documentId, annotationId)] = annotation;
@@ -842,8 +841,6 @@ function transformFromRenderCoordinate(annotation) {
     let {y, pageNumber} = convertToExportY(annotation.y);
     annotation.y = y;
     annotation.page = pageNumber;
-
-    console.log('aaaaaaaaaaaa:', y, pageNumber);
   }
 
   if (annotation.y1) {
@@ -962,8 +959,6 @@ function _getSecondaryAnnotations(documentId) {
 
 
 function updateAnnotations(documentId, annotations) {
-
-  console.log('updateAnnotations');
 
   // Transform coordinate system.
   annotations = annotations.map(a => transformFromRenderCoordinate(a));
