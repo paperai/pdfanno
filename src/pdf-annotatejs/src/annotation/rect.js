@@ -7,6 +7,7 @@ import AbstractAnnotation from './abstract';
 import PDFJSAnnotate from '../PDFJSAnnotate';
 import {
     scaleUp,
+    scaleDown,
     getMetadata,
     disableUserSelect,
     enableUserSelect
@@ -49,7 +50,6 @@ export default class RectAnnotation extends AbstractAnnotation {
          // TODO Refactoring.
          this.$element.remove();
          this.$element = $(appendChild(getSVGLayer(), this));
-         console.log('render:', this.$element);
     }
 
     destroy() {
@@ -183,7 +183,6 @@ export default class RectAnnotation extends AbstractAnnotation {
     }
 
     handleMouseMoveOnDocument(e) {
-        // console.log('handleMouseMoveOnDocument', e, e.originalEvent.clientX);
 
         if (!this.startX) {
             this.startX = parseInt(e.originalEvent.clientX);
@@ -192,12 +191,13 @@ export default class RectAnnotation extends AbstractAnnotation {
         this.endX = parseInt(e.originalEvent.clientX);
         this.endY = parseInt(e.originalEvent.clientY);
 
-        // console.log('start,end=', this.startX, this.startY, this.endX, this.endY);
+        let diff = scaleDown({
+            x : this.endX - this.startX,
+            y : this.endY - this.startY
+        });
 
-        this.x = this.originalX + (this.endX - this.startX);
-        this.y = this.originalY + (this.endY - this.startY);
-
-        console.log('x,y = ', this.x, this.y);
+        this.x = this.originalX + diff.x;
+        this.y = this.originalY + diff.y;
 
         this.render(); // heavy?
     }
@@ -241,8 +241,5 @@ export default class RectAnnotation extends AbstractAnnotation {
         this.$element.find('text').off('click', this.handleClickTextEvent);
         this.$element.find('text').off('dbclick', this.handleDoubleClickTextEvent);
     }
-
-
-
 
 }
