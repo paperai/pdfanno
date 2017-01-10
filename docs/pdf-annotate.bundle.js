@@ -16984,10 +16984,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'createAnnotation',
 	        value: function createAnnotation() {
-	            var a = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-	
 	            // TODO Refactring.
-	            return (0, _deepAssign2.default)({}, a, {
+	            return {
 	                uuid: this.uuid,
 	                type: this.type,
 	                x: this.x,
@@ -16995,8 +16993,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                width: this.width,
 	                height: this.height,
 	                text: this.text,
-	                color: this.color
-	            });
+	                color: this.color,
+	                readyOnly: this.readOnly
+	            };
 	        }
 	    }, {
 	        key: 'save',
@@ -17011,6 +17010,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                if (a) {
 	                    // update.
 	                    a = _this2.createAnnotation(a);
+	                    console.log('save:', a);
 	                    _PDFJSAnnotate2.default.getStoreAdapter().editAnnotation(documentId, _this2.uuid, a);
 	                } else {
 	                    // insert.
