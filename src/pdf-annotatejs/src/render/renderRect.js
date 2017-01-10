@@ -63,7 +63,7 @@ function createHighlight(a, svg) {
 
 function createRectBox(a, svg) {
 
-  console.log('createRectBox:', a);
+  // console.log('createRectBox:', a);
 
   let color = a.color;
   if (!color) {

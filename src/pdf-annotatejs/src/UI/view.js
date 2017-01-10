@@ -164,6 +164,7 @@ function handleDocumentMousemove(e) {
 }
 
 function handleDocumentKeydown(e) {
+    console.log('handleDocumentKeydown')
     // Delete or BackSpace.
     if (e.keyCode == 46 || e.keyCode == 8) {
         e.preventDefault();
@@ -206,6 +207,11 @@ function moveRectComponent(svg, startPos, currentPos, rect) {
  * Delete annotations selected.
  */
 function deleteSelectedAnnotations() {
+
+    // New type.
+    window.annotationContainer.getAllAnnotations().forEach(r => {
+        r.deleteSelectedAnnotation();
+    });
 
     let annotationIds = [];
     let documentId = document.querySelector('svg').getAttribute('data-pdf-annotate-document');
@@ -623,15 +629,16 @@ function initializeMonitoringAnnotations() {
 
 
     // Rects.
-    let rects = window.annotationContainer.getAllAnnotations().filter(a => {
-        return a.type === 'area';
+    // let rects = window.annotationContainer.getAllAnnotations().filter(a => {
+    //     return a.type === 'area';
+    // });
+    // rects.forEach(r => {
+    //     r.enableViewMode();
+    // });
+
+    window.annotationContainer.getAllAnnotations().forEach(r => {
+        r.enableViewMode();
     });
-    rects.forEach(r => {
-        r.enableHoverEvent();
-    });
-
-
-
 
 
 
@@ -655,6 +662,10 @@ function disableMouseListening() {
     monitoringRects = [];
     monitoringArrows = [];
     monitoringCircles = [];
+
+    window.annotationContainer.getAllAnnotations().forEach(r => {
+        r.disableViewMode();
+    });
 
     document.removeEventListener('mousedown', handleDocumentMousedown);
     document.removeEventListener('mousemove', handleDocumentMousemove);

@@ -152,7 +152,7 @@ export default function appendChild(svg, annotation, viewport) {
     svg.appendChild(transform(child, viewport));
   }
 
-  console.log('appendChild:', child);
+  // console.log('appendChild:', child);
 
   return child;
 }

@@ -18,6 +18,7 @@ import {
   getCurrentPage
 } from './utils';
 import { addInputField } from './text';
+import RectAnnotation from '../annotation/rect';
 
 const _type = 'area';
 
@@ -148,7 +149,11 @@ function saveRect(rect) {
 
     console.log('bbbbbbbbb:', annotation);
 
-    appendChild(svg, annotation);
+    // appendChild(svg, annotation);
+
+    let rectAnnotation = RectAnnotation.newInstance(annotation);
+    rectAnnotation.render();
+    window.annotationContainer.add(rectAnnotation);    
 
     // Add an input field.
     let x = annotation.x;
@@ -169,12 +174,17 @@ function saveRect(rect) {
       annotation.text = text;
 
       // Create a text annotation.
-      $(`[data-pdf-annotate-id="${annotation.uuid}"]`).remove();
+      // $(`[data-pdf-annotate-id="${annotation.uuid}"]`).remove();
       // TODO
-      appendChild(svg, annotation);
+      // let $elmenet = appendChild(svg, annotation);
 
       // Update data.
       PDFJSAnnotate.getStoreAdapter().editAnnotation(documentId, annotation.uuid, annotation);
+
+
+      rectAnnotation.text = text;
+      rectAnnotation.render();
+
 
       // Save and Update.
 

@@ -12,7 +12,13 @@ export default class AnnotationContainer {
     }
 
     remove(annotation) {
-        // TODO
+        let newList = [];
+        this.list.forEach(a => {
+            if (annotation !== a) {
+                newList.push(a);
+            }
+        });
+        this.list = newList;
     }
 
     getAllAnnotations() {
