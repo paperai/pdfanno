@@ -7,7 +7,7 @@ It offers functions for various types of linguistic annotations, including part-
 
 ## Features
 * Simple and easy-to-use user interface
-* Not installation is required.
+* No installation is required.
 * Client-only application. No communication with server.
 * Multi-user support
 
