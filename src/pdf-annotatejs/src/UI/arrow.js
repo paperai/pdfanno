@@ -172,8 +172,8 @@ function handleDocumentMouseup(e) {
     y2: endPos.y,
     type : 'arrow',
     direction : _arrowType,
-    highlight1 : startBoundingCircle.parentNode.getAttribute('data-pdf-annotate-id'),
-    highlight2 : endBoundingCircle.parentNode.getAttribute('data-pdf-annotate-id'),
+    rel1 : startBoundingCircle.parentNode.getAttribute('data-pdf-annotate-id'),
+    rel2 : endBoundingCircle.parentNode.getAttribute('data-pdf-annotate-id'),
   };
 
   let { documentId, pageNumber } = getMetadata(svg);

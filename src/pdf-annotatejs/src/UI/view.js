@@ -260,7 +260,7 @@ function deleteSelectedAnnotations() {
             // Arrow relations.
             let criteria = {
                 type       : 'arrow',
-                highlight1 : annotationId
+                rel1 : annotationId
             };
             PDFJSAnnotate.getStoreAdapter().findAnnotations(documentId, criteria).then(annotations => {
                 if (annotations.length > 0) {
@@ -269,7 +269,7 @@ function deleteSelectedAnnotations() {
                 }
                 let criteria = {
                     type : 'arrow',
-                    highlight2 : annotationId
+                    rel2 : annotationId
                 };
                 PDFJSAnnotate.getStoreAdapter().findAnnotations(documentId, criteria).then(annotations => {
                     if (annotations.length > 0) {
@@ -402,8 +402,8 @@ function setComponentVisibility(component, opacity) {
 
     if (type === 'arrow') {
         [
-            g.getAttribute('data-highlight1'),
-            g.getAttribute('data-highlight2'),
+            g.getAttribute('data-rel1'),
+            g.getAttribute('data-rel2'),
             g.getAttribute('data-text')
         ].forEach(id => {
             let element = document.querySelector(`g[data-pdf-annotate-id="${id}"]`);
@@ -415,8 +415,8 @@ function setComponentVisibility(component, opacity) {
     } else if (type === 'highlight' || type === 'textbox') {
         PDFJSAnnotate.getStoreAdapter().getAnnotations(documentId, null).then(({documentId, pageNumber, annotations}) => {
             let arrowAnnotations = annotations.filter(annotation => {
-                return annotation.highlight1 === uuid
-                        || annotation.highlight2 === uuid
+                return annotation.rel1 === uuid
+                        || annotation.rel2 === uuid
                         || annotation.text === uuid
             });
             arrowAnnotations.forEach(arrowAnnotation => {

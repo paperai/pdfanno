@@ -254,14 +254,14 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                   annotation.page1,
                   annotation.direction,
                 ];
-                let highlight1s = container[documentId].annotations.filter(a => {
-                  return a.uuid === annotation.highlight1;
+                let rel1s = container[documentId].annotations.filter(a => {
+                  return a.uuid === annotation.rel1;
                 });
-                data.push(highlight1s[0].key);
-                let highlight2s = container[documentId].annotations.filter(a => {
-                  return a.uuid === annotation.highlight2;
+                data.push(rel1s[0].key);
+                let rel2s = container[documentId].annotations.filter(a => {
+                  return a.uuid === annotation.rel2;
                 });
-                data.push(highlight2s[0].key);
+                data.push(rel2s[0].key);
                 let texts = container[documentId].annotations.filter(a => {
                   return a.uuid === annotation.text;
                 });
@@ -474,23 +474,23 @@ function _createContainerFromJson2(json, color, isPrimary) {
       } else if (key.indexOf('rel') === 0) {
 
         // Find highlights.
-        let highlight1s = annotations.filter(a => {
+        let rel1s = annotations.filter(a => {
           return a.key === data[2];
         });
-        let highlight1 = highlight1s[0];
-        let highlight2s = annotations.filter(a => {
+        let rel1 = rel1s[0];
+        let rel2s = annotations.filter(a => {
           return a.key === data[3];
         });
-        let highlight2 = highlight2s[0];
+        let rel2 = rel2s[0];
 
         // Specify startPosition and endPosition.
-        let x1 = highlight1.rectangles[0].x;
-        let y1 = highlight1.rectangles[0].y - 5;
-        let x2 = highlight2.rectangles[0].x;
-        let y2 = highlight2.rectangles[0].y - 5;
+        let x1 = rel1.rectangles[0].x;
+        let y1 = rel1.rectangles[0].y - 5;
+        let x2 = rel2.rectangles[0].x;
+        let y2 = rel2.rectangles[0].y - 5;
 
-        let page1 = highlight1.rectangles[0].page;
-        let page2 = highlight2.rectangles[0].page;
+        let page1 = rel1.rectangles[0].page;
+        let page2 = rel2.rectangles[0].page;
 
         let textPage = page1;
 
@@ -565,8 +565,8 @@ function _createContainerFromJson2(json, color, isPrimary) {
           page1,
           page2,
           text       : textId,
-          highlight1 : highlight1.uuid,
-          highlight2 : highlight2.uuid,
+          rel1 : rel1.uuid,
+          rel2 : rel2.uuid,
           color      : "FF0000",         // TODO 要る？
           readOnly,
           color
@@ -674,23 +674,23 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
       } else if (key.indexOf('rel') === 0) {
 
         // Find highlights.
-        let highlight1s = annotations.filter(a => {
+        let rel1s = annotations.filter(a => {
           return a.key === data[2];
         });
-        let highlight1 = highlight1s[0];
-        let highlight2s = annotations.filter(a => {
+        let rel1 = rel1s[0];
+        let rel2s = annotations.filter(a => {
           return a.key === data[3];
         });
-        let highlight2 = highlight2s[0];
+        let rel2 = rel2s[0];
 
         // Specify startPosition and endPosition.
-        let x1 = highlight1.rectangles[0].x;
-        let y1 = highlight1.rectangles[0].y - 5;
-        let x2 = highlight2.rectangles[0].x;
-        let y2 = highlight2.rectangles[0].y - 5;
+        let x1 = rel1.rectangles[0].x;
+        let y1 = rel1.rectangles[0].y - 5;
+        let x2 = rel2.rectangles[0].x;
+        let y2 = rel2.rectangles[0].y - 5;
 
-        let page1 = highlight1.rectangles[0].page;
-        let page2 = highlight2.rectangles[0].page;
+        let page1 = rel1.rectangles[0].page;
+        let page2 = rel2.rectangles[0].page;
 
         let textPage = page1;
 
@@ -765,8 +765,8 @@ function _createContainerFromJson(json, readOnly=false, index=0) {
           page1,
           page2,
           text       : textId,
-          highlight1 : highlight1.uuid,
-          highlight2 : highlight2.uuid,
+          rel1 : rel1.uuid,
+          rel2 : rel2.uuid,
           color      : "FF0000",         // TODO 要る？
           readOnly,
           seq        : index

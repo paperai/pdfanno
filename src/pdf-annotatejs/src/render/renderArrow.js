@@ -43,8 +43,8 @@ export function createArrow(a, id=null) {
   setAttributes(group, {
     fill: color,
     stroke: color,
-    'data-highlight1': a.highlight1,
-    'data-highlight2': a.highlight2,
+    'data-rel1': a.rel1,
+    'data-rel2': a.rel2,
     'data-text': a.text
   });
   group.style.visibility = 'visible';
