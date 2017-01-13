@@ -183,7 +183,6 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
 
           // Set version.
           dataExport.version = ANNO_VERSION;
-          console.log('version:', dataExport.version, ANNO_VERSION);
 
           // Every documents.
           let container = _getContainer();
@@ -201,20 +200,24 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
             let annotations = {};
             dataExport[documentId] = annotations;
 
-            console.log('annos:', container, documentId, container[documentId].annotations);
+            // console.log('annos:', container, documentId, container[documentId].annotations);
 
             container[documentId].annotations.forEach(annotation => {
 
               // Rect
               if (annotation.type === 'area') {
-                annotations[`rect-${indexRect++}`] = [
+                let key = `rect-${indexRect++}`;
+                annotations[key] = [
                   annotation.page,
                   annotation.x,
                   annotation.y,
                   annotation.width,
                   annotation.height,
-                  annotation.text
+                  annotation.text || ''
                 ];
+                // save tmporary for arrow.
+                annotation.key = key;
+                annotation.page = annotation.page;
 
               // Highlight.
               } else if (annotation.type === 'highlight') {
@@ -273,20 +276,20 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                 annotations[`rel-${indexRel++}`] = data;
 
               // Textbox independent.
-              } else if (annotation.type === 'textbox') {
+              // } else if (annotation.type === 'textbox') {
 
-                let rels = container[documentId].annotations.filter(a => {
-                  // relation for arrow or highlight.
-                  return a.text === annotation.uuid;
-                });
-                if (rels.length === 0) {
-                  annotations[`text-${indexText++}`] = [
-                    annotation.page,
-                    annotation.x,
-                    annotation.y,
-                    annotation.content
-                  ];
-                }
+              //   let rels = container[documentId].annotations.filter(a => {
+              //     // relation for arrow or highlight.
+              //     return a.text === annotation.uuid;
+              //   });
+              //   if (rels.length === 0) {
+              //     annotations[`text-${indexText++}`] = [
+              //       annotation.page,
+              //       annotation.x,
+              //       annotation.y,
+              //       annotation.content
+              //     ];
+              //   }
               }
 
             });
@@ -404,7 +407,8 @@ function _createContainerFromJson2(json, color, isPrimary) {
           height : data[4],
           text   : data[5],
           readOnly,
-          color
+          color,
+          key    : key // tmp for arrow.
         });
       
       // Highlight.
@@ -457,18 +461,18 @@ function _createContainerFromJson2(json, color, isPrimary) {
         });
 
       // Text Independent.
-      } else if (key.indexOf('text') === 0) {
-        annotations.push({
-          class      : 'Annotation',
-          type       : 'textbox',
-          uuid       : uuid(),
-          page       : data[0],
-          x          : data[1],
-          y          : data[2],
-          content    : data[3],
-          readOnly,
-          color
-        });
+      // } else if (key.indexOf('text') === 0) {
+      //   annotations.push({
+      //     class      : 'Annotation',
+      //     type       : 'textbox',
+      //     uuid       : uuid(),
+      //     page       : data[0],
+      //     x          : data[1],
+      //     y          : data[2],
+      //     content    : data[3],
+      //     readOnly,
+      //     color
+      //   });
 
       // Arrow.
       } else if (key.indexOf('rel') === 0) {
@@ -484,13 +488,25 @@ function _createContainerFromJson2(json, color, isPrimary) {
         let rel2 = rel2s[0];
 
         // Specify startPosition and endPosition.
-        let x1 = rel1.rectangles[0].x;
-        let y1 = rel1.rectangles[0].y - 5;
-        let x2 = rel2.rectangles[0].x;
-        let y2 = rel2.rectangles[0].y - 5;
-
-        let page1 = rel1.rectangles[0].page;
-        let page2 = rel2.rectangles[0].page;
+        let x1, y1, x2, y2, page1, page2;
+        if (rel1.type === 'highlight') {
+          x1 = rel1.rectangles[0].x;
+          y1 = rel1.rectangles[0].y - 5;
+          page1 = rel1.rectangles[0].page;
+        } else {
+          x1 = rel1.x;
+          y1 = rel1.y - 5;          
+          page1 = rel1.page;
+        }
+        if (rel2.type === 'highlight') {
+          x2 = rel2.rectangles[0].x;
+          y2 = rel2.rectangles[0].y - 5;   
+          page2 = rel2.rectangles[0].page;       
+        } else {
+          x2 = rel2.x;
+          y2 = rel2.y - 5;
+          page2 = rel2.page;
+        }
 
         let textPage = page1;
 
@@ -565,8 +581,8 @@ function _createContainerFromJson2(json, color, isPrimary) {
           page1,
           page2,
           text       : textId,
-          rel1 : rel1.uuid,
-          rel2 : rel2.uuid,
+          rel1       : rel1.uuid,
+          rel2       : rel2.uuid,
           color      : "FF0000",         // TODO 要る？
           readOnly,
           color
