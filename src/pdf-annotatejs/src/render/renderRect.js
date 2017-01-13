@@ -28,9 +28,16 @@ export default function renderRect(a, svg) {
   });
   group.appendChild(rect);
 
+  let circle = renderCircle({
+    x    : a.x,
+    y    : a.y - DEFAULT_RADIUS - 2,
+    type : 'boundingCircle'
+  });
+  group.appendChild(circle);
+
   if (a.text) {
     let textAnnotation = {
-      x       : a.x,
+      x       : a.x + DEFAULT_RADIUS + 2,
       y       : a.y - 20,
       content : a.text,
       color
