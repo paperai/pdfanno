@@ -412,7 +412,7 @@ function setComponentVisibility(component, opacity) {
             }
         });
         
-    } else if (type === 'highlight' || type === 'textbox') {
+    } else if (type === 'highlight' || type === 'textbox' || type === 'area') {
         PDFJSAnnotate.getStoreAdapter().getAnnotations(documentId, null).then(({documentId, pageNumber, annotations}) => {
             let arrowAnnotations = annotations.filter(annotation => {
                 return annotation.rel1 === uuid
