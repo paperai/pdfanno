@@ -145,7 +145,6 @@ let _secondaryAnnotations = [];
 function initializeFileUploader() {
     setupPrimaryAnnotationButton();
     setupSecondaryAnnotationButton();
-    setupLoadButton();
 }
 
 function setupPrimaryAnnotationButton() {
@@ -187,22 +186,6 @@ function setupSecondaryAnnotationButton() {
             }
             fileReader.readAsText(file);
         });
-    });
-}
-
-function setupLoadButton() {
-    $('#load').off('click').on('click', e => {
-
-        // Set data.
-        _primaryAnnotation && localStorage.setItem('_pdfanno_pdfanno_upload', _primaryAnnotation);
-        _secondaryAnnotations && localStorage.setItem('_pdfanno_pdfanno_upload_second', JSON.stringify(_secondaryAnnotations));
-
-        // Reload pdf.js.
-        $('#viewer iframe').remove();
-        $('#viewer').html('<iframe src="./pages/viewer.html" class="anno-viewer" frameborder="0"></iframe>');
-
-        // Re-setup.
-        startApplication();
     });
 }
 
