@@ -39,6 +39,8 @@ function handleDoubleClick(e) {
     let component = findHitElement(e, true);
     if (component && isTextComponent(component)) {
 
+        console.log('aaaaaaaaaaaaaaa');
+
         // Add text input filed.
         let svg = findSVGAtPoint(e.clientX, e.clientY);
         let pos = scaleUp(svg, {
@@ -632,7 +634,10 @@ function initializeMonitoringAnnotations() {
     });
     // Texts.
     forEach.call(document.querySelectorAll('svg > [data-pdf-annotate-type="textbox"] > rect'), rect => {
-        monitoringTexts.push(rect);
+        if (rect.parentNode.getAttribute('data-pdf-annotate-id') !== 'undefined') {
+            console.log('bbbbbbb:', rect.parentNode.getAttribute('data-pdf-annotate-id'));
+            monitoringTexts.push(rect);            
+        }
     });
     // Arrows.
     forEach.call(document.querySelectorAll('svg > [data-pdf-annotate-type="arrow"] > path'), path => {

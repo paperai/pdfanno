@@ -132,6 +132,7 @@ export default function appendChild(svg, annotation, viewport) {
       child = renderPoint(annotation, svg);
       break;
     case 'textbox':
+      console.log('textbox:', annotation);
       child = renderText(annotation, svg);
       break;
     case 'drawing':
@@ -144,6 +145,7 @@ export default function appendChild(svg, annotation, viewport) {
       child = renderCircle(annotation, svg);
       break;
   }
+
 
   // If no type was provided for an annotation it will result in node being null.
   // Skip appending/transforming if node doesn't exist.

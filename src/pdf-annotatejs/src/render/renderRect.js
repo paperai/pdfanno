@@ -35,16 +35,16 @@ export default function renderRect(a, svg) {
   });
   group.appendChild(circle);
 
-  if (a.text) {
-    let textAnnotation = {
-      x       : a.x + DEFAULT_RADIUS + 2,
-      y       : a.y - 20,
-      content : a.text,
-      color
-    };
-    let text = renderText(textAnnotation, svg);
-    group.appendChild(text);
-  }
+  // if (a.text) {
+  //   let textAnnotation = {
+  //     x       : a.x + DEFAULT_RADIUS + 2,
+  //     y       : a.y - 20,
+  //     content : a.text,
+  //     color
+  //   };
+  //   let text = renderText(textAnnotation, svg);
+  //   group.appendChild(text);
+  // }
 
   return group;    
 }

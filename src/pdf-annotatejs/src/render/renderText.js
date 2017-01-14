@@ -53,7 +53,7 @@ export default function renderText(a, svg) {
         fill: color,
         fontSize: DEFAULT_FONT_SIZE
     });
-    text.innerHTML = a.content;
+    text.innerHTML = a.content || a.text;
 
     // Background.
     let box = document.createElementNS('http://www.w3.org/2000/svg', 'rect');

@@ -4,6 +4,7 @@ import { getSVGLayer } from '../UI/utils';
 import { addInputField } from '../UI/text';
 import { enableViewMode, disableViewMode } from '../UI/view';
 import AbstractAnnotation from './abstract';
+import TextAnnotation from './text';
 import PDFJSAnnotate from '../PDFJSAnnotate';
 import {
     scaleUp,
@@ -33,6 +34,11 @@ export default class RectAnnotation extends AbstractAnnotation {
         this.color    = null;
         this.readOnly = false;
         this.$element = $('<div class="dummy"/>');
+
+        this.textAnnotation = new TextAnnotation(this);
+        this.textAnnotation.on('hoverin', this.handleTextHoverIn);
+        this.textAnnotation.on('hovverout', this.handleTextHoverOut);
+        this.textAnnotation.on('textchanged', this.handleTextChanged);
     }
 
     static newInstance(annotation) {
@@ -49,9 +55,9 @@ export default class RectAnnotation extends AbstractAnnotation {
     }
 
     render() {
-         // TODO Refactoring.
          this.$element.remove();
          this.$element = $(appendChild(getSVGLayer(), this));
+         this.textAnnotation.render();
     }
 
     destroy() {
@@ -92,6 +98,7 @@ export default class RectAnnotation extends AbstractAnnotation {
     }
 
     deleteSelectedAnnotation() {
+        // TODO this will be better using eventEmitter on global?
         console.log('deleteSelectedAnnotation');
         // TODO Refactoring.
         if (this.$element.find('.anno-rect').hasClass('--selected')) {
@@ -107,18 +114,45 @@ export default class RectAnnotation extends AbstractAnnotation {
             this.render();
             this.enableViewMode();
         }
+
+        this.textAnnotation.deleteSelectedAnnotation();
+    }
+
+    getTextPosition() {
+        return {
+            x : this.x + 7, // 7 = DEFAULT_RADIUS + 2
+            y : this.y - 20
+        };
+    }
+
+    handleTextHoverIn() {
+        // TODO Refactoring CSS.
+        this.$element.find('rect').addClass('--hover');
+        this.$element.css('opacity', 1);
+    }
+
+    handleTextHoverOut() {
+        this.$element.find('rect').removeClass('--hover');
+        this.$element.css('opacity', 0.5);
+    }
+
+    handleTextChanged(textAfter) {
+        this.text = textAfter;
+        this.save();
     }
 
     handleHoverInEvent() {
         this.$element.find('rect, text').addClass('--hover');
         // TODO Refactoring.
         this.$element.css('opacity', 1);
+        this.emit('hoverin');
     }
 
     handleHoverOutEvent() {
         this.$element.find('rect, text').removeClass('--hover');
         // TODO Refactoring.
         this.$element.css('opacity', 0.5);
+        this.emit('hoverout');
     }
 
     handleClickRectEvent() {
@@ -185,6 +219,8 @@ export default class RectAnnotation extends AbstractAnnotation {
 
         document.addEventListener('mousemove', this.handleMouseMoveOnDocument);
         document.addEventListener('mouseup', this.handleMouseUpOnDocument);
+
+        this.emit('rectmovestart', this);
     }
 
     handleMouseMoveOnDocument(e) {
@@ -255,8 +291,8 @@ export default class RectAnnotation extends AbstractAnnotation {
     enableViewMode() {
 
         this.$element.find('rect, text').hover(
-            this.handleHoverInEvent.bind(this), 
-            this.handleHoverOutEvent.bind(this)
+            this.handleHoverInEvent, 
+            this.handleHoverOutEvent
         );
 
         if (!this.readOnly) {
@@ -268,6 +304,8 @@ export default class RectAnnotation extends AbstractAnnotation {
             this.$element.find('.anno-rect').off('mousedown', this.handleMouseDownOnRect).on('mousedown', this.handleMouseDownOnRect);
          
         }
+
+        this.textAnnotation.enableViewMode();
     }
 
     disableViewMode() {
@@ -277,6 +315,8 @@ export default class RectAnnotation extends AbstractAnnotation {
         this.$element.find('text').off('dbclick', this.handleDoubleClickTextEvent);
 
         this.$element.find('.anno-rect').off('mousedown', this.handleMouseDownOnRect);
+
+        this.textAnnotation.disableViewMode();
     }
 
 }
