@@ -183,33 +183,18 @@ export default class RectAnnotation extends AbstractAnnotation {
 
         disableUserSelect();
 
-        // $(document).on('mousemove', this.handleMouseMoveOnDocument);
-        // $(document).on('mouseup', this.handleMouseUpOnDocument);
         document.addEventListener('mousemove', this.handleMouseMoveOnDocument);
         document.addEventListener('mouseup', this.handleMouseUpOnDocument);
     }
-
-    // handleMouseUpOnRect() {
-    //     console.log('handleMouseUpOnRect:', this._dragging);
-
-    //     // Click.
-    //     if (!this._dragging) {
-    //         this.handleClickRectEvent();
-    //     }
-    // }
 
     handleMouseMoveOnDocument(e) {
 
         this._dragging = true;
 
         if (!this.startX) {
-            // this.startX = parseInt(e.originalEvent.clientX);
-            // this.startY = parseInt(e.originalEvent.clientY);
             this.startX = parseInt(e.clientX);
             this.startY = parseInt(e.clientY);
         }
-        // this.endX = parseInt(e.originalEvent.clientX);
-        // this.endY = parseInt(e.originalEvent.clientY);
         this.endX = parseInt(e.clientX);
         this.endY = parseInt(e.clientY);
 
@@ -222,6 +207,16 @@ export default class RectAnnotation extends AbstractAnnotation {
         this.y = this.originalY + diff.y;
 
         this.render(); // heavy?
+
+        // TODO FIXME
+        // var event = document.createEvent('CustomEvent');
+        // event.initCustomEvent('rectmove', true, true, {
+        //   id: this.uuid
+        // });
+        // window.dispatchEvent(event);
+
+        this.emit('rectmove', this);
+
     }
 
     handleMouseUpOnDocument() {
@@ -238,13 +233,20 @@ export default class RectAnnotation extends AbstractAnnotation {
             this.endY = null;
 
             this.save();
-            this.enableViewMode();            
+            this.enableViewMode();
+
+            // TODO FIXME
+            // var event = document.createEvent('CustomEvent');
+            // event.initCustomEvent('rectmoveend', true, true, {
+            //   id: this.uuid
+            // });
+            // window.dispatchEvent(event);
+
+            this.emit('rectmoveend', this);
         }
 
         enableUserSelect();
 
-        // $(document).off('mousemove', this.handleMouseMoveOnDocument);
-        // $(document).off('mouseup', this.handleMouseUpOnDocument);
         document.removeEventListener('mousemove', this.handleMouseMoveOnDocument);
         document.removeEventListener('mouseup', this.handleMouseUpOnDocument);            
 
@@ -264,7 +266,7 @@ export default class RectAnnotation extends AbstractAnnotation {
             this.$element.find('text').off('dbclick', this.handleDoubleClickTextEvent).on('dbclick', this.handleDoubleClickTextEvent);
 
             this.$element.find('.anno-rect').off('mousedown', this.handleMouseDownOnRect).on('mousedown', this.handleMouseDownOnRect);
-            // this.$element.find('.anno-rect').off('mouseup', this.handleMouseUpOnRect).on('mouseup', this.handleMouseUpOnRect);            
+         
         }
     }
 
@@ -275,7 +277,6 @@ export default class RectAnnotation extends AbstractAnnotation {
         this.$element.find('text').off('dbclick', this.handleDoubleClickTextEvent);
 
         this.$element.find('.anno-rect').off('mousedown', this.handleMouseDownOnRect);
-        // this.$element.find('.anno-rect').off('mouseup', this.handleMouseUpOnRect);        
     }
 
 }

@@ -1,10 +1,14 @@
+import EventEmitter from 'events';
+
 /**
  *
  */
-export default class AbstractAnnotation {
+export default class AbstractAnnotation extends EventEmitter {
+// export default class AbstractAnnotation {
 
     constructor() {
-        this.autoBind();
+      super();
+      this.autoBind();
     }
 
     /**
@@ -17,4 +21,5 @@ export default class AbstractAnnotation {
           this[method] = this[method].bind(this);
         });
     }
+
 }

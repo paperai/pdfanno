@@ -181,6 +181,14 @@ function handleDocumentKeyup(e) {
     }
 }
 
+function handleRectMove(e) {
+    console.log('handleRectMove:', e, e.detail);
+}
+
+function handleRectMoveEnd(e) {
+    console.log('handleRectMoveEnd:', e, e.detail);
+}
+
 function moveRectComponent(svg, startPos, currentPos, rect) {
 
     let diff = scaleDown(svg, {
@@ -202,6 +210,8 @@ function moveRectComponent(svg, startPos, currentPos, rect) {
     // }
 
 }
+
+
 
 /**
  * Delete annotations selected.
@@ -644,6 +654,8 @@ function initializeMonitoringAnnotations() {
 
     window.annotationContainer.getAllAnnotations().forEach(r => {
         r.enableViewMode();
+        r.on('rectmove', handleRectMove);
+        r.on('rectmoveend', handleRectMoveEnd);
     });
 
 
@@ -671,6 +683,8 @@ function disableMouseListening() {
 
     window.annotationContainer.getAllAnnotations().forEach(r => {
         r.disableViewMode();
+        r.removeListener('rectmove', handleRectMove);
+        r.removeListener('rectmoveend', handleRectMoveEnd);
     });
 
     document.removeEventListener('mousedown', handleDocumentMousedown);
@@ -697,6 +711,10 @@ export function enableViewMode() {
 
     enableMouseListening();
     setComponenTranslucent(OPACITY_TRANSLUCENT);
+
+    // FIXME
+    // window.addEventListener('rectmove', this.handleRectMove);
+    // window.addEventListener('rectmoveend', this.handleRectMoveEnd);
 }
 export function disableViewMode() {
     console.log('disableViewMode');
@@ -708,4 +726,8 @@ export function disableViewMode() {
 
     disableMouseListening();
     setComponenTranslucent(OPACITY_VISIBLE);
+
+    // FIXME
+    // window.removeEventListener('rectmove', this.handleRectMove);
+    // window.removeEventListener('rectmoveend', this.handleRectMoveEnd);
 }
