@@ -21,15 +21,13 @@ export default class TextAnnotation extends AbstractAnnotation {
     constructor(parent) {
         super();
         this.type     = 'textbox';
-        this.parent   = parent;
+        this.parent   = parent;     // TODO Avoid cycle reference.
         this.x        = 0;
         this.y        = 0;
         this.$element = $('<div class="dummy"/>');
 
         parent.on('hoverin', this.handleParentHoverIn);
         parent.on('hoverout', this.handleParentHoverOut);
-
-        console.log('parent:::::', parent);
     }
 
     render() {
@@ -109,9 +107,8 @@ export default class TextAnnotation extends AbstractAnnotation {
 
             if (text) {
                 this.text = text;
-                // this.save();
                 // TODO Refactoring.
-                this.enableViewMode();
+                this.enableViewMode(); // TODO 大丈夫？
                 this.emit('textchanged', text);
             }
 

@@ -4,24 +4,20 @@
 export default class AnnotationContainer {
 
     constructor() {
-        this.list = [];
+        this.set = new Set();
     }
 
     add(annotation) {
-        this.list.push(annotation);
+        this.set.add(annotation);
     }
 
     remove(annotation) {
-        let newList = [];
-        this.list.forEach(a => {
-            if (annotation !== a) {
-                newList.push(a);
-            }
-        });
-        this.list = newList;
+        this.set.delete(annotation);
     }
 
     getAllAnnotations() {
-        return this.list;
+        let list = [];
+        this.set.forEach(a => list.push(a));
+        return list;
     }
 }

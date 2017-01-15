@@ -145,23 +145,32 @@ function saveRect(rect) {
   let { documentId, pageNumber } = getMetadata(svg);
 
   // Save.
-  PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation).then((annotation) => {
+  let rectAnnotation = RectAnnotation.newInstance(annotation);
+  rectAnnotation.save();
+  // window.annotationContainer.add(rectAnnotation); // TODO move to annotation#save. Make container as SetObject.
 
-    console.log('bbbbbbbbb:', annotation);
+  // Render.
+  rectAnnotation.render();
 
-    // appendChild(svg, annotation);
 
-    let rectAnnotation = RectAnnotation.newInstance(annotation);
-    rectAnnotation.render();
-    window.annotationContainer.add(rectAnnotation);    
+  // TODO Use annotation#save.
+  // PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation).then((annotation) => {
+
+  //   console.log('bbbbbbbbb:', annotation);
+
+  //   // appendChild(svg, annotation);
+
+  //   let rectAnnotation = RectAnnotation.newInstance(annotation);
+  //   rectAnnotation.render();
+  //   window.annotationContainer.add(rectAnnotation);    
 
     // Add an input field.
     let x = annotation.x;
     let y = annotation.y - 20; // 20 = circle'radius(3px) + input height(14px) + α
-    let rect = svg.getBoundingClientRect();
+    let boundingRect = svg.getBoundingClientRect();
 
-    x = scaleUp(svg, {x}).x + rect.left;
-    y = scaleUp(svg, {y}).y + rect.top;
+    x = scaleUp(svg, {x}).x + boundingRect.left;
+    y = scaleUp(svg, {y}).y + boundingRect.top;
 
     addInputField(x, y, null, null, (text) => {
 
@@ -171,7 +180,12 @@ function saveRect(rect) {
         return;
       }
 
-      annotation.text = text;
+      // annotation.text = text;
+
+      rectAnnotation.text = text;
+      rectAnnotation.render();
+      rectAnnotation.save();
+
 
       // Create a text annotation.
       // $(`[data-pdf-annotate-id="${annotation.uuid}"]`).remove();
@@ -179,11 +193,11 @@ function saveRect(rect) {
       // let $elmenet = appendChild(svg, annotation);
 
       // Update data.
-      PDFJSAnnotate.getStoreAdapter().editAnnotation(documentId, annotation.uuid, annotation);
+      // PDFJSAnnotate.getStoreAdapter().editAnnotation(documentId, annotation.uuid, annotation);
 
 
-      rectAnnotation.text = text;
-      rectAnnotation.render();
+      // rectAnnotation.text = text;
+      // rectAnnotation.render();
 
 
       // Save and Update.
@@ -223,7 +237,7 @@ function saveRect(rect) {
 
     }, 'text');
 
-  });
+  // });
 }
 
 /**

@@ -14,6 +14,7 @@ import {
   getSVGLayer  
 } from './utils';
 import { addInputField } from './text';
+import HighlightAnnotation from '../annotation/highlight';
 
 const _type = 'highlight';
 
@@ -104,14 +105,27 @@ function saveRect(rects) {
   };
   
 
-  let { documentId, pageNumber } = getMetadata(svg);
+  // Save.
+  let highlightAnnotation = HighlightAnnotation.newInstance(annotation);
+  highlightAnnotation.save();
+
+  // Render.
+  highlightAnnotation.render();
+
+
+
+
+
+
+  // let { documentId, pageNumber } = getMetadata(svg);
 
   // Add the annotation
-  PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation).then((annotation) => {
+  // PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation).then((annotation) => {
 
-    console.log('annotation:', annotation);
 
-    appendChild(svg, annotation);
+    // console.log('annotation:', annotation);
+
+    // appendChild(svg, annotation);
 
     // Add an input field.
     let x = annotation.rectangles[0].x + 5;  // 5 = boundingRadius(3) + 2
@@ -121,28 +135,34 @@ function saveRect(rects) {
     x = scaleUp(svg, {x}).x + rect.left;
     y = scaleUp(svg, {y}).y + rect.top;
 
-    addInputField(x, y, null, null, (textAnnotation) => {
+    addInputField(x, y, null, null, (text) => {
 
-      if (!textAnnotation) {
+      if (!text) {
         return;
       }
 
+      highlightAnnotation.text = text;
+      highlightAnnotation.render();
+      highlightAnnotation.save();
+      // annotation.text = text;
+
       // FIXME: cannot stop refarence counter. I wanna use the original `annotation`, but couldn't.
-      PDFJSAnnotate.getStoreAdapter().getAnnotation(documentId, annotation.uuid).then(annotation => {
+      // PDFJSAnnotate.getStoreAdapter().getAnnotation(documentId, annotation.uuid).then(annotation => {
 
-        // Set relation between arrow and text.
-        annotation.text = textAnnotation.uuid;
 
-        // Update data.
-        PDFJSAnnotate.getStoreAdapter().editAnnotation(documentId, annotation.uuid, annotation);
+      //   // // Set relation between arrow and text.
+      //   // annotation.text = textAnnotation.uuid;
 
-        // Update UI.
-        $(`[data-pdf-annotate-id="${annotation.uuid}"]`).attr('data-text', textAnnotation.uuid);
+      //   // // Update data.
+      //   // PDFJSAnnotate.getStoreAdapter().editAnnotation(documentId, annotation.uuid, annotation);
 
-      });
-    });
+      //   // // Update UI.
+      //   // $(`[data-pdf-annotate-id="${annotation.uuid}"]`).attr('data-text', textAnnotation.uuid);
 
-  });
+      // });
+    }, 'text');
+
+  // });
 }
 
 /**

@@ -1,5 +1,6 @@
 import assign from 'deep-assign';
 import appendChild from '../render/appendChild';
+import uuid from '../utils/uuid';
 import { getSVGLayer } from '../UI/utils';
 import { addInputField } from '../UI/text';
 import { enableViewMode, disableViewMode } from '../UI/view';
@@ -14,7 +15,7 @@ import {
     enableUserSelect
 } from '../UI/utils';
 
-// TODO Text should be an another annotation class.
+// TODO Refactoring - remove text implements.
 
 
 /**
@@ -30,7 +31,7 @@ export default class RectAnnotation extends AbstractAnnotation {
         this.y        = 0;
         this.width    = 0;
         this.height   = 0;
-        this.text     = 0;
+        this.text     = null;
         this.color    = null;
         this.readOnly = false;
         this.$element = $('<div class="dummy"/>');
@@ -43,7 +44,7 @@ export default class RectAnnotation extends AbstractAnnotation {
 
     static newInstance(annotation) {
         let rect      = new RectAnnotation();
-        rect.uuid     = annotation.uuid;
+        rect.uuid     = annotation.uuid || uuid();
         rect.x        = annotation.x;
         rect.y        = annotation.y;
         rect.width    = annotation.width;
@@ -95,6 +96,7 @@ export default class RectAnnotation extends AbstractAnnotation {
                 PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, 1, a);
             }
         });
+        window.annotationContainer.add(this);
     }
 
     deleteSelectedAnnotation() {
@@ -107,6 +109,8 @@ export default class RectAnnotation extends AbstractAnnotation {
             PDFJSAnnotate.getStoreAdapter().deleteAnnotation(documentId, this.uuid).then(() => {
                 console.log('deleted');
             });
+            this.textAnnotation.destroy();
+            window.annotationContainer.remove(this);
         
         } else if (this.$element.find('.anno-text').hasClass('--selected')) {
             this.text = null;
@@ -290,18 +294,20 @@ export default class RectAnnotation extends AbstractAnnotation {
 
     enableViewMode() {
 
-        this.$element.find('rect, text').hover(
+        // this.$element.addClass('anno-viewmode');
+
+        this.$element.find('rect, circle').hover(
             this.handleHoverInEvent, 
             this.handleHoverOutEvent
         );
 
         if (!this.readOnly) {
 
-            this.$element.find('.anno-rect').off('click', this.handleClickRectEvent).on('click', this.handleClickRectEvent);
-            this.$element.find('text').off('click', this.handleClickTextEvent).on('click', this.handleClickTextEvent);
-            this.$element.find('text').off('dbclick', this.handleDoubleClickTextEvent).on('dbclick', this.handleDoubleClickTextEvent);
+            this.$element.find('.anno-rect, circle').off('click', this.handleClickRectEvent).on('click', this.handleClickRectEvent);
+            // this.$element.find('text').off('click', this.handleClickTextEvent).on('click', this.handleClickTextEvent);
+            // this.$element.find('text').off('dbclick', this.handleDoubleClickTextEvent).on('dbclick', this.handleDoubleClickTextEvent);
 
-            this.$element.find('.anno-rect').off('mousedown', this.handleMouseDownOnRect).on('mousedown', this.handleMouseDownOnRect);
+            this.$element.find('.anno-rect, circle').off('mousedown', this.handleMouseDownOnRect).on('mousedown', this.handleMouseDownOnRect);
          
         }
 
@@ -309,10 +315,13 @@ export default class RectAnnotation extends AbstractAnnotation {
     }
 
     disableViewMode() {
-        this.$element.find('rect, text').off('mouseenter mouseleave');
+
+        // this.$element.removeClass('anno-viewmode');
+
+        this.$element.find('rect, circle').off('mouseenter mouseleave');
         this.$element.find('.anno-rect').off('click', this.handleClickRectEvent);
-        this.$element.find('text').off('click', this.handleClickTextEvent);
-        this.$element.find('text').off('dbclick', this.handleDoubleClickTextEvent);
+        // this.$element.find('text').off('click', this.handleClickTextEvent);
+        // this.$element.find('text').off('dbclick', this.handleDoubleClickTextEvent);
 
         this.$element.find('.anno-rect').off('mousedown', this.handleMouseDownOnRect);
 

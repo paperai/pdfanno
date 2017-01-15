@@ -630,12 +630,18 @@ function initializeMonitoringAnnotations() {
 
     // Components for monitoring.
     forEach.call(document.querySelectorAll('svg > g > [type="boundingCircle"]'), boundingCircle => {
-        monitoringCircles.push(boundingCircle);
+        console.log('aaaaaaa:', boundingCircle.parentNode.getAttribute('data-pdf-annotate-type'));
+        if (boundingCircle.parentNode.getAttribute('data-pdf-annotate-type') !== 'area') {
+            console.log('bbbbb');
+            monitoringCircles.push(boundingCircle);            
+        } else {
+            console.log('ccccc');
+        }
     });
+    console.log('monitoringCircles:', monitoringCircles.length);
     // Texts.
     forEach.call(document.querySelectorAll('svg > [data-pdf-annotate-type="textbox"] > rect'), rect => {
         if (rect.parentNode.getAttribute('data-pdf-annotate-id') !== 'undefined') {
-            console.log('bbbbbbb:', rect.parentNode.getAttribute('data-pdf-annotate-id'));
             monitoringTexts.push(rect);            
         }
     });
