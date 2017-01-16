@@ -302,8 +302,8 @@ export default class RectAnnotation extends AbstractAnnotation {
     }
 
     disableViewMode() {
-        this.$element.find('.anno-rect').off('click', this.handleClickRectEvent);
-        this.$element.find('.anno-rect').off('mousedown', this.handleMouseDownOnRect);
+        this.$element.find('.anno-rect, circle').off('click', this.handleClickRectEvent);
+        this.$element.find('.anno-rect, circle').off('mousedown', this.handleMouseDownOnRect);
         this.textAnnotation.disableViewMode();
     }
 

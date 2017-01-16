@@ -214,12 +214,17 @@ export function enableArrow(arrowType='one-way') {
 
   window.annotationContainer.getAllAnnotations().forEach(a => {
 
-    if (a.readOnly) {
-      a.hideBoundingCircle();
+    if (a.hasBoundingCircle()) {
 
-    } else {
-      a.on('circlehoverin', handleBoundingCircleHoverIn);
-      a.on('circlehoverout', handleBoundingCircleHoverOut);
+      console.log('a.readOnly', a.readOnly);
+
+      if (a.readOnly) {
+        a.hideBoundingCircle();
+
+      } else {
+        a.on('circlehoverin', handleBoundingCircleHoverIn);
+        a.on('circlehoverout', handleBoundingCircleHoverOut);
+      }
     }
 
   });
@@ -242,12 +247,16 @@ export function disableArrow() {
 
   window.annotationContainer.getAllAnnotations().forEach(a => {
 
-    if (a.readOnly) {
-      a.showBoundingCircle();
+    if (a.hasBoundingCircle()) {
 
-    } else {
-      a.removeListener('circlehoverin', handleBoundingCircleHoverIn);
-      a.removeListener('circlehoverout', handleBoundingCircleHoverOut);
+      if (a.readOnly) {
+        a.showBoundingCircle();
+
+      } else {
+        a.removeListener('circlehoverin', handleBoundingCircleHoverIn);
+        a.removeListener('circlehoverout', handleBoundingCircleHoverOut);
+      }
+
     }
 
   });

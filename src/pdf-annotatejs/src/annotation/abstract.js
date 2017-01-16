@@ -32,4 +32,9 @@ export default class AbstractAnnotation extends EventEmitter {
           this.$element.addClass('--viewMode');
          }
     }
+
+    hasBoundingCircle() {
+        return this.$element.find('circle').length > 0;
+    }
+
 }
