@@ -1,4 +1,3 @@
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 <p align="center"><img src="https://github.com/paperai/pdfanno/blob/master/pdfanno.png" width="750"></p>
 
 # PDFAnno
@@ -24,13 +23,13 @@ Then,
 PDFAnno does NOT automatically save the user's annotation.  
 
 ### Annotation Tools
-* <i class="fa fa-mouse-pointer"></i>: Selection tool.
-* <i class="fa fa-pencil"></i>: Span highlighting.
-* <i class="fa fa-long-arrow-right"></i>: One-way relation. This is used for annotating dependency relation between spans.
-* <i class="fa fa-arrows-h"></i>: Two-way relation.
-* <i class="fa fa-minus"></i>: Link relation. If you want to add non-directional relation between spans, use this.
-* <i class="fa fa-square-o"></i>: Rectangle.
-* <i class="fa fa-download"></i>: Download the annotation file.
+* ![](https://github.com/paperai/pdfanno/blob/master/icons/fa-mouse-pointer.png): Selection tool.
+* ![](https://github.com/paperai/pdfanno/blob/master/icons/fa-pencil.png): Span highlighting.
+* ![](https://github.com/paperai/pdfanno/blob/master/icons/fa-long-arrow-right.png): One-way relation. This is used for annotating dependency relation between spans.
+* ![](https://github.com/paperai/pdfanno/blob/master/icons/fa-arrows-h.png): Two-way relation.
+* ![](https://github.com/paperai/pdfanno/blob/master/icons/fa-minus.png): Link relation. If you want to add non-directional relation between spans, use this.
+* ![](https://github.com/paperai/pdfanno/blob/master/icons/fa-square-o.png): Rectangle.
+* ![](https://github.com/paperai/pdfanno/blob/master/icons/fa-download.png): Download the annotation file.
 * DEL: Delete all of current annotations.
 
 ### Annotation File (.anno)
