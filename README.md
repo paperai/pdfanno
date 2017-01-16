@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 <p align="center"><img src="https://github.com/paperai/pdfanno/blob/master/pdfanno.png" width="750"></p>
 
 # PDFAnno
