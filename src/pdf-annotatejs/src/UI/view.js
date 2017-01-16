@@ -1,5 +1,8 @@
 import $ from 'jquery';
 
+/**
+ * Prevent page-back behavior.
+ */
 function handleDocumentKeydown(e) {
     // Delete or BackSpace.
     if (e.keyCode == 46 || e.keyCode == 8) {
@@ -8,6 +11,9 @@ function handleDocumentKeydown(e) {
     }
 }
 
+/**
+ * Delete selected annotations, and prevent page-back behavior.
+ */
 function handleDocumentKeyup(e) {
     // Delete or BackSpace.
     if (e.keyCode == 46 || e.keyCode == 8) {
@@ -24,6 +30,9 @@ function deleteSelectedAnnotations() {
     window.globalEvent.emit('deleteSelectedAnnotation');
 }
 
+/**
+ * Set annotations' translucent state.
+ */
 function setComponenTranslucent(translucent) {
 
     if (translucent) {
@@ -34,14 +43,23 @@ function setComponenTranslucent(translucent) {
     }
 }
 
+/**
+ * Make annotations view mode.
+ */
 function setAnnotationViewMode() {
     window.globalEvent.emit('enableViewMode');
 }
 
+/**
+ * Make annotations NOT view mode.
+ */
 function resetAnnotationViewMode() {
     window.globalEvent.emit('disableViewMode');
 }
 
+/**
+ * Enable view mode.
+ */
 export function enableViewMode() {
     this.disableViewMode();
     setComponenTranslucent(true);
@@ -50,6 +68,9 @@ export function enableViewMode() {
     document.addEventListener('keydown', handleDocumentKeydown);
 }
 
+/**
+ * Disable view mode.
+ */
 export function disableViewMode() {
     setComponenTranslucent(false);
     resetAnnotationViewMode();
