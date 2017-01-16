@@ -56,12 +56,12 @@ export default class RectAnnotation extends AbstractAnnotation {
         return rect;
     }
 
-    render() {
-         this.$element.remove();
-         this.$element = $(appendChild(getSVGLayer(), this));
-         this.setHoverEvent();
-         this.textAnnotation.render();
-    }
+    // render() {
+    //      this.$element.remove();
+    //      this.$element = $(appendChild(getSVGLayer(), this));
+    //      this.setHoverEvent();
+    //      this.textAnnotation.render();
+    // }
 
     setHoverEvent() {
         this.$element.find('rect, circle').hover(

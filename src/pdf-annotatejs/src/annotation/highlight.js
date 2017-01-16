@@ -48,12 +48,12 @@ export default class HighlightAnnotation extends AbstractAnnotation {
         return highlight;        
     }
 
-    render() {
-         this.$element.remove();
-         this.$element = $(appendChild(getSVGLayer(), this));
-         this.setHoverEvent();
-         this.textAnnotation.render();
-    }
+    // render() {
+    //      this.$element.remove();
+    //      this.$element = $(appendChild(getSVGLayer(), this));
+    //      this.setHoverEvent();
+    //      this.textAnnotation.render();
+    // }
 
     setHoverEvent() {
         this.$element.find('circle').hover(

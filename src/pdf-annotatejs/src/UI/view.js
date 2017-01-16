@@ -66,6 +66,8 @@ export function enableViewMode() {
     setAnnotationViewMode();
     document.addEventListener('keyup', handleDocumentKeyup);
     document.addEventListener('keydown', handleDocumentKeydown);
+
+    window.viewMode = true;
 }
 
 /**
@@ -76,4 +78,6 @@ export function disableViewMode() {
     resetAnnotationViewMode();
     document.removeEventListener('keyup', handleDocumentKeyup);
     document.removeEventListener('keydown', handleDocumentKeydown);
+
+    window.viewMode = false;
 }

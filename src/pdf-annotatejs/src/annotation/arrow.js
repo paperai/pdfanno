@@ -105,6 +105,8 @@ export default class ArrowAnnotation extends AbstractAnnotation {
             this.y2 = p.y;
         }
 
+        super.render();
+
         // console.log('render:', this);
 
         // if (this.rel1Annotation && this.rel2Annotation) {
@@ -114,9 +116,9 @@ export default class ArrowAnnotation extends AbstractAnnotation {
         //     // Here used at UI/arrow.js for tmp rendering.
         // }
 
-        this.$element.remove();
-        this.$element = $(appendChild(getSVGLayer(), this));
-        this.textAnnotation.render();
+        // this.$element.remove();
+        // this.$element = $(appendChild(getSVGLayer(), this));
+        // this.textAnnotation.render();
 
         // console.log('render:', this.$element);
     }

@@ -34,9 +34,10 @@ export default class TextAnnotation extends AbstractAnnotation {
             assign(this, this.parent.getTextPosition());
             this.text = this.parent.text;
             this.color = this.parent.color;
-            this.$element.remove();
-            this.$element = $(appendChild(getSVGLayer(), this));    
-            this.setHoverEvent();        
+            super.render();
+            // this.$element.remove();
+            // this.$element = $(appendChild(getSVGLayer(), this));    
+            // this.setHoverEvent();        
         }
     }
 
