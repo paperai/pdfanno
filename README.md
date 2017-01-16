@@ -1,9 +1,9 @@
 <p align="center"><img src="https://github.com/paperai/paperanno/blob/master/paperanno.png" width="750"></p>
 
-# PaperAnno
-PaperAnno is a web-based annotation tool for PDF documents.  
+# PDFAnno
+PDFAnno is a web-based linguistic annotation tool for PDF documents.  
 It offers functions for various types of linguistic annotations, including part-of-speech, named entity, dependency relation, and coreference chain.  
-[demo](https://paperai.github.io/paperanno/)
+[demo](https://paperai.github.io/pdfanno/)
 
 ## Features
 * Simple and easy-to-use user interface
@@ -12,10 +12,10 @@ It offers functions for various types of linguistic annotations, including part-
 * Multi-user support
 
 ## Usage
-Visit our [demo](https://paperai.github.io/paperanno/).
+Visit our [demo](https://paperai.github.io/pdfanno/).
 
 ## Developer's Guide
-PaperAnno is an extension of the following libraries:
+PDFAnno is an extension of the following libraries:
 * [pdf.js](https://github.com/mozilla/pdf.js)
 * [pdf-annotate.js](https://github.com/instructure/pdf-annotate.js/)
 
