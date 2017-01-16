@@ -15,9 +15,6 @@ import {
     enableUserSelect
 } from '../UI/utils';
 
-// TODO ここから
-// Hightlightの追加処理はOK（テキストの扱いが変わっているかは確認、html上とannoファイル上、テキスト表示される？）
-// UI的なイベント処理はこれから実装する.
 
 export default class HighlightAnnotation extends AbstractAnnotation {
 
@@ -31,6 +28,10 @@ export default class HighlightAnnotation extends AbstractAnnotation {
         this.readOnly = null;
         this.$element = $('<div class="dummy"/>');
 
+        window.globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
+        window.globalEvent.on('enableViewMode', this.enableViewMode);
+        window.globalEvent.on('disableViewMode', this.disableViewMode);
+
         this.textAnnotation = new TextAnnotation(this);
         this.textAnnotation.on('hoverin', this.handleTextHoverIn);
         this.textAnnotation.on('hoverout', this.handleTextHoverOut);
@@ -39,11 +40,11 @@ export default class HighlightAnnotation extends AbstractAnnotation {
 
     static newInstance(annotation) {
         let highlight      = new HighlightAnnotation();
-        highlight.uuid     = annotation.uuid || uuid();;
+        highlight.uuid     = annotation.uuid || uuid();
         highlight.rectangles = annotation.rectangles;
         highlight.text     = annotation.text;
         highlight.color    = annotation.color;
-        highlight.readOnly = annotation.readOnly;
+        highlight.readOnly = annotation.readOnly || false;
         return highlight;        
     }
 
@@ -119,7 +120,7 @@ export default class HighlightAnnotation extends AbstractAnnotation {
         if (this.rectangles.length > 0) {
 
             return {
-                x : this.rectangles[0].x + 7, // 7 = DEFAULT_RADIUS + 2
+                x : this.rectangles[0].x + 7,
                 y : this.rectangles[0].y - 20
             };
 
@@ -167,71 +168,10 @@ export default class HighlightAnnotation extends AbstractAnnotation {
         this.emit('hoverout');
     }
 
-    // handleTextChanged(textAfter) {
-    //     this.text = textAfter;
-    //     this.save();
-    // }
-
-    // handleHoverInEvent(e) {
-    //     this.highlight();
-    //     this.emit('hoverin');
-
-    //     let $elm = $(e.currentTarget);
-    //     if ($elm.prop("tagName") === 'circle') {
-    //         this.emit('circlehoverin', this);
-    //     }
-    // }
-
-    // handleHoverOutEvent(e) {
-    //     this.dehighlight();
-    //     this.emit('hoverout');
-
-    //     let $elm = $(e.currentTarget);
-    //     if ($elm.prop("tagName") === 'circle') {
-    //         this.emit('circlehoverout', this);
-    //     }
-    // }
-
-    // handleTextHoverIn() {
-    //     // TODO Refactoring CSS.
-    //     this.$element.find('rect').addClass('--hover');
-    //     this.$element.addClass('--emphasis');
-    //     // if (window.viewMode) {
-    //     //     this.$element.css('opacity', 1);
-    //     // }
-    // }
-
-    // handleTextHoverOut() {
-    //     // TODO Refactoring CSS.
-    //     this.$element.find('rect').removeClass('--hover');
-    //     this.$element.removeClass('--emphasis');
-    //     // if (window.viewMode) {
-    //     //     this.$element.css('opacity', 0.5);
-    //     // }
-    // }
-
     handleTextChanged(textAfter) {
         this.text = textAfter;
         this.save();
     }
-
-    // handleHoverInEvent(e) {
-    //     this.highlight();
-
-    //     let $elm = $(e.currentTarget);
-    //     if ($elm.prop("tagName") === 'circle') {
-    //         this.emit('circlehoverin', this);
-    //     }
-    // }
-
-    // handleHoverOutEvent(e) {
-    //     this.dehighlight();
-
-    //     let $elm = $(e.currentTarget);
-    //     if ($elm.prop("tagName") === 'circle') {
-    //         this.emit('circlehoverout', this);
-    //     }
-    // }
 
     handleHoverInEvent(e) {
         this.highlight();
@@ -259,26 +199,15 @@ export default class HighlightAnnotation extends AbstractAnnotation {
 
     enableViewMode() {
 
-        // this.$element.find('cirle').off();
-        // this.$element.find('circle').hover(
-        //     this.handleHoverInEvent,
-        //     this.handleHoverOutEvent
-        // );
         this.textAnnotation.enableViewMode();
 
         if (!this.readOnly) {
             this.$element.find('circle').off('click').on('click', this.handleClickEvent);
         }
-
-
     }
 
     disableViewMode() {
-        
-        // this.$element.find('circle').off('mouseenter mouseleave');
-
         this.$element.find('circle').off('click', this.handleClickEvent);
         this.textAnnotation.disableViewMode();
     }
-
 }

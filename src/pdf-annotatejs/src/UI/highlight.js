@@ -1,27 +1,11 @@
 import $ from 'jquery';
-import PDFJSAnnotate from '../PDFJSAnnotate';
-import appendChild from '../render/appendChild';
 import {
-  BORDER_COLOR,
-  disableUserSelect,
-  enableUserSelect,
-  findSVGAtPoint,
-  getMetadata,
-  getOffset,
   scaleDown,
   scaleUp,
-  getXY,
   getSVGLayer  
 } from './utils';
 import { addInputField } from './text';
 import HighlightAnnotation from '../annotation/highlight';
-
-const _type = 'highlight';
-
-let _enabled = false;
-let overlay;
-let originY;
-let originX;
 
 /**
  * Get the current window selection as rects
@@ -85,15 +69,10 @@ function removeSelection() {
 function saveRect(rects) {
 
   let svg = getSVGLayer();
-  let node;
-  let annotation;
-
   let boundingRect = svg.getBoundingClientRect();
 
-
   // Initialize the annotation
-  annotation = {
-    type : _type,
+  let annotation = {
     rectangles: [...rects].map((r) => {
       return scaleDown(svg, {
         x      : r.left - boundingRect.left,
@@ -104,7 +83,6 @@ function saveRect(rects) {
     }).filter((r) => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1)
   };
   
-
   // Save.
   let highlightAnnotation = HighlightAnnotation.newInstance(annotation);
   highlightAnnotation.save();
@@ -123,10 +101,6 @@ function saveRect(rects) {
 
   addInputField(x, y, null, null, (text) => {
 
-    if (!text) {
-      return;
-    }
-
     highlightAnnotation.text = text;
     highlightAnnotation.render();
     highlightAnnotation.save();
@@ -136,23 +110,16 @@ function saveRect(rects) {
 }
 
 /**
- * Enable rect behavior
+ * Enable hightlight behavior.
  */
-export function enableHighlight() {
-  
-  if (_enabled) { return; }
-
-  _enabled = true;
+export function enableHighlight() {  
+  document.removeEventListener('mouseup', handleDocumentMouseup);
   document.addEventListener('mouseup', handleDocumentMouseup);
 }
 
 /**
- * Disable rect behavior
+ * Disable hightlight behavior.
  */
 export function disableHighlight() {
-
-  if (!_enabled) { return; }
-
-  _enabled = false;
   document.removeEventListener('mouseup', handleDocumentMouseup);
 }

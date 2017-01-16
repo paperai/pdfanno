@@ -33,6 +33,10 @@ export default class RectAnnotation extends AbstractAnnotation {
         this.readOnly = false;
         this.$element = $('<div class="dummy"/>');
 
+        window.globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
+        window.globalEvent.on('enableViewMode', this.enableViewMode);
+        window.globalEvent.on('disableViewMode', this.disableViewMode);
+
         this.textAnnotation = new TextAnnotation(this);
         this.textAnnotation.on('hoverin', this.handleTextHoverIn);
         this.textAnnotation.on('hoverout', this.handleTextHoverOut);
@@ -48,7 +52,7 @@ export default class RectAnnotation extends AbstractAnnotation {
         rect.height   = annotation.height;
         rect.text     = annotation.text;
         rect.color    = annotation.color;
-        rect.readOnly = annotation.readOnly;
+        rect.readOnly = annotation.readOnly || false;
         return rect;
     }
 
@@ -190,18 +194,7 @@ export default class RectAnnotation extends AbstractAnnotation {
     }
 
     handleClickRectEvent() {
-        console.log('handleClickRectEvent!!!!!');
-        // TODO Refactoring.
         this.$element.find('.anno-rect').toggleClass('--selected');
-        // if (this.$element.find('.anno-rect').hasClass('--selected')) {
-        //     // if (window.viewMode) {
-        //     //     this.$element.css('opacity', 1);
-        //     // }
-        // } else {
-        //     if (window.viewMode) {
-        //         this.$element.css('opacity', 0.5);
-        //     }
-        // }
     }
 
     handleDoubleClickTextEvent() {

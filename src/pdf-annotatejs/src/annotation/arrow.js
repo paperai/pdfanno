@@ -38,6 +38,10 @@ export default class ArrowAnnotation extends AbstractAnnotation {
         this.x2 = 0;
         this.y2 = 0;
 
+        window.globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
+        window.globalEvent.on('enableViewMode', this.enableViewMode);
+        window.globalEvent.on('disableViewMode', this.disableViewMode);
+
         this.textAnnotation = new TextAnnotation(this);
         this.textAnnotation.on('hoverin', this.handleTextHoverIn);
         this.textAnnotation.on('hoverout', this.handleTextHoverOut);
@@ -52,7 +56,7 @@ export default class ArrowAnnotation extends AbstractAnnotation {
         a.rel2Annotation = window.annotationContainer.findById(annotation.rel2);
         a.text           = annotation.text;
         a.color          = annotation.color;
-        a.readOnly       = annotation.readOnly;
+        a.readOnly       = annotation.readOnly || false;
 
         return a;
     }
@@ -252,33 +256,12 @@ export default class ArrowAnnotation extends AbstractAnnotation {
         this.highlight();
         this.emit('hoverin');
         this.highlightRelAnnotations();
-
-        // this.$element.find('path').addClass('--hover');
-        // this.$element.addClass('--emphasis');
-        // // // TODO Refactoring.
-        // // if (window.viewMode) {
-        // //     this.$element.css('opacity', 1);
-        // // }
-        // this.emit('hoverin');
-
-        // this.highlightRelAnnotations();
     }
 
     handleHoverOutEvent() {
-
         this.dehighlight();
         this.emit('hoverout');
         this.dehighlightRelAnnotations();
-
-        // this.$element.find('path').removeClass('--hover');
-        // this.$element.removeClass('--emphasis');
-        // // // TODO Refactoring.
-        // // if (window.viewMode) {
-        // //     this.$element.css('opacity', 0.5);
-        // // }
-        // this.emit('hoverout');
-
-        // this.dehighlightRelAnnotations();
     }    
 
     handleClickEvent() {

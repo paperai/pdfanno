@@ -26,8 +26,7 @@ export default class TextAnnotation extends AbstractAnnotation {
         this.y        = 0;
         this.$element = $('<div class="dummy"/>');
 
-        // parent.on('hoverin', this.handleParentHoverIn);
-        // parent.on('hoverout', this.handleParentHoverOut);
+        window.globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
     }
 
     render() {
@@ -74,28 +73,17 @@ export default class TextAnnotation extends AbstractAnnotation {
 
     handleParentHoverOut() {
         this.dehighlight();
-        // this.$element.removeClass('--hover');
-        // // if (window.viewMode) {
-        // //     this.$element.css('opacity', 0.5);
-        // // }
-        // this.$element.removeClass('--emphasis');
     }
 
     handleHoverInEvent() {
         this.$element.addClass('--hover');
         this.$element.addClass('--emphasis');
-        // if (window.viewMode) {
-        //     this.$element.css('opacity', 1);
-        // }
         this.emit('hoverin');
     }
 
     handleHoverOutEvent() {
         this.$element.removeClass('--hover');
         this.$element.removeClass('--emphasis');
-        // if (window.viewMode) {
-        //     this.$element.css('opacity', 0.5);
-        // }
         this.emit('hoverout');
     }
 

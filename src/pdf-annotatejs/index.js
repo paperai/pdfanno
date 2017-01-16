@@ -1,9 +1,13 @@
 require("!style!css!./pdf-annotate.css");
 import $ from 'jquery';
+import EventEmitter from 'events';
 
 
 // for Convinience.
 window.$ = window.jQuery = $;
+
+window.globalEvent = new EventEmitter();
+
 
 // The entry point of window.xxx.
 // (setting from webpack.config.js)
