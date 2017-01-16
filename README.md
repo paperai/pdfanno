@@ -14,6 +14,7 @@ It offers functions for various types of linguistic annotations, including part-
 ## Usage
 First, visit our online demo.  
 Then,
+
 1. Load your PDF by drag & drop.
 2. Load your annotation file (.anno) if you already have.
 3. Annotate the PDF.
