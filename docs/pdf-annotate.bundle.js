@@ -64,7 +64,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _jquery2 = _interopRequireDefault(_jquery);
 	
-	var _PDFJSAnnotate = __webpack_require__(7);
+	var _events = __webpack_require__(7);
+	
+	var _events2 = _interopRequireDefault(_events);
+	
+	var _PDFJSAnnotate = __webpack_require__(8);
 	
 	var _PDFJSAnnotate2 = _interopRequireDefault(_PDFJSAnnotate);
 	
@@ -72,11 +76,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _container2 = _interopRequireDefault(_container);
 	
-	var _rect = __webpack_require__(48);
+	var _rect = __webpack_require__(46);
 	
 	var _rect2 = _interopRequireDefault(_rect);
 	
-	var _appendChild = __webpack_require__(23);
+	var _highlight = __webpack_require__(51);
+	
+	var _highlight2 = _interopRequireDefault(_highlight);
+	
+	var _arrow = __webpack_require__(53);
+	
+	var _arrow2 = _interopRequireDefault(_arrow);
+	
+	var _appendChild = __webpack_require__(22);
 	
 	var _appendChild2 = _interopRequireDefault(_appendChild);
 	
@@ -87,6 +99,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// for Convinience.
 	window.$ = window.jQuery = _jquery2.default;
+	
+	window.globalEvent = new _events2.default();
 	
 	// The entry point of window.xxx.
 	// (setting from webpack.config.js)
@@ -144,7 +158,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var width = (0, _jquery2.default)('.page').width();
 	
 	    // Add an annotation layer.
-	    var $annoLayer = (0, _jquery2.default)('<svg id="' + svgLayerId + '"/>').css({ // TODO CSSClass.
+	    var $annoLayer = (0, _jquery2.default)('<svg id="' + svgLayerId + '" class="' + svgLayerId + '"/>').css({ // TODO CSSClass.
 	        position: 'absolute',
 	        top: '0px',
 	        left: leftMargin + 'px',
@@ -175,14 +189,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    svg.setAttribute('data-pdf-annotate-document', documentId);
 	    svg.setAttribute('data-pdf-annotate-page', 1);
 	
-	    // Import user uploading annotation, if exists.
-	    if (uploadedAnnotationExists()) {
-	        importUploadedAnnotation().then(function () {
-	            renderAnnotations(svg, 1);
-	        });
-	    } else {
-	        renderAnnotations(svg, 1);
-	    }
+	    renderAnnotations(svg, 1);
 	}
 	
 	function renderAnnotations(svg, pageNumber) {
@@ -195,27 +202,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            // Render annotations.
 	            var viewport = PDFView.pdfViewer.getPageView(0).viewport;
-	            // PDFAnnotate.render(svg, viewport, annotations).then((svg, elements) => {
-	
-	            //     for (let i = 0; i < annotations.length; i++) {
-	
-	            //     }
-	
-	
-	            //     // var event = document.createEvent('CustomEvent');
-	            //     // event.initCustomEvent('annotationrendered', true, true, {
-	            //     //   pageNumber: pageNumber
-	            //     // });
-	            //     // window.dispatchEvent(event);
-	
-	            // });
 	
 	            annotations.annotations.forEach(function (a) {
 	
+	                // TODO move to annotation/index.js
 	                if (a.type === 'area') {
 	                    var rect = _rect2.default.newInstance(a);
 	                    rect.render();
 	                    window.annotationContainer.add(rect);
+	                } else if (a.type === 'highlight') {
+	                    var highlight = _highlight2.default.newInstance(a);
+	                    highlight.render();
+	                    window.annotationContainer.add(highlight);
+	                } else if (a.type === 'arrow') {
+	                    var arrowAnnotation = _arrow2.default.newInstance(a);
+	                    arrowAnnotation.render();
+	                    window.annotationContainer.add(arrowAnnotation);
 	                } else {
 	                    (0, _appendChild2.default)(svg, a);
 	                }
@@ -228,41 +230,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            window.dispatchEvent(event);
 	        });
 	    });
-	}
-	
-	function uploadedAnnotationExists() {
-	    var item = localStorage.getItem('_pdfanno_pdfanno_upload');
-	    var itemSecondary = localStorage.getItem('_pdfanno_pdfanno_upload_second');
-	    return item || itemSecondary;
-	}
-	
-	function importUploadedAnnotation() {
-	
-	    var actions = [];
-	
-	    // Primary Annotation.
-	    if (localStorage.getItem('_pdfanno_pdfanno_upload')) {
-	        console.log('LOAD PRIMARY');
-	        var annotations = JSON.parse(localStorage.getItem('_pdfanno_pdfanno_upload'));
-	        console.log('importUploadedAnnotation:', annotations);
-	        var promise = PDFAnnotate.getStoreAdapter().importData(annotations).then(function () {
-	            localStorage.removeItem('_pdfanno_pdfanno_upload');
-	        });
-	        actions.push(promise);
-	    }
-	
-	    // Seconday Annotations.
-	    if (localStorage.getItem('_pdfanno_pdfanno_upload_second')) {
-	        console.log('LOAD SECONDARY');
-	        var secondAnnotations = JSON.parse(localStorage.getItem('_pdfanno_pdfanno_upload_second'));
-	        console.log('secondAnnotations:', secondAnnotations);
-	        var _promise = PDFAnnotate.getStoreAdapter().importDataSecondary(secondAnnotations).then(function () {
-	            localStorage.removeItem('_pdfanno_pdfanno_upload_second');
-	        });
-	        actions.push(_promise);
-	    }
-	
-	    return Promise.all(actions);
 	}
 	
 	function setupPDFDragAndDropLoader() {
@@ -281,8 +248,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	setupPDFDragAndDropLoader();
 	
 	function handleDroppedFile(e) {
-	
-	    console.log('bbbbbbbbbbbbb');
 	
 	    var event = document.createEvent('CustomEvent');
 	    event.initCustomEvent('pdfdropped', true, true, { originalEvent: e.originalEvent });
@@ -10868,644 +10833,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 7 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _StoreAdapter = __webpack_require__(8);
-	
-	var _StoreAdapter2 = _interopRequireDefault(_StoreAdapter);
-	
-	var _LocalStoreAdapter = __webpack_require__(14);
-	
-	var _LocalStoreAdapter2 = _interopRequireDefault(_LocalStoreAdapter);
-	
-	var _PdfannoStoreAdapter = __webpack_require__(16);
-	
-	var _PdfannoStoreAdapter2 = _interopRequireDefault(_PdfannoStoreAdapter);
-	
-	var _render = __webpack_require__(22);
-	
-	var _render2 = _interopRequireDefault(_render);
-	
-	var _UI = __webpack_require__(42);
-	
-	var _UI2 = _interopRequireDefault(_UI);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	__webpack_require__(54);
-	
-	exports.default = {
-	  /**
-	   * Abstract class that needs to be defined so PDFJSAnnotate
-	   * knows how to communicate with your server.
-	   */
-	  StoreAdapter: _StoreAdapter2.default,
-	
-	  /**
-	   * Implementation of StoreAdapter that stores annotation data to localStorage.
-	   */
-	  LocalStoreAdapter: _LocalStoreAdapter2.default,
-	
-	  /**
-	    Implementation of StoreAdapter for PDFAnno.
-	  */
-	  PdfannoStoreAdapter: _PdfannoStoreAdapter2.default,
-	
-	  /**
-	   * Abstract instance of StoreAdapter
-	   */
-	  __storeAdapter: new _StoreAdapter2.default(),
-	
-	  /**
-	   * Getter for the underlying StoreAdapter property
-	   *
-	   * @return {StoreAdapter}
-	   */
-	  getStoreAdapter: function getStoreAdapter() {
-	    return this.__storeAdapter;
-	  },
-	
-	
-	  /**
-	   * Setter for the underlying StoreAdapter property
-	   *
-	   * @param {StoreAdapter} adapter The StoreAdapter implementation to be used.
-	   */
-	  setStoreAdapter: function setStoreAdapter(adapter) {
-	    // TODO this throws an error when bundled
-	    // if (!(adapter instanceof StoreAdapter)) {
-	    //   throw new Error('adapter must be an instance of StoreAdapter');
-	    // }
-	
-	    this.__storeAdapter = adapter;
-	  },
-	
-	
-	  /**
-	   * UI is a helper for instrumenting UI interactions for creating,
-	   * editing, and deleting annotations in the browser.
-	   */
-	  UI: _UI2.default,
-	
-	  /**
-	   * Render the annotations for a page in the PDF Document
-	   *
-	   * @param {SVGElement} svg The SVG element that annotations should be rendered to
-	   * @param {PageViewport} viewport The PDFPage.getViewport data
-	   * @param {Object} data The StoreAdapter.getAnnotations data
-	   * @return {Promise}
-	   */
-	  render: _render2.default,
-	
-	  /**
-	   * Convenience method for getting annotation data
-	   *
-	   * @alias StoreAdapter.getAnnotations
-	   * @param {String} documentId The ID of the document
-	   * @param {String} pageNumber The page number
-	   * @return {Promise}
-	   */
-	  getAnnotations: function getAnnotations(documentId, pageNumber) {
-	    var _getStoreAdapter;
-	
-	    return (_getStoreAdapter = this.getStoreAdapter()).getAnnotations.apply(_getStoreAdapter, arguments);
-	  }
-	};
-	module.exports = exports['default'];
-
-/***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _abstractFunction = __webpack_require__(9);
-	
-	var _abstractFunction2 = _interopRequireDefault(_abstractFunction);
-	
-	var _event = __webpack_require__(10);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	// Adapter should never be invoked publicly
-	var StoreAdapter = function () {
-	  /**
-	   * Create a new StoreAdapter instance
-	   *
-	   * @param {Object} [definition] The definition to use for overriding abstract methods
-	   */
-	  function StoreAdapter() {
-	    var _this = this;
-	
-	    var definition = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-	
-	    _classCallCheck(this, StoreAdapter);
-	
-	    // Copy each function from definition if it is a function we know about
-	    Object.keys(definition).forEach(function (key) {
-	      if (typeof definition[key] === 'function' && typeof _this[key] === 'function') {
-	        _this[key] = definition[key];
-	      }
-	    });
-	  }
-	
-	  /**
-	   * Get all the annotations for a given document and page number.
-	   *
-	   * @param {String} documentId The ID for the document the annotations belong to
-	   * @param {Number} pageNumber The number of the page the annotations belong to
-	   * @return {Promise}
-	   */
-	
-	
-	  _createClass(StoreAdapter, [{
-	    key: '__getAnnotations',
-	    value: function __getAnnotations(documentId, pageNumber) {
-	      (0, _abstractFunction2.default)('getAnnotations');
-	    }
-	  }, {
-	    key: '__getSecondaryAnnotations',
-	    value: function __getSecondaryAnnotations(documentId, pageNumber) {
-	      (0, _abstractFunction2.default)('getSecondaryAnnotations');
-	    }
-	  }, {
-	    key: 'getAnnotation',
-	
-	
-	    /**
-	     * Get the definition for a specific annotation.
-	     *
-	     * @param {String} documentId The ID for the document the annotation belongs to
-	     * @param {String} annotationId The ID for the annotation
-	     * @return {Promise}
-	     */
-	    value: function getAnnotation(documentId, annotationId) {
-	      (0, _abstractFunction2.default)('getAnnotation');
-	    }
-	
-	    /**
-	     * Add an annotation
-	     *
-	     * @param {String} documentId The ID for the document to add the annotation to
-	     * @param {String} pageNumber The page number to add the annotation to
-	     * @param {Object} annotation The definition for the new annotation
-	     * @return {Promise}
-	     */
-	
-	  }, {
-	    key: '__addAnnotation',
-	    value: function __addAnnotation(documentId, pageNumber, annotation) {
-	      (0, _abstractFunction2.default)('addAnnotation');
-	    }
-	  }, {
-	    key: '__addAllAnnotations',
-	    value: function __addAllAnnotations(documentId, annotations) {
-	      (0, _abstractFunction2.default)('addAllAnnotations');
-	    }
-	  }, {
-	    key: '__editAnnotation',
-	
-	
-	    /**
-	     * Edit an annotation
-	     *
-	     * @param {String} documentId The ID for the document
-	     * @param {String} pageNumber the page number of the annotation
-	     * @param {Object} annotation The definition of the modified annotation
-	     * @return {Promise}
-	     */
-	    value: function __editAnnotation(documentId, pageNumber, annotation) {
-	      (0, _abstractFunction2.default)('editAnnotation');
-	    }
-	  }, {
-	    key: '__deleteAnnotation',
-	
-	
-	    /**
-	     * Delete an annotation
-	     *
-	     * @param {String} documentId The ID for the document
-	     * @param {String} annotationId The ID for the annotation
-	     * @return {Promise}
-	     */
-	    value: function __deleteAnnotation(documentId, annotationId) {
-	      (0, _abstractFunction2.default)('deleteAnnotation');
-	    }
-	  }, {
-	    key: '__deleteAnnotations',
-	    value: function __deleteAnnotations(documentId) {
-	      (0, _abstractFunction2.default)('deleteAnnotations');
-	    }
-	  }, {
-	    key: 'getComments',
-	
-	
-	    /**
-	     * Get all the comments for an annotation
-	     *
-	     * @param {String} documentId The ID for the document
-	     * @param {String} annotationId The ID for the annotation
-	     * @return {Promise}
-	     */
-	    value: function getComments(documentId, annotationId) {
-	      (0, _abstractFunction2.default)('getComments');
-	    }
-	
-	    /**
-	     * Add a new comment
-	     *
-	     * @param {String} documentId The ID for the document
-	     * @param {String} annotationId The ID for the annotation
-	     * @param {Object} content The definition of the comment
-	     * @return {Promise}
-	     */
-	
-	  }, {
-	    key: '__addComment',
-	    value: function __addComment(documentId, annotationId, content) {
-	      (0, _abstractFunction2.default)('addComment');
-	    }
-	  }, {
-	    key: '__deleteComment',
-	
-	
-	    /**
-	     * Delete a comment
-	     *
-	     * @param {String} documentId The ID for the document
-	     * @param {String} commentId The ID for the comment
-	     * @return {Promise}
-	     */
-	    value: function __deleteComment(documentId, commentId) {
-	      (0, _abstractFunction2.default)('deleteComment');
-	    }
-	  }, {
-	    key: '__exportData',
-	    value: function __exportData() {
-	      (0, _abstractFunction2.default)('exportData');
-	    }
-	  }, {
-	    key: '__importAnnotations',
-	    value: function __importAnnotations(data) {
-	      (0, _abstractFunction2.default)('importAnnotations');
-	    }
-	  }, {
-	    key: '__importData',
-	
-	
-	    /**
-	     * @Duplicated.
-	     */
-	    value: function __importData(json) {
-	      (0, _abstractFunction2.default)('importData');
-	    }
-	  }, {
-	    key: '__importDataSecondary',
-	
-	
-	    /**
-	     * @Duplicated.
-	     */
-	    value: function __importDataSecondary(jsonArray) {
-	      (0, _abstractFunction2.default)('importDataSecondary');
-	    }
-	  }, {
-	    key: '__findAnnotations',
-	    value: function __findAnnotations(documentId, criteria) {
-	      (0, _abstractFunction2.default)('findAnnotations');
-	    }
-	  }, {
-	    key: 'getAnnotations',
-	    get: function get() {
-	      return this.__getAnnotations;
-	    },
-	    set: function set(fn) {
-	      this.__getAnnotations = function getAnnotations(documentId, pageNumber) {
-	        return fn.apply(undefined, arguments).then(function (annotations) {
-	          // TODO may be best to have this happen on the server
-	          if (annotations.annotations) {
-	            annotations.annotations.forEach(function (a) {
-	              a.documentId = documentId;
-	            });
-	          }
-	          return annotations;
-	        });
-	      };
-	    }
-	  }, {
-	    key: 'getSecondaryAnnotations',
-	    get: function get() {
-	      return this.__getSecondaryAnnotations;
-	    },
-	    set: function set(fn) {
-	      this.__getSecondaryAnnotations = function getSecondaryAnnotations(documentId, pageNumber) {
-	        return fn.apply(undefined, arguments).then(function (annotations) {
-	          // TODO may be best to have this happen on the server
-	          if (annotations.annotations) {
-	            annotations.annotations.forEach(function (a) {
-	              a.documentId = documentId;
-	            });
-	          }
-	          return annotations;
-	        });
-	      };
-	    }
-	  }, {
-	    key: 'addAnnotation',
-	    get: function get() {
-	      return this.__addAnnotation;
-	    },
-	    set: function set(fn) {
-	      this.__addAnnotation = function addAnnotation(documentId, pageNumber, annotation) {
-	        return fn.apply(undefined, arguments).then(function (annotation) {
-	          (0, _event.fireEvent)('annotation:add', documentId, pageNumber, annotation);
-	          return annotation;
-	        });
-	      };
-	    }
-	  }, {
-	    key: 'addAllAnnotations',
-	    get: function get() {
-	      return this.__addAllAnnotations;
-	    },
-	    set: function set(fn) {
-	      this.__addAllAnnotations = function addAllAnnotations(documentId, annotations) {
-	        return fn.apply(undefined, arguments).then(function (annotation) {
-	          (0, _event.fireEvent)('annotation:addAll', documentId);
-	          return annotation;
-	        });
-	      };
-	    }
-	  }, {
-	    key: 'editAnnotation',
-	    get: function get() {
-	      return this.__editAnnotation;
-	    },
-	    set: function set(fn) {
-	      this.__editAnnotation = function editAnnotation(documentId, annotationId, annotation) {
-	        return fn.apply(undefined, arguments).then(function (annotation) {
-	          (0, _event.fireEvent)('annotation:edit', documentId, annotationId, annotation);
-	          return annotation;
-	        });
-	      };
-	    }
-	  }, {
-	    key: 'deleteAnnotation',
-	    get: function get() {
-	      return this.__deleteAnnotation;
-	    },
-	    set: function set(fn) {
-	      this.__deleteAnnotation = function deleteAnnotation(documentId, annotationId) {
-	        return fn.apply(undefined, arguments).then(function (success) {
-	          if (success) {
-	            (0, _event.fireEvent)('annotation:delete', documentId, annotationId);
-	          }
-	          return success;
-	        });
-	      };
-	    }
-	  }, {
-	    key: 'deleteAnnotations',
-	    get: function get() {
-	      return this.__deleteAnnotations;
-	    },
-	    set: function set(fn) {
-	      this.__deleteAnnotations = function deleteAnnotations(documentId) {
-	        return fn.apply(undefined, arguments).then(function (success) {
-	          if (success) {
-	            (0, _event.fireEvent)('annotation:deleteAll', documentId);
-	          }
-	          return success;
-	        });
-	      };
-	    }
-	  }, {
-	    key: 'addComment',
-	    get: function get() {
-	      return this.__addComment;
-	    },
-	    set: function set(fn) {
-	      this.__addComment = function addComment(documentId, annotationId, content) {
-	        return fn.apply(undefined, arguments).then(function (comment) {
-	          (0, _event.fireEvent)('comment:add', documentId, annotationId, comment);
-	          return comment;
-	        });
-	      };
-	    }
-	  }, {
-	    key: 'deleteComment',
-	    get: function get() {
-	      return this.__deleteComment;
-	    },
-	    set: function set(fn) {
-	      this.__deleteComment = function deleteComment(documentId, commentId) {
-	        return fn.apply(undefined, arguments).then(function (success) {
-	          if (success) {
-	            (0, _event.fireEvent)('comment:delete', documentId, commentId);
-	          }
-	          return success;
-	        });
-	      };
-	    }
-	  }, {
-	    key: 'exportData',
-	    get: function get() {
-	      return this.__exportData;
-	    },
-	    set: function set(fn) {
-	      this.__exportData = function exportData() {
-	        return fn.apply(undefined, arguments).then(function (success) {
-	          if (success) {
-	            (0, _event.fireEvent)('export');
-	          }
-	          return success;
-	        });
-	      };
-	    }
-	  }, {
-	    key: 'importAnnotations',
-	    get: function get() {
-	      return this.__importAnnotations;
-	    },
-	    set: function set(fn) {
-	      this.__importAnnotations = function importAnnotations(json) {
-	        return fn.apply(undefined, arguments).then(function (success) {
-	          if (success) {
-	            (0, _event.fireEvent)('importAnnotations', json);
-	          }
-	          return success;
-	        });
-	      };
-	    }
-	  }, {
-	    key: 'importData',
-	    get: function get() {
-	      return this.__importData;
-	    },
-	    set: function set(fn) {
-	      this.__importData = function importData(json) {
-	        return fn.apply(undefined, arguments).then(function (success) {
-	          if (success) {
-	            (0, _event.fireEvent)('import', json);
-	          }
-	          return success;
-	        });
-	      };
-	    }
-	  }, {
-	    key: 'importDataSecondary',
-	    get: function get() {
-	      return this.__importDataSecondary;
-	    },
-	    set: function set(fn) {
-	      this.__importDataSecondary = function importDataSecondary(jsonArray) {
-	        return fn.apply(undefined, arguments).then(function (success) {
-	          if (success) {
-	            (0, _event.fireEvent)('importSecondary', jsonArray);
-	          }
-	          return success;
-	        });
-	      };
-	    }
-	  }, {
-	    key: 'findAnnotations',
-	    get: function get() {
-	      return this.__findAnnotations;
-	    },
-	    set: function set(fn) {
-	      this.__findAnnotations = function findAnnotations(documentId, criteria) {
-	        return fn.apply(undefined, arguments).then(function (annotations) {
-	          // TODO may be best to have this happen on the server
-	          if (annotations.annotations) {
-	            annotations.annotations.forEach(function (a) {
-	              a.documentId = documentId;
-	            });
-	          }
-	          return annotations;
-	        });
-	      };
-	    }
-	  }]);
-	
-	  return StoreAdapter;
-	}();
-	
-	exports.default = StoreAdapter;
-	module.exports = exports['default'];
-
-/***/ },
-/* 9 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = abstractFunction;
-	/**
-	 * Throw an Error for an abstract function that hasn't been implemented.
-	 *
-	 * @param {String} name The name of the abstract function
-	 */
-	function abstractFunction(name) {
-	  throw new Error(name + ' is not implemented');
-	}
-	module.exports = exports['default'];
-
-/***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.fireEvent = fireEvent;
-	exports.addEventListener = addEventListener;
-	exports.removeEventListener = removeEventListener;
-	
-	var _events = __webpack_require__(11);
-	
-	var _events2 = _interopRequireDefault(_events);
-	
-	var _utils = __webpack_require__(12);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var emitter = new _events2.default();
-	
-	var clickNode = void 0;
-	
-	/**
-	 * Handle document.click event
-	 *
-	 * @param {Event} e The DOM event to be handled
-	 */
-	document.addEventListener('click', function handleDocumentClick(e) {
-	  if (!(0, _utils.findSVGAtPoint)(e.clientX, e.clientY)) {
-	    return;
-	  }
-	
-	  var target = (0, _utils.findAnnotationAtPoint)(e.clientX, e.clientY);
-	
-	  // Emit annotation:blur if clickNode is no longer clicked
-	  if (clickNode && clickNode !== target) {
-	    emitter.emit('annotation:blur', clickNode);
-	  }
-	
-	  // Emit annotation:click if target was clicked
-	  if (target) {
-	    emitter.emit('annotation:click', target);
-	  }
-	
-	  clickNode = target;
-	});
-	
-	// let mouseOverNode;
-	// document.addEventListener('mousemove', function handleDocumentMousemove(e) {
-	//   let target = findAnnotationAtPoint(e.clientX, e.clientY);
-	//
-	//   // Emit annotation:mouseout if target was mouseout'd
-	//   if (mouseOverNode && !target) {
-	//     emitter.emit('annotation:mouseout', mouseOverNode);
-	//   }
-	//
-	//   // Emit annotation:mouseover if target was mouseover'd
-	//   if (target && mouseOverNode !== target) {
-	//     emitter.emit('annotation:mouseover', target);
-	//   }
-	//
-	//   mouseOverNode = target;
-	// });
-	
-	function fireEvent() {
-	  emitter.emit.apply(emitter, arguments);
-	};
-	function addEventListener() {
-	  emitter.on.apply(emitter, arguments);
-	};
-	function removeEventListener() {
-	  emitter.removeListener.apply(emitter, arguments);
-	};
-
-/***/ },
-/* 11 */
 /***/ function(module, exports) {
 
 	// Copyright Joyent, Inc. and other Node contributors.
@@ -11813,7 +11140,1580 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _StoreAdapter = __webpack_require__(9);
+	
+	var _StoreAdapter2 = _interopRequireDefault(_StoreAdapter);
+	
+	var _LocalStoreAdapter = __webpack_require__(11);
+	
+	var _LocalStoreAdapter2 = _interopRequireDefault(_LocalStoreAdapter);
+	
+	var _PdfannoStoreAdapter = __webpack_require__(13);
+	
+	var _PdfannoStoreAdapter2 = _interopRequireDefault(_PdfannoStoreAdapter);
+	
+	var _render = __webpack_require__(21);
+	
+	var _render2 = _interopRequireDefault(_render);
+	
+	var _UI = __webpack_require__(43);
+	
+	var _UI2 = _interopRequireDefault(_UI);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	__webpack_require__(54);
+	
+	exports.default = {
+	  /**
+	   * Abstract class that needs to be defined so PDFJSAnnotate
+	   * knows how to communicate with your server.
+	   */
+	  StoreAdapter: _StoreAdapter2.default,
+	
+	  /**
+	   * Implementation of StoreAdapter that stores annotation data to localStorage.
+	   */
+	  LocalStoreAdapter: _LocalStoreAdapter2.default,
+	
+	  /**
+	    Implementation of StoreAdapter for PDFAnno.
+	  */
+	  PdfannoStoreAdapter: _PdfannoStoreAdapter2.default,
+	
+	  /**
+	   * Abstract instance of StoreAdapter
+	   */
+	  __storeAdapter: new _StoreAdapter2.default(),
+	
+	  /**
+	   * Getter for the underlying StoreAdapter property
+	   *
+	   * @return {StoreAdapter}
+	   */
+	  getStoreAdapter: function getStoreAdapter() {
+	    return this.__storeAdapter;
+	  },
+	
+	
+	  /**
+	   * Setter for the underlying StoreAdapter property
+	   *
+	   * @param {StoreAdapter} adapter The StoreAdapter implementation to be used.
+	   */
+	  setStoreAdapter: function setStoreAdapter(adapter) {
+	    // TODO this throws an error when bundled
+	    // if (!(adapter instanceof StoreAdapter)) {
+	    //   throw new Error('adapter must be an instance of StoreAdapter');
+	    // }
+	
+	    this.__storeAdapter = adapter;
+	  },
+	
+	
+	  /**
+	   * UI is a helper for instrumenting UI interactions for creating,
+	   * editing, and deleting annotations in the browser.
+	   */
+	  UI: _UI2.default,
+	
+	  /**
+	   * Render the annotations for a page in the PDF Document
+	   *
+	   * @param {SVGElement} svg The SVG element that annotations should be rendered to
+	   * @param {PageViewport} viewport The PDFPage.getViewport data
+	   * @param {Object} data The StoreAdapter.getAnnotations data
+	   * @return {Promise}
+	   */
+	  render: _render2.default,
+	
+	  /**
+	   * Convenience method for getting annotation data
+	   *
+	   * @alias StoreAdapter.getAnnotations
+	   * @param {String} documentId The ID of the document
+	   * @param {String} pageNumber The page number
+	   * @return {Promise}
+	   */
+	  getAnnotations: function getAnnotations(documentId, pageNumber) {
+	    var _getStoreAdapter;
+	
+	    return (_getStoreAdapter = this.getStoreAdapter()).getAnnotations.apply(_getStoreAdapter, arguments);
+	  }
+	};
+	module.exports = exports['default'];
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _abstractFunction = __webpack_require__(10);
+	
+	var _abstractFunction2 = _interopRequireDefault(_abstractFunction);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	// Adapter should never be invoked publicly
+	var StoreAdapter = function () {
+	  /**
+	   * Create a new StoreAdapter instance
+	   *
+	   * @param {Object} [definition] The definition to use for overriding abstract methods
+	   */
+	  function StoreAdapter() {
+	    var _this = this;
+	
+	    var definition = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+	
+	    _classCallCheck(this, StoreAdapter);
+	
+	    // Copy each function from definition if it is a function we know about
+	    Object.keys(definition).forEach(function (key) {
+	      if (typeof definition[key] === 'function' && typeof _this[key] === 'function') {
+	        _this[key] = definition[key];
+	      }
+	    });
+	  }
+	
+	  /**
+	   * Get all the annotations for a given document and page number.
+	   *
+	   * @param {String} documentId The ID for the document the annotations belong to
+	   * @param {Number} pageNumber The number of the page the annotations belong to
+	   * @return {Promise}
+	   */
+	
+	
+	  _createClass(StoreAdapter, [{
+	    key: '__getAnnotations',
+	    value: function __getAnnotations(documentId, pageNumber) {
+	      (0, _abstractFunction2.default)('getAnnotations');
+	    }
+	  }, {
+	    key: '__getSecondaryAnnotations',
+	    value: function __getSecondaryAnnotations(documentId, pageNumber) {
+	      (0, _abstractFunction2.default)('getSecondaryAnnotations');
+	    }
+	  }, {
+	    key: 'getAnnotation',
+	
+	
+	    /**
+	     * Get the definition for a specific annotation.
+	     *
+	     * @param {String} documentId The ID for the document the annotation belongs to
+	     * @param {String} annotationId The ID for the annotation
+	     * @return {Promise}
+	     */
+	    value: function getAnnotation(documentId, annotationId) {
+	      (0, _abstractFunction2.default)('getAnnotation');
+	    }
+	
+	    /**
+	     * Add an annotation
+	     *
+	     * @param {String} documentId The ID for the document to add the annotation to
+	     * @param {String} pageNumber The page number to add the annotation to
+	     * @param {Object} annotation The definition for the new annotation
+	     * @return {Promise}
+	     */
+	
+	  }, {
+	    key: '__addAnnotation',
+	    value: function __addAnnotation(documentId, pageNumber, annotation) {
+	      (0, _abstractFunction2.default)('addAnnotation');
+	    }
+	  }, {
+	    key: '__addAllAnnotations',
+	    value: function __addAllAnnotations(documentId, annotations) {
+	      (0, _abstractFunction2.default)('addAllAnnotations');
+	    }
+	  }, {
+	    key: '__editAnnotation',
+	
+	
+	    /**
+	     * Edit an annotation
+	     *
+	     * @param {String} documentId The ID for the document
+	     * @param {String} pageNumber the page number of the annotation
+	     * @param {Object} annotation The definition of the modified annotation
+	     * @return {Promise}
+	     */
+	    value: function __editAnnotation(documentId, pageNumber, annotation) {
+	      (0, _abstractFunction2.default)('editAnnotation');
+	    }
+	  }, {
+	    key: '__deleteAnnotation',
+	
+	
+	    /**
+	     * Delete an annotation
+	     *
+	     * @param {String} documentId The ID for the document
+	     * @param {String} annotationId The ID for the annotation
+	     * @return {Promise}
+	     */
+	    value: function __deleteAnnotation(documentId, annotationId) {
+	      (0, _abstractFunction2.default)('deleteAnnotation');
+	    }
+	  }, {
+	    key: '__deleteAnnotations',
+	    value: function __deleteAnnotations(documentId) {
+	      (0, _abstractFunction2.default)('deleteAnnotations');
+	    }
+	  }, {
+	    key: 'getComments',
+	
+	
+	    /**
+	     * Get all the comments for an annotation
+	     *
+	     * @param {String} documentId The ID for the document
+	     * @param {String} annotationId The ID for the annotation
+	     * @return {Promise}
+	     */
+	    value: function getComments(documentId, annotationId) {
+	      (0, _abstractFunction2.default)('getComments');
+	    }
+	
+	    /**
+	     * Add a new comment
+	     *
+	     * @param {String} documentId The ID for the document
+	     * @param {String} annotationId The ID for the annotation
+	     * @param {Object} content The definition of the comment
+	     * @return {Promise}
+	     */
+	
+	  }, {
+	    key: '__addComment',
+	    value: function __addComment(documentId, annotationId, content) {
+	      (0, _abstractFunction2.default)('addComment');
+	    }
+	  }, {
+	    key: '__deleteComment',
+	
+	
+	    /**
+	     * Delete a comment
+	     *
+	     * @param {String} documentId The ID for the document
+	     * @param {String} commentId The ID for the comment
+	     * @return {Promise}
+	     */
+	    value: function __deleteComment(documentId, commentId) {
+	      (0, _abstractFunction2.default)('deleteComment');
+	    }
+	  }, {
+	    key: '__exportData',
+	    value: function __exportData() {
+	      (0, _abstractFunction2.default)('exportData');
+	    }
+	  }, {
+	    key: '__importAnnotations',
+	    value: function __importAnnotations(data) {
+	      (0, _abstractFunction2.default)('importAnnotations');
+	    }
+	  }, {
+	    key: '__findAnnotations',
+	    value: function __findAnnotations(documentId, criteria) {
+	      (0, _abstractFunction2.default)('findAnnotations');
+	    }
+	  }, {
+	    key: 'getAnnotations',
+	    get: function get() {
+	      return this.__getAnnotations;
+	    },
+	    set: function set(fn) {
+	      this.__getAnnotations = function getAnnotations(documentId, pageNumber) {
+	        return fn.apply(undefined, arguments).then(function (annotations) {
+	          // TODO may be best to have this happen on the server
+	          if (annotations.annotations) {
+	            annotations.annotations.forEach(function (a) {
+	              a.documentId = documentId;
+	            });
+	          }
+	          return annotations;
+	        });
+	      };
+	    }
+	  }, {
+	    key: 'getSecondaryAnnotations',
+	    get: function get() {
+	      return this.__getSecondaryAnnotations;
+	    },
+	    set: function set(fn) {
+	      this.__getSecondaryAnnotations = function getSecondaryAnnotations(documentId, pageNumber) {
+	        return fn.apply(undefined, arguments).then(function (annotations) {
+	          // TODO may be best to have this happen on the server
+	          if (annotations.annotations) {
+	            annotations.annotations.forEach(function (a) {
+	              a.documentId = documentId;
+	            });
+	          }
+	          return annotations;
+	        });
+	      };
+	    }
+	  }, {
+	    key: 'addAnnotation',
+	    get: function get() {
+	      return this.__addAnnotation;
+	    },
+	    set: function set(fn) {
+	      this.__addAnnotation = function addAnnotation(documentId, pageNumber, annotation) {
+	        return fn.apply(undefined, arguments).then(function (annotation) {
+	          return annotation;
+	        });
+	      };
+	    }
+	  }, {
+	    key: 'addAllAnnotations',
+	    get: function get() {
+	      return this.__addAllAnnotations;
+	    },
+	    set: function set(fn) {
+	      this.__addAllAnnotations = function addAllAnnotations(documentId, annotations) {
+	        return fn.apply(undefined, arguments).then(function (annotation) {
+	          return annotation;
+	        });
+	      };
+	    }
+	  }, {
+	    key: 'editAnnotation',
+	    get: function get() {
+	      return this.__editAnnotation;
+	    },
+	    set: function set(fn) {
+	      this.__editAnnotation = function editAnnotation(documentId, annotationId, annotation) {
+	        return fn.apply(undefined, arguments).then(function (annotation) {
+	          return annotation;
+	        });
+	      };
+	    }
+	  }, {
+	    key: 'deleteAnnotation',
+	    get: function get() {
+	      return this.__deleteAnnotation;
+	    },
+	    set: function set(fn) {
+	      this.__deleteAnnotation = function deleteAnnotation(documentId, annotationId) {
+	        return fn.apply(undefined, arguments).then(function (success) {
+	          return success;
+	        });
+	      };
+	    }
+	  }, {
+	    key: 'deleteAnnotations',
+	    get: function get() {
+	      return this.__deleteAnnotations;
+	    },
+	    set: function set(fn) {
+	      this.__deleteAnnotations = function deleteAnnotations(documentId) {
+	        return fn.apply(undefined, arguments).then(function (success) {
+	          return success;
+	        });
+	      };
+	    }
+	  }, {
+	    key: 'addComment',
+	    get: function get() {
+	      return this.__addComment;
+	    },
+	    set: function set(fn) {
+	      this.__addComment = function addComment(documentId, annotationId, content) {
+	        return fn.apply(undefined, arguments).then(function (comment) {
+	          return comment;
+	        });
+	      };
+	    }
+	  }, {
+	    key: 'deleteComment',
+	    get: function get() {
+	      return this.__deleteComment;
+	    },
+	    set: function set(fn) {
+	      this.__deleteComment = function deleteComment(documentId, commentId) {
+	        return fn.apply(undefined, arguments).then(function (success) {
+	          return success;
+	        });
+	      };
+	    }
+	  }, {
+	    key: 'exportData',
+	    get: function get() {
+	      return this.__exportData;
+	    },
+	    set: function set(fn) {
+	      this.__exportData = function exportData() {
+	        return fn.apply(undefined, arguments).then(function (success) {
+	          return success;
+	        });
+	      };
+	    }
+	  }, {
+	    key: 'importAnnotations',
+	    get: function get() {
+	      return this.__importAnnotations;
+	    },
+	    set: function set(fn) {
+	      this.__importAnnotations = function importAnnotations(json) {
+	        return fn.apply(undefined, arguments).then(function (success) {
+	          return success;
+	        });
+	      };
+	    }
+	  }, {
+	    key: 'findAnnotations',
+	    get: function get() {
+	      return this.__findAnnotations;
+	    },
+	    set: function set(fn) {
+	      this.__findAnnotations = function findAnnotations(documentId, criteria) {
+	        return fn.apply(undefined, arguments).then(function (annotations) {
+	          // TODO may be best to have this happen on the server
+	          if (annotations.annotations) {
+	            annotations.annotations.forEach(function (a) {
+	              a.documentId = documentId;
+	            });
+	          }
+	          return annotations;
+	        });
+	      };
+	    }
+	  }]);
+	
+	  return StoreAdapter;
+	}();
+	
+	exports.default = StoreAdapter;
+	module.exports = exports['default'];
+
+/***/ },
+/* 10 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = abstractFunction;
+	/**
+	 * Throw an Error for an abstract function that hasn't been implemented.
+	 *
+	 * @param {String} name The name of the abstract function
+	 */
+	function abstractFunction(name) {
+	  throw new Error(name + ' is not implemented');
+	}
+	module.exports = exports['default'];
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _uuid = __webpack_require__(12);
+	
+	var _uuid2 = _interopRequireDefault(_uuid);
+	
+	var _StoreAdapter2 = __webpack_require__(9);
+	
+	var _StoreAdapter3 = _interopRequireDefault(_StoreAdapter2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	// StoreAdapter for working with localStorage
+	// This is ideal for testing, examples, and prototyping
+	var LocalStoreAdapter = function (_StoreAdapter) {
+	  _inherits(LocalStoreAdapter, _StoreAdapter);
+	
+	  function LocalStoreAdapter() {
+	    _classCallCheck(this, LocalStoreAdapter);
+	
+	    return _possibleConstructorReturn(this, (LocalStoreAdapter.__proto__ || Object.getPrototypeOf(LocalStoreAdapter)).call(this, {
+	      getAnnotations: function getAnnotations(documentId, pageNumber) {
+	        return new Promise(function (resolve, reject) {
+	          var annotations = _getAnnotations(documentId).filter(function (i) {
+	            return i.page === pageNumber && i.class === 'Annotation';
+	          });
+	
+	          resolve({
+	            documentId: documentId,
+	            pageNumber: pageNumber,
+	            annotations: annotations
+	          });
+	        });
+	      },
+	      getAnnotation: function getAnnotation(documentId, annotationId) {
+	        return Promise.resolve(_getAnnotations(documentId)[findAnnotation(documentId, annotationId)]);
+	      },
+	      addAnnotation: function addAnnotation(documentId, pageNumber, annotation) {
+	        return new Promise(function (resolve, reject) {
+	          annotation.class = 'Annotation';
+	          annotation.uuid = (0, _uuid2.default)();
+	          annotation.page = pageNumber;
+	
+	          var annotations = _getAnnotations(documentId);
+	          annotations.push(annotation);
+	          updateAnnotations(documentId, annotations);
+	
+	          resolve(annotation);
+	        });
+	      },
+	      addAllAnnotations: function addAllAnnotations(documentId, annotations) {
+	        console.log('addAllAnnotations');
+	        return new Promise(function (resolve, reject) {
+	          updateAnnotations(documentId, annotations);
+	          resolve();
+	        });
+	      },
+	      editAnnotation: function editAnnotation(documentId, annotationId, annotation) {
+	        return new Promise(function (resolve, reject) {
+	          var annotations = _getAnnotations(documentId);
+	          annotations[findAnnotation(documentId, annotationId)] = annotation;
+	          updateAnnotations(documentId, annotations);
+	
+	          resolve(annotation);
+	        });
+	      },
+	      deleteAnnotation: function deleteAnnotation(documentId, annotationId) {
+	        return new Promise(function (resolve, reject) {
+	          var index = findAnnotation(documentId, annotationId);
+	          if (index > -1) {
+	            var annotations = _getAnnotations(documentId);
+	            annotations.splice(index, 1);
+	            updateAnnotations(documentId, annotations);
+	          }
+	
+	          resolve(true);
+	        });
+	      },
+	      getComments: function getComments(documentId, annotationId) {
+	        return new Promise(function (resolve, reject) {
+	          resolve(_getAnnotations(documentId).filter(function (i) {
+	            return i.class === 'Comment' && i.annotation === annotationId;
+	          }));
+	        });
+	      },
+	      addComment: function addComment(documentId, annotationId, content) {
+	        return new Promise(function (resolve, reject) {
+	          var comment = {
+	            class: 'Comment',
+	            uuid: (0, _uuid2.default)(),
+	            annotation: annotationId,
+	            content: content
+	          };
+	
+	          var annotations = _getAnnotations(documentId);
+	          annotations.push(comment);
+	          updateAnnotations(documentId, annotations);
+	
+	          resolve(comment);
+	        });
+	      },
+	      deleteComment: function deleteComment(documentId, commentId) {
+	        return new Promise(function (resolve, reject) {
+	          _getAnnotations(documentId);
+	          var index = -1;
+	          var annotations = _getAnnotations(documentId);
+	          for (var i = 0, l = annotations.length; i < l; i++) {
+	            if (annotations[i].uuid === commentId) {
+	              index = i;
+	              break;
+	            }
+	          }
+	
+	          if (index > -1) {
+	            annotations.splice(index, 1);
+	            updateAnnotations(documentId, annotations);
+	          }
+	
+	          resolve(true);
+	        });
+	      }
+	    }));
+	  }
+	
+	  return LocalStoreAdapter;
+	}(_StoreAdapter3.default);
+	
+	exports.default = LocalStoreAdapter;
+	
+	
+	function _getAnnotations(documentId) {
+	  return JSON.parse(localStorage.getItem(documentId + '/annotations')) || [];
+	}
+	
+	function updateAnnotations(documentId, annotations) {
+	  localStorage.setItem(documentId + '/annotations', JSON.stringify(annotations));
+	}
+	
+	function findAnnotation(documentId, annotationId) {
+	  var index = -1;
+	  var annotations = _getAnnotations(documentId);
+	  for (var i = 0, l = annotations.length; i < l; i++) {
+	    if (annotations[i].uuid === annotationId) {
+	      index = i;
+	      break;
+	    }
+	  }
+	  return index;
+	}
+	module.exports = exports['default'];
+
+/***/ },
 /* 12 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = uuid;
+	var REGEXP = /[xy]/g;
+	var PATTERN = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
+	
+	function replacement(c) {
+	  var r = Math.random() * 16 | 0;
+	  var v = c == 'x' ? r : r & 0x3 | 0x8;
+	  return v.toString(16);
+	}
+	
+	/**
+	 * Generate a univierally unique identifier
+	 *
+	 * @return {String}
+	 */
+	function uuid() {
+	  return PATTERN.replace(REGEXP, replacement);
+	}
+	module.exports = exports['default'];
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _deepAssign = __webpack_require__(14);
+	
+	var _deepAssign2 = _interopRequireDefault(_deepAssign);
+	
+	var _uuid = __webpack_require__(12);
+	
+	var _uuid2 = _interopRequireDefault(_uuid);
+	
+	var _StoreAdapter2 = __webpack_require__(9);
+	
+	var _StoreAdapter3 = _interopRequireDefault(_StoreAdapter2);
+	
+	var _utils = __webpack_require__(16);
+	
+	var _relation = __webpack_require__(18);
+	
+	var _version = __webpack_require__(19);
+	
+	var _version2 = _interopRequireDefault(_version);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	/**
+	 * The LocalStorage key for save annotations.
+	 */
+	var LOCALSTORAGE_KEY = '_pdfanno_containers';
+	
+	/**
+	  Implmenetation of StoreAdapter for PDFAnno.
+	*/
+	
+	var PdfannoStoreAdapter = function (_StoreAdapter) {
+	  _inherits(PdfannoStoreAdapter, _StoreAdapter);
+	
+	  function PdfannoStoreAdapter() {
+	    _classCallCheck(this, PdfannoStoreAdapter);
+	
+	    return _possibleConstructorReturn(this, (PdfannoStoreAdapter.__proto__ || Object.getPrototypeOf(PdfannoStoreAdapter)).call(this, {
+	      getAnnotations: function getAnnotations(documentId, pageNumber) {
+	        return new Promise(function (resolve, reject) {
+	          var annotations = _getAnnotations(documentId).filter(function (i) {
+	            // if (pageNumber) {
+	            //   return i.page === pageNumber && i.class === 'Annotation';
+	            // } else {
+	            return true;
+	            // }            
+	          });
+	
+	          resolve({
+	            documentId: documentId,
+	            pageNumber: pageNumber,
+	            annotations: annotations
+	          });
+	        });
+	      },
+	      getSecondaryAnnotations: function getSecondaryAnnotations(documentId, pageNumber) {
+	        return new Promise(function (resolve, reject) {
+	
+	          var annotations = [];
+	          var containers = _getSecondaryContainers();
+	          containers.forEach(function (container) {
+	            // TODO refactoring. same thing exists.
+	            var tmpAnnotations = ((container[documentId] || {}).annotations || []).filter(function (i) {
+	              // if (pageNumber) {
+	              //   return i.page === pageNumber && i.class === 'Annotation';
+	              // } else {
+	              return true;
+	              // }
+	            });
+	            annotations = annotations.concat(tmpAnnotations);
+	          });
+	
+	          // Convert coordinate system.
+	          annotations = annotations.map(function (a) {
+	            return transformToRenderCoordinate(a);
+	          });
+	
+	          resolve({
+	            documentId: documentId,
+	            pageNumber: pageNumber,
+	            annotations: annotations
+	          });
+	        });
+	      },
+	      getAnnotation: function getAnnotation(documentId, annotationId) {
+	        return Promise.resolve(_getAnnotations(documentId)[findAnnotation(documentId, annotationId)]);
+	      },
+	      addAnnotation: function addAnnotation(documentId, pageNumber, annotation) {
+	
+	        return new Promise(function (resolve, reject) {
+	          annotation.class = 'Annotation';
+	          annotation.uuid = annotation.uuid || (0, _uuid2.default)();
+	
+	          var annotations = _getAnnotations(documentId);
+	          annotations.push(annotation);
+	
+	          updateAnnotations(documentId, annotations);
+	
+	          resolve(annotation);
+	        });
+	      },
+	      addAllAnnotations: function addAllAnnotations(documentId, annotations) {
+	        return new Promise(function (resolve, reject) {
+	          updateAnnotations(documentId, annotations);
+	          resolve();
+	        });
+	      },
+	      editAnnotation: function editAnnotation(documentId, annotationId, annotation) {
+	        return new Promise(function (resolve, reject) {
+	          var annotations = _getAnnotations(documentId);
+	          annotations[findAnnotation(documentId, annotationId)] = annotation;
+	          updateAnnotations(documentId, annotations);
+	
+	          resolve(annotation);
+	        });
+	      },
+	      deleteAnnotation: function deleteAnnotation(documentId, annotationId) {
+	        return new Promise(function (resolve, reject) {
+	          var index = findAnnotation(documentId, annotationId);
+	          if (index > -1) {
+	            var annotations = _getAnnotations(documentId);
+	            annotations.splice(index, 1);
+	            updateAnnotations(documentId, annotations);
+	          }
+	
+	          resolve(true);
+	        });
+	      },
+	      deleteAnnotations: function deleteAnnotations(documentId) {
+	        return new Promise(function (resolve, reject) {
+	          var container = _getContainer();
+	          delete container[documentId];
+	          _saveContainer(container);
+	          resolve();
+	        });
+	      },
+	      getComments: function getComments(documentId, annotationId) {
+	        return new Promise(function (resolve, reject) {
+	          resolve(_getAnnotations(documentId).filter(function (i) {
+	            return i.class === 'Comment' && i.annotation === annotationId;
+	          }));
+	        });
+	      },
+	      addComment: function addComment(documentId, annotationId, content) {
+	        return new Promise(function (resolve, reject) {
+	          var comment = {
+	            class: 'Comment',
+	            uuid: (0, _uuid2.default)(),
+	            annotation: annotationId,
+	            content: content
+	          };
+	
+	          var annotations = _getAnnotations(documentId);
+	          annotations.push(comment);
+	          updateAnnotations(documentId, annotations);
+	
+	          resolve(comment);
+	        });
+	      },
+	      deleteComment: function deleteComment(documentId, commentId) {
+	        return new Promise(function (resolve, reject) {
+	          _getAnnotations(documentId);
+	          var index = -1;
+	          var annotations = _getAnnotations(documentId);
+	          for (var i = 0, l = annotations.length; i < l; i++) {
+	            if (annotations[i].uuid === commentId) {
+	              index = i;
+	              break;
+	            }
+	          }
+	
+	          if (index > -1) {
+	            annotations.splice(index, 1);
+	            updateAnnotations(documentId, annotations);
+	          }
+	
+	          resolve(true);
+	        });
+	      },
+	      exportData: function exportData() {
+	        return new Promise(function (resolve, reject) {
+	
+	          var dataExport = {};
+	
+	          // Set version.
+	          dataExport.version = _version2.default;
+	
+	          // Every documents.
+	          var container = _getContainer();
+	
+	          var _loop = function _loop(documentId) {
+	
+	            if (!container[documentId].annotations || container[documentId].annotations.length === 0) {
+	              return 'continue';
+	            }
+	
+	            // Every annotations.
+	            var indexRect = 1;
+	            var indexSpan = 1;
+	            var indexRel = 1;
+	            var indexText = 1;
+	            var annotations = {};
+	            dataExport[documentId] = annotations;
+	
+	            // console.log('annos:', container, documentId, container[documentId].annotations);
+	
+	            container[documentId].annotations.forEach(function (annotation) {
+	
+	              // Rect
+	              if (annotation.type === 'area') {
+	                var key = 'rect-' + indexRect++;
+	                annotations[key] = [annotation.page, annotation.x, annotation.y, annotation.width, annotation.height, annotation.text || ''];
+	                // save tmporary for arrow.
+	                annotation.key = key;
+	                annotation.page = annotation.page;
+	
+	                // Highlight.
+	              } else if (annotation.type === 'highlight') {
+	                // rectangles.
+	                var data = annotation.rectangles.map(function (rectangle) {
+	                  return [rectangle.page, rectangle.x, rectangle.y, rectangle.width, rectangle.height];
+	                });
+	                // span text.
+	                var text = annotation.text || '';
+	                data.push(text);
+	
+	                var _key = 'span-' + indexSpan++;
+	                annotations[_key] = data;
+	
+	                // save tmporary for arrow.
+	                annotation.key = _key;
+	                annotation.page = pageNumber;
+	
+	                // Arrow.
+	              } else if (annotation.type === 'arrow') {
+	                var rel1s = container[documentId].annotations.filter(function (a) {
+	                  return a.uuid === annotation.rel1;
+	                });
+	                var rel1 = rel1s[0];
+	                var rel2s = container[documentId].annotations.filter(function (a) {
+	                  return a.uuid === annotation.rel2;
+	                });
+	                var rel2 = rel2s[0];
+	
+	                var page = void 0;
+	                if (rel1.type === 'highlight') {
+	                  page = rel1.rectangles[0].page;
+	                } else {
+	                  page = rel1.page;
+	                }
+	
+	                console.log(page);
+	
+	                var _data = [page, annotation.direction, rel1.key, rel2.key, annotation.text || ''];
+	                // data.push(rel1.key);
+	                // // let rel2s = container[documentId].annotations.filter(a => {
+	                // //   return a.uuid === annotation.rel2;
+	                // // });
+	                // data.push(rel2s[0].key);
+	                // let texts = container[documentId].annotations.filter(a => {
+	                //   return a.uuid === annotation.text;
+	                // });
+	                // if (texts.length > 0) {
+	                //   data.push(texts[0].content);
+	                // } else {
+	                //   data.push('');
+	                // }
+	                // data.push(annotation.text || '');
+	                annotations['rel-' + indexRel++] = _data;
+	              }
+	            });
+	          };
+	
+	          for (var documentId in container) {
+	            var _ret = _loop(documentId);
+	
+	            if (_ret === 'continue') continue;
+	          }
+	
+	          resolve(dataExport);
+	        });
+	      },
+	      importAnnotations: function importAnnotations(data) {
+	        return new Promise(function (resolve, reject) {
+	          console.log('importAnnotations:', data);
+	
+	          var containers = data.annotations.map(function (a, i) {
+	
+	            var color = data.colors[i];
+	            var isPrimary = i === data.primary;
+	            var visible = data.visibilities[i];
+	
+	            if (visible) {
+	              return _createContainerFromJson(a, color, isPrimary);
+	            }
+	          }).filter(function (c) {
+	            return c;
+	          });
+	
+	          console.log('containers:', containers);
+	
+	          _saveContainers(containers);
+	
+	          resolve(true);
+	        });
+	      },
+	      findAnnotations: function findAnnotations(documentId) {
+	        var criteria = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+	
+	        return new Promise(function (resolve, reject) {
+	          var annotations = _getAnnotations(documentId).filter(function (annotation) {
+	            var flg = true;
+	            for (var key in criteria) {
+	              var value = criteria[key];
+	              if (annotation[key] !== value) {
+	                flg = false;
+	              }
+	            }
+	            return flg;
+	          });
+	          resolve(annotations);
+	        });
+	      }
+	    }));
+	  }
+	
+	  return PdfannoStoreAdapter;
+	}(_StoreAdapter3.default);
+	
+	exports.default = PdfannoStoreAdapter;
+	
+	
+	function _createContainerFromJson(json, color, isPrimary) {
+	
+	  if (!json) {
+	    return null;
+	  }
+	
+	  var readOnly = !isPrimary;
+	
+	  var container = {};
+	
+	  container.isPrimary = isPrimary;
+	
+	  for (var documentId in json) {
+	
+	    var _annotations = [];
+	    container[documentId] = { annotations: _annotations };
+	
+	    var _loop2 = function _loop2(key) {
+	
+	      var data = json[documentId][key];
+	
+	      // Rect.
+	      if (key.indexOf('rect') === 0) {
+	        _annotations.push({
+	          class: 'Annotation',
+	          type: 'area',
+	          uuid: (0, _uuid2.default)(),
+	          page: data[0],
+	          x: data[1],
+	          y: data[2],
+	          width: data[3],
+	          height: data[4],
+	          text: data[5],
+	          readOnly: readOnly,
+	          color: color,
+	          key: key // tmp for arrow.
+	        });
+	
+	        // Highlight.
+	      } else if (key.indexOf('span') === 0) {
+	        // rectangles.
+	        var rectangles = data.slice(0, data.length - 1).map(function (d) {
+	          return {
+	            page: d[0],
+	            x: d[1],
+	            y: d[2],
+	            width: d[3],
+	            height: d[4]
+	          };
+	        });
+	        _annotations.push(_defineProperty({
+	          class: 'Annotation',
+	          type: 'highlight',
+	          uuid: (0, _uuid2.default)(),
+	          page: data[0][0],
+	          color: '#FFFF00', // TODO なくてもOK？
+	          rectangles: rectangles,
+	          text: data[data.length - 1],
+	          key: key, // tmp for arrow.
+	          readOnly: readOnly
+	        }, 'color', color));
+	
+	        // Arrow.
+	      } else if (key.indexOf('rel') === 0) {
+	
+	        // Find rels.
+	        var rel1s = _annotations.filter(function (a) {
+	          return a.key === data[2];
+	        });
+	        var rel1 = rel1s[0];
+	        var rel2s = _annotations.filter(function (a) {
+	          return a.key === data[3];
+	        });
+	        var rel2 = rel2s[0];
+	
+	        // Find highlights.
+	        // let rel1s = annotations.filter(a => {
+	        //   return a.key === data[2];
+	        // });
+	        // let rel1 = rel1s[0];
+	        // let rel2s = annotations.filter(a => {
+	        //   return a.key === data[3];
+	        // });
+	        // let rel2 = rel2s[0];
+	
+	        // Specify startPosition and endPosition.
+	        // let x1, y1, x2, y2, page1, page2;
+	        // if (rel1.type === 'highlight') {
+	        //   x1 = rel1.rectangles[0].x;
+	        //   y1 = rel1.rectangles[0].y - 5;
+	        //   page1 = rel1.rectangles[0].page;
+	        // } else {
+	        //   x1 = rel1.x;
+	        //   y1 = rel1.y - 5;          
+	        //   page1 = rel1.page;
+	        // }
+	        // if (rel2.type === 'highlight') {
+	        //   x2 = rel2.rectangles[0].x;
+	        //   y2 = rel2.rectangles[0].y - 5;   
+	        //   page2 = rel2.rectangles[0].page;       
+	        // } else {
+	        //   x2 = rel2.x;
+	        //   y2 = rel2.y - 5;
+	        //   page2 = rel2.page;
+	        // }
+	
+	        // let textPage = page1;
+	
+	        // Specify textbox position.
+	        // let svg = document.querySelector('.annotationLayer');
+	        // let svg = document.getElementById('annoLayer'); // TODO make it const.
+	        // let p = scaleUp(svg, { x1, y1, x2, y2 });
+	        // let rect = svg.getBoundingClientRect();
+	        // p.x1 -= rect.left;
+	        // p.y1 -= rect.top;
+	        // p.x2 -= rect.left;
+	        // p.y2 -= rect.top;
+	        // let textPosition = scaleDown(svg, getRelationTextPosition(svg, p.x1, p.y1, p.x2, p.y2));
+	
+	        // if (page1 !== page2) {
+	
+	        //   console.log('y1,y2=', y1, y2, page1, page2);
+	
+	        //   let y1Tmp = convertFromExportY(page1, y1);
+	        //   let y2Tmp = convertFromExportY(page2, y2);
+	
+	        //   console.log('y1,y2=', y1Tmp, y2Tmp);
+	
+	        //   // Specify textbox position.
+	        //   // let svg = document.querySelector('.annotationLayer');
+	        //   let svg = document.getElementById('annoLayer'); // TODO make it const.
+	        //   let p = scaleUp(svg, { x1, y1Tmp, x2, y2Tmp });
+	        //   let rect = svg.getBoundingClientRect();
+	        //   p.x1 -= rect.left;
+	        //   p.y1Tmp -= rect.top;
+	        //   p.x2 -= rect.left;
+	        //   p.y2Tmp -= rect.top;
+	        //   textPosition = scaleDown(svg, getRelationTextPosition(svg, p.x1, p.y1Tmp, p.x2, p.y2Tmp));
+	
+	        //   let { y, pageNumber } = convertToExportY(textPosition.y);
+	        //   textPosition.y = y;
+	        //   textPage = pageNumber;
+	        // }
+	
+	        // Add textbox and get the uuid of if.
+	        // let textId = null;
+	        // let textContent = data[4];
+	        // if (textContent) {
+	
+	        //   textId = uuid();
+	        //   annotations.push({
+	        //     class      : 'Annotation',
+	        //     type       : 'textbox',
+	        //     uuid       : textId,
+	        //     page       : textPage,
+	        //     x          : textPosition.x,
+	        //     y          : textPosition.y,
+	        //     content    : textContent,
+	        //     readOnly,
+	        //     color
+	        //   });          
+	        // }
+	
+	        // let pageNumber = data[0];
+	
+	        // Add arrow.
+	        _annotations.push({
+	          class: 'Annotation',
+	          type: 'arrow',
+	          direction: data[1],
+	          uuid: (0, _uuid2.default)(),
+	          // page       : data[0],
+	          // x1,
+	          // y1,
+	          // x2,
+	          // y2,
+	          // page1,
+	          // page2,
+	          // text       : textId,
+	          text: data[4],
+	          rel1: rel1.uuid,
+	          rel2: rel2.uuid,
+	          // color      : "FF0000",         // TODO 要る？
+	          readOnly: readOnly,
+	          color: color
+	        });
+	      }
+	    };
+	
+	    for (var key in json[documentId]) {
+	      _loop2(key);
+	    }
+	  }
+	
+	  return container;
+	}
+	
+	function getPageSize() {
+	  var viewBox = PDFView.pdfViewer.getPageView(0).viewport.viewBox;
+	  var size = { width: viewBox[2], height: viewBox[3] };
+	  return size;
+	}
+	
+	function transformToRenderCoordinate(annotation) {
+	
+	  var _type = 'render';
+	
+	  if (annotation.coords === _type) {
+	    return annotation;
+	  }
+	
+	  annotation.coords = _type;
+	
+	  // Copy for avoiding sharing.
+	  annotation = (0, _deepAssign2.default)({}, annotation);
+	
+	  if (annotation.y) {
+	    annotation.y = convertFromExportY(annotation.page, annotation.y);
+	  }
+	
+	  if (annotation.y1) {
+	    annotation.y1 = convertFromExportY(annotation.page1, annotation.y1);
+	  }
+	
+	  if (annotation.y2) {
+	    annotation.y2 = convertFromExportY(annotation.page2, annotation.y2);
+	  }
+	
+	  if (annotation.rectangles) {
+	    // Copy for avoiding sharing.
+	    annotation.rectangles = annotation.rectangles.map(function (a) {
+	      return (0, _deepAssign2.default)({}, a);
+	    });
+	    annotation.rectangles.forEach(function (r) {
+	      r.y = convertFromExportY(r.page, r.y);
+	    });
+	  }
+	
+	  return annotation;
+	}
+	
+	function transformFromRenderCoordinate(annotation) {
+	
+	  var _type = 'saveData';
+	
+	  if (annotation.coords === _type) {
+	    console.log('skip: ', annotation);
+	    return annotation;
+	  }
+	
+	  // Copy for avoiding sharing.
+	  annotation = (0, _deepAssign2.default)({}, annotation);
+	
+	  annotation.coords = _type;
+	
+	  if (annotation.y) {
+	    var _convertToExportY = convertToExportY(annotation.y),
+	        y = _convertToExportY.y,
+	        _pageNumber = _convertToExportY.pageNumber;
+	
+	    annotation.y = y;
+	    annotation.page = _pageNumber;
+	  }
+	
+	  if (annotation.y1) {
+	    var _convertToExportY2 = convertToExportY(annotation.y1),
+	        _y = _convertToExportY2.y,
+	        _pageNumber2 = _convertToExportY2.pageNumber;
+	
+	    annotation.y1 = _y;
+	    annotation.page1 = _pageNumber2;
+	  }
+	
+	  if (annotation.y2) {
+	    var _convertToExportY3 = convertToExportY(annotation.y2),
+	        _y2 = _convertToExportY3.y,
+	        _pageNumber3 = _convertToExportY3.pageNumber;
+	
+	    annotation.y2 = _y2;
+	    annotation.page2 = _pageNumber3;
+	  }
+	
+	  if (annotation.rectangles) {
+	    // Copy for avoiding sharing.
+	    annotation.rectangles = annotation.rectangles.map(function (a) {
+	      return (0, _deepAssign2.default)({}, a);
+	    });
+	    annotation.rectangles.forEach(function (r) {
+	      var _convertToExportY4 = convertToExportY(r.y),
+	          y = _convertToExportY4.y,
+	          pageNumber = _convertToExportY4.pageNumber;
+	
+	      r.y = y;
+	      r.page = pageNumber;
+	
+	      console.log('rec:', r.y, y, pageNumber);
+	    });
+	  }
+	
+	  return annotation;
+	}
+	
+	function _getContainers() {
+	  var containers = JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY) || '[]');
+	  return containers;
+	}
+	
+	function _getContainer() {
+	
+	  var containers = _getContainers().filter(function (c) {
+	    return c.isPrimary;
+	  });
+	
+	  if (containers.length > 0) {
+	    return containers[0];
+	  } else {
+	    return {};
+	  }
+	}
+	
+	function _getSecondaryContainers() {
+	
+	  var containers = _getContainers().filter(function (c) {
+	    return !c.isPrimary;
+	  });
+	
+	  if (containers.length > 0) {
+	    return containers;
+	  } else {
+	    return [];
+	  }
+	}
+	
+	function _saveContainer(container) {
+	
+	  container.isPrimary = true;
+	
+	  var containers = _getContainers().filter(function (c) {
+	    return c.isPrimary === false;
+	  });
+	
+	  containers = containers.concat([container]);
+	
+	  _saveContainers(containers);
+	}
+	
+	function _saveContainers(containers) {
+	  localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(containers));
+	}
+	
+	function _getAnnotations(documentId) {
+	  // Primary annotation.
+	  var container = _getContainer();
+	  var annotations = (container[documentId] || {}).annotations || [];
+	
+	  // transform coordinate system.
+	  annotations = annotations.map(function (a) {
+	    return transformToRenderCoordinate(a);
+	  });
+	
+	  return annotations;
+	}
+	
+	function _getSecondaryAnnotations(documentId) {
+	
+	  var annotations = [];
+	
+	  var containers = _getSecondaryContainers();
+	
+	  containers.forEach(function (container) {
+	    var tmpAnnotations = (container[documentId] || {}).annotations;
+	    if (tmpAnnotations) {
+	      annotations = annotations.concat(tmpAnnotations);
+	    }
+	  });
+	
+	  // transform coordinate system.
+	  annotations = annotations.map(function (a) {
+	    return transformToRenderCoordinate(a);
+	  });
+	
+	  return annotations;
+	}
+	
+	function updateAnnotations(documentId, annotations) {
+	
+	  // Transform coordinate system.
+	  annotations = annotations.map(function (a) {
+	    return transformFromRenderCoordinate(a);
+	  });
+	
+	  var viewBox = PDFView.pdfViewer.getPageView(0).viewport.viewBox;
+	
+	  // TODO remove.
+	  var meta = { w: viewBox[2], h: viewBox[3] };
+	
+	  var container = _getContainer();
+	  container[documentId] = { meta: meta, annotations: annotations };
+	  _saveContainer(container);
+	
+	  // Notifiy.
+	  var event = document.createEvent('CustomEvent');
+	  event.initCustomEvent('annotationUpdated', true, true, {});
+	  window.dispatchEvent(event);
+	}
+	
+	function findAnnotation(documentId, annotationId) {
+	  var index = -1;
+	  var annotations = _getAnnotations(documentId);
+	  for (var i = 0, l = annotations.length; i < l; i++) {
+	    if (annotations[i].uuid === annotationId) {
+	      index = i;
+	      break;
+	    }
+	  }
+	  return index;
+	}
+	
+	var paddingTop = 0;
+	var paddingBetweenPages = 9;
+	
+	function convertToExportY(y, meta) {
+	
+	  meta = getPageSize();
+	
+	  y -= paddingTop;
+	
+	  var pageNumber = Math.floor(y / meta.height) + 1;
+	  var yInPage = y - (pageNumber - 1) * (meta.height + paddingBetweenPages);
+	
+	  return { pageNumber: pageNumber, y: yInPage };
+	}
+	
+	function convertFromExportY(pageNumber, yInPage, meta) {
+	
+	  meta = getPageSize();
+	
+	  var y = yInPage + paddingTop;
+	
+	  y += (pageNumber - 1) * (meta.height + paddingBetweenPages);
+	
+	  return y;
+	}
+	
+	var paddingLeft = 0;
+	
+	function convertToExportX(x, meta) {
+	  return x - paddingLeft;
+	}
+	function convertFromExportX(x, meta) {
+	  return x + paddingLeft;
+	}
+	module.exports = exports['default'];
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var isObj = __webpack_require__(15);
+	var hasOwnProperty = Object.prototype.hasOwnProperty;
+	var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+	
+	function toObject(val) {
+		if (val === null || val === undefined) {
+			throw new TypeError('Sources cannot be null or undefined');
+		}
+	
+		return Object(val);
+	}
+	
+	function assignKey(to, from, key) {
+		var val = from[key];
+	
+		if (val === undefined || val === null) {
+			return;
+		}
+	
+		if (hasOwnProperty.call(to, key)) {
+			if (to[key] === undefined || to[key] === null) {
+				throw new TypeError('Cannot convert undefined or null to object (' + key + ')');
+			}
+		}
+	
+		if (!hasOwnProperty.call(to, key) || !isObj(val)) {
+			to[key] = val;
+		} else {
+			to[key] = assign(Object(to[key]), from[key]);
+		}
+	}
+	
+	function assign(to, from) {
+		if (to === from) {
+			return to;
+		}
+	
+		from = Object(from);
+	
+		for (var key in from) {
+			if (hasOwnProperty.call(from, key)) {
+				assignKey(to, from, key);
+			}
+		}
+	
+		if (Object.getOwnPropertySymbols) {
+			var symbols = Object.getOwnPropertySymbols(from);
+	
+			for (var i = 0; i < symbols.length; i++) {
+				if (propIsEnumerable.call(from, symbols[i])) {
+					assignKey(to, from, symbols[i]);
+				}
+			}
+		}
+	
+		return to;
+	}
+	
+	module.exports = function deepAssign(target) {
+		target = toObject(target);
+	
+		for (var s = 1; s < arguments.length; s++) {
+			assign(target, arguments[s]);
+		}
+	
+		return target;
+	};
+
+
+/***/ },
+/* 15 */
+/***/ function(module, exports) {
+
+	'use strict';
+	module.exports = function (x) {
+		var type = typeof x;
+		return x !== null && (type === 'object' || type === 'function');
+	};
+
+
+/***/ },
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -11845,7 +12745,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _jquery2 = _interopRequireDefault(_jquery);
 	
-	var _createStylesheet = __webpack_require__(13);
+	var _createStylesheet = __webpack_require__(17);
 	
 	var _createStylesheet2 = _interopRequireDefault(_createStylesheet);
 	
@@ -12315,7 +13215,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 13 */
+/* 17 */
 /***/ function(module, exports) {
 
 	module.exports = function createStyleSheet(blocks) {
@@ -12356,1356 +13256,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 14 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _uuid = __webpack_require__(15);
-	
-	var _uuid2 = _interopRequireDefault(_uuid);
-	
-	var _StoreAdapter2 = __webpack_require__(8);
-	
-	var _StoreAdapter3 = _interopRequireDefault(_StoreAdapter2);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	// StoreAdapter for working with localStorage
-	// This is ideal for testing, examples, and prototyping
-	var LocalStoreAdapter = function (_StoreAdapter) {
-	  _inherits(LocalStoreAdapter, _StoreAdapter);
-	
-	  function LocalStoreAdapter() {
-	    _classCallCheck(this, LocalStoreAdapter);
-	
-	    return _possibleConstructorReturn(this, (LocalStoreAdapter.__proto__ || Object.getPrototypeOf(LocalStoreAdapter)).call(this, {
-	      getAnnotations: function getAnnotations(documentId, pageNumber) {
-	        return new Promise(function (resolve, reject) {
-	          var annotations = _getAnnotations(documentId).filter(function (i) {
-	            return i.page === pageNumber && i.class === 'Annotation';
-	          });
-	
-	          resolve({
-	            documentId: documentId,
-	            pageNumber: pageNumber,
-	            annotations: annotations
-	          });
-	        });
-	      },
-	      getAnnotation: function getAnnotation(documentId, annotationId) {
-	        return Promise.resolve(_getAnnotations(documentId)[findAnnotation(documentId, annotationId)]);
-	      },
-	      addAnnotation: function addAnnotation(documentId, pageNumber, annotation) {
-	        return new Promise(function (resolve, reject) {
-	          annotation.class = 'Annotation';
-	          annotation.uuid = (0, _uuid2.default)();
-	          annotation.page = pageNumber;
-	
-	          var annotations = _getAnnotations(documentId);
-	          annotations.push(annotation);
-	          updateAnnotations(documentId, annotations);
-	
-	          resolve(annotation);
-	        });
-	      },
-	      addAllAnnotations: function addAllAnnotations(documentId, annotations) {
-	        console.log('addAllAnnotations');
-	        return new Promise(function (resolve, reject) {
-	          updateAnnotations(documentId, annotations);
-	          resolve();
-	        });
-	      },
-	      editAnnotation: function editAnnotation(documentId, annotationId, annotation) {
-	        return new Promise(function (resolve, reject) {
-	          var annotations = _getAnnotations(documentId);
-	          annotations[findAnnotation(documentId, annotationId)] = annotation;
-	          updateAnnotations(documentId, annotations);
-	
-	          resolve(annotation);
-	        });
-	      },
-	      deleteAnnotation: function deleteAnnotation(documentId, annotationId) {
-	        return new Promise(function (resolve, reject) {
-	          var index = findAnnotation(documentId, annotationId);
-	          if (index > -1) {
-	            var annotations = _getAnnotations(documentId);
-	            annotations.splice(index, 1);
-	            updateAnnotations(documentId, annotations);
-	          }
-	
-	          resolve(true);
-	        });
-	      },
-	      getComments: function getComments(documentId, annotationId) {
-	        return new Promise(function (resolve, reject) {
-	          resolve(_getAnnotations(documentId).filter(function (i) {
-	            return i.class === 'Comment' && i.annotation === annotationId;
-	          }));
-	        });
-	      },
-	      addComment: function addComment(documentId, annotationId, content) {
-	        return new Promise(function (resolve, reject) {
-	          var comment = {
-	            class: 'Comment',
-	            uuid: (0, _uuid2.default)(),
-	            annotation: annotationId,
-	            content: content
-	          };
-	
-	          var annotations = _getAnnotations(documentId);
-	          annotations.push(comment);
-	          updateAnnotations(documentId, annotations);
-	
-	          resolve(comment);
-	        });
-	      },
-	      deleteComment: function deleteComment(documentId, commentId) {
-	        return new Promise(function (resolve, reject) {
-	          _getAnnotations(documentId);
-	          var index = -1;
-	          var annotations = _getAnnotations(documentId);
-	          for (var i = 0, l = annotations.length; i < l; i++) {
-	            if (annotations[i].uuid === commentId) {
-	              index = i;
-	              break;
-	            }
-	          }
-	
-	          if (index > -1) {
-	            annotations.splice(index, 1);
-	            updateAnnotations(documentId, annotations);
-	          }
-	
-	          resolve(true);
-	        });
-	      }
-	    }));
-	  }
-	
-	  return LocalStoreAdapter;
-	}(_StoreAdapter3.default);
-	
-	exports.default = LocalStoreAdapter;
-	
-	
-	function _getAnnotations(documentId) {
-	  return JSON.parse(localStorage.getItem(documentId + '/annotations')) || [];
-	}
-	
-	function updateAnnotations(documentId, annotations) {
-	  localStorage.setItem(documentId + '/annotations', JSON.stringify(annotations));
-	}
-	
-	function findAnnotation(documentId, annotationId) {
-	  var index = -1;
-	  var annotations = _getAnnotations(documentId);
-	  for (var i = 0, l = annotations.length; i < l; i++) {
-	    if (annotations[i].uuid === annotationId) {
-	      index = i;
-	      break;
-	    }
-	  }
-	  return index;
-	}
-	module.exports = exports['default'];
-
-/***/ },
-/* 15 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = uuid;
-	var REGEXP = /[xy]/g;
-	var PATTERN = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
-	
-	function replacement(c) {
-	  var r = Math.random() * 16 | 0;
-	  var v = c == 'x' ? r : r & 0x3 | 0x8;
-	  return v.toString(16);
-	}
-	
-	/**
-	 * Generate a univierally unique identifier
-	 *
-	 * @return {String}
-	 */
-	function uuid() {
-	  return PATTERN.replace(REGEXP, replacement);
-	}
-	module.exports = exports['default'];
-
-/***/ },
-/* 16 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _deepAssign = __webpack_require__(17);
-	
-	var _deepAssign2 = _interopRequireDefault(_deepAssign);
-	
-	var _uuid = __webpack_require__(15);
-	
-	var _uuid2 = _interopRequireDefault(_uuid);
-	
-	var _StoreAdapter2 = __webpack_require__(8);
-	
-	var _StoreAdapter3 = _interopRequireDefault(_StoreAdapter2);
-	
-	var _utils = __webpack_require__(12);
-	
-	var _relation = __webpack_require__(19);
-	
-	var _version = __webpack_require__(20);
-	
-	var _version2 = _interopRequireDefault(_version);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var LOCALSTORAGE_KEY = '_pdfanno_pdfanno';
-	var LOCALSTORAGE_KEY_SECONDARY = '_pdfanno_pdfanno_secondary';
-	
-	var LOCALSTORAGE_KEY2 = '_pdfanno_containers';
-	
-	/**
-	  Implmenetation of StoreAdapter for PDFAnno.
-	*/
-	
-	var PdfannoStoreAdapter = function (_StoreAdapter) {
-	  _inherits(PdfannoStoreAdapter, _StoreAdapter);
-	
-	  function PdfannoStoreAdapter() {
-	    _classCallCheck(this, PdfannoStoreAdapter);
-	
-	    return _possibleConstructorReturn(this, (PdfannoStoreAdapter.__proto__ || Object.getPrototypeOf(PdfannoStoreAdapter)).call(this, {
-	      getAnnotations: function getAnnotations(documentId, pageNumber) {
-	        return new Promise(function (resolve, reject) {
-	          var annotations = _getAnnotations(documentId).filter(function (i) {
-	            // if (pageNumber) {
-	            //   return i.page === pageNumber && i.class === 'Annotation';
-	            // } else {
-	            return true;
-	            // }            
-	          });
-	
-	          resolve({
-	            documentId: documentId,
-	            pageNumber: pageNumber,
-	            annotations: annotations
-	          });
-	        });
-	      },
-	      getSecondaryAnnotations: function getSecondaryAnnotations(documentId, pageNumber) {
-	        return new Promise(function (resolve, reject) {
-	
-	          var annotations = [];
-	          var containers = _getSecondaryContainers();
-	          containers.forEach(function (container) {
-	            // TODO refactoring. same thing exists.
-	            var tmpAnnotations = ((container[documentId] || {}).annotations || []).filter(function (i) {
-	              // if (pageNumber) {
-	              //   return i.page === pageNumber && i.class === 'Annotation';
-	              // } else {
-	              return true;
-	              // }
-	            });
-	            annotations = annotations.concat(tmpAnnotations);
-	          });
-	
-	          // Convert coordinate system.
-	          annotations = annotations.map(function (a) {
-	            return transformToRenderCoordinate(a);
-	          });
-	
-	          resolve({
-	            documentId: documentId,
-	            pageNumber: pageNumber,
-	            annotations: annotations
-	          });
-	        });
-	      },
-	      getAnnotation: function getAnnotation(documentId, annotationId) {
-	        return Promise.resolve(_getAnnotations(documentId)[findAnnotation(documentId, annotationId)]);
-	      },
-	      addAnnotation: function addAnnotation(documentId, pageNumber, annotation) {
-	
-	        console.log('addAnnotation1:', annotation);
-	
-	        return new Promise(function (resolve, reject) {
-	          annotation.class = 'Annotation';
-	          annotation.uuid = annotation.uuid || (0, _uuid2.default)();
-	          // annotation.page = pageNumber;
-	
-	          var annotations = _getAnnotations(documentId);
-	          annotations.push(annotation);
-	
-	          updateAnnotations(documentId, annotations);
-	
-	          console.log('addAnnotation2:', annotation);
-	
-	          resolve(annotation);
-	        });
-	      },
-	      addAllAnnotations: function addAllAnnotations(documentId, annotations) {
-	        return new Promise(function (resolve, reject) {
-	          updateAnnotations(documentId, annotations);
-	          resolve();
-	        });
-	      },
-	      editAnnotation: function editAnnotation(documentId, annotationId, annotation) {
-	        return new Promise(function (resolve, reject) {
-	          var annotations = _getAnnotations(documentId);
-	          annotations[findAnnotation(documentId, annotationId)] = annotation;
-	          updateAnnotations(documentId, annotations);
-	
-	          resolve(annotation);
-	        });
-	      },
-	      deleteAnnotation: function deleteAnnotation(documentId, annotationId) {
-	        return new Promise(function (resolve, reject) {
-	          var index = findAnnotation(documentId, annotationId);
-	          if (index > -1) {
-	            var annotations = _getAnnotations(documentId);
-	            annotations.splice(index, 1);
-	            updateAnnotations(documentId, annotations);
-	          }
-	
-	          resolve(true);
-	        });
-	      },
-	      deleteAnnotations: function deleteAnnotations(documentId) {
-	        return new Promise(function (resolve, reject) {
-	          var container = _getContainer();
-	          delete container[documentId];
-	          _saveContainer(container);
-	          resolve();
-	        });
-	      },
-	      getComments: function getComments(documentId, annotationId) {
-	        return new Promise(function (resolve, reject) {
-	          resolve(_getAnnotations(documentId).filter(function (i) {
-	            return i.class === 'Comment' && i.annotation === annotationId;
-	          }));
-	        });
-	      },
-	      addComment: function addComment(documentId, annotationId, content) {
-	        return new Promise(function (resolve, reject) {
-	          var comment = {
-	            class: 'Comment',
-	            uuid: (0, _uuid2.default)(),
-	            annotation: annotationId,
-	            content: content
-	          };
-	
-	          var annotations = _getAnnotations(documentId);
-	          annotations.push(comment);
-	          updateAnnotations(documentId, annotations);
-	
-	          resolve(comment);
-	        });
-	      },
-	      deleteComment: function deleteComment(documentId, commentId) {
-	        return new Promise(function (resolve, reject) {
-	          _getAnnotations(documentId);
-	          var index = -1;
-	          var annotations = _getAnnotations(documentId);
-	          for (var i = 0, l = annotations.length; i < l; i++) {
-	            if (annotations[i].uuid === commentId) {
-	              index = i;
-	              break;
-	            }
-	          }
-	
-	          if (index > -1) {
-	            annotations.splice(index, 1);
-	            updateAnnotations(documentId, annotations);
-	          }
-	
-	          resolve(true);
-	        });
-	      },
-	      exportData: function exportData() {
-	        return new Promise(function (resolve, reject) {
-	
-	          var dataExport = {};
-	
-	          // Set version.
-	          dataExport.version = _version2.default;
-	          console.log('version:', dataExport.version, _version2.default);
-	
-	          // Every documents.
-	          var container = _getContainer();
-	
-	          var _loop = function _loop(documentId) {
-	
-	            if (!container[documentId].annotations || container[documentId].annotations.length === 0) {
-	              return 'continue';
-	            }
-	
-	            // Every annotations.
-	            var indexRect = 1;
-	            var indexSpan = 1;
-	            var indexRel = 1;
-	            var indexText = 1;
-	            var annotations = {};
-	            dataExport[documentId] = annotations;
-	
-	            console.log('annos:', container, documentId, container[documentId].annotations);
-	
-	            container[documentId].annotations.forEach(function (annotation) {
-	
-	              // Rect
-	              if (annotation.type === 'area') {
-	                annotations['rect-' + indexRect++] = [annotation.page, annotation.x, annotation.y, annotation.width, annotation.height, annotation.text];
-	
-	                // Highlight.
-	              } else if (annotation.type === 'highlight') {
-	                // rectangles.
-	                var data = annotation.rectangles.map(function (rectangle) {
-	                  return [rectangle.page, rectangle.x, rectangle.y, rectangle.width, rectangle.height];
-	                });
-	                // span text.
-	                var text = '';
-	                if (annotation.text) {
-	                  // TODO use `getAnnotations` instead.
-	                  var texts = container[documentId].annotations.filter(function (a) {
-	                    return a.uuid === annotation.text;
-	                  });
-	                  if (texts.length > 0) {
-	                    text = texts[0].content;
-	                  }
-	                }
-	                data.push(text);
-	
-	                var key = 'span-' + indexSpan++;
-	                annotations[key] = data;
-	
-	                // save tmporary for arrow.
-	                annotation.key = key;
-	                annotation.page = pageNumber;
-	
-	                // Arrow.
-	              } else if (annotation.type === 'arrow') {
-	                var _data = [annotation.page1, annotation.direction];
-	                var highlight1s = container[documentId].annotations.filter(function (a) {
-	                  return a.uuid === annotation.highlight1;
-	                });
-	                _data.push(highlight1s[0].key);
-	                var highlight2s = container[documentId].annotations.filter(function (a) {
-	                  return a.uuid === annotation.highlight2;
-	                });
-	                _data.push(highlight2s[0].key);
-	                var _texts = container[documentId].annotations.filter(function (a) {
-	                  return a.uuid === annotation.text;
-	                });
-	                if (_texts.length > 0) {
-	                  _data.push(_texts[0].content);
-	                } else {
-	                  _data.push('');
-	                }
-	                annotations['rel-' + indexRel++] = _data;
-	
-	                // Textbox independent.
-	              } else if (annotation.type === 'textbox') {
-	
-	                var rels = container[documentId].annotations.filter(function (a) {
-	                  // relation for arrow or highlight.
-	                  return a.text === annotation.uuid;
-	                });
-	                if (rels.length === 0) {
-	                  annotations['text-' + indexText++] = [annotation.page, annotation.x, annotation.y, annotation.content];
-	                }
-	              }
-	            });
-	          };
-	
-	          for (var documentId in container) {
-	            var _ret = _loop(documentId);
-	
-	            if (_ret === 'continue') continue;
-	          }
-	
-	          resolve(dataExport);
-	        });
-	      },
-	      importAnnotations: function importAnnotations(data) {
-	        return new Promise(function (resolve, reject) {
-	          console.log('importAnnotations:', data);
-	
-	          var containers = data.annotations.map(function (a, i) {
-	
-	            var color = data.colors[i];
-	            var isPrimary = i === data.primary;
-	            var visible = data.visibilities[i];
-	
-	            if (visible) {
-	              return _createContainerFromJson2(a, color, isPrimary);
-	            }
-	          }).filter(function (c) {
-	            return c;
-	          });
-	
-	          console.log('containers:', containers);
-	
-	          _saveContainers(containers);
-	
-	          resolve(true);
-	        });
-	      },
-	      importData: function importData(json) {
-	        return new Promise(function (resolve, reject) {
-	
-	          // Delete version.
-	          delete json.version;
-	
-	          var container = _createContainerFromJson(json);
-	
-	          _saveContainer(container);
-	
-	          resolve();
-	        });
-	      },
-	      importDataSecondary: function importDataSecondary(jsonArray) {
-	        return new Promise(function (resolve, reject) {
-	
-	          var containers = jsonArray.map(function (json, index) {
-	            return _createContainerFromJson(json, true, index);
-	          });
-	
-	          _saveSecondaryContainer(containers);
-	
-	          resolve();
-	        });
-	      },
-	      findAnnotations: function findAnnotations(documentId) {
-	        var criteria = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-	
-	        return new Promise(function (resolve, reject) {
-	          var annotations = _getAnnotations(documentId).filter(function (annotation) {
-	            var flg = true;
-	            for (var key in criteria) {
-	              var value = criteria[key];
-	              if (annotation[key] !== value) {
-	                flg = false;
-	              }
-	            }
-	            return flg;
-	          });
-	          resolve(annotations);
-	        });
-	      }
-	    }));
-	  }
-	
-	  return PdfannoStoreAdapter;
-	}(_StoreAdapter3.default);
-	
-	exports.default = PdfannoStoreAdapter;
-	
-	
-	function _createContainerFromJson2(json, color, isPrimary) {
-	
-	  if (!json) {
-	    return null;
-	  }
-	
-	  var readOnly = !isPrimary;
-	
-	  var container = {};
-	
-	  container.isPrimary = isPrimary;
-	
-	  for (var documentId in json) {
-	
-	    var _annotations = [];
-	    container[documentId] = { annotations: _annotations };
-	
-	    var _loop2 = function _loop2(key) {
-	
-	      var data = json[documentId][key];
-	
-	      // Rect.
-	      if (key.indexOf('rect') === 0) {
-	        _annotations.push({
-	          class: 'Annotation',
-	          type: 'area',
-	          uuid: (0, _uuid2.default)(),
-	          page: data[0],
-	          x: data[1],
-	          y: data[2],
-	          width: data[3],
-	          height: data[4],
-	          text: data[5],
-	          readOnly: readOnly,
-	          color: color
-	        });
-	
-	        // Highlight.
-	      } else if (key.indexOf('span') === 0) {
-	        // rectangles.
-	        var rectangles = data.slice(0, data.length - 1).map(function (d) {
-	          return {
-	            page: d[0],
-	            x: d[1],
-	            y: d[2],
-	            width: d[3],
-	            height: d[4]
-	          };
-	        });
-	        // span text.
-	        var spanText = data[data.length - 1];
-	        var textId = null;
-	        if (spanText) {
-	          textId = (0, _uuid2.default)();
-	          var svg = document.querySelector('.annotationLayer');
-	
-	          var x = rectangles[0].x;
-	          var y = rectangles[0].y - 20; // 20 = circle'radius(3px) + input height(14px) + α
-	
-	          var _pageNumber = data[0][0];
-	
-	          _annotations.push({
-	            class: 'Annotation',
-	            type: 'textbox',
-	            uuid: textId,
-	            page: _pageNumber,
-	            x: x,
-	            y: y,
-	            content: spanText,
-	            readOnly: readOnly,
-	            color: color
-	          });
-	        }
-	        _annotations.push(_defineProperty({
-	          class: 'Annotation',
-	          type: 'highlight',
-	          uuid: (0, _uuid2.default)(),
-	          page: data[0][0],
-	          color: '#FFFF00', // TODO なくてもOK？
-	          rectangles: rectangles,
-	          text: textId,
-	          key: key, // tmp for arrow.
-	          readOnly: readOnly
-	        }, 'color', color));
-	
-	        // Text Independent.
-	      } else if (key.indexOf('text') === 0) {
-	        _annotations.push({
-	          class: 'Annotation',
-	          type: 'textbox',
-	          uuid: (0, _uuid2.default)(),
-	          page: data[0],
-	          x: data[1],
-	          y: data[2],
-	          content: data[3],
-	          readOnly: readOnly,
-	          color: color
-	        });
-	
-	        // Arrow.
-	      } else if (key.indexOf('rel') === 0) {
-	
-	        // Find highlights.
-	        var highlight1s = _annotations.filter(function (a) {
-	          return a.key === data[2];
-	        });
-	        var highlight1 = highlight1s[0];
-	        var highlight2s = _annotations.filter(function (a) {
-	          return a.key === data[3];
-	        });
-	        var highlight2 = highlight2s[0];
-	
-	        // Specify startPosition and endPosition.
-	        var x1 = highlight1.rectangles[0].x;
-	        var y1 = highlight1.rectangles[0].y - 5;
-	        var x2 = highlight2.rectangles[0].x;
-	        var y2 = highlight2.rectangles[0].y - 5;
-	
-	        var page1 = highlight1.rectangles[0].page;
-	        var page2 = highlight2.rectangles[0].page;
-	
-	        var textPage = page1;
-	
-	        // Specify textbox position.
-	        // let svg = document.querySelector('.annotationLayer');
-	        var _svg = document.getElementById('annoLayer'); // TODO make it const.
-	        var p = (0, _utils.scaleUp)(_svg, { x1: x1, y1: y1, x2: x2, y2: y2 });
-	        var rect = _svg.getBoundingClientRect();
-	        p.x1 -= rect.left;
-	        p.y1 -= rect.top;
-	        p.x2 -= rect.left;
-	        p.y2 -= rect.top;
-	        var textPosition = (0, _utils.scaleDown)(_svg, (0, _relation.getRelationTextPosition)(_svg, p.x1, p.y1, p.x2, p.y2));
-	
-	        if (page1 !== page2) {
-	
-	          console.log('y1,y2=', y1, y2, page1, page2);
-	
-	          var y1Tmp = convertFromExportY(page1, y1);
-	          var y2Tmp = convertFromExportY(page2, y2);
-	
-	          console.log('y1,y2=', y1Tmp, y2Tmp);
-	
-	          // Specify textbox position.
-	          // let svg = document.querySelector('.annotationLayer');
-	          var _svg2 = document.getElementById('annoLayer'); // TODO make it const.
-	          var _p = (0, _utils.scaleUp)(_svg2, { x1: x1, y1Tmp: y1Tmp, x2: x2, y2Tmp: y2Tmp });
-	          var _rect = _svg2.getBoundingClientRect();
-	          _p.x1 -= _rect.left;
-	          _p.y1Tmp -= _rect.top;
-	          _p.x2 -= _rect.left;
-	          _p.y2Tmp -= _rect.top;
-	          textPosition = (0, _utils.scaleDown)(_svg2, (0, _relation.getRelationTextPosition)(_svg2, _p.x1, _p.y1Tmp, _p.x2, _p.y2Tmp));
-	
-	          var _convertToExportY = convertToExportY(textPosition.y),
-	              _y = _convertToExportY.y,
-	              _pageNumber3 = _convertToExportY.pageNumber;
-	
-	          textPosition.y = _y;
-	          textPage = _pageNumber3;
-	        }
-	
-	        // Add textbox and get the uuid of if.
-	        var _textId = null;
-	        var textContent = data[4];
-	        if (textContent) {
-	
-	          _textId = (0, _uuid2.default)();
-	          _annotations.push({
-	            class: 'Annotation',
-	            type: 'textbox',
-	            uuid: _textId,
-	            page: textPage,
-	            x: textPosition.x,
-	            y: textPosition.y,
-	            content: textContent,
-	            readOnly: readOnly,
-	            color: color
-	          });
-	        }
-	
-	        var _pageNumber2 = data[0];
-	
-	        // Add arrow.
-	        _annotations.push(_defineProperty({
-	          class: 'Annotation',
-	          type: 'arrow',
-	          direction: data[1],
-	          uuid: (0, _uuid2.default)(),
-	          page: data[0],
-	          x1: x1,
-	          y1: y1,
-	          x2: x2,
-	          y2: y2,
-	          page1: page1,
-	          page2: page2,
-	          text: _textId,
-	          highlight1: highlight1.uuid,
-	          highlight2: highlight2.uuid,
-	          color: "FF0000", // TODO 要る？
-	          readOnly: readOnly
-	        }, 'color', color));
-	      }
-	    };
-	
-	    for (var key in json[documentId]) {
-	      _loop2(key);
-	    }
-	  }
-	
-	  return container;
-	}
-	
-	function _createContainerFromJson(json) {
-	  var readOnly = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-	  var index = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-	
-	  var container = {};
-	
-	  for (var documentId in json) {
-	
-	    var _annotations2 = [];
-	    container[documentId] = { annotations: _annotations2 };
-	
-	    var _loop3 = function _loop3(key) {
-	
-	      var data = json[documentId][key];
-	
-	      // Rect.
-	      if (key.indexOf('rect') === 0) {
-	        _annotations2.push({
-	          class: 'Annotation',
-	          type: 'area',
-	          uuid: (0, _uuid2.default)(),
-	          page: data[0],
-	          x: data[1],
-	          y: data[2],
-	          width: data[3],
-	          height: data[4],
-	          readOnly: readOnly,
-	          seq: index
-	        });
-	
-	        // Highlight.
-	      } else if (key.indexOf('span') === 0) {
-	        // rectangles.
-	        var rectangles = data.slice(0, data.length - 1).map(function (d) {
-	          return {
-	            page: d[0],
-	            x: d[1],
-	            y: d[2],
-	            width: d[3],
-	            height: d[4]
-	          };
-	        });
-	        // span text.
-	        var spanText = data[data.length - 1];
-	        var textId = null;
-	        if (spanText) {
-	          textId = (0, _uuid2.default)();
-	          var svg = document.querySelector('.annotationLayer');
-	
-	          var x = rectangles[0].x;
-	          var y = rectangles[0].y - 20; // 20 = circle'radius(3px) + input height(14px) + α
-	
-	          var _pageNumber4 = data[0][0];
-	
-	          _annotations2.push({
-	            class: 'Annotation',
-	            type: 'textbox',
-	            uuid: textId,
-	            page: _pageNumber4,
-	            x: x,
-	            y: y,
-	            content: spanText,
-	            readOnly: readOnly,
-	            seq: index
-	          });
-	        }
-	        _annotations2.push({
-	          class: 'Annotation',
-	          type: 'highlight',
-	          uuid: (0, _uuid2.default)(),
-	          page: data[0][0],
-	          color: '#FFFF00', // TODO なくてもOK？
-	          rectangles: rectangles,
-	          text: textId,
-	          key: key, // tmp for arrow.
-	          readOnly: readOnly,
-	          seq: index
-	        });
-	
-	        // Text Independent.
-	      } else if (key.indexOf('text') === 0) {
-	        _annotations2.push({
-	          class: 'Annotation',
-	          type: 'textbox',
-	          uuid: (0, _uuid2.default)(),
-	          page: data[0],
-	          x: data[1],
-	          y: data[2],
-	          content: data[3],
-	          readOnly: readOnly,
-	          seq: index
-	        });
-	
-	        // Arrow.
-	      } else if (key.indexOf('rel') === 0) {
-	
-	        // Find highlights.
-	        var highlight1s = _annotations2.filter(function (a) {
-	          return a.key === data[2];
-	        });
-	        var highlight1 = highlight1s[0];
-	        var highlight2s = _annotations2.filter(function (a) {
-	          return a.key === data[3];
-	        });
-	        var highlight2 = highlight2s[0];
-	
-	        // Specify startPosition and endPosition.
-	        var x1 = highlight1.rectangles[0].x;
-	        var y1 = highlight1.rectangles[0].y - 5;
-	        var x2 = highlight2.rectangles[0].x;
-	        var y2 = highlight2.rectangles[0].y - 5;
-	
-	        var page1 = highlight1.rectangles[0].page;
-	        var page2 = highlight2.rectangles[0].page;
-	
-	        var textPage = page1;
-	
-	        // Specify textbox position.
-	        // let svg = document.querySelector('.annotationLayer');
-	        var _svg3 = document.getElementById('annoLayer'); // TODO make it const.
-	        var p = (0, _utils.scaleUp)(_svg3, { x1: x1, y1: y1, x2: x2, y2: y2 });
-	        var rect = _svg3.getBoundingClientRect();
-	        p.x1 -= rect.left;
-	        p.y1 -= rect.top;
-	        p.x2 -= rect.left;
-	        p.y2 -= rect.top;
-	        var textPosition = (0, _utils.scaleDown)(_svg3, (0, _relation.getRelationTextPosition)(_svg3, p.x1, p.y1, p.x2, p.y2));
-	
-	        if (page1 !== page2) {
-	
-	          console.log('y1,y2=', y1, y2, page1, page2);
-	
-	          var y1Tmp = convertFromExportY(page1, y1);
-	          var y2Tmp = convertFromExportY(page2, y2);
-	
-	          console.log('y1,y2=', y1Tmp, y2Tmp);
-	
-	          // Specify textbox position.
-	          // let svg = document.querySelector('.annotationLayer');
-	          var _svg4 = document.getElementById('annoLayer'); // TODO make it const.
-	          var _p2 = (0, _utils.scaleUp)(_svg4, { x1: x1, y1Tmp: y1Tmp, x2: x2, y2Tmp: y2Tmp });
-	          var _rect2 = _svg4.getBoundingClientRect();
-	          _p2.x1 -= _rect2.left;
-	          _p2.y1Tmp -= _rect2.top;
-	          _p2.x2 -= _rect2.left;
-	          _p2.y2Tmp -= _rect2.top;
-	          textPosition = (0, _utils.scaleDown)(_svg4, (0, _relation.getRelationTextPosition)(_svg4, _p2.x1, _p2.y1Tmp, _p2.x2, _p2.y2Tmp));
-	
-	          var _convertToExportY2 = convertToExportY(textPosition.y),
-	              _y2 = _convertToExportY2.y,
-	              _pageNumber6 = _convertToExportY2.pageNumber;
-	
-	          textPosition.y = _y2;
-	          textPage = _pageNumber6;
-	        }
-	
-	        // Add textbox and get the uuid of if.
-	        var _textId2 = null;
-	        var textContent = data[4];
-	        if (textContent) {
-	
-	          _textId2 = (0, _uuid2.default)();
-	          _annotations2.push({
-	            class: 'Annotation',
-	            type: 'textbox',
-	            uuid: _textId2,
-	            page: textPage,
-	            x: textPosition.x,
-	            y: textPosition.y,
-	            content: textContent,
-	            readOnly: readOnly,
-	            seq: index
-	          });
-	        }
-	
-	        var _pageNumber5 = data[0];
-	
-	        // Add arrow.
-	        _annotations2.push({
-	          class: 'Annotation',
-	          type: 'arrow',
-	          direction: data[1],
-	          uuid: (0, _uuid2.default)(),
-	          page: data[0],
-	          x1: x1,
-	          y1: y1,
-	          x2: x2,
-	          y2: y2,
-	          page1: page1,
-	          page2: page2,
-	          text: _textId2,
-	          highlight1: highlight1.uuid,
-	          highlight2: highlight2.uuid,
-	          color: "FF0000", // TODO 要る？
-	          readOnly: readOnly,
-	          seq: index
-	        });
-	      }
-	    };
-	
-	    for (var key in json[documentId]) {
-	      _loop3(key);
-	    }
-	  }
-	
-	  return container;
-	}
-	
-	function getPageSize() {
-	  var viewBox = PDFView.pdfViewer.getPageView(0).viewport.viewBox;
-	  var size = { width: viewBox[2], height: viewBox[3] };
-	  return size;
-	}
-	
-	function transformToRenderCoordinate(annotation) {
-	
-	  // console.log('transformToRenderCoordinate:', annotation);
-	
-	  var _type = 'render';
-	
-	  if (annotation.coords === _type) {
-	    return annotation;
-	  }
-	
-	  annotation.coords = _type;
-	
-	  // Copy for avoiding sharing.
-	  annotation = (0, _deepAssign2.default)({}, annotation);
-	
-	  if (annotation.y) {
-	    annotation.y = convertFromExportY(annotation.page, annotation.y);
-	  }
-	
-	  if (annotation.y1) {
-	    annotation.y1 = convertFromExportY(annotation.page1, annotation.y1);
-	  }
-	
-	  if (annotation.y2) {
-	    annotation.y2 = convertFromExportY(annotation.page2, annotation.y2);
-	  }
-	
-	  if (annotation.rectangles) {
-	    // Copy for avoiding sharing.
-	    annotation.rectangles = annotation.rectangles.map(function (a) {
-	      return (0, _deepAssign2.default)({}, a);
-	    });
-	    annotation.rectangles.forEach(function (r) {
-	      r.y = convertFromExportY(r.page, r.y);
-	    });
-	  }
-	
-	  return annotation;
-	}
-	
-	function transformFromRenderCoordinate(annotation) {
-	
-	  var _type = 'saveData';
-	
-	  if (annotation.coords === _type) {
-	    console.log('skip: ', annotation);
-	    return annotation;
-	  }
-	
-	  // Copy for avoiding sharing.
-	  annotation = (0, _deepAssign2.default)({}, annotation);
-	
-	  annotation.coords = _type;
-	
-	  if (annotation.y) {
-	    var _convertToExportY3 = convertToExportY(annotation.y),
-	        y = _convertToExportY3.y,
-	        _pageNumber7 = _convertToExportY3.pageNumber;
-	
-	    annotation.y = y;
-	    annotation.page = _pageNumber7;
-	  }
-	
-	  if (annotation.y1) {
-	    var _convertToExportY4 = convertToExportY(annotation.y1),
-	        _y3 = _convertToExportY4.y,
-	        _pageNumber8 = _convertToExportY4.pageNumber;
-	
-	    annotation.y1 = _y3;
-	    annotation.page1 = _pageNumber8;
-	  }
-	
-	  if (annotation.y2) {
-	    var _convertToExportY5 = convertToExportY(annotation.y2),
-	        _y4 = _convertToExportY5.y,
-	        _pageNumber9 = _convertToExportY5.pageNumber;
-	
-	    annotation.y2 = _y4;
-	    annotation.page2 = _pageNumber9;
-	  }
-	
-	  if (annotation.rectangles) {
-	    // Copy for avoiding sharing.
-	    annotation.rectangles = annotation.rectangles.map(function (a) {
-	      return (0, _deepAssign2.default)({}, a);
-	    });
-	    annotation.rectangles.forEach(function (r) {
-	      var _convertToExportY6 = convertToExportY(r.y),
-	          y = _convertToExportY6.y,
-	          pageNumber = _convertToExportY6.pageNumber;
-	
-	      r.y = y;
-	      r.page = pageNumber;
-	
-	      console.log('rec:', r.y, y, pageNumber);
-	    });
-	  }
-	
-	  return annotation;
-	}
-	
-	function _getContainers() {
-	  var containers = JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY2) || '[]');
-	  return containers;
-	}
-	
-	function _getContainer() {
-	
-	  var containers = _getContainers().filter(function (c) {
-	    return c.isPrimary;
-	  });
-	
-	  if (containers.length > 0) {
-	    return containers[0];
-	  } else {
-	    return {};
-	  }
-	}
-	
-	function _getSecondaryContainers() {
-	
-	  var containers = _getContainers().filter(function (c) {
-	    return !c.isPrimary;
-	  });
-	
-	  if (containers.length > 0) {
-	    return containers;
-	  } else {
-	    return [];
-	  }
-	
-	  // let containers = localStorage.getItem(LOCALSTORAGE_KEY_SECONDARY) || '[]';
-	  // return JSON.parse(containers);
-	}
-	
-	function _saveContainer(container) {
-	
-	  container.isPrimary = true;
-	
-	  var containers = _getContainers().filter(function (c) {
-	    return c.isPrimary === false;
-	  });
-	
-	  containers = containers.concat([container]);
-	
-	  _saveContainers(containers);
-	
-	  // localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(container));
-	}
-	
-	function _saveContainers(containers) {
-	  localStorage.setItem(LOCALSTORAGE_KEY2, JSON.stringify(containers));
-	}
-	
-	function _saveSecondaryContainer(containers) {
-	  localStorage.setItem(LOCALSTORAGE_KEY_SECONDARY, JSON.stringify(containers));
-	}
-	
-	function _getAnnotations(documentId) {
-	  // Primary annotation.
-	  var container = _getContainer();
-	  var annotations = (container[documentId] || {}).annotations || [];
-	
-	  // transform coordinate system.
-	  annotations = annotations.map(function (a) {
-	    return transformToRenderCoordinate(a);
-	  });
-	
-	  return annotations;
-	}
-	
-	function _getSecondaryAnnotations(documentId) {
-	
-	  var annotations = [];
-	
-	  var containers = _getSecondaryContainers();
-	
-	  containers.forEach(function (container) {
-	    var tmpAnnotations = (container[documentId] || {}).annotations;
-	    if (tmpAnnotations) {
-	      annotations = annotations.concat(tmpAnnotations);
-	    }
-	  });
-	
-	  // transform coordinate system.
-	  annotations = annotations.map(function (a) {
-	    return transformToRenderCoordinate(a);
-	  });
-	
-	  return annotations;
-	}
-	
-	function updateAnnotations(documentId, annotations) {
-	
-	  // Transform coordinate system.
-	  annotations = annotations.map(function (a) {
-	    return transformFromRenderCoordinate(a);
-	  });
-	
-	  var viewBox = PDFView.pdfViewer.getPageView(0).viewport.viewBox;
-	
-	  // TODO remove.
-	  var meta = { w: viewBox[2], h: viewBox[3] };
-	
-	  var container = _getContainer();
-	  container[documentId] = { meta: meta, annotations: annotations };
-	  _saveContainer(container);
-	
-	  // Notifiy.
-	  var event = document.createEvent('CustomEvent');
-	  event.initCustomEvent('annotationUpdated', true, true, {});
-	  window.dispatchEvent(event);
-	}
-	
-	function findAnnotation(documentId, annotationId) {
-	  var index = -1;
-	  var annotations = _getAnnotations(documentId);
-	  for (var i = 0, l = annotations.length; i < l; i++) {
-	    if (annotations[i].uuid === annotationId) {
-	      index = i;
-	      break;
-	    }
-	  }
-	  return index;
-	}
-	
-	var paddingTop = 0;
-	var paddingBetweenPages = 9;
-	
-	function convertToExportY(y, meta) {
-	
-	  meta = getPageSize();
-	
-	  y -= paddingTop;
-	
-	  var pageNumber = Math.floor(y / meta.height) + 1;
-	  var yInPage = y - (pageNumber - 1) * (meta.height + paddingBetweenPages);
-	
-	  return { pageNumber: pageNumber, y: yInPage };
-	}
-	
-	function convertFromExportY(pageNumber, yInPage, meta) {
-	
-	  meta = getPageSize();
-	
-	  var y = yInPage + paddingTop;
-	
-	  y += (pageNumber - 1) * (meta.height + paddingBetweenPages);
-	
-	  return y;
-	}
-	
-	var paddingLeft = 0;
-	
-	function convertToExportX(x, meta) {
-	  return x - paddingLeft;
-	}
-	function convertFromExportX(x, meta) {
-	  return x + paddingLeft;
-	}
-	module.exports = exports['default'];
-
-/***/ },
-/* 17 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	var isObj = __webpack_require__(18);
-	var hasOwnProperty = Object.prototype.hasOwnProperty;
-	var propIsEnumerable = Object.prototype.propertyIsEnumerable;
-	
-	function toObject(val) {
-		if (val === null || val === undefined) {
-			throw new TypeError('Sources cannot be null or undefined');
-		}
-	
-		return Object(val);
-	}
-	
-	function assignKey(to, from, key) {
-		var val = from[key];
-	
-		if (val === undefined || val === null) {
-			return;
-		}
-	
-		if (hasOwnProperty.call(to, key)) {
-			if (to[key] === undefined || to[key] === null) {
-				throw new TypeError('Cannot convert undefined or null to object (' + key + ')');
-			}
-		}
-	
-		if (!hasOwnProperty.call(to, key) || !isObj(val)) {
-			to[key] = val;
-		} else {
-			to[key] = assign(Object(to[key]), from[key]);
-		}
-	}
-	
-	function assign(to, from) {
-		if (to === from) {
-			return to;
-		}
-	
-		from = Object(from);
-	
-		for (var key in from) {
-			if (hasOwnProperty.call(from, key)) {
-				assignKey(to, from, key);
-			}
-		}
-	
-		if (Object.getOwnPropertySymbols) {
-			var symbols = Object.getOwnPropertySymbols(from);
-	
-			for (var i = 0; i < symbols.length; i++) {
-				if (propIsEnumerable.call(from, symbols[i])) {
-					assignKey(to, from, symbols[i]);
-				}
-			}
-		}
-	
-		return to;
-	}
-	
-	module.exports = function deepAssign(target) {
-		target = toObject(target);
-	
-		for (var s = 1; s < arguments.length; s++) {
-			assign(target, arguments[s]);
-		}
-	
-		return target;
-	};
-
-
-/***/ },
 /* 18 */
-/***/ function(module, exports) {
-
-	'use strict';
-	module.exports = function (x) {
-		var type = typeof x;
-		return x !== null && (type === 'object' || type === 'function');
-	};
-
-
-/***/ },
-/* 19 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -13791,13 +13342,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	}
 	
-	function getRelationTextPosition(svg, x1, y1, x2, y2) {
+	function getRelationTextPosition(svgOrNull, x1, y1, x2, y2) {
 	
 	  var textPosition = findBezierControlPoint(x1, y1, x2, y2);
 	
-	  var rect = svg.getBoundingClientRect();
-	  textPosition.x += rect.left;
-	  textPosition.y += rect.top;
+	  if (svgOrNull) {
+	    // Coordinate for DOM.
+	    var rect = svgOrNull.getBoundingClientRect();
+	    textPosition.x += rect.left;
+	    textPosition.y += rect.top;
+	  }
 	
 	  if (x1 < x2) {
 	    // right top quadrant.
@@ -13825,7 +13379,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 20 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -13833,7 +13387,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	var packageJson = __webpack_require__(21);
+	var packageJson = __webpack_require__(20);
 	/**
 	 * Paper Anno Version.
 	 * This is overwritten at build.
@@ -13843,7 +13397,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 21 */
+/* 20 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -13898,7 +13452,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 22 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -13908,11 +13462,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.default = render;
 	
-	var _PDFJSAnnotate = __webpack_require__(7);
+	var _PDFJSAnnotate = __webpack_require__(8);
 	
 	var _PDFJSAnnotate2 = _interopRequireDefault(_PDFJSAnnotate);
 	
-	var _appendChild = __webpack_require__(23);
+	var _appendChild = __webpack_require__(22);
 	
 	var _appendChild2 = _interopRequireDefault(_appendChild);
 	
@@ -13967,7 +13521,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 23 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -13978,27 +13532,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.transform = transform;
 	exports.default = appendChild;
 	
-	var _objectAssign = __webpack_require__(24);
+	var _objectAssign = __webpack_require__(23);
 	
 	var _objectAssign2 = _interopRequireDefault(_objectAssign);
 	
-	var _renderLine = __webpack_require__(25);
+	var _renderLine = __webpack_require__(24);
 	
 	var _renderLine2 = _interopRequireDefault(_renderLine);
 	
-	var _renderPath = __webpack_require__(28);
+	var _renderPath = __webpack_require__(27);
 	
 	var _renderPath2 = _interopRequireDefault(_renderPath);
 	
-	var _renderPoint = __webpack_require__(29);
+	var _renderPoint = __webpack_require__(28);
 	
 	var _renderPoint2 = _interopRequireDefault(_renderPoint);
 	
-	var _renderRect = __webpack_require__(30);
+	var _renderRect = __webpack_require__(29);
 	
 	var _renderRect2 = _interopRequireDefault(_renderRect);
 	
-	var _renderText = __webpack_require__(32);
+	var _renderHighlight = __webpack_require__(32);
+	
+	var _renderHighlight2 = _interopRequireDefault(_renderHighlight);
+	
+	var _renderText = __webpack_require__(31);
 	
 	var _renderText2 = _interopRequireDefault(_renderText);
 	
@@ -14006,7 +13564,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _renderArrow2 = _interopRequireDefault(_renderArrow);
 	
-	var _renderCircle = __webpack_require__(31);
+	var _renderCircle = __webpack_require__(30);
 	
 	var _renderCircle2 = _interopRequireDefault(_renderCircle);
 	
@@ -14124,14 +13682,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	      point = void 0;
 	  switch (annotation.type) {
 	    case 'area':
-	    case 'highlight':
 	    case 'boundingBox':
-	      // **extension**
 	      child = (0, _renderRect2.default)(annotation, svg);
 	      break;
-	    case 'strikeout':
-	      child = (0, _renderLine2.default)(annotation, svg);
+	    case 'highlight':
+	      child = (0, _renderHighlight2.default)(annotation, svg);
 	      break;
+	    // case 'strikeout':
+	    //   child = renderLine(annotation, svg);
+	    //   break;
 	    case 'point':
 	      child = (0, _renderPoint2.default)(annotation, svg);
 	      break;
@@ -14165,7 +13724,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 24 */
+/* 23 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -14254,7 +13813,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 25 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -14264,11 +13823,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.default = renderLine;
 	
-	var _setAttributes = __webpack_require__(26);
+	var _setAttributes = __webpack_require__(25);
 	
 	var _setAttributes2 = _interopRequireDefault(_setAttributes);
 	
-	var _normalizeColor = __webpack_require__(27);
+	var _normalizeColor = __webpack_require__(26);
 	
 	var _normalizeColor2 = _interopRequireDefault(_normalizeColor);
 	
@@ -14306,7 +13865,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 26 */
+/* 25 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -14343,7 +13902,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 27 */
+/* 26 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -14369,7 +13928,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 28 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -14379,11 +13938,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.default = renderPath;
 	
-	var _setAttributes = __webpack_require__(26);
+	var _setAttributes = __webpack_require__(25);
 	
 	var _setAttributes2 = _interopRequireDefault(_setAttributes);
 	
-	var _normalizeColor = __webpack_require__(27);
+	var _normalizeColor = __webpack_require__(26);
 	
 	var _normalizeColor2 = _interopRequireDefault(_normalizeColor);
 	
@@ -14420,7 +13979,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 29 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -14430,7 +13989,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.default = renderPoint;
 	
-	var _setAttributes = __webpack_require__(26);
+	var _setAttributes = __webpack_require__(25);
 	
 	var _setAttributes2 = _interopRequireDefault(_setAttributes);
 	
@@ -14490,7 +14049,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 30 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -14500,30 +14059,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.default = renderRect;
 	
-	var _uuid = __webpack_require__(15);
-	
-	var _uuid2 = _interopRequireDefault(_uuid);
-	
-	var _setAttributes = __webpack_require__(26);
+	var _setAttributes = __webpack_require__(25);
 	
 	var _setAttributes2 = _interopRequireDefault(_setAttributes);
 	
-	var _normalizeColor = __webpack_require__(27);
-	
-	var _normalizeColor2 = _interopRequireDefault(_normalizeColor);
-	
-	var _renderCircle = __webpack_require__(31);
+	var _renderCircle = __webpack_require__(30);
 	
 	var _renderCircle2 = _interopRequireDefault(_renderCircle);
 	
-	var _renderText = __webpack_require__(32);
+	var _renderText = __webpack_require__(31);
 	
 	var _renderText2 = _interopRequireDefault(_renderText);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var rectSecondaryColor = ['green', 'blue', 'purple'];
-	var highlightSecondaryColor = ['green', 'blue', 'purple'];
 	
 	/**
 	 * Create SVGRectElements from an annotation definition.
@@ -14534,60 +14082,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function renderRect(a, svg) {
 	
-	  if (a.type === 'highlight') {
-	    return createHighlight(a, svg);
-	  } else {
-	    return createRectBox(a, svg);
-	  }
-	}
-	
-	function createHighlight(a, svg) {
-	
-	  var color = a.color;
-	  if (!color) {
-	    if (a.readOnly) {
-	      color = highlightSecondaryColor[a.seq % highlightSecondaryColor.length];
-	    } else {
-	      color = '#FF0';
-	    }
-	  }
-	
-	  var group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-	  group.setAttribute('read-only', a.readOnly === true);
-	  group.setAttribute('data-text', a.text);
-	
-	  a.rectangles.forEach(function (r) {
-	    var rect = createRect(r);
-	    rect.setAttribute('fill-opacity', 0.2);
-	    rect.setAttribute('fill', color);
-	    rect.classList.add('anno-highlight');
-	    group.appendChild(rect);
-	  });
-	
-	  var rect = a.rectangles[0];
-	  var circle = (0, _renderCircle2.default)({
-	    x: rect.x,
-	    y: rect.y - _renderCircle.DEFAULT_RADIUS,
-	    type: 'boundingCircle'
-	  });
-	  group.style.visibility = 'visible';
-	  group.appendChild(circle);
-	
-	  return group;
-	}
-	
-	function createRectBox(a, svg) {
-	
-	  // console.log('createRectBox:', a);
-	
-	  var color = a.color;
-	  if (!color) {
-	    if (a.readOnly) {
-	      color = rectSecondaryColor[a.seq % rectSecondaryColor.length];
-	    } else {
-	      color = '#f00';
-	    }
-	  }
+	  var color = a.color || '#f00';
 	
 	  var group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 	  group.setAttribute('read-only', a.readOnly === true);
@@ -14602,28 +14097,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	  group.appendChild(rect);
 	
-	  if (a.text) {
+	  var circle = (0, _renderCircle2.default)({
+	    x: a.x,
+	    y: a.y - _renderCircle.DEFAULT_RADIUS - 2,
+	    type: 'boundingCircle'
+	  });
+	  group.appendChild(circle);
 	
-	    var textAnnotation = {
-	      x: a.x,
-	      y: a.y - 20,
-	      color: color,
-	      content: a.text
-	    };
-	    var text = (0, _renderText2.default)(textAnnotation, svg);
-	    text.setAttribute('data-pdf-annotate-type', 'textbox');
-	    group.appendChild(text);
-	
-	    text.setAttribute('data-rect-id', a.uuid);
-	    var textId = (0, _uuid2.default)();
-	    text.setAttribute('data-pdf-annotate-id', textId);
-	    group.setAttribute('data-text-id', textId);
-	  }
-	
-	  // svg.appendChild(group);
+	  // if (a.text) {
+	  //   let textAnnotation = {
+	  //     x       : a.x + DEFAULT_RADIUS + 2,
+	  //     y       : a.y - 20,
+	  //     content : a.text,
+	  //     color
+	  //   };
+	  //   let text = renderText(textAnnotation, svg);
+	  //   group.appendChild(text);
+	  // }
 	
 	  return group;
-	  // return svg;
 	}
 	
 	function createRect(r) {
@@ -14641,7 +14133,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 31 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -14652,11 +14144,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.DEFAULT_RADIUS = undefined;
 	exports.default = renderCircle;
 	
-	var _setAttributes = __webpack_require__(26);
+	var _setAttributes = __webpack_require__(25);
 	
 	var _setAttributes2 = _interopRequireDefault(_setAttributes);
 	
-	var _normalizeColor = __webpack_require__(27);
+	var _normalizeColor = __webpack_require__(26);
 	
 	var _normalizeColor2 = _interopRequireDefault(_normalizeColor);
 	
@@ -14728,7 +14220,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 32 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -14738,15 +14230,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.default = renderText;
 	
-	var _setAttributes = __webpack_require__(26);
+	var _setAttributes = __webpack_require__(25);
 	
 	var _setAttributes2 = _interopRequireDefault(_setAttributes);
 	
-	var _normalizeColor = __webpack_require__(27);
+	var _normalizeColor = __webpack_require__(26);
 	
 	var _normalizeColor2 = _interopRequireDefault(_normalizeColor);
 	
-	var _renderCircle = __webpack_require__(31);
+	var _renderCircle = __webpack_require__(30);
 	
 	var _renderCircle2 = _interopRequireDefault(_renderCircle);
 	
@@ -14802,7 +14294,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    fill: color,
 	    fontSize: DEFAULT_FONT_SIZE
 	  });
-	  text.innerHTML = a.content;
+	  text.innerHTML = a.content || a.text;
 	
 	  // Background.
 	  var box = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -14828,6 +14320,88 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
+/* 32 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = renderHighlight;
+	
+	var _uuid = __webpack_require__(12);
+	
+	var _uuid2 = _interopRequireDefault(_uuid);
+	
+	var _setAttributes = __webpack_require__(25);
+	
+	var _setAttributes2 = _interopRequireDefault(_setAttributes);
+	
+	var _normalizeColor = __webpack_require__(26);
+	
+	var _normalizeColor2 = _interopRequireDefault(_normalizeColor);
+	
+	var _renderCircle = __webpack_require__(30);
+	
+	var _renderCircle2 = _interopRequireDefault(_renderCircle);
+	
+	var _renderText = __webpack_require__(31);
+	
+	var _renderText2 = _interopRequireDefault(_renderText);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	/**
+	 * Create SVGRectElements from an annotation definition.
+	 * This is used for anntations of type `area` and `highlight`.
+	 *
+	 * @param {Object} a The annotation definition
+	 * @return {SVGGElement|SVGRectElement} A group of all rects to be rendered
+	 */
+	function renderHighlight(a, svg) {
+	
+	  var color = a.color || '#FF0';
+	
+	  var group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+	  group.setAttribute('read-only', a.readOnly === true);
+	  group.setAttribute('data-text', a.text);
+	
+	  a.rectangles.forEach(function (r) {
+	    var rect = createRect(r);
+	    rect.setAttribute('fill-opacity', 0.2);
+	    rect.setAttribute('fill', color);
+	    rect.classList.add('anno-highlight');
+	    group.appendChild(rect);
+	  });
+	
+	  var rect = a.rectangles[0];
+	  var circle = (0, _renderCircle2.default)({
+	    x: rect.x,
+	    y: rect.y - _renderCircle.DEFAULT_RADIUS,
+	    type: 'boundingCircle'
+	  });
+	  group.style.visibility = 'visible';
+	  group.appendChild(circle);
+	
+	  return group;
+	}
+	
+	function createRect(r) {
+	
+	  var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+	  (0, _setAttributes2.default)(rect, {
+	    x: r.x,
+	    y: r.y,
+	    width: r.width,
+	    height: r.height
+	  });
+	
+	  return rect;
+	}
+	module.exports = exports['default'];
+
+/***/ },
 /* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -14839,19 +14413,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = renderArrow;
 	exports.createArrow = createArrow;
 	
-	var _setAttributes = __webpack_require__(26);
+	var _setAttributes = __webpack_require__(25);
 	
 	var _setAttributes2 = _interopRequireDefault(_setAttributes);
 	
-	var _normalizeColor = __webpack_require__(27);
+	var _normalizeColor = __webpack_require__(26);
 	
 	var _normalizeColor2 = _interopRequireDefault(_normalizeColor);
 	
-	var _renderCircle = __webpack_require__(31);
+	var _renderCircle = __webpack_require__(30);
 	
 	var _renderCircle2 = _interopRequireDefault(_renderCircle);
 	
-	var _relation = __webpack_require__(19);
+	var _relation = __webpack_require__(18);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -14896,8 +14470,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  (0, _setAttributes2.default)(group, {
 	    fill: color,
 	    stroke: color,
-	    'data-highlight1': a.highlight1,
-	    'data-highlight2': a.highlight2,
+	    'data-rel1': a.rel1,
+	    'data-rel2': a.rel2,
 	    'data-text': a.text
 	  });
 	  group.style.visibility = 'visible';
@@ -14961,7 +14535,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  group.appendChild(arrow);
 	
-	  console.log('createArrow:', group);
+	  // console.log('createArrow:', group);
 	
 	  return group;
 	}
@@ -15199,7 +14773,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _insertElementWithinElement2 = _interopRequireDefault(_insertElementWithinElement);
 	
-	var _utils = __webpack_require__(12);
+	var _utils = __webpack_require__(16);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -15266,7 +14840,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.default = insertElementWithinElement;
 	
-	var _utils = __webpack_require__(12);
+	var _utils = __webpack_require__(16);
 	
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 	
@@ -15370,7 +14944,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.default = renderScreenReaderComments;
 	
-	var _PDFJSAnnotate = __webpack_require__(7);
+	var _PDFJSAnnotate = __webpack_require__(8);
 	
 	var _PDFJSAnnotate2 = _interopRequireDefault(_PDFJSAnnotate);
 	
@@ -15484,9 +15058,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _renderScreenReaderComments2 = _interopRequireDefault(_renderScreenReaderComments);
 	
-	var _event = __webpack_require__(10);
+	var _event = __webpack_require__(42);
 	
-	var _PDFJSAnnotate = __webpack_require__(7);
+	var _PDFJSAnnotate = __webpack_require__(8);
 	
 	var _PDFJSAnnotate2 = _interopRequireDefault(_PDFJSAnnotate);
 	
@@ -15596,43 +15170,73 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.fireEvent = fireEvent;
+	exports.addEventListener = addEventListener;
+	exports.removeEventListener = removeEventListener;
 	
-	var _event = __webpack_require__(10);
+	var _events = __webpack_require__(7);
 	
-	var _edit = __webpack_require__(43);
+	var _events2 = _interopRequireDefault(_events);
 	
-	var _pen = __webpack_require__(44);
+	var _utils = __webpack_require__(16);
 	
-	var _point = __webpack_require__(45);
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var _rect = __webpack_require__(46);
+	var emitter = new _events2.default();
 	
-	var _highlight = __webpack_require__(51);
+	var clickNode = void 0;
 	
-	var _text = __webpack_require__(47);
+	/**
+	 * Handle document.click event
+	 *
+	 * @param {Event} e The DOM event to be handled
+	 */
+	document.addEventListener('click', function handleDocumentClick(e) {
+	  if (!(0, _utils.findSVGAtPoint)(e.clientX, e.clientY)) {
+	    return;
+	  }
 	
-	var _page = __webpack_require__(52);
+	  var target = (0, _utils.findAnnotationAtPoint)(e.clientX, e.clientY);
 	
-	var _arrow = __webpack_require__(53);
+	  // Emit annotation:blur if clickNode is no longer clicked
+	  if (clickNode && clickNode !== target) {
+	    emitter.emit('annotation:blur', clickNode);
+	  }
 	
-	var _view = __webpack_require__(49);
+	  // Emit annotation:click if target was clicked
+	  if (target) {
+	    emitter.emit('annotation:click', target);
+	  }
 	
-	// extends.
-	exports.default = {
-	  addEventListener: _event.addEventListener, removeEventListener: _event.removeEventListener, fireEvent: _event.fireEvent,
-	  disableEdit: _edit.disableEdit, enableEdit: _edit.enableEdit,
-	  disablePen: _pen.disablePen, enablePen: _pen.enablePen, setPen: _pen.setPen,
-	  disablePoint: _point.disablePoint, enablePoint: _point.enablePoint,
-	  disableRect: _rect.disableRect, enableRect: _rect.enableRect,
-	  disableHighlight: _highlight.disableHighlight, enableHighlight: _highlight.enableHighlight,
-	  disableText: _text.disableText, enableText: _text.enableText,
-	  createPage: _page.createPage, renderPage: _page.renderPage,
+	  clickNode = target;
+	});
 	
-	  // extends
-	  disableArrow: _arrow.disableArrow, enableArrow: _arrow.enableArrow,
-	  disableViewMode: _view.disableViewMode, enableViewMode: _view.enableViewMode
+	// let mouseOverNode;
+	// document.addEventListener('mousemove', function handleDocumentMousemove(e) {
+	//   let target = findAnnotationAtPoint(e.clientX, e.clientY);
+	//
+	//   // Emit annotation:mouseout if target was mouseout'd
+	//   if (mouseOverNode && !target) {
+	//     emitter.emit('annotation:mouseout', mouseOverNode);
+	//   }
+	//
+	//   // Emit annotation:mouseover if target was mouseover'd
+	//   if (target && mouseOverNode !== target) {
+	//     emitter.emit('annotation:mouseover', target);
+	//   }
+	//
+	//   mouseOverNode = target;
+	// });
+	
+	function fireEvent() {
+	  emitter.emit.apply(emitter, arguments);
 	};
-	module.exports = exports['default'];
+	function addEventListener() {
+	  emitter.on.apply(emitter, arguments);
+	};
+	function removeEventListener() {
+	  emitter.removeListener.apply(emitter, arguments);
+	};
 
 /***/ },
 /* 43 */
@@ -15644,734 +15248,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 	
-	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+	var _event = __webpack_require__(42);
 	
-	exports.enableEdit = enableEdit;
-	exports.disableEdit = disableEdit;
+	var _rect = __webpack_require__(44);
 	
-	var _PDFJSAnnotate = __webpack_require__(7);
+	var _highlight = __webpack_require__(50);
 	
-	var _PDFJSAnnotate2 = _interopRequireDefault(_PDFJSAnnotate);
+	var _text = __webpack_require__(45);
 	
-	var _appendChild = __webpack_require__(23);
+	var _arrow = __webpack_require__(52);
 	
-	var _appendChild2 = _interopRequireDefault(_appendChild);
+	var _view = __webpack_require__(47);
 	
-	var _event = __webpack_require__(10);
+	exports.default = {
+	  addEventListener: _event.addEventListener, removeEventListener: _event.removeEventListener, fireEvent: _event.fireEvent,
 	
-	var _utils = __webpack_require__(12);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-	
-	var _enabled = false;
-	var isDragging = false,
-	    overlay = void 0;
-	var dragOffsetX = void 0,
-	    dragOffsetY = void 0,
-	    dragStartX = void 0,
-	    dragStartY = void 0;
-	var OVERLAY_BORDER_SIZE = 3;
-	
-	/**
-	 * Create an overlay for editing an annotation.
-	 *
-	 * @param {Element} target The annotation element to apply overlay for
-	 */
-	function createEditOverlay(target) {
-	  destroyEditOverlay();
-	
-	  overlay = document.createElement('div');
-	  var anchor = document.createElement('a');
-	  var parentNode = (0, _utils.findSVGContainer)(target).parentNode;
-	  var id = target.getAttribute('data-pdf-annotate-id');
-	  var rect = (0, _utils.getAnnotationRect)(target);
-	  var styleLeft = rect.left - OVERLAY_BORDER_SIZE;
-	  var styleTop = rect.top - OVERLAY_BORDER_SIZE;
-	
-	  overlay.setAttribute('id', 'pdf-annotate-edit-overlay');
-	  overlay.setAttribute('data-target-id', id);
-	  overlay.style.boxSizing = 'content-box';
-	  overlay.style.position = 'absolute';
-	  overlay.style.top = styleTop + 'px';
-	  overlay.style.left = styleLeft + 'px';
-	  overlay.style.width = rect.width + 'px';
-	  overlay.style.height = rect.height + 'px';
-	  overlay.style.border = OVERLAY_BORDER_SIZE + 'px solid ' + _utils.BORDER_COLOR;
-	  overlay.style.borderRadius = OVERLAY_BORDER_SIZE + 'px';
-	
-	  anchor.innerHTML = '×';
-	  anchor.setAttribute('href', 'javascript://');
-	  anchor.style.background = '#fff';
-	  anchor.style.borderRadius = '20px';
-	  anchor.style.border = '1px solid #bbb';
-	  anchor.style.color = '#bbb';
-	  anchor.style.fontSize = '16px';
-	  anchor.style.padding = '2px';
-	  anchor.style.textAlign = 'center';
-	  anchor.style.textDecoration = 'none';
-	  anchor.style.position = 'absolute';
-	  anchor.style.top = '-13px';
-	  anchor.style.right = '-13px';
-	  anchor.style.width = '25px';
-	  anchor.style.height = '25px';
-	
-	  overlay.appendChild(anchor);
-	  parentNode.appendChild(overlay);
-	  document.addEventListener('click', handleDocumentClick);
-	  document.addEventListener('keyup', handleDocumentKeyup);
-	  document.addEventListener('mousedown', handleDocumentMousedown);
-	  anchor.addEventListener('click', deleteAnnotation);
-	  anchor.addEventListener('mouseover', function () {
-	    anchor.style.color = '#35A4DC';
-	    anchor.style.borderColor = '#999';
-	    anchor.style.boxShadow = '0 1px 1px #ccc';
-	  });
-	  anchor.addEventListener('mouseout', function () {
-	    anchor.style.color = '#bbb';
-	    anchor.style.borderColor = '#bbb';
-	    anchor.style.boxShadow = '';
-	  });
-	  overlay.addEventListener('mouseover', function () {
-	    if (!isDragging) {
-	      anchor.style.display = '';
-	    }
-	  });
-	  overlay.addEventListener('mouseout', function () {
-	    anchor.style.display = 'none';
-	  });
-	}
-	
-	/**
-	 * Destroy the edit overlay if it exists.
-	 */
-	function destroyEditOverlay() {
-	  if (overlay) {
-	    overlay.parentNode.removeChild(overlay);
-	    overlay = null;
-	  }
-	
-	  document.removeEventListener('click', handleDocumentClick);
-	  document.removeEventListener('keyup', handleDocumentKeyup);
-	  document.removeEventListener('mousedown', handleDocumentMousedown);
-	  document.removeEventListener('mousemove', handleDocumentMousemove);
-	  document.removeEventListener('mouseup', handleDocumentMouseup);
-	  (0, _utils.enableUserSelect)();
-	}
-	
-	/**
-	 * Delete currently selected annotation
-	 */
-	function deleteAnnotation() {
-	  if (!overlay) {
-	    return;
-	  }
-	
-	  var annotationId = overlay.getAttribute('data-target-id');
-	  var nodes = document.querySelectorAll('[data-pdf-annotate-id="' + annotationId + '"]');
-	  var svg = overlay.parentNode.querySelector('svg.annotationLayer');
-	
-	  var _getMetadata = (0, _utils.getMetadata)(svg),
-	      documentId = _getMetadata.documentId;
-	
-	  [].concat(_toConsumableArray(nodes)).forEach(function (n) {
-	    n.parentNode.removeChild(n);
-	  });
-	
-	  _PDFJSAnnotate2.default.getStoreAdapter().deleteAnnotation(documentId, annotationId);
-	
-	  destroyEditOverlay();
-	}
-	
-	/**
-	 * Handle document.click event
-	 *
-	 * @param {Event} e The DOM event that needs to be handled
-	 */
-	function handleDocumentClick(e) {
-	  if (!(0, _utils.findSVGAtPoint)(e.clientX, e.clientY)) {
-	    return;
-	  }
-	
-	  // Remove current overlay
-	  var overlay = document.getElementById('pdf-annotate-edit-overlay');
-	  if (overlay) {
-	    if (isDragging || e.target === overlay) {
-	      return;
-	    }
-	
-	    destroyEditOverlay();
-	  }
-	}
-	
-	/**
-	 * Handle document.keyup event
-	 *
-	 * @param {Event} e The DOM event that needs to be handled
-	 */
-	function handleDocumentKeyup(e) {
-	  if (overlay && e.keyCode === 46 && e.target.nodeName.toLowerCase() !== 'textarea' && e.target.nodeName.toLowerCase() !== 'input') {
-	    deleteAnnotation();
-	  }
-	}
-	
-	/**
-	 * Handle document.mousedown event
-	 *
-	 * @param {Event} e The DOM event that needs to be handled
-	 */
-	function handleDocumentMousedown(e) {
-	  if (e.target !== overlay) {
-	    return;
-	  }
-	
-	  // Highlight and strikeout annotations are bound to text within the document.
-	  // It doesn't make sense to allow repositioning these types of annotations.
-	  var annotationId = overlay.getAttribute('data-target-id');
-	  var target = document.querySelector('[data-pdf-annotate-id="' + annotationId + '"]');
-	  var type = target.getAttribute('data-pdf-annotate-type');
-	
-	  if (type === 'highlight' || type === 'strikeout') {
-	    return;
-	  }
-	
-	  isDragging = true;
-	  dragOffsetX = e.clientX;
-	  dragOffsetY = e.clientY;
-	  dragStartX = overlay.offsetLeft;
-	  dragStartY = overlay.offsetTop;
-	
-	  overlay.style.background = 'rgba(255, 255, 255, 0.7)';
-	  overlay.style.cursor = 'move';
-	  overlay.querySelector('a').style.display = 'none';
-	
-	  document.addEventListener('mousemove', handleDocumentMousemove);
-	  document.addEventListener('mouseup', handleDocumentMouseup);
-	  (0, _utils.disableUserSelect)();
-	}
-	
-	/**
-	 * Handle document.mousemove event
-	 *
-	 * @param {Event} e The DOM event that needs to be handled
-	 */
-	function handleDocumentMousemove(e) {
-	  var annotationId = overlay.getAttribute('data-target-id');
-	  var parentNode = overlay.parentNode;
-	  var rect = parentNode.getBoundingClientRect();
-	  var y = dragStartY + (e.clientY - dragOffsetY);
-	  var x = dragStartX + (e.clientX - dragOffsetX);
-	  var minY = 0;
-	  var maxY = rect.height;
-	  var minX = 0;
-	  var maxX = rect.width;
-	
-	  if (y > minY && y + overlay.offsetHeight < maxY) {
-	    overlay.style.top = y + 'px';
-	  }
-	
-	  if (x > minX && x + overlay.offsetWidth < maxX) {
-	    overlay.style.left = x + 'px';
-	  }
-	}
-	
-	/**
-	 * Handle document.mouseup event
-	 *
-	 * @param {Event} e The DOM event that needs to be handled
-	 */
-	function handleDocumentMouseup(e) {
-	  var annotationId = overlay.getAttribute('data-target-id');
-	  var target = document.querySelectorAll('[data-pdf-annotate-id="' + annotationId + '"]');
-	  var type = target[0].getAttribute('data-pdf-annotate-type');
-	  var svg = overlay.parentNode.querySelector('svg.annotationLayer');
-	
-	  var _getMetadata2 = (0, _utils.getMetadata)(svg),
-	      documentId = _getMetadata2.documentId;
-	
-	  overlay.querySelector('a').style.display = '';
-	
-	  function getDelta(propX, propY) {
-	    return calcDelta(parseInt(target[0].getAttribute(propX), 10), parseInt(target[0].getAttribute(propY), 10));
-	  }
-	
-	  function calcDelta(x, y) {
-	    return {
-	      deltaX: OVERLAY_BORDER_SIZE + (0, _utils.scaleDown)(svg, { x: overlay.offsetLeft }).x - x,
-	      deltaY: OVERLAY_BORDER_SIZE + (0, _utils.scaleDown)(svg, { y: overlay.offsetTop }).y - y
-	    };
-	  }
-	
-	  _PDFJSAnnotate2.default.getStoreAdapter().getAnnotation(documentId, annotationId).then(function (annotation) {
-	    if (['area', 'highlight', 'point', 'textbox'].indexOf(type) > -1) {
-	      (function () {
-	        var _getDelta = getDelta('x', 'y'),
-	            deltaX = _getDelta.deltaX,
-	            deltaY = _getDelta.deltaY;
-	
-	        [].concat(_toConsumableArray(target)).forEach(function (t, i) {
-	          if (deltaY !== 0) {
-	            var modelY = parseInt(t.getAttribute('y'), 10) + deltaY;
-	            var viewY = modelY;
-	
-	            if (type === 'textbox') {
-	              viewY += annotation.size;
-	            }
-	
-	            if (type === 'point') {
-	              viewY = (0, _utils.scaleUp)(svg, { viewY: viewY }).viewY;
-	            }
-	
-	            t.setAttribute('y', viewY);
-	            if (annotation.rectangles) {
-	              annotation.rectangles[i].y = modelY;
-	            } else if (annotation.y) {
-	              annotation.y = modelY;
-	            }
-	          }
-	          if (deltaX !== 0) {
-	            var modelX = parseInt(t.getAttribute('x'), 10) + deltaX;
-	            var viewX = modelX;
-	
-	            if (type === 'point') {
-	              viewX = (0, _utils.scaleUp)(svg, { viewX: viewX }).viewX;
-	            }
-	
-	            t.setAttribute('x', viewX);
-	            if (annotation.rectangles) {
-	              annotation.rectangles[i].x = modelX;
-	            } else if (annotation.x) {
-	              annotation.x = modelX;
-	            }
-	          }
-	        });
-	        // } else if (type === 'strikeout') {
-	        //   let { deltaX, deltaY } = getDelta('x1', 'y1');
-	        //   [...target].forEach(target, (t, i) => {
-	        //     if (deltaY !== 0) {
-	        //       t.setAttribute('y1', parseInt(t.getAttribute('y1'), 10) + deltaY);
-	        //       t.setAttribute('y2', parseInt(t.getAttribute('y2'), 10) + deltaY);
-	        //       annotation.rectangles[i].y = parseInt(t.getAttribute('y1'), 10);
-	        //     }
-	        //     if (deltaX !== 0) {
-	        //       t.setAttribute('x1', parseInt(t.getAttribute('x1'), 10) + deltaX);
-	        //       t.setAttribute('x2', parseInt(t.getAttribute('x2'), 10) + deltaX);
-	        //       annotation.rectangles[i].x = parseInt(t.getAttribute('x1'), 10);
-	        //     }
-	        //   });
-	      })();
-	    } else if (type === 'drawing') {
-	      (function () {
-	        var rect = (0, _utils.scaleDown)(svg, (0, _utils.getAnnotationRect)(target[0]));
-	
-	        var _annotation$lines$ = _slicedToArray(annotation.lines[0], 2),
-	            originX = _annotation$lines$[0],
-	            originY = _annotation$lines$[1];
-	
-	        var _calcDelta = calcDelta(originX, originY),
-	            deltaX = _calcDelta.deltaX,
-	            deltaY = _calcDelta.deltaY;
-	
-	        // origin isn't necessarily at 0/0 in relation to overlay x/y
-	        // adjust the difference between overlay and drawing coords
-	
-	
-	        deltaY += originY - rect.top;
-	        deltaX += originX - rect.left;
-	
-	        annotation.lines.forEach(function (line, i) {
-	          var _annotation$lines$i = _slicedToArray(annotation.lines[i], 2),
-	              x = _annotation$lines$i[0],
-	              y = _annotation$lines$i[1];
-	
-	          annotation.lines[i][0] = x + deltaX;
-	          annotation.lines[i][1] = y + deltaY;
-	        });
-	
-	        target[0].parentNode.removeChild(target[0]);
-	        (0, _appendChild2.default)(svg, annotation);
-	      })();
-	    }
-	
-	    _PDFJSAnnotate2.default.getStoreAdapter().editAnnotation(documentId, annotationId, annotation);
-	  });
-	
-	  setTimeout(function () {
-	    isDragging = false;
-	  }, 0);
-	
-	  overlay.style.background = '';
-	  overlay.style.cursor = '';
-	
-	  document.removeEventListener('mousemove', handleDocumentMousemove);
-	  document.removeEventListener('mouseup', handleDocumentMouseup);
-	  (0, _utils.enableUserSelect)();
-	}
-	
-	/**
-	 * Handle annotation.click event
-	 *
-	 * @param {Element} e The annotation element that was clicked
-	 */
-	function handleAnnotationClick(target) {
-	  createEditOverlay(target);
-	}
-	
-	/**
-	 * Enable edit mode behavior.
-	 */
-	function enableEdit() {
-	  if (_enabled) {
-	    return;
-	  }
-	
-	  _enabled = true;
-	  (0, _event.addEventListener)('annotation:click', handleAnnotationClick);
+	  disableRect: _rect.disableRect, enableRect: _rect.enableRect,
+	  disableHighlight: _highlight.disableHighlight, enableHighlight: _highlight.enableHighlight,
+	  disableText: _text.disableText, enableText: _text.enableText,
+	  disableArrow: _arrow.disableArrow, enableArrow: _arrow.enableArrow,
+	  disableViewMode: _view.disableViewMode, enableViewMode: _view.enableViewMode
 	};
-	
-	/**
-	 * Disable edit mode behavior.
-	 */
-	function disableEdit() {
-	  destroyEditOverlay();
-	
-	  if (!_enabled) {
-	    return;
-	  }
-	
-	  _enabled = false;
-	  (0, _event.removeEventListener)('annotation:click', handleAnnotationClick);
-	};
+	module.exports = exports['default'];
 
 /***/ },
 /* 44 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.setPen = setPen;
-	exports.enablePen = enablePen;
-	exports.disablePen = disablePen;
-	
-	var _PDFJSAnnotate = __webpack_require__(7);
-	
-	var _PDFJSAnnotate2 = _interopRequireDefault(_PDFJSAnnotate);
-	
-	var _appendChild = __webpack_require__(23);
-	
-	var _appendChild2 = _interopRequireDefault(_appendChild);
-	
-	var _utils = __webpack_require__(12);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var _enabled = false;
-	var _penSize = void 0;
-	var _penColor = void 0;
-	var path = void 0;
-	var lines = void 0;
-	
-	/**
-	 * Handle document.mousedown event
-	 */
-	function handleDocumentMousedown() {
-	  path = null;
-	  lines = [];
-	
-	  document.addEventListener('mousemove', handleDocumentMousemove);
-	  document.addEventListener('mouseup', handleDocumentMouseup);
-	}
-	
-	/**
-	 * Handle document.mouseup event
-	 *
-	 * @param {Event} e The DOM event to be handled
-	 */
-	function handleDocumentMouseup(e) {
-	  var svg = void 0;
-	  if (lines.length > 1 && (svg = (0, _utils.findSVGAtPoint)(e.clientX, e.clientY))) {
-	    var _getMetadata = (0, _utils.getMetadata)(svg),
-	        documentId = _getMetadata.documentId,
-	        pageNumber = _getMetadata.pageNumber;
-	
-	    _PDFJSAnnotate2.default.getStoreAdapter().addAnnotation(documentId, pageNumber, {
-	      type: 'drawing',
-	      width: _penSize,
-	      color: _penColor,
-	      lines: lines
-	    }).then(function (annotation) {
-	      if (path) {
-	        svg.removeChild(path);
-	      }
-	
-	      (0, _appendChild2.default)(svg, annotation);
-	    });
-	  }
-	
-	  document.removeEventListener('mousemove', handleDocumentMousemove);
-	  document.removeEventListener('mouseup', handleDocumentMouseup);
-	}
-	
-	/**
-	 * Handle document.mousemove event
-	 *
-	 * @param {Event} e The DOM event to be handled
-	 */
-	function handleDocumentMousemove(e) {
-	  savePoint(e.clientX, e.clientY);
-	}
-	
-	/**
-	 * Handle document.keyup event
-	 *
-	 * @param {Event} e The DOM event to be handled
-	 */
-	function handleDocumentKeyup(e) {
-	  // Cancel rect if Esc is pressed
-	  if (e.keyCode === 27) {
-	    lines = null;
-	    path.parentNode.removeChild(path);
-	    document.removeEventListener('mousemove', handleDocumentMousemove);
-	    document.removeEventListener('mouseup', handleDocumentMouseup);
-	  }
-	}
-	
-	/**
-	 * Save a point to the line being drawn.
-	 *
-	 * @param {Number} x The x coordinate of the point
-	 * @param {Number} y The y coordinate of the point
-	 */
-	function savePoint(x, y) {
-	  var svg = (0, _utils.findSVGAtPoint)(x, y);
-	  if (!svg) {
-	    return;
-	  }
-	
-	  var rect = svg.getBoundingClientRect();
-	  var point = (0, _utils.scaleDown)(svg, {
-	    x: x - rect.left,
-	    y: y - rect.top
-	  });
-	
-	  lines.push([point.x, point.y]);
-	
-	  if (lines.length <= 1) {
-	    return;
-	  }
-	
-	  if (path) {
-	    svg.removeChild(path);
-	  }
-	
-	  path = (0, _appendChild2.default)(svg, {
-	    type: 'drawing',
-	    color: _penColor,
-	    width: _penSize,
-	    lines: lines
-	  });
-	}
-	
-	/**
-	 * Set the attributes of the pen.
-	 *
-	 * @param {Number} penSize The size of the lines drawn by the pen
-	 * @param {String} penColor The color of the lines drawn by the pen
-	 */
-	function setPen() {
-	  var penSize = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-	  var penColor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '000000';
-	
-	  _penSize = parseInt(penSize, 10);
-	  _penColor = penColor;
-	}
-	
-	/**
-	 * Enable the pen behavior
-	 */
-	function enablePen() {
-	  if (_enabled) {
-	    return;
-	  }
-	
-	  _enabled = true;
-	  document.addEventListener('mousedown', handleDocumentMousedown);
-	  document.addEventListener('keyup', handleDocumentKeyup);
-	  (0, _utils.disableUserSelect)();
-	}
-	
-	/**
-	 * Disable the pen behavior
-	 */
-	function disablePen() {
-	  if (!_enabled) {
-	    return;
-	  }
-	
-	  _enabled = false;
-	  document.removeEventListener('mousedown', handleDocumentMousedown);
-	  document.removeEventListener('keyup', handleDocumentKeyup);
-	  (0, _utils.enableUserSelect)();
-	}
-
-/***/ },
-/* 45 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-	
-	exports.enablePoint = enablePoint;
-	exports.disablePoint = disablePoint;
-	
-	var _PDFJSAnnotate = __webpack_require__(7);
-	
-	var _PDFJSAnnotate2 = _interopRequireDefault(_PDFJSAnnotate);
-	
-	var _appendChild = __webpack_require__(23);
-	
-	var _appendChild2 = _interopRequireDefault(_appendChild);
-	
-	var _utils = __webpack_require__(12);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var _enabled = false;
-	var input = void 0;
-	
-	/**
-	 * Handle document.mouseup event
-	 *
-	 * @param {Event} The DOM event to be handled
-	 */
-	function handleDocumentMouseup(e) {
-	  if (input || !(0, _utils.findSVGAtPoint)(e.clientX, e.clientY)) {
-	    return;
-	  }
-	
-	  input = document.createElement('input');
-	  input.setAttribute('id', 'pdf-annotate-point-input');
-	  input.setAttribute('placeholder', 'Enter comment');
-	  input.style.border = '3px solid ' + _utils.BORDER_COLOR;
-	  input.style.borderRadius = '3px';
-	  input.style.position = 'absolute';
-	  input.style.top = e.clientY + 'px';
-	  input.style.left = e.clientX + 'px';
-	
-	  input.addEventListener('blur', handleInputBlur);
-	  input.addEventListener('keyup', handleInputKeyup);
-	
-	  document.body.appendChild(input);
-	  input.focus();
-	}
-	
-	/**
-	 * Handle input.blur event
-	 */
-	function handleInputBlur() {
-	  savePoint();
-	}
-	
-	/**
-	 * Handle input.keyup event
-	 *
-	 * @param {Event} e The DOM event to handle
-	 */
-	function handleInputKeyup(e) {
-	  if (e.keyCode === 27) {
-	    closeInput();
-	  } else if (e.keyCode === 13) {
-	    savePoint();
-	  }
-	}
-	
-	/**
-	 * Save a new point annotation from input
-	 */
-	function savePoint() {
-	  if (input.value.trim().length > 0) {
-	    var _ret = function () {
-	      var clientX = parseInt(input.style.left, 10);
-	      var clientY = parseInt(input.style.top, 10);
-	      var content = input.value.trim();
-	      var svg = (0, _utils.findSVGAtPoint)(clientX, clientY);
-	      if (!svg) {
-	        return {
-	          v: void 0
-	        };
-	      }
-	
-	      var rect = svg.getBoundingClientRect();
-	
-	      var _getMetadata = (0, _utils.getMetadata)(svg),
-	          documentId = _getMetadata.documentId,
-	          pageNumber = _getMetadata.pageNumber;
-	
-	      var annotation = Object.assign({
-	        type: 'point'
-	      }, (0, _utils.scaleDown)(svg, {
-	        x: clientX - rect.left,
-	        y: clientY - rect.top
-	      }));
-	
-	      _PDFJSAnnotate2.default.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation).then(function (annotation) {
-	        _PDFJSAnnotate2.default.getStoreAdapter().addComment(documentId, annotation.uuid, content);
-	
-	        (0, _appendChild2.default)(svg, annotation);
-	      });
-	    }();
-	
-	    if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
-	  }
-	
-	  closeInput();
-	}
-	
-	/**
-	 * Close the input element
-	 */
-	function closeInput() {
-	  input.removeEventListener('blur', handleInputBlur);
-	  input.removeEventListener('keyup', handleInputKeyup);
-	  document.body.removeChild(input);
-	  input = null;
-	}
-	
-	/**
-	 * Enable point annotation behavior
-	 */
-	function enablePoint() {
-	  if (_enabled) {
-	    return;
-	  }
-	
-	  _enabled = true;
-	  document.addEventListener('mouseup', handleDocumentMouseup);
-	}
-	
-	/**
-	 * Disable point annotation behavior
-	 */
-	function disablePoint() {
-	  if (!_enabled) {
-	    return;
-	  }
-	
-	  _enabled = false;
-	  document.removeEventListener('mouseup', handleDocumentMouseup);
-	}
-
-/***/ },
-/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -16386,23 +15287,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _jquery2 = _interopRequireDefault(_jquery);
 	
-	var _deepAssign = __webpack_require__(17);
+	var _deepAssign = __webpack_require__(14);
 	
 	var _deepAssign2 = _interopRequireDefault(_deepAssign);
 	
-	var _PDFJSAnnotate = __webpack_require__(7);
+	var _PDFJSAnnotate = __webpack_require__(8);
 	
 	var _PDFJSAnnotate2 = _interopRequireDefault(_PDFJSAnnotate);
 	
-	var _appendChild = __webpack_require__(23);
+	var _appendChild = __webpack_require__(22);
 	
 	var _appendChild2 = _interopRequireDefault(_appendChild);
 	
-	var _utils = __webpack_require__(12);
+	var _utils = __webpack_require__(16);
 	
-	var _text = __webpack_require__(47);
+	var _text = __webpack_require__(45);
 	
-	var _rect = __webpack_require__(48);
+	var _rect = __webpack_require__(46);
 	
 	var _rect2 = _interopRequireDefault(_rect);
 	
@@ -16539,81 +15440,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // Save.
 	
 	
-	  _PDFJSAnnotate2.default.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation).then(function (annotation) {
+	  var rectAnnotation = _rect2.default.newInstance(annotation);
+	  rectAnnotation.save();
 	
-	    console.log('bbbbbbbbb:', annotation);
+	  // Render.
+	  rectAnnotation.render();
 	
-	    // appendChild(svg, annotation);
+	  // Add an input field.
+	  var x = annotation.x;
+	  var y = annotation.y - 20; // 20 = circle'radius(3px) + input height(14px) + α
+	  var boundingRect = svg.getBoundingClientRect();
 	
-	    var rectAnnotation = _rect2.default.newInstance(annotation);
+	  x = (0, _utils.scaleUp)(svg, { x: x }).x + boundingRect.left;
+	  y = (0, _utils.scaleUp)(svg, { y: y }).y + boundingRect.top;
+	
+	  (0, _text.addInputField)(x, y, null, null, function (text) {
+	
+	    if (!text) {
+	      return;
+	    }
+	
+	    rectAnnotation.text = text;
 	    rectAnnotation.render();
-	    window.annotationContainer.add(rectAnnotation);
-	
-	    // Add an input field.
-	    var x = annotation.x;
-	    var y = annotation.y - 20; // 20 = circle'radius(3px) + input height(14px) + α
-	    var rect = svg.getBoundingClientRect();
-	
-	    x = (0, _utils.scaleUp)(svg, { x: x }).x + rect.left;
-	    y = (0, _utils.scaleUp)(svg, { y: y }).y + rect.top;
-	
-	    (0, _text.addInputField)(x, y, null, null, function (text) {
-	
-	      console.log('text: ', text);
-	
-	      if (!text) {
-	        return;
-	      }
-	
-	      annotation.text = text;
-	
-	      // Create a text annotation.
-	      // $(`[data-pdf-annotate-id="${annotation.uuid}"]`).remove();
-	      // TODO
-	      // let $elmenet = appendChild(svg, annotation);
-	
-	      // Update data.
-	      _PDFJSAnnotate2.default.getStoreAdapter().editAnnotation(documentId, annotation.uuid, annotation);
-	
-	      rectAnnotation.text = text;
-	      rectAnnotation.render();
-	
-	      // Save and Update.
-	
-	
-	      // // Move the text into the rect svg group.
-	      // let $text = $(`[data-pdf-annotate-id="${textAnnotation.uuid}"]`);
-	      // $(`[data-pdf-annotate-id="${annotation.uuid}"]`).append($text.children());
-	      // $text.remove();
-	      // // Delete text annotation.
-	      // PDFJSAnnotate.getStoreAdapter().deleteAnnotation(documentId, textAnnotation.uuid);
-	
-	      // 設計変更
-	      // =================================
-	      // ラベルアノテーションは、いろんなアノテーションに付属する感じ。
-	      // 各種アノテーションを追加したのちに、インプットフィールドを用意。
-	      // 入力が終わったら、annotationではなく、テキスト文字自体をコールバックに戻すようにする。
-	      // 受け取った値をDBに保存し、またレンダリングも行う（自身のアノテーションのg内に）。
-	
-	
-	      // これが良さそうだったら、ハイライト、arrow、にも設計を展開する。
-	
-	
-	      // // FIXME: cannot stop refarence counter. I wanna use the original `annotation`, but couldn't.
-	      // PDFJSAnnotate.getStoreAdapter().getAnnotation(documentId, annotation.uuid).then(annotation => {
-	
-	      //   // Set relation between arrow and text.
-	      //   annotation.text = textAnnotation.uuid;
-	
-	      //   // Update data.
-	      //   PDFJSAnnotate.getStoreAdapter().editAnnotation(documentId, annotation.uuid, annotation);
-	
-	      //   // Update UI.
-	      //   $(`[data-pdf-annotate-id="${annotation.uuid}"]`).attr('data-text', textAnnotation.uuid);
-	
-	      // });
-	    }, 'text');
-	  });
+	    rectAnnotation.save();
+	  }, 'text');
 	}
 	
 	/**
@@ -16649,7 +15499,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 47 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -16666,15 +15516,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _jquery2 = _interopRequireDefault(_jquery);
 	
-	var _PDFJSAnnotate = __webpack_require__(7);
+	var _PDFJSAnnotate = __webpack_require__(8);
 	
 	var _PDFJSAnnotate2 = _interopRequireDefault(_PDFJSAnnotate);
 	
-	var _appendChild = __webpack_require__(23);
+	var _appendChild = __webpack_require__(22);
 	
 	var _appendChild2 = _interopRequireDefault(_appendChild);
 	
-	var _utils = __webpack_require__(12);
+	var _utils = __webpack_require__(16);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -16754,7 +15604,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  input.style.left = x + 'px';
 	  input.style.fontSize = TEXT_SIZE + 'px';
 	  input.style.width = '150px';
-	  input.style.zIndex = 2;
+	  input.style.zIndex = 4; // fixme.
 	
 	  if (selfId) {
 	    input.setAttribute('data-self-id', selfId);
@@ -16772,7 +15622,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  input.addEventListener('keyup', handleInputKeyup);
 	
 	  $form.append(input);
-	  input.focus();
+	
+	  // for Chrome.
+	  setTimeout(function () {
+	    input.focus();
+	  }, 100);
 	}
 	
 	/*
@@ -16900,7 +15754,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 48 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -16911,25 +15765,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _deepAssign = __webpack_require__(17);
+	var _deepAssign = __webpack_require__(14);
 	
 	var _deepAssign2 = _interopRequireDefault(_deepAssign);
 	
-	var _appendChild = __webpack_require__(23);
+	var _appendChild = __webpack_require__(22);
 	
 	var _appendChild2 = _interopRequireDefault(_appendChild);
 	
-	var _utils = __webpack_require__(12);
+	var _uuid = __webpack_require__(12);
 	
-	var _text = __webpack_require__(47);
+	var _uuid2 = _interopRequireDefault(_uuid);
 	
-	var _view = __webpack_require__(49);
+	var _utils = __webpack_require__(16);
 	
-	var _abstract = __webpack_require__(50);
+	var _text = __webpack_require__(45);
+	
+	var _view = __webpack_require__(47);
+	
+	var _abstract = __webpack_require__(48);
 	
 	var _abstract2 = _interopRequireDefault(_abstract);
 	
-	var _PDFJSAnnotate = __webpack_require__(7);
+	var _text2 = __webpack_require__(49);
+	
+	var _text3 = _interopRequireDefault(_text2);
+	
+	var _PDFJSAnnotate = __webpack_require__(8);
 	
 	var _PDFJSAnnotate2 = _interopRequireDefault(_PDFJSAnnotate);
 	
@@ -16940,9 +15802,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	// TODO Text should be an another annotation class.
-	
 	
 	/**
 	 * Rect Annotation.
@@ -16961,30 +15820,55 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _this.y = 0;
 	        _this.width = 0;
 	        _this.height = 0;
-	        _this.text = 0;
+	        _this.text = null;
 	        _this.color = null;
 	        _this.readOnly = false;
 	        _this.$element = $('<div class="dummy"/>');
+	
+	        window.globalEvent.on('deleteSelectedAnnotation', _this.deleteSelectedAnnotation);
+	        window.globalEvent.on('enableViewMode', _this.enableViewMode);
+	        window.globalEvent.on('disableViewMode', _this.disableViewMode);
+	
+	        _this.textAnnotation = new _text3.default(_this);
+	        _this.textAnnotation.on('hoverin', _this.handleTextHoverIn);
+	        _this.textAnnotation.on('hoverout', _this.handleTextHoverOut);
+	        _this.textAnnotation.on('textchanged', _this.handleTextChanged);
 	        return _this;
 	    }
 	
 	    _createClass(RectAnnotation, [{
-	        key: 'render',
-	        value: function render() {
-	            // TODO Refactoring.
-	            this.$element.remove();
-	            this.$element = $((0, _appendChild2.default)((0, _utils.getSVGLayer)(), this));
+	        key: 'setHoverEvent',
+	
+	
+	        // render() {
+	        //      this.$element.remove();
+	        //      this.$element = $(appendChild(getSVGLayer(), this));
+	        //      this.setHoverEvent();
+	        //      this.textAnnotation.render();
+	        // }
+	
+	        value: function setHoverEvent() {
+	            this.$element.find('rect, circle').hover(this.handleHoverInEvent, this.handleHoverOutEvent);
 	        }
 	    }, {
 	        key: 'destroy',
 	        value: function destroy() {
 	            this.$element.remove();
 	            window.annotationContainer.remove(this);
+	
+	            var _getMetadata = (0, _utils.getMetadata)(),
+	                documentId = _getMetadata.documentId; // TODO Remove this.
+	
+	
+	            _PDFJSAnnotate2.default.getStoreAdapter().deleteAnnotation(documentId, this.uuid).then(function () {
+	                console.log('deleted');
+	            });
+	            this.textAnnotation.destroy();
+	            this.emit('delete');
 	        }
 	    }, {
 	        key: 'createAnnotation',
 	        value: function createAnnotation() {
-	            // TODO Refactring.
 	            return {
 	                uuid: this.uuid,
 	                type: this.type,
@@ -17003,82 +15887,119 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var _this2 = this;
 	
 	            // TODO Competible to insert and update.
-	            var _getMetadata = (0, _utils.getMetadata)(),
-	                documentId = _getMetadata.documentId;
+	            var _getMetadata2 = (0, _utils.getMetadata)(),
+	                documentId = _getMetadata2.documentId;
 	
 	            _PDFJSAnnotate2.default.getStoreAdapter().getAnnotation(documentId, this.uuid).then(function (a) {
 	                if (a) {
 	                    // update.
 	                    a = _this2.createAnnotation(a);
-	                    console.log('save:', a);
+	                    console.log('save:update:', a);
 	                    _PDFJSAnnotate2.default.getStoreAdapter().editAnnotation(documentId, _this2.uuid, a);
 	                } else {
 	                    // insert.
 	                    a = _this2.createAnnotation();
+	                    console.log('save:insert:', a);
 	                    _PDFJSAnnotate2.default.getStoreAdapter().addAnnotation(documentId, 1, a);
 	                }
 	            });
+	            window.annotationContainer.add(this);
 	        }
 	    }, {
 	        key: 'deleteSelectedAnnotation',
 	        value: function deleteSelectedAnnotation() {
-	            console.log('deleteSelectedAnnotation');
-	            // TODO Refactoring.
 	            if (this.$element.find('.anno-rect').hasClass('--selected')) {
-	                this.$element.remove();
-	
-	                var _getMetadata2 = (0, _utils.getMetadata)(),
-	                    documentId = _getMetadata2.documentId;
-	
-	                _PDFJSAnnotate2.default.getStoreAdapter().deleteAnnotation(documentId, this.uuid).then(function () {
-	                    console.log('deleted');
-	                });
-	            } else if (this.$element.find('.anno-text').hasClass('--selected')) {
-	                this.text = null;
-	                this.save();
-	                this.render();
-	                this.enableViewMode();
+	                console.log('rect:deleteSelectedAnnotation');
+	                this.destroy();
 	            }
 	        }
 	    }, {
-	        key: 'handleHoverInEvent',
-	        value: function handleHoverInEvent() {
+	        key: 'getTextPosition',
+	        value: function getTextPosition() {
+	            return {
+	                x: this.x + 7, // 7 = DEFAULT_RADIUS + 2
+	                y: this.y - 20
+	            };
+	        }
+	    }, {
+	        key: 'getBoundingCirclePosition',
+	        value: function getBoundingCirclePosition() {
+	            var $circle = this.$element.find('circle');
+	            return {
+	                x: parseFloat($circle.attr('cx')),
+	                y: parseFloat($circle.attr('cy'))
+	            };
+	        }
+	    }, {
+	        key: 'showBoundingCircle',
+	        value: function showBoundingCircle() {
+	            this.$element.find('circle').removeClass('--hide');
+	        }
+	    }, {
+	        key: 'hideBoundingCircle',
+	        value: function hideBoundingCircle() {
+	            this.$element.find('circle').addClass('--hide');
+	        }
+	    }, {
+	        key: 'highlight',
+	        value: function highlight() {
 	            this.$element.find('rect, text').addClass('--hover');
-	            // TODO Refactoring.
-	            this.$element.css('opacity', 1);
+	            this.$element.addClass('--emphasis');
+	            this.textAnnotation.highlight();
+	            // this.emit('hoverin');
+	        }
+	    }, {
+	        key: 'dehighlight',
+	        value: function dehighlight() {
+	            this.$element.find('rect, text').removeClass('--hover');
+	            this.$element.removeClass('--emphasis');
+	            this.textAnnotation.dehighlight();
+	            // this.emit('hoverout');
+	        }
+	    }, {
+	        key: 'handleTextHoverIn',
+	        value: function handleTextHoverIn() {
+	            this.highlight();
+	            this.emit('hoverin');
+	        }
+	    }, {
+	        key: 'handleTextHoverOut',
+	        value: function handleTextHoverOut() {
+	            this.dehighlight();
+	            this.emit('hoverout');
+	        }
+	    }, {
+	        key: 'handleTextChanged',
+	        value: function handleTextChanged(textAfter) {
+	            this.text = textAfter;
+	            this.save();
+	        }
+	    }, {
+	        key: 'handleHoverInEvent',
+	        value: function handleHoverInEvent(e) {
+	            this.highlight();
+	            this.emit('hoverin');
+	
+	            var $elm = $(e.currentTarget);
+	            if ($elm.prop("tagName") === 'circle') {
+	                this.emit('circlehoverin', this);
+	            }
 	        }
 	    }, {
 	        key: 'handleHoverOutEvent',
-	        value: function handleHoverOutEvent() {
-	            this.$element.find('rect, text').removeClass('--hover');
-	            // TODO Refactoring.
-	            this.$element.css('opacity', 0.5);
+	        value: function handleHoverOutEvent(e) {
+	            this.dehighlight();
+	            this.emit('hoverout');
+	
+	            var $elm = $(e.currentTarget);
+	            if ($elm.prop("tagName") === 'circle') {
+	                this.emit('circlehoverout', this);
+	            }
 	        }
 	    }, {
 	        key: 'handleClickRectEvent',
 	        value: function handleClickRectEvent() {
-	            console.log('handleClickRectEvent!!!!!');
-	            // TODO Refactoring.
 	            this.$element.find('.anno-rect').toggleClass('--selected');
-	            if (this.$element.find('.anno-rect').hasClass('--selected')) {
-	                this.$element.css('opacity', 1);
-	            } else {
-	                this.$element.css('opacity', 0.5);
-	            }
-	        }
-	    }, {
-	        key: 'handleClickTextEvent',
-	        value: function handleClickTextEvent() {
-	            console.log('handleClickTextEvent');
-	            // TODO Refactoring.
-	            this.$element.find('.anno-text').toggleClass('--selected');
-	
-	            // Check double click.
-	            var currentTime = new Date().getTime();
-	            if (this.prevClickTime && currentTime - this.prevClickTime < 400) {
-	                this.handleDoubleClickTextEvent();
-	            }
-	            this.prevClickTime = currentTime;
 	        }
 	    }, {
 	        key: 'handleDoubleClickTextEvent',
@@ -17121,21 +16042,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            (0, _utils.disableUserSelect)();
 	
-	            // $(document).on('mousemove', this.handleMouseMoveOnDocument);
-	            // $(document).on('mouseup', this.handleMouseUpOnDocument);
 	            document.addEventListener('mousemove', this.handleMouseMoveOnDocument);
 	            document.addEventListener('mouseup', this.handleMouseUpOnDocument);
+	
+	            this.emit('rectmovestart', this);
 	        }
-	
-	        // handleMouseUpOnRect() {
-	        //     console.log('handleMouseUpOnRect:', this._dragging);
-	
-	        //     // Click.
-	        //     if (!this._dragging) {
-	        //         this.handleClickRectEvent();
-	        //     }
-	        // }
-	
 	    }, {
 	        key: 'handleMouseMoveOnDocument',
 	        value: function handleMouseMoveOnDocument(e) {
@@ -17143,13 +16054,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this._dragging = true;
 	
 	            if (!this.startX) {
-	                // this.startX = parseInt(e.originalEvent.clientX);
-	                // this.startY = parseInt(e.originalEvent.clientY);
 	                this.startX = parseInt(e.clientX);
 	                this.startY = parseInt(e.clientY);
 	            }
-	            // this.endX = parseInt(e.originalEvent.clientX);
-	            // this.endY = parseInt(e.originalEvent.clientY);
 	            this.endX = parseInt(e.clientX);
 	            this.endY = parseInt(e.clientY);
 	
@@ -17162,11 +16069,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.y = this.originalY + diff.y;
 	
 	            this.render(); // heavy?
+	
+	            this.emit('rectmove', this);
 	        }
 	    }, {
 	        key: 'handleMouseUpOnDocument',
 	        value: function handleMouseUpOnDocument() {
-	            console.log('handleMouseUpOnDocument');
 	
 	            if (this._dragging) {
 	                this._dragging = false;
@@ -17180,12 +16088,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                this.save();
 	                this.enableViewMode();
+	
+	                this.emit('rectmoveend', this);
 	            }
 	
 	            (0, _utils.enableUserSelect)();
 	
-	            // $(document).off('mousemove', this.handleMouseMoveOnDocument);
-	            // $(document).off('mouseup', this.handleMouseUpOnDocument);
 	            document.removeEventListener('mousemove', this.handleMouseMoveOnDocument);
 	            document.removeEventListener('mouseup', this.handleMouseUpOnDocument);
 	        }
@@ -17193,41 +16101,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'enableViewMode',
 	        value: function enableViewMode() {
 	
-	            this.$element.find('rect, text').hover(this.handleHoverInEvent.bind(this), this.handleHoverOutEvent.bind(this));
-	
 	            if (!this.readOnly) {
 	
-	                this.$element.find('.anno-rect').off('click', this.handleClickRectEvent).on('click', this.handleClickRectEvent);
-	                this.$element.find('text').off('click', this.handleClickTextEvent).on('click', this.handleClickTextEvent);
-	                this.$element.find('text').off('dbclick', this.handleDoubleClickTextEvent).on('dbclick', this.handleDoubleClickTextEvent);
-	
-	                this.$element.find('.anno-rect').off('mousedown', this.handleMouseDownOnRect).on('mousedown', this.handleMouseDownOnRect);
-	                // this.$element.find('.anno-rect').off('mouseup', this.handleMouseUpOnRect).on('mouseup', this.handleMouseUpOnRect);            
+	                this.$element.find('.anno-rect, circle').off('click', this.handleClickRectEvent).on('click', this.handleClickRectEvent);
+	                this.$element.find('.anno-rect, circle').off('mousedown', this.handleMouseDownOnRect).on('mousedown', this.handleMouseDownOnRect);
 	            }
+	
+	            this.textAnnotation.enableViewMode();
 	        }
 	    }, {
 	        key: 'disableViewMode',
 	        value: function disableViewMode() {
-	            this.$element.find('rect, text').off('mouseenter mouseleave');
-	            this.$element.find('.anno-rect').off('click', this.handleClickRectEvent);
-	            this.$element.find('text').off('click', this.handleClickTextEvent);
-	            this.$element.find('text').off('dbclick', this.handleDoubleClickTextEvent);
-	
-	            this.$element.find('.anno-rect').off('mousedown', this.handleMouseDownOnRect);
-	            // this.$element.find('.anno-rect').off('mouseup', this.handleMouseUpOnRect);        
+	            this.$element.find('.anno-rect, circle').off('click', this.handleClickRectEvent);
+	            this.$element.find('.anno-rect, circle').off('mousedown', this.handleMouseDownOnRect);
+	            this.textAnnotation.disableViewMode();
 	        }
 	    }], [{
 	        key: 'newInstance',
 	        value: function newInstance(annotation) {
 	            var rect = new RectAnnotation();
-	            rect.uuid = annotation.uuid;
+	            rect.uuid = annotation.uuid || (0, _uuid2.default)();
 	            rect.x = annotation.x;
 	            rect.y = annotation.y;
 	            rect.width = annotation.width;
 	            rect.height = annotation.height;
 	            rect.text = annotation.text;
 	            rect.color = annotation.color;
-	            rect.readOnly = annotation.readOnly;
+	            rect.readOnly = annotation.readOnly || false;
 	            return rect;
 	        }
 	    }]);
@@ -17239,7 +16139,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 49 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -17254,181 +16154,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _jquery2 = _interopRequireDefault(_jquery);
 	
-	var _PDFJSAnnotate = __webpack_require__(7);
-	
-	var _PDFJSAnnotate2 = _interopRequireDefault(_PDFJSAnnotate);
-	
-	var _utils = __webpack_require__(12);
-	
-	var _text = __webpack_require__(47);
-	
-	var _rect = __webpack_require__(48);
-	
-	var _rect2 = _interopRequireDefault(_rect);
-	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var filter = Array.prototype.filter;
-	var forEach = Array.prototype.forEach;
-	
-	var _enable = false;
-	
-	var OPACITY_VISIBLE = 1;
-	var OPACITY_TRANSLUCENT = 0.5;
-	
-	var monitoringRects = []; // rect
-	var monitoringTexts = []; // textbox
-	var monitoringArrows = []; // arrow
-	var monitoringCircles = []; // boundingCircle for highlight.
-	
-	var rects = [];
-	
-	var hitComponent = null;
-	
-	var rectDraggingWillStart = false;
-	var rectDragging = false;
-	var rectDraggingComponent = null;
-	var rectDraggingStartPos = null;
-	
-	function handleDoubleClick(e) {
-	
-	    var component = findHitElement(e, true);
-	    if (component && isTextComponent(component)) {
-	
-	        // Add text input filed.
-	        var svg = (0, _utils.findSVGAtPoint)(e.clientX, e.clientY);
-	        var pos = (0, _utils.scaleUp)(svg, {
-	            x: parseFloat(component.getAttribute('x')),
-	            y: parseFloat(component.getAttribute('y'))
-	        });
-	        var rect = svg.getBoundingClientRect();
-	        pos.x += rect.left;
-	        pos.y += rect.top;
-	        var id = component.parentNode.getAttribute('data-pdf-annotate-id');
-	        var text = component.parentNode.querySelector('text').textContent;
-	        (0, _text.addInputField)(pos.x, pos.y, id, text, function () {
-	            // wait for save finished, and enable.
-	            setTimeout(function () {
-	                enableViewMode();
-	            }, 500);
-	        });
-	
-	        // Remove current text from data.
-	
-	        var _getMetadata = (0, _utils.getMetadata)(svg),
-	            documentId = _getMetadata.documentId,
-	            pageNumber = _getMetadata.pageNumber;
-	
-	        var annotationId = component.parentNode.getAttribute('data-pdf-annotate-id');
-	        deleteAnnotation(documentId, [annotationId]);
-	
-	        // Remove from UI.
-	        (0, _jquery2.default)(component).closest('g').remove();
-	
-	        // disable
-	        disableViewMode();
-	    }
-	}
-	
-	function handleDocumentMouseup(e) {
-	
-	    // Save rect position if dragging ended.
-	    if (rectDragging) {
-	
-	        console.log('handleDocumentMouseup:rectDragging');
-	
-	        var svg = (0, _utils.findSVGAtPoint)(e.clientX, e.clientY);
-	        if (svg) {
-	            (function () {
-	                moveRectComponent(svg, rectDraggingStartPos, getClientXY(e), rectDraggingComponent);
-	
-	                // Update annotation, and save it.
-	
-	                var _getMetadata2 = (0, _utils.getMetadata)(svg),
-	                    documentId = _getMetadata2.documentId,
-	                    pageNumber = _getMetadata2.pageNumber;
-	
-	                var annotationId = rectDraggingComponent.parentNode.getAttribute('data-pdf-annotate-id');
-	                _PDFJSAnnotate2.default.getStoreAdapter().getAnnotation(documentId, annotationId).then(function (annotation) {
-	                    annotation.x = parseFloat(rectDraggingComponent.getAttribute('x'));
-	                    annotation.y = parseFloat(rectDraggingComponent.getAttribute('y'));
-	                    _PDFJSAnnotate2.default.getStoreAdapter().editAnnotation(documentId, annotationId, annotation);
-	                });
-	            })();
-	        }
-	
-	        // Reset.
-	        rectDragging = false;
-	        rectDraggingWillStart = false;
-	        (0, _utils.enableUserSelect)();
-	
-	        return;
-	    }
-	
-	    rectDraggingWillStart = false;
-	
-	    // Set component state to selected if exists.
-	    var element = findHitElement(e, true);
-	    if (element) {
-	        var g = element.parentNode;
-	        if (g.getAttribute('data-selected') === 'true') {
-	            g.setAttribute('data-selected', false);
-	            setSelectedVisibility(element, 'hide');
-	        } else {
-	            g.setAttribute('data-selected', true);
-	            setSelectedVisibility(element, 'show');
-	        }
-	    }
-	}
-	
-	function handleDocumentMousedown(e) {
-	
-	    // Start rect dragging if exists.
-	    var component = findHitElement(e, true);
-	    if (component && isRectComponent(component)) {
-	        rectDraggingWillStart = true;
-	        rectDraggingComponent = component;
-	        var x = rectDraggingComponent.getAttribute('x');
-	        var y = rectDraggingComponent.getAttribute('y');
-	        rectDraggingComponent.setAttribute('data-original-x', x);
-	        rectDraggingComponent.setAttribute('data-original-y', y);
-	        rectDraggingStartPos = getClientXY(e);
-	    }
-	}
-	
-	function handleDocumentMousemove(e) {
-	
-	    // Drag a rect if now dragging.
-	    if (rectDraggingWillStart) {
-	        rectDraggingWillStart = false;
-	        rectDragging = true;
-	        (0, _utils.disableUserSelect)();
-	    }
-	    if (rectDragging) {
-	        var svg = (0, _utils.findSVGAtPoint)(e.clientX, e.clientY);
-	        if (svg) {
-	            moveRectComponent(svg, rectDraggingStartPos, getClientXY(e), rectDraggingComponent);
-	        }
-	        return;
-	    }
-	
-	    // Set component state to visible if exists.
-	    var element = findHitElement(e);
-	    if (element) {
-	        if (!hitComponent) {
-	            hitComponent = element;
-	            setVisibility(hitComponent, OPACITY_VISIBLE);
-	        }
-	    } else {
-	        if (hitComponent) {
-	            setVisibility(hitComponent, OPACITY_TRANSLUCENT);
-	            hitComponent = null;
-	        }
-	    }
-	}
-	
+	/**
+	 * Prevent page-back behavior.
+	 */
 	function handleDocumentKeydown(e) {
-	    console.log('handleDocumentKeydown');
 	    // Delete or BackSpace.
 	    if (e.keyCode == 46 || e.keyCode == 8) {
 	        e.preventDefault();
@@ -17436,6 +16167,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 	
+	/**
+	 * Delete selected annotations, and prevent page-back behavior.
+	 */
 	function handleDocumentKeyup(e) {
 	    // Delete or BackSpace.
 	    if (e.keyCode == 46 || e.keyCode == 8) {
@@ -17445,521 +16179,152 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 	
-	function moveRectComponent(svg, startPos, currentPos, rect) {
-	
-	    var diff = (0, _utils.scaleDown)(svg, {
-	        x: startPos.x - currentPos.x,
-	        y: startPos.y - currentPos.y
-	    });
-	
-	    var originalX = parseFloat(rect.getAttribute('data-original-x'));
-	    var originalY = parseFloat(rect.getAttribute('data-original-y'));
-	
-	    rect.setAttribute('x', originalX - diff.x);
-	    rect.setAttribute('y', originalY - diff.y);
-	
-	    // Move related text.
-	    // let textId = $(rect).parents('g').data('text');
-	    // let $text = $(`[data-pdf-annotate-id="${textId}"]`);
-	    // if (!$text.data('original-x')) {
-	    //     $text.data('original-x', $text.)
-	    // }
+	/**
+	 * Delete selected annotations.
+	 */
+	function deleteSelectedAnnotations() {
+	    window.globalEvent.emit('deleteSelectedAnnotation');
 	}
 	
 	/**
-	 * Delete annotations selected.
+	 * Set annotations' translucent state.
 	 */
-	function deleteSelectedAnnotations() {
+	function setComponenTranslucent(translucent) {
 	
-	    // New type.
-	    window.annotationContainer.getAllAnnotations().forEach(function (r) {
-	        r.deleteSelectedAnnotation();
-	    });
-	
-	    var annotationIds = [];
-	    var documentId = document.querySelector('svg').getAttribute('data-pdf-annotate-document');
-	
-	    forEach.call(document.querySelectorAll('svg [data-selected="true"]'), function (g) {
-	
-	        // Delete it.
-	        var annotationId = g.getAttribute('data-pdf-annotate-id');
-	        annotationIds.push(annotationId);
-	        g.parentNode.removeChild(g);
-	
-	        // Delete relations.
-	
-	        var type = g.getAttribute('data-pdf-annotate-type');
-	
-	        if (type === 'arrow') {
-	            var criteria = {
-	                type: 'arrow',
-	                uuid: annotationId
-	            };
-	            _PDFJSAnnotate2.default.getStoreAdapter().findAnnotations(documentId, criteria).then(function (annotations) {
-	                if (annotations.length > 0) {
-	                    annotationIds.push(annotations[0].text);
-	                }
-	                deleteAnnotation(documentId, annotationIds, initializeMonitoringAnnotations);
-	            });
-	        } else if (type === 'textbox') {
-	            var _criteria = {
-	                type: 'arrow',
-	                text: annotationId
-	            };
-	            _PDFJSAnnotate2.default.getStoreAdapter().findAnnotations(documentId, _criteria).then(function (annotations) {
-	                if (annotations.length > 0) {
-	                    annotationIds.push(annotations[0].uuid);
-	                }
-	                deleteAnnotation(documentId, annotationIds, initializeMonitoringAnnotations);
-	            });
-	        } else if (type === 'highlight') {
-	            // Span text.
-	            var textId = (0, _jquery2.default)(g).attr('data-text');
-	            if (textId) {
-	                annotationIds.push(textId);
-	            }
-	            // Arrow relations.
-	            var _criteria2 = {
-	                type: 'arrow',
-	                highlight1: annotationId
-	            };
-	            _PDFJSAnnotate2.default.getStoreAdapter().findAnnotations(documentId, _criteria2).then(function (annotations) {
-	                if (annotations.length > 0) {
-	                    annotationIds.push(annotations[0].uuid);
-	                    annotationIds.push(annotations[0].text);
-	                }
-	                var criteria = {
-	                    type: 'arrow',
-	                    highlight2: annotationId
-	                };
-	                _PDFJSAnnotate2.default.getStoreAdapter().findAnnotations(documentId, criteria).then(function (annotations) {
-	                    if (annotations.length > 0) {
-	                        annotationIds.push(annotations[0].uuid);
-	                        annotationIds.push(annotations[0].text);
-	                    }
-	                    deleteAnnotation(documentId, annotationIds, initializeMonitoringAnnotations);
-	                });
-	            });
-	        } else {
-	            deleteAnnotation(documentId, annotationIds, initializeMonitoringAnnotations);
-	        }
-	    });
-	}
-	
-	function deleteAnnotation(documentId, ids, callback) {
-	    if (ids.length === 0) {
-	        return callback && callback();
-	    }
-	    var annotationId = ids.shift();
-	    _PDFJSAnnotate2.default.getStoreAdapter().deleteAnnotation(documentId, annotationId).then(function () {
-	        deleteAnnotation(documentId, ids);
-	    }).catch(function () {
-	        deleteAnnotation(documentId, ids);
-	    });
-	
-	    var element = document.querySelector('[data-pdf-annotate-id="' + annotationId + '"]');
-	    if (element && element.parentNode) {
-	        element.parentNode.removeChild(element);
-	    }
-	}
-	
-	function setSelectedVisibility(component, state) {
-	
-	    console.log('setSelectedVisibility:', component);
-	
-	    var $g = (0, _jquery2.default)(component.tagName.toLowerCase() === 'g' ? component : component.parentNode);
-	
-	    // For highlight, rect, text, arrow.
-	    if (state === 'show') {
-	        $g.find('rect,path').addClass('--selected');
+	    if (translucent) {
+	        (0, _jquery2.default)('svg > *').addClass('--viewMode');
 	    } else {
-	        $g.find('rect,path').removeClass('--selected');
+	        (0, _jquery2.default)('svg > *').removeClass('--viewMode');
 	    }
 	}
 	
-	function setVisibility(component, opacity) {
-	    setComponentVisibility(component, opacity);
+	/**
+	 * Make annotations view mode.
+	 */
+	function setAnnotationViewMode() {
+	    window.globalEvent.emit('enableViewMode');
 	}
 	
-	function isHighlightComponent(component) {
-	    if (component.tagName.toLowerCase() === 'g') {
-	        return component.getAttribute('data-pdf-annotate-type') === 'highlight';
-	    }
-	    return component.parentNode && component.parentNode.getAttribute('data-pdf-annotate-type') === 'highlight';
+	/**
+	 * Make annotations NOT view mode.
+	 */
+	function resetAnnotationViewMode() {
+	    window.globalEvent.emit('disableViewMode');
 	}
 	
-	function isRectComponent(component) {
-	    if (component.tagName.toLowerCase() === 'g') {
-	        return component.getAttribute('data-pdf-annotate-type') === 'area';
-	    }
-	    return component.parentNode && component.parentNode.getAttribute('data-pdf-annotate-type') === 'area';
-	}
-	
-	function isTextComponent(component) {
-	    if (component.tagName.toLowerCase() === 'g') {
-	        return component.getAttribute('data-pdf-annotate-type') === 'textbox';
-	    }
-	    return component.parentNode && component.parentNode.getAttribute('data-pdf-annotate-type') === 'textbox';
-	}
-	
-	function isArrowComponent(component) {
-	    if (component.tagName.toLowerCase() === 'g') {
-	        return component.getAttribute('data-pdf-annotate-type') === 'arrow';
-	    }
-	    return component.parentNode && component.parentNode.getAttribute('data-pdf-annotate-type') === 'arrow';
-	}
-	
-	function setComponentVisibility(component, opacity) {
-	    console.log('setComponentVisibility', component.tagName, opacity);
-	
-	    // let g = (component.tagName.toLowerCase() === 'g' ? component : component.parentNode);
-	    var g = void 0;
-	    if (component.tagName.toLowerCase() === 'g') {
-	        g = component;
-	    } else {
-	        g = (0, _jquery2.default)(component).parents('g[data-pdf-annotate-id]')[0];
-	    }
-	
-	    g.style.opacity = opacity;
-	
-	    if (!g.parentNode) {
-	        return;
-	    }
-	
-	    // For circle.
-	    if (opacity === OPACITY_VISIBLE) {
-	        (0, _jquery2.default)(g).find('circle').addClass('--hover');
-	    } else {
-	        (0, _jquery2.default)(g).find('circle').removeClass('--hover');
-	    }
-	
-	    // For highlight, rect.
-	    if (opacity === OPACITY_VISIBLE) {
-	        (0, _jquery2.default)(g).find('rect').addClass('--hover');
-	    } else {
-	        (0, _jquery2.default)(g).find('rect').removeClass('--hover');
-	    }
-	
-	    // For Arrow.
-	    if (opacity === OPACITY_VISIBLE) {
-	        (0, _jquery2.default)(g).find('path').addClass('--hover');
-	    } else {
-	        (0, _jquery2.default)(g).find('path').removeClass('--hover');
-	    }
-	
-	    // Also set to relation items.
-	    var documentId = g.parentNode.getAttribute('data-pdf-annotate-document');
-	    var uuid = g.getAttribute('data-pdf-annotate-id');
-	    var type = g.getAttribute('data-pdf-annotate-type');
-	
-	    if (type === 'arrow') {
-	        [g.getAttribute('data-highlight1'), g.getAttribute('data-highlight2'), g.getAttribute('data-text')].forEach(function (id) {
-	            var element = document.querySelector('g[data-pdf-annotate-id="' + id + '"]');
-	            if (element) {
-	                element.style.opacity = opacity;
-	            }
-	        });
-	    } else if (type === 'highlight' || type === 'textbox') {
-	        _PDFJSAnnotate2.default.getStoreAdapter().getAnnotations(documentId, null).then(function (_ref) {
-	            var documentId = _ref.documentId,
-	                pageNumber = _ref.pageNumber,
-	                annotations = _ref.annotations;
-	
-	            var arrowAnnotations = annotations.filter(function (annotation) {
-	                return annotation.highlight1 === uuid || annotation.highlight2 === uuid || annotation.text === uuid;
-	            });
-	            arrowAnnotations.forEach(function (arrowAnnotation) {
-	                var arrowElement = document.querySelector('g[data-pdf-annotate-id="' + arrowAnnotation.uuid + '"]');
-	                setComponentVisibility(arrowElement, opacity);
-	            });
-	        });
-	
-	        if (type === 'highlight') {
-	            var textId = (0, _jquery2.default)(g).attr('data-text');
-	            if (textId) {
-	                var $g = (0, _jquery2.default)('g[data-pdf-annotate-id="' + textId + '"]');
-	                if (opacity === OPACITY_VISIBLE) {
-	                    $g.find('rect').addClass('--hover');
-	                    $g.css('opacity', opacity);
-	                } else {
-	                    $g.find('rect').removeClass('--hover');
-	                    $g.css('opacity', opacity);
-	                }
-	            }
-	        }
-	    }
-	}
-	
-	function findHitElement(e) {
-	    var canEdit = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-	
-	
-	    var svg = (0, _utils.findSVGAtPoint)(e.clientX, e.clientY);
-	    if (!svg) {
-	        return null;
-	    }
-	
-	    // Mouse Point.
-	    var point = (0, _utils.scaleDown)(svg, getClientXY(e));
-	
-	    // highlight.
-	    for (var i = 0; i < monitoringCircles.length; i++) {
-	        if (isHit(point, monitoringCircles[i], 'boundingCircle')) {
-	            if (canEdit) {
-	                var readOnly = (0, _jquery2.default)(monitoringCircles[i]).closest('g').attr('read-only') === 'true';
-	                if (!readOnly) {
-	                    return monitoringCircles[i];
-	                }
-	            } else {
-	                return monitoringCircles[i];
-	            }
-	        }
-	    }
-	
-	    // rect.
-	    for (var _i = 0; _i < monitoringRects.length; _i++) {
-	        if (isHit(point, monitoringRects[_i], 'rect')) {
-	            if (canEdit) {
-	                var _readOnly = (0, _jquery2.default)(monitoringRects[_i]).closest('g').attr('read-only') === 'true';
-	                if (!_readOnly) {
-	                    return monitoringRects[_i];
-	                }
-	            } else {
-	                return monitoringRects[_i];
-	            }
-	        }
-	    }
-	
-	    // textbox.
-	    for (var _i2 = 0; _i2 < monitoringTexts.length; _i2++) {
-	        if (isHit(point, monitoringTexts[_i2], 'text')) {
-	            if (canEdit) {
-	                var _readOnly2 = (0, _jquery2.default)(monitoringTexts[_i2]).closest('g').attr('read-only') === 'true';
-	                if (!_readOnly2) {
-	                    return monitoringTexts[_i2];
-	                }
-	            } else {
-	                return monitoringTexts[_i2];
-	            }
-	        }
-	    }
-	
-	    // arrow.
-	    for (var _i3 = 0; _i3 < monitoringArrows.length; _i3++) {
-	        if (isHit(point, monitoringArrows[_i3], 'arrow')) {
-	            if (canEdit) {
-	                var _readOnly3 = (0, _jquery2.default)(monitoringArrows[_i3]).closest('g').attr('read-only') === 'true';
-	                if (!_readOnly3) {
-	                    return monitoringArrows[_i3];
-	                }
-	            } else {
-	                return monitoringArrows[_i3];
-	            }
-	        }
-	    }
-	}
-	
-	function isHit(pos, element, type) {
-	
-	    if (type === 'boundingCircle') {
-	        var r = parseFloat(element.getAttribute('r'));
-	        var x = parseFloat(element.getAttribute('cx'));
-	        var y = parseFloat(element.getAttribute('cy'));
-	        var distance = Math.sqrt(Math.pow(pos.x - x, 2) + Math.pow(pos.y - y, 2));
-	        return distance <= r;
-	    }
-	
-	    if (type === 'rect') {
-	        var top = parseFloat(element.getAttribute('y'));
-	        var bottom = top + parseFloat(element.getAttribute('height'));
-	        var left = parseFloat(element.getAttribute('x'));
-	        var right = left + parseFloat(element.getAttribute('width'));
-	
-	        var _x2 = pos.x;
-	        var _y = pos.y;
-	        return (
-	            // left
-	            left - 2 <= _x2 && _x2 <= left + 2 && top <= _y && _y <= bottom ||
-	            // right
-	            right - 2 <= _x2 && _x2 <= right + 2 && top <= _y && _y <= bottom
-	            // top
-	            || left <= _x2 && _x2 <= right && top - 2 <= _y && _y <= top + 2
-	            // bottom
-	            || left <= _x2 && _x2 <= right && bottom - 2 <= _y && _y <= bottom + 2
-	        );
-	        // return left <= pos.x && pos.x <= right && top <= pos.y && pos.y <= bottom;        
-	    }
-	
-	    if (type === 'text') {
-	        var _top = parseFloat(element.getAttribute('y'));
-	        var _bottom = _top + parseFloat(element.getAttribute('height'));
-	        var _left = parseFloat(element.getAttribute('x'));
-	        var _right = _left + parseFloat(element.getAttribute('width'));
-	        return _left <= pos.x && pos.x <= _right && _top <= pos.y && pos.y <= _bottom;
-	    }
-	
-	    if (type === 'arrow') {
-	
-	        // Judge using triangle in-out.
-	
-	        // test.
-	        var d = element.getAttribute('d').split(' ');
-	        // d: `M ${a.x1} ${a.y1} Q ${control.x} ${control.y} ${a.x2} ${a.y2}`,
-	        // M 400.12120426203285 88.13763102725366 Q 318.94806886179947 118.75219077638972 277.05534651364843 194.7214542557652
-	        var x1 = parseFloat(d[1]);
-	        var y1 = parseFloat(d[2]);
-	        var x2 = parseFloat(d[6]);
-	        var y2 = parseFloat(d[7]);
-	        var x3 = parseFloat(d[4]);
-	        var y3 = parseFloat(d[5]);
-	
-	        var vecAB = {
-	            x: x1 - x2,
-	            y: y1 - y2
-	        };
-	        var vecBP = {
-	            x: x2 - pos.x,
-	            y: y2 - pos.y
-	        };
-	
-	        var vecBC = {
-	            x: x2 - x3,
-	            y: y2 - y3
-	        };
-	        var vecCP = {
-	            x: x3 - pos.x,
-	            y: y3 - pos.y
-	        };
-	
-	        var vecCA = {
-	            x: x3 - x1,
-	            y: y3 - y1
-	        };
-	        var vecAP = {
-	            x: x1 - pos.x,
-	            y: y1 - pos.y
-	        };
-	
-	        var c1 = vecAB.x * vecBP.y - vecAB.y * vecBP.x;
-	        var c2 = vecBC.x * vecCP.y - vecBC.y * vecCP.x;
-	        var c3 = vecCA.x * vecAP.y - vecCA.y * vecAP.x;
-	
-	        return c1 > 0 && c2 > 0 && c3 > 0 || c1 < 0 && c2 < 0 && c3 < 0;
-	    }
-	}
-	
-	function getClientXY(e) {
-	    var svg = (0, _utils.findSVGAtPoint)(e.clientX, e.clientY);
-	    if (!svg) {
-	        return null;
-	    }
-	    var rect = svg.getBoundingClientRect();
-	    var x = e.clientX - rect.left;
-	    var y = e.clientY - rect.top;
-	    return { x: x, y: y };
-	}
-	
-	function initializeMonitoringAnnotations() {
-	
-	    monitoringRects = [];
-	    monitoringTexts = [];
-	    monitoringArrows = [];
-	    monitoringCircles = [];
-	
-	    // Components for monitoring.
-	    forEach.call(document.querySelectorAll('svg > g > [type="boundingCircle"]'), function (boundingCircle) {
-	        monitoringCircles.push(boundingCircle);
-	    });
-	    // Texts.
-	    forEach.call(document.querySelectorAll('svg > [data-pdf-annotate-type="textbox"] > rect'), function (rect) {
-	        monitoringTexts.push(rect);
-	    });
-	    // Arrows.
-	    forEach.call(document.querySelectorAll('svg > [data-pdf-annotate-type="arrow"] > path'), function (path) {
-	        monitoringArrows.push(path);
-	    });
-	    // // Highlights.
-	    // forEach.call(document.querySelectorAll('svg > [data-pdf-annotate-type="highlight"] > rect'), rect => {
-	    //     monitoringRects.push(rect);
-	    // });
-	
-	
-	    // Rects.
-	    // let rects = window.annotationContainer.getAllAnnotations().filter(a => {
-	    //     return a.type === 'area';
-	    // });
-	    // rects.forEach(r => {
-	    //     r.enableViewMode();
-	    // });
-	
-	    window.annotationContainer.getAllAnnotations().forEach(function (r) {
-	        r.enableViewMode();
-	    });
-	}
-	
-	function enableMouseListening() {
-	
-	    initializeMonitoringAnnotations();
-	
-	    document.addEventListener('mousedown', handleDocumentMousedown);
-	    document.addEventListener('mousemove', handleDocumentMousemove);
-	    document.addEventListener('mouseup', handleDocumentMouseup);
+	/**
+	 * Enable view mode.
+	 */
+	function enableViewMode() {
+	    disableViewMode();
+	    setComponenTranslucent(true);
+	    setAnnotationViewMode();
 	    document.addEventListener('keyup', handleDocumentKeyup);
 	    document.addEventListener('keydown', handleDocumentKeydown);
-	    document.addEventListener('dblclick', handleDoubleClick);
+	
+	    window.viewMode = true;
 	}
 	
-	function disableMouseListening() {
-	    console.log('disableMouseListening');
-	
-	    monitoringRects = [];
-	    monitoringArrows = [];
-	    monitoringCircles = [];
-	
-	    window.annotationContainer.getAllAnnotations().forEach(function (r) {
-	        r.disableViewMode();
-	    });
-	
-	    document.removeEventListener('mousedown', handleDocumentMousedown);
-	    document.removeEventListener('mousemove', handleDocumentMousemove);
-	    document.removeEventListener('mouseup', handleDocumentMouseup);
+	/**
+	 * Disable view mode.
+	 */
+	function disableViewMode() {
+	    setComponenTranslucent(false);
+	    resetAnnotationViewMode();
 	    document.removeEventListener('keyup', handleDocumentKeyup);
 	    document.removeEventListener('keydown', handleDocumentKeydown);
-	    document.removeEventListener('dblclick', handleDoubleClick);
-	}
 	
-	function setComponenTranslucent(opacity) {
-	    forEach.call(document.querySelectorAll('svg > *'), function (svgComponent) {
-	        svgComponent.style.opacity = opacity;
-	    });
-	}
-	
-	function enableViewMode() {
-	    console.log('enableViewMode');
-	
-	    if (_enable) {
-	        return;
-	    }
-	    _enable = true;
-	
-	    enableMouseListening();
-	    setComponenTranslucent(OPACITY_TRANSLUCENT);
-	}
-	function disableViewMode() {
-	    console.log('disableViewMode');
-	
-	    if (!_enable) {
-	        return;
-	    }
-	    _enable = false;
-	
-	    disableMouseListening();
-	    setComponenTranslucent(OPACITY_VISIBLE);
+	    window.viewMode = false;
 	}
 
 /***/ },
-/* 50 */
-/***/ function(module, exports) {
+/* 48 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _events = __webpack_require__(7);
+	
+	var _events2 = _interopRequireDefault(_events);
+	
+	var _appendChild = __webpack_require__(22);
+	
+	var _appendChild2 = _interopRequireDefault(_appendChild);
+	
+	var _utils = __webpack_require__(16);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	/**
+	 *
+	 */
+	var AbstractAnnotation = function (_EventEmitter) {
+	  _inherits(AbstractAnnotation, _EventEmitter);
+	
+	  function AbstractAnnotation() {
+	    _classCallCheck(this, AbstractAnnotation);
+	
+	    var _this = _possibleConstructorReturn(this, (AbstractAnnotation.__proto__ || Object.getPrototypeOf(AbstractAnnotation)).call(this));
+	
+	    _this.autoBind();
+	    return _this;
+	  }
+	
+	  /**
+	   * クラスのメソッドのthisをクラスインスタンスにバインドします。
+	   */
+	
+	
+	  _createClass(AbstractAnnotation, [{
+	    key: 'autoBind',
+	    value: function autoBind() {
+	      var _this2 = this;
+	
+	      Object.getOwnPropertyNames(this.constructor.prototype).filter(function (prop) {
+	        return typeof _this2[prop] === 'function';
+	      }).forEach(function (method) {
+	        _this2[method] = _this2[method].bind(_this2);
+	      });
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      this.$element.remove();
+	      this.$element = $((0, _appendChild2.default)((0, _utils.getSVGLayer)(), this));
+	      this.setHoverEvent && this.setHoverEvent();
+	      this.textAnnotation && this.textAnnotation.render();
+	      if (window.viewMode) {
+	        this.$element.addClass('--viewMode');
+	      }
+	    }
+	  }, {
+	    key: 'hasBoundingCircle',
+	    value: function hasBoundingCircle() {
+	      return this.$element.find('circle').length > 0;
+	    }
+	  }]);
+	
+	  return AbstractAnnotation;
+	}(_events2.default);
+	
+	exports.default = AbstractAnnotation;
+	module.exports = exports['default'];
+
+/***/ },
+/* 49 */
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -17969,44 +16334,194 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
+	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+	
+	var _deepAssign = __webpack_require__(14);
+	
+	var _deepAssign2 = _interopRequireDefault(_deepAssign);
+	
+	var _appendChild = __webpack_require__(22);
+	
+	var _appendChild2 = _interopRequireDefault(_appendChild);
+	
+	var _utils = __webpack_require__(16);
+	
+	var _text = __webpack_require__(45);
+	
+	var _view = __webpack_require__(47);
+	
+	var _abstract = __webpack_require__(48);
+	
+	var _abstract2 = _interopRequireDefault(_abstract);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	/**
-	 *
-	 */
-	var AbstractAnnotation = function () {
-	    function AbstractAnnotation() {
-	        _classCallCheck(this, AbstractAnnotation);
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 	
-	        this.autoBind();
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	/**
+	 * Text Annotation.
+	 */
+	var TextAnnotation = function (_AbstractAnnotation) {
+	    _inherits(TextAnnotation, _AbstractAnnotation);
+	
+	    function TextAnnotation(parent) {
+	        _classCallCheck(this, TextAnnotation);
+	
+	        var _this = _possibleConstructorReturn(this, (TextAnnotation.__proto__ || Object.getPrototypeOf(TextAnnotation)).call(this));
+	
+	        _this.type = 'textbox';
+	        _this.parent = parent; // TODO Avoid cycle reference.
+	        _this.x = 0;
+	        _this.y = 0;
+	        _this.$element = $('<div class="dummy"/>');
+	
+	        window.globalEvent.on('deleteSelectedAnnotation', _this.deleteSelectedAnnotation);
+	        return _this;
 	    }
 	
-	    /**
-	     * クラスのメソッドのthisをクラスインスタンスにバインドします。
-	     */
+	    _createClass(TextAnnotation, [{
+	        key: 'render',
+	        value: function render() {
+	            if (this.parent.text) {
+	                (0, _deepAssign2.default)(this, this.parent.getTextPosition());
+	                this.text = this.parent.text;
+	                this.color = this.parent.color;
+	                _get(TextAnnotation.prototype.__proto__ || Object.getPrototypeOf(TextAnnotation.prototype), 'render', this).call(this);
+	                // this.$element.remove();
+	                // this.$element = $(appendChild(getSVGLayer(), this));    
+	                // this.setHoverEvent();        
+	            }
+	        }
+	    }, {
+	        key: 'setHoverEvent',
+	        value: function setHoverEvent() {
+	            this.$element.find('text').hover(this.handleHoverInEvent, this.handleHoverOutEvent);
+	        }
+	    }, {
+	        key: 'destroy',
+	        value: function destroy() {
+	            this.$element.remove();
+	            this.$element = $('<div class="dummy"/>');
+	        }
+	    }, {
+	        key: 'deleteSelectedAnnotation',
+	        value: function deleteSelectedAnnotation() {
+	            if (this.$element.find('rect').hasClass('--selected')) {
+	                console.log('text:deleteSelectedAnnotation');
+	                this.destroy();
+	                this.emit('textchanged', null);
+	            }
+	        }
+	    }, {
+	        key: 'highlight',
+	        value: function highlight() {
+	            this.$element.addClass('--hover');
+	            this.$element.addClass('--emphasis');
+	        }
+	    }, {
+	        key: 'dehighlight',
+	        value: function dehighlight() {
+	            this.$element.removeClass('--hover');
+	            this.$element.removeClass('--emphasis');
+	        }
+	    }, {
+	        key: 'handleParentHoverIn',
+	        value: function handleParentHoverIn() {
+	            this.highlight();
+	        }
+	    }, {
+	        key: 'handleParentHoverOut',
+	        value: function handleParentHoverOut() {
+	            this.dehighlight();
+	        }
+	    }, {
+	        key: 'handleHoverInEvent',
+	        value: function handleHoverInEvent() {
+	            this.$element.addClass('--hover');
+	            this.$element.addClass('--emphasis');
+	            this.emit('hoverin');
+	        }
+	    }, {
+	        key: 'handleHoverOutEvent',
+	        value: function handleHoverOutEvent() {
+	            this.$element.removeClass('--hover');
+	            this.$element.removeClass('--emphasis');
+	            this.emit('hoverout');
+	        }
+	    }, {
+	        key: 'handleClickEvent',
+	        value: function handleClickEvent() {
+	            this.$element.find('rect').toggleClass('--selected');
 	
+	            // Check double click.
+	            var currentTime = new Date().getTime();
+	            if (this.prevClickTime && currentTime - this.prevClickTime < 400) {
+	                this.handleDoubleClickEvent();
+	            }
+	            this.prevClickTime = currentTime;
+	        }
+	    }, {
+	        key: 'handleDoubleClickEvent',
+	        value: function handleDoubleClickEvent() {
+	            var _this2 = this;
 	
-	    _createClass(AbstractAnnotation, [{
-	        key: 'autoBind',
-	        value: function autoBind() {
-	            var _this = this;
+	            console.log('handleDoubleClickEvent');
 	
-	            Object.getOwnPropertyNames(this.constructor.prototype).filter(function (prop) {
-	                return typeof _this[prop] === 'function';
-	            }).forEach(function (method) {
-	                _this[method] = _this[method].bind(_this);
+	            this.destroy();
+	
+	            var svg = (0, _utils.getSVGLayer)();
+	            var pos = (0, _utils.scaleUp)(svg, {
+	                x: this.x,
+	                y: this.y
 	            });
+	            var rect = svg.getBoundingClientRect();
+	            pos.x += rect.left;
+	            pos.y += rect.top;
+	
+	            (0, _view.disableViewMode)(); // TODO Refactoring.
+	
+	            (0, _text.addInputField)(pos.x, pos.y, this.uuid, this.text, function (text) {
+	
+	                console.log('callback:', text);
+	
+	                if (text) {
+	                    _this2.text = text;
+	                    _this2.emit('textchanged', text);
+	                    _this2.enableViewMode();
+	                }
+	
+	                _this2.render();
+	
+	                (0, _view.enableViewMode)(); // TODO Refactoring.
+	            }, 'text');
+	        }
+	    }, {
+	        key: 'enableViewMode',
+	        value: function enableViewMode() {
+	
+	            if (!this.parent.readOnly) {
+	                this.$element.find('text').off('click').on('click', this.handleClickEvent);
+	            }
+	        }
+	    }, {
+	        key: 'disableViewMode',
+	        value: function disableViewMode() {
+	            this.$element.find('text').off('click', this.handleClickEvent);
 	        }
 	    }]);
 	
-	    return AbstractAnnotation;
-	}();
+	    return TextAnnotation;
+	}(_abstract2.default);
 	
-	exports.default = AbstractAnnotation;
+	exports.default = TextAnnotation;
 	module.exports = exports['default'];
 
 /***/ },
-/* 51 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -18021,28 +16536,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _jquery2 = _interopRequireDefault(_jquery);
 	
-	var _PDFJSAnnotate = __webpack_require__(7);
+	var _utils = __webpack_require__(16);
 	
-	var _PDFJSAnnotate2 = _interopRequireDefault(_PDFJSAnnotate);
+	var _text = __webpack_require__(45);
 	
-	var _appendChild = __webpack_require__(23);
+	var _highlight = __webpack_require__(51);
 	
-	var _appendChild2 = _interopRequireDefault(_appendChild);
-	
-	var _utils = __webpack_require__(12);
-	
-	var _text = __webpack_require__(47);
+	var _highlight2 = _interopRequireDefault(_highlight);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-	
-	var _type = 'highlight';
-	
-	var _enabled = false;
-	var overlay = void 0;
-	var originY = void 0;
-	var originX = void 0;
 	
 	/**
 	 * Get the current window selection as rects
@@ -18083,6 +16587,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }));
 	  }
 	
+	  console.log('handleDocumentMouseup:', rects);
+	
 	  removeSelection();
 	}
 	
@@ -18104,14 +16610,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	function saveRect(rects) {
 	
 	  var svg = (0, _utils.getSVGLayer)();
-	  var node = void 0;
-	  var annotation = void 0;
-	
 	  var boundingRect = svg.getBoundingClientRect();
 	
 	  // Initialize the annotation
-	  annotation = {
-	    type: _type,
+	  var annotation = {
 	    rectangles: [].concat(_toConsumableArray(rects)).map(function (r) {
 	      return (0, _utils.scaleDown)(svg, {
 	        x: r.left - boundingRect.left,
@@ -18124,307 +16626,336 @@ return /******/ (function(modules) { // webpackBootstrap
 	    })
 	  };
 	
-	  var _getMetadata = (0, _utils.getMetadata)(svg),
-	      documentId = _getMetadata.documentId,
-	      pageNumber = _getMetadata.pageNumber;
+	  // Save.
+	  var highlightAnnotation = _highlight2.default.newInstance(annotation);
+	  highlightAnnotation.save();
 	
-	  // Add the annotation
+	  // Render.
+	  highlightAnnotation.render();
 	
+	  // Add an input field.
+	  var x = annotation.rectangles[0].x + 5; // 5 = boundingRadius(3) + 2
+	  var y = annotation.rectangles[0].y - 20; // 20 = circle'radius(3px) + input height(14px) + α
+	  var rect = svg.getBoundingClientRect();
 	
-	  _PDFJSAnnotate2.default.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation).then(function (annotation) {
+	  x = (0, _utils.scaleUp)(svg, { x: x }).x + rect.left;
+	  y = (0, _utils.scaleUp)(svg, { y: y }).y + rect.top;
 	
-	    console.log('annotation:', annotation);
+	  // disableUserSelect();
 	
-	    (0, _appendChild2.default)(svg, annotation);
+	  document.removeEventListener('mouseup', handleDocumentMouseup);
 	
-	    // Add an input field.
-	    var x = annotation.rectangles[0].x + 5; // 5 = boundingRadius(3) + 2
-	    var y = annotation.rectangles[0].y - 20; // 20 = circle'radius(3px) + input height(14px) + α
-	    var rect = svg.getBoundingClientRect();
+	  (0, _text.addInputField)(x, y, null, null, function (text) {
 	
-	    x = (0, _utils.scaleUp)(svg, { x: x }).x + rect.left;
-	    y = (0, _utils.scaleUp)(svg, { y: y }).y + rect.top;
+	    document.addEventListener('mouseup', handleDocumentMouseup);
 	
-	    (0, _text.addInputField)(x, y, null, null, function (textAnnotation) {
-	
-	      if (!textAnnotation) {
-	        return;
-	      }
-	
-	      // FIXME: cannot stop refarence counter. I wanna use the original `annotation`, but couldn't.
-	      _PDFJSAnnotate2.default.getStoreAdapter().getAnnotation(documentId, annotation.uuid).then(function (annotation) {
-	
-	        // Set relation between arrow and text.
-	        annotation.text = textAnnotation.uuid;
-	
-	        // Update data.
-	        _PDFJSAnnotate2.default.getStoreAdapter().editAnnotation(documentId, annotation.uuid, annotation);
-	
-	        // Update UI.
-	        (0, _jquery2.default)('[data-pdf-annotate-id="' + annotation.uuid + '"]').attr('data-text', textAnnotation.uuid);
-	      });
-	    });
-	  });
+	    highlightAnnotation.text = text;
+	    highlightAnnotation.render();
+	    highlightAnnotation.save();
+	  }, 'text');
 	}
 	
 	/**
-	 * Enable rect behavior
+	 * Enable hightlight behavior.
 	 */
 	function enableHighlight() {
-	
-	  if (_enabled) {
-	    return;
-	  }
-	
-	  _enabled = true;
+	  this.disableHighlight();
 	  document.addEventListener('mouseup', handleDocumentMouseup);
+	  (0, _jquery2.default)('.textLayer').css('z-index', 3); // over svg layer.
 	}
 	
 	/**
-	 * Disable rect behavior
+	 * Disable hightlight behavior.
 	 */
 	function disableHighlight() {
-	
-	  if (!_enabled) {
-	    return;
-	  }
-	
-	  _enabled = false;
 	  document.removeEventListener('mouseup', handleDocumentMouseup);
+	  (0, _jquery2.default)('.textLayer').css('z-index', 1);
 	}
 
 /***/ },
-/* 52 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	  value: true
+	    value: true
 	});
 	
-	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	exports.createPage = createPage;
-	exports.renderPage = renderPage;
+	var _deepAssign = __webpack_require__(14);
 	
-	var _PDFJSAnnotate = __webpack_require__(7);
+	var _deepAssign2 = _interopRequireDefault(_deepAssign);
+	
+	var _appendChild = __webpack_require__(22);
+	
+	var _appendChild2 = _interopRequireDefault(_appendChild);
+	
+	var _uuid = __webpack_require__(12);
+	
+	var _uuid2 = _interopRequireDefault(_uuid);
+	
+	var _utils = __webpack_require__(16);
+	
+	var _text = __webpack_require__(45);
+	
+	var _view = __webpack_require__(47);
+	
+	var _abstract = __webpack_require__(48);
+	
+	var _abstract2 = _interopRequireDefault(_abstract);
+	
+	var _text2 = __webpack_require__(49);
+	
+	var _text3 = _interopRequireDefault(_text2);
+	
+	var _PDFJSAnnotate = __webpack_require__(8);
 	
 	var _PDFJSAnnotate2 = _interopRequireDefault(_PDFJSAnnotate);
 	
-	var _renderScreenReaderHints = __webpack_require__(34);
-	
-	var _renderScreenReaderHints2 = _interopRequireDefault(_renderScreenReaderHints);
-	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	// Template for creating a new page
-	var PAGE_TEMPLATE = '\n  <div style="visibility: hidden;" class="page" data-loaded="false">\n    <div class="canvasWrapper">\n      <canvas></canvas>\n    </div>\n    <svg class="annotationLayer"></svg>\n    <div class="textLayer"></div>\n  </div>\n';
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	/**
-	 * Create a new page to be appended to the DOM.
-	 *
-	 * @param {Number} pageNumber The page number that is being created
-	 * @return {HTMLElement}
-	 */
-	function createPage(pageNumber) {
-	  var temp = document.createElement('div');
-	  temp.innerHTML = PAGE_TEMPLATE;
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 	
-	  var page = temp.children[0];
-	  var canvas = page.querySelector('canvas');
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	  page.setAttribute('id', 'pageContainer' + pageNumber);
-	  page.setAttribute('data-page-number', pageNumber);
+	var HighlightAnnotation = function (_AbstractAnnotation) {
+	    _inherits(HighlightAnnotation, _AbstractAnnotation);
 	
-	  canvas.mozOpaque = true;
-	  canvas.setAttribute('id', 'page' + pageNumber);
+	    function HighlightAnnotation() {
+	        _classCallCheck(this, HighlightAnnotation);
 	
-	  return page;
-	}
+	        var _this = _possibleConstructorReturn(this, (HighlightAnnotation.__proto__ || Object.getPrototypeOf(HighlightAnnotation)).call(this));
 	
-	/**
-	 * Render a page that has already been created.
-	 *
-	 * @param {Number} pageNumber The page number to be rendered
-	 * @param {Object} renderOptions The options for rendering
-	 * @return {Promise} Settled once rendering has completed
-	 *  A settled Promise will be either:
-	 *    - fulfilled: [pdfPage, annotations]
-	 *    - rejected: Error
-	 */
-	function renderPage(pageNumber, renderOptions) {
-	  var documentId = renderOptions.documentId,
-	      pdfDocument = renderOptions.pdfDocument,
-	      scale = renderOptions.scale,
-	      rotate = renderOptions.rotate;
+	        _this.uuid = null;
+	        _this.type = 'highlight';
+	        _this.rectangles = [];
+	        _this.text = null;
+	        _this.color = null;
+	        _this.readOnly = null;
+	        _this.$element = $('<div class="dummy"/>');
 	
-	  // Load the page and annotations
+	        window.globalEvent.on('deleteSelectedAnnotation', _this.deleteSelectedAnnotation);
+	        window.globalEvent.on('enableViewMode', _this.enableViewMode);
+	        window.globalEvent.on('disableViewMode', _this.disableViewMode);
 	
-	  return Promise.all([pdfDocument.getPage(pageNumber), _PDFJSAnnotate2.default.getAnnotations(documentId, pageNumber)]).then(function (_ref) {
-	    var _ref2 = _slicedToArray(_ref, 2),
-	        pdfPage = _ref2[0],
-	        annotations = _ref2[1];
+	        _this.textAnnotation = new _text3.default(_this);
+	        _this.textAnnotation.on('hoverin', _this.handleTextHoverIn);
+	        _this.textAnnotation.on('hoverout', _this.handleTextHoverOut);
+	        _this.textAnnotation.on('textchanged', _this.handleTextChanged);
+	        return _this;
+	    }
 	
-	    var page = document.getElementById('pageContainer' + pageNumber);
-	    var svg = page.querySelector('.annotationLayer');
-	    var canvas = page.querySelector('.canvasWrapper canvas');
-	    var canvasContext = canvas.getContext('2d', { alpha: false });
-	    var viewport = pdfPage.getViewport(scale, rotate);
-	    var transform = scalePage(pageNumber, viewport, canvasContext);
+	    _createClass(HighlightAnnotation, [{
+	        key: 'setHoverEvent',
 	
-	    // Render the page
-	    return Promise.all([pdfPage.render({ canvasContext: canvasContext, viewport: viewport, transform: transform }), _PDFJSAnnotate2.default.render(svg, viewport, annotations)]).then(function () {
-	      // Text content is needed for a11y, but is also necessary for creating
-	      // highlight and strikeout annotations which require selecting text.
-	      return pdfPage.getTextContent({ normalizeWhitespace: true }).then(function (textContent) {
-	        return new Promise(function (resolve, reject) {
-	          // Render text layer for a11y of text content
-	          var textLayer = page.querySelector('.textLayer');
-	          var textLayerFactory = new PDFJS.DefaultTextLayerFactory();
-	          var textLayerBuilder = textLayerFactory.createTextLayerBuilder(textLayer, pageNumber - 1, viewport);
-	          textLayerBuilder.setTextContent(textContent);
-	          textLayerBuilder.render();
 	
-	          // Enable a11y for annotations
-	          // Timeout is needed to wait for `textLayerBuilder.render`
-	          setTimeout(function () {
-	            try {
-	              (0, _renderScreenReaderHints2.default)(annotations.annotations);
-	              resolve();
-	            } catch (e) {
-	              reject(e);
+	        // render() {
+	        //      this.$element.remove();
+	        //      this.$element = $(appendChild(getSVGLayer(), this));
+	        //      this.setHoverEvent();
+	        //      this.textAnnotation.render();
+	        // }
+	
+	        value: function setHoverEvent() {
+	            this.$element.find('circle').hover(this.handleHoverInEvent, this.handleHoverOutEvent);
+	        }
+	    }, {
+	        key: 'destroy',
+	        value: function destroy() {
+	            this.$element.remove();
+	            window.annotationContainer.remove(this);
+	
+	            var _getMetadata = (0, _utils.getMetadata)(),
+	                documentId = _getMetadata.documentId; // TODO Remove this.
+	
+	
+	            _PDFJSAnnotate2.default.getStoreAdapter().deleteAnnotation(documentId, this.uuid).then(function () {
+	                console.log('deleted');
+	            });
+	            this.textAnnotation.destroy();
+	            this.emit('delete');
+	        }
+	    }, {
+	        key: 'createAnnotation',
+	        value: function createAnnotation() {
+	            // TODO Refactring.
+	            return {
+	                uuid: this.uuid,
+	                type: this.type,
+	                rectangles: this.rectangles,
+	                text: this.text,
+	                color: this.color,
+	                readyOnly: this.readOnly
+	            };
+	        }
+	    }, {
+	        key: 'save',
+	        value: function save() {
+	            var _this2 = this;
+	
+	            // TODO make this in abstract.
+	            // TODO Competible to insert and update.
+	            var _getMetadata2 = (0, _utils.getMetadata)(),
+	                documentId = _getMetadata2.documentId;
+	
+	            _PDFJSAnnotate2.default.getStoreAdapter().getAnnotation(documentId, this.uuid).then(function (a) {
+	                if (a) {
+	                    // update.
+	                    a = _this2.createAnnotation(a);
+	                    console.log('save:', a);
+	                    _PDFJSAnnotate2.default.getStoreAdapter().editAnnotation(documentId, _this2.uuid, a);
+	                } else {
+	                    // insert.
+	                    a = _this2.createAnnotation();
+	                    _PDFJSAnnotate2.default.getStoreAdapter().addAnnotation(documentId, 1, a);
+	                }
+	            });
+	            window.annotationContainer.add(this);
+	        }
+	    }, {
+	        key: 'deleteSelectedAnnotation',
+	        value: function deleteSelectedAnnotation() {
+	            // TODO this will be better using eventEmitter on global?
+	            console.log('deleteSelectedAnnotation');
+	
+	            if (this.$element.find('rect').hasClass('--selected')) {
+	                this.destroy();
 	            }
-	          });
-	        });
-	      });
-	    }).then(function () {
-	      // Indicate that the page was loaded
-	      page.setAttribute('data-loaded', 'true');
+	        }
+	    }, {
+	        key: 'getTextPosition',
+	        value: function getTextPosition() {
 	
-	      return [pdfPage, annotations];
-	    });
-	  });
-	}
+	            if (this.rectangles.length > 0) {
 	
-	/**
-	 * Scale the elements of a page.
-	 *
-	 * @param {Number} pageNumber The page number to be scaled
-	 * @param {Object} viewport The viewport of the PDF page (see pdfPage.getViewport(scale, rotate))
-	 * @param {Object} context The canvas context that the PDF page is rendered to
-	 * @return {Array} The transform data for rendering the PDF page
-	 */
-	function scalePage(pageNumber, viewport, context) {
-	  var page = document.getElementById('pageContainer' + pageNumber);
-	  var canvas = page.querySelector('.canvasWrapper canvas');
-	  var svg = page.querySelector('.annotationLayer');
-	  var wrapper = page.querySelector('.canvasWrapper');
-	  var textLayer = page.querySelector('.textLayer');
-	  var outputScale = getOutputScale(context);
-	  var transform = !outputScale.scaled ? null : [outputScale.sx, 0, 0, outputScale.sy, 0, 0];
-	  var sfx = approximateFraction(outputScale.sx);
-	  var sfy = approximateFraction(outputScale.sy);
+	                return {
+	                    x: this.rectangles[0].x + 7,
+	                    y: this.rectangles[0].y - 20
+	                };
+	            } else {
+	                return { x: 0, y: 0 };
+	            }
+	        }
+	    }, {
+	        key: 'getBoundingCirclePosition',
+	        value: function getBoundingCirclePosition() {
+	            var $circle = this.$element.find('circle');
+	            return {
+	                x: parseFloat($circle.attr('cx')),
+	                y: parseFloat($circle.attr('cy'))
+	            };
+	        }
+	    }, {
+	        key: 'showBoundingCircle',
+	        value: function showBoundingCircle() {
+	            this.$element.find('circle').removeClass('--hide');
+	        }
+	    }, {
+	        key: 'hideBoundingCircle',
+	        value: function hideBoundingCircle() {
+	            this.$element.find('circle').addClass('--hide');
+	        }
+	    }, {
+	        key: 'highlight',
+	        value: function highlight() {
+	            // TODO CSS Refactoring.
+	            this.$element.find('rect').addClass('--hover');
+	            this.$element.addClass('--emphasis');
+	            this.textAnnotation.highlight();
+	        }
+	    }, {
+	        key: 'dehighlight',
+	        value: function dehighlight() {
+	            this.$element.find('rect').removeClass('--hover');
+	            this.$element.removeClass('--emphasis');
+	            this.textAnnotation.dehighlight();
+	        }
+	    }, {
+	        key: 'handleTextHoverIn',
+	        value: function handleTextHoverIn() {
+	            this.highlight();
+	            this.emit('hoverin');
+	        }
+	    }, {
+	        key: 'handleTextHoverOut',
+	        value: function handleTextHoverOut() {
+	            this.dehighlight();
+	            this.emit('hoverout');
+	        }
+	    }, {
+	        key: 'handleTextChanged',
+	        value: function handleTextChanged(textAfter) {
+	            this.text = textAfter;
+	            this.save();
+	        }
+	    }, {
+	        key: 'handleHoverInEvent',
+	        value: function handleHoverInEvent(e) {
+	            this.highlight();
+	            this.emit('hoverin');
 	
-	  // Adjust width/height for scale
-	  page.style.visibility = '';
-	  canvas.width = roundToDivide(viewport.width * outputScale.sx, sfx[0]);
-	  canvas.height = roundToDivide(viewport.height * outputScale.sy, sfy[0]);
-	  canvas.style.width = roundToDivide(viewport.width, sfx[1]) + 'px';
-	  canvas.style.height = roundToDivide(viewport.height, sfx[1]) + 'px';
-	  svg.setAttribute('width', viewport.width);
-	  svg.setAttribute('height', viewport.height);
-	  svg.style.width = viewport.width + 'px';
-	  svg.style.height = viewport.height + 'px';
-	  page.style.width = viewport.width + 'px';
-	  page.style.height = viewport.height + 'px';
-	  wrapper.style.width = viewport.width + 'px';
-	  wrapper.style.height = viewport.height + 'px';
-	  textLayer.style.width = viewport.width + 'px';
-	  textLayer.style.height = viewport.height + 'px';
+	            var $elm = $(e.currentTarget);
+	            if ($elm.prop("tagName") === 'circle') {
+	                this.emit('circlehoverin', this);
+	            }
+	        }
+	    }, {
+	        key: 'handleHoverOutEvent',
+	        value: function handleHoverOutEvent(e) {
+	            this.dehighlight();
+	            this.emit('hoverout');
 	
-	  return transform;
-	}
+	            var $elm = $(e.currentTarget);
+	            if ($elm.prop("tagName") === 'circle') {
+	                this.emit('circlehoverout', this);
+	            }
+	        }
+	    }, {
+	        key: 'handleClickEvent',
+	        value: function handleClickEvent() {
+	            this.$element.find('rect').toggleClass('--selected');
+	        }
+	    }, {
+	        key: 'enableViewMode',
+	        value: function enableViewMode() {
 	
-	/**
-	 * The following methods are taken from mozilla/pdf.js and as such fall under
-	 * the Apache License (http://www.apache.org/licenses/).
-	 *
-	 * Original source can be found at mozilla/pdf.js:
-	 * https://github.com/mozilla/pdf.js/blob/master/web/ui_utils.js
-	 */
+	            this.textAnnotation.enableViewMode();
 	
-	/**
-	 * Approximates a float number as a fraction using Farey sequence (max order
-	 * of 8).
-	 *
-	 * @param {Number} x Positive float number
-	 * @return {Array} Estimated fraction: the first array item is a numerator,
-	 *                 the second one is a denominator.
-	 */
-	function approximateFraction(x) {
-	  // Fast path for int numbers or their inversions.
-	  if (Math.floor(x) === x) {
-	    return [x, 1];
-	  }
+	            if (!this.readOnly) {
+	                this.$element.find('circle').off('click').on('click', this.handleClickEvent);
+	            }
+	        }
+	    }, {
+	        key: 'disableViewMode',
+	        value: function disableViewMode() {
+	            this.$element.find('circle').off('click', this.handleClickEvent);
+	            this.textAnnotation.disableViewMode();
+	        }
+	    }], [{
+	        key: 'newInstance',
+	        value: function newInstance(annotation) {
+	            var highlight = new HighlightAnnotation();
+	            highlight.uuid = annotation.uuid || (0, _uuid2.default)();
+	            highlight.rectangles = annotation.rectangles;
+	            highlight.text = annotation.text;
+	            highlight.color = annotation.color;
+	            highlight.readOnly = annotation.readOnly || false;
+	            return highlight;
+	        }
+	    }]);
 	
-	  var xinv = 1 / x;
-	  var limit = 8;
-	  if (xinv > limit) {
-	    return [1, limit];
-	  } else if (Math.floor(xinv) === xinv) {
-	    return [1, xinv];
-	  }
+	    return HighlightAnnotation;
+	}(_abstract2.default);
 	
-	  var x_ = x > 1 ? xinv : x;
-	
-	  // a/b and c/d are neighbours in Farey sequence.
-	  var a = 0,
-	      b = 1,
-	      c = 1,
-	      d = 1;
-	
-	  // Limit search to order 8.
-	  while (true) {
-	    // Generating next term in sequence (order of q).
-	    var p = a + c,
-	        q = b + d;
-	    if (q > limit) {
-	      break;
-	    }
-	    if (x_ <= p / q) {
-	      c = p;d = q;
-	    } else {
-	      a = p;b = q;
-	    }
-	  }
-	
-	  // Select closest of neighbours to x.
-	  if (x_ - a / b < c / d - x_) {
-	    return x_ === x ? [a, b] : [b, a];
-	  } else {
-	    return x_ === x ? [c, d] : [d, c];
-	  }
-	}
-	
-	function getOutputScale(ctx) {
-	  var devicePixelRatio = window.devicePixelRatio || 1;
-	  var backingStoreRatio = ctx.webkitBackingStorePixelRatio || ctx.mozBackingStorePixelRatio || ctx.msBackingStorePixelRatio || ctx.oBackingStorePixelRatio || ctx.backingStorePixelRatio || 1;
-	  var pixelRatio = devicePixelRatio / backingStoreRatio;
-	  return {
-	    sx: pixelRatio,
-	    sy: pixelRatio,
-	    scaled: pixelRatio !== 1
-	  };
-	}
-	
-	function roundToDivide(x, div) {
-	  var r = x % div;
-	  return r === 0 ? x : Math.round(x - r + div);
-	}
+	exports.default = HighlightAnnotation;
+	module.exports = exports['default'];
 
 /***/ },
-/* 53 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -18439,27 +16970,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _jquery2 = _interopRequireDefault(_jquery);
 	
-	var _PDFJSAnnotate = __webpack_require__(7);
-	
-	var _PDFJSAnnotate2 = _interopRequireDefault(_PDFJSAnnotate);
-	
-	var _appendChild = __webpack_require__(23);
+	var _appendChild = __webpack_require__(22);
 	
 	var _appendChild2 = _interopRequireDefault(_appendChild);
 	
-	var _utils = __webpack_require__(12);
+	var _utils = __webpack_require__(16);
 	
-	var _relation = __webpack_require__(19);
+	var _relation = __webpack_require__(18);
 	
-	var _text = __webpack_require__(47);
+	var _text = __webpack_require__(45);
 	
-	var _uuid = __webpack_require__(15);
+	var _uuid = __webpack_require__(12);
 	
 	var _uuid2 = _interopRequireDefault(_uuid);
 	
+	var _arrow = __webpack_require__(53);
+	
+	var _arrow2 = _interopRequireDefault(_arrow);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var filter = Array.prototype.filter;
+	var _hoverAnnotation = null;
+	var arrowAnnotation = null;
+	
 	var forEach = Array.prototype.forEach;
 	
 	var _enabled = false;
@@ -18467,20 +17000,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _arrowType = void 0;
 	
 	var arrow = void 0;
-	var lines = void 0;
 	
 	var dragging = false;
 	
 	var svg = void 0;
 	
-	var BORDER_COLOR = '#FF0000';
-	var BGCOLOR = '#FFFF00';
-	var BGCOLOR_SELECTED = '#FF0000';
-	
 	var boundingCircles = [];
-	var hitBoundingCircle = void 0;
-	var startBoundingCircle = void 0;
-	var endBoundingCircle = void 0;
 	
 	/**
 	 * Handle document.mousedown event
@@ -18488,23 +17013,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {Event} e The DOM event to handle
 	 */
 	function handleDocumentMousedown(e) {
-	  var svg = (0, _utils.findSVGAtPoint)(e.clientX, e.clientY);
-	  if (!svg) {
-	    return;
-	  }
 	
-	  arrow = null;
-	  lines = [];
+	  if (_hoverAnnotation) {
+	    arrowAnnotation = new _arrow2.default();
+	    arrowAnnotation.direction = _arrowType;
+	    arrowAnnotation.rel1Annotation = _hoverAnnotation;
+	    arrowAnnotation.readOnly = false;
 	
-	  (0, _utils.disableUserSelect)();
-	
-	  if (hitBoundingCircle) {
-	    startBoundingCircle = hitBoundingCircle;
-	    dragging = true;
+	    document.addEventListener('mouseup', handleDocumentMouseup);
+	    document.addEventListener('mousemove', handleDocumentMousemove);
 	  }
 	}
 	
 	function getClientXY(e) {
+	  var svg = (0, _utils.getSVGLayer)();
 	  var rect = svg.getBoundingClientRect();
 	  var x = e.clientX - rect.left;
 	  var y = e.clientY - rect.top;
@@ -18518,31 +17040,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function handleDocumentMousemove(e) {
 	
-	  var circle = findHitBoundingCircle(e);
-	  if (circle) {
-	    if (!hitBoundingCircle) {
-	      hitBoundingCircle = circle;
-	      setVisibility(hitBoundingCircle, BGCOLOR_SELECTED);
-	    }
-	  } else {
-	    if (hitBoundingCircle) {
-	      setVisibility(hitBoundingCircle, BGCOLOR);
-	      hitBoundingCircle = null;
-	    }
-	  }
-	
-	  if (dragging) {
-	    saveArrow(e.clientX, e.clientY);
-	  }
-	}
-	
-	function setVisibility(circle, style) {
-	  if (style === BGCOLOR_SELECTED) {
-	    // <animatetransform attributetype="xml" attributename="transform" type="scale" begin="0.7s" dur="0.5s" values="1 1;1.7 1;1 1" calcmode="spline" keysplines=".2,0 .8,.4; .2,.6 .8,1" additive="sum">
-	    (0, _jquery2.default)(circle.parentNode).find('rect').addClass('--hover');
-	  } else {
-	    (0, _jquery2.default)(circle.parentNode).find('rect').removeClass('--hover');
-	  }
+	  var p = (0, _utils.scaleDown)(getClientXY(e));
+	  arrowAnnotation.x2 = p.x;
+	  arrowAnnotation.y2 = p.y;
+	  arrowAnnotation.render();
 	}
 	
 	function findHitBoundingCircle(e) {
@@ -18576,207 +17077,92 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function handleDocumentMouseup(e) {
 	
-	  dragging = false;
+	  document.removeEventListener('mouseup', handleDocumentMouseup);
+	  document.removeEventListener('mousemove', handleDocumentMousemove);
 	
-	  cancelArrow();
+	  // FIXME use drag and drop event, it may be better.
 	
-	  var svg = (0, _utils.findSVGAtPoint)(e.clientX, e.clientY);
-	  if (!svg) {
-	    console.log('not found svg.');
+	  // Find the end position.
+	  var circle = findHitBoundingCircle(e);
+	  if (!circle) {
+	    arrowAnnotation.destroy();
+	    arrowAnnotation = null;
 	    return;
 	  }
 	
-	  // End point.
-	  endBoundingCircle = hitBoundingCircle;
-	
-	  // Check valid.
-	  if (!endBoundingCircle) {
-	    return console.log('not specified end point.');
-	  }
-	  if (!startBoundingCircle) {
-	    return console.log('not specified start point.');
-	  }
-	  if (startBoundingCircle === endBoundingCircle) {
-	    return console.log('start/end are same.');
-	  }
-	
-	  // Create annotation.
-	  var startPos = {
-	    x: parseFloat(startBoundingCircle.getAttribute('cx')),
-	    y: parseFloat(startBoundingCircle.getAttribute('cy'))
-	  };
-	  var endPos = {
-	    x: parseFloat(endBoundingCircle.getAttribute('cx')),
-	    y: parseFloat(endBoundingCircle.getAttribute('cy'))
-	  };
-	  var annotation = {
-	    x1: startPos.x,
-	    y1: startPos.y,
-	    x2: endPos.x,
-	    y2: endPos.y,
-	    type: 'arrow',
-	    direction: _arrowType,
-	    highlight1: startBoundingCircle.parentNode.getAttribute('data-pdf-annotate-id'),
-	    highlight2: endBoundingCircle.parentNode.getAttribute('data-pdf-annotate-id')
-	  };
-	
-	  var _getMetadata = (0, _utils.getMetadata)(svg),
-	      documentId = _getMetadata.documentId,
-	      pageNumber = _getMetadata.pageNumber;
-	
-	  _PDFJSAnnotate2.default.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation).then(function (annotation) {
-	    var arrow = (0, _appendChild2.default)(svg, annotation);
-	
-	    var arrowId = annotation.uuid;
-	
-	    // add text input.
-	    var s = (0, _utils.scaleUp)(svg, startPos);
-	    var e = (0, _utils.scaleUp)(svg, endPos);
-	    showTextInput(s, e, annotation);
-	  });
-	}
-	
-	function showTextInput(start, end, arrowAnnotation) {
-	
-	  var textPosition = (0, _relation.getRelationTextPosition)(svg, start.x, start.y, end.x, end.y);
-	
-	  (0, _text.addInputField)(textPosition.x, textPosition.y, null, null, function (textAnnotation) {
-	
-	    if (!textAnnotation) {
-	      return;
-	    }
-	
-	    var svg = (0, _utils.getSVGLayer)();
-	
-	    var _getMetadata2 = (0, _utils.getMetadata)(svg),
-	        documentId = _getMetadata2.documentId,
-	        pageNumber = _getMetadata2.pageNumber;
-	
-	    // FIXME: cannot stop refarence counter. I wanna use the original `annotation`, but couldn't.
-	
-	
-	    _PDFJSAnnotate2.default.getStoreAdapter().getAnnotation(documentId, arrowAnnotation.uuid).then(function (arrowAnnotation) {
-	
-	      // Set relation between arrow and text.
-	      arrowAnnotation.text = textAnnotation.uuid;
-	
-	      // Update.
-	      // let element = document.querySelector('.annotationLayer');
-	      var element = document.getElementById('annoLayer'); // TODO make it const.
-	      var documentId = element.getAttribute('data-pdf-annotate-document'); // 共通化
-	      _PDFJSAnnotate2.default.getStoreAdapter().editAnnotation(documentId, arrowAnnotation.uuid, arrowAnnotation);
-	
-	      // Update UI.
-	      console.log('arrow:', (0, _jquery2.default)('[data-pdf-annotate-id="' + arrowAnnotation.uuid + '"]'));
-	      (0, _jquery2.default)('[data-pdf-annotate-id="' + arrowAnnotation.uuid + '"]').attr('data-text', textAnnotation.uuid);
-	    });
-	  });
-	}
-	
-	/**
-	 * Handle document.keyup event
-	 *
-	 * @param {Event} e The DOM event to handle
-	 */
-	function handleDocumentKeyup(e) {
-	  // Cancel arrow if Esc is pressed
-	  if (e.keyCode === 27) {
-	    cancelArrow();
-	  }
-	}
-	
-	function cancelArrow() {
-	  lines = null;
-	  if (arrow) {
-	    arrow.parentNode.removeChild(arrow);
-	    arrow = null;
-	  }
-	}
-	
-	/**
-	  Save arrow information(x1,y1,x2,y2) and show an arrow.
-	
-	  @param {Float} x : the point of x.
-	  @param {Float} y : the point of y.
-	*/
-	function saveArrow(x, y) {
-	  var svg = (0, _utils.findSVGAtPoint)(x, y);
-	  if (!svg) {
+	  var uuid = circle.parentNode.getAttribute('data-pdf-annotate-id');
+	  var endAnnotation = window.annotationContainer.findById(uuid);
+	  if (arrowAnnotation.rel1Annotation === endAnnotation) {
+	    arrowAnnotation.destroy();
+	    arrowAnnotation = null;
 	    return;
 	  }
 	
-	  var rect = svg.getBoundingClientRect();
-	  var point = (0, _utils.scaleDown)(svg, {
-	    x: x - rect.left,
-	    y: y - rect.top
-	  });
+	  arrowAnnotation.rel2Annotation = endAnnotation;
 	
-	  lines.push([point.x, point.y]);
-	  if (lines.length > 1) {
-	    lines = [lines[0], lines[lines.length - 1]];
-	  }
+	  arrowAnnotation.save();
 	
-	  if (lines.length <= 1) {
-	    return;
-	  }
+	  showTextInput();
+	}
 	
-	  if (arrow) {
-	    svg.removeChild(arrow);
-	  }
+	function showTextInput() {
 	
-	  arrow = (0, _appendChild2.default)(svg, {
-	    x1: lines[0][0],
-	    y1: lines[0][1],
-	    x2: lines[1][0],
-	    y2: lines[1][1],
-	    type: 'arrow',
-	    direction: _arrowType
-	  });
+	  var p1 = arrowAnnotation.rel1Annotation.getBoundingCirclePosition();
+	  var p2 = arrowAnnotation.rel2Annotation.getBoundingCirclePosition();
+	  var textPosition = (0, _relation.getRelationTextPosition)(null, p1.x, p1.y, p2.x, p2.y);
+	
+	  var boundingRect = svg.getBoundingClientRect();
+	
+	  var x = (0, _utils.scaleUp)(svg, { x: textPosition.x }).x + boundingRect.left;
+	  var y = (0, _utils.scaleUp)(svg, { y: textPosition.y }).y + boundingRect.top;
+	
+	  (0, _text.addInputField)(x, y, null, null, function (text) {
+	
+	    arrowAnnotation.text = text;
+	    arrowAnnotation.save();
+	    arrowAnnotation.render();
+	  }, 'text');
 	}
 	
 	/**
 	  Show BoundingBox on highlight objects.
+	  FIXME wanna remove this.
 	*/
-	function showBoundingBox() {
-	
-	  // svg = document
-	  //             .querySelector('#pageContainer' + PDFView.page)
-	  //             .querySelector('svg');
-	
-	  svg = document.getElementById('annoLayer'); // TODO make it const.
-	
-	  // Collect boundingCircles for highlight.
+	function createBoundingBoxList() {
+	  svg = (0, _utils.getSVGLayer)();
 	  boundingCircles = [];
 	  forEach.call(svg.querySelectorAll('g > [type="boundingCircle"]'), function (boundingCircle) {
 	    if ((0, _jquery2.default)(boundingCircle).closest('g').attr('read-only') !== 'true') {
 	      boundingCircles.push(boundingCircle);
-	    } else {
-	      (0, _jquery2.default)(boundingCircle).hide();
 	    }
 	  });
 	}
 	
 	function disableTextlayer() {
-	  var currentPage = PDFView.page;
-	  var textLayer = document.querySelector('#pageContainer' + currentPage + ' .textLayer');
-	  textLayer.style.pointerEvents = 'None';
+	  (0, _jquery2.default)('.textLayer').hide();
 	}
 	
 	function enableTextlayer() {
-	  var currentPage = PDFView.page;
-	  var textLayer = document.querySelector('#pageContainer' + currentPage + ' .textLayer');
-	  textLayer.style.pointerEvents = 'Auto';
+	  (0, _jquery2.default)('.textLayer').show();
 	}
 	
-	function deleteBoundingBoxes() {
+	/**
+	 * TODO wanna remove this.
+	 */
+	function deleteBoundingBoxList() {
 	  boundingCircles = [];
+	}
 	
-	  // Collect boundingCircles for highlight.
-	  forEach.call(svg.querySelectorAll('g > [type="boundingCircle"]'), function (boundingCircle) {
-	    if ((0, _jquery2.default)(boundingCircle).closest('g').attr('read-only') === 'true') {
-	      (0, _jquery2.default)(boundingCircle).show();
-	    }
-	  });
+	function handleBoundingCircleHoverIn(annotation) {
+	  console.log('handleBoundingCircleHoverIn');
+	
+	  _hoverAnnotation = annotation;
+	}
+	
+	function handleBoundingCircleHoverOut(annotation) {
+	  console.log('handleBoundingCircleHoverOut');
+	
+	  _hoverAnnotation = null;
 	}
 	
 	/**
@@ -18794,13 +17180,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  console.log('enableArrow: ', _arrowType);
 	
-	  showBoundingBox();
+	  createBoundingBoxList();
 	  (0, _utils.disableUserSelect)();
 	  disableTextlayer();
 	
-	  document.addEventListener('mouseup', handleDocumentMouseup);
 	  document.addEventListener('mousedown', handleDocumentMousedown);
-	  document.addEventListener('mousemove', handleDocumentMousemove);
+	
+	  window.annotationContainer.getAllAnnotations().forEach(function (a) {
+	
+	    if (a.hasBoundingCircle()) {
+	
+	      console.log('a.readOnly', a.readOnly);
+	
+	      if (a.readOnly) {
+	        a.hideBoundingCircle();
+	      } else {
+	        a.on('circlehoverin', handleBoundingCircleHoverIn);
+	        a.on('circlehoverout', handleBoundingCircleHoverOut);
+	      }
+	    }
+	  });
 	}
 	
 	/**
@@ -18812,16 +17211,409 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	
 	  _enabled = false;
-	  document.removeEventListener('mouseup', handleDocumentMouseup);
 	  document.removeEventListener('mousedown', handleDocumentMousedown);
-	  document.removeEventListener('keyup', handleDocumentKeyup);
-	  document.removeEventListener('mousemove', handleDocumentMousemove);
 	
 	  (0, _utils.enableUserSelect)();
 	  enableTextlayer();
 	
-	  deleteBoundingBoxes();
+	  deleteBoundingBoxList();
+	
+	  window.annotationContainer.getAllAnnotations().forEach(function (a) {
+	
+	    if (a.hasBoundingCircle()) {
+	
+	      if (a.readOnly) {
+	        a.showBoundingCircle();
+	      } else {
+	        a.removeListener('circlehoverin', handleBoundingCircleHoverIn);
+	        a.removeListener('circlehoverout', handleBoundingCircleHoverOut);
+	      }
+	    }
+	  });
 	}
+
+/***/ },
+/* 53 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+	
+	var _deepAssign = __webpack_require__(14);
+	
+	var _deepAssign2 = _interopRequireDefault(_deepAssign);
+	
+	var _appendChild = __webpack_require__(22);
+	
+	var _appendChild2 = _interopRequireDefault(_appendChild);
+	
+	var _uuid = __webpack_require__(12);
+	
+	var _uuid2 = _interopRequireDefault(_uuid);
+	
+	var _utils = __webpack_require__(16);
+	
+	var _text = __webpack_require__(45);
+	
+	var _view = __webpack_require__(47);
+	
+	var _abstract = __webpack_require__(48);
+	
+	var _abstract2 = _interopRequireDefault(_abstract);
+	
+	var _text2 = __webpack_require__(49);
+	
+	var _text3 = _interopRequireDefault(_text2);
+	
+	var _PDFJSAnnotate = __webpack_require__(8);
+	
+	var _PDFJSAnnotate2 = _interopRequireDefault(_PDFJSAnnotate);
+	
+	var _relation = __webpack_require__(18);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	/**
+	 * Arrow Annotation (one-way / two-way / link)
+	 */
+	var ArrowAnnotation = function (_AbstractAnnotation) {
+	    _inherits(ArrowAnnotation, _AbstractAnnotation);
+	
+	    function ArrowAnnotation() {
+	        _classCallCheck(this, ArrowAnnotation);
+	
+	        var _this = _possibleConstructorReturn(this, (ArrowAnnotation.__proto__ || Object.getPrototypeOf(ArrowAnnotation)).call(this));
+	
+	        _this.uuid = (0, _uuid2.default)();
+	        _this.type = 'arrow';
+	        _this.rel1Annotation = null;
+	        _this.rel2Annotation = null;
+	        _this.text = null;
+	        _this.color = null;
+	        _this.readOnly = false;
+	        _this.$element = $('<div class="dummy"/>');
+	
+	        // for render.
+	        _this.x1 = 0;
+	        _this.y1 = 0;
+	        _this.x2 = 0;
+	        _this.y2 = 0;
+	
+	        window.globalEvent.on('deleteSelectedAnnotation', _this.deleteSelectedAnnotation);
+	        window.globalEvent.on('enableViewMode', _this.enableViewMode);
+	        window.globalEvent.on('disableViewMode', _this.disableViewMode);
+	
+	        _this.textAnnotation = new _text3.default(_this);
+	        _this.textAnnotation.on('hoverin', _this.handleTextHoverIn);
+	        _this.textAnnotation.on('hoverout', _this.handleTextHoverOut);
+	        _this.textAnnotation.on('textchanged', _this.handleTextChanged);
+	        return _this;
+	    }
+	
+	    _createClass(ArrowAnnotation, [{
+	        key: 'render',
+	        value: function render() {
+	
+	            // Set start/end positions.
+	            if (this._rel1Annotation) {
+	                var p = this._rel1Annotation.getBoundingCirclePosition();
+	                this.x1 = p.x;
+	                this.y1 = p.y;
+	            }
+	            if (this._rel2Annotation) {
+	                var _p = this._rel2Annotation.getBoundingCirclePosition();
+	                this.x2 = _p.x;
+	                this.y2 = _p.y;
+	            }
+	
+	            _get(ArrowAnnotation.prototype.__proto__ || Object.getPrototypeOf(ArrowAnnotation.prototype), 'render', this).call(this);
+	
+	            // console.log('render:', this);
+	
+	            // if (this.rel1Annotation && this.rel2Annotation) {
+	            //     assign(this, _getStartEndPoint(this));            
+	
+	            // } else {
+	            //     // Here used at UI/arrow.js for tmp rendering.
+	            // }
+	
+	            // this.$element.remove();
+	            // this.$element = $(appendChild(getSVGLayer(), this));
+	            // this.textAnnotation.render();
+	
+	            // console.log('render:', this.$element);
+	        }
+	    }, {
+	        key: 'destroy',
+	        value: function destroy() {
+	            this.$element.remove();
+	            window.annotationContainer.remove(this);
+	
+	            var _getMetadata = (0, _utils.getMetadata)(),
+	                documentId = _getMetadata.documentId; // TODO Remove this.
+	
+	
+	            _PDFJSAnnotate2.default.getStoreAdapter().deleteAnnotation(documentId, this.uuid).then(function () {
+	                console.log('deleted');
+	            });
+	            this.textAnnotation.destroy();
+	        }
+	    }, {
+	        key: 'createAnnotation',
+	        value: function createAnnotation() {
+	            return {
+	                uuid: this.uuid,
+	                type: this.type,
+	                direction: this.direction,
+	                rel1: this._rel1Annotation.uuid,
+	                rel2: this._rel2Annotation.uuid,
+	                text: this.text,
+	                color: this.color,
+	                readOnly: this.readOnly
+	            };
+	        }
+	    }, {
+	        key: 'save',
+	        value: function save() {
+	            var _this2 = this;
+	
+	            // TODO Competible to insert and update.
+	            var _getMetadata2 = (0, _utils.getMetadata)(),
+	                documentId = _getMetadata2.documentId;
+	
+	            _PDFJSAnnotate2.default.getStoreAdapter().getAnnotation(documentId, this.uuid).then(function (a) {
+	                if (a) {
+	                    // update.
+	                    a = _this2.createAnnotation(a);
+	                    console.log('save:update:', a);
+	                    _PDFJSAnnotate2.default.getStoreAdapter().editAnnotation(documentId, _this2.uuid, a);
+	                } else {
+	                    // insert.
+	                    a = _this2.createAnnotation();
+	                    _PDFJSAnnotate2.default.getStoreAdapter().addAnnotation(documentId, 1, a);
+	                    console.log('save:insert:', a);
+	                }
+	            });
+	            window.annotationContainer.add(this);
+	        }
+	    }, {
+	        key: 'deleteSelectedAnnotation',
+	        value: function deleteSelectedAnnotation() {
+	            // TODO this will be better using eventEmitter on global?
+	            if (this.$element.find('path').hasClass('--selected')) {
+	                this.destroy();
+	            }
+	            // this.textAnnotation.deleteSelectedAnnotation();
+	        }
+	
+	        // arrow選択時のrel1,2のhover処理
+	
+	        // rel1,2削除時のarrowとtextの削除処理
+	
+	    }, {
+	        key: 'getTextPosition',
+	        value: function getTextPosition() {
+	            var p = _getStartEndPoint(this);
+	            return (0, _relation.getRelationTextPosition)(null, p.x1, p.y1, p.x2, p.y2);
+	        }
+	    }, {
+	        key: 'highlightRelAnnotations',
+	        value: function highlightRelAnnotations() {
+	            if (this._rel1Annotation) {
+	                this._rel1Annotation.highlight();
+	            }
+	            if (this._rel2Annotation) {
+	                this._rel2Annotation.highlight();
+	            }
+	        }
+	    }, {
+	        key: 'dehighlightRelAnnotations',
+	        value: function dehighlightRelAnnotations() {
+	            if (this._rel1Annotation) {
+	                this._rel1Annotation.dehighlight();
+	            }
+	            if (this.rel2Annotation) {
+	                this.rel2Annotation.dehighlight();
+	            }
+	        }
+	    }, {
+	        key: 'highlight',
+	        value: function highlight() {
+	            // TODO Refactoring CSS.
+	            this.$element.find('path').addClass('--hover');
+	            this.$element.addClass('--emphasis');
+	            this.textAnnotation.highlight();
+	        }
+	    }, {
+	        key: 'dehighlight',
+	        value: function dehighlight() {
+	            this.$element.find('path').removeClass('--hover');
+	            this.$element.removeClass('--emphasis');
+	            this.textAnnotation.dehighlight();
+	        }
+	    }, {
+	        key: 'handleTextHoverIn',
+	        value: function handleTextHoverIn() {
+	            this.highlight();
+	            this.emit('hoverin');
+	            this.highlightRelAnnotations();
+	        }
+	    }, {
+	        key: 'handleTextHoverOut',
+	        value: function handleTextHoverOut() {
+	            this.dehighlight();
+	            this.emit('hoverout');
+	            this.dehighlightRelAnnotations();
+	        }
+	    }, {
+	        key: 'handleRelHoverIn',
+	        value: function handleRelHoverIn() {
+	            this.highlight();
+	            // this.$element.find('path').addClass('--hover');
+	            // this.$element.addClass('--emphasis');
+	            this.highlightRelAnnotations();
+	            // this.emit('hoverin');
+	        }
+	    }, {
+	        key: 'handleRelHoverOut',
+	        value: function handleRelHoverOut() {
+	            this.dehighlight();
+	            // this.$element.find('path').removeClass('--hover');
+	            // this.$element.removeClass('--emphasis');
+	            this.dehighlightRelAnnotations();
+	            // this.emit('hoverout');
+	        }
+	    }, {
+	        key: 'handleRelDelete',
+	        value: function handleRelDelete() {
+	            this.destroy();
+	        }
+	    }, {
+	        key: 'handleRelMove',
+	        value: function handleRelMove() {
+	            this.render();
+	        }
+	    }, {
+	        key: 'handleTextChanged',
+	        value: function handleTextChanged(textAfter) {
+	            this.text = textAfter;
+	            this.save();
+	        }
+	    }, {
+	        key: 'handleHoverInEvent',
+	        value: function handleHoverInEvent() {
+	            this.highlight();
+	            this.emit('hoverin');
+	            this.highlightRelAnnotations();
+	        }
+	    }, {
+	        key: 'handleHoverOutEvent',
+	        value: function handleHoverOutEvent() {
+	            this.dehighlight();
+	            this.emit('hoverout');
+	            this.dehighlightRelAnnotations();
+	        }
+	    }, {
+	        key: 'handleClickEvent',
+	        value: function handleClickEvent() {
+	            this.$element.find('path').toggleClass('--selected');
+	        }
+	    }, {
+	        key: 'enableViewMode',
+	        value: function enableViewMode() {
+	
+	            this.$element.find('path').off();
+	            this.$element.find('path').hover(this.handleHoverInEvent, this.handleHoverOutEvent);
+	            this.textAnnotation.enableViewMode();
+	
+	            if (!this.readOnly) {
+	                this.$element.find('path').on('click', this.handleClickEvent);
+	            }
+	        }
+	    }, {
+	        key: 'disableViewMode',
+	        value: function disableViewMode() {
+	            this.$element.find('path').off('mouseenter mouseleave');
+	            this.$element.find('path').off('click', this.handleClickEvent);
+	            this.textAnnotation.disableViewMode();
+	        }
+	    }, {
+	        key: 'rel1Annotation',
+	        set: function set(a) {
+	            console.log('setRel1Annotation:', a);
+	            this._rel1Annotation = a;
+	            if (this._rel1Annotation) {
+	                this._rel1Annotation.on('hoverin', this.handleRelHoverIn);
+	                this._rel1Annotation.on('hoverout', this.handleRelHoverOut);
+	                this._rel1Annotation.on('rectmove', this.handleRelMove);
+	                this._rel1Annotation.on('delete', this.handleRelDelete);
+	            }
+	        },
+	        get: function get() {
+	            return this._rel1Annotation;
+	        }
+	    }, {
+	        key: 'rel2Annotation',
+	        set: function set(a) {
+	            console.log('setRel2Annotation');
+	            this._rel2Annotation = a;
+	            if (this._rel2Annotation) {
+	                this._rel2Annotation.on('hoverin', this.handleRelHoverIn);
+	                this._rel2Annotation.on('hoverout', this.handleRelHoverOut);
+	                this._rel2Annotation.on('rectmove', this.handleRelMove);
+	                this._rel2Annotation.on('delete', this.handleRelDelete);
+	            }
+	        },
+	        get: function get() {
+	            return this._rel2Annotation;
+	        }
+	    }], [{
+	        key: 'newInstance',
+	        value: function newInstance(annotation) {
+	            var a = new ArrowAnnotation();
+	            a.uuid = annotation.uuid || (0, _uuid2.default)();
+	            a.direction = annotation.direction;
+	            a.rel1Annotation = window.annotationContainer.findById(annotation.rel1);
+	            a.rel2Annotation = window.annotationContainer.findById(annotation.rel2);
+	            a.text = annotation.text;
+	            a.color = annotation.color;
+	            a.readOnly = annotation.readOnly || false;
+	
+	            return a;
+	        }
+	    }]);
+	
+	    return ArrowAnnotation;
+	}(_abstract2.default);
+	
+	exports.default = ArrowAnnotation;
+	
+	
+	function _getStartEndPoint(arrowAnnotation) {
+	    // set the start/end position.
+	    var p1 = arrowAnnotation._rel1Annotation.getBoundingCirclePosition();
+	    var p2 = arrowAnnotation._rel2Annotation.getBoundingCirclePosition();
+	    return {
+	        x1: p1.x,
+	        y1: p1.y,
+	        x2: p2.x,
+	        y2: p2.y
+	    };
+	}
+	module.exports = exports['default'];
 
 /***/ },
 /* 54 */
@@ -18858,7 +17650,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, "/**\n    各種アノテーション\n*/\n.anno-circle {\n    transition:0.2s;\n    transform-origin: center center;\n}\n.anno-circle:hover, .anno-circle.\\--hover {\n  box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;\n  /*transform: scale(2);*/\n  stroke: blue;\n  stroke-width: 5px;\n}\n\n.anno-highlight:hover, .anno-highlight.\\--hover {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 1px;\n}\n.anno-highlight.\\--selected {\n  stroke: black;\n  stroke-width: 1px;\n  stroke-dasharray: 3;\n}\n\n/**\n  Arrow.\n*/\n.anno-arrow {\n  /*TODO CSSに移した方がソースが綺麗になる*/\n  transition:0.2s;\n}\n.anno-arrow:hover, .anno-arrow.\\--hover {\n  stroke-width: 2px;\n}\n.anno-arrow-outline {\n  fill: none;\n  stroke: black;\n  visibility: hidden;\n  stroke-width: 4px;\n  stroke-dasharray: 2.5;\n  pointer-events: stroke;\n}\n.anno-arrow-outline.\\--selected {\n  visibility: visible;\n}\n\n/**\n  Rect.\n*/\n.anno-rect {\n  transition: 0.2s;\n}\n.anno-rect:hover, .anno-rect.\\--hover {\n  stroke-width: 2px;\n}\n.anno-rect.\\--selected {\n  stroke: black;\n  stroke-width: 4px;\n  stroke-dasharray: 3;\n}\n\n/**\n  Text.\n*/\n.anno-text {\n  transition: 0.2s;\n}\n.anno-text:hover, .anno-text.\\--hover {\n  stroke: red;\n  stroke-width: 0.5px;\n}\n.anno-text.\\--selected {\n  stroke: black;\n  stroke-width: 2px;\n  stroke-dasharray: 3;\n}\n", ""]);
+	exports.push([module.id, "\n/**\n * Utilities.\n */\n.\\--hide {\n  display: none;\n}\n\n/**\n * SVGLayer.\n */\n.annoLayer {}\n.annoLayer > *.\\--viewMode {\n  opacity: 0.5;\n}\n.annoLayer > *.\\--viewMode.\\--emphasis {\n  opacity: 1;\n}\n\n/**\n    各種アノテーション\n*/\n.anno-circle {\n    transition:0.2s;\n    transform-origin: center center;\n}\n.anno-circle.\\--hover {\n  box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;\n  /*transform: scale(2);*/\n  stroke: blue;\n  stroke-width: 5px;\n}\n\n.anno-highlight.\\--hover {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 1px;\n}\n.anno-highlight.\\--selected {\n  stroke: black;\n  stroke-width: 1px;\n  stroke-dasharray: 3;\n}\n\n/**\n  Arrow.\n*/\n.anno-arrow {\n  transition:0.2s;\n}\n.anno-arrow.\\--hover {\n  stroke-width: 2px;\n}\n.anno-arrow-outline {\n  fill: none;\n  stroke: black;\n  visibility: hidden;\n  stroke-width: 4px;\n  stroke-dasharray: 2.5;\n  pointer-events: stroke;\n}\n.anno-arrow-outline.\\--selected {\n  visibility: visible;\n}\n\n/**\n  Rect.\n*/\n.anno-rect {\n  transition: 0.2s;\n}\n.anno-rect.\\--hover {\n  stroke-width: 2px;\n}\n.anno-rect.\\--selected {\n  stroke: black;\n  stroke-width: 4px;\n  stroke-dasharray: 3;\n}\n\n/**\n  Text.\n*/\n.anno-text {\n  transition: 0.2s;\n}\n.anno-text.\\--hover {\n  stroke: red;\n  stroke-width: 0.5px;\n}\n.anno-text.\\--selected {\n  stroke: black;\n  stroke-width: 2px;\n  stroke-dasharray: 3;\n}\n", ""]);
 	
 	// exports
 
@@ -18884,29 +17676,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function AnnotationContainer() {
 	        _classCallCheck(this, AnnotationContainer);
 	
-	        this.list = [];
+	        this.set = new Set();
 	    }
 	
 	    _createClass(AnnotationContainer, [{
 	        key: "add",
 	        value: function add(annotation) {
-	            this.list.push(annotation);
+	            this.set.add(annotation);
 	        }
 	    }, {
 	        key: "remove",
 	        value: function remove(annotation) {
-	            var newList = [];
-	            this.list.forEach(function (a) {
-	                if (annotation !== a) {
-	                    newList.push(a);
-	                }
-	            });
-	            this.list = newList;
+	            this.set.delete(annotation);
 	        }
 	    }, {
 	        key: "getAllAnnotations",
 	        value: function getAllAnnotations() {
-	            return this.list;
+	            var list = [];
+	            this.set.forEach(function (a) {
+	                return list.push(a);
+	            });
+	            return list;
+	        }
+	    }, {
+	        key: "findById",
+	        value: function findById(uuid) {
+	            var annotation = null;
+	            this.set.forEach(function (a) {
+	                if (a.uuid === uuid) {
+	                    annotation = a;
+	                }
+	            });
+	            return annotation;
 	        }
 	    }]);
 	
