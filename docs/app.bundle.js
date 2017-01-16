@@ -196,7 +196,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	function initializeFileUploader() {
 	    setupPrimaryAnnotationButton();
 	    setupSecondaryAnnotationButton();
-	    setupLoadButton();
 	}
 	
 	function setupPrimaryAnnotationButton() {
@@ -237,22 +236,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            };
 	            fileReader.readAsText(file);
 	        });
-	    });
-	}
-	
-	function setupLoadButton() {
-	    $('#load').off('click').on('click', function (e) {
-	
-	        // Set data.
-	        _primaryAnnotation && localStorage.setItem('_pdfanno_pdfanno_upload', _primaryAnnotation);
-	        _secondaryAnnotations && localStorage.setItem('_pdfanno_pdfanno_upload_second', JSON.stringify(_secondaryAnnotations));
-	
-	        // Reload pdf.js.
-	        $('#viewer iframe').remove();
-	        $('#viewer').html('<iframe src="./pages/viewer.html" class="anno-viewer" frameborder="0"></iframe>');
-	
-	        // Re-setup.
-	        startApplication();
 	    });
 	}
 	
@@ -593,7 +576,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, "@charset 'utf-8';\n\n\n.anno-viewer {\n    width: 100%;\n    height: 500px;\n}\n\n/**\n    PDF Drag and Drop UI.\n*/\n/*#viewer {\n    position: relative;\n}\n#viewer.-active:after {\n    position: absolute;\n    top: 0;\n    left: 0;\n    width: 100%;\n    height: 100%;\n    background: rgba(0, 0, 255, 0.3);\n    content: \" \";\n}*/\n\n/**\n * Annotation Select UI Layout.\n */\n.anno-select-layout {}\n.anno-select-layout .row:first-child {\n    margin-bottom: 10px;\n}\n.anno-select-layout [type=\"radio\"] {\n    margin-right: 5px;\n}\n.anno-select-layout [type=\"file\"] {\n    display: inline-block;\n    margin-left: 5px;\n    line-height: 1em;\n}\n.anno-select-layout .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-select-layout .sp-dd {\n    display: none;\n}", ""]);
+	exports.push([module.id, "@charset 'utf-8';\n\n\n.anno-viewer {\n    width: 100%;\n    height: 500px;\n}\n\n/*.anno-viewmode {\n    opacity: 0.5;\n}*/\n\n/**\n    PDF Drag and Drop UI.\n*/\n/*#viewer {\n    position: relative;\n}\n#viewer.-active:after {\n    position: absolute;\n    top: 0;\n    left: 0;\n    width: 100%;\n    height: 100%;\n    background: rgba(0, 0, 255, 0.3);\n    content: \" \";\n}*/\n\n/**\n * Annotation Select UI Layout.\n */\n.anno-select-layout {}\n.anno-select-layout .row:first-child {\n    margin-bottom: 10px;\n}\n.anno-select-layout [type=\"radio\"] {\n    margin-right: 5px;\n}\n.anno-select-layout [type=\"file\"] {\n    display: inline-block;\n    margin-left: 5px;\n    line-height: 1em;\n}\n.anno-select-layout .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-select-layout .sp-dd {\n    display: none;\n}", ""]);
 	
 	// exports
 

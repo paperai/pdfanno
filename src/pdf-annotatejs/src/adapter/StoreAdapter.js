@@ -1,5 +1,4 @@
 import abstractFunction from '../utils/abstractFunction';
-import { fireEvent } from '../UI/event';
 
 // Adapter should never be invoked publicly
 export default class StoreAdapter {
@@ -79,7 +78,6 @@ export default class StoreAdapter {
   set addAnnotation(fn) {
     this.__addAnnotation = function addAnnotation(documentId, pageNumber, annotation) {
       return fn(...arguments).then((annotation) => {
-        fireEvent('annotation:add', documentId, pageNumber, annotation);
         return annotation;
       });
     };
@@ -90,7 +88,6 @@ export default class StoreAdapter {
   set addAllAnnotations(fn) {
     this.__addAllAnnotations = function addAllAnnotations(documentId, annotations) {
       return fn(...arguments).then((annotation) => {
-        fireEvent('annotation:addAll', documentId);
         return annotation;
       });
     };    
@@ -109,7 +106,6 @@ export default class StoreAdapter {
   set editAnnotation(fn) {
     this.__editAnnotation = function editAnnotation(documentId, annotationId, annotation) {
       return fn(...arguments).then((annotation) => {
-        fireEvent('annotation:edit', documentId, annotationId, annotation);
         return annotation;
       });
     };
@@ -127,9 +123,6 @@ export default class StoreAdapter {
   set deleteAnnotation(fn) {
     this.__deleteAnnotation = function deleteAnnotation(documentId, annotationId) {
       return fn(...arguments).then((success) => {
-        if (success) {
-          fireEvent('annotation:delete', documentId, annotationId);
-        }
         return success;
       });
     };
@@ -140,9 +133,6 @@ export default class StoreAdapter {
   set deleteAnnotations(fn) {
     this.__deleteAnnotations = function deleteAnnotations(documentId) {
       return fn(...arguments).then((success) => {
-        if (success) {
-          fireEvent('annotation:deleteAll', documentId);
-        }
         return success;
       });
     };
@@ -171,7 +161,6 @@ export default class StoreAdapter {
   set addComment(fn) {
     this.__addComment = function addComment(documentId, annotationId, content) {
       return fn(...arguments).then((comment) => {
-        fireEvent('comment:add', documentId, annotationId, comment);
         return comment;
       });
     };
@@ -189,9 +178,6 @@ export default class StoreAdapter {
   set deleteComment(fn) {
     this.__deleteComment = function deleteComment(documentId, commentId) {
       return fn(...arguments).then((success) => {
-        if (success) {
-          fireEvent('comment:delete', documentId, commentId);
-        }
         return success;
       });
     };
@@ -202,9 +188,6 @@ export default class StoreAdapter {
   set exportData(fn) {
     this.__exportData = function exportData() {
       return fn(...arguments).then(success => {
-        if (success) {
-          fireEvent('export');
-        }
         return success;
       });
     }
@@ -215,41 +198,6 @@ export default class StoreAdapter {
   set importAnnotations(fn) {
     this.__importAnnotations = function importAnnotations(json) {
       return fn(...arguments).then(success => {
-        if (success) {
-          fireEvent('importAnnotations', json);
-        }
-        return success;
-      });
-    }
-  }
-
-  /**
-   * @Duplicated.
-   */
-  __importData(json) { abstractFunction('importData'); }
-  get importData() { return this.__importData; }
-  set importData(fn) {
-    this.__importData = function importData(json) {
-      return fn(...arguments).then(success => {
-        if (success) {
-          fireEvent('import', json);
-        }
-        return success;
-      });
-    }
-  }
-
-  /**
-   * @Duplicated.
-   */
-  __importDataSecondary(jsonArray) { abstractFunction('importDataSecondary'); }
-  get importDataSecondary() { return this.__importDataSecondary; }
-  set importDataSecondary(fn) {
-    this.__importDataSecondary = function importDataSecondary(jsonArray) {
-      return fn(...arguments).then(success => {
-        if (success) {
-          fireEvent('importSecondary', jsonArray);
-        }
         return success;
       });
     }

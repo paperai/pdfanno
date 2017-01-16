@@ -1,9 +1,13 @@
 require("!style!css!./pdf-annotate.css");
 import $ from 'jquery';
+import EventEmitter from 'events';
 
 
 // for Convinience.
 window.$ = window.jQuery = $;
+
+window.globalEvent = new EventEmitter();
+
 
 // The entry point of window.xxx.
 // (setting from webpack.config.js)
@@ -18,6 +22,8 @@ import AnnotationContainer from './src/annotation/container';
 window.annotationContainer = new AnnotationContainer();
 
 import RectAnnotation from './src/annotation/rect';
+import HighlightAnnotation from './src/annotation/highlight';
+import ArrowAnnotation from './src/annotation/arrow';
 
 import appendChild from './src/render/appendChild';
 
@@ -67,7 +73,7 @@ function renderAnno() {
     let width = $('.page').width();
 
     // Add an annotation layer.
-    let $annoLayer = $(`<svg id="${svgLayerId}"/>`).css({   // TODO CSSClass.
+    let $annoLayer = $(`<svg id="${svgLayerId}" class="${svgLayerId}"/>`).css({   // TODO CSSClass.
         position   : 'absolute',
         top        : '0px',
         left       : `${leftMargin}px`,
@@ -98,14 +104,7 @@ function renderAnno() {
     svg.setAttribute('data-pdf-annotate-document', documentId);
     svg.setAttribute('data-pdf-annotate-page', 1);
 
-    // Import user uploading annotation, if exists.
-    if (uploadedAnnotationExists()) {
-        importUploadedAnnotation().then(() => {
-            renderAnnotations(svg, 1);
-        });
-    } else {
-        renderAnnotations(svg, 1);
-    }
+    renderAnnotations(svg, 1);
 }
 
 function renderAnnotations(svg, pageNumber) {
@@ -118,28 +117,22 @@ function renderAnnotations(svg, pageNumber) {
 
             // Render annotations.
             let viewport = PDFView.pdfViewer.getPageView(0).viewport;
-            // PDFAnnotate.render(svg, viewport, annotations).then((svg, elements) => {
-
-            //     for (let i = 0; i < annotations.length; i++) {
-
-            //     }
-
-
-            //     // var event = document.createEvent('CustomEvent');
-            //     // event.initCustomEvent('annotationrendered', true, true, {
-            //     //   pageNumber: pageNumber
-            //     // });
-            //     // window.dispatchEvent(event);
-
-            // });
 
             annotations.annotations.forEach(a => {
 
+                // TODO move to annotation/index.js
                 if (a.type === 'area') {
                     let rect = RectAnnotation.newInstance(a);
                     rect.render();
                     window.annotationContainer.add(rect);
-                
+                } else if (a.type === 'highlight') {
+                    let highlight = HighlightAnnotation.newInstance(a);
+                    highlight.render();
+                    window.annotationContainer.add(highlight);                
+                } else if (a.type === 'arrow') {
+                    let arrowAnnotation = ArrowAnnotation.newInstance(a);
+                    arrowAnnotation.render();
+                    window.annotationContainer.add(arrowAnnotation);                
                 } else {
                     appendChild(svg, a);
                 }
@@ -157,42 +150,6 @@ function renderAnnotations(svg, pageNumber) {
     });
 }
 
-function uploadedAnnotationExists() {
-    let item = localStorage.getItem('_pdfanno_pdfanno_upload');
-    let itemSecondary = localStorage.getItem('_pdfanno_pdfanno_upload_second');
-    return item || itemSecondary;
-}
-
-function importUploadedAnnotation() {
-    
-    let actions = [];
-
-    // Primary Annotation.
-    if (localStorage.getItem('_pdfanno_pdfanno_upload')) {
-        console.log('LOAD PRIMARY');
-        let annotations = JSON.parse(localStorage.getItem('_pdfanno_pdfanno_upload'));
-        console.log('importUploadedAnnotation:', annotations);
-        let promise = PDFAnnotate.getStoreAdapter().importData(annotations).then(() => {
-            localStorage.removeItem('_pdfanno_pdfanno_upload');
-        });
-        actions.push(promise);
-    }
-
-    // Seconday Annotations.
-    if (localStorage.getItem('_pdfanno_pdfanno_upload_second')) {
-        console.log('LOAD SECONDARY');
-        let secondAnnotations = JSON.parse(localStorage.getItem('_pdfanno_pdfanno_upload_second'));
-        console.log('secondAnnotations:', secondAnnotations);
-        let promise = PDFAnnotate.getStoreAdapter().importDataSecondary(secondAnnotations).then(() => {
-            localStorage.removeItem('_pdfanno_pdfanno_upload_second');
-        });
-        actions.push(promise);
-    }
-
-    return Promise.all(actions);
-}
-
-
 function setupPDFDragAndDropLoader() {
 
     let element = document.querySelector('body');
@@ -209,8 +166,6 @@ function setupPDFDragAndDropLoader() {
 setupPDFDragAndDropLoader();
 
 function handleDroppedFile(e) {
-
-    console.log('bbbbbbbbbbbbb');
 
     var event = document.createEvent('CustomEvent');
     event.initCustomEvent('pdfdropped', true, true, { originalEvent: e.originalEvent });

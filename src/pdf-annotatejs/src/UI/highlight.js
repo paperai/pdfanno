@@ -1,26 +1,13 @@
 import $ from 'jquery';
-import PDFJSAnnotate from '../PDFJSAnnotate';
-import appendChild from '../render/appendChild';
 import {
-  BORDER_COLOR,
   disableUserSelect,
   enableUserSelect,
-  findSVGAtPoint,
-  getMetadata,
-  getOffset,
   scaleDown,
   scaleUp,
-  getXY,
   getSVGLayer  
 } from './utils';
 import { addInputField } from './text';
-
-const _type = 'highlight';
-
-let _enabled = false;
-let overlay;
-let originY;
-let originX;
+import HighlightAnnotation from '../annotation/highlight';
 
 /**
  * Get the current window selection as rects
@@ -63,6 +50,8 @@ function handleDocumentMouseup(e) {
     }));
   }
 
+  console.log('handleDocumentMouseup:', rects);
+
   removeSelection();
 }
 
@@ -84,15 +73,10 @@ function removeSelection() {
 function saveRect(rects) {
 
   let svg = getSVGLayer();
-  let node;
-  let annotation;
-
   let boundingRect = svg.getBoundingClientRect();
 
-
   // Initialize the annotation
-  annotation = {
-    type : _type,
+  let annotation = {
     rectangles: [...rects].map((r) => {
       return scaleDown(svg, {
         x      : r.left - boundingRect.left,
@@ -103,66 +87,51 @@ function saveRect(rects) {
     }).filter((r) => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1)
   };
   
+  // Save.
+  let highlightAnnotation = HighlightAnnotation.newInstance(annotation);
+  highlightAnnotation.save();
 
-  let { documentId, pageNumber } = getMetadata(svg);
+  // Render.
+  highlightAnnotation.render();
 
-  // Add the annotation
-  PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation).then((annotation) => {
 
-    console.log('annotation:', annotation);
+  // Add an input field.
+  let x = annotation.rectangles[0].x + 5;  // 5 = boundingRadius(3) + 2
+  let y = annotation.rectangles[0].y - 20; // 20 = circle'radius(3px) + input height(14px) + α
+  let rect = svg.getBoundingClientRect();
 
-    appendChild(svg, annotation);
+  x = scaleUp(svg, {x}).x + rect.left;
+  y = scaleUp(svg, {y}).y + rect.top;
 
-    // Add an input field.
-    let x = annotation.rectangles[0].x + 5;  // 5 = boundingRadius(3) + 2
-    let y = annotation.rectangles[0].y - 20; // 20 = circle'radius(3px) + input height(14px) + α
-    let rect = svg.getBoundingClientRect();
+  // disableUserSelect();
 
-    x = scaleUp(svg, {x}).x + rect.left;
-    y = scaleUp(svg, {y}).y + rect.top;
+  document.removeEventListener('mouseup', handleDocumentMouseup);
 
-    addInputField(x, y, null, null, (textAnnotation) => {
+  addInputField(x, y, null, null, (text) => {
 
-      if (!textAnnotation) {
-        return;
-      }
+    document.addEventListener('mouseup', handleDocumentMouseup);
 
-      // FIXME: cannot stop refarence counter. I wanna use the original `annotation`, but couldn't.
-      PDFJSAnnotate.getStoreAdapter().getAnnotation(documentId, annotation.uuid).then(annotation => {
+    highlightAnnotation.text = text;
+    highlightAnnotation.render();
+    highlightAnnotation.save();
 
-        // Set relation between arrow and text.
-        annotation.text = textAnnotation.uuid;
+  }, 'text');
 
-        // Update data.
-        PDFJSAnnotate.getStoreAdapter().editAnnotation(documentId, annotation.uuid, annotation);
-
-        // Update UI.
-        $(`[data-pdf-annotate-id="${annotation.uuid}"]`).attr('data-text', textAnnotation.uuid);
-
-      });
-    });
-
-  });
 }
 
 /**
- * Enable rect behavior
+ * Enable hightlight behavior.
  */
-export function enableHighlight() {
-  
-  if (_enabled) { return; }
-
-  _enabled = true;
+export function enableHighlight() {  
+  this.disableHighlight();
   document.addEventListener('mouseup', handleDocumentMouseup);
+  $('.textLayer').css('z-index', 3); // over svg layer.
 }
 
 /**
- * Disable rect behavior
+ * Disable hightlight behavior.
  */
 export function disableHighlight() {
-
-  if (!_enabled) { return; }
-
-  _enabled = false;
   document.removeEventListener('mouseup', handleDocumentMouseup);
+  $('.textLayer').css('z-index', 1);
 }
