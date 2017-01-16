@@ -102,11 +102,12 @@ export default class RectAnnotation extends AbstractAnnotation {
             if (a) {
                 // update.
                 a = this.createAnnotation(a);
-                console.log('save:', a);
+                console.log('save:update:', a);
                 PDFJSAnnotate.getStoreAdapter().editAnnotation(documentId, this.uuid, a);
             } else {
                 // insert.
                 a = this.createAnnotation();
+                console.log('save:insert:', a);
                 PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, 1, a);
             }
         });
@@ -114,11 +115,10 @@ export default class RectAnnotation extends AbstractAnnotation {
     }
 
     deleteSelectedAnnotation() {
-        // TODO this will be better using eventEmitter on global?
         if (this.$element.find('.anno-rect').hasClass('--selected')) {
+            console.log('rect:deleteSelectedAnnotation');
             this.destroy();
-        }
-        this.textAnnotation.deleteSelectedAnnotation();
+        }        
     }
 
     getTextPosition() {

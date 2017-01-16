@@ -132,7 +132,6 @@ export default function appendChild(svg, annotation, viewport) {
       child = renderPoint(annotation, svg);
       break;
     case 'textbox':
-      console.log('textbox:', annotation);
       child = renderText(annotation, svg);
       break;
     case 'drawing':

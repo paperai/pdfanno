@@ -170,7 +170,7 @@ export default class ArrowAnnotation extends AbstractAnnotation {
         if (this.$element.find('path').hasClass('--selected')) {
             this.destroy();
         }
-        this.textAnnotation.deleteSelectedAnnotation();
+        // this.textAnnotation.deleteSelectedAnnotation();
     }
 
     // arrow選択時のrel1,2のhover処理

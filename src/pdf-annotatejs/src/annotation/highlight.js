@@ -112,7 +112,6 @@ export default class HighlightAnnotation extends AbstractAnnotation {
             this.destroy();
         }
 
-        this.textAnnotation.deleteSelectedAnnotation();
     }
 
     getTextPosition() {

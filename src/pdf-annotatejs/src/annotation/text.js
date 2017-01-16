@@ -50,10 +50,12 @@ export default class TextAnnotation extends AbstractAnnotation {
 
     destroy() {
         this.$element.remove();
+        this.$element = $('<div class="dummy"/>');
     }
 
     deleteSelectedAnnotation() {
         if (this.$element.find('rect').hasClass('--selected')) {
+            console.log('text:deleteSelectedAnnotation');
             this.destroy();
             this.emit('textchanged', null);            
         }
@@ -90,7 +92,6 @@ export default class TextAnnotation extends AbstractAnnotation {
     }
 
     handleClickEvent() {
-        console.log('handleClickEvent');
         this.$element.find('rect').toggleClass('--selected');
 
         // Check double click.
