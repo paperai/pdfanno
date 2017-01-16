@@ -61,7 +61,7 @@ function resetAnnotationViewMode() {
  * Enable view mode.
  */
 export function enableViewMode() {
-    this.disableViewMode();
+    disableViewMode();
     setComponenTranslucent(true);
     setAnnotationViewMode();
     document.addEventListener('keyup', handleDocumentKeyup);

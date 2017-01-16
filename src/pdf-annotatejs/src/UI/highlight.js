@@ -1,5 +1,7 @@
 import $ from 'jquery';
 import {
+  disableUserSelect,
+  enableUserSelect,
   scaleDown,
   scaleUp,
   getSVGLayer  
@@ -47,6 +49,8 @@ function handleDocumentMouseup(e) {
       };
     }));
   }
+
+  console.log('handleDocumentMouseup:', rects);
 
   removeSelection();
 }
@@ -99,7 +103,13 @@ function saveRect(rects) {
   x = scaleUp(svg, {x}).x + rect.left;
   y = scaleUp(svg, {y}).y + rect.top;
 
+  // disableUserSelect();
+
+  document.removeEventListener('mouseup', handleDocumentMouseup);
+
   addInputField(x, y, null, null, (text) => {
+
+    document.addEventListener('mouseup', handleDocumentMouseup);
 
     highlightAnnotation.text = text;
     highlightAnnotation.render();
@@ -113,8 +123,9 @@ function saveRect(rects) {
  * Enable hightlight behavior.
  */
 export function enableHighlight() {  
-  document.removeEventListener('mouseup', handleDocumentMouseup);
+  this.disableHighlight();
   document.addEventListener('mouseup', handleDocumentMouseup);
+  $('.textLayer').css('z-index', 3); // over svg layer.
 }
 
 /**
@@ -122,4 +133,5 @@ export function enableHighlight() {
  */
 export function disableHighlight() {
   document.removeEventListener('mouseup', handleDocumentMouseup);
+  $('.textLayer').css('z-index', 1);
 }

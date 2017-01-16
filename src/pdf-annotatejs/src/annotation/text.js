@@ -33,6 +33,7 @@ export default class TextAnnotation extends AbstractAnnotation {
         if (this.parent.text) {
             assign(this, this.parent.getTextPosition());
             this.text = this.parent.text;
+            this.color = this.parent.color;
             this.$element.remove();
             this.$element = $(appendChild(getSVGLayer(), this));    
             this.setHoverEvent();        
@@ -121,9 +122,8 @@ export default class TextAnnotation extends AbstractAnnotation {
 
             if (text) {
                 this.text = text;
-                // TODO Refactoring.
-                this.enableViewMode(); // TODO 大丈夫？
                 this.emit('textchanged', text);
+                this.enableViewMode();
             }
 
             this.render();
@@ -138,11 +138,6 @@ export default class TextAnnotation extends AbstractAnnotation {
 
     enableViewMode() {
 
-        // this.$element.find('text').hover(
-        //     this.handleHoverInEvent, 
-        //     this.handleHoverOutEvent
-        // );
-
         if (!this.parent.readOnly) {
             this.$element.find('text').off('click').on('click', this.handleClickEvent);
         }
@@ -150,12 +145,7 @@ export default class TextAnnotation extends AbstractAnnotation {
     }
 
     disableViewMode() {
-
-        // this.$element.find('text').off('mouseenter mouseleave');
         this.$element.find('text').off('click', this.handleClickEvent);
     }
 
 }
-
-// TODO
-// opacity 0.5のCSS対応

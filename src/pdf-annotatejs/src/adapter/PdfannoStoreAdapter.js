@@ -72,20 +72,15 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
 
       addAnnotation(documentId, pageNumber, annotation) {
 
-        console.log('addAnnotation1:', annotation);
-
         return new Promise((resolve, reject) => {
           annotation.class = 'Annotation';
           annotation.uuid = annotation.uuid || uuid();
-          // annotation.page = pageNumber;
 
           let annotations = getAnnotations(documentId);
           annotations.push(annotation);
 
 
           updateAnnotations(documentId, annotations);
-
-          console.log('addAnnotation2:', annotation);
 
           resolve(annotation);
         });

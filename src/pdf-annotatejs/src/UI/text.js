@@ -79,7 +79,7 @@ export function addInputField(x, y, selfId=null, text=null, finishCallback=null,
   input.style.left = `${x}px`;
   input.style.fontSize = `${TEXT_SIZE}px`;
   input.style.width = '150px';
-  input.style.zIndex = 2;
+  input.style.zIndex = 4; // fixme.
 
   if (selfId) {
     input.setAttribute('data-self-id', selfId);
@@ -97,7 +97,11 @@ export function addInputField(x, y, selfId=null, text=null, finishCallback=null,
   input.addEventListener('keyup', handleInputKeyup);
 
   $form.append(input);
-  input.focus();
+
+  // for Chrome.
+  setTimeout(() => {
+    input.focus();
+  }, 100);
 }
 
 /*

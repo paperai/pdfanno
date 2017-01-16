@@ -24,14 +24,14 @@
     transition:0.2s;
     transform-origin: center center;
 }
-.anno-circle:hover, .anno-circle.--hover {
+.anno-circle.--hover {
   box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;
   /*transform: scale(2);*/
   stroke: blue;
   stroke-width: 5px;
 }
 
-.anno-highlight:hover, .anno-highlight.--hover {
+.anno-highlight.--hover {
   /*html*/
   box-shadow: 0 0 0 1px #ccc inset;
   /*svg*/
@@ -48,10 +48,9 @@
   Arrow.
 */
 .anno-arrow {
-  /*TODO CSSに移した方がソースが綺麗になる*/
   transition:0.2s;
 }
-.anno-arrow:hover, .anno-arrow.--hover {
+.anno-arrow.--hover {
   stroke-width: 2px;
 }
 .anno-arrow-outline {
@@ -72,7 +71,7 @@
 .anno-rect {
   transition: 0.2s;
 }
-.anno-rect:hover, .anno-rect.--hover {
+.anno-rect.--hover {
   stroke-width: 2px;
 }
 .anno-rect.--selected {
@@ -87,7 +86,7 @@
 .anno-text {
   transition: 0.2s;
 }
-.anno-text:hover, .anno-text.--hover {
+.anno-text.--hover {
   stroke: red;
   stroke-width: 0.5px;
 }
