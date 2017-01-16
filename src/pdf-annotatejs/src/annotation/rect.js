@@ -126,9 +126,17 @@ export default class RectAnnotation extends AbstractAnnotation {
     getBoundingCirclePosition() {
         let $circle = this.$element.find('circle');
         return {
-            x : parseFloat($circle.attr(cx)),
-            y : parseFloat($circle.attr(cx))
+            x : parseFloat($circle.attr('cx')),
+            y : parseFloat($circle.attr('cy'))
         };
+    }
+
+    showBoundingCircle() {
+        this.$element.find('circle').removeClass('--hide');
+    }
+
+    hideBoundingCircle() {
+        this.$element.find('circle').addClass('--hide');
     }
 
     handleTextHoverIn() {
@@ -164,7 +172,7 @@ export default class RectAnnotation extends AbstractAnnotation {
 
         let $elm = $(e.currentTarget);
         if ($elm.prop("tagName") === 'circle') {
-            this.emit('circlehoverin');
+            this.emit('circlehoverin', this);
         }
     }
 
@@ -179,7 +187,7 @@ export default class RectAnnotation extends AbstractAnnotation {
 
         let $elm = $(e.currentTarget);
         if ($elm.prop("tagName") === 'circle') {
-            this.emit('circlehoverout');
+            this.emit('circlehoverout', this);
         }
     }
 

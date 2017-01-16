@@ -629,26 +629,31 @@ function initializeMonitoringAnnotations() {
     monitoringCircles = [];
 
     // Components for monitoring.
-    forEach.call(document.querySelectorAll('svg > g > [type="boundingCircle"]'), boundingCircle => {
-        if (boundingCircle.parentNode.getAttribute('data-pdf-annotate-type') !== 'area'
-            && boundingCircle.parentNode.getAttribute('data-pdf-annotate-type') !== 'highlight') {
-            console.log('bbbbb');
-            monitoringCircles.push(boundingCircle);            
-        } else {
-            console.log('ccccc');
-        }
-    });
-    console.log('monitoringCircles:', monitoringCircles.length);
-    // Texts.
-    forEach.call(document.querySelectorAll('svg > [data-pdf-annotate-type="textbox"] > rect'), rect => {
-        if (rect.parentNode.getAttribute('data-pdf-annotate-id') !== 'undefined') {
-            monitoringTexts.push(rect);            
-        }
-    });
-    // Arrows.
-    forEach.call(document.querySelectorAll('svg > [data-pdf-annotate-type="arrow"] > path'), path => {
-        monitoringArrows.push(path);
-    });
+    // forEach.call(document.querySelectorAll('svg > g > [type="boundingCircle"]'), boundingCircle => {
+    //     if (boundingCircle.parentNode.getAttribute('data-pdf-annotate-type') !== 'area'
+    //         && boundingCircle.parentNode.getAttribute('data-pdf-annotate-type') !== 'highlight') {
+    //         console.log('bbbbb');
+    //         monitoringCircles.push(boundingCircle);            
+    //     } else {
+    //         console.log('ccccc');
+    //     }
+    // });
+    // console.log('monitoringCircles:', monitoringCircles.length);
+    // // Texts.
+    // forEach.call(document.querySelectorAll('svg > [data-pdf-annotate-type="textbox"] > rect'), rect => {
+    //     if (rect.parentNode.getAttribute('data-pdf-annotate-id') !== 'undefined') {
+    //         monitoringTexts.push(rect);            
+    //     }
+    // });
+    // // Arrows.
+    // forEach.call(document.querySelectorAll('svg > [data-pdf-annotate-type="arrow"] > path'), path => {
+    //     monitoringArrows.push(path);
+    // });
+
+
+
+
+
     // // Highlights.
     // forEach.call(document.querySelectorAll('svg > [data-pdf-annotate-type="highlight"] > rect'), rect => {
     //     monitoringRects.push(rect);

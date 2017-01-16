@@ -23,8 +23,8 @@ export default class ArrowAnnotation extends AbstractAnnotation {
 
     constructor() {
         super();
-        this.uuid  = null;
-        this.type  = null;
+        this.uuid  = uuid();
+        this.type  = 'arrow';
         this.rel1Annotation = null;
         this.rel2Annotation = null;
         this.text = null;
@@ -40,14 +40,14 @@ export default class ArrowAnnotation extends AbstractAnnotation {
 
         this.textAnnotation = new TextAnnotation(this);
         this.textAnnotation.on('hoverin', this.handleTextHoverIn);
-        this.textAnnotation.on('hovverout', this.handleTextHoverOut);
+        this.textAnnotation.on('hoverout', this.handleTextHoverOut);
         this.textAnnotation.on('textchanged', this.handleTextChanged);
     }
 
     static newInstance(annotation) {
         let a            = new ArrowAnnotation();
         a.uuid           = annotation.uuid || uuid();
-        a.type           = annotation.type;
+        a.direction      = annotation.direction;
         a.rel1Annotation = window.annotationContainer.findById(annotation.rel1);
         a.rel2Annotation = window.annotationContainer.findById(annotation.rel2);
         a.text           = annotation.text;
@@ -60,16 +60,31 @@ export default class ArrowAnnotation extends AbstractAnnotation {
     render() {
 
         // Set start/end positions.
-        if (this.rel1Annotation && this.rel2Annotation) {
-            assign(this, _getStartEndPoint(this));            
-        
-        } else {
-            // Here used at UI/arrow.js for tmp rendering.
+        if (this.rel1Annotation) {
+            let p = this.rel1Annotation.getBoundingCirclePosition();
+            this.x1 = p.x;
+            this.y1 = p.y;
+        }
+        if (this.rel2Annotation) {
+            let p = this.rel2Annotation.getBoundingCirclePosition();
+            this.x2 = p.x;
+            this.y2 = p.y;
         }
 
-        this.$eleent.remove();
+        // console.log('render:', this);
+
+        // if (this.rel1Annotation && this.rel2Annotation) {
+        //     assign(this, _getStartEndPoint(this));            
+        
+        // } else {
+        //     // Here used at UI/arrow.js for tmp rendering.
+        // }
+
+        this.$element.remove();
         this.$element = $(appendChild(getSVGLayer(), this));
         this.textAnnotation.render();
+
+        // console.log('render:', this.$element);
     }
 
     destroy() {
@@ -86,8 +101,9 @@ export default class ArrowAnnotation extends AbstractAnnotation {
         return {
             uuid           : this.uuid,
             type           : this.type,
-            rel1Annotation : this.rel1Annotation.uuid,
-            rel2Annotation : this.rel2Annotation.uuid,
+            direction      : this.direction,
+            rel1 : this.rel1Annotation.uuid,
+            rel2 : this.rel2Annotation.uuid,
             text           : this.text,
             color          : this.color,
             readOnly       : this.readOnly
@@ -101,12 +117,13 @@ export default class ArrowAnnotation extends AbstractAnnotation {
             if (a) {
                 // update.
                 a = this.createAnnotation(a);
-                console.log('save:', a);
+                console.log('save:update:', a);
                 PDFJSAnnotate.getStoreAdapter().editAnnotation(documentId, this.uuid, a);
             } else {
                 // insert.
                 a = this.createAnnotation();
                 PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, 1, a);
+                console.log('save:insert:', a);
             }
         });
         window.annotationContainer.add(this);
@@ -196,7 +213,7 @@ export default class ArrowAnnotation extends AbstractAnnotation {
     }    
 }
 
-_getStartEndPoint(arrowAnnotation) {
+function _getStartEndPoint(arrowAnnotation) {
     // set the start/end position.
     let p1 = arrowAnnotation.rel1Annotation.getBoundingCirclePosition();
     let p2 = arrowAnnotation.rel2Annotation.getBoundingCirclePosition();

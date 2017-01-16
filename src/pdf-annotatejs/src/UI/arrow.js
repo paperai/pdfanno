@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import PDFJSAnnotate from '../PDFJSAnnotate';
+// import { getSVGLayer } from '../UI/utils';
 import appendChild from '../render/appendChild';
 import {
   disableUserSelect,
@@ -14,7 +15,10 @@ import { getRelationTextPosition } from '../utils/relation.js';
 import { addInputField } from './text';
 import uuid from '../utils/uuid';
 
-import HighlightAnnotation from '../annotation/highlight';
+import ArrowAnnotation from '../annotation/arrow';
+
+let _hoverAnnotation = null;
+let arrowAnnotation = null;
 
 let filter = Array.prototype.filter;
 let forEach = Array.prototype.forEach;
@@ -46,23 +50,36 @@ let endBoundingCircle;
  * @param {Event} e The DOM event to handle
  */
 function handleDocumentMousedown(e) {
-  let svg = findSVGAtPoint(e.clientX, e.clientY);
-  if (!svg) {
-    return;
+
+  if (_hoverAnnotation) {
+    arrowAnnotation = new ArrowAnnotation();
+    arrowAnnotation.direction = _arrowType;
+    arrowAnnotation.rel1Annotation = _hoverAnnotation;
+    arrowAnnotation.readOnly = false;
+
+    document.addEventListener('mouseup', handleDocumentMouseup);
+    document.addEventListener('mousemove', handleDocumentMousemove);    
   }
+
+
+  // let svg = findSVGAtPoint(e.clientX, e.clientY);
+  // if (!svg) {
+  //   return;
+  // }
   
-  arrow = null;
-  lines = [];
+  // arrow = null;
+  // lines = [];
 
-  disableUserSelect();
+  // disableUserSelect();
 
-  if (hitBoundingCircle) {
-    startBoundingCircle = hitBoundingCircle;
-    dragging = true;
-  }
+  // if (hitBoundingCircle) {
+  //   startBoundingCircle = hitBoundingCircle;
+  //   dragging = true;
+  // }
 }
 
 function getClientXY(e) {
+  let svg = getSVGLayer();
   let rect = svg.getBoundingClientRect();
   let x = e.clientX - rect.left;
   let y = e.clientY - rect.top;
@@ -76,22 +93,27 @@ function getClientXY(e) {
  */
 function handleDocumentMousemove(e) {
 
-  let circle = findHitBoundingCircle(e);
-  if (circle) {
-      if (!hitBoundingCircle) {
-          hitBoundingCircle = circle;
-          setVisibility(hitBoundingCircle, BGCOLOR_SELECTED);
-      }
-  } else {
-      if (hitBoundingCircle) {
-        setVisibility(hitBoundingCircle, BGCOLOR);
-          hitBoundingCircle = null;
-      }
-  }
+  let p = scaleDown(getClientXY(e));
+  arrowAnnotation.x2 = p.x;
+  arrowAnnotation.y2 = p.y;
+  arrowAnnotation.render();
 
-  if (dragging) {
-    saveArrow(e.clientX, e.clientY);    
-  }
+  // let circle = findHitBoundingCircle(e);
+  // if (circle) {
+  //     if (!hitBoundingCircle) {
+  //         hitBoundingCircle = circle;
+  //         setVisibility(hitBoundingCircle, BGCOLOR_SELECTED);
+  //     }
+  // } else {
+  //     if (hitBoundingCircle) {
+  //       setVisibility(hitBoundingCircle, BGCOLOR);
+  //         hitBoundingCircle = null;
+  //     }
+  // }
+
+  // if (dragging) {
+  //   saveArrow(e.clientX, e.clientY);    
+  // }
 }
 
 function setVisibility(circle, style) {
@@ -134,98 +156,192 @@ function isCircleHit(pos, element) {
  */
 function handleDocumentMouseup(e) {
 
-  dragging = false;
+  document.removeEventListener('mouseup', handleDocumentMouseup);
+  document.removeEventListener('mousemove', handleDocumentMousemove);
 
-  cancelArrow();
+  // FIXME use drag and drop event, it may be better.
 
-  let svg = findSVGAtPoint(e.clientX, e.clientY);
-  if (!svg) {
-    console.log('not found svg.');
+  // Find the end position.
+  let circle = findHitBoundingCircle(e);
+  if (!circle) {
+    arrowAnnotation.destroy();    
+    arrowAnnotation = null;
     return;
   }
 
-  // End point.
-  endBoundingCircle = hitBoundingCircle;
-
-  // Check valid.
-  if (!endBoundingCircle) {
-    return console.log('not specified end point.');
-  }
-  if (!startBoundingCircle) {
-    return console.log('not specified start point.');
-  }
-  if (startBoundingCircle === endBoundingCircle) {
-    return console.log('start/end are same.');
+  let uuid = circle.parentNode.getAttribute('data-pdf-annotate-id');
+  let endAnnotation = window.annotationContainer.findById(uuid);
+  if (arrowAnnotation.rel1Annotation === endAnnotation) {
+    arrowAnnotation.destroy();
+    arrowAnnotation = null;
+    return;    
   }
 
-  // Create annotation.
-  let startPos = {
-    x: parseFloat(startBoundingCircle.getAttribute('cx')),
-    y: parseFloat(startBoundingCircle.getAttribute('cy'))
-  };
-  let endPos = {
-    x: parseFloat(endBoundingCircle.getAttribute('cx')),
-    y: parseFloat(endBoundingCircle.getAttribute('cy'))    
-  }
-  let annotation = {
-    x1: startPos.x,
-    y1: startPos.y,
-    x2: endPos.x,
-    y2: endPos.y,
-    type : 'arrow',
-    direction : _arrowType,
-    rel1 : startBoundingCircle.parentNode.getAttribute('data-pdf-annotate-id'),
-    rel2 : endBoundingCircle.parentNode.getAttribute('data-pdf-annotate-id'),
-  };
+  arrowAnnotation.rel2Annotation = endAnnotation;
 
-  let { documentId, pageNumber } = getMetadata(svg);
-  PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation)
-    .then((annotation) => {
-      let arrow = appendChild(svg, annotation);
 
-      let arrowId = annotation.uuid;
 
-      // add text input.
-      let s = scaleUp(svg, startPos);
-      let e = scaleUp(svg, endPos);
-      showTextInput(s, e, annotation);
-    });
+
+  // if (!_hoverAnnotation
+  //     || arrowAnnotation.rel1Annotation === _hoverAnnotation) {
+
+  //   arrowAnnotation.destroy();
+  //   arrowAnnotation = null;
+  //   return;
+  // }
+
+  // arrowAnnotation.rel2Annotation = _hoverAnnotation;
+  arrowAnnotation.save();
+
+  console.log('aaaaaaaaa:', arrowAnnotation.rel1Annotation);
+
+  showTextInput2();
+
+  // dragging = false;
+
+  // cancelArrow();
+
+  // let svg = findSVGAtPoint(e.clientX, e.clientY);
+  // if (!svg) {
+  //   console.log('not found svg.');
+  //   return;
+  // }
+
+  // // End point.
+  // endBoundingCircle = hitBoundingCircle;
+
+  // // Check valid.
+  // if (!endBoundingCircle) {
+  //   return console.log('not specified end point.');
+  // }
+  // if (!startBoundingCircle) {
+  //   return console.log('not specified start point.');
+  // }
+  // if (startBoundingCircle === endBoundingCircle) {
+  //   return console.log('start/end are same.');
+  // }
+
+  // // Create annotation.
+  // let startPos = {
+  //   x: parseFloat(startBoundingCircle.getAttribute('cx')),
+  //   y: parseFloat(startBoundingCircle.getAttribute('cy'))
+  // };
+  // let endPos = {
+  //   x: parseFloat(endBoundingCircle.getAttribute('cx')),
+  //   y: parseFloat(endBoundingCircle.getAttribute('cy'))    
+  // }
+  // let annotation = {
+  //   x1: startPos.x,
+  //   y1: startPos.y,
+  //   x2: endPos.x,
+  //   y2: endPos.y,
+  //   type : 'arrow',
+  //   direction : _arrowType,
+  //   rel1 : startBoundingCircle.parentNode.getAttribute('data-pdf-annotate-id'),
+  //   rel2 : endBoundingCircle.parentNode.getAttribute('data-pdf-annotate-id'),
+  // };
+
+  // let { documentId, pageNumber } = getMetadata(svg);
+  // PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation)
+  //   .then((annotation) => {
+  //     let arrow = appendChild(svg, annotation);
+
+  //     let arrowId = annotation.uuid;
+
+  //     // add text input.
+  //     let s = scaleUp(svg, startPos);
+  //     let e = scaleUp(svg, endPos);
+  //     showTextInput(s, e, annotation);
+  //   });
 }
 
-function showTextInput(start, end, arrowAnnotation) {
+function showTextInput2() {
 
-  let textPosition = getRelationTextPosition(svg, start.x, start.y, end.x, end.y);
+  let p1 = arrowAnnotation.rel1Annotation.getBoundingCirclePosition();
+  let p2 = arrowAnnotation.rel2Annotation.getBoundingCirclePosition();
+  let textPosition = getRelationTextPosition(null, p1.x, p1.y, p2.x, p2.y);
 
-  addInputField(textPosition.x, textPosition.y, null, null, (textAnnotation) => {
+  let boundingRect = svg.getBoundingClientRect();
 
-    if (!textAnnotation) {
+  let x = scaleUp(svg, {x : textPosition.x}).x + boundingRect.left;
+  let y = scaleUp(svg, {y : textPosition.y}).y + boundingRect.top;
+
+
+
+
+  // let textPosition = getRelationTextPosition(svg, p1.x, p1.y, p2.x, p2.y);
+
+  // console.log('textPosition:', textPosition);
+
+  addInputField(x, y, null, null, (text) => {
+
+    if (!text) {
       return;
     }
 
-    let svg = getSVGLayer();
-    let { documentId, pageNumber } = getMetadata(svg);
+    arrowAnnotation.text = text;
+    arrowAnnotation.save();
+    arrowAnnotation.render();
 
-    // FIXME: cannot stop refarence counter. I wanna use the original `annotation`, but couldn't.
-    PDFJSAnnotate.getStoreAdapter().getAnnotation(documentId, arrowAnnotation.uuid).then(arrowAnnotation => {
+    // let svg = getSVGLayer();
+    // let { documentId, pageNumber } = getMetadata(svg);
 
-      // Set relation between arrow and text.
-      arrowAnnotation.text = textAnnotation.uuid;
+    // // FIXME: cannot stop refarence counter. I wanna use the original `annotation`, but couldn't.
+    // PDFJSAnnotate.getStoreAdapter().getAnnotation(documentId, arrowAnnotation.uuid).then(arrowAnnotation => {
 
-      // Update.
-      // let element = document.querySelector('.annotationLayer');
-      let element = document.getElementById('annoLayer'); // TODO make it const.
-      let documentId = element.getAttribute('data-pdf-annotate-document');  // 共通化
-      PDFJSAnnotate.getStoreAdapter().editAnnotation(documentId, arrowAnnotation.uuid, arrowAnnotation);
+    //   // Set relation between arrow and text.
+    //   arrowAnnotation.text = textAnnotation.uuid;
 
-      // Update UI.
-      console.log('arrow:', $(`[data-pdf-annotate-id="${arrowAnnotation.uuid}"]`));
-      $(`[data-pdf-annotate-id="${arrowAnnotation.uuid}"]`).attr('data-text', textAnnotation.uuid);
+    //   // Update.
+    //   // let element = document.querySelector('.annotationLayer');
+    //   let element = document.getElementById('annoLayer'); // TODO make it const.
+    //   let documentId = element.getAttribute('data-pdf-annotate-document');  // 共通化
+    //   PDFJSAnnotate.getStoreAdapter().editAnnotation(documentId, arrowAnnotation.uuid, arrowAnnotation);
 
-    });
+    //   // Update UI.
+    //   console.log('arrow:', $(`[data-pdf-annotate-id="${arrowAnnotation.uuid}"]`));
+    //   $(`[data-pdf-annotate-id="${arrowAnnotation.uuid}"]`).attr('data-text', textAnnotation.uuid);
+
+    // });
 
 
-  });
+  }, 'text');
 }
+
+// function showTextInput(start, end, arrowAnnotation) {
+
+//   let textPosition = getRelationTextPosition(svg, start.x, start.y, end.x, end.y);
+
+//   addInputField(textPosition.x, textPosition.y, null, null, (textAnnotation) => {
+
+//     if (!textAnnotation) {
+//       return;
+//     }
+
+//     let svg = getSVGLayer();
+//     let { documentId, pageNumber } = getMetadata(svg);
+
+//     // FIXME: cannot stop refarence counter. I wanna use the original `annotation`, but couldn't.
+//     PDFJSAnnotate.getStoreAdapter().getAnnotation(documentId, arrowAnnotation.uuid).then(arrowAnnotation => {
+
+//       // Set relation between arrow and text.
+//       arrowAnnotation.text = textAnnotation.uuid;
+
+//       // Update.
+//       // let element = document.querySelector('.annotationLayer');
+//       let element = document.getElementById('annoLayer'); // TODO make it const.
+//       let documentId = element.getAttribute('data-pdf-annotate-document');  // 共通化
+//       PDFJSAnnotate.getStoreAdapter().editAnnotation(documentId, arrowAnnotation.uuid, arrowAnnotation);
+
+//       // Update UI.
+//       console.log('arrow:', $(`[data-pdf-annotate-id="${arrowAnnotation.uuid}"]`));
+//       $(`[data-pdf-annotate-id="${arrowAnnotation.uuid}"]`).attr('data-text', textAnnotation.uuid);
+
+//     });
+
+
+//   });
+// }
 
 /**
  * Handle document.keyup event
@@ -304,8 +420,8 @@ function showBoundingBox() {
   forEach.call(svg.querySelectorAll('g > [type="boundingCircle"]'), boundingCircle => {
     if ($(boundingCircle).closest('g').attr('read-only') !== 'true') {
       boundingCircles.push(boundingCircle);
-    } else {
-      $(boundingCircle).hide();
+    // } else {
+    //   $(boundingCircle).hide();
     }
   });
 
@@ -336,6 +452,19 @@ function deleteBoundingBoxes() {
 
 }
 
+function handleBoundingCircleHoverIn(annotation) {
+  console.log('handleBoundingCircleHoverIn');
+
+  _hoverAnnotation = annotation;
+}
+
+function handleBoundingCircleHoverOut(annotation) {
+  console.log('handleBoundingCircleHoverOut');
+
+  _hoverAnnotation = null;
+}
+
+
 /**
  * Enable arrow behavior.
  */
@@ -351,9 +480,22 @@ export function enableArrow(arrowType='one-way') {
   disableUserSelect();
   disableTextlayer();
 
-  document.addEventListener('mouseup', handleDocumentMouseup);
+  // document.addEventListener('mouseup', handleDocumentMouseup);
   document.addEventListener('mousedown', handleDocumentMousedown);
-  document.addEventListener('mousemove', handleDocumentMousemove);
+  // document.addEventListener('mousemove', handleDocumentMousemove);
+
+  window.annotationContainer.getAllAnnotations().forEach(a => {
+
+    if (a.readOnly) {
+      a.hideBoundingCircle();
+
+    } else {
+      a.on('circlehoverin', handleBoundingCircleHoverIn);
+      a.on('circlehoverout', handleBoundingCircleHoverOut);
+    }
+
+  });
+
 }
 
 /**
@@ -363,13 +505,26 @@ export function disableArrow() {
   if (!_enabled) { return; }
 
   _enabled = false;
-  document.removeEventListener('mouseup', handleDocumentMouseup);
+  // document.removeEventListener('mouseup', handleDocumentMouseup);
   document.removeEventListener('mousedown', handleDocumentMousedown);
-  document.removeEventListener('keyup', handleDocumentKeyup);
-  document.removeEventListener('mousemove', handleDocumentMousemove);
+  // document.removeEventListener('keyup', handleDocumentKeyup);
+  // document.removeEventListener('mousemove', handleDocumentMousemove);
 
   enableUserSelect();
   enableTextlayer();
 
   deleteBoundingBoxes();  
+
+  window.annotationContainer.getAllAnnotations().forEach(a => {
+
+    if (a.readOnly) {
+      a.showBoundingCircle();
+
+    } else {
+      a.removeListener('circlehoverin', handleBoundingCircleHoverIn);
+      a.removeListener('circlehoverout', handleBoundingCircleHoverOut);
+    }
+
+  });
+
 }

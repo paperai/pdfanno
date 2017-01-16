@@ -1,3 +1,11 @@
+
+/**
+ * Utilities.
+ */
+.--hide {
+  display: none;
+}
+
 /**
  * SVGLayer.
  */
@@ -8,8 +16,6 @@
 .annoLayer > *.--viewMode.--emphasis {
   opacity: 1;
 }
-
-
 
 /**
     各種アノテーション

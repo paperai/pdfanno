@@ -111,7 +111,7 @@ export function createArrow(a, id=null) {
 
   group.appendChild(arrow);
 
-  console.log('createArrow:', group);
+  // console.log('createArrow:', group);
 
   return group;
 }

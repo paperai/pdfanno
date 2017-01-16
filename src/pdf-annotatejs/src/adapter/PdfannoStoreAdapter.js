@@ -244,26 +244,41 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
               
               // Arrow.
               } else if (annotation.type === 'arrow') {
-                let data = [
-                  annotation.page1,
-                  annotation.direction,
-                ];
-                let rel1s = container[documentId].annotations.filter(a => {
-                  return a.uuid === annotation.rel1;
-                });
-                data.push(rel1s[0].key);
-                let rel2s = container[documentId].annotations.filter(a => {
-                  return a.uuid === annotation.rel2;
-                });
-                data.push(rel2s[0].key);
-                let texts = container[documentId].annotations.filter(a => {
-                  return a.uuid === annotation.text;
-                });
-                if (texts.length > 0) {
-                  data.push(texts[0].content);
+                let rel1s = container[documentId].annotations.filter(a => a.uuid === annotation.rel1);
+                let rel1 = rel1s[0];
+                let rel2s = container[documentId].annotations.filter(a => a.uuid === annotation.rel2);
+                let rel2 = rel2s[0];
+
+                let page;
+                if (rel1.type === 'highlight') {
+                  page = rel1.rectangles[0].page;
                 } else {
-                  data.push('');
+                  page = rel1.page;
                 }
+
+                console.log(page);
+
+                let data = [
+                  page,
+                  annotation.direction,
+                  rel1.key,
+                  rel2.key,
+                  annotation.text || ''
+                ];
+                // data.push(rel1.key);
+                // // let rel2s = container[documentId].annotations.filter(a => {
+                // //   return a.uuid === annotation.rel2;
+                // // });
+                // data.push(rel2s[0].key);
+                // let texts = container[documentId].annotations.filter(a => {
+                //   return a.uuid === annotation.text;
+                // });
+                // if (texts.length > 0) {
+                //   data.push(texts[0].content);
+                // } else {
+                //   data.push('');
+                // }
+                // data.push(annotation.text || '');
                 annotations[`rel-${indexRel++}`] = data;
 
               }
@@ -388,95 +403,102 @@ function _createContainerFromJson(json, color, isPrimary) {
       // Arrow.
       } else if (key.indexOf('rel') === 0) {
 
-        // Find highlights.
-        let rel1s = annotations.filter(a => {
-          return a.key === data[2];
-        });
+        // Find rels.
+        let rel1s = annotations.filter(a => a.key === data[2]);
         let rel1 = rel1s[0];
-        let rel2s = annotations.filter(a => {
-          return a.key === data[3];
-        });
+        let rel2s = annotations.filter(a => a.key === data[3]);
         let rel2 = rel2s[0];
 
-        // Specify startPosition and endPosition.
-        let x1, y1, x2, y2, page1, page2;
-        if (rel1.type === 'highlight') {
-          x1 = rel1.rectangles[0].x;
-          y1 = rel1.rectangles[0].y - 5;
-          page1 = rel1.rectangles[0].page;
-        } else {
-          x1 = rel1.x;
-          y1 = rel1.y - 5;          
-          page1 = rel1.page;
-        }
-        if (rel2.type === 'highlight') {
-          x2 = rel2.rectangles[0].x;
-          y2 = rel2.rectangles[0].y - 5;   
-          page2 = rel2.rectangles[0].page;       
-        } else {
-          x2 = rel2.x;
-          y2 = rel2.y - 5;
-          page2 = rel2.page;
-        }
 
-        let textPage = page1;
+        // Find highlights.
+        // let rel1s = annotations.filter(a => {
+        //   return a.key === data[2];
+        // });
+        // let rel1 = rel1s[0];
+        // let rel2s = annotations.filter(a => {
+        //   return a.key === data[3];
+        // });
+        // let rel2 = rel2s[0];
+
+        // Specify startPosition and endPosition.
+        // let x1, y1, x2, y2, page1, page2;
+        // if (rel1.type === 'highlight') {
+        //   x1 = rel1.rectangles[0].x;
+        //   y1 = rel1.rectangles[0].y - 5;
+        //   page1 = rel1.rectangles[0].page;
+        // } else {
+        //   x1 = rel1.x;
+        //   y1 = rel1.y - 5;          
+        //   page1 = rel1.page;
+        // }
+        // if (rel2.type === 'highlight') {
+        //   x2 = rel2.rectangles[0].x;
+        //   y2 = rel2.rectangles[0].y - 5;   
+        //   page2 = rel2.rectangles[0].page;       
+        // } else {
+        //   x2 = rel2.x;
+        //   y2 = rel2.y - 5;
+        //   page2 = rel2.page;
+        // }
+
+        // let textPage = page1;
 
         // Specify textbox position.
         // let svg = document.querySelector('.annotationLayer');
-        let svg = document.getElementById('annoLayer'); // TODO make it const.
-        let p = scaleUp(svg, { x1, y1, x2, y2 });
-        let rect = svg.getBoundingClientRect();
-        p.x1 -= rect.left;
-        p.y1 -= rect.top;
-        p.x2 -= rect.left;
-        p.y2 -= rect.top;
-        let textPosition = scaleDown(svg, getRelationTextPosition(svg, p.x1, p.y1, p.x2, p.y2));
+        // let svg = document.getElementById('annoLayer'); // TODO make it const.
+        // let p = scaleUp(svg, { x1, y1, x2, y2 });
+        // let rect = svg.getBoundingClientRect();
+        // p.x1 -= rect.left;
+        // p.y1 -= rect.top;
+        // p.x2 -= rect.left;
+        // p.y2 -= rect.top;
+        // let textPosition = scaleDown(svg, getRelationTextPosition(svg, p.x1, p.y1, p.x2, p.y2));
 
-        if (page1 !== page2) {
+        // if (page1 !== page2) {
 
-          console.log('y1,y2=', y1, y2, page1, page2);
+        //   console.log('y1,y2=', y1, y2, page1, page2);
 
-          let y1Tmp = convertFromExportY(page1, y1);
-          let y2Tmp = convertFromExportY(page2, y2);
+        //   let y1Tmp = convertFromExportY(page1, y1);
+        //   let y2Tmp = convertFromExportY(page2, y2);
 
-          console.log('y1,y2=', y1Tmp, y2Tmp);
+        //   console.log('y1,y2=', y1Tmp, y2Tmp);
 
-          // Specify textbox position.
-          // let svg = document.querySelector('.annotationLayer');
-          let svg = document.getElementById('annoLayer'); // TODO make it const.
-          let p = scaleUp(svg, { x1, y1Tmp, x2, y2Tmp });
-          let rect = svg.getBoundingClientRect();
-          p.x1 -= rect.left;
-          p.y1Tmp -= rect.top;
-          p.x2 -= rect.left;
-          p.y2Tmp -= rect.top;
-          textPosition = scaleDown(svg, getRelationTextPosition(svg, p.x1, p.y1Tmp, p.x2, p.y2Tmp));
+        //   // Specify textbox position.
+        //   // let svg = document.querySelector('.annotationLayer');
+        //   let svg = document.getElementById('annoLayer'); // TODO make it const.
+        //   let p = scaleUp(svg, { x1, y1Tmp, x2, y2Tmp });
+        //   let rect = svg.getBoundingClientRect();
+        //   p.x1 -= rect.left;
+        //   p.y1Tmp -= rect.top;
+        //   p.x2 -= rect.left;
+        //   p.y2Tmp -= rect.top;
+        //   textPosition = scaleDown(svg, getRelationTextPosition(svg, p.x1, p.y1Tmp, p.x2, p.y2Tmp));
 
-          let { y, pageNumber } = convertToExportY(textPosition.y);
-          textPosition.y = y;
-          textPage = pageNumber;
-        }
+        //   let { y, pageNumber } = convertToExportY(textPosition.y);
+        //   textPosition.y = y;
+        //   textPage = pageNumber;
+        // }
 
         // Add textbox and get the uuid of if.
-        let textId = null;
-        let textContent = data[4];
-        if (textContent) {
+        // let textId = null;
+        // let textContent = data[4];
+        // if (textContent) {
 
-          textId = uuid();
-          annotations.push({
-            class      : 'Annotation',
-            type       : 'textbox',
-            uuid       : textId,
-            page       : textPage,
-            x          : textPosition.x,
-            y          : textPosition.y,
-            content    : textContent,
-            readOnly,
-            color
-          });          
-        }
+        //   textId = uuid();
+        //   annotations.push({
+        //     class      : 'Annotation',
+        //     type       : 'textbox',
+        //     uuid       : textId,
+        //     page       : textPage,
+        //     x          : textPosition.x,
+        //     y          : textPosition.y,
+        //     content    : textContent,
+        //     readOnly,
+        //     color
+        //   });          
+        // }
 
-        let pageNumber = data[0];
+        // let pageNumber = data[0];
 
         // Add arrow.
         annotations.push({
@@ -484,17 +506,18 @@ function _createContainerFromJson(json, color, isPrimary) {
           type       : 'arrow',
           direction  : data[1],
           uuid       : uuid(),
-          page       : data[0],
-          x1,
-          y1,
-          x2,
-          y2,
-          page1,
-          page2,
-          text       : textId,
+          // page       : data[0],
+          // x1,
+          // y1,
+          // x2,
+          // y2,
+          // page1,
+          // page2,
+          // text       : textId,
+          text : data[4],
           rel1       : rel1.uuid,
           rel2       : rel2.uuid,
-          color      : "FF0000",         // TODO 要る？
+          // color      : "FF0000",         // TODO 要る？
           readOnly,
           color
         });

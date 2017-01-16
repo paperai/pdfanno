@@ -19,6 +19,7 @@ window.annotationContainer = new AnnotationContainer();
 
 import RectAnnotation from './src/annotation/rect';
 import HighlightAnnotation from './src/annotation/highlight';
+import ArrowAnnotation from './src/annotation/arrow';
 
 import appendChild from './src/render/appendChild';
 
@@ -124,6 +125,10 @@ function renderAnnotations(svg, pageNumber) {
                     let highlight = HighlightAnnotation.newInstance(a);
                     highlight.render();
                     window.annotationContainer.add(highlight);                
+                } else if (a.type === 'arrow') {
+                    let arrowAnnotation = ArrowAnnotation.newInstance(a);
+                    arrowAnnotation.render();
+                    window.annotationContainer.add(arrowAnnotation);                
                 } else {
                     appendChild(svg, a);
                 }

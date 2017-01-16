@@ -130,9 +130,17 @@ export default class HighlightAnnotation extends AbstractAnnotation {
     getBoundingCirclePosition() {
         let $circle = this.$element.find('circle');
         return {
-            x : parseFloat($circle.attr(cx)),
-            y : parseFloat($circle.attr(cx))
+            x : parseFloat($circle.attr('cx')),
+            y : parseFloat($circle.attr('cy'))
         };
+    }
+
+    showBoundingCircle() {
+        this.$element.find('circle').removeClass('--hide');
+    }
+
+    hideBoundingCircle() {
+        this.$element.find('circle').addClass('--hide');
     }
 
     handleTextHoverIn() {
@@ -158,7 +166,8 @@ export default class HighlightAnnotation extends AbstractAnnotation {
         this.save();
     }
 
-    handleHoverInEvent() {
+    handleHoverInEvent(e) {
+        // TODO CSS Refactoring.
         this.$element.find('rect').addClass('--hover');
         this.$element.addClass('--emphasis');
         // // TODO Refactoring.
@@ -166,9 +175,14 @@ export default class HighlightAnnotation extends AbstractAnnotation {
         //     this.$element.css('opacity', 1);
         // }
         this.emit('hoverin');
+
+        let $elm = $(e.currentTarget);
+        if ($elm.prop("tagName") === 'circle') {
+            this.emit('circlehoverin', this);
+        }
     }
 
-    handleHoverOutEvent() {
+    handleHoverOutEvent(e) {
         this.$element.find('rect').removeClass('--hover');
         this.$element.removeClass('--emphasis');
         // // TODO Refactoring.
@@ -176,6 +190,11 @@ export default class HighlightAnnotation extends AbstractAnnotation {
         //     this.$element.css('opacity', 0.5);
         // }
         this.emit('hoverout');
+
+        let $elm = $(e.currentTarget);
+        if ($elm.prop("tagName") === 'circle') {
+            this.emit('circlehoverout', this);
+        }
     }
 
     handleClickEvent() {
