@@ -74,6 +74,7 @@ export default class RectAnnotation extends AbstractAnnotation {
             console.log('deleted');
         });
         this.textAnnotation.destroy();
+        this.emit('delete');
     }
 
     createAnnotation() {

@@ -64,6 +64,7 @@ export default class ArrowAnnotation extends AbstractAnnotation {
             this._rel1Annotation.on('hoverin', this.handleRelHoverIn);
             this._rel1Annotation.on('hoverout', this.handleRelHoverOut);
             this._rel1Annotation.on('rectmove', this.handleRelMove);
+            this._rel1Annotation.on('delete', this.handleRelDelete);
         }
     }
 
@@ -78,6 +79,7 @@ export default class ArrowAnnotation extends AbstractAnnotation {
             this._rel2Annotation.on('hoverin', this.handleRelHoverIn);
             this._rel2Annotation.on('hoverout', this.handleRelHoverOut);            
             this._rel2Annotation.on('rectmove', this.handleRelMove);
+            this._rel2Annotation.on('delete', this.handleRelDelete);
         }
     }
 
@@ -231,6 +233,10 @@ export default class ArrowAnnotation extends AbstractAnnotation {
         // this.$element.removeClass('--emphasis');
         this.dehighlightRelAnnotations();
         // this.emit('hoverout');
+    }
+
+    handleRelDelete() {
+        this.destroy();
     }
 
     handleRelMove() {

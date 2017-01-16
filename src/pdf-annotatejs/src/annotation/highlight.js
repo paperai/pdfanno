@@ -69,6 +69,7 @@ export default class HighlightAnnotation extends AbstractAnnotation {
             console.log('deleted');
         });
         this.textAnnotation.destroy();
+        this.emit('delete');
     }
 
     createAnnotation() {
