@@ -409,11 +409,13 @@ function saveArrow(x, y) {
 */
 function showBoundingBox() {
 
+  svg = getSVGLayer();
+
   // svg = document
   //             .querySelector('#pageContainer' + PDFView.page)
   //             .querySelector('svg');
 
-  svg = document.getElementById('annoLayer'); // TODO make it const.
+  // svg = document.getElementById('annoLayer'); // TODO make it const.
 
   // Collect boundingCircles for highlight.
   boundingCircles = [];

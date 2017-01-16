@@ -57,16 +57,44 @@ export default class ArrowAnnotation extends AbstractAnnotation {
         return a;
     }
 
+    set rel1Annotation(a) {
+        console.log('setRel1Annotation:', a);
+        this._rel1Annotation = a;
+        if (this._rel1Annotation) {
+            this._rel1Annotation.on('hoverin', this.handleRelHoverIn);
+            this._rel1Annotation.on('hoverout', this.handleRelHoverOut);
+            this._rel1Annotation.on('rectmove', this.handleRelMove);
+        }
+    }
+
+    get rel1Annotation() {
+        return this._rel1Annotation;
+    }
+
+    set rel2Annotation(a) {
+        console.log('setRel2Annotation');
+        this._rel2Annotation = a;
+        if (this._rel2Annotation) {
+            this._rel2Annotation.on('hoverin', this.handleRelHoverIn);
+            this._rel2Annotation.on('hoverout', this.handleRelHoverOut);            
+            this._rel2Annotation.on('rectmove', this.handleRelMove);
+        }
+    }
+
+    get rel2Annotation() {
+        return this._rel2Annotation;
+    }
+
     render() {
 
         // Set start/end positions.
-        if (this.rel1Annotation) {
-            let p = this.rel1Annotation.getBoundingCirclePosition();
+        if (this._rel1Annotation) {
+            let p = this._rel1Annotation.getBoundingCirclePosition();
             this.x1 = p.x;
             this.y1 = p.y;
         }
-        if (this.rel2Annotation) {
-            let p = this.rel2Annotation.getBoundingCirclePosition();
+        if (this._rel2Annotation) {
+            let p = this._rel2Annotation.getBoundingCirclePosition();
             this.x2 = p.x;
             this.y2 = p.y;
         }
@@ -102,8 +130,8 @@ export default class ArrowAnnotation extends AbstractAnnotation {
             uuid           : this.uuid,
             type           : this.type,
             direction      : this.direction,
-            rel1 : this.rel1Annotation.uuid,
-            rel2 : this.rel2Annotation.uuid,
+            rel1 : this._rel1Annotation.uuid,
+            rel2 : this._rel2Annotation.uuid,
             text           : this.text,
             color          : this.color,
             readOnly       : this.readOnly
@@ -146,21 +174,67 @@ export default class ArrowAnnotation extends AbstractAnnotation {
         return getRelationTextPosition(null, p.x1, p.y1, p.x2, p.y2);
     }
 
-    handleTextHoverIn() {
+    highlightRelAnnotations() {
+        if (this._rel1Annotation) {
+            this._rel1Annotation.highlight();
+        }
+        if (this._rel2Annotation) {
+            this._rel2Annotation.highlight();
+        }
+    }
+
+    dehighlightRelAnnotations() {
+        if (this._rel1Annotation) {
+            this._rel1Annotation.dehighlight();
+        }
+        if (this.rel2Annotation) {
+            this.rel2Annotation.dehighlight();
+        }
+    }
+
+    highlight() {
         // TODO Refactoring CSS.
         this.$element.find('path').addClass('--hover');
         this.$element.addClass('--emphasis');
-        // if (window.viewMode) {
-        //     this.$element.css('opacity', 1);
-        // }
+        this.textAnnotation.highlight();
+    }
+
+    dehighlight() {
+        this.$element.find('path').removeClass('--hover');
+        this.$element.removeClass('--emphasis');
+        this.textAnnotation.dehighlight();
+    }
+
+    handleTextHoverIn() {
+        this.highlight();
+        this.emit('hoverin');
+        this.highlightRelAnnotations();
     }
 
     handleTextHoverOut() {
-        this.$element.find('path').removeClass('--hover');
-        this.$element.removeClass('--emphasis');
-        // if (window.viewMode) {
-        //     this.$element.css('opacity', 0.5);
-        // }
+        this.dehighlight();
+        this.emit('hoverout');
+        this.dehighlightRelAnnotations();
+    }
+
+    handleRelHoverIn() {
+        this.highlight();
+        // this.$element.find('path').addClass('--hover');
+        // this.$element.addClass('--emphasis');
+        this.highlightRelAnnotations();
+        // this.emit('hoverin');
+    }
+
+    handleRelHoverOut() {
+        this.dehighlight();
+        // this.$element.find('path').removeClass('--hover');
+        // this.$element.removeClass('--emphasis');
+        this.dehighlightRelAnnotations();
+        // this.emit('hoverout');
+    }
+
+    handleRelMove() {
+        this.render();
     }
 
     handleTextChanged(textAfter) {
@@ -169,23 +243,36 @@ export default class ArrowAnnotation extends AbstractAnnotation {
     }
 
     handleHoverInEvent() {
-        this.$element.find('path').addClass('--hover');
-        this.$element.addClass('--emphasis');
-        // // TODO Refactoring.
-        // if (window.viewMode) {
-        //     this.$element.css('opacity', 1);
-        // }
+        this.highlight();
         this.emit('hoverin');
+        this.highlightRelAnnotations();
+
+        // this.$element.find('path').addClass('--hover');
+        // this.$element.addClass('--emphasis');
+        // // // TODO Refactoring.
+        // // if (window.viewMode) {
+        // //     this.$element.css('opacity', 1);
+        // // }
+        // this.emit('hoverin');
+
+        // this.highlightRelAnnotations();
     }
 
     handleHoverOutEvent() {
-        this.$element.find('path').removeClass('--hover');
-        this.$element.removeClass('--emphasis');
-        // // TODO Refactoring.
-        // if (window.viewMode) {
-        //     this.$element.css('opacity', 0.5);
-        // }
+
+        this.dehighlight();
         this.emit('hoverout');
+        this.dehighlightRelAnnotations();
+
+        // this.$element.find('path').removeClass('--hover');
+        // this.$element.removeClass('--emphasis');
+        // // // TODO Refactoring.
+        // // if (window.viewMode) {
+        // //     this.$element.css('opacity', 0.5);
+        // // }
+        // this.emit('hoverout');
+
+        // this.dehighlightRelAnnotations();
     }    
 
     handleClickEvent() {
@@ -215,8 +302,8 @@ export default class ArrowAnnotation extends AbstractAnnotation {
 
 function _getStartEndPoint(arrowAnnotation) {
     // set the start/end position.
-    let p1 = arrowAnnotation.rel1Annotation.getBoundingCirclePosition();
-    let p2 = arrowAnnotation.rel2Annotation.getBoundingCirclePosition();
+    let p1 = arrowAnnotation._rel1Annotation.getBoundingCirclePosition();
+    let p2 = arrowAnnotation._rel2Annotation.getBoundingCirclePosition();
     return {
         x1 : p1.x,
         y1 : p1.y,

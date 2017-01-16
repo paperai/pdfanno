@@ -143,37 +143,97 @@ export default class HighlightAnnotation extends AbstractAnnotation {
         this.$element.find('circle').addClass('--hide');
     }
 
-    handleTextHoverIn() {
-        // TODO Refactoring CSS.
+    highlight() {
+        // TODO CSS Refactoring.
         this.$element.find('rect').addClass('--hover');
         this.$element.addClass('--emphasis');
-        // if (window.viewMode) {
-        //     this.$element.css('opacity', 1);
-        // }
+        this.textAnnotation.highlight();
+    }
+
+    dehighlight() {
+        this.$element.find('rect').removeClass('--hover');
+        this.$element.removeClass('--emphasis');
+        this.textAnnotation.dehighlight();
+    }
+
+    handleTextHoverIn() {
+        this.highlight();
+        this.emit('hoverin');
     }
 
     handleTextHoverOut() {
-        // TODO Refactoring CSS.
-        this.$element.find('rect').removeClass('--hover');
-        this.$element.removeClass('--emphasis');
-        // if (window.viewMode) {
-        //     this.$element.css('opacity', 0.5);
-        // }
+        this.dehighlight();
+        this.emit('hoverout');
     }
+
+    // handleTextChanged(textAfter) {
+    //     this.text = textAfter;
+    //     this.save();
+    // }
+
+    // handleHoverInEvent(e) {
+    //     this.highlight();
+    //     this.emit('hoverin');
+
+    //     let $elm = $(e.currentTarget);
+    //     if ($elm.prop("tagName") === 'circle') {
+    //         this.emit('circlehoverin', this);
+    //     }
+    // }
+
+    // handleHoverOutEvent(e) {
+    //     this.dehighlight();
+    //     this.emit('hoverout');
+
+    //     let $elm = $(e.currentTarget);
+    //     if ($elm.prop("tagName") === 'circle') {
+    //         this.emit('circlehoverout', this);
+    //     }
+    // }
+
+    // handleTextHoverIn() {
+    //     // TODO Refactoring CSS.
+    //     this.$element.find('rect').addClass('--hover');
+    //     this.$element.addClass('--emphasis');
+    //     // if (window.viewMode) {
+    //     //     this.$element.css('opacity', 1);
+    //     // }
+    // }
+
+    // handleTextHoverOut() {
+    //     // TODO Refactoring CSS.
+    //     this.$element.find('rect').removeClass('--hover');
+    //     this.$element.removeClass('--emphasis');
+    //     // if (window.viewMode) {
+    //     //     this.$element.css('opacity', 0.5);
+    //     // }
+    // }
 
     handleTextChanged(textAfter) {
         this.text = textAfter;
         this.save();
     }
 
+    // handleHoverInEvent(e) {
+    //     this.highlight();
+
+    //     let $elm = $(e.currentTarget);
+    //     if ($elm.prop("tagName") === 'circle') {
+    //         this.emit('circlehoverin', this);
+    //     }
+    // }
+
+    // handleHoverOutEvent(e) {
+    //     this.dehighlight();
+
+    //     let $elm = $(e.currentTarget);
+    //     if ($elm.prop("tagName") === 'circle') {
+    //         this.emit('circlehoverout', this);
+    //     }
+    // }
+
     handleHoverInEvent(e) {
-        // TODO CSS Refactoring.
-        this.$element.find('rect').addClass('--hover');
-        this.$element.addClass('--emphasis');
-        // // TODO Refactoring.
-        // if (window.viewMode) {
-        //     this.$element.css('opacity', 1);
-        // }
+        this.highlight();
         this.emit('hoverin');
 
         let $elm = $(e.currentTarget);
@@ -183,12 +243,7 @@ export default class HighlightAnnotation extends AbstractAnnotation {
     }
 
     handleHoverOutEvent(e) {
-        this.$element.find('rect').removeClass('--hover');
-        this.$element.removeClass('--emphasis');
-        // // TODO Refactoring.
-        // if (window.viewMode) {
-        //     this.$element.css('opacity', 0.5);
-        // }
+        this.dehighlight();
         this.emit('hoverout');
 
         let $elm = $(e.currentTarget);

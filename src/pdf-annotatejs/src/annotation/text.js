@@ -26,8 +26,8 @@ export default class TextAnnotation extends AbstractAnnotation {
         this.y        = 0;
         this.$element = $('<div class="dummy"/>');
 
-        parent.on('hoverin', this.handleParentHoverIn);
-        parent.on('hoverout', this.handleParentHoverOut);
+        // parent.on('hoverin', this.handleParentHoverIn);
+        // parent.on('hoverout', this.handleParentHoverOut);
     }
 
     render() {
@@ -58,21 +58,27 @@ export default class TextAnnotation extends AbstractAnnotation {
         }
     }
 
-    handleParentHoverIn() {
-        console.log('handleParentHoverIn');
+    highlight() {
         this.$element.addClass('--hover');
-        // if (window.viewMode) {
-        //     this.$element.css('opacity', 1);
-        // }
         this.$element.addClass('--emphasis');
     }
 
-    handleParentHoverOut() {
+    dehighlight() {
         this.$element.removeClass('--hover');
-        // if (window.viewMode) {
-        //     this.$element.css('opacity', 0.5);
-        // }
         this.$element.removeClass('--emphasis');
+    }
+
+    handleParentHoverIn() {
+        this.highlight();
+    }
+
+    handleParentHoverOut() {
+        this.dehighlight();
+        // this.$element.removeClass('--hover');
+        // // if (window.viewMode) {
+        // //     this.$element.css('opacity', 0.5);
+        // // }
+        // this.$element.removeClass('--emphasis');
     }
 
     handleHoverInEvent() {

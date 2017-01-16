@@ -139,21 +139,28 @@ export default class RectAnnotation extends AbstractAnnotation {
         this.$element.find('circle').addClass('--hide');
     }
 
-    handleTextHoverIn() {
-        // TODO Refactoring CSS.
-        this.$element.find('rect').addClass('--hover');
+    highlight() {
+        this.$element.find('rect, text').addClass('--hover');
         this.$element.addClass('--emphasis');
-        // if (window.viewMode) {
-        //     this.$element.css('opacity', 1);            
-        // }
+        this.textAnnotation.highlight();
+        // this.emit('hoverin');
+    }
+
+    dehighlight() {
+        this.$element.find('rect, text').removeClass('--hover');
+        this.$element.removeClass('--emphasis');
+        this.textAnnotation.dehighlight();
+        // this.emit('hoverout');
+    }
+
+    handleTextHoverIn() {
+        this.highlight();
+        this.emit('hoverin');
     }
 
     handleTextHoverOut() {
-        this.$element.find('rect').removeClass('--hover');
-        this.$element.removeClass('--emphasis');
-        // if (window.viewMode) {
-        //     this.$element.css('opacity', 0.5);
-        // }
+        this.dehighlight();
+        this.emit('hoverout');
     }
 
     handleTextChanged(textAfter) {
@@ -162,12 +169,7 @@ export default class RectAnnotation extends AbstractAnnotation {
     }
 
     handleHoverInEvent(e) {
-        this.$element.find('rect, text').addClass('--hover');
-        // TODO Refactoring.
-        // if (window.viewMode) {
-            // this.$element.css('opacity', 1);
-        // }
-        this.$element.addClass('--emphasis');
+        this.highlight();
         this.emit('hoverin');
 
         let $elm = $(e.currentTarget);
@@ -177,12 +179,7 @@ export default class RectAnnotation extends AbstractAnnotation {
     }
 
     handleHoverOutEvent(e) {
-        this.$element.find('rect, text').removeClass('--hover');
-        // TODO Refactoring.
-        // if (window.viewMode) {
-        //     this.$element.css('opacity', 0.5);
-        // }
-        this.$element.removeClass('--emphasis');
+        this.dehighlight();
         this.emit('hoverout');
 
         let $elm = $(e.currentTarget);
