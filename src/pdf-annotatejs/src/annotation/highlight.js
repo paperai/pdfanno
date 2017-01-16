@@ -16,7 +16,7 @@ import {
 } from '../UI/utils';
 
 // TODO ここから
-// Hightlightの追加処理はOK（テキストの扱いが変わっているかは確認、html上とannoファイル上）
+// Hightlightの追加処理はOK（テキストの扱いが変わっているかは確認、html上とannoファイル上、テキスト表示される？）
 // UI的なイベント処理はこれから実装する.
 
 export default class HighlightAnnotation extends AbstractAnnotation {
@@ -33,7 +33,7 @@ export default class HighlightAnnotation extends AbstractAnnotation {
 
         this.textAnnotation = new TextAnnotation(this);
         this.textAnnotation.on('hoverin', this.handleTextHoverIn);
-        this.textAnnotation.on('hovverout', this.handleTextHoverOut);
+        this.textAnnotation.on('hoverout', this.handleTextHoverOut);
         this.textAnnotation.on('textchanged', this.handleTextChanged);
     }
 
@@ -56,6 +56,11 @@ export default class HighlightAnnotation extends AbstractAnnotation {
     destroy() {
         this.$element.remove();
         window.annotationContainer.remove(this);
+        let { documentId } = getMetadata(); // TODO Remove this.
+        PDFJSAnnotate.getStoreAdapter().deleteAnnotation(documentId, this.uuid).then(() => {
+            console.log('deleted');
+        });
+        this.textAnnotation.destroy();
     }
 
     createAnnotation() {
@@ -92,22 +97,10 @@ export default class HighlightAnnotation extends AbstractAnnotation {
     deleteSelectedAnnotation() {
         // TODO this will be better using eventEmitter on global?
         console.log('deleteSelectedAnnotation');
-        // // TODO Refactoring.
-        // if (this.$element.find('.anno-rect').hasClass('--selected')) {
-        //     this.$element.remove();
-        //     let { documentId } = getMetadata();
-        //     PDFJSAnnotate.getStoreAdapter().deleteAnnotation(documentId, this.uuid).then(() => {
-        //         console.log('deleted');
-        //     });
-        //     this.textAnnotation.destroy();
-        //     window.annotationContainer.remove(this);
-        
-        // } else if (this.$element.find('.anno-text').hasClass('--selected')) {
-        //     this.text = null;
-        //     this.save();
-        //     this.render();
-        //     this.enableViewMode();
-        // }
+
+        if (this.$element.find('rect').hasClass('--selected')) {
+            this.destroy();
+        }
 
         this.textAnnotation.deleteSelectedAnnotation();
     }
@@ -142,17 +135,44 @@ export default class HighlightAnnotation extends AbstractAnnotation {
         this.save();
     }
 
+    handleHoverInEvent() {
+        this.$element.find('rect').addClass('--hover');
+        // TODO Refactoring.
+        this.$element.css('opacity', 1);
+        this.emit('hoverin');
+    }
+
+    handleHoverOutEvent() {
+        this.$element.find('rect').removeClass('--hover');
+        // TODO Refactoring.
+        this.$element.css('opacity', 0.5);
+        this.emit('hoverout');
+    }
+
+    handleClickEvent() {
+        this.$element.find('rect').toggleClass('--selected');
+    }
 
     enableViewMode() {
 
-        // TODO BoundingCircle対応.
+        this.$element.find('cirle').off();
+        this.$element.find('circle').hover(
+            this.handleHoverInEvent,
+            this.handleHoverOutEvent
+        );
+        this.textAnnotation.enableViewMode();
+
+        if (!this.readOnly) {
+            this.$element.find('circle').on('click', this.handleClickEvent);
+        }
+
 
     }
 
-
     disableViewMode() {
-
-        // TODO BoundingCircle対応.
+        this.$element.find('circle').off('mouseenter mouseleave');
+        this.$element.find('circle').off('click', this.handleClickEvent);
+        this.textAnnotation.disableViewMode();
 
     }
 

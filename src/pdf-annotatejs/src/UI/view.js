@@ -630,8 +630,8 @@ function initializeMonitoringAnnotations() {
 
     // Components for monitoring.
     forEach.call(document.querySelectorAll('svg > g > [type="boundingCircle"]'), boundingCircle => {
-        console.log('aaaaaaa:', boundingCircle.parentNode.getAttribute('data-pdf-annotate-type'));
-        if (boundingCircle.parentNode.getAttribute('data-pdf-annotate-type') !== 'area') {
+        if (boundingCircle.parentNode.getAttribute('data-pdf-annotate-type') !== 'area'
+            && boundingCircle.parentNode.getAttribute('data-pdf-annotate-type') !== 'highlight') {
             console.log('bbbbb');
             monitoringCircles.push(boundingCircle);            
         } else {
@@ -722,11 +722,8 @@ export function enableViewMode() {
 
     enableMouseListening();
     setComponenTranslucent(OPACITY_TRANSLUCENT);
-
-    // FIXME
-    // window.addEventListener('rectmove', this.handleRectMove);
-    // window.addEventListener('rectmoveend', this.handleRectMoveEnd);
 }
+
 export function disableViewMode() {
     console.log('disableViewMode');
 
@@ -737,8 +734,4 @@ export function disableViewMode() {
 
     disableMouseListening();
     setComponenTranslucent(OPACITY_VISIBLE);
-
-    // FIXME
-    // window.removeEventListener('rectmove', this.handleRectMove);
-    // window.removeEventListener('rectmoveend', this.handleRectMoveEnd);
 }

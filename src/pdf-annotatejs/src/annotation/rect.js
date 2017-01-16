@@ -15,9 +15,6 @@ import {
     enableUserSelect
 } from '../UI/utils';
 
-// TODO Refactoring - remove text implements.
-
-
 /**
  * Rect Annotation.
  */
@@ -67,16 +64,15 @@ export default class RectAnnotation extends AbstractAnnotation {
     }
 
     createAnnotation() {
-        // TODO Refactring.
         return {
-            uuid   : this.uuid,
-            type   : this.type,
-            x      : this.x,
-            y      : this.y,
-            width  : this.width,
-            height : this.height,
-            text   : this.text,
-            color  : this.color,
+            uuid      : this.uuid,
+            type      : this.type,
+            x         : this.x,
+            y         : this.y,
+            width     : this.width,
+            height    : this.height,
+            text      : this.text,
+            color     : this.color,
             readyOnly : this.readOnly
         };
     }
@@ -110,13 +106,7 @@ export default class RectAnnotation extends AbstractAnnotation {
                 console.log('deleted');
             });
             this.textAnnotation.destroy();
-            window.annotationContainer.remove(this);
-        
-        } else if (this.$element.find('.anno-text').hasClass('--selected')) {
-            this.text = null;
-            this.save();
-            this.render();
-            this.enableViewMode();
+            window.annotationContainer.remove(this);        
         }
 
         this.textAnnotation.deleteSelectedAnnotation();
@@ -168,19 +158,6 @@ export default class RectAnnotation extends AbstractAnnotation {
         } else {
             this.$element.css('opacity', 0.5);
         }
-    }
-
-    handleClickTextEvent() {
-        console.log('handleClickTextEvent');
-        // TODO Refactoring.
-        this.$element.find('.anno-text').toggleClass('--selected');
-
-        // Check double click.
-        let currentTime = (new Date()).getTime();
-        if (this.prevClickTime && (currentTime - this.prevClickTime) < 400) {
-            this.handleDoubleClickTextEvent();
-        }
-        this.prevClickTime = currentTime;
     }
 
     handleDoubleClickTextEvent() {
@@ -248,19 +225,10 @@ export default class RectAnnotation extends AbstractAnnotation {
 
         this.render(); // heavy?
 
-        // TODO FIXME
-        // var event = document.createEvent('CustomEvent');
-        // event.initCustomEvent('rectmove', true, true, {
-        //   id: this.uuid
-        // });
-        // window.dispatchEvent(event);
-
         this.emit('rectmove', this);
-
     }
 
     handleMouseUpOnDocument() {
-        console.log('handleMouseUpOnDocument');
 
         if (this._dragging) {
             this._dragging = false;
@@ -275,13 +243,6 @@ export default class RectAnnotation extends AbstractAnnotation {
             this.save();
             this.enableViewMode();
 
-            // TODO FIXME
-            // var event = document.createEvent('CustomEvent');
-            // event.initCustomEvent('rectmoveend', true, true, {
-            //   id: this.uuid
-            // });
-            // window.dispatchEvent(event);
-
             this.emit('rectmoveend', this);
         }
 
@@ -294,8 +255,6 @@ export default class RectAnnotation extends AbstractAnnotation {
 
     enableViewMode() {
 
-        // this.$element.addClass('anno-viewmode');
-
         this.$element.find('rect, circle').hover(
             this.handleHoverInEvent, 
             this.handleHoverOutEvent
@@ -304,9 +263,6 @@ export default class RectAnnotation extends AbstractAnnotation {
         if (!this.readOnly) {
 
             this.$element.find('.anno-rect, circle').off('click', this.handleClickRectEvent).on('click', this.handleClickRectEvent);
-            // this.$element.find('text').off('click', this.handleClickTextEvent).on('click', this.handleClickTextEvent);
-            // this.$element.find('text').off('dbclick', this.handleDoubleClickTextEvent).on('dbclick', this.handleDoubleClickTextEvent);
-
             this.$element.find('.anno-rect, circle').off('mousedown', this.handleMouseDownOnRect).on('mousedown', this.handleMouseDownOnRect);
          
         }
@@ -316,15 +272,9 @@ export default class RectAnnotation extends AbstractAnnotation {
 
     disableViewMode() {
 
-        // this.$element.removeClass('anno-viewmode');
-
         this.$element.find('rect, circle').off('mouseenter mouseleave');
         this.$element.find('.anno-rect').off('click', this.handleClickRectEvent);
-        // this.$element.find('text').off('click', this.handleClickTextEvent);
-        // this.$element.find('text').off('dbclick', this.handleDoubleClickTextEvent);
-
         this.$element.find('.anno-rect').off('mousedown', this.handleMouseDownOnRect);
-
         this.textAnnotation.disableViewMode();
     }
 

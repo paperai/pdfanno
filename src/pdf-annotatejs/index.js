@@ -18,6 +18,7 @@ import AnnotationContainer from './src/annotation/container';
 window.annotationContainer = new AnnotationContainer();
 
 import RectAnnotation from './src/annotation/rect';
+import HighlightAnnotation from './src/annotation/highlight';
 
 import appendChild from './src/render/appendChild';
 
@@ -111,28 +112,18 @@ function renderAnnotations(svg, pageNumber) {
 
             // Render annotations.
             let viewport = PDFView.pdfViewer.getPageView(0).viewport;
-            // PDFAnnotate.render(svg, viewport, annotations).then((svg, elements) => {
-
-            //     for (let i = 0; i < annotations.length; i++) {
-
-            //     }
-
-
-            //     // var event = document.createEvent('CustomEvent');
-            //     // event.initCustomEvent('annotationrendered', true, true, {
-            //     //   pageNumber: pageNumber
-            //     // });
-            //     // window.dispatchEvent(event);
-
-            // });
 
             annotations.annotations.forEach(a => {
 
+                // TODO move to annotation/index.js
                 if (a.type === 'area') {
                     let rect = RectAnnotation.newInstance(a);
                     rect.render();
                     window.annotationContainer.add(rect);
-                
+                } else if (a.type === 'highlight') {
+                    let highlight = HighlightAnnotation.newInstance(a);
+                    highlight.render();
+                    window.annotationContainer.add(highlight);                
                 } else {
                     appendChild(svg, a);
                 }
@@ -166,8 +157,6 @@ function setupPDFDragAndDropLoader() {
 setupPDFDragAndDropLoader();
 
 function handleDroppedFile(e) {
-
-    console.log('bbbbbbbbbbbbb');
 
     var event = document.createEvent('CustomEvent');
     event.initCustomEvent('pdfdropped', true, true, { originalEvent: e.originalEvent });

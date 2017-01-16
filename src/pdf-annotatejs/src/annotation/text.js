@@ -31,7 +31,6 @@ export default class TextAnnotation extends AbstractAnnotation {
     }
 
     render() {
-        console.log('render::::::::', this.parent.text);
         if (this.parent.text) {
             assign(this, this.parent.getTextPosition());
             this.text = this.parent.text;
@@ -52,6 +51,7 @@ export default class TextAnnotation extends AbstractAnnotation {
     }
 
     handleParentHoverIn() {
+        console.log('handleParentHoverIn');
         this.$element.addClass('--hover');
         this.$element.css('opacity', 1);
     }

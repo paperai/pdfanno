@@ -232,16 +232,7 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                   ];
                 });
                 // span text.
-                let text = '';
-                if (annotation.text) {
-                  // TODO use `getAnnotations` instead.
-                  let texts = container[documentId].annotations.filter(a => {
-                    return a.uuid === annotation.text;
-                  });
-                  if (texts.length > 0) {
-                    text = texts[0].content;
-                  }
-                }
+                let text = annotation.text || '';
                 data.push(text);
 
                 let key = `span-${indexSpan++}`;
@@ -381,30 +372,6 @@ function _createContainerFromJson(json, color, isPrimary) {
             height : d[4]
           }
         });
-        // span text.
-        let spanText = data[data.length-1];
-        let textId = null;
-        if (spanText) {
-          textId = uuid();
-          let svg = document.querySelector('.annotationLayer');
-
-          let x = rectangles[0].x;
-          let y = rectangles[0].y - 20; // 20 = circle'radius(3px) + input height(14px) + α
-
-          let pageNumber = data[0][0];
-
-          annotations.push({
-            class      : 'Annotation',
-            type       : 'textbox',
-            uuid       : textId,
-            page       : pageNumber,
-            x          : x,
-            y,
-            content    : spanText,
-            readOnly,
-            color
-          });
-        }
         annotations.push({
           class      : 'Annotation',
           type       : 'highlight',
@@ -412,25 +379,11 @@ function _createContainerFromJson(json, color, isPrimary) {
           page       : data[0][0],
           color      : '#FFFF00',   // TODO なくてもOK？
           rectangles,
-          text       : textId,
+          text       : data[data.length-1],
           key        : key,  // tmp for arrow.
           readOnly,
           color
         });
-
-      // Text Independent.
-      // } else if (key.indexOf('text') === 0) {
-      //   annotations.push({
-      //     class      : 'Annotation',
-      //     type       : 'textbox',
-      //     uuid       : uuid(),
-      //     page       : data[0],
-      //     x          : data[1],
-      //     y          : data[2],
-      //     content    : data[3],
-      //     readOnly,
-      //     color
-      //   });
 
       // Arrow.
       } else if (key.indexOf('rel') === 0) {
