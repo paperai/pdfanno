@@ -35,8 +35,16 @@ export default class TextAnnotation extends AbstractAnnotation {
             assign(this, this.parent.getTextPosition());
             this.text = this.parent.text;
             this.$element.remove();
-            this.$element = $(appendChild(getSVGLayer(), this));            
+            this.$element = $(appendChild(getSVGLayer(), this));    
+            this.setHoverEvent();        
         }
+    }
+
+    setHoverEvent() {
+        this.$element.find('text').hover(
+            this.handleHoverInEvent, 
+            this.handleHoverOutEvent
+        );
     }
 
     destroy() {
@@ -53,23 +61,35 @@ export default class TextAnnotation extends AbstractAnnotation {
     handleParentHoverIn() {
         console.log('handleParentHoverIn');
         this.$element.addClass('--hover');
-        this.$element.css('opacity', 1);
+        // if (window.viewMode) {
+        //     this.$element.css('opacity', 1);
+        // }
+        this.$element.addClass('--emphasis');
     }
 
     handleParentHoverOut() {
         this.$element.removeClass('--hover');
-        this.$element.css('opacity', 0.5);
+        // if (window.viewMode) {
+        //     this.$element.css('opacity', 0.5);
+        // }
+        this.$element.removeClass('--emphasis');
     }
 
     handleHoverInEvent() {
         this.$element.addClass('--hover');
-        this.$element.css('opacity', 1);
+        this.$element.addClass('--emphasis');
+        // if (window.viewMode) {
+        //     this.$element.css('opacity', 1);
+        // }
         this.emit('hoverin');
     }
 
     handleHoverOutEvent() {
         this.$element.removeClass('--hover');
-        this.$element.css('opacity', 0.5);
+        this.$element.removeClass('--emphasis');
+        // if (window.viewMode) {
+        //     this.$element.css('opacity', 0.5);
+        // }
         this.emit('hoverout');
     }
 
@@ -124,24 +144,24 @@ export default class TextAnnotation extends AbstractAnnotation {
 
     enableViewMode() {
 
-        this.$element.find('text').hover(
-            this.handleHoverInEvent, 
-            this.handleHoverOutEvent
-        );
+        // this.$element.find('text').hover(
+        //     this.handleHoverInEvent, 
+        //     this.handleHoverOutEvent
+        // );
 
         if (!this.parent.readOnly) {
-            console.log('ccccc:', this, this.$element.find('text'));
-            this.$element.find('text').on('click', this.handleClickEvent);
-            // this.$element.off('dbclick').on('dbclick', this.handleDoubleClickEvent);
+            this.$element.find('text').off('click').on('click', this.handleClickEvent);
         }
 
     }
 
     disableViewMode() {
 
-        this.$element.find('text').off('mouseenter mouseleave');
+        // this.$element.find('text').off('mouseenter mouseleave');
         this.$element.find('text').off('click', this.handleClickEvent);
     }
 
 }
 
+// TODO
+// opacity 0.5のCSS対応

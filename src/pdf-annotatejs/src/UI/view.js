@@ -707,9 +707,18 @@ function disableMouseListening() {
 }
 
 function setComponenTranslucent(opacity) {
-    forEach.call(document.querySelectorAll('svg > *'), svgComponent => {
-        svgComponent.style.opacity = opacity;
-    });
+
+    if (opacity === OPACITY_VISIBLE) {
+        $('svg > *').removeClass('--viewMode');
+        // $('.annoLayer').removeClass('--viewMode');
+    } else {
+        $('svg > *').addClass('--viewMode');
+        // $('.annoLayer').addClass('--viewMode');
+    }
+
+    // forEach.call(document.querySelectorAll('svg > *'), svgComponent => {
+    //     svgComponent.style.opacity = opacity;
+    // });
 }
 
 export function enableViewMode() {
@@ -722,6 +731,8 @@ export function enableViewMode() {
 
     enableMouseListening();
     setComponenTranslucent(OPACITY_TRANSLUCENT);
+
+    window.viewMode = true;
 }
 
 export function disableViewMode() {
@@ -734,4 +745,6 @@ export function disableViewMode() {
 
     disableMouseListening();
     setComponenTranslucent(OPACITY_VISIBLE);
+
+    window.viewMode = false;
 }

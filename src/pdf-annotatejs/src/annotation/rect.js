@@ -35,7 +35,7 @@ export default class RectAnnotation extends AbstractAnnotation {
 
         this.textAnnotation = new TextAnnotation(this);
         this.textAnnotation.on('hoverin', this.handleTextHoverIn);
-        this.textAnnotation.on('hovverout', this.handleTextHoverOut);
+        this.textAnnotation.on('hoverout', this.handleTextHoverOut);
         this.textAnnotation.on('textchanged', this.handleTextChanged);
     }
 
@@ -55,12 +55,25 @@ export default class RectAnnotation extends AbstractAnnotation {
     render() {
          this.$element.remove();
          this.$element = $(appendChild(getSVGLayer(), this));
+         this.setHoverEvent();
          this.textAnnotation.render();
+    }
+
+    setHoverEvent() {
+        this.$element.find('rect, circle').hover(
+            this.handleHoverInEvent, 
+            this.handleHoverOutEvent
+        );
     }
 
     destroy() {
         this.$element.remove();
         window.annotationContainer.remove(this);
+        let { documentId } = getMetadata(); // TODO Remove this.
+        PDFJSAnnotate.getStoreAdapter().deleteAnnotation(documentId, this.uuid).then(() => {
+            console.log('deleted');
+        });
+        this.textAnnotation.destroy();
     }
 
     createAnnotation() {
@@ -97,18 +110,9 @@ export default class RectAnnotation extends AbstractAnnotation {
 
     deleteSelectedAnnotation() {
         // TODO this will be better using eventEmitter on global?
-        console.log('deleteSelectedAnnotation');
-        // TODO Refactoring.
         if (this.$element.find('.anno-rect').hasClass('--selected')) {
-            this.$element.remove();
-            let { documentId } = getMetadata();
-            PDFJSAnnotate.getStoreAdapter().deleteAnnotation(documentId, this.uuid).then(() => {
-                console.log('deleted');
-            });
-            this.textAnnotation.destroy();
-            window.annotationContainer.remove(this);        
+            this.destroy();
         }
-
         this.textAnnotation.deleteSelectedAnnotation();
     }
 
@@ -119,15 +123,29 @@ export default class RectAnnotation extends AbstractAnnotation {
         };
     }
 
+    getBoundingCirclePosition() {
+        let $circle = this.$element.find('circle');
+        return {
+            x : parseFloat($circle.attr(cx)),
+            y : parseFloat($circle.attr(cx))
+        };
+    }
+
     handleTextHoverIn() {
         // TODO Refactoring CSS.
         this.$element.find('rect').addClass('--hover');
-        this.$element.css('opacity', 1);
+        this.$element.addClass('--emphasis');
+        // if (window.viewMode) {
+        //     this.$element.css('opacity', 1);            
+        // }
     }
 
     handleTextHoverOut() {
         this.$element.find('rect').removeClass('--hover');
-        this.$element.css('opacity', 0.5);
+        this.$element.removeClass('--emphasis');
+        // if (window.viewMode) {
+        //     this.$element.css('opacity', 0.5);
+        // }
     }
 
     handleTextChanged(textAfter) {
@@ -135,29 +153,49 @@ export default class RectAnnotation extends AbstractAnnotation {
         this.save();
     }
 
-    handleHoverInEvent() {
+    handleHoverInEvent(e) {
         this.$element.find('rect, text').addClass('--hover');
         // TODO Refactoring.
-        this.$element.css('opacity', 1);
+        // if (window.viewMode) {
+            // this.$element.css('opacity', 1);
+        // }
+        this.$element.addClass('--emphasis');
         this.emit('hoverin');
+
+        let $elm = $(e.currentTarget);
+        if ($elm.prop("tagName") === 'circle') {
+            this.emit('circlehoverin');
+        }
     }
 
-    handleHoverOutEvent() {
+    handleHoverOutEvent(e) {
         this.$element.find('rect, text').removeClass('--hover');
         // TODO Refactoring.
-        this.$element.css('opacity', 0.5);
+        // if (window.viewMode) {
+        //     this.$element.css('opacity', 0.5);
+        // }
+        this.$element.removeClass('--emphasis');
         this.emit('hoverout');
+
+        let $elm = $(e.currentTarget);
+        if ($elm.prop("tagName") === 'circle') {
+            this.emit('circlehoverout');
+        }
     }
 
     handleClickRectEvent() {
         console.log('handleClickRectEvent!!!!!');
         // TODO Refactoring.
         this.$element.find('.anno-rect').toggleClass('--selected');
-        if (this.$element.find('.anno-rect').hasClass('--selected')) {
-            this.$element.css('opacity', 1);
-        } else {
-            this.$element.css('opacity', 0.5);
-        }
+        // if (this.$element.find('.anno-rect').hasClass('--selected')) {
+        //     // if (window.viewMode) {
+        //     //     this.$element.css('opacity', 1);
+        //     // }
+        // } else {
+        //     if (window.viewMode) {
+        //         this.$element.css('opacity', 0.5);
+        //     }
+        // }
     }
 
     handleDoubleClickTextEvent() {
@@ -255,24 +293,16 @@ export default class RectAnnotation extends AbstractAnnotation {
 
     enableViewMode() {
 
-        this.$element.find('rect, circle').hover(
-            this.handleHoverInEvent, 
-            this.handleHoverOutEvent
-        );
-
         if (!this.readOnly) {
 
             this.$element.find('.anno-rect, circle').off('click', this.handleClickRectEvent).on('click', this.handleClickRectEvent);
-            this.$element.find('.anno-rect, circle').off('mousedown', this.handleMouseDownOnRect).on('mousedown', this.handleMouseDownOnRect);
-         
+            this.$element.find('.anno-rect, circle').off('mousedown', this.handleMouseDownOnRect).on('mousedown', this.handleMouseDownOnRect);         
         }
 
         this.textAnnotation.enableViewMode();
     }
 
     disableViewMode() {
-
-        this.$element.find('rect, circle').off('mouseenter mouseleave');
         this.$element.find('.anno-rect').off('click', this.handleClickRectEvent);
         this.$element.find('.anno-rect').off('mousedown', this.handleMouseDownOnRect);
         this.textAnnotation.disableViewMode();

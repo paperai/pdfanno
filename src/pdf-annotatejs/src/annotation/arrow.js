@@ -7,6 +7,7 @@ import { enableViewMode, disableViewMode } from '../UI/view';
 import AbstractAnnotation from './abstract';
 import TextAnnotation from './text';
 import PDFJSAnnotate from '../PDFJSAnnotate';
+import { getRelationTextPosition } from '../utils/relation.js';
 import {
     scaleUp,
     scaleDown,
@@ -15,50 +16,60 @@ import {
     enableUserSelect
 } from '../UI/utils';
 
-// TODO ここから
-// Hightlightの追加処理はOK（テキストの扱いが変わっているかは確認、html上とannoファイル上、テキスト表示される？）
-// UI的なイベント処理はこれから実装する.
-
-export default class HighlightAnnotation extends AbstractAnnotation {
+/**
+ * Arrow Annotation (one-way / two-way / link)
+ */
+export default class ArrowAnnotation extends AbstractAnnotation {
 
     constructor() {
         super();
-        this.uuid = null;
-        this.type = 'highlight';
-        this.rectangles = [];
+        this.uuid  = null;
+        this.type  = null;
+        this.rel1Annotation = null;
+        this.rel2Annotation = null;
         this.text = null;
         this.color = null;
-        this.readOnly = null;
+        this.readOnly = false;
         this.$element = $('<div class="dummy"/>');
+
+        // for render.
+        this.x1 = 0;
+        this.y1 = 0;
+        this.x2 = 0;
+        this.y2 = 0;
 
         this.textAnnotation = new TextAnnotation(this);
         this.textAnnotation.on('hoverin', this.handleTextHoverIn);
-        this.textAnnotation.on('hoverout', this.handleTextHoverOut);
+        this.textAnnotation.on('hovverout', this.handleTextHoverOut);
         this.textAnnotation.on('textchanged', this.handleTextChanged);
     }
 
     static newInstance(annotation) {
-        let highlight      = new HighlightAnnotation();
-        highlight.uuid     = annotation.uuid || uuid();;
-        highlight.rectangles = annotation.rectangles;
-        highlight.text     = annotation.text;
-        highlight.color    = annotation.color;
-        highlight.readOnly = annotation.readOnly;
-        return highlight;        
+        let a            = new ArrowAnnotation();
+        a.uuid           = annotation.uuid || uuid();
+        a.type           = annotation.type;
+        a.rel1Annotation = window.annotationContainer.findById(annotation.rel1);
+        a.rel2Annotation = window.annotationContainer.findById(annotation.rel2);
+        a.text           = annotation.text;
+        a.color          = annotation.color;
+        a.readOnly       = annotation.readOnly;
+
+        return a;
     }
 
     render() {
-         this.$element.remove();
-         this.$element = $(appendChild(getSVGLayer(), this));
-         this.setHoverEvent();
-         this.textAnnotation.render();
-    }
 
-    setHoverEvent() {
-        this.$element.find('circle').hover(
-            this.handleHoverInEvent, 
-            this.handleHoverOutEvent
-        );
+        // Set start/end positions.
+        if (this.rel1Annotation && this.rel2Annotation) {
+            assign(this, _getStartEndPoint(this));            
+        
+        } else {
+            // Here used at UI/arrow.js for tmp rendering.
+        }
+
+        this.$eleent.remove();
+        this.$element = $(appendChild(getSVGLayer(), this));
+        this.textAnnotation.render();
     }
 
     destroy() {
@@ -72,19 +83,18 @@ export default class HighlightAnnotation extends AbstractAnnotation {
     }
 
     createAnnotation() {
-        // TODO Refactring.
         return {
-            uuid   : this.uuid,
-            type   : this.type,
-            rectangles      : this.rectangles,
-            text   : this.text,
-            color  : this.color,
-            readyOnly : this.readOnly
+            uuid           : this.uuid,
+            type           : this.type,
+            rel1Annotation : this.rel1Annotation.uuid,
+            rel2Annotation : this.rel2Annotation.uuid,
+            text           : this.text,
+            color          : this.color,
+            readOnly       : this.readOnly
         };
     }
 
     save() {
-        // TODO make this in abstract.
         // TODO Competible to insert and update.
         let { documentId } = getMetadata();
         PDFJSAnnotate.getStoreAdapter().getAnnotation(documentId, this.uuid).then(a => {
@@ -104,40 +114,24 @@ export default class HighlightAnnotation extends AbstractAnnotation {
 
     deleteSelectedAnnotation() {
         // TODO this will be better using eventEmitter on global?
-        console.log('deleteSelectedAnnotation');
-
-        if (this.$element.find('rect').hasClass('--selected')) {
+        if (this.$element.find('path').hasClass('--selected')) {
             this.destroy();
         }
-
         this.textAnnotation.deleteSelectedAnnotation();
     }
 
+    // arrow選択時のrel1,2のhover処理
+
+    // rel1,2削除時のarrowとtextの削除処理
+
     getTextPosition() {
-
-        if (this.rectangles.length > 0) {
-
-            return {
-                x : this.rectangles[0].x + 7, // 7 = DEFAULT_RADIUS + 2
-                y : this.rectangles[0].y - 20
-            };
-
-        } else {
-            return { x : 0, y : 0 };
-        }
-    }
-
-    getBoundingCirclePosition() {
-        let $circle = this.$element.find('circle');
-        return {
-            x : parseFloat($circle.attr(cx)),
-            y : parseFloat($circle.attr(cx))
-        };
+        let p = _getStartEndPoint(this);
+        return getRelationTextPosition(null, p.x1, p.y1, p.x2, p.y2);
     }
 
     handleTextHoverIn() {
         // TODO Refactoring CSS.
-        this.$element.find('rect').addClass('--hover');
+        this.$element.find('path').addClass('--hover');
         this.$element.addClass('--emphasis');
         // if (window.viewMode) {
         //     this.$element.css('opacity', 1);
@@ -145,8 +139,7 @@ export default class HighlightAnnotation extends AbstractAnnotation {
     }
 
     handleTextHoverOut() {
-        // TODO Refactoring CSS.
-        this.$element.find('rect').removeClass('--hover');
+        this.$element.find('path').removeClass('--hover');
         this.$element.removeClass('--emphasis');
         // if (window.viewMode) {
         //     this.$element.css('opacity', 0.5);
@@ -159,7 +152,7 @@ export default class HighlightAnnotation extends AbstractAnnotation {
     }
 
     handleHoverInEvent() {
-        this.$element.find('rect').addClass('--hover');
+        this.$element.find('path').addClass('--hover');
         this.$element.addClass('--emphasis');
         // // TODO Refactoring.
         // if (window.viewMode) {
@@ -169,41 +162,48 @@ export default class HighlightAnnotation extends AbstractAnnotation {
     }
 
     handleHoverOutEvent() {
-        this.$element.find('rect').removeClass('--hover');
+        this.$element.find('path').removeClass('--hover');
         this.$element.removeClass('--emphasis');
         // // TODO Refactoring.
         // if (window.viewMode) {
         //     this.$element.css('opacity', 0.5);
         // }
         this.emit('hoverout');
-    }
+    }    
 
     handleClickEvent() {
-        this.$element.find('rect').toggleClass('--selected');
+        this.$element.find('path').toggleClass('--selected');
     }
 
     enableViewMode() {
 
-        // this.$element.find('cirle').off();
-        // this.$element.find('circle').hover(
-        //     this.handleHoverInEvent,
-        //     this.handleHoverOutEvent
-        // );
+        this.$element.find('path').off();
+        this.$element.find('path').hover(
+            this.handleHoverInEvent,
+            this.handleHoverOutEvent
+        );
         this.textAnnotation.enableViewMode();
 
         if (!this.readOnly) {
-            this.$element.find('circle').off('click').on('click', this.handleClickEvent);
+            this.$element.find('path').on('click', this.handleClickEvent);
         }
-
-
     }
 
     disableViewMode() {
-        
-        // this.$element.find('circle').off('mouseenter mouseleave');
-
-        this.$element.find('circle').off('click', this.handleClickEvent);
+        this.$element.find('path').off('mouseenter mouseleave');
+        this.$element.find('path').off('click', this.handleClickEvent);
         this.textAnnotation.disableViewMode();
-    }
+    }    
+}
 
+_getStartEndPoint(arrowAnnotation) {
+    // set the start/end position.
+    let p1 = arrowAnnotation.rel1Annotation.getBoundingCirclePosition();
+    let p2 = arrowAnnotation.rel2Annotation.getBoundingCirclePosition();
+    return {
+        x1 : p1.x,
+        y1 : p1.y,
+        x2 : p2.x,
+        y2 : p2.y        
+    };
 }

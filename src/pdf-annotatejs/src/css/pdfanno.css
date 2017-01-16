@@ -1,4 +1,17 @@
 /**
+ * SVGLayer.
+ */
+.annoLayer {}
+.annoLayer > *.--viewMode {
+  opacity: 0.5;
+}
+.annoLayer > *.--viewMode.--emphasis {
+  opacity: 1;
+}
+
+
+
+/**
     各種アノテーション
 */
 .anno-circle {

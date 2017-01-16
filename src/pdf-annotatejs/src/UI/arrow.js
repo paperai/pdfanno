@@ -14,6 +14,8 @@ import { getRelationTextPosition } from '../utils/relation.js';
 import { addInputField } from './text';
 import uuid from '../utils/uuid';
 
+import HighlightAnnotation from '../annotation/highlight';
+
 let filter = Array.prototype.filter;
 let forEach = Array.prototype.forEach;
 

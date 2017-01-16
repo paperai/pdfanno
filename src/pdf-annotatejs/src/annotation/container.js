@@ -20,4 +20,14 @@ export default class AnnotationContainer {
         this.set.forEach(a => list.push(a));
         return list;
     }
+
+    findById(uuid) {
+        let annotation = null;
+        this.set.forEach(a => {
+            if (a.uuid === uuid) {
+                annotation = a;
+            }
+        });
+        return annotation;
+    }
 }

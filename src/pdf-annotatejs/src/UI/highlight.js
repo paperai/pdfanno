@@ -113,56 +113,26 @@ function saveRect(rects) {
   highlightAnnotation.render();
 
 
+  // Add an input field.
+  let x = annotation.rectangles[0].x + 5;  // 5 = boundingRadius(3) + 2
+  let y = annotation.rectangles[0].y - 20; // 20 = circle'radius(3px) + input height(14px) + α
+  let rect = svg.getBoundingClientRect();
 
+  x = scaleUp(svg, {x}).x + rect.left;
+  y = scaleUp(svg, {y}).y + rect.top;
 
+  addInputField(x, y, null, null, (text) => {
 
+    if (!text) {
+      return;
+    }
 
-  // let { documentId, pageNumber } = getMetadata(svg);
+    highlightAnnotation.text = text;
+    highlightAnnotation.render();
+    highlightAnnotation.save();
 
-  // Add the annotation
-  // PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation).then((annotation) => {
+  }, 'text');
 
-
-    // console.log('annotation:', annotation);
-
-    // appendChild(svg, annotation);
-
-    // Add an input field.
-    let x = annotation.rectangles[0].x + 5;  // 5 = boundingRadius(3) + 2
-    let y = annotation.rectangles[0].y - 20; // 20 = circle'radius(3px) + input height(14px) + α
-    let rect = svg.getBoundingClientRect();
-
-    x = scaleUp(svg, {x}).x + rect.left;
-    y = scaleUp(svg, {y}).y + rect.top;
-
-    addInputField(x, y, null, null, (text) => {
-
-      if (!text) {
-        return;
-      }
-
-      highlightAnnotation.text = text;
-      highlightAnnotation.render();
-      highlightAnnotation.save();
-      // annotation.text = text;
-
-      // FIXME: cannot stop refarence counter. I wanna use the original `annotation`, but couldn't.
-      // PDFJSAnnotate.getStoreAdapter().getAnnotation(documentId, annotation.uuid).then(annotation => {
-
-
-      //   // // Set relation between arrow and text.
-      //   // annotation.text = textAnnotation.uuid;
-
-      //   // // Update data.
-      //   // PDFJSAnnotate.getStoreAdapter().editAnnotation(documentId, annotation.uuid, annotation);
-
-      //   // // Update UI.
-      //   // $(`[data-pdf-annotate-id="${annotation.uuid}"]`).attr('data-text', textAnnotation.uuid);
-
-      // });
-    }, 'text');
-
-  // });
 }
 
 /**

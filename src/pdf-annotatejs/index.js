@@ -68,7 +68,7 @@ function renderAnno() {
     let width = $('.page').width();
 
     // Add an annotation layer.
-    let $annoLayer = $(`<svg id="${svgLayerId}"/>`).css({   // TODO CSSClass.
+    let $annoLayer = $(`<svg id="${svgLayerId}" class="${svgLayerId}"/>`).css({   // TODO CSSClass.
         position   : 'absolute',
         top        : '0px',
         left       : `${leftMargin}px`,
