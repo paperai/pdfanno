@@ -23,14 +23,21 @@ Then,
 PDFAnno does NOT automatically save the user's annotation.  
 
 ### Annotation Tools
-* ![](https://github.com/paperai/pdfanno/blob/master/icons/fa-mouse-pointer.png): Selection tool.
-* ![](https://github.com/paperai/pdfanno/blob/master/icons/fa-pencil.png): Span highlighting.
-* ![](https://github.com/paperai/pdfanno/blob/master/icons/fa-long-arrow-right.png): One-way relation. This is used for annotating dependency relation between spans.
-* ![](https://github.com/paperai/pdfanno/blob/master/icons/fa-arrows-h.png): Two-way relation.
-* ![](https://github.com/paperai/pdfanno/blob/master/icons/fa-minus.png): Link relation. If you want to add non-directional relation between spans, use this.
-* ![](https://github.com/paperai/pdfanno/blob/master/icons/fa-square-o.png): Rectangle.
-* ![](https://github.com/paperai/pdfanno/blob/master/icons/fa-download.png): Download the annotation file.
-* DEL: Delete all of current annotations.
+<img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-mouse-pointer.png" width="3%">: Selection tool.
+
+<img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-pencil.png" width="3%">: Span highlighting.
+
+<img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-long-arrow-right.png" width="3%">: One-way relation. This is used for annotating dependency relation between spans.
+
+<img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-arrows-h.png" width="3%">: Two-way relation.
+
+<img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-minus.png" width="3%">: Link relation. If you want to add non-directional relation between spans, use this.
+
+<img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-square-o.png" width="3%">: Rectangle
+
+<img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-download.png" width="3%">: Download the annotation file.
+
+DEL: Delete all of current annotations.
 
 ### Annotation File (.anno)
 In PDFAnno, the annotation file (.anno) follows JSON format.  
