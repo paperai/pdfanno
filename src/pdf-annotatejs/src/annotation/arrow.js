@@ -62,7 +62,6 @@ export default class ArrowAnnotation extends AbstractAnnotation {
     }
 
     set rel1Annotation(a) {
-        console.log('setRel1Annotation:', a);
         this._rel1Annotation = a;
         if (this._rel1Annotation) {
             this._rel1Annotation.on('hoverin', this.handleRelHoverIn);
@@ -77,7 +76,6 @@ export default class ArrowAnnotation extends AbstractAnnotation {
     }
 
     set rel2Annotation(a) {
-        console.log('setRel2Annotation');
         this._rel2Annotation = a;
         if (this._rel2Annotation) {
             this._rel2Annotation.on('hoverin', this.handleRelHoverIn);

@@ -37,4 +37,12 @@ export default class AbstractAnnotation extends EventEmitter {
         return this.$element.find('circle').length > 0;
     }
 
+    enableArrowMode() {
+        // Implement in a child.
+    }
+
+    disableArrowMode() {
+        // Implement in a child.
+    }
+
 }

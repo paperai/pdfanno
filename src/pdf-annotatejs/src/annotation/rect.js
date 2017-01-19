@@ -56,13 +56,6 @@ export default class RectAnnotation extends AbstractAnnotation {
         return rect;
     }
 
-    // render() {
-    //      this.$element.remove();
-    //      this.$element = $(appendChild(getSVGLayer(), this));
-    //      this.setHoverEvent();
-    //      this.textAnnotation.render();
-    // }
-
     setHoverEvent() {
         this.$element.find('rect, circle').hover(
             this.handleHoverInEvent, 
@@ -145,14 +138,14 @@ export default class RectAnnotation extends AbstractAnnotation {
     }
 
     highlight() {
-        this.$element.find('rect, text').addClass('--hover');
+        this.$element.find('rect, text, circle').addClass('--hover');
         this.$element.addClass('--emphasis');
         this.textAnnotation.highlight();
         // this.emit('hoverin');
     }
 
     dehighlight() {
-        this.$element.find('rect, text').removeClass('--hover');
+        this.$element.find('rect, text, circle').removeClass('--hover');
         this.$element.removeClass('--emphasis');
         this.textAnnotation.dehighlight();
         // this.emit('hoverout');
@@ -305,6 +298,42 @@ export default class RectAnnotation extends AbstractAnnotation {
         this.$element.find('.anno-rect, circle').off('click', this.handleClickRectEvent);
         this.$element.find('.anno-rect, circle').off('mousedown', this.handleMouseDownOnRect);
         this.textAnnotation.disableViewMode();
+    }
+
+    handleCircleDragStart() {
+        console.log('handleCircleDragStart');
+    }
+
+    handleCircleDragEnd() {
+        console.log('handleCircleDragEnd');
+    }
+
+    handleCircleDragEnter() {
+        console.log('handleCircleDragEnter');
+    }
+
+    handleCircleDragLeave() {
+        console.log('handleCircleDragLeave');
+    }
+
+    enableArrowMode() {
+        console.log('enableArrowMode');
+
+        let c = this.$element.find('circle');
+        c.on('dragstart', this.handleCircleDragStart);
+        c.on('dragend', this.handleCircleDragEnd);
+        c.on('dragenter', this.handleCircleDragEnter);
+        c.on('dragleave', this.handleCircleDragLeave);
+    }
+
+    disableArrowMode() {
+        console.log('disableArrowMode');
+
+        let c = this.$element.find('circle');
+        c.on('dragstart', this.handleCircleDragStart);
+        c.on('dragend', this.handleCircleDragEnd);
+        c.on('dragenter', this.handleCircleDragEnter);
+        c.on('dragleave', this.handleCircleDragLeave);
     }
 
 }
