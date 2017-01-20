@@ -34,6 +34,19 @@ PDFAnnotate.setStoreAdapter(new PDFAnnotate.PdfannoStoreAdapter());
 window.addEventListener('pagerendered', function(ev) {
     console.log('pagerendered:', ev.detail.pageNumber);
     renderAnno();
+
+    // Issue Fix.
+    // Correctly rendering when changing scaling.
+    // The margin between pages is fixed(9px), and never be scaled in default,
+    // then manually have to change the margin.
+    let scale = PDFView.pdfViewer.getPageView(0).viewport.scale;
+    let borderWidth = `${9 * scale}px`;
+    let marginBottom = `${-8 * scale}px`;
+    $('.page').css({
+        'border-top-width' : borderWidth,
+        'border-bottom-width' : borderWidth,
+        'margin-bottom': marginBottom
+    });
 });
 
 // Adapt to scale change.

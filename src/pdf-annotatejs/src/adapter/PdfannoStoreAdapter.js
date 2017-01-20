@@ -404,115 +404,15 @@ function _createContainerFromJson(json, color, isPrimary) {
         let rel2s = annotations.filter(a => a.key === data[3]);
         let rel2 = rel2s[0];
 
-
-        // Find highlights.
-        // let rel1s = annotations.filter(a => {
-        //   return a.key === data[2];
-        // });
-        // let rel1 = rel1s[0];
-        // let rel2s = annotations.filter(a => {
-        //   return a.key === data[3];
-        // });
-        // let rel2 = rel2s[0];
-
-        // Specify startPosition and endPosition.
-        // let x1, y1, x2, y2, page1, page2;
-        // if (rel1.type === 'highlight') {
-        //   x1 = rel1.rectangles[0].x;
-        //   y1 = rel1.rectangles[0].y - 5;
-        //   page1 = rel1.rectangles[0].page;
-        // } else {
-        //   x1 = rel1.x;
-        //   y1 = rel1.y - 5;          
-        //   page1 = rel1.page;
-        // }
-        // if (rel2.type === 'highlight') {
-        //   x2 = rel2.rectangles[0].x;
-        //   y2 = rel2.rectangles[0].y - 5;   
-        //   page2 = rel2.rectangles[0].page;       
-        // } else {
-        //   x2 = rel2.x;
-        //   y2 = rel2.y - 5;
-        //   page2 = rel2.page;
-        // }
-
-        // let textPage = page1;
-
-        // Specify textbox position.
-        // let svg = document.querySelector('.annotationLayer');
-        // let svg = document.getElementById('annoLayer'); // TODO make it const.
-        // let p = scaleUp(svg, { x1, y1, x2, y2 });
-        // let rect = svg.getBoundingClientRect();
-        // p.x1 -= rect.left;
-        // p.y1 -= rect.top;
-        // p.x2 -= rect.left;
-        // p.y2 -= rect.top;
-        // let textPosition = scaleDown(svg, getRelationTextPosition(svg, p.x1, p.y1, p.x2, p.y2));
-
-        // if (page1 !== page2) {
-
-        //   console.log('y1,y2=', y1, y2, page1, page2);
-
-        //   let y1Tmp = convertFromExportY(page1, y1);
-        //   let y2Tmp = convertFromExportY(page2, y2);
-
-        //   console.log('y1,y2=', y1Tmp, y2Tmp);
-
-        //   // Specify textbox position.
-        //   // let svg = document.querySelector('.annotationLayer');
-        //   let svg = document.getElementById('annoLayer'); // TODO make it const.
-        //   let p = scaleUp(svg, { x1, y1Tmp, x2, y2Tmp });
-        //   let rect = svg.getBoundingClientRect();
-        //   p.x1 -= rect.left;
-        //   p.y1Tmp -= rect.top;
-        //   p.x2 -= rect.left;
-        //   p.y2Tmp -= rect.top;
-        //   textPosition = scaleDown(svg, getRelationTextPosition(svg, p.x1, p.y1Tmp, p.x2, p.y2Tmp));
-
-        //   let { y, pageNumber } = convertToExportY(textPosition.y);
-        //   textPosition.y = y;
-        //   textPage = pageNumber;
-        // }
-
-        // Add textbox and get the uuid of if.
-        // let textId = null;
-        // let textContent = data[4];
-        // if (textContent) {
-
-        //   textId = uuid();
-        //   annotations.push({
-        //     class      : 'Annotation',
-        //     type       : 'textbox',
-        //     uuid       : textId,
-        //     page       : textPage,
-        //     x          : textPosition.x,
-        //     y          : textPosition.y,
-        //     content    : textContent,
-        //     readOnly,
-        //     color
-        //   });          
-        // }
-
-        // let pageNumber = data[0];
-
         // Add arrow.
         annotations.push({
           class      : 'Annotation',
           type       : 'arrow',
           direction  : data[1],
           uuid       : uuid(),
-          // page       : data[0],
-          // x1,
-          // y1,
-          // x2,
-          // y2,
-          // page1,
-          // page2,
-          // text       : textId,
           text : data[4],
           rel1       : rel1.uuid,
           rel2       : rel2.uuid,
-          // color      : "FF0000",         // TODO 要る？
           readOnly,
           color
         });
@@ -528,6 +428,10 @@ function getPageSize() {
   let viewBox = PDFView.pdfViewer.getPageView(0).viewport.viewBox;
   let size = { width : viewBox[2], height : viewBox[3] };
   return size;
+}
+
+function getPageScale() {
+  return PDFView.pdfViewer.getPageView(0).viewport.scale;
 }
 
 function transformToRenderCoordinate(annotation) {
@@ -548,10 +452,12 @@ function transformToRenderCoordinate(annotation) {
     annotation.y = convertFromExportY(annotation.page, annotation.y);
   }
 
+  // TODO Remove?
   if (annotation.y1) {
     annotation.y1 = convertFromExportY(annotation.page1, annotation.y1);
   }
 
+  // TODO Remove?
   if (annotation.y2) {
     annotation.y2 = convertFromExportY(annotation.page2, annotation.y2);
   }
@@ -727,28 +633,38 @@ function findAnnotation(documentId, annotationId) {
   return index;
 }
 
-const paddingTop = 0;
+const paddingTop = 9;
 const paddingBetweenPages = 9;
 
-function convertToExportY(y, meta) {
+function convertToExportY(y) {
 
-  meta = getPageSize();
+  let meta = getPageSize();
 
   y -= paddingTop;
 
-  let pageNumber = Math.floor(y / meta.height) + 1;
-  let yInPage = y - (pageNumber-1) * (meta.height + paddingBetweenPages);
+  let pageHeight = meta.height + paddingBetweenPages;
+
+  let pageNumber = Math.floor(y / pageHeight) + 1;
+  let yInPage = y - (pageNumber-1) * pageHeight;
 
   return { pageNumber, y : yInPage };
 }
 
-function convertFromExportY(pageNumber, yInPage, meta) {
+function convertFromExportY(pageNumber, yInPage) {
 
-  meta = getPageSize();
+  let meta = getPageSize();
 
   let y = yInPage + paddingTop;
+  // console.log('y1:', y);
 
-  y += (pageNumber - 1) * (meta.height + paddingBetweenPages);
+  let pagePadding = paddingBetweenPages;
+
+  y += (pageNumber - 1) * (meta.height + pagePadding);
+  // console.log('y2:', y);
+
+  // test.
+  // y += pageNumber * paddingBetweenPages * (1 - getPageScale());
+  // console.log('y3:', y);
 
   return y;
 }

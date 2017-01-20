@@ -32,6 +32,8 @@ let svg;
 
 let boundingCircles = [];
 
+let hitCircle = null;
+
 /**
  * Handle document.mousedown event
  *
@@ -46,7 +48,9 @@ function handleDocumentMousedown(e) {
     arrowAnnotation.readOnly = false;
 
     document.addEventListener('mouseup', handleDocumentMouseup);
-    document.addEventListener('mousemove', handleDocumentMousemove);    
+    // document.addEventListener('mousemove', handleDocumentMousemove);    
+
+    dragging = true;
   }
 
 }
@@ -66,10 +70,23 @@ function getClientXY(e) {
  */
 function handleDocumentMousemove(e) {
 
-  let p = scaleDown(getClientXY(e));
-  arrowAnnotation.x2 = p.x;
-  arrowAnnotation.y2 = p.y;
-  arrowAnnotation.render();
+  if (dragging) {
+    let p = scaleDown(getClientXY(e));
+    arrowAnnotation.x2 = p.x;
+    arrowAnnotation.y2 = p.y;
+    arrowAnnotation.render();    
+  }
+
+  // Hover visual event.
+  let circle = findHitBoundingCircle(e);
+  if (!hitCircle && circle) {
+    hitCircle = circle;
+    $(hitCircle).addClass('--hover');
+  
+  } else if (hitCircle && !circle) {
+    $(hitCircle).removeClass('--hover');
+    hitCircle = null;
+  }
 
 }
 
@@ -104,8 +121,10 @@ function isCircleHit(pos, element) {
  */
 function handleDocumentMouseup(e) {
 
+  dragging = false;
+
   document.removeEventListener('mouseup', handleDocumentMouseup);
-  document.removeEventListener('mousemove', handleDocumentMousemove);
+  // document.removeEventListener('mousemove', handleDocumentMousemove);
 
   // FIXME use drag and drop event, it may be better.
 
@@ -211,6 +230,7 @@ export function enableArrow(arrowType='one-way') {
   disableTextlayer();
 
   document.addEventListener('mousedown', handleDocumentMousedown);
+  document.addEventListener('mousemove', handleDocumentMousemove);
 
   window.annotationContainer.getAllAnnotations().forEach(a => {
 
@@ -227,6 +247,8 @@ export function enableArrow(arrowType='one-way') {
       }
     }
 
+    // a.enableArrowMode();
+
   });
 
 }
@@ -239,6 +261,7 @@ export function disableArrow() {
 
   _enabled = false;
   document.removeEventListener('mousedown', handleDocumentMousedown);
+  document.removeEventListener('mousemove', handleDocumentMousemove);
 
   enableUserSelect();
   enableTextlayer();
@@ -258,6 +281,8 @@ export function disableArrow() {
       }
 
     }
+
+    // a.disableArrowMode();
 
   });
 

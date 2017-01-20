@@ -119,6 +119,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	window.addEventListener('pagerendered', function (ev) {
 	    console.log('pagerendered:', ev.detail.pageNumber);
 	    renderAnno();
+	
+	    // Issue Fix.
+	    // Correctly rendering when changing scaling.
+	    // The margin between pages is fixed(9px), and never be scaled in default,
+	    // then manually have to change the margin.
+	    var scale = PDFView.pdfViewer.getPageView(0).viewport.scale;
+	    var borderWidth = 9 * scale + 'px';
+	    var marginBottom = -8 * scale + 'px';
+	    (0, _jquery2.default)('.page').css({
+	        'border-top-width': borderWidth,
+	        'border-bottom-width': borderWidth,
+	        'margin-bottom': marginBottom
+	    });
 	});
 	
 	// Adapt to scale change.
@@ -12248,114 +12261,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 	        var rel2 = rel2s[0];
 	
-	        // Find highlights.
-	        // let rel1s = annotations.filter(a => {
-	        //   return a.key === data[2];
-	        // });
-	        // let rel1 = rel1s[0];
-	        // let rel2s = annotations.filter(a => {
-	        //   return a.key === data[3];
-	        // });
-	        // let rel2 = rel2s[0];
-	
-	        // Specify startPosition and endPosition.
-	        // let x1, y1, x2, y2, page1, page2;
-	        // if (rel1.type === 'highlight') {
-	        //   x1 = rel1.rectangles[0].x;
-	        //   y1 = rel1.rectangles[0].y - 5;
-	        //   page1 = rel1.rectangles[0].page;
-	        // } else {
-	        //   x1 = rel1.x;
-	        //   y1 = rel1.y - 5;          
-	        //   page1 = rel1.page;
-	        // }
-	        // if (rel2.type === 'highlight') {
-	        //   x2 = rel2.rectangles[0].x;
-	        //   y2 = rel2.rectangles[0].y - 5;   
-	        //   page2 = rel2.rectangles[0].page;       
-	        // } else {
-	        //   x2 = rel2.x;
-	        //   y2 = rel2.y - 5;
-	        //   page2 = rel2.page;
-	        // }
-	
-	        // let textPage = page1;
-	
-	        // Specify textbox position.
-	        // let svg = document.querySelector('.annotationLayer');
-	        // let svg = document.getElementById('annoLayer'); // TODO make it const.
-	        // let p = scaleUp(svg, { x1, y1, x2, y2 });
-	        // let rect = svg.getBoundingClientRect();
-	        // p.x1 -= rect.left;
-	        // p.y1 -= rect.top;
-	        // p.x2 -= rect.left;
-	        // p.y2 -= rect.top;
-	        // let textPosition = scaleDown(svg, getRelationTextPosition(svg, p.x1, p.y1, p.x2, p.y2));
-	
-	        // if (page1 !== page2) {
-	
-	        //   console.log('y1,y2=', y1, y2, page1, page2);
-	
-	        //   let y1Tmp = convertFromExportY(page1, y1);
-	        //   let y2Tmp = convertFromExportY(page2, y2);
-	
-	        //   console.log('y1,y2=', y1Tmp, y2Tmp);
-	
-	        //   // Specify textbox position.
-	        //   // let svg = document.querySelector('.annotationLayer');
-	        //   let svg = document.getElementById('annoLayer'); // TODO make it const.
-	        //   let p = scaleUp(svg, { x1, y1Tmp, x2, y2Tmp });
-	        //   let rect = svg.getBoundingClientRect();
-	        //   p.x1 -= rect.left;
-	        //   p.y1Tmp -= rect.top;
-	        //   p.x2 -= rect.left;
-	        //   p.y2Tmp -= rect.top;
-	        //   textPosition = scaleDown(svg, getRelationTextPosition(svg, p.x1, p.y1Tmp, p.x2, p.y2Tmp));
-	
-	        //   let { y, pageNumber } = convertToExportY(textPosition.y);
-	        //   textPosition.y = y;
-	        //   textPage = pageNumber;
-	        // }
-	
-	        // Add textbox and get the uuid of if.
-	        // let textId = null;
-	        // let textContent = data[4];
-	        // if (textContent) {
-	
-	        //   textId = uuid();
-	        //   annotations.push({
-	        //     class      : 'Annotation',
-	        //     type       : 'textbox',
-	        //     uuid       : textId,
-	        //     page       : textPage,
-	        //     x          : textPosition.x,
-	        //     y          : textPosition.y,
-	        //     content    : textContent,
-	        //     readOnly,
-	        //     color
-	        //   });          
-	        // }
-	
-	        // let pageNumber = data[0];
-	
 	        // Add arrow.
 	        _annotations.push({
 	          class: 'Annotation',
 	          type: 'arrow',
 	          direction: data[1],
 	          uuid: (0, _uuid2.default)(),
-	          // page       : data[0],
-	          // x1,
-	          // y1,
-	          // x2,
-	          // y2,
-	          // page1,
-	          // page2,
-	          // text       : textId,
 	          text: data[4],
 	          rel1: rel1.uuid,
 	          rel2: rel2.uuid,
-	          // color      : "FF0000",         // TODO 要る？
 	          readOnly: readOnly,
 	          color: color
 	        });
@@ -12376,6 +12290,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return size;
 	}
 	
+	function getPageScale() {
+	  return PDFView.pdfViewer.getPageView(0).viewport.scale;
+	}
+	
 	function transformToRenderCoordinate(annotation) {
 	
 	  var _type = 'render';
@@ -12393,10 +12311,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    annotation.y = convertFromExportY(annotation.page, annotation.y);
 	  }
 	
+	  // TODO Remove?
 	  if (annotation.y1) {
 	    annotation.y1 = convertFromExportY(annotation.page1, annotation.y1);
 	  }
 	
+	  // TODO Remove?
 	  if (annotation.y2) {
 	    annotation.y2 = convertFromExportY(annotation.page2, annotation.y2);
 	  }
@@ -12591,28 +12511,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return index;
 	}
 	
-	var paddingTop = 0;
+	var paddingTop = 9;
 	var paddingBetweenPages = 9;
 	
-	function convertToExportY(y, meta) {
+	function convertToExportY(y) {
 	
-	  meta = getPageSize();
+	  var meta = getPageSize();
 	
 	  y -= paddingTop;
 	
-	  var pageNumber = Math.floor(y / meta.height) + 1;
-	  var yInPage = y - (pageNumber - 1) * (meta.height + paddingBetweenPages);
+	  var pageHeight = meta.height + paddingBetweenPages;
+	
+	  var pageNumber = Math.floor(y / pageHeight) + 1;
+	  var yInPage = y - (pageNumber - 1) * pageHeight;
 	
 	  return { pageNumber: pageNumber, y: yInPage };
 	}
 	
-	function convertFromExportY(pageNumber, yInPage, meta) {
+	function convertFromExportY(pageNumber, yInPage) {
 	
-	  meta = getPageSize();
+	  var meta = getPageSize();
 	
 	  var y = yInPage + paddingTop;
+	  // console.log('y1:', y);
 	
-	  y += (pageNumber - 1) * (meta.height + paddingBetweenPages);
+	  var pagePadding = paddingBetweenPages;
+	
+	  y += (pageNumber - 1) * (meta.height + pagePadding);
+	  // console.log('y2:', y);
+	
+	  // test.
+	  // y += pageNumber * paddingBetweenPages * (1 - getPageScale());
+	  // console.log('y3:', y);
 	
 	  return y;
 	}
@@ -13727,8 +13657,15 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 23 */
 /***/ function(module, exports) {
 
+	/*
+	object-assign
+	(c) Sindre Sorhus
+	@license MIT
+	*/
+	
 	'use strict';
 	/* eslint-disable no-unused-vars */
+	var getOwnPropertySymbols = Object.getOwnPropertySymbols;
 	var hasOwnProperty = Object.prototype.hasOwnProperty;
 	var propIsEnumerable = Object.prototype.propertyIsEnumerable;
 	
@@ -13749,7 +13686,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			// Detect buggy property enumeration order in older V8 versions.
 	
 			// https://bugs.chromium.org/p/v8/issues/detail?id=4118
-			var test1 = new String('abc');  // eslint-disable-line
+			var test1 = new String('abc');  // eslint-disable-line no-new-wrappers
 			test1[5] = 'de';
 			if (Object.getOwnPropertyNames(test1)[0] === '5') {
 				return false;
@@ -13778,7 +13715,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			}
 	
 			return true;
-		} catch (e) {
+		} catch (err) {
 			// We don't expect any of the above to throw, but better to be safe.
 			return false;
 		}
@@ -13798,8 +13735,8 @@ return /******/ (function(modules) { // webpackBootstrap
 				}
 			}
 	
-			if (Object.getOwnPropertySymbols) {
-				symbols = Object.getOwnPropertySymbols(from);
+			if (getOwnPropertySymbols) {
+				symbols = getOwnPropertySymbols(from);
 				for (var i = 0; i < symbols.length; i++) {
 					if (propIsEnumerable.call(from, symbols[i])) {
 						to[symbols[i]] = from[symbols[i]];
@@ -14456,8 +14393,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      color = '#F00';
 	    }
 	  }
-	
-	  console.log('color:', color);
 	
 	  // <svg viewBox="0 0 200 200">
 	  //     <marker id="m_ar" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="strokeWidth" preserveAspectRatio="none" markerWidth="2" markerHeight="3" orient="auto-start-reverse">
@@ -15838,15 +15773,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    _createClass(RectAnnotation, [{
 	        key: 'setHoverEvent',
-	
-	
-	        // render() {
-	        //      this.$element.remove();
-	        //      this.$element = $(appendChild(getSVGLayer(), this));
-	        //      this.setHoverEvent();
-	        //      this.textAnnotation.render();
-	        // }
-	
 	        value: function setHoverEvent() {
 	            this.$element.find('rect, circle').hover(this.handleHoverInEvent, this.handleHoverOutEvent);
 	        }
@@ -15943,7 +15869,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'highlight',
 	        value: function highlight() {
-	            this.$element.find('rect, text').addClass('--hover');
+	            this.$element.find('rect, text, circle').addClass('--hover');
 	            this.$element.addClass('--emphasis');
 	            this.textAnnotation.highlight();
 	            // this.emit('hoverin');
@@ -15951,7 +15877,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'dehighlight',
 	        value: function dehighlight() {
-	            this.$element.find('rect, text').removeClass('--hover');
+	            this.$element.find('rect, text, circle').removeClass('--hover');
 	            this.$element.removeClass('--emphasis');
 	            this.textAnnotation.dehighlight();
 	            // this.emit('hoverout');
@@ -16116,6 +16042,48 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.$element.find('.anno-rect, circle').off('mousedown', this.handleMouseDownOnRect);
 	            this.textAnnotation.disableViewMode();
 	        }
+	    }, {
+	        key: 'handleCircleDragStart',
+	        value: function handleCircleDragStart() {
+	            console.log('handleCircleDragStart');
+	        }
+	    }, {
+	        key: 'handleCircleDragEnd',
+	        value: function handleCircleDragEnd() {
+	            console.log('handleCircleDragEnd');
+	        }
+	    }, {
+	        key: 'handleCircleDragEnter',
+	        value: function handleCircleDragEnter() {
+	            console.log('handleCircleDragEnter');
+	        }
+	    }, {
+	        key: 'handleCircleDragLeave',
+	        value: function handleCircleDragLeave() {
+	            console.log('handleCircleDragLeave');
+	        }
+	    }, {
+	        key: 'enableArrowMode',
+	        value: function enableArrowMode() {
+	            console.log('enableArrowMode');
+	
+	            var c = this.$element.find('circle');
+	            c.on('dragstart', this.handleCircleDragStart);
+	            c.on('dragend', this.handleCircleDragEnd);
+	            c.on('dragenter', this.handleCircleDragEnter);
+	            c.on('dragleave', this.handleCircleDragLeave);
+	        }
+	    }, {
+	        key: 'disableArrowMode',
+	        value: function disableArrowMode() {
+	            console.log('disableArrowMode');
+	
+	            var c = this.$element.find('circle');
+	            c.on('dragstart', this.handleCircleDragStart);
+	            c.on('dragend', this.handleCircleDragEnd);
+	            c.on('dragenter', this.handleCircleDragEnter);
+	            c.on('dragleave', this.handleCircleDragLeave);
+	        }
 	    }], [{
 	        key: 'newInstance',
 	        value: function newInstance(annotation) {
@@ -16244,7 +16212,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	  value: true
+	    value: true
 	});
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -16271,52 +16239,62 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 */
 	var AbstractAnnotation = function (_EventEmitter) {
-	  _inherits(AbstractAnnotation, _EventEmitter);
+	    _inherits(AbstractAnnotation, _EventEmitter);
 	
-	  function AbstractAnnotation() {
-	    _classCallCheck(this, AbstractAnnotation);
+	    function AbstractAnnotation() {
+	        _classCallCheck(this, AbstractAnnotation);
 	
-	    var _this = _possibleConstructorReturn(this, (AbstractAnnotation.__proto__ || Object.getPrototypeOf(AbstractAnnotation)).call(this));
+	        var _this = _possibleConstructorReturn(this, (AbstractAnnotation.__proto__ || Object.getPrototypeOf(AbstractAnnotation)).call(this));
 	
-	    _this.autoBind();
-	    return _this;
-	  }
-	
-	  /**
-	   * クラスのメソッドのthisをクラスインスタンスにバインドします。
-	   */
-	
-	
-	  _createClass(AbstractAnnotation, [{
-	    key: 'autoBind',
-	    value: function autoBind() {
-	      var _this2 = this;
-	
-	      Object.getOwnPropertyNames(this.constructor.prototype).filter(function (prop) {
-	        return typeof _this2[prop] === 'function';
-	      }).forEach(function (method) {
-	        _this2[method] = _this2[method].bind(_this2);
-	      });
+	        _this.autoBind();
+	        return _this;
 	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      this.$element.remove();
-	      this.$element = $((0, _appendChild2.default)((0, _utils.getSVGLayer)(), this));
-	      this.setHoverEvent && this.setHoverEvent();
-	      this.textAnnotation && this.textAnnotation.render();
-	      if (window.viewMode) {
-	        this.$element.addClass('--viewMode');
-	      }
-	    }
-	  }, {
-	    key: 'hasBoundingCircle',
-	    value: function hasBoundingCircle() {
-	      return this.$element.find('circle').length > 0;
-	    }
-	  }]);
 	
-	  return AbstractAnnotation;
+	    /**
+	     * クラスのメソッドのthisをクラスインスタンスにバインドします。
+	     */
+	
+	
+	    _createClass(AbstractAnnotation, [{
+	        key: 'autoBind',
+	        value: function autoBind() {
+	            var _this2 = this;
+	
+	            Object.getOwnPropertyNames(this.constructor.prototype).filter(function (prop) {
+	                return typeof _this2[prop] === 'function';
+	            }).forEach(function (method) {
+	                _this2[method] = _this2[method].bind(_this2);
+	            });
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            this.$element.remove();
+	            this.$element = $((0, _appendChild2.default)((0, _utils.getSVGLayer)(), this));
+	            this.setHoverEvent && this.setHoverEvent();
+	            this.textAnnotation && this.textAnnotation.render();
+	            if (window.viewMode) {
+	                this.$element.addClass('--viewMode');
+	            }
+	        }
+	    }, {
+	        key: 'hasBoundingCircle',
+	        value: function hasBoundingCircle() {
+	            return this.$element.find('circle').length > 0;
+	        }
+	    }, {
+	        key: 'enableArrowMode',
+	        value: function enableArrowMode() {
+	            // Implement in a child.
+	        }
+	    }, {
+	        key: 'disableArrowMode',
+	        value: function disableArrowMode() {
+	            // Implement in a child.
+	        }
+	    }]);
+	
+	    return AbstractAnnotation;
 	}(_events2.default);
 	
 	exports.default = AbstractAnnotation;
@@ -17007,6 +16985,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var boundingCircles = [];
 	
+	var hitCircle = null;
+	
 	/**
 	 * Handle document.mousedown event
 	 *
@@ -17021,7 +17001,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    arrowAnnotation.readOnly = false;
 	
 	    document.addEventListener('mouseup', handleDocumentMouseup);
-	    document.addEventListener('mousemove', handleDocumentMousemove);
+	    // document.addEventListener('mousemove', handleDocumentMousemove);    
+	
+	    dragging = true;
 	  }
 	}
 	
@@ -17040,10 +17022,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function handleDocumentMousemove(e) {
 	
-	  var p = (0, _utils.scaleDown)(getClientXY(e));
-	  arrowAnnotation.x2 = p.x;
-	  arrowAnnotation.y2 = p.y;
-	  arrowAnnotation.render();
+	  if (dragging) {
+	    var p = (0, _utils.scaleDown)(getClientXY(e));
+	    arrowAnnotation.x2 = p.x;
+	    arrowAnnotation.y2 = p.y;
+	    arrowAnnotation.render();
+	  }
+	
+	  // Hover visual event.
+	  var circle = findHitBoundingCircle(e);
+	  if (!hitCircle && circle) {
+	    hitCircle = circle;
+	    (0, _jquery2.default)(hitCircle).addClass('--hover');
+	  } else if (hitCircle && !circle) {
+	    (0, _jquery2.default)(hitCircle).removeClass('--hover');
+	    hitCircle = null;
+	  }
 	}
 	
 	function findHitBoundingCircle(e) {
@@ -17077,8 +17071,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function handleDocumentMouseup(e) {
 	
+	  dragging = false;
+	
 	  document.removeEventListener('mouseup', handleDocumentMouseup);
-	  document.removeEventListener('mousemove', handleDocumentMousemove);
+	  // document.removeEventListener('mousemove', handleDocumentMousemove);
 	
 	  // FIXME use drag and drop event, it may be better.
 	
@@ -17185,6 +17181,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  disableTextlayer();
 	
 	  document.addEventListener('mousedown', handleDocumentMousedown);
+	  document.addEventListener('mousemove', handleDocumentMousemove);
 	
 	  window.annotationContainer.getAllAnnotations().forEach(function (a) {
 	
@@ -17199,6 +17196,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        a.on('circlehoverout', handleBoundingCircleHoverOut);
 	      }
 	    }
+	
+	    // a.enableArrowMode();
 	  });
 	}
 	
@@ -17212,6 +17211,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  _enabled = false;
 	  document.removeEventListener('mousedown', handleDocumentMousedown);
+	  document.removeEventListener('mousemove', handleDocumentMousemove);
 	
 	  (0, _utils.enableUserSelect)();
 	  enableTextlayer();
@@ -17229,6 +17229,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        a.removeListener('circlehoverout', handleBoundingCircleHoverOut);
 	      }
 	    }
+	
+	    // a.disableArrowMode();
 	  });
 	}
 
@@ -17553,7 +17555,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'rel1Annotation',
 	        set: function set(a) {
-	            console.log('setRel1Annotation:', a);
 	            this._rel1Annotation = a;
 	            if (this._rel1Annotation) {
 	                this._rel1Annotation.on('hoverin', this.handleRelHoverIn);
@@ -17568,7 +17569,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'rel2Annotation',
 	        set: function set(a) {
-	            console.log('setRel2Annotation');
 	            this._rel2Annotation = a;
 	            if (this._rel2Annotation) {
 	                this._rel2Annotation.on('hoverin', this.handleRelHoverIn);

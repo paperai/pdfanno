@@ -29,8 +29,6 @@ export function createArrow(a, id=null) {
     }    
   }
 
-  console.log('color:', color);
-
 
 // <svg viewBox="0 0 200 200">
 //     <marker id="m_ar" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="strokeWidth" preserveAspectRatio="none" markerWidth="2" markerHeight="3" orient="auto-start-reverse">
