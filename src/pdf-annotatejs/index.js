@@ -141,11 +141,11 @@ function renderAnnotations(svg, pageNumber) {
                 } else if (a.type === 'highlight') {
                     let highlight = HighlightAnnotation.newInstance(a);
                     highlight.render();
-                    window.annotationContainer.add(highlight);                
+                    window.annotationContainer.add(highlight);
                 } else if (a.type === 'arrow') {
                     let arrowAnnotation = ArrowAnnotation.newInstance(a);
                     arrowAnnotation.render();
-                    window.annotationContainer.add(arrowAnnotation);                
+                    window.annotationContainer.add(arrowAnnotation);
                 } else {
                     appendChild(svg, a);
                 }
@@ -162,10 +162,7 @@ function renderAnnotations(svg, pageNumber) {
 }
 
 function setupPDFDragAndDropLoader() {
-
-    let element = document.querySelector('body');
-
-    $(element)
+    $('body')
         .off('dragover', handleDragOver).on('dragover', handleDragOver)
         .off('drop', handleDroppedFile).on('drop', handleDroppedFile);
 }
@@ -173,19 +170,22 @@ setupPDFDragAndDropLoader();
 
 function handleDroppedFile(e) {
 
+    // console.log('aaa', e.originalEvent.dataTransfer.files[0]);
+    let file = e.originalEvent.dataTransfer.files[0];
+
     var event = document.createEvent('CustomEvent');
-    event.initCustomEvent('pdfdropped', true, true, { originalEvent: e.originalEvent });
+    // event.initCustomEvent('pdfdropped', true, true, { originalEvent: e.originalEvent });
+    event.initCustomEvent('pdfdropped', true, true, { file: file });
     window.dispatchEvent(event);
 
     return cancelEvent(e);
 }
 
 function handleDragOver(e) {
-
     // This is the setting to allow D&D for Firefox.
     // @see https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/effectAllowed
     e.originalEvent.dataTransfer.effectAllowed = 'move';
-
+    // Prevent default.
     return cancelEvent(e);
 }
 
