@@ -1,6 +1,5 @@
 import PDFJSAnnotate from '../PDFJSAnnotate';
 import appendChild from './appendChild';
-import renderScreenReaderHints from '../a11y/renderScreenReaderHints';
 
 /**
  * Render the response from PDFJSAnnotate.getStoreAdapter().getAnnotations to SVG
@@ -16,7 +15,7 @@ import renderScreenReaderHints from '../a11y/renderScreenReaderHints';
 export default function render(svg, viewport, data) {
   return new Promise((resolve, reject) => {
     // Reset the content of the SVG
-    svg.innerHTML = ''; 
+    svg.innerHTML = '';
     svg.setAttribute('data-pdf-annotate-container', true);
     svg.setAttribute('data-pdf-annotate-viewport', JSON.stringify(viewport));
     svg.removeAttribute('data-pdf-annotate-document');
@@ -29,7 +28,7 @@ export default function render(svg, viewport, data) {
 
     svg.setAttribute('data-pdf-annotate-document', data.documentId);
     svg.setAttribute('data-pdf-annotate-page', data.pageNumber);
-  
+
     // Make sure annotations is an array
     if (!Array.isArray(data.annotations) || data.annotations.length === 0) {
       return resolve(svg);
