@@ -24,7 +24,6 @@ function adjustViewerSize() {
 function disableAnnotateTools() {
     window.iframeWindow.PDFAnnotate.UI.disableRect();
     window.iframeWindow.PDFAnnotate.UI.disableHighlight();
-    window.iframeWindow.PDFAnnotate.UI.disableText();
     window.iframeWindow.PDFAnnotate.UI.disableArrow();
     window.iframeWindow.PDFAnnotate.UI.disableViewMode();
 }
@@ -32,7 +31,6 @@ function disableAnnotateTools() {
 /**
     Set the behavior of the tool buttons for annotations.
 */
-let _viewMode = false;
 function initializeAnnoToolButtons() {
 
     $('.js-tool-btn').off('click').on('click', (e) => {
@@ -45,10 +43,7 @@ function initializeAnnoToolButtons() {
 
         disableAnnotateTools();
 
-        _viewMode = false;
-
         if (type === 'view') {
-            _viewMode = true;
             window.iframeWindow.PDFAnnotate.UI.enableViewMode();
         
         } else if (type === 'highlight') {
@@ -93,6 +88,9 @@ function initializeAnnoToolButtons() {
     $('.js-tool-btn[data-type="view"]').click();
 }
 
+/**
+ * Export the primary annotation data for download.
+ */
 function downloadAnnotation() {
 
     window.iframeWindow.PDFAnnotate.getStoreAdapter().exportData().then(annotations => {
@@ -110,6 +108,9 @@ function downloadAnnotation() {
     unlistenWindowLeaveEvent();
 }
 
+/**
+ * Reload PDF Viewer.
+ */
 function reloadPDFViewer() {
 
     // Reload pdf.js.
@@ -125,6 +126,7 @@ function reloadPDFViewer() {
  */
 function deleteAllAnnotations() {
 
+    // Comfirm to user.
     let userAnswer = window.confirm('Are you sure to clear the current annotations?');
     if (!userAnswer) {
         return;
@@ -132,63 +134,13 @@ function deleteAllAnnotations() {
 
     let documentId = window.iframeWindow.getFileName(window.iframeWindow.PDFView.url);
     window.iframeWindow.PDFAnnotate.getStoreAdapter().deleteAnnotations(documentId).then(() => {
-
         reloadPDFViewer();        
     });
 }
 
 /**
-    Set the behaviors of file inputs.
-*/
-let _primaryAnnotation = null;
-let _secondaryAnnotations = [];
-function initializeFileUploader() {
-    setupPrimaryAnnotationButton();
-    setupSecondaryAnnotationButton();
-}
-
-function setupPrimaryAnnotationButton() {
-
-    // The primary annotations.
-    $('#primary-anno').off('change').on('change', e => {
-
-        let files = e.target.files;
-        if (!files || files.length === 0) {
-            return;
-        }
-
-        let file = files[0];
-
-        let fileReader = new FileReader();
-        fileReader.onload = event => {
-            _primaryAnnotation = event.target.result;
-        }
-        fileReader.readAsText(file);
-
-    });
-}
-
-function setupSecondaryAnnotationButton() {
-    // The secondary annotations.
-    $('#secondary-anno').off('change').on('change', e => {
-
-        let files = e.target.files;
-        if (!files || files.length === 0) {
-            return;
-        }
-
-        _secondaryAnnotations = [];
-
-        Array.prototype.forEach.call(files, file => {
-            let fileReader = new FileReader();
-            fileReader.onload = event => {
-                _secondaryAnnotations.push(JSON.parse(event.target.result));
-            }
-            fileReader.readAsText(file);
-        });
-    });
-}
-
+ * Set the behavior of loading a PDF file via drag & drop action.
+ */
 function setupPDFDragAndDropLoader() {
 
     let element = document.querySelector('.js-viewer-root');
@@ -220,8 +172,6 @@ function handleDroppedFile(e) {
     }
 
     e = e.originalEvent || e;
-
-    console.log('aaaaaaaaaaa', e, e.dataTransfer);
 
     let element = e.target;
     let file = e.dataTransfer.files[0];
@@ -262,7 +212,6 @@ function handleDragLeave(e) {
     return cancelEvent(e);
 }
 
-let timer = null;
 function handleDragOver(e) {
 
     e = e.originalEvent || e;
@@ -273,19 +222,10 @@ function handleDragOver(e) {
     // @see https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/effectAllowed
     e.dataTransfer.effectAllowed = 'move';
 
-    // $('#viewer').addClass('-active');
-
-    // if (timer) {
-    //     clearTimeout(timer);
-    // }
-    // timer = setTimeout(() => {
-    //     $('#viewer').removeClass('-active');
-    //     timer = null;
-    // }, 1000);
-
     return cancelEvent(e);
 }
 
+let timer = null;
 function handleDragOverFromViewer() {
     $('#viewer').addClass('-active');
 
@@ -342,10 +282,10 @@ function displayAnnotation(e) {
 
     let updateTarget = $(e.target).attr('name');
 
-    // Primary annotation index.
+    // Get the primary index which indicates the editable annotation.
     let primaryIndex = parseInt($('.js-anno-radio:checked').val(), 10);
 
-    // Visibilities.
+    // Get annotation visibilities.
     let visibilities = [
         $('.js-anno-visibility').eq(0).is(':checked'),
         $('.js-anno-visibility').eq(1).is(':checked'),
@@ -353,7 +293,7 @@ function displayAnnotation(e) {
         $('.js-anno-visibility').eq(3).is(':checked'),
     ];
     
-    // Annotation color.
+    // Get annotation colors.
     let colors = [
         $('.js-anno-palette').eq(0).spectrum('get').toHexString(),
         $('.js-anno-palette').eq(1).spectrum('get').toHexString(),
@@ -361,7 +301,7 @@ function displayAnnotation(e) {
         $('.js-anno-palette').eq(3).spectrum('get').toHexString()
     ];
 
-    // Annotation files.
+    // Get annotation data.
     let actions = [];
     $('.js-anno-file').each(function() {
         let files = this.files;
@@ -437,22 +377,15 @@ function startApplication() {
         // Initialize tool buttons' behavior.
         initializeAnnoToolButtons();
 
-        // Set the behaviors of file inputs.
-        initializeFileUploader();        
-
         // Set the event drag & drop for loading a PDF file.
         setupPDFDragAndDropLoader();
 
         unlistenWindowLeaveEvent();
     });
 
-    iframeWindow.addEventListener('annotationrendered', (ev) => {
-        console.log('annotationrendered', ev.detail.pageNumber);
-
-        if (_viewMode) {
-            window.iframeWindow.PDFAnnotate.UI.disableViewMode();
-            window.iframeWindow.PDFAnnotate.UI.enableViewMode();
-        }
+    iframeWindow.addEventListener('annotationrendered', () => {
+        window.iframeWindow.PDFAnnotate.UI.disableViewMode();
+        window.iframeWindow.PDFAnnotate.UI.enableViewMode();
     });
 
     iframeWindow.addEventListener('pdfdropped', (ev) => {
@@ -460,13 +393,7 @@ function startApplication() {
         handleDroppedFile(ev.detail.originalEvent);
     });
 
-    iframeWindow.addEventListener('pdfdragover', (ev) => {
-        console.log('pdfdragover!!!');
-        // handleDragOverFromViewer(ev.detail.originalEvent);
-    });
-
     iframeWindow.addEventListener('annotationUpdated', () => {
-        console.log('annotationUpdated');
         listenWindowLeaveEvent();
     });
 }

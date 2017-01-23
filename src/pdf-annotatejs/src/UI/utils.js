@@ -423,19 +423,8 @@ export function getCurrentPage(e) {
     }
 
 
-    // if (pointIntersectsRect(x, y, rect)) {
-
-    //   console.log('find!!!', el, rect);
-
-    //   return el;
-    // }
   }
 
   console.log('notfound ><...');
   return null;
-
-
-
-  // TODO
-  return 1;
 }

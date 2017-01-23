@@ -154,9 +154,7 @@ function renderAnnotations(svg, pageNumber) {
 
 
             var event = document.createEvent('CustomEvent');
-            event.initCustomEvent('annotationrendered', true, true, {
-              pageNumber: pageNumber
-            });
+            event.initCustomEvent('annotationrendered', true, true, null);
             window.dispatchEvent(event);
 
         });
@@ -167,14 +165,9 @@ function setupPDFDragAndDropLoader() {
 
     let element = document.querySelector('body');
 
-    $(element).off('dragenter', handleDragEnter);
-    $(element).off('dragleave', handleDragLeave);
-    $(element).off('dragover', handleDragOver);
-    $(element).off('drop', handleDroppedFile);
-    $(element).on('dragenter', handleDragEnter);
-    $(element).on('dragleave', handleDragLeave);
-    $(element).on('dragover', handleDragOver);
-    $(element).on('drop', handleDroppedFile);
+    $(element)
+        .off('dragover', handleDragOver).on('dragover', handleDragOver)
+        .off('drop', handleDroppedFile).on('drop', handleDroppedFile);
 }
 setupPDFDragAndDropLoader();
 
@@ -187,33 +180,11 @@ function handleDroppedFile(e) {
     return cancelEvent(e);
 }
 
-function handleDragEnter(e) {
-
-    var event = document.createEvent('CustomEvent');
-    event.initCustomEvent('pdfdragenter', true, true, { originalEvent: e });
-    window.dispatchEvent(event);
-
-    return cancelEvent(e);
-}
-
-function handleDragLeave(e) {
-
-    var event = document.createEvent('CustomEvent');
-    event.initCustomEvent('pdfdragleave', true, true, { originalEvent: e });
-    window.dispatchEvent(event);
-
-    return cancelEvent(e);
-}
-
 function handleDragOver(e) {
 
     // This is the setting to allow D&D for Firefox.
     // @see https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/effectAllowed
     e.originalEvent.dataTransfer.effectAllowed = 'move';
-
-    var event = document.createEvent('CustomEvent');
-    event.initCustomEvent('pdfdragover', true, true, { originalEvent: e });
-    window.dispatchEvent(event);
 
     return cancelEvent(e);
 }

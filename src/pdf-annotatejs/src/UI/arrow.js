@@ -223,8 +223,6 @@ export function enableArrow(arrowType='one-way') {
   _enabled = true;
   _arrowType = arrowType;
 
-  console.log('enableArrow: ', _arrowType);
-
   createBoundingBoxList();
   disableUserSelect();
   disableTextlayer();
@@ -236,8 +234,6 @@ export function enableArrow(arrowType='one-way') {
 
     if (a.hasBoundingCircle()) {
 
-      console.log('a.readOnly', a.readOnly);
-
       if (a.readOnly) {
         a.hideBoundingCircle();
 
@@ -246,8 +242,6 @@ export function enableArrow(arrowType='one-way') {
         a.on('circlehoverout', handleBoundingCircleHoverOut);
       }
     }
-
-    // a.enableArrowMode();
 
   });
 
@@ -281,8 +275,6 @@ export function disableArrow() {
       }
 
     }
-
-    // a.disableArrowMode();
 
   });
 

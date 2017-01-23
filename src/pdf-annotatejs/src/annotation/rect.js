@@ -316,24 +316,4 @@ export default class RectAnnotation extends AbstractAnnotation {
         console.log('handleCircleDragLeave');
     }
 
-    enableArrowMode() {
-        console.log('enableArrowMode');
-
-        let c = this.$element.find('circle');
-        c.on('dragstart', this.handleCircleDragStart);
-        c.on('dragend', this.handleCircleDragEnd);
-        c.on('dragenter', this.handleCircleDragEnter);
-        c.on('dragleave', this.handleCircleDragLeave);
-    }
-
-    disableArrowMode() {
-        console.log('disableArrowMode');
-
-        let c = this.$element.find('circle');
-        c.on('dragstart', this.handleCircleDragStart);
-        c.on('dragend', this.handleCircleDragEnd);
-        c.on('dragenter', this.handleCircleDragEnter);
-        c.on('dragleave', this.handleCircleDragLeave);
-    }
-
 }
