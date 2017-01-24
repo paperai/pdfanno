@@ -171,18 +171,18 @@ function saveText() {
   $('#autocompleteform [type="submit"]').click();
 
   if (_returnType === 'annotation') {
-    PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, pageNumber, annotation)
+    PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, annotation)
       .then((annotation) => {
         appendChild(svg, annotation);
 
 
         closeInput(annotation);
-    });    
-  
+    });
+
   } else {
     closeInput(content);
   }
-  
+
 }
 
 /**
@@ -190,9 +190,9 @@ function saveText() {
  * @param {Object} textAnnotation - the annotation registerd.
  */
 export function closeInput(textAnnotationOrText) {
-  
+
   if (input) {
-    
+
     $(input).parents('form').remove();
     input = null;
 

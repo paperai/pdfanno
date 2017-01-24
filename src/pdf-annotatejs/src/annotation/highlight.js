@@ -45,7 +45,7 @@ export default class HighlightAnnotation extends AbstractAnnotation {
         highlight.text     = annotation.text;
         highlight.color    = annotation.color;
         highlight.readOnly = annotation.readOnly || false;
-        return highlight;        
+        return highlight;
     }
 
     // render() {
@@ -57,7 +57,7 @@ export default class HighlightAnnotation extends AbstractAnnotation {
 
     setHoverEvent() {
         this.$element.find('circle').hover(
-            this.handleHoverInEvent, 
+            this.handleHoverInEvent,
             this.handleHoverOutEvent
         );
     }
@@ -98,7 +98,7 @@ export default class HighlightAnnotation extends AbstractAnnotation {
             } else {
                 // insert.
                 a = this.createAnnotation();
-                PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, 1, a);
+                PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, a);
             }
         });
         window.annotationContainer.add(this);

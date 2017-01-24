@@ -117,13 +117,13 @@ function renderAnno() {
     svg.setAttribute('data-pdf-annotate-document', documentId);
     svg.setAttribute('data-pdf-annotate-page', 1);
 
-    renderAnnotations(svg, 1);
+    renderAnnotations(svg);
 }
 
-function renderAnnotations(svg, pageNumber) {
+function renderAnnotations(svg) {
     let documentId = getFileName(PDFView.url);
-    PDFAnnotate.getAnnotations(documentId, pageNumber).then(function(annotations) {
-        PDFAnnotate.getStoreAdapter().getSecondaryAnnotations(documentId, pageNumber).then(function(secondaryAnnotations) {
+    PDFAnnotate.getAnnotations(documentId).then(function(annotations) {
+        PDFAnnotate.getStoreAdapter().getSecondaryAnnotations(documentId).then(function(secondaryAnnotations) {
 
             // Primary + Secondary annotations.
             annotations.annotations = annotations.annotations.concat(secondaryAnnotations.annotations);

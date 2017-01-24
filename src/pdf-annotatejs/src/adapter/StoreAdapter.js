@@ -21,15 +21,13 @@ export default class StoreAdapter {
    * Get all the annotations for a given document and page number.
    *
    * @param {String} documentId The ID for the document the annotations belong to
-   * @param {Number} pageNumber The number of the page the annotations belong to
    * @return {Promise}
    */
-  __getAnnotations(documentId, pageNumber) { abstractFunction('getAnnotations'); }
+  __getAnnotations(documentId) { abstractFunction('getAnnotations'); }
   get getAnnotations() { return this.__getAnnotations; }
   set getAnnotations(fn) {
-    this.__getAnnotations = function getAnnotations(documentId, pageNumber) {
+    this.__getAnnotations = function getAnnotations(documentId) {
       return fn(...arguments).then((annotations) => {
-        // TODO may be best to have this happen on the server
         if (annotations.annotations) {
           annotations.annotations.forEach((a) => {
             a.documentId = documentId;
@@ -40,12 +38,11 @@ export default class StoreAdapter {
     };
   }
 
-  __getSecondaryAnnotations(documentId, pageNumber) { abstractFunction('getSecondaryAnnotations'); }
+  __getSecondaryAnnotations(documentId) { abstractFunction('getSecondaryAnnotations'); }
   get getSecondaryAnnotations() { return this.__getSecondaryAnnotations; }
   set getSecondaryAnnotations(fn) {
-    this.__getSecondaryAnnotations = function getSecondaryAnnotations(documentId, pageNumber) {
+    this.__getSecondaryAnnotations = function getSecondaryAnnotations(documentId) {
       return fn(...arguments).then((annotations) => {
-        // TODO may be best to have this happen on the server
         if (annotations.annotations) {
           annotations.annotations.forEach((a) => {
             a.documentId = documentId;
@@ -73,24 +70,14 @@ export default class StoreAdapter {
    * @param {Object} annotation The definition for the new annotation
    * @return {Promise}
    */
-  __addAnnotation(documentId, pageNumber, annotation) { abstractFunction('addAnnotation'); }
+  __addAnnotation(documentId, annotation) { abstractFunction('addAnnotation'); }
   get addAnnotation() { return this.__addAnnotation; }
   set addAnnotation(fn) {
-    this.__addAnnotation = function addAnnotation(documentId, pageNumber, annotation) {
+    this.__addAnnotation = function addAnnotation(documentId, annotation) {
       return fn(...arguments).then((annotation) => {
         return annotation;
       });
     };
-  }
-
-  __addAllAnnotations(documentId, annotations) { abstractFunction('addAllAnnotations'); }
-  get addAllAnnotations() { return this.__addAllAnnotations; }
-  set addAllAnnotations(fn) {
-    this.__addAllAnnotations = function addAllAnnotations(documentId, annotations) {
-      return fn(...arguments).then((annotation) => {
-        return annotation;
-      });
-    };    
   }
 
   /**
@@ -132,51 +119,6 @@ export default class StoreAdapter {
   get deleteAnnotations() { return this.__deleteAnnotations; }
   set deleteAnnotations(fn) {
     this.__deleteAnnotations = function deleteAnnotations(documentId) {
-      return fn(...arguments).then((success) => {
-        return success;
-      });
-    };
-  }
-
-
-  /**
-   * Get all the comments for an annotation
-   *
-   * @param {String} documentId The ID for the document
-   * @param {String} annotationId The ID for the annotation
-   * @return {Promise}
-   */
-  getComments(documentId, annotationId) { abstractFunction('getComments'); }
-
-  /**
-   * Add a new comment
-   *
-   * @param {String} documentId The ID for the document
-   * @param {String} annotationId The ID for the annotation
-   * @param {Object} content The definition of the comment
-   * @return {Promise}
-   */
-  __addComment(documentId, annotationId, content) { abstractFunction('addComment'); }
-  get addComment() { return this.__addComment; }
-  set addComment(fn) {
-    this.__addComment = function addComment(documentId, annotationId, content) {
-      return fn(...arguments).then((comment) => {
-        return comment;
-      });
-    };
-  }
-
-  /**
-   * Delete a comment
-   *
-   * @param {String} documentId The ID for the document
-   * @param {String} commentId The ID for the comment
-   * @return {Promise}
-   */
-  __deleteComment(documentId, commentId) { abstractFunction('deleteComment'); }
-  get deleteComment() { return this.__deleteComment; }
-  set deleteComment(fn) {
-    this.__deleteComment = function deleteComment(documentId, commentId) {
       return fn(...arguments).then((success) => {
         return success;
       });

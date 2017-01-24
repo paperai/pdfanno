@@ -1,5 +1,4 @@
 import StoreAdapter from './adapter/StoreAdapter';
-import LocalStoreAdapter from './adapter/LocalStoreAdapter';
 import PdfannoStoreAdapter from './adapter/PdfannoStoreAdapter';
 import render from './render';
 import UI from './UI';
@@ -12,11 +11,6 @@ export default {
    * knows how to communicate with your server.
    */
   StoreAdapter,
-
-  /**
-   * Implementation of StoreAdapter that stores annotation data to localStorage.
-   */
-  LocalStoreAdapter,
 
   /**
     Implementation of StoreAdapter for PDFAnno.
@@ -72,10 +66,9 @@ export default {
    *
    * @alias StoreAdapter.getAnnotations
    * @param {String} documentId The ID of the document
-   * @param {String} pageNumber The page number
    * @return {Promise}
    */
-  getAnnotations(documentId, pageNumber) {
+  getAnnotations(documentId) {
     return this.getStoreAdapter().getAnnotations(...arguments);
   }
 }

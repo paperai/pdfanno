@@ -58,7 +58,7 @@ export default class RectAnnotation extends AbstractAnnotation {
 
     setHoverEvent() {
         this.$element.find('rect, circle').hover(
-            this.handleHoverInEvent, 
+            this.handleHoverInEvent,
             this.handleHoverOutEvent
         );
     }
@@ -101,7 +101,7 @@ export default class RectAnnotation extends AbstractAnnotation {
                 // insert.
                 a = this.createAnnotation();
                 console.log('save:insert:', a);
-                PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, 1, a);
+                PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, a);
             }
         });
         window.annotationContainer.add(this);
@@ -111,7 +111,7 @@ export default class RectAnnotation extends AbstractAnnotation {
         if (this.$element.find('.anno-rect').hasClass('--selected')) {
             console.log('rect:deleteSelectedAnnotation');
             this.destroy();
-        }        
+        }
     }
 
     getTextPosition() {
@@ -279,7 +279,7 @@ export default class RectAnnotation extends AbstractAnnotation {
         enableUserSelect();
 
         document.removeEventListener('mousemove', this.handleMouseMoveOnDocument);
-        document.removeEventListener('mouseup', this.handleMouseUpOnDocument);            
+        document.removeEventListener('mouseup', this.handleMouseUpOnDocument);
 
     }
 
@@ -288,7 +288,7 @@ export default class RectAnnotation extends AbstractAnnotation {
         if (!this.readOnly) {
 
             this.$element.find('.anno-rect, circle').off('click', this.handleClickRectEvent).on('click', this.handleClickRectEvent);
-            this.$element.find('.anno-rect, circle').off('mousedown', this.handleMouseDownOnRect).on('mousedown', this.handleMouseDownOnRect);         
+            this.$element.find('.anno-rect, circle').off('mousedown', this.handleMouseDownOnRect).on('mousedown', this.handleMouseDownOnRect);
         }
 
         this.textAnnotation.enableViewMode();

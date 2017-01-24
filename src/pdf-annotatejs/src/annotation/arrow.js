@@ -79,7 +79,7 @@ export default class ArrowAnnotation extends AbstractAnnotation {
         this._rel2Annotation = a;
         if (this._rel2Annotation) {
             this._rel2Annotation.on('hoverin', this.handleRelHoverIn);
-            this._rel2Annotation.on('hoverout', this.handleRelHoverOut);            
+            this._rel2Annotation.on('hoverout', this.handleRelHoverOut);
             this._rel2Annotation.on('rectmove', this.handleRelMove);
             this._rel2Annotation.on('delete', this.handleRelDelete);
         }
@@ -108,8 +108,8 @@ export default class ArrowAnnotation extends AbstractAnnotation {
         // console.log('render:', this);
 
         // if (this.rel1Annotation && this.rel2Annotation) {
-        //     assign(this, _getStartEndPoint(this));            
-        
+        //     assign(this, _getStartEndPoint(this));
+
         // } else {
         //     // Here used at UI/arrow.js for tmp rendering.
         // }
@@ -156,7 +156,7 @@ export default class ArrowAnnotation extends AbstractAnnotation {
             } else {
                 // insert.
                 a = this.createAnnotation();
-                PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, 1, a);
+                PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, a);
                 console.log('save:insert:', a);
             }
         });
@@ -262,7 +262,7 @@ export default class ArrowAnnotation extends AbstractAnnotation {
         this.dehighlight();
         this.emit('hoverout');
         this.dehighlightRelAnnotations();
-    }    
+    }
 
     handleClickEvent() {
         this.$element.find('path').toggleClass('--selected');
@@ -286,7 +286,7 @@ export default class ArrowAnnotation extends AbstractAnnotation {
         this.$element.find('path').off('mouseenter mouseleave');
         this.$element.find('path').off('click', this.handleClickEvent);
         this.textAnnotation.disableViewMode();
-    }    
+    }
 }
 
 function _getStartEndPoint(arrowAnnotation) {
@@ -297,6 +297,6 @@ function _getStartEndPoint(arrowAnnotation) {
         x1 : p1.x,
         y1 : p1.y,
         x2 : p2.x,
-        y2 : p2.y        
+        y2 : p2.y
     };
 }
