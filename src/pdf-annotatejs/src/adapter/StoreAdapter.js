@@ -109,42 +109,56 @@ export default class StoreAdapter {
   get deleteAnnotation() { return this.__deleteAnnotation; }
   set deleteAnnotation(fn) {
     this.__deleteAnnotation = function deleteAnnotation(documentId, annotationId) {
-      return fn(...arguments).then((success) => {
-        return success;
-      });
+      return fn(...arguments);
     };
   }
 
+  /**
+   * Delete all annotations.
+   *
+   * @param {String} documentId - the ID for the document.
+   * @return {Promise}
+   */
   __deleteAnnotations(documentId) { abstractFunction('deleteAnnotations'); }
   get deleteAnnotations() { return this.__deleteAnnotations; }
   set deleteAnnotations(fn) {
     this.__deleteAnnotations = function deleteAnnotations(documentId) {
-      return fn(...arguments).then((success) => {
-        return success;
-      });
+      return fn(...arguments);
     };
   }
 
+  /**
+   * Export annotation data.
+   *
+   * @return {Promise}
+   */
   __exportData() { abstractFunction('exportData'); }
   get exportData() { return this.__exportData; }
   set exportData(fn) {
     this.__exportData = function exportData() {
-      return fn(...arguments).then(success => {
-        return success;
-      });
+      return fn(...arguments);
     }
   }
 
+  /**
+   * Import annotation data from a JSON data.
+   *
+   * @param {Object} data - the data for import formatted as json.
+   */
   __importAnnotations(data) { abstractFunction('importAnnotations'); }
   get importAnnotations() { return this.__importAnnotations; }
   set importAnnotations(fn) {
     this.__importAnnotations = function importAnnotations(json) {
-      return fn(...arguments).then(success => {
-        return success;
-      });
+      return fn(...arguments);
     }
   }
 
+  /**
+   * Find annotations.
+   *
+   * @param {String} documentId - the ID for the document.
+   * @param {Object} criteria - the search condition.
+   */
   __findAnnotations(documentId, criteria) { abstractFunction('findAnnotations'); }
   get findAnnotations() { return this.__findAnnotations; }
   set findAnnotations(fn) {
