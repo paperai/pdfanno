@@ -48,7 +48,7 @@ function handleDocumentMousedown(e) {
     arrowAnnotation.readOnly = false;
 
     document.addEventListener('mouseup', handleDocumentMouseup);
-    // document.addEventListener('mousemove', handleDocumentMousemove);    
+    // document.addEventListener('mousemove', handleDocumentMousemove);
 
     dragging = true;
   }
@@ -74,7 +74,7 @@ function handleDocumentMousemove(e) {
     let p = scaleDown(getClientXY(e));
     arrowAnnotation.x2 = p.x;
     arrowAnnotation.y2 = p.y;
-    arrowAnnotation.render();    
+    arrowAnnotation.render();
   }
 
   // Hover visual event.
@@ -82,7 +82,7 @@ function handleDocumentMousemove(e) {
   if (!hitCircle && circle) {
     hitCircle = circle;
     $(hitCircle).addClass('--hover');
-  
+
   } else if (hitCircle && !circle) {
     $(hitCircle).removeClass('--hover');
     hitCircle = null;
@@ -131,7 +131,7 @@ function handleDocumentMouseup(e) {
   // Find the end position.
   let circle = findHitBoundingCircle(e);
   if (!circle) {
-    arrowAnnotation.destroy();    
+    arrowAnnotation.destroy();
     arrowAnnotation = null;
     return;
   }
@@ -141,7 +141,7 @@ function handleDocumentMouseup(e) {
   if (arrowAnnotation.rel1Annotation === endAnnotation) {
     arrowAnnotation.destroy();
     arrowAnnotation = null;
-    return;    
+    return;
   }
 
   arrowAnnotation.rel2Annotation = endAnnotation;
@@ -156,7 +156,7 @@ function showTextInput() {
 
   let p1 = arrowAnnotation.rel1Annotation.getBoundingCirclePosition();
   let p2 = arrowAnnotation.rel2Annotation.getBoundingCirclePosition();
-  let textPosition = getRelationTextPosition(null, p1.x, p1.y, p2.x, p2.y);
+  let textPosition = getRelationTextPosition(p1.x, p1.y, p2.x, p2.y);
 
   let boundingRect = svg.getBoundingClientRect();
 
@@ -260,7 +260,7 @@ export function disableArrow() {
   enableUserSelect();
   enableTextlayer();
 
-  deleteBoundingBoxList();  
+  deleteBoundingBoxList();
 
   window.annotationContainer.getAllAnnotations().forEach(a => {
 

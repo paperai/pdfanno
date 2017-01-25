@@ -50,9 +50,6 @@
 .anno-arrow {
   transition:0.2s;
 }
-.anno-arrow.--hover {
-  stroke-width: 2px;
-}
 .anno-arrow-outline {
   fill: none;
   stroke: black;
@@ -61,7 +58,10 @@
   stroke-dasharray: 2.5;
   pointer-events: stroke;
 }
-.anno-arrow-outline.--selected {
+.--hover .anno-arrow {
+  stroke-width: 2px;
+}
+.--selected .anno-arrow-outline {
   visibility: visible;
 }
 

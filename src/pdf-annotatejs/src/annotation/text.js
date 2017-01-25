@@ -27,6 +27,8 @@ export default class TextAnnotation extends AbstractAnnotation {
         this.$element = $('<div class="dummy"/>');
 
         window.globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
+        window.globalEvent.on('enableViewMode', this.enableViewMode);
+        window.globalEvent.on('disableViewMode', this.disableViewMode);
     }
 
     render() {
@@ -36,14 +38,14 @@ export default class TextAnnotation extends AbstractAnnotation {
             this.color = this.parent.color;
             super.render();
             // this.$element.remove();
-            // this.$element = $(appendChild(getSVGLayer(), this));    
-            // this.setHoverEvent();        
+            // this.$element = $(appendChild(getSVGLayer(), this));
+            // this.setHoverEvent();
         }
     }
 
     setHoverEvent() {
         this.$element.find('text').hover(
-            this.handleHoverInEvent, 
+            this.handleHoverInEvent,
             this.handleHoverOutEvent
         );
     }
@@ -57,7 +59,7 @@ export default class TextAnnotation extends AbstractAnnotation {
         if (this.$element.find('rect').hasClass('--selected')) {
             console.log('text:deleteSelectedAnnotation');
             this.destroy();
-            this.emit('textchanged', null);            
+            this.emit('textchanged', null);
         }
     }
 

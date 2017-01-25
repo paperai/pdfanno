@@ -75,16 +75,9 @@ export function findBezierControlPoint(x1, y1, x2, y2) {
 }
 
 
-export function getRelationTextPosition(svgOrNull, x1, y1, x2, y2) {
+export function getRelationTextPosition(x1, y1, x2, y2) {
 
     let textPosition = findBezierControlPoint(x1, y1, x2, y2);
-
-    if (svgOrNull) {
-      // Coordinate for DOM.
-      let rect = svgOrNull.getBoundingClientRect();
-      textPosition.x += rect.left;
-      textPosition.y += rect.top;      
-    }
 
     if (x1 < x2) {
       // right top quadrant.
