@@ -1,32 +1,25 @@
-import assign from 'deep-assign';
-import appendChild from '../render/appendChild';
 import uuid from '../utils/uuid';
-import { getSVGLayer } from '../UI/utils';
-import { addInputField } from '../UI/text';
-import { enableViewMode, disableViewMode } from '../UI/view';
 import AbstractAnnotation from './abstract';
 import TextAnnotation from './text';
-import PDFJSAnnotate from '../PDFJSAnnotate';
-import {
-    scaleUp,
-    scaleDown,
-    getMetadata,
-    disableUserSelect,
-    enableUserSelect
-} from '../UI/utils';
 
-
+/**
+ * Highlight Annotation.
+ */
 export default class HighlightAnnotation extends AbstractAnnotation {
 
+    /**
+     * Constructor.
+     */
     constructor() {
         super();
-        this.uuid = null;
-        this.type = 'highlight';
+
+        this.uuid       = null;
+        this.type       = 'highlight';
         this.rectangles = [];
-        this.text = null;
-        this.color = null;
-        this.readOnly = null;
-        this.$element = $('<div class="dummy"/>');
+        this.text       = null;
+        this.color      = null;
+        this.readOnly   = false;
+        this.$element   = this.createDummyElement();
 
         window.globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
         window.globalEvent.on('enableViewMode', this.enableViewMode);
@@ -38,23 +31,22 @@ export default class HighlightAnnotation extends AbstractAnnotation {
         this.textAnnotation.on('textchanged', this.handleTextChanged);
     }
 
+    /**
+     * Create an instance from an annotation data.
+     */
     static newInstance(annotation) {
-        let highlight      = new HighlightAnnotation();
-        highlight.uuid     = annotation.uuid || uuid();
-        highlight.rectangles = annotation.rectangles;
-        highlight.text     = annotation.text;
-        highlight.color    = annotation.color;
-        highlight.readOnly = annotation.readOnly || false;
-        return highlight;
+        let a        = new HighlightAnnotation();
+        a.uuid       = annotation.uuid || uuid();
+        a.rectangles = annotation.rectangles;
+        a.text       = annotation.text;
+        a.color      = annotation.color;
+        a.readOnly   = annotation.readOnly || false;
+        return a;
     }
 
-    // render() {
-    //      this.$element.remove();
-    //      this.$element = $(appendChild(getSVGLayer(), this));
-    //      this.setHoverEvent();
-    //      this.textAnnotation.render();
-    // }
-
+    /**
+     * Set a hover event.
+     */
     setHoverEvent() {
         this.$element.find('circle').hover(
             this.handleHoverInEvent,
@@ -62,72 +54,55 @@ export default class HighlightAnnotation extends AbstractAnnotation {
         );
     }
 
+    /**
+     * Delete the annotation from rendering, a container in window, and a container in localStorage.
+     */
     destroy() {
-        this.$element.remove();
-        window.annotationContainer.remove(this);
-        let { documentId } = getMetadata(); // TODO Remove this.
-        PDFJSAnnotate.getStoreAdapter().deleteAnnotation(documentId, this.uuid).then(() => {
-            console.log('deleted');
-        });
-        this.textAnnotation.destroy();
+        super.destroy();
         this.emit('delete');
     }
 
+    /**
+     * Create an annotation data for save.
+     */
     createAnnotation() {
-        // TODO Refactring.
         return {
-            uuid   : this.uuid,
-            type   : this.type,
-            rectangles      : this.rectangles,
-            text   : this.text,
-            color  : this.color,
-            readyOnly : this.readOnly
+            uuid       : this.uuid,
+            type       : this.type,
+            rectangles : this.rectangles,
+            text       : this.text,
+            color      : this.color,
+            readyOnly  : this.readOnly
         };
     }
 
-    save() {
-        // TODO make this in abstract.
-        // TODO Competible to insert and update.
-        let { documentId } = getMetadata();
-        PDFJSAnnotate.getStoreAdapter().getAnnotation(documentId, this.uuid).then(a => {
-            if (a) {
-                // update.
-                a = this.createAnnotation(a);
-                console.log('save:', a);
-                PDFJSAnnotate.getStoreAdapter().editAnnotation(documentId, this.uuid, a);
-            } else {
-                // insert.
-                a = this.createAnnotation();
-                PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, a);
-            }
-        });
-        window.annotationContainer.add(this);
-    }
-
-    deleteSelectedAnnotation() {
-        // TODO this will be better using eventEmitter on global?
-        console.log('deleteSelectedAnnotation');
-
-        if (this.$element.find('rect').hasClass('--selected')) {
-            this.destroy();
-        }
-
-    }
-
+    /**
+     * Get the position for text.
+     */
     getTextPosition() {
 
-        if (this.rectangles.length > 0) {
+        let p = null;
 
-            return {
+        if (this.rectangles.length > 0) {
+            p = {
                 x : this.rectangles[0].x + 7,
                 y : this.rectangles[0].y - 20
             };
-
-        } else {
-            return { x : 0, y : 0 };
         }
+
+        return p;
     }
 
+    /**
+     * Delete the annotation if selected.
+     */
+    deleteSelectedAnnotation() {
+        super.deleteSelectedAnnotation();
+    }
+
+    /**
+     * Get the position of the boundingCircle.
+     */
     getBoundingCirclePosition() {
         let $circle = this.$element.find('circle');
         return {
@@ -136,77 +111,85 @@ export default class HighlightAnnotation extends AbstractAnnotation {
         };
     }
 
+    /**
+     * Show the boundingCircle.
+     */
     showBoundingCircle() {
         this.$element.find('circle').removeClass('--hide');
     }
 
+    /**
+     * Hide the boundingCircle.
+     */
     hideBoundingCircle() {
         this.$element.find('circle').addClass('--hide');
     }
 
-    highlight() {
-        // TODO CSS Refactoring.
-        this.$element.find('rect').addClass('--hover');
-        this.$element.addClass('--emphasis');
-        this.textAnnotation.highlight();
-    }
-
-    dehighlight() {
-        this.$element.find('rect').removeClass('--hover');
-        this.$element.removeClass('--emphasis');
-        this.textAnnotation.dehighlight();
-    }
-
+    /**
+     * Handle a hovein event on a text.
+     */
     handleTextHoverIn() {
         this.highlight();
         this.emit('hoverin');
     }
 
+    /**
+     * Handle a hoveout event on a text.
+     */
     handleTextHoverOut() {
         this.dehighlight();
         this.emit('hoverout');
     }
 
-    handleTextChanged(textAfter) {
-        this.text = textAfter;
+    /**
+     * Save a new text.
+     */
+    handleTextChanged(newText) {
+        this.text = newText;
         this.save();
     }
 
+    /**
+     * Handle a hoverin event.
+     */
     handleHoverInEvent(e) {
         this.highlight();
         this.emit('hoverin');
-
-        let $elm = $(e.currentTarget);
-        if ($elm.prop("tagName") === 'circle') {
-            this.emit('circlehoverin', this);
-        }
+        this.emit('circlehoverin', this);
     }
 
+    /**
+     * Handle a hoverout event.
+     */
     handleHoverOutEvent(e) {
         this.dehighlight();
         this.emit('hoverout');
-
-        let $elm = $(e.currentTarget);
-        if ($elm.prop("tagName") === 'circle') {
-            this.emit('circlehoverout', this);
-        }
+        this.emit('circlehoverout', this);
     }
 
+    /**
+     * Handle a click event.
+     */
     handleClickEvent() {
-        this.$element.find('rect').toggleClass('--selected');
+        this.$element.toggleClass('--selected');
     }
 
+    /**
+     * Enable view mode.
+     */
     enableViewMode() {
 
-        this.textAnnotation.enableViewMode();
+        this.disableViewMode();
 
         if (!this.readOnly) {
-            this.$element.find('circle').off('click').on('click', this.handleClickEvent);
+            this.$element.find('circle').on('click', this.handleClickEvent);
         }
     }
 
+    /**
+     * Disable view mode.
+     */
     disableViewMode() {
-        this.$element.find('circle').off('click', this.handleClickEvent);
-        this.textAnnotation.disableViewMode();
+        this.$element.find('circle').off('click');
     }
 }

@@ -75,10 +75,42 @@ export default class AbstractAnnotation extends EventEmitter {
     }
 
     /**
+     * Highlight the annotation.
+     */
+    highlight() {
+        this.$element.addClass('--hover --emphasis');
+        this.textAnnotation && this.textAnnotation.highlight();
+    }
+
+    /**
+     * Dehighlight the annotations.
+     */
+    dehighlight() {
+        this.$element.removeClass('--hover --emphasis');
+        this.textAnnotation && this.textAnnotation.dehighlight();
+    }
+
+    /**
+     * Delete the annotation if selected.
+     */
+    deleteSelectedAnnotation() {
+        if (this.isSelected()) {
+            this.destroy();
+        }
+    }
+
+    /**
      * Check whether a boundingCircle is included.
      */
     hasBoundingCircle() {
         return this.$element.find('circle').length > 0;
+    }
+
+    /**
+     * Check whether the annotation is selected.
+     */
+    isSelected() {
+        return this.$element.hasClass('--selected');
     }
 
     /**

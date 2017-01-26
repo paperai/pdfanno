@@ -1,20 +1,7 @@
-import assign from 'deep-assign';
-import appendChild from '../render/appendChild';
 import uuid from '../utils/uuid';
-import { getSVGLayer } from '../UI/utils';
-import { addInputField } from '../UI/text';
-import { enableViewMode, disableViewMode } from '../UI/view';
 import AbstractAnnotation from './abstract';
 import TextAnnotation from './text';
-import PDFJSAnnotate from '../PDFJSAnnotate';
 import { getRelationTextPosition } from '../utils/relation.js';
-import {
-    scaleUp,
-    scaleDown,
-    getMetadata,
-    disableUserSelect,
-    enableUserSelect
-} from '../UI/utils';
 
 /**
  * Arrow Annotation (one-way / two-way / link)
@@ -66,6 +53,16 @@ export default class ArrowAnnotation extends AbstractAnnotation {
         a.readOnly       = annotation.readOnly || false;
 
         return a;
+    }
+
+    /**
+     * Set a hover event.
+     */
+    setHoverEvent() {
+        this.$element.find('path').hover(
+            this.handleHoverInEvent,
+            this.handleHoverOutEvent
+        );
     }
 
     /**
@@ -133,19 +130,10 @@ export default class ArrowAnnotation extends AbstractAnnotation {
     }
 
     /**
-     * Check whether the annotation is selected.
-     */
-    isSelected() {
-        return this.$element.hasClass('--selected');
-    }
-
-    /**
      * Delete the annotation if selected.
      */
     deleteSelectedAnnotation() {
-        if (this.isSelected()) {
-            this.destroy();
-        }
+        super.deleteSelectedAnnotation();
     }
 
     /**
@@ -178,24 +166,6 @@ export default class ArrowAnnotation extends AbstractAnnotation {
         if (this.rel2Annotation) {
             this.rel2Annotation.dehighlight();
         }
-    }
-
-    /**
-     * Highlight the annotation.
-     */
-    highlight() {
-        this.$element.addClass('--hover');
-        this.$element.addClass('--emphasis');
-        this.textAnnotation.highlight();
-    }
-
-    /**
-     * Dehighlight the annotations.
-     */
-    dehighlight() {
-        this.$element.removeClass('--hover');
-        this.$element.removeClass('--emphasis');
-        this.textAnnotation.dehighlight();
     }
 
     /**
@@ -288,12 +258,6 @@ export default class ArrowAnnotation extends AbstractAnnotation {
 
         this.disableViewMode();
 
-        // TODO Move to setHoverEvent.
-        this.$element.find('path').hover(
-            this.handleHoverInEvent,
-            this.handleHoverOutEvent
-        );
-
         if (!this.readOnly) {
             this.$element.find('path').on('click', this.handleClickEvent);
         }
@@ -303,9 +267,12 @@ export default class ArrowAnnotation extends AbstractAnnotation {
      * Disable view mode.
      */
     disableViewMode() {
-        this.$element.find('path').off('mouseenter mouseleave click');
+        this.$element.find('path').off('click');
     }
 
+    /**
+     * Set the start / end points of the arrow.
+     */
     setStartEndPosition() {
         if (this._rel1Annotation) {
             let p = this._rel1Annotation.getBoundingCirclePosition();

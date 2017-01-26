@@ -31,14 +31,14 @@
   stroke-width: 5px;
 }
 
-.anno-highlight.--hover {
+.--hover .anno-highlight {
   /*html*/
   box-shadow: 0 0 0 1px #ccc inset;
   /*svg*/
   stroke: #ccc;
   stroke-width: 1px;
 }
-.anno-highlight.--selected {
+.--selected .anno-highlight {
   stroke: black;
   stroke-width: 1px;
   stroke-dasharray: 3;
