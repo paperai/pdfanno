@@ -57,12 +57,13 @@ export default function renderText(a, svg) {
 
     // Background.
     let box = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    console.log(svg)
     let rect = getRect(text, svg);
     setAttributes(box, {
-      x: a.x,
-      y: a.y,
-      width: rect.width,
-      height: rect.height,
+      x: a.x -4,
+      y: a.y -1,
+      width: rect.width +8,
+      height: rect.height +2,
       fill: '#FFFFFF',
       class : 'anno-text'
     });

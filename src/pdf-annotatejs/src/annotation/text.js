@@ -35,9 +35,9 @@ export default class TextAnnotation extends AbstractAnnotation {
             this.text = this.parent.text;
             this.color = this.parent.color;
             super.render();
-            // this.$element.remove();
-            // this.$element = $(appendChild(getSVGLayer(), this));    
-            // this.setHoverEvent();        
+            this.$element.remove();
+            this.$element = $(appendChild(getSVGLayer(), this));    
+            this.setHoverEvent();        
         }
     }
 
@@ -81,12 +81,14 @@ export default class TextAnnotation extends AbstractAnnotation {
 
     handleHoverInEvent() {
         this.$element.addClass('--hover');
+        this.$element.find('rect').addClass('--hover');
         this.$element.addClass('--emphasis');
         this.emit('hoverin');
     }
 
     handleHoverOutEvent() {
         this.$element.removeClass('--hover');
+        this.$element.find('rect').removeClass('--hover');
         this.$element.removeClass('--emphasis');
         this.emit('hoverout');
     }

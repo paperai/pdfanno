@@ -73,6 +73,7 @@
 }
 .anno-rect.--hover {
   stroke-width: 2px;
+  fill: rgba(255, 0, 0, 0.5);
 }
 .anno-rect.--selected {
   stroke: black;
@@ -84,14 +85,19 @@
   Text.
 */
 .anno-text {
-  transition: 0.2s;
+  rx: 2;
+  ry: 2;
 }
 .anno-text.--hover {
-  stroke: red;
-  stroke-width: 0.5px;
+  fill: rgba(255, 255, 255, 0.9);
+  transition: 0.15s;
 }
-.anno-text.--selected {
-  stroke: black;
-  stroke-width: 2px;
-  stroke-dasharray: 3;
+.anno-text.--hover ~ text {
+  fill: rgba(255, 0, 0, 0.9);
+}
+.anno-text.--selected  {
+  fill: rgba(255, 0, 0, 0.7);
+}
+.anno-text.--selected ~ text {
+  fill: rgba(255, 255, 255, 1.0);
 }
