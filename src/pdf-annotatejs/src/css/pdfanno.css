@@ -48,21 +48,23 @@
   Arrow.
 */
 .anno-arrow {
-  transition:0.2s;
 }
 .anno-arrow.--hover {
   stroke-width: 2px;
 }
+.anno-arrow.--selected {
+  animation: anime-arrow 0.5s infinite alternate;
+}
 .anno-arrow-outline {
   fill: none;
-  stroke: black;
-  visibility: hidden;
-  stroke-width: 4px;
-  stroke-dasharray: 2.5;
-  pointer-events: stroke;
 }
 .anno-arrow-outline.--selected {
-  visibility: visible;
+  animation: anime-arrow 0.5s infinite alternate;
+}
+@keyframes anime-arrow {
+  0% {stroke: rgba(255, 60, 90, 1.0);}
+  5% {stroke: rgba(255, 60, 90, 1.0);}
+  100% {stroke: rgba(255, 210, 245, 1.0);}
 }
 
 /**
@@ -96,8 +98,14 @@
   fill: rgba(255, 0, 0, 0.9);
 }
 .anno-text.--selected  {
-  fill: rgba(255, 0, 0, 0.7);
+  animation: anime-text 0.5s infinite alternate;
 }
 .anno-text.--selected ~ text {
   fill: rgba(255, 255, 255, 1.0);
+}
+
+@keyframes anime-text {
+  0% {fill: rgba(255, 40, 60, 0.8);}
+  5% {fill: rgba(255, 40, 60, 0.8);}
+  100% {fill: rgba(255, 120, 180, 0.8);}
 }
