@@ -112,20 +112,6 @@ export default class HighlightAnnotation extends AbstractAnnotation {
     }
 
     /**
-     * Show the boundingCircle.
-     */
-    showBoundingCircle() {
-        this.$element.find('circle').removeClass('--hide');
-    }
-
-    /**
-     * Hide the boundingCircle.
-     */
-    hideBoundingCircle() {
-        this.$element.find('circle').addClass('--hide');
-    }
-
-    /**
      * Handle a hovein event on a text.
      */
     handleTextHoverIn() {

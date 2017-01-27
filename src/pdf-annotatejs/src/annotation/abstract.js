@@ -91,6 +91,20 @@ export default class AbstractAnnotation extends EventEmitter {
     }
 
     /**
+     * Show the boundingCircle.
+     */
+    showBoundingCircle() {
+        this.$element.find('circle').removeClass('--hide');
+    }
+
+    /**
+     * Hide the boundingCircle.
+     */
+    hideBoundingCircle() {
+        this.$element.find('circle').addClass('--hide');
+    }
+
+    /**
      * Delete the annotation if selected.
      */
     deleteSelectedAnnotation() {

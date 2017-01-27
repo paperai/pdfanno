@@ -24,7 +24,7 @@
     transition:0.2s;
     transform-origin: center center;
 }
-.anno-circle.--hover {
+.--hover .anno-circle {
   box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;
   /*transform: scale(2);*/
   stroke: blue;
@@ -71,10 +71,10 @@
 .anno-rect {
   transition: 0.2s;
 }
-.anno-rect.--hover {
+.--hover .anno-rect {
   stroke-width: 2px;
 }
-.anno-rect.--selected {
+.--selected .anno-rect {
   stroke: black;
   stroke-width: 4px;
   stroke-dasharray: 3;
@@ -86,11 +86,11 @@
 .anno-text {
   transition: 0.2s;
 }
-.anno-text.--hover {
+.--hover .anno-text {
   stroke: red;
   stroke-width: 0.5px;
 }
-.anno-text.--selected {
+.--selected .anno-text {
   stroke: black;
   stroke-width: 2px;
   stroke-dasharray: 3;

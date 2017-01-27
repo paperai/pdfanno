@@ -18,31 +18,39 @@ import {
  */
 export default class TextAnnotation extends AbstractAnnotation {
 
+    /**
+     * Constructor.
+     */
     constructor(parent) {
         super();
+
         this.type     = 'textbox';
-        this.parent   = parent;     // TODO Avoid cycle reference.
+        this.parent   = parent;
         this.x        = 0;
         this.y        = 0;
-        this.$element = $('<div class="dummy"/>');
+        this.$element = this.createDummyElement();
 
         window.globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
         window.globalEvent.on('enableViewMode', this.enableViewMode);
         window.globalEvent.on('disableViewMode', this.disableViewMode);
     }
 
-    render() {
+
+    /**
+     * Render a text.
+     */
+     render() {
         if (this.parent.text) {
             assign(this, this.parent.getTextPosition());
             this.text = this.parent.text;
             this.color = this.parent.color;
             super.render();
-            // this.$element.remove();
-            // this.$element = $(appendChild(getSVGLayer(), this));
-            // this.setHoverEvent();
         }
     }
 
+    /**
+     * Set a hover event.
+     */
     setHoverEvent() {
         this.$element.find('text').hover(
             this.handleHoverInEvent,
@@ -50,12 +58,19 @@ export default class TextAnnotation extends AbstractAnnotation {
         );
     }
 
+    /**
+     * Delete a text annotation.
+     */
     destroy() {
         this.$element.remove();
-        this.$element = $('<div class="dummy"/>');
+        this.$element = this.createDummyElement();
     }
 
     deleteSelectedAnnotation() {
+
+        // TODO ここから.
+        // event名を変えたり、destroyのタイミングで発火したりできないかなー？
+
         if (this.$element.find('rect').hasClass('--selected')) {
             console.log('text:deleteSelectedAnnotation');
             this.destroy();
