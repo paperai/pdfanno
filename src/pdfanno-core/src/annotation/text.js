@@ -12,71 +12,52 @@ import {
     enableUserSelect
 } from '../UI/utils';
 
-let globalEvent;
 
 /**
  * Text Annotation.
  */
 export default class TextAnnotation extends AbstractAnnotation {
 
-    /**
-     * Constructor.
-     */
     constructor(parent) {
         super();
-
-        globalEvent = window.globalEvent;
-
         this.type     = 'textbox';
-        this.parent   = parent;
+        this.parent   = parent;     // TODO Avoid cycle reference.
         this.x        = 0;
         this.y        = 0;
-        this.$element = this.createDummyElement();
-
-        // parent.on('rectmoveend', this.handleRectMoveEnd);
-        globalEvent.on('rectmoveend', this.handleRectMoveEnd);
+        this.$element = $('<div class="dummy"/>');
 
         window.globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
-        window.globalEvent.on('enableViewMode', this.enableViewMode);
-        window.globalEvent.on('disableViewMode', this.disableViewMode);
     }
 
-
-    /**
-     * Render a text.
-     */
-     render() {
+    render() {
         if (this.parent.text) {
             assign(this, this.parent.getTextPosition());
             this.text = this.parent.text;
             this.color = this.parent.color;
             super.render();
+            this.$element.remove();
+            this.$element = $(appendChild(getSVGLayer(), this));    
+            this.setHoverEvent();        
         }
     }
 
-    /**
-     * Set a hover event.
-     */
     setHoverEvent() {
         this.$element.find('text').hover(
-            this.handleHoverInEvent,
+            this.handleHoverInEvent, 
             this.handleHoverOutEvent
         );
     }
 
-    /**
-     * Delete a text annotation.
-     */
     destroy() {
         this.$element.remove();
-        this.$element = this.createDummyElement();
+        this.$element = $('<div class="dummy"/>');
     }
 
     deleteSelectedAnnotation() {
-        if (this.$element.hasClass('--selected')) {
+        if (this.$element.find('rect').hasClass('--selected')) {
             console.log('text:deleteSelectedAnnotation');
             this.destroy();
-            this.emit('textchanged', null);
+            this.emit('textchanged', null);            
         }
     }
 
@@ -100,18 +81,20 @@ export default class TextAnnotation extends AbstractAnnotation {
 
     handleHoverInEvent() {
         this.$element.addClass('--hover');
+        this.$element.find('rect').addClass('--hover');
         this.$element.addClass('--emphasis');
         this.emit('hoverin');
     }
 
     handleHoverOutEvent() {
         this.$element.removeClass('--hover');
+        this.$element.find('rect').removeClass('--hover');
         this.$element.removeClass('--emphasis');
         this.emit('hoverout');
     }
 
     handleClickEvent() {
-        this.$element.toggleClass('--selected');
+        this.$element.find('rect').toggleClass('--selected');
 
         // Check double click.
         let currentTime = (new Date()).getTime();
@@ -153,12 +136,8 @@ export default class TextAnnotation extends AbstractAnnotation {
 
         }, 'text');
 
-    }
 
-    handleRectMoveEnd(rectAnnotation) {
-        if (rectAnnotation === this.parent) {
-            this.enableViewMode();
-        }
+
     }
 
     enableViewMode() {
