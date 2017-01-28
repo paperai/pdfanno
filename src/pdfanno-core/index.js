@@ -10,8 +10,8 @@ window.globalEvent = new EventEmitter();
 
 // This is the entry point of window.xxx.
 // (setting from webpack.config.js)
-import PDFJSAnnotate from './src/PDFJSAnnotate';
-export default PDFJSAnnotate;
+import PDFAnnoCore from './src/PDFAnnoCore';
+export default PDFAnnoCore;
 
 
 import AnnotationContainer from './src/annotation/container';
@@ -24,7 +24,7 @@ import ArrowAnnotation from './src/annotation/arrow';
 import appendChild from './src/render/appendChild';
 
 // Setup Storage.
-PDFJSAnnotate.setStoreAdapter(new PDFJSAnnotate.PdfannoStoreAdapter());
+PDFAnnoCore.setStoreAdapter(new PDFAnnoCore.PdfannoStoreAdapter());
 
 // The event called at page rendered by pdfjs.
 window.addEventListener('pagerendered', function(ev) {
@@ -118,8 +118,8 @@ function renderAnno() {
 
 function renderAnnotations(svg) {
     let documentId = getFileName(PDFView.url);
-    PDFJSAnnotate.getAnnotations(documentId).then(function(annotations) {
-        PDFJSAnnotate.getStoreAdapter().getSecondaryAnnotations(documentId).then(function(secondaryAnnotations) {
+    PDFAnnoCore.getAnnotations(documentId).then(function(annotations) {
+        PDFAnnoCore.getStoreAdapter().getSecondaryAnnotations(documentId).then(function(secondaryAnnotations) {
 
             // Primary + Secondary annotations.
             annotations.annotations = annotations.annotations.concat(secondaryAnnotations.annotations);

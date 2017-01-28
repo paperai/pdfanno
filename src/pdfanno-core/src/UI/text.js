@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import PDFJSAnnotate from '../PDFJSAnnotate';
+import PDFAnnoCore from '../PDFAnnoCore';
 import appendChild from '../render/appendChild';
 import {
   BORDER_COLOR,
@@ -171,7 +171,7 @@ function saveText() {
   $('#autocompleteform [type="submit"]').click();
 
   if (_returnType === 'annotation') {
-    PDFJSAnnotate.getStoreAdapter().addAnnotation(documentId, annotation)
+    PDFAnnoCore.getStoreAdapter().addAnnotation(documentId, annotation)
       .then((annotation) => {
         appendChild(svg, annotation);
 

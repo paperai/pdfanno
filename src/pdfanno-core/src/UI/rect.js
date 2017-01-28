@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import assign from 'deep-assign';
-import PDFJSAnnotate from '../PDFJSAnnotate';
+import PDFAnnoCore from '../PDFAnnoCore';
 import appendChild from '../render/appendChild';
 import {
   BORDER_COLOR,

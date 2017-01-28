@@ -7,7 +7,7 @@ require("!style!css!./css/pdfanno.css");
 
 export default {
   /**
-   * Abstract class that needs to be defined so PDFJSAnnotate
+   * Abstract class that needs to be defined so PDFAnnoCore
    * knows how to communicate with your server.
    */
   StoreAdapter,

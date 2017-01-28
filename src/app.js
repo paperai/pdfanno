@@ -22,10 +22,10 @@ function adjustViewerSize() {
     Disable annotation tool buttons.
 */
 function disableAnnotateTools() {
-    window.iframeWindow.PDFAnnotate.UI.disableRect();
-    window.iframeWindow.PDFAnnotate.UI.disableHighlight();
-    window.iframeWindow.PDFAnnotate.UI.disableArrow();
-    window.iframeWindow.PDFAnnotate.UI.disableViewMode();
+    window.iframeWindow.PDFAnnoCore.UI.disableRect();
+    window.iframeWindow.PDFAnnoCore.UI.disableHighlight();
+    window.iframeWindow.PDFAnnoCore.UI.disableArrow();
+    window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
 }
 
 /**
@@ -44,25 +44,25 @@ function initializeAnnoToolButtons() {
         disableAnnotateTools();
 
         if (type === 'view') {
-            window.iframeWindow.PDFAnnotate.UI.enableViewMode();
+            window.iframeWindow.PDFAnnoCore.UI.enableViewMode();
 
         } else if (type === 'highlight') {
-            window.iframeWindow.PDFAnnotate.UI.enableHighlight();
+            window.iframeWindow.PDFAnnoCore.UI.enableHighlight();
 
         } else if (type === 'arrow') {
-            window.iframeWindow.PDFAnnotate.UI.enableArrow('one-way');
+            window.iframeWindow.PDFAnnoCore.UI.enableArrow('one-way');
 
         } else if (type === 'arrow-two-way') {
-            window.iframeWindow.PDFAnnotate.UI.enableArrow('two-way');
+            window.iframeWindow.PDFAnnoCore.UI.enableArrow('two-way');
 
         } else if (type === 'link') {
-            window.iframeWindow.PDFAnnotate.UI.enableArrow('link');
+            window.iframeWindow.PDFAnnoCore.UI.enableArrow('link');
 
         } else if (type === 'rect') {
-            window.iframeWindow.PDFAnnotate.UI.enableRect();
+            window.iframeWindow.PDFAnnoCore.UI.enableRect();
 
         } else if (type === 'text') {
-            window.iframeWindow.PDFAnnotate.UI.enableText();
+            window.iframeWindow.PDFAnnoCore.UI.enableText();
         }
 
         return false;
@@ -93,7 +93,7 @@ function initializeAnnoToolButtons() {
  */
 function downloadAnnotation() {
 
-    window.iframeWindow.PDFAnnotate.getStoreAdapter().exportData().then(annotations => {
+    window.iframeWindow.PDFAnnoCore.getStoreAdapter().exportData().then(annotations => {
         annotations = JSON.stringify(annotations, null, '\t');
         let blob = new Blob([annotations]);
         let blobURL = window.URL.createObjectURL(blob);
@@ -133,7 +133,7 @@ function deleteAllAnnotations() {
     }
 
     let documentId = window.iframeWindow.getFileName(window.iframeWindow.PDFView.url);
-    window.iframeWindow.PDFAnnotate.getStoreAdapter().deleteAnnotations(documentId).then(() => {
+    window.iframeWindow.PDFAnnoCore.getStoreAdapter().deleteAnnotations(documentId).then(() => {
         reloadPDFViewer();
     });
 }
@@ -272,7 +272,7 @@ function displayAnnotation(e) {
         };
 
         // Pass the data to pdf-annotatejs.
-        window.iframeWindow.PDFAnnotate.getStoreAdapter().importAnnotations(paperData).then(result => {
+        window.iframeWindow.PDFAnnoCore.getStoreAdapter().importAnnotations(paperData).then(result => {
 
             // Reload the viewer.
             reloadPDFViewer();
@@ -321,8 +321,8 @@ function startApplication() {
 
     // Set viewMode behavior after annotations rendered.
     iframeWindow.addEventListener('annotationrendered', () => {
-        window.iframeWindow.PDFAnnotate.UI.disableViewMode();
-        window.iframeWindow.PDFAnnotate.UI.enableViewMode();
+        window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
+        window.iframeWindow.PDFAnnoCore.UI.enableViewMode();
     });
 
     // Handle the pdf user dropped in.

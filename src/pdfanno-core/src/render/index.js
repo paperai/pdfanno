@@ -1,12 +1,12 @@
-import PDFJSAnnotate from '../PDFJSAnnotate';
+import PDFAnnoCore from '../PDFAnnoCore';
 import appendChild from './appendChild';
 
 /**
- * Render the response from PDFJSAnnotate.getStoreAdapter().getAnnotations to SVG
+ * Render the response from PDFAnnoCore.getStoreAdapter().getAnnotations to SVG
  *
  * @param {SVGElement} svg The SVG element to render the annotations to
  * @param {Object} viewport The page viewport data
- * @param {Object} data The response from PDFJSAnnotate.getStoreAdapter().getAnnotations
+ * @param {Object} data The response from PDFAnnoCore.getStoreAdapter().getAnnotations
  * @return {Promise} Settled once rendering has completed
  *  A settled Promise will be either:
  *    - fulfilled: SVGElement
