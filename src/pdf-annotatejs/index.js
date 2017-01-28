@@ -1,4 +1,3 @@
-require("!style!css!./pdf-annotate.css");
 import $ from 'jquery';
 import EventEmitter from 'events';
 
