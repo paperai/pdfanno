@@ -22,7 +22,6 @@ export default function renderCircle(a) {
     cx: x,
     cy: y,
     r: a.r || DEFAULT_RADIUS,
-    // fill: normalizeColor(a.color || '#f00'),
     fill : 'blue'
   });
   if (a.type) {

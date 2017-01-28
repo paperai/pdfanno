@@ -59,20 +59,6 @@ export function findSVGAtPoint(x, y) {
 
   return null;
 
-
-  // let elements = document.querySelectorAll('svg[data-pdf-annotate-container="true"]');
-
-  // for (let i=0, l=elements.length; i<l; i++) {
-  //   let el = elements[i];
-  //   let rect = el.getBoundingClientRect();
-
-  //   if (pointIntersectsRect(x, y, rect)) {
-
-  //     return el;
-  //   }
-  // }
-
-  // return null;
 }
 
 /**
@@ -90,7 +76,7 @@ export function findAnnotationAtPoint(x, y) {
   // Find a target element within SVG
   for (let i=0, l=elements.length; i<l; i++) {
     let el = elements[i];
-    if (pointIntersectsRect(x, y, getOffsetAnnotationRect(el))) {   
+    if (pointIntersectsRect(x, y, getOffsetAnnotationRect(el))) {
       return el;
     }
   }
@@ -414,10 +400,6 @@ export function getCurrentPage(e) {
     if (minX <= x && x <= maxX && minY <= y && y <= maxY) {
 
       let page = parseInt(el.parentNode.id.replace('pageContainer', ''));
-
-      console.log('find!!!!', page);
-      // console.log('x', minX <= x && x <= maxX, minX, x, maxX);
-      // console.log('y', minY <= y && y <= maxY, minY, y, maxY);
 
       return { page, minX, maxX, minY, maxY };
     }

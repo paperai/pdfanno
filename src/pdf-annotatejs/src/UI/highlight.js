@@ -4,7 +4,7 @@ import {
   enableUserSelect,
   scaleDown,
   scaleUp,
-  getSVGLayer  
+  getSVGLayer
 } from './utils';
 import { addInputField } from './text';
 import HighlightAnnotation from '../annotation/highlight';
@@ -23,9 +23,9 @@ function getSelectionRects() {
     if (rects.length > 0 && rects[0].width > 0 && rects[0].height > 0) {
       return rects;
     }
-    
+
   } catch (e) {}
-  
+
   return null;
 }
 
@@ -42,10 +42,10 @@ function handleDocumentMouseup(e) {
     let svg = getSVGLayer();
     saveRect([...rects].map((r) => {
       return {
-        top: r.top,
-        left: r.left,
-        width: r.width,
-        height: r.height
+        top    : r.top,
+        left   : r.left,
+        width  : r.width,
+        height : r.height
       };
     }));
   }
@@ -86,7 +86,7 @@ function saveRect(rects) {
       });
     }).filter((r) => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1)
   };
-  
+
   // Save.
   let highlightAnnotation = HighlightAnnotation.newInstance(annotation);
   highlightAnnotation.save();
@@ -122,7 +122,7 @@ function saveRect(rects) {
 /**
  * Enable hightlight behavior.
  */
-export function enableHighlight() {  
+export function enableHighlight() {
   this.disableHighlight();
   document.addEventListener('mouseup', handleDocumentMouseup);
   $('.textLayer').css('z-index', 3); // over svg layer.

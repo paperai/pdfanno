@@ -26,7 +26,7 @@ export function createArrow(a, id=null) {
       color = arrowSecondaryColor[a.seq % arrowSecondaryColor.length];
     } else {
       color = '#F00';
-    }    
+    }
   }
 
 
@@ -39,11 +39,11 @@ export function createArrow(a, id=null) {
 
   let group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   setAttributes(group, {
-    fill: color,
-    stroke: color,
-    'data-rel1': a.rel1,
-    'data-rel2': a.rel2,
-    'data-text': a.text
+    fill        : color,
+    stroke      : color,
+    'data-rel1' : a.rel1,
+    'data-rel2' : a.rel2,
+    'data-text' : a.text
   });
   group.style.visibility = 'visible';
   group.setAttribute('read-only', a.readOnly === true);
@@ -108,8 +108,6 @@ export function createArrow(a, id=null) {
   }
 
   group.appendChild(arrow);
-
-  // console.log('createArrow:', group);
 
   return group;
 }
