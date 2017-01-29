@@ -42,7 +42,7 @@
   stroke: black;
   stroke-width: 1px;
   stroke-dasharray: 3;
-  animation: anime-highlight 0.5s infinite alternate;
+/*  animation: anime-highlight 0.5s infinite alternate;*/
 }
 @keyframes anime-highlight {
   0% {stroke: rgba(255, 60, 90, 1.0);}
