@@ -41,6 +41,7 @@
 .anno-highlight.--selected {
   stroke: black;
   stroke-width: 1px;
+  stroke-dasharray: 3;
   animation: anime-highlight 0.5s infinite alternate;
 }
 @keyframes anime-highlight {
