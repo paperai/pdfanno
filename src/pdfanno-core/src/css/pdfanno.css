@@ -24,21 +24,21 @@
     transition:0.2s;
     transform-origin: center center;
 }
-.anno-circle.--hover {
+.--hover .anno-circle {
   box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;
   /*transform: scale(2);*/
   stroke: blue;
   stroke-width: 5px;
 }
 
-.anno-highlight.--hover {
+.--hover .anno-highlight {
   /*html*/
   box-shadow: 0 0 0 1px #ccc inset;
   /*svg*/
   stroke: #ccc;
   stroke-width: 0.75px;
 }
-.anno-highlight.--selected {
+.--selected .anno-highlight {
   stroke: black;
   stroke-width: 0.5px;
   stroke-dasharray: 3;
@@ -55,10 +55,10 @@
 .anno-arrow {
   transition:0.2s;
 }
-.anno-arrow.--hover {
+.--hover .anno-arrow {
   stroke-width: 2px;
 }
-.anno-arrow.--selected {
+.--selected .anno-arrow {
   animation: anime-arrow 0.5s infinite alternate;
 }
 .anno-arrow-outline {
@@ -66,7 +66,7 @@
   visibility: hidden;
 
 }
-.anno-arrow-outline.--selected {
+.--selected .anno-arrow-outline {
   visibility: visible;
   stroke: black;
   stroke-width: 2.5px;
@@ -84,11 +84,11 @@
 */
 .anno-rect {
 }
-.anno-rect.--hover {
+.--hover .anno-rect {
   stroke-width: 2px;
   fill: rgba(255, 0, 0, 0.5);
 }
-.anno-rect.--selected {
+.--selected .anno-rect {
   stroke: black;
   stroke-width: 4px;
   stroke-dasharray: 3;
@@ -101,21 +101,21 @@
   rx: 2;
   ry: 2;
 }
-.anno-text.--hover {
+.--hover .anno-text {
   fill: rgba(255, 255, 255, 0.9);
   transition: 0.15s;
   stroke: black;
   stroke-width: 1px;
 }
-.anno-text.--hover ~ text {
+.--hover .anno-text ~ text {
   fill: rgba(255, 0, 0, 0.9);
 }
-.anno-text.--selected  {
+.--selected .anno-text {
   animation: anime-text 0.5s infinite alternate;
   stroke: black;
   stroke-width: 1px;
 }
-.anno-text.--selected ~ text {
+.--selected .anno-text ~ text {
   fill: rgba(255, 255, 255, 1.0);
   font-weight: 300;
 }
