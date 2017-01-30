@@ -37,10 +37,11 @@
   /*svg*/
   stroke: #ccc;
   stroke-width: 0.75px;
+  stroke-dasharray: 3;
 }
 .anno-highlight.--selected {
   stroke: black;
-  stroke-width: 0.75px;
+  stroke-width: 0.5px;
   stroke-dasharray: 3;
 /*  animation: anime-highlight 0.5s infinite alternate;*/
 }
