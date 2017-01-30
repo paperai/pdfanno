@@ -2,7 +2,7 @@ var webpack = require('webpack');
 
 module.exports = {
   entry: {
-    app : './src/app.js',
+    pdfanno : './src/pdfanno.js',
     'pdfanno-core' : './src/pdfanno-core/index.js'
   },
   output: {

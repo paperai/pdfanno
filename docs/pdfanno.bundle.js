@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
 	else if(typeof exports === 'object')
-		exports["PDFAnnotate"] = factory();
+		exports["PDFAnnoCore"] = factory();
 	else
-		root["PDFAnnotate"] = factory();
+		root["PDFAnnoCore"] = factory();
 })(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -80,17 +80,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Disable annotation tool buttons.
 	*/
 	function disableAnnotateTools() {
-	    window.iframeWindow.PDFAnnotate.UI.disableRect();
-	    window.iframeWindow.PDFAnnotate.UI.disableHighlight();
-	    window.iframeWindow.PDFAnnotate.UI.disableText();
-	    window.iframeWindow.PDFAnnotate.UI.disableArrow();
-	    window.iframeWindow.PDFAnnotate.UI.disableViewMode();
+	    window.iframeWindow.PDFAnnoCore.UI.disableRect();
+	    window.iframeWindow.PDFAnnoCore.UI.disableHighlight();
+	    window.iframeWindow.PDFAnnoCore.UI.disableArrow();
+	    window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
 	}
 	
 	/**
 	    Set the behavior of the tool buttons for annotations.
 	*/
-	var _viewMode = false;
 	function initializeAnnoToolButtons() {
 	
 	    $('.js-tool-btn').off('click').on('click', function (e) {
@@ -103,23 +101,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        disableAnnotateTools();
 	
-	        _viewMode = false;
-	
 	        if (type === 'view') {
-	            _viewMode = true;
-	            window.iframeWindow.PDFAnnotate.UI.enableViewMode();
+	            window.iframeWindow.PDFAnnoCore.UI.enableViewMode();
 	        } else if (type === 'highlight') {
-	            window.iframeWindow.PDFAnnotate.UI.enableHighlight();
+	            window.iframeWindow.PDFAnnoCore.UI.enableHighlight();
 	        } else if (type === 'arrow') {
-	            window.iframeWindow.PDFAnnotate.UI.enableArrow('one-way');
+	            window.iframeWindow.PDFAnnoCore.UI.enableArrow('one-way');
 	        } else if (type === 'arrow-two-way') {
-	            window.iframeWindow.PDFAnnotate.UI.enableArrow('two-way');
+	            window.iframeWindow.PDFAnnoCore.UI.enableArrow('two-way');
 	        } else if (type === 'link') {
-	            window.iframeWindow.PDFAnnotate.UI.enableArrow('link');
+	            window.iframeWindow.PDFAnnoCore.UI.enableArrow('link');
 	        } else if (type === 'rect') {
-	            window.iframeWindow.PDFAnnotate.UI.enableRect();
+	            window.iframeWindow.PDFAnnoCore.UI.enableRect();
 	        } else if (type === 'text') {
-	            window.iframeWindow.PDFAnnotate.UI.enableText();
+	            window.iframeWindow.PDFAnnoCore.UI.enableText();
 	        }
 	
 	        return false;
@@ -144,9 +139,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    $('.js-tool-btn[data-type="view"]').click();
 	}
 	
+	/**
+	 * Export the primary annotation data for download.
+	 */
 	function downloadAnnotation() {
 	
-	    window.iframeWindow.PDFAnnotate.getStoreAdapter().exportData().then(function (annotations) {
+	    window.iframeWindow.PDFAnnoCore.getStoreAdapter().exportData().then(function (annotations) {
 	        annotations = JSON.stringify(annotations, null, '\t');
 	        var blob = new Blob([annotations]);
 	        var blobURL = window.URL.createObjectURL(blob);
@@ -161,6 +159,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    unlistenWindowLeaveEvent();
 	}
 	
+	/**
+	 * Reload PDF Viewer.
+	 */
 	function reloadPDFViewer() {
 	
 	    // Reload pdf.js.
@@ -176,83 +177,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function deleteAllAnnotations() {
 	
+	    // Comfirm to user.
 	    var userAnswer = window.confirm('Are you sure to clear the current annotations?');
 	    if (!userAnswer) {
 	        return;
 	    }
 	
 	    var documentId = window.iframeWindow.getFileName(window.iframeWindow.PDFView.url);
-	    window.iframeWindow.PDFAnnotate.getStoreAdapter().deleteAnnotations(documentId).then(function () {
-	
+	    window.iframeWindow.PDFAnnoCore.getStoreAdapter().deleteAnnotations(documentId).then(function () {
 	        reloadPDFViewer();
 	    });
 	}
 	
 	/**
-	    Set the behaviors of file inputs.
-	*/
-	var _primaryAnnotation = null;
-	var _secondaryAnnotations = [];
-	function initializeFileUploader() {
-	    setupPrimaryAnnotationButton();
-	    setupSecondaryAnnotationButton();
-	}
-	
-	function setupPrimaryAnnotationButton() {
-	
-	    // The primary annotations.
-	    $('#primary-anno').off('change').on('change', function (e) {
-	
-	        var files = e.target.files;
-	        if (!files || files.length === 0) {
-	            return;
-	        }
-	
-	        var file = files[0];
-	
-	        var fileReader = new FileReader();
-	        fileReader.onload = function (event) {
-	            _primaryAnnotation = event.target.result;
-	        };
-	        fileReader.readAsText(file);
-	    });
-	}
-	
-	function setupSecondaryAnnotationButton() {
-	    // The secondary annotations.
-	    $('#secondary-anno').off('change').on('change', function (e) {
-	
-	        var files = e.target.files;
-	        if (!files || files.length === 0) {
-	            return;
-	        }
-	
-	        _secondaryAnnotations = [];
-	
-	        Array.prototype.forEach.call(files, function (file) {
-	            var fileReader = new FileReader();
-	            fileReader.onload = function (event) {
-	                _secondaryAnnotations.push(JSON.parse(event.target.result));
-	            };
-	            fileReader.readAsText(file);
-	        });
-	    });
-	}
-	
-	function setupPDFDragAndDropLoader() {
-	
-	    var element = document.querySelector('.js-viewer-root');
-	
-	    element.removeEventListener('dragenter', handleDragEnter);
-	    element.removeEventListener('dragleave', handleDragLeave);
-	    element.removeEventListener('dragover', handleDragOver);
-	    element.removeEventListener('drop', handleDroppedFile);
-	    element.addEventListener('dragenter', handleDragEnter);
-	    element.addEventListener('dragleave', handleDragLeave);
-	    element.addEventListener('dragover', handleDragOver);
-	    element.addEventListener('drop', handleDroppedFile);
-	}
-	
+	 * Check the filename which user dropped in.
+	 */
 	function checkFileCompatibility(fileName, ext) {
 	    var fragments = fileName.split('.');
 	    if (fragments.length < 2) {
@@ -261,32 +200,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return fragments[1].toLowerCase() === ext;
 	}
 	
-	function handleDroppedFile(e) {
+	/**
+	 * Load user's pdf file.
+	 */
+	function handleDroppedFile(file) {
 	
-	    // Confirm override.
+	    // Confirm dialog.
 	    var userAnswer = window.confirm('Are you sure to load a new pdf file? Please save your current annotations.');
 	    if (!userAnswer) {
-	        return cancelEvent(e);
+	        return;
 	    }
-	
-	    e = e.originalEvent || e;
-	
-	    console.log('aaaaaaaaaaa', e, e.dataTransfer);
-	
-	    var element = e.target;
-	    var file = e.dataTransfer.files[0];
-	    console.log('file:', file);
-	
-	    $('#viewer').removeClass('-active');
 	
 	    var fileName = file.name;
 	
 	    // Check compatibility.
 	    if (!checkFileCompatibility(fileName, 'pdf')) {
-	        alert("FILE NOT COMPATIBLE. \"*.pdf\" can be loaded.\n actual = \"" + fileName + "\".");
-	        return cancelEvent(e);
+	        return alert("FILE NOT COMPATIBLE. \"*.pdf\" can be loaded.\n actual = \"" + fileName + "\".");
 	    }
 	
+	    // Load pdf data, and reload.
 	    var fileReader = new FileReader();
 	    fileReader.onload = function (event) {
 	        var data = event.target.result;
@@ -296,62 +228,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        reloadPDFViewer();
 	    };
 	    fileReader.readAsDataURL(file);
-	
-	    return cancelEvent(e);
-	}
-	
-	function handleDragEnter(e) {
-	    console.log('handleDragEnter');
-	    $('#viewer').addClass('-active');
-	    return cancelEvent(e);
-	}
-	
-	function handleDragLeave(e) {
-	    console.log('handleDragLeave');
-	    $('#viewer').removeClass('-active');
-	    return cancelEvent(e);
-	}
-	
-	var timer = null;
-	function handleDragOver(e) {
-	
-	    e = e.originalEvent || e;
-	
-	    console.log('handleDragOver', e.dataTransfer);
-	
-	    // This is the setting to allow D&D for Firefox.
-	    // @see https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/effectAllowed
-	    e.dataTransfer.effectAllowed = 'move';
-	
-	    // $('#viewer').addClass('-active');
-	
-	    // if (timer) {
-	    //     clearTimeout(timer);
-	    // }
-	    // timer = setTimeout(() => {
-	    //     $('#viewer').removeClass('-active');
-	    //     timer = null;
-	    // }, 1000);
-	
-	    return cancelEvent(e);
-	}
-	
-	function handleDragOverFromViewer() {
-	    $('#viewer').addClass('-active');
-	
-	    if (timer) {
-	        clearTimeout(timer);
-	    }
-	    timer = setTimeout(function () {
-	        $('#viewer').removeClass('-active');
-	        timer = null;
-	    }, 1000);
-	}
-	
-	// Cancel handler
-	function cancelEvent(e) {
-	    e.preventDefault();
-	    return false;
 	}
 	
 	/**
@@ -385,20 +261,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Load annotation data and display.
 	 */
 	function displayAnnotation(e) {
-	    console.log('displayAnnotation');
 	
 	    var updateTarget = $(e.target).attr('name');
 	
-	    // Primary annotation index.
+	    // Get the primary index which indicates the editable annotation.
 	    var primaryIndex = parseInt($('.js-anno-radio:checked').val(), 10);
 	
-	    // Visibilities.
+	    // Get annotation visibilities.
 	    var visibilities = [$('.js-anno-visibility').eq(0).is(':checked'), $('.js-anno-visibility').eq(1).is(':checked'), $('.js-anno-visibility').eq(2).is(':checked'), $('.js-anno-visibility').eq(3).is(':checked')];
 	
-	    // Annotation color.
+	    // Get annotation colors.
 	    var colors = [$('.js-anno-palette').eq(0).spectrum('get').toHexString(), $('.js-anno-palette').eq(1).spectrum('get').toHexString(), $('.js-anno-palette').eq(2).spectrum('get').toHexString(), $('.js-anno-palette').eq(3).spectrum('get').toHexString()];
 	
-	    // Annotation files.
+	    // Get annotation data.
 	    var actions = [];
 	    $('.js-anno-file').each(function () {
 	        var files = this.files;
@@ -412,20 +287,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var fileReader = new FileReader();
 	            fileReader.onload = function (event) {
 	                var annotation = event.target.result;
-	                // TODO JSON scheme check.
+	                // TODO JSON scheme check ?
 	                resolve(JSON.parse(annotation));
 	            };
 	            fileReader.readAsText(files[0]);
 	        }));
 	    });
 	    Promise.all(actions).then(function (annotations) {
-	        console.log(annotations);
 	
 	        annotations = annotations.map(function (a) {
 	            return a ? a : {};
 	        });
-	
-	        console.log(annotations);
 	
 	        // Create import data.
 	        paperData = {
@@ -438,29 +310,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	        };
 	
 	        // Pass the data to pdf-annotatejs.
-	        window.iframeWindow.PDFAnnotate.getStoreAdapter().importAnnotations(paperData).then(function (result) {
+	        window.iframeWindow.PDFAnnoCore.getStoreAdapter().importAnnotations(paperData).then(function (result) {
 	
-	            console.log('Done:', result);
-	
-	            // TODO Re-render annotations.
+	            // Reload the viewer.
 	            reloadPDFViewer();
 	
-	            // TODO set the mode to viewMode.
+	            // Reset tools to viewMode.
 	            $('.js-tool-btn[data-type="view"]').click();
 	        });
 	    });
 	}
 	
+	/**
+	 * Set the confirm dialog at leaving the page.
+	 */
 	function listenWindowLeaveEvent() {
 	    $(window).off('beforeunload').on('beforeunload', function () {
 	        return 'You don\'t save the annotations yet.\nAre you sure to leave ?';
 	    });
 	}
 	
+	/**
+	 * Unset the confirm dialog at leaving the page.
+	 */
 	function unlistenWindowLeaveEvent() {
 	    $(window).off('beforeunload');
 	}
 	
+	/**
+	 * Start PDFAnno Application.
+	 */
 	function startApplication() {
 	
 	    // Alias for convenience.
@@ -474,51 +353,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // Initialize tool buttons' behavior.
 	        initializeAnnoToolButtons();
 	
-	        // Set the behaviors of file inputs.
-	        initializeFileUploader();
-	
-	        // Set the event drag & drop for loading a PDF file.
-	        setupPDFDragAndDropLoader();
-	
+	        // Reset the confirm dialog at leaving page.
 	        unlistenWindowLeaveEvent();
 	    });
 	
-	    iframeWindow.addEventListener('annotationrendered', function (ev) {
-	        console.log('annotationrendered', ev.detail.pageNumber);
-	
-	        if (_viewMode) {
-	            window.iframeWindow.PDFAnnotate.UI.disableViewMode();
-	            window.iframeWindow.PDFAnnotate.UI.enableViewMode();
-	        }
+	    // Set viewMode behavior after annotations rendered.
+	    iframeWindow.addEventListener('annotationrendered', function () {
+	        window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
+	        window.iframeWindow.PDFAnnoCore.UI.enableViewMode();
 	    });
 	
+	    // Handle the pdf user dropped in.
 	    iframeWindow.addEventListener('pdfdropped', function (ev) {
-	        console.log('pdfdropped', ev.detail.originalEvent.dataTransfer.files[0]);
-	        handleDroppedFile(ev.detail.originalEvent);
+	        handleDroppedFile(ev.detail.file);
 	    });
 	
-	    iframeWindow.addEventListener('pdfdragover', function (ev) {
-	        console.log('pdfdragover!!!');
-	        // handleDragOverFromViewer(ev.detail.originalEvent);
-	    });
-	
-	    iframeWindow.addEventListener('annotationUpdated', function () {
-	        console.log('annotationUpdated');
-	        listenWindowLeaveEvent();
-	    });
-	}
-	
-	/**
-	 * Initialize PAPERANNO application.
-	 * This is called only once at launch.
-	 */
-	function initApplication() {
-	
-	    // Start application.
-	    startApplication();
-	
-	    // Setup the annotation load and select UI.
-	    setupAnnotationSelectUI();
+	    // Set the confirm dialog at page leaving.
+	    iframeWindow.addEventListener('annotationUpdated', listenWindowLeaveEvent);
 	}
 	
 	/**
@@ -532,7 +383,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        localStorage.removeItem(LOCALSTORAGE_KEY2);
 	    }
 	
-	    initApplication();
+	    // Start application.
+	    startApplication();
+	
+	    // Setup the annotation load and select UI.
+	    setupAnnotationSelectUI();
 	});
 
 /***/ },
@@ -557,8 +412,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../node_modules/css-loader/index.js!./app.css", function() {
-				var newContent = require("!!./../node_modules/css-loader/index.js!./app.css");
+			module.hot.accept("!!./../node_modules/css-loader/index.js!./pdfanno.css", function() {
+				var newContent = require("!!./../node_modules/css-loader/index.js!./pdfanno.css");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -576,7 +431,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, "@charset 'utf-8';\n\n\n.anno-viewer {\n    width: 100%;\n    height: 500px;\n}\n\n/*.anno-viewmode {\n    opacity: 0.5;\n}*/\n\n/**\n    PDF Drag and Drop UI.\n*/\n/*#viewer {\n    position: relative;\n}\n#viewer.-active:after {\n    position: absolute;\n    top: 0;\n    left: 0;\n    width: 100%;\n    height: 100%;\n    background: rgba(0, 0, 255, 0.3);\n    content: \" \";\n}*/\n\n/**\n * Annotation Select UI Layout.\n */\n.anno-select-layout {}\n.anno-select-layout .row:first-child {\n    margin-bottom: 10px;\n}\n.anno-select-layout [type=\"radio\"] {\n    margin-right: 5px;\n}\n.anno-select-layout [type=\"file\"] {\n    display: inline-block;\n    margin-left: 5px;\n    line-height: 1em;\n}\n.anno-select-layout .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-select-layout .sp-dd {\n    display: none;\n}", ""]);
+	exports.push([module.id, "@charset 'utf-8';\n\n/**\n * Viewer size.\n * This height will be override to fit the browser height (by app.js).\n */\n.anno-viewer {\n    width: 100%;\n    height: 500px;\n}\n\n/**\n * Annotation Select UI Layout.\n */\n.anno-select-layout {}\n.anno-select-layout .row:first-child {\n    margin-bottom: 10px;\n}\n.anno-select-layout [type=\"radio\"] {\n    margin-right: 5px;\n}\n.anno-select-layout [type=\"file\"] {\n    display: inline-block;\n    margin-left: 5px;\n    line-height: 1em;\n}\n.anno-select-layout .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-select-layout .sp-dd {\n    display: none;\n}\n", ""]);
 	
 	// exports
 
@@ -893,4 +748,4 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ ])
 });
 ;
-//# sourceMappingURL=app.bundle.js.map
+//# sourceMappingURL=pdfanno.bundle.js.map

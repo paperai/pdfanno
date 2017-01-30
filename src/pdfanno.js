@@ -1,5 +1,5 @@
 require("file?name=dist/index.html!./index.html");
-require("!style!css!./app.css");
+require("!style!css!./pdfanno.css");
 
 /**
  * Resize the height of PDFViewer adjusting to the window.
