@@ -202,14 +202,12 @@ function deleteBoundingBoxList() {
 }
 
 function handleBoundingCircleHoverIn(annotation) {
-  console.log('handleBoundingCircleHoverIn');
-
+  // console.log('handleBoundingCircleHoverIn');
   _hoverAnnotation = annotation;
 }
 
 function handleBoundingCircleHoverOut(annotation) {
-  console.log('handleBoundingCircleHoverOut');
-
+  // console.log('handleBoundingCircleHoverOut');
   _hoverAnnotation = null;
 }
 

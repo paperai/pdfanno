@@ -12,6 +12,7 @@ import {
     enableUserSelect
 } from '../UI/utils';
 
+let globalEvent;
 
 /**
  * Text Annotation.
@@ -24,11 +25,16 @@ export default class TextAnnotation extends AbstractAnnotation {
     constructor(parent) {
         super();
 
+        globalEvent = window.globalEvent;
+
         this.type     = 'textbox';
         this.parent   = parent;
         this.x        = 0;
         this.y        = 0;
         this.$element = this.createDummyElement();
+
+        // parent.on('rectmoveend', this.handleRectMoveEnd);
+        globalEvent.on('rectmoveend', this.handleRectMoveEnd);
 
         window.globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
         window.globalEvent.on('enableViewMode', this.enableViewMode);
@@ -67,11 +73,7 @@ export default class TextAnnotation extends AbstractAnnotation {
     }
 
     deleteSelectedAnnotation() {
-
-        // TODO ここから.
-        // event名を変えたり、destroyのタイミングで発火したりできないかなー？
-
-        if (this.$element.find('rect').hasClass('--selected')) {
+        if (this.$element.hasClass('--selected')) {
             console.log('text:deleteSelectedAnnotation');
             this.destroy();
             this.emit('textchanged', null);
@@ -109,7 +111,7 @@ export default class TextAnnotation extends AbstractAnnotation {
     }
 
     handleClickEvent() {
-        this.$element.find('rect').toggleClass('--selected');
+        this.$element.toggleClass('--selected');
 
         // Check double click.
         let currentTime = (new Date()).getTime();
@@ -151,8 +153,12 @@ export default class TextAnnotation extends AbstractAnnotation {
 
         }, 'text');
 
+    }
 
-
+    handleRectMoveEnd(rectAnnotation) {
+        if (rectAnnotation === this.parent) {
+            this.enableViewMode();
+        }
     }
 
     enableViewMode() {

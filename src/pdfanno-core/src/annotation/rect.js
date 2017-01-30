@@ -7,6 +7,8 @@ import {
     enableUserSelect
 } from '../UI/utils';
 
+let globalEvent;
+
 /**
  * Rect Annotation.
  */
@@ -18,6 +20,8 @@ export default class RectAnnotation extends AbstractAnnotation {
     constructor() {
 
         super();
+
+        globalEvent = window.globalEvent;
 
         this.uuid     = null;
         this.type     = 'area';
@@ -235,6 +239,8 @@ export default class RectAnnotation extends AbstractAnnotation {
 
             this.save();
             this.enableViewMode();
+            // this.emit('rectmoveend', this);
+            globalEvent.emit('rectmoveend', this);
         }
 
         enableUserSelect();

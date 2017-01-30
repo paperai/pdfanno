@@ -3,6 +3,8 @@ import AbstractAnnotation from './abstract';
 import TextAnnotation from './text';
 import { getRelationTextPosition } from '../utils/relation.js';
 
+let globalEvent;
+
 /**
  * Arrow Annotation (one-way / two-way / link)
  */
@@ -13,6 +15,8 @@ export default class ArrowAnnotation extends AbstractAnnotation {
      */
     constructor() {
         super();
+
+        globalEvent = window.globalEvent;
 
         this.uuid           = uuid();
         this.type           = 'arrow';
@@ -29,9 +33,10 @@ export default class ArrowAnnotation extends AbstractAnnotation {
         this.x2 = 0;
         this.y2 = 0;
 
-        window.globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
-        window.globalEvent.on('enableViewMode', this.enableViewMode);
-        window.globalEvent.on('disableViewMode', this.disableViewMode);
+        globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
+        globalEvent.on('enableViewMode', this.enableViewMode);
+        globalEvent.on('disableViewMode', this.disableViewMode);
+        globalEvent.on('rectmoveend', this.handleRelMoveEnd);
 
         this.textAnnotation = new TextAnnotation(this);
         this.textAnnotation.on('hoverin', this.handleTextHoverIn);
@@ -214,6 +219,15 @@ export default class ArrowAnnotation extends AbstractAnnotation {
      */
     handleRelMove() {
         this.render();
+    }
+
+    /**
+     * The callback that is called relations has finished to be moved.
+     */
+    handleRelMoveEnd(rectAnnotation) {
+        if (this._rel1Annotation === rectAnnotation || this._rel2Annotation === rectAnnotation) {
+            this.textAnnotation.enableViewMode();
+        }
     }
 
     /**

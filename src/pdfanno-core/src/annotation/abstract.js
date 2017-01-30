@@ -49,13 +49,13 @@ export default class AbstractAnnotation extends EventEmitter {
             if (a) {
                 // update.
                 a = this.createAnnotation(a);
-                console.log('save:update:', a);
+                // console.log('save:update:', a);
                 PDFAnnoCore.getStoreAdapter().editAnnotation(documentId, this.uuid, a);
             } else {
                 // insert.
                 a = this.createAnnotation();
                 PDFAnnoCore.getStoreAdapter().addAnnotation(documentId, a);
-                console.log('save:insert:', a);
+                // console.log('save:insert:', a);
             }
         });
         window.annotationContainer.add(this);
