@@ -37,7 +37,6 @@
   /*svg*/
   stroke: #ccc;
   stroke-width: 0.75px;
-  stroke-dasharray: 3;
 }
 .anno-highlight.--selected {
   stroke: black;
