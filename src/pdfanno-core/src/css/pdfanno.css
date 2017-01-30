@@ -36,11 +36,11 @@
   box-shadow: 0 0 0 1px #ccc inset;
   /*svg*/
   stroke: #ccc;
-  stroke-width: 1px;
+  stroke-width: 0.75px;
 }
 .anno-highlight.--selected {
   stroke: black;
-  stroke-width: 1px;
+  stroke-width: 0.75px;
   stroke-dasharray: 3;
 /*  animation: anime-highlight 0.5s infinite alternate;*/
 }
@@ -69,7 +69,7 @@
 .anno-arrow-outline.--selected {
   visibility: visible;
   stroke: black;
-  stroke-width: 3px;
+  stroke-width: 2.5px;
   pointer-events: stroke;
 }
 @keyframes anime-arrow {
