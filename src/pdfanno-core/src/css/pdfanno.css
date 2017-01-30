@@ -23,6 +23,7 @@
 .anno-circle {
     transition:0.2s;
     transform-origin: center center;
+    z-index: 5;
 }
 .--hover .anno-circle {
   box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;
