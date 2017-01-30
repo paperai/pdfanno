@@ -42,12 +42,6 @@
   stroke: black;
   stroke-width: 0.5px;
   stroke-dasharray: 3;
-/*  animation: anime-highlight 0.5s infinite alternate;*/
-}
-@keyframes anime-highlight {
-  0% {stroke: rgba(255, 60, 90, 1.0);}
-  5% {stroke: rgba(255, 60, 90, 1.0);}
-  100% {stroke: rgba(255, 210, 245, 1.0);}
 }
 /**
   Arrow.
@@ -69,7 +63,7 @@
 .--selected .anno-arrow-outline {
   visibility: visible;
   stroke: black;
-  stroke-width: 2.5px;
+  stroke-width: 2.75px;
   pointer-events: stroke;
 }
 @keyframes anime-arrow {
@@ -85,12 +79,15 @@
 .anno-rect {
 }
 .--hover .anno-rect {
-  stroke-width: 2px;
-  fill: rgba(255, 0, 0, 0.5);
+  /*html*/
+  box-shadow: 0 0 0 1px #ccc inset;
+  /*svg*/
+  stroke: #ccc;
+  stroke-width: 0.75px;
 }
 .--selected .anno-rect {
   stroke: black;
-  stroke-width: 4px;
+  stroke-width: 0.5px;
   stroke-dasharray: 3;
 }
 
@@ -103,9 +100,8 @@
 }
 .--hover .anno-text {
   fill: rgba(255, 255, 255, 0.9);
-  transition: 0.15s;
   stroke: black;
-  stroke-width: 1px;
+  stroke-width: 0.75px;
 }
 .--hover .anno-text ~ text {
   fill: rgba(255, 0, 0, 0.9);
@@ -113,7 +109,8 @@
 .--selected .anno-text {
   animation: anime-text 0.5s infinite alternate;
   stroke: black;
-  stroke-width: 1px;
+  stroke-width: 0.75px;
+  stroke-dasharray: 4;
 }
 .--selected .anno-text ~ text {
   fill: rgba(255, 255, 255, 1.0);
