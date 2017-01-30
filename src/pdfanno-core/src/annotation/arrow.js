@@ -134,6 +134,22 @@ export default class ArrowAnnotation extends AbstractAnnotation {
         };
     }
 
+    destroy() {
+        super.destroy();
+        if (this._rel1Annotation) {
+            this._rel1Annotation.removeListener('hoverin', this.handleRelHoverIn);
+            this._rel1Annotation.removeListener('hoverout', this.handleRelHoverOut);
+            this._rel1Annotation.removeListener('rectmove', this.handleRelMove);
+            this._rel1Annotation.removeListener('delete', this.handleRelDelete);
+        }
+        if (this._rel2Annotation) {
+            this._rel2Annotation.removeListener('hoverin', this.handleRelHoverIn);
+            this._rel2Annotation.removeListener('hoverout', this.handleRelHoverOut);
+            this._rel2Annotation.removeListener('rectmove', this.handleRelMove);
+            this._rel2Annotation.removeListener('delete', this.handleRelDelete);
+        }
+    }
+
     /**
      * Delete the annotation if selected.
      */
@@ -226,6 +242,7 @@ export default class ArrowAnnotation extends AbstractAnnotation {
      */
     handleRelMoveEnd(rectAnnotation) {
         if (this._rel1Annotation === rectAnnotation || this._rel2Annotation === rectAnnotation) {
+            this.enableViewMode();
             this.textAnnotation.enableViewMode();
         }
     }

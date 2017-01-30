@@ -110,7 +110,9 @@ export default class AbstractAnnotation extends EventEmitter {
     deleteSelectedAnnotation() {
         if (this.isSelected()) {
             this.destroy();
+            return true;
         }
+        return false;
     }
 
     /**
