@@ -42,7 +42,6 @@ let pdfName = localStorage.getItem('_pdfanno_pdfname');
 if (pdfData) {
   DEFAULT_URL = pdfData;  
   DEFAULT_PDF_NAME = pdfName;
-  console.log('DEFAULT_PDF_NAME', DEFAULT_PDF_NAME);
 }
 
 function configure(PDFJS) {

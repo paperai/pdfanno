@@ -1,0 +1,97 @@
+
+/**
+ * Utilities.
+ */
+.--hide {
+  display: none;
+}
+
+/**
+ * SVGLayer.
+ */
+.annoLayer {}
+.annoLayer > *.--viewMode {
+  opacity: 0.5;
+}
+.annoLayer > *.--viewMode.--emphasis {
+  opacity: 1;
+}
+
+/**
+    各種アノテーション
+*/
+.anno-circle {
+    transition:0.2s;
+    transform-origin: center center;
+}
+.--hover .anno-circle {
+  box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;
+  /*transform: scale(2);*/
+  stroke: blue;
+  stroke-width: 5px;
+}
+
+.--hover .anno-highlight {
+  /*html*/
+  box-shadow: 0 0 0 1px #ccc inset;
+  /*svg*/
+  stroke: #ccc;
+  stroke-width: 1px;
+}
+.--selected .anno-highlight {
+  stroke: black;
+  stroke-width: 1px;
+  stroke-dasharray: 3;
+}
+
+/**
+  Arrow.
+*/
+.anno-arrow {
+  transition:0.2s;
+}
+.anno-arrow-outline {
+  fill: none;
+  stroke: black;
+  visibility: hidden;
+  stroke-width: 4px;
+  stroke-dasharray: 2.5;
+  pointer-events: stroke;
+}
+.--hover .anno-arrow {
+  stroke-width: 2px;
+}
+.--selected .anno-arrow-outline {
+  visibility: visible;
+}
+
+/**
+  Rect.
+*/
+.anno-rect {
+  transition: 0.2s;
+}
+.--hover .anno-rect {
+  stroke-width: 2px;
+}
+.--selected .anno-rect {
+  stroke: black;
+  stroke-width: 4px;
+  stroke-dasharray: 3;
+}
+
+/**
+  Text.
+*/
+.anno-text {
+  transition: 0.2s;
+}
+.--hover .anno-text {
+  stroke: red;
+  stroke-width: 0.5px;
+}
+.--selected .anno-text {
+  stroke: black;
+  stroke-width: 2px;
+  stroke-dasharray: 3;
+}

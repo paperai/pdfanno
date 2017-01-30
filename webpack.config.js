@@ -2,12 +2,12 @@ var webpack = require('webpack');
 
 module.exports = {
   entry: {
-    app : './src/app.js',
-    'pdf-annotate' : './src/pdf-annotatejs/index.js'
+    pdfanno : './src/pdfanno.js',
+    'pdfanno-core' : './src/pdfanno-core/index.js'
   },
   output: {
     filename: './dist/[name].bundle.js',
-    library: 'PDFAnnotate',
+    library: 'PDFAnnoCore',
     libraryTarget: 'umd'
   },
   module: {
