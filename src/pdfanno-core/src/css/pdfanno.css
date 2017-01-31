@@ -58,13 +58,13 @@
 .anno-arrow-outline {
   fill: none;
   visibility: hidden;
-
 }
 .--selected .anno-arrow-outline {
   visibility: visible;
   stroke: black;
-  stroke-width: 2.75px;
+  stroke-width: 2.85px;
   pointer-events: stroke;
+  stroke-dasharray: 3;
 }
 @keyframes anime-arrow {
   0% {stroke: rgba(255, 60, 90, 1.0);}
@@ -110,7 +110,6 @@
   animation: anime-text 0.5s infinite alternate;
   stroke: black;
   stroke-width: 0.75px;
-  stroke-dasharray: 4;
 }
 .--selected .anno-text ~ text {
   fill: rgba(255, 255, 255, 1.0);
