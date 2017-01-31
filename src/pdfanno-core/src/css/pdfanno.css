@@ -53,7 +53,6 @@
   stroke-width: 2px;
 }
 .--selected .anno-arrow {
-/*  animation: anime-arrow 0.5s infinite alternate;*/
 }
 .anno-arrow-outline {
   fill: none;
@@ -66,12 +65,6 @@
   pointer-events: stroke;
   stroke-dasharray: 3;
 }
-@keyframes anime-arrow {
-  0% {stroke: rgba(255, 60, 90, 1.0);}
-  5% {stroke: rgba(255, 60, 90, 1.0);}
-  100% {stroke: rgba(255, 210, 245, 1.0);}
-}
-
 
 /**
   Rect.
@@ -105,17 +98,12 @@
   fill: rgba(255, 0, 0, 1.0);
 }
 .--selected .anno-text {
-  animation: anime-text 0.5s infinite alternate;
   stroke: rgba(255, 0, 0, 1.0);
   stroke-width: 1.5px;
   fill: rgba(255, 232, 188, 1.0);
+  stroke-dasharray: 3;
 }
 .--selected .anno-text ~ text {
   fill: rgba(0, 0, 0, 1.0);
-}
-@keyframes anime-text {
-  0% {fill: rgba(255, 232, 188, 1.0);}
-  5% {fill: rgba(255, 232, 188, 1.0);}
-  100% {fill: rgba(255, 245, 230, 1.0);}
 }
 
