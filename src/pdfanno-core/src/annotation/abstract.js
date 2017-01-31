@@ -49,13 +49,11 @@ export default class AbstractAnnotation extends EventEmitter {
             if (a) {
                 // update.
                 a = this.createAnnotation(a);
-                // console.log('save:update:', a);
                 PDFAnnoCore.getStoreAdapter().editAnnotation(documentId, this.uuid, a);
             } else {
                 // insert.
                 a = this.createAnnotation();
                 PDFAnnoCore.getStoreAdapter().addAnnotation(documentId, a);
-                // console.log('save:insert:', a);
             }
         });
         window.annotationContainer.add(this);
@@ -136,14 +134,24 @@ export default class AbstractAnnotation extends EventEmitter {
         return $('<div class="dummy"/>');
     }
 
+    /**
+     * Enable a view mode.
+     */
     enableViewMode() {
         this.render();
     }
 
+    /**
+     * Disable a view mode.
+     */
     disableViewMode() {
         this.render();
     }
 
+    /**
+     * Make the text always visible.
+     * This state will be reset at entering the view mode.
+     */
     setTextForceDisplay() {
         if (this.textAnnotation) {
             this.textAnnotation.textForceDisplay = true;
