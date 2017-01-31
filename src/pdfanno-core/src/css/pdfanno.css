@@ -102,7 +102,6 @@
   fill: rgba(255, 255, 255, 1.0);
   stroke: black;
   stroke-width: 0.75px;
-  stroke-dasharray: 3;
 }
 .--hover .anno-text ~ text {
   fill: rgba(255, 0, 0, 1.0);
