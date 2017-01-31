@@ -48,7 +48,7 @@ export default function renderText(a, svg) {
     // Text.
     let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     setAttributes(text, {
-        x: a.x +3,
+        x: a.x,
         y: a.y + parseInt(DEFAULT_FONT_SIZE, 10),
         fill: color,
         fontSize: DEFAULT_FONT_SIZE
@@ -60,9 +60,9 @@ export default function renderText(a, svg) {
     console.log(svg)
     let rect = getRect(text, svg);
     setAttributes(box, {
-      x: a.x,
+      x: a.x -4,
       y: a.y -1,
-      width: rect.width +6,
+      width: rect.width +8,
       height: rect.height +2,
       fill: '#FFFFFF',
       class : 'anno-text'

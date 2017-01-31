@@ -95,29 +95,26 @@
   Text.
 */
 .anno-text {
-  fill: rgba(255, 255, 190, 0.8);
-}
-.anno-text ~ text {
-  fill: rgba(0, 0, 0, 1.0);
+  rx: 2;
+  ry: 2;
 }
 .--hover .anno-text {
-  /*html*/
-  box-shadow: 0 0 0 1px #ccc inset;
-  /*svg*/
-  stroke: #ccc;
+  fill: rgba(255, 255, 255, 0.9);
+  stroke: black;
   stroke-width: 0.75px;
-  fill: rgba(255, 255, 190, 0.9);
 }
 .--hover .anno-text ~ text {
-  fill: rgba(0, 0, 0, 1.0);
+  fill: rgba(255, 0, 0, 0.9);
 }
 .--selected .anno-text {
+  animation: anime-text 0.5s infinite alternate;
   stroke: black;
-  stroke-width: 0.5px;
-  stroke-dasharray: 3;
+  stroke-width: 0.75px;
+  stroke-dasharray: 4;
 }
 .--selected .anno-text ~ text {
-  fill: rgba(0, 0, 0, 1.0);
+  fill: rgba(255, 255, 255, 1.0);
+  font-weight: 300;
 }
 @keyframes anime-text {
   0% {fill: rgba(255, 40, 60, 0.8);}
