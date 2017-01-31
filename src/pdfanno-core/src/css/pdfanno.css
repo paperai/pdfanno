@@ -95,8 +95,6 @@
   Text.
 */
 .anno-text {
-  rx: 2;
-  ry: 2;
 }
 .--hover .anno-text {
   fill: rgba(255, 255, 255, 1.0);
@@ -107,18 +105,17 @@
   fill: rgba(255, 0, 0, 1.0);
 }
 .--selected .anno-text {
-/*  animation: anime-text 0.5s infinite alternate;*/
-  stroke: black;
-  stroke-width: 0.75px;
-  stroke-dasharray: 3;
-  fill: rgba(255, 0, 0, 1.0);
+  animation: anime-text 0.5s infinite alternate;
+  stroke: rgba(255, 0, 0, 1.0);
+  stroke-width: 1.5px;
+  fill: rgba(255, 232, 188, 1.0);
 }
 .--selected .anno-text ~ text {
-  fill: rgba(255, 255, 255, 1.0);
+  fill: rgba(0, 0, 0, 1.0);
 }
 @keyframes anime-text {
-  0% {fill: rgba(255, 40, 60, 0.8);}
-  5% {fill: rgba(255, 40, 60, 0.8);}
-  100% {fill: rgba(255, 120, 180, 0.8);}
+  0% {fill: rgba(255, 232, 188, 1.0);}
+  5% {fill: rgba(255, 232, 188, 1.0);}
+  100% {fill: rgba(255, 245, 230, 1.0);}
 }
 
