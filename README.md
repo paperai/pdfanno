@@ -68,9 +68,8 @@ PDFAnno allows simultaneous visualization of multi-user's annotation files on th
 To be written...
 
 ## Developer's Guide
-PDFAnno uses the following libraries:
-* [pdf.js](https://github.com/mozilla/pdf.js)
-* [pdf-annotate.js](https://github.com/instructure/pdf-annotate.js/)
+PDFAnno is built on [pdf.js](https://github.com/mozilla/pdf.js) for PDF viewer.
+We implement custom layers for rendering annotations.
 
 ### Install and Build
 First, install [Node.js](https://nodejs.org/) and npm. The version of Node.js must be 6+.  
