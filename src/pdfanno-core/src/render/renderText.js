@@ -15,7 +15,7 @@ let textSecondaryColor = ['green', 'blue', 'purple'];
 
 /**
  * Calculate boundingClientRect that is needed for rendering text.
- * 
+ *
  * @param {String} text - A text to be renderd.
  * @param {SVGElement} svg - svgHTMLElement to be used for rendering text.
  * @return {Object} A boundingBox of text element.
@@ -42,7 +42,7 @@ export default function renderText(a, svg) {
         color = textSecondaryColor[a.seq % textSecondaryColor.length];
       } else {
         color = '#F00';
-      }      
+      }
     }
 
     // Text.
@@ -69,6 +69,7 @@ export default function renderText(a, svg) {
 
     // Group.
     let group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    group.classList.add('anno-text-group');
     group.setAttribute('read-only', a.readOnly === true);
     group.style.visibility = 'visible';
 

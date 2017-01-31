@@ -286,6 +286,7 @@ export default class ArrowAnnotation extends AbstractAnnotation {
      * Enable view mode.
      */
     enableViewMode() {
+        super.enableViewMode();
 
         this.disableViewMode();
 
@@ -298,6 +299,7 @@ export default class ArrowAnnotation extends AbstractAnnotation {
      * Disable view mode.
      */
     disableViewMode() {
+        super.disableViewMode();
         this.$element.find('path').off('click');
     }
 

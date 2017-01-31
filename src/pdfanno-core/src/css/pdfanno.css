@@ -84,6 +84,15 @@
 /**
   Text.
 */
+.anno-text-group, .anno-text-group.--viewMode {
+    transition: 0.2s;
+    opacity: 0.01; /* for enabling a hover event. */
+}
+.anno-text-group.--hover,
+.anno-text-group.--selected,
+.anno-text-group.--visible {
+    opacity: 1;
+}
 .anno-text {
   transition: 0.2s;
 }

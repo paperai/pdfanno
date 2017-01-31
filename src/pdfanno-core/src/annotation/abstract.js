@@ -135,4 +135,18 @@ export default class AbstractAnnotation extends EventEmitter {
     createDummyElement() {
         return $('<div class="dummy"/>');
     }
+
+    enableViewMode() {
+        this.render();
+    }
+
+    disableViewMode() {
+        this.render();
+    }
+
+    setTextForceDisplay() {
+        if (this.textAnnotation) {
+            this.textAnnotation.textForceDisplay = true;
+        }
+    }
 }

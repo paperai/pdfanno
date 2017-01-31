@@ -61,7 +61,7 @@ function handleDocumentMousedown(e) {
   overlay.style.boxSizing = 'border-box';
   overlay.style.visibility = 'visible';
   getTmpLayer().appendChild(overlay);
-  
+
   document.addEventListener('mousemove', handleDocumentMousemove);
 }
 
@@ -106,7 +106,7 @@ function handleDocumentMousemove(e) {
  * @param {Event} e The DOM event to handle
  */
 function handleDocumentMouseup(e) {
-  
+
   if (!overlay) {
     return;
   }
@@ -166,6 +166,7 @@ function saveRect(rect) {
     }
 
     rectAnnotation.text = text;
+    rectAnnotation.setTextForceDisplay();
     rectAnnotation.render();
     rectAnnotation.save();
 
@@ -177,7 +178,7 @@ function saveRect(rect) {
  * Enable rect behavior
  */
 export function enableRect() {
-  
+
   if (_enabled) { return; }
 
   _enabled = true;
@@ -191,7 +192,7 @@ export function enableRect() {
  * Disable rect behavior
  */
 export function disableRect() {
-  
+
   if (!_enabled) { return; }
 
   _enabled = false;

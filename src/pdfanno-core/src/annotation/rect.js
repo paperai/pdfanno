@@ -253,6 +253,7 @@ export default class RectAnnotation extends AbstractAnnotation {
      * Enable view mode.
      */
     enableViewMode() {
+        super.enableViewMode();
 
         this.disableViewMode();
 
@@ -267,6 +268,7 @@ export default class RectAnnotation extends AbstractAnnotation {
      * Disable view mode.
      */
     disableViewMode() {
+        super.disableViewMode();
         this.$element.find('.anno-rect, circle').off('click mousedown');
     }
 

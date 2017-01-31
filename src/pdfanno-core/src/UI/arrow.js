@@ -166,6 +166,7 @@ function showTextInput() {
   addInputField(x, y, null, null, (text) => {
 
     arrowAnnotation.text = text;
+    arrowAnnotation.setTextForceDisplay();
     arrowAnnotation.save();
     arrowAnnotation.render();
 
