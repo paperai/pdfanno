@@ -115,7 +115,6 @@
 }
 .--selected .anno-text ~ text {
   fill: rgba(255, 255, 255, 1.0);
-  font-weight: 300;
 }
 @keyframes anime-text {
   0% {fill: rgba(255, 40, 60, 0.8);}

@@ -60,10 +60,10 @@ export default function renderText(a, svg) {
     console.log(svg)
     let rect = getRect(text, svg);
     setAttributes(box, {
-      x: a.x -4,
-      y: a.y -1,
-      width: rect.width +8,
-      height: rect.height +2,
+      x: a.x -2,
+      y: a.y,
+      width: rect.width +4,
+      height: rect.height,
       fill: '#FFFFFF',
       class : 'anno-text'
     });
