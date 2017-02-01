@@ -194,6 +194,8 @@ function createBoundingBoxList() {
 }
 
 function disableAnnotationHoverEvent() {
+    // Disable annotation original hover event,
+    // bacause the event occur intermittently at mouse dragging.
     $('svg > g').css('pointer-events', 'none');
 }
 
