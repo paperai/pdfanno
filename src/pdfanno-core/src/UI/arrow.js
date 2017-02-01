@@ -48,7 +48,6 @@ function handleDocumentMousedown(e) {
     arrowAnnotation.readOnly = false;
 
     document.addEventListener('mouseup', handleDocumentMouseup);
-    // document.addEventListener('mousemove', handleDocumentMousemove);
 
     dragging = true;
   }
@@ -81,11 +80,13 @@ function handleDocumentMousemove(e) {
   let circle = findHitBoundingCircle(e);
   if (!hitCircle && circle) {
     hitCircle = circle;
-    $(hitCircle).addClass('--hover');
+    $(hitCircle).parents('g').addClass('--hover');
+    console.log('hover up', $(hitCircle).parents('g'));
 
   } else if (hitCircle && !circle) {
-    $(hitCircle).removeClass('--hover');
+    $(hitCircle).parents('g').removeClass('--hover');
     hitCircle = null;
+    console.log('hover down');
   }
 
 }
@@ -124,7 +125,6 @@ function handleDocumentMouseup(e) {
   dragging = false;
 
   document.removeEventListener('mouseup', handleDocumentMouseup);
-  // document.removeEventListener('mousemove', handleDocumentMousemove);
 
   // FIXME use drag and drop event, it may be better.
 
