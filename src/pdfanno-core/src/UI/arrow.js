@@ -46,8 +46,11 @@ function handleDocumentMousedown(e) {
     arrowAnnotation.direction = _arrowType;
     arrowAnnotation.rel1Annotation = _hoverAnnotation;
     arrowAnnotation.readOnly = false;
+    arrowAnnotation.setDisableHoverEvent();
 
     document.addEventListener('mouseup', handleDocumentMouseup);
+
+    disableAnnotationHoverEvent();
 
     dragging = true;
   }
@@ -81,12 +84,12 @@ function handleDocumentMousemove(e) {
   if (!hitCircle && circle) {
     hitCircle = circle;
     $(hitCircle).parents('g').addClass('--hover');
-    console.log('hover up', $(hitCircle).parents('g'));
+    console.log('up');
 
   } else if (hitCircle && !circle) {
     $(hitCircle).parents('g').removeClass('--hover');
     hitCircle = null;
-    console.log('hover down');
+    console.log('down');
   }
 
 }
@@ -126,6 +129,8 @@ function handleDocumentMouseup(e) {
 
   document.removeEventListener('mouseup', handleDocumentMouseup);
 
+  enableAnnotationHoverEvent();
+
   // FIXME use drag and drop event, it may be better.
 
   // Find the end position.
@@ -145,6 +150,7 @@ function handleDocumentMouseup(e) {
   }
 
   arrowAnnotation.rel2Annotation = endAnnotation;
+  arrowAnnotation.setEnableHoverEvent();
 
   arrowAnnotation.save();
 
@@ -185,6 +191,14 @@ function createBoundingBoxList() {
       boundingCircles.push(boundingCircle);
     }
   });
+}
+
+function disableAnnotationHoverEvent() {
+    $('svg > g').css('pointer-events', 'none');
+}
+
+function enableAnnotationHoverEvent() {
+    $('svg > g').css('pointer-events', 'auto');
 }
 
 function disableTextlayer() {

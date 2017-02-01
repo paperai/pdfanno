@@ -70,6 +70,12 @@ export default class RectAnnotation extends AbstractAnnotation {
         );
     }
 
+    render() {
+        super.render();
+
+        console.log('render');
+    }
+
     /**
      * Delete the annotation from rendering, a container in window, and a container in localStorage.
      */

@@ -31,10 +31,15 @@ export default class AbstractAnnotation extends EventEmitter {
      * Render annotation(s).
      */
     render() {
+
          this.$element.remove();
          this.$element = $(appendChild(getSVGLayer(), this));
-         this.setHoverEvent && this.setHoverEvent();
          this.textAnnotation && this.textAnnotation.render();
+
+         if (!this.hoverEventDisable && this.setHoverEvent) {
+            this.setHoverEvent();
+         }
+
          if (window.viewMode) {
           this.$element.addClass('--viewMode');
          }
@@ -157,4 +162,13 @@ export default class AbstractAnnotation extends EventEmitter {
             this.textAnnotation.textForceDisplay = true;
         }
     }
+
+    setDisableHoverEvent() {
+        this.hoverEventDisable = true;
+    }
+
+    setEnableHoverEvent() {
+        this.hoverEventDisable = false;
+    }
+
 }

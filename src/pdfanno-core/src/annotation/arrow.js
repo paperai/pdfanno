@@ -134,6 +134,9 @@ export default class ArrowAnnotation extends AbstractAnnotation {
         };
     }
 
+    /**
+     * Destroy the annotation.
+     */
     destroy() {
         super.destroy();
         if (this._rel1Annotation) {
