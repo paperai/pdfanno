@@ -23,7 +23,6 @@
 .anno-circle {
     transition:0.2s;
     transform-origin: center center;
-    z-index: 5;
 }
 .--hover .anno-circle {
   box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;
@@ -37,47 +36,51 @@
   box-shadow: 0 0 0 1px #ccc inset;
   /*svg*/
   stroke: #ccc;
-  stroke-width: 1px;
+  stroke-width: 0.75px;
 }
 .--selected .anno-highlight {
   stroke: black;
-  stroke-width: 1px;
+  stroke-width: 0.5px;
   stroke-dasharray: 3;
 }
-
 /**
   Arrow.
 */
 .anno-arrow {
   transition:0.2s;
 }
-.anno-arrow-outline {
-  fill: none;
-  stroke: black;
-  visibility: hidden;
-  stroke-width: 4px;
-  stroke-dasharray: 2.5;
-  pointer-events: stroke;
-}
 .--hover .anno-arrow {
   stroke-width: 2px;
 }
+.--selected .anno-arrow {
+}
+.anno-arrow-outline {
+  fill: none;
+  visibility: hidden;
+}
 .--selected .anno-arrow-outline {
   visibility: visible;
+  stroke: black;
+  stroke-width: 2.85px;
+  pointer-events: stroke;
+  stroke-dasharray: 3;
 }
 
 /**
   Rect.
 */
 .anno-rect {
-  transition: 0.2s;
 }
 .--hover .anno-rect {
-  stroke-width: 2px;
+  /*html*/
+  box-shadow: 0 0 0 1px #ccc inset;
+  /*svg*/
+  stroke: #ccc;
+  stroke-width: 0.75px;
 }
 .--selected .anno-rect {
   stroke: black;
-  stroke-width: 4px;
+  stroke-width: 0.5px;
   stroke-dasharray: 3;
 }
 
@@ -85,14 +88,22 @@
   Text.
 */
 .anno-text {
-  transition: 0.2s;
 }
 .--hover .anno-text {
-  stroke: red;
-  stroke-width: 0.5px;
+  fill: rgba(255, 255, 255, 1.0);
+  stroke: black;
+  stroke-width: 0.75px;
+}
+.--hover .anno-text ~ text {
+  fill: rgba(255, 0, 0, 1.0);
 }
 .--selected .anno-text {
-  stroke: black;
-  stroke-width: 2px;
+  stroke: rgba(255, 0, 0, 1.0);
+  stroke-width: 1.5px;
+  fill: rgba(255, 232, 188, 1.0);
   stroke-dasharray: 3;
 }
+.--selected .anno-text ~ text {
+  fill: rgba(0, 0, 0, 1.0);
+}
+

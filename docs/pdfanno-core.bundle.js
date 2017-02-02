@@ -12323,7 +12323,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	module.exports = {
-		"name": "paperanno",
+		"name": "pdfanno",
 		"version": "0.0.1",
 		"description": "",
 		"main": "index.js",
@@ -12335,14 +12335,14 @@ return /******/ (function(modules) { // webpackBootstrap
 		},
 		"repository": {
 			"type": "git",
-			"url": "git+https://github.com/paperai/paperanno"
+			"url": "git+https://github.com/paperai/pdfanno"
 		},
 		"author": "hshindo, yoheiMune",
 		"license": "MIT",
 		"bugs": {
-			"url": "https://github.com/paperai/paperanno/issues"
+			"url": "https://github.com/paperai/pdfanno/issues"
 		},
-		"homepage": "https://github.com/paperai/paperanno#readme",
+		"homepage": "https://github.com/paperai/pdfanno#readme",
 		"devDependencies": {
 			"babel-cli": "^6.14.0",
 			"babel-core": "^6.21.0",
@@ -13222,11 +13222,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  // Background.
 	  var box = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+	  console.log(svg);
 	  var rect = getRect(text, svg);
 	  (0, _setAttributes2.default)(box, {
-	    x: a.x,
+	    x: a.x - 2,
 	    y: a.y,
-	    width: rect.width,
+	    width: rect.width + 4,
 	    height: rect.height,
 	    fill: '#FFFFFF',
 	    class: 'anno-text'
@@ -16810,7 +16811,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, "\n/**\n * Utilities.\n */\n.\\--hide {\n  display: none;\n}\n\n/**\n * SVGLayer.\n */\n.annoLayer {}\n.annoLayer > *.\\--viewMode {\n  opacity: 0.5;\n}\n.annoLayer > *.\\--viewMode.\\--emphasis {\n  opacity: 1;\n}\n\n/**\n    各種アノテーション\n*/\n.anno-circle {\n    transition:0.2s;\n    transform-origin: center center;\n    z-index: 5;\n}\n.\\--hover .anno-circle {\n  box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;\n  /*transform: scale(2);*/\n  stroke: blue;\n  stroke-width: 5px;\n}\n\n.\\--hover .anno-highlight {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 1px;\n}\n.\\--selected .anno-highlight {\n  stroke: black;\n  stroke-width: 1px;\n  stroke-dasharray: 3;\n}\n\n/**\n  Arrow.\n*/\n.anno-arrow {\n  transition:0.2s;\n}\n.anno-arrow-outline {\n  fill: none;\n  stroke: black;\n  visibility: hidden;\n  stroke-width: 4px;\n  stroke-dasharray: 2.5;\n  pointer-events: stroke;\n}\n.\\--hover .anno-arrow {\n  stroke-width: 2px;\n}\n.\\--selected .anno-arrow-outline {\n  visibility: visible;\n}\n\n/**\n  Rect.\n*/\n.anno-rect {\n  transition: 0.2s;\n}\n.\\--hover .anno-rect {\n  stroke-width: 2px;\n}\n.\\--selected .anno-rect {\n  stroke: black;\n  stroke-width: 4px;\n  stroke-dasharray: 3;\n}\n\n/**\n  Text.\n*/\n.anno-text {\n  transition: 0.2s;\n}\n.\\--hover .anno-text {\n  stroke: red;\n  stroke-width: 0.5px;\n}\n.\\--selected .anno-text {\n  stroke: black;\n  stroke-width: 2px;\n  stroke-dasharray: 3;\n}\n", ""]);
+	exports.push([module.id, "\n/**\n * Utilities.\n */\n.\\--hide {\n  display: none;\n}\n\n/**\n * SVGLayer.\n */\n.annoLayer {}\n.annoLayer > *.\\--viewMode {\n  opacity: 0.5;\n}\n.annoLayer > *.\\--viewMode.\\--emphasis {\n  opacity: 1;\n}\n\n/**\n    各種アノテーション\n*/\n.anno-circle {\n    transition:0.2s;\n    transform-origin: center center;\n}\n.\\--hover .anno-circle {\n  box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;\n  /*transform: scale(2);*/\n  stroke: blue;\n  stroke-width: 5px;\n}\n\n.\\--hover .anno-highlight {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-highlight {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n/**\n  Arrow.\n*/\n.anno-arrow {\n  transition:0.2s;\n}\n.\\--hover .anno-arrow {\n  stroke-width: 2px;\n}\n.\\--selected .anno-arrow {\n}\n.anno-arrow-outline {\n  fill: none;\n  visibility: hidden;\n}\n.\\--selected .anno-arrow-outline {\n  visibility: visible;\n  stroke: black;\n  stroke-width: 2.85px;\n  pointer-events: stroke;\n  stroke-dasharray: 3;\n}\n\n/**\n  Rect.\n*/\n.anno-rect {\n}\n.\\--hover .anno-rect {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-rect {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n\n/**\n  Text.\n*/\n.anno-text {\n}\n.\\--hover .anno-text {\n  fill: rgba(255, 255, 255, 1.0);\n  stroke: black;\n  stroke-width: 0.75px;\n}\n.\\--hover .anno-text ~ text {\n  fill: rgba(255, 0, 0, 1.0);\n}\n.\\--selected .anno-text {\n  stroke: rgba(255, 0, 0, 1.0);\n  stroke-width: 1.5px;\n  fill: rgba(255, 232, 188, 1.0);\n  stroke-dasharray: 3;\n}\n.\\--selected .anno-text ~ text {\n  fill: rgba(0, 0, 0, 1.0);\n}\n\n", ""]);
 	
 	// exports
 
