@@ -76,6 +76,9 @@ export default class RectAnnotation extends AbstractAnnotation {
     destroy() {
         super.destroy();
         this.emit('delete');
+        window.globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
+        window.globalEvent.removeListener('enableViewMode', this.enableViewMode);
+        window.globalEvent.removeListener('disableViewMode', this.disableViewMode);
     }
 
     /**
