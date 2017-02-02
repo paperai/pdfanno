@@ -84,12 +84,10 @@ function handleDocumentMousemove(e) {
   if (!hitCircle && circle) {
     hitCircle = circle;
     $(hitCircle).parents('g').addClass('--hover');
-    console.log('up');
 
   } else if (hitCircle && !circle) {
     $(hitCircle).parents('g').removeClass('--hover');
     hitCircle = null;
-    console.log('down');
   }
 
 }

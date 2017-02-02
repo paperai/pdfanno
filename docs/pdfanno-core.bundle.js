@@ -11996,8 +11996,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      r.y = y;
 	      r.page = pageNumber;
-	
-	      console.log('rec:', r.y, y, pageNumber);
 	    });
 	  }
 	
@@ -13211,7 +13209,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  // Background.
 	  var box = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-	  console.log(svg);
 	  var rect = getRect(text, svg);
 	  (0, _setAttributes2.default)(box, {
 	    x: a.x - 2,
@@ -14729,6 +14726,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function destroy() {
 	            _get(RectAnnotation.prototype.__proto__ || Object.getPrototypeOf(RectAnnotation.prototype), 'destroy', this).call(this);
 	            this.emit('delete');
+	            window.globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
+	            window.globalEvent.removeListener('enableViewMode', this.enableViewMode);
+	            window.globalEvent.removeListener('disableViewMode', this.disableViewMode);
 	        }
 	
 	        /**
@@ -15847,6 +15847,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function destroy() {
 	            _get(HighlightAnnotation.prototype.__proto__ || Object.getPrototypeOf(HighlightAnnotation.prototype), 'destroy', this).call(this);
 	            this.emit('delete');
+	            window.globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
+	            window.globalEvent.removeListener('enableViewMode', this.enableViewMode);
+	            window.globalEvent.removeListener('disableViewMode', this.disableViewMode);
 	        }
 	
 	        /**
@@ -16126,11 +16129,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (!hitCircle && circle) {
 	    hitCircle = circle;
 	    (0, _jquery2.default)(hitCircle).parents('g').addClass('--hover');
-	    console.log('up');
 	  } else if (hitCircle && !circle) {
 	    (0, _jquery2.default)(hitCircle).parents('g').removeClass('--hover');
 	    hitCircle = null;
-	    console.log('down');
 	  }
 	}
 	

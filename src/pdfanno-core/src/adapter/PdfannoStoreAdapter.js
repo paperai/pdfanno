@@ -416,8 +416,6 @@ function transformFromRenderCoordinate(annotation) {
       let {y, pageNumber} = convertToExportY(r.y);
       r.y = y;
       r.page = pageNumber;
-
-      console.log('rec:', r.y, y, pageNumber);
     });
   }
 

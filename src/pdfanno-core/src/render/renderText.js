@@ -57,7 +57,6 @@ export default function renderText(a, svg) {
 
     // Background.
     let box = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    console.log(svg)
     let rect = getRect(text, svg);
     setAttributes(box, {
       x: a.x -2,
