@@ -1,5 +1,5 @@
 {
-  "name": "paperanno",
+  "name": "pdfanno",
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/paperai/paperanno"
+    "url": "git+https://github.com/paperai/pdfanno"
   },
   "author": "hshindo, yoheiMune",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/paperai/paperanno/issues"
+    "url": "https://github.com/paperai/pdfanno/issues"
   },
-  "homepage": "https://github.com/paperai/paperanno#readme",
+  "homepage": "https://github.com/paperai/pdfanno#readme",
   "devDependencies": {
     "babel-cli": "^6.14.0",
     "babel-core": "^6.21.0",
