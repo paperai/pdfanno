@@ -35,12 +35,12 @@ function deleteSelectedAnnotations() {
  */
 function setComponenTranslucent(translucent) {
 
-    if (translucent) {
-        $('svg > *').addClass('--viewMode');
+    // if (translucent) {
+    //     $('svg > *').addClass('--viewMode');
 
-    } else {
-        $('svg > *').removeClass('--viewMode');
-    }
+    // } else {
+    //     $('svg > *').removeClass('--viewMode');
+    // }
 }
 
 /**
@@ -62,22 +62,23 @@ function resetAnnotationViewMode() {
  */
 export function enableViewMode() {
     disableViewMode();
+
+    window.viewMode = true;
+
     setComponenTranslucent(true);
     setAnnotationViewMode();
     document.addEventListener('keyup', handleDocumentKeyup);
     document.addEventListener('keydown', handleDocumentKeydown);
 
-    window.viewMode = true;
 }
 
 /**
  * Disable view mode.
  */
 export function disableViewMode() {
+    window.viewMode = false;
     setComponenTranslucent(false);
     resetAnnotationViewMode();
     document.removeEventListener('keyup', handleDocumentKeyup);
     document.removeEventListener('keydown', handleDocumentKeydown);
-
-    window.viewMode = false;
 }

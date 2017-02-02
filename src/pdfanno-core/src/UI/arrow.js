@@ -46,9 +46,11 @@ function handleDocumentMousedown(e) {
     arrowAnnotation.direction = _arrowType;
     arrowAnnotation.rel1Annotation = _hoverAnnotation;
     arrowAnnotation.readOnly = false;
+    arrowAnnotation.setDisableHoverEvent();
 
     document.addEventListener('mouseup', handleDocumentMouseup);
-    // document.addEventListener('mousemove', handleDocumentMousemove);
+
+    disableAnnotationHoverEvent();
 
     dragging = true;
   }
@@ -81,11 +83,13 @@ function handleDocumentMousemove(e) {
   let circle = findHitBoundingCircle(e);
   if (!hitCircle && circle) {
     hitCircle = circle;
-    $(hitCircle).addClass('--hover');
+    $(hitCircle).parents('g').addClass('--hover');
+    console.log('up');
 
   } else if (hitCircle && !circle) {
-    $(hitCircle).removeClass('--hover');
+    $(hitCircle).parents('g').removeClass('--hover');
     hitCircle = null;
+    console.log('down');
   }
 
 }
@@ -124,7 +128,8 @@ function handleDocumentMouseup(e) {
   dragging = false;
 
   document.removeEventListener('mouseup', handleDocumentMouseup);
-  // document.removeEventListener('mousemove', handleDocumentMousemove);
+
+  enableAnnotationHoverEvent();
 
   // FIXME use drag and drop event, it may be better.
 
@@ -145,6 +150,7 @@ function handleDocumentMouseup(e) {
   }
 
   arrowAnnotation.rel2Annotation = endAnnotation;
+  arrowAnnotation.setEnableHoverEvent();
 
   arrowAnnotation.save();
 
@@ -166,6 +172,7 @@ function showTextInput() {
   addInputField(x, y, null, null, (text) => {
 
     arrowAnnotation.text = text;
+    arrowAnnotation.setTextForceDisplay();
     arrowAnnotation.save();
     arrowAnnotation.render();
 
@@ -184,6 +191,16 @@ function createBoundingBoxList() {
       boundingCircles.push(boundingCircle);
     }
   });
+}
+
+function disableAnnotationHoverEvent() {
+    // Disable annotation original hover event,
+    // bacause the event occur intermittently at mouse dragging.
+    $('svg > g').css('pointer-events', 'none');
+}
+
+function enableAnnotationHoverEvent() {
+    $('svg > g').css('pointer-events', 'auto');
 }
 
 function disableTextlayer() {

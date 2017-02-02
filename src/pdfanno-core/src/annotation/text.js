@@ -33,6 +33,9 @@ export default class TextAnnotation extends AbstractAnnotation {
         this.y        = 0;
         this.$element = this.createDummyElement();
 
+        // Updated by parent via AbstractAnnotation#setTextForceDisplay.
+        this.textForceDisplay = false;
+
         // parent.on('rectmoveend', this.handleRectMoveEnd);
         globalEvent.on('rectmoveend', this.handleRectMoveEnd);
 
@@ -51,6 +54,9 @@ export default class TextAnnotation extends AbstractAnnotation {
             this.text = this.parent.text;
             this.color = this.parent.color;
             super.render();
+            if (this.textForceDisplay) {
+                this.$element.addClass('--visible');
+            }
         }
     }
 
@@ -163,13 +169,17 @@ export default class TextAnnotation extends AbstractAnnotation {
 
     enableViewMode() {
 
+        // Reset the state that always display a content.
+        this.textForceDisplay = false;
+
+        super.enableViewMode();
         if (!this.parent.readOnly) {
             this.$element.find('text').off('click').on('click', this.handleClickEvent);
         }
-
     }
 
     disableViewMode() {
+        super.disableViewMode();
         this.$element.find('text').off('click', this.handleClickEvent);
     }
 

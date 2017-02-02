@@ -112,6 +112,7 @@ function saveRect(rects) {
     document.addEventListener('mouseup', handleDocumentMouseup);
 
     highlightAnnotation.text = text;
+    highlightAnnotation.setTextForceDisplay();
     highlightAnnotation.render();
     highlightAnnotation.save();
 

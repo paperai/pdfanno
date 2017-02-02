@@ -72,19 +72,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _PDFAnnoCore2 = _interopRequireDefault(_PDFAnnoCore);
 	
-	var _container = __webpack_require__(47);
+	var _container = __webpack_require__(46);
 	
 	var _container2 = _interopRequireDefault(_container);
 	
-	var _rect = __webpack_require__(37);
+	var _rect = __webpack_require__(36);
 	
 	var _rect2 = _interopRequireDefault(_rect);
 	
-	var _highlight = __webpack_require__(42);
+	var _highlight = __webpack_require__(41);
 	
 	var _highlight2 = _interopRequireDefault(_highlight);
 	
-	var _arrow = __webpack_require__(44);
+	var _arrow = __webpack_require__(43);
 	
 	var _arrow2 = _interopRequireDefault(_arrow);
 	
@@ -11142,7 +11142,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	__webpack_require__(45);
+	__webpack_require__(44);
 	
 	exports.default = {
 	  /**
@@ -13029,17 +13029,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	  group.appendChild(circle);
 	
-	  // if (a.text) {
-	  //   let textAnnotation = {
-	  //     x       : a.x + DEFAULT_RADIUS + 2,
-	  //     y       : a.y - 20,
-	  //     content : a.text,
-	  //     color
-	  //   };
-	  //   let text = renderText(textAnnotation, svg);
-	  //   group.appendChild(text);
-	  // }
-	
 	  return group;
 	}
 	
@@ -13180,7 +13169,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/**
 	 * Calculate boundingClientRect that is needed for rendering text.
-	 * 
+	 *
 	 * @param {String} text - A text to be renderd.
 	 * @param {SVGElement} svg - svgHTMLElement to be used for rendering text.
 	 * @return {Object} A boundingBox of text element.
@@ -13235,6 +13224,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  // Group.
 	  var group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+	  group.classList.add('anno-text-group');
 	  group.setAttribute('read-only', a.readOnly === true);
 	  group.style.visibility = 'visible';
 	
@@ -13620,21 +13610,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 	
-	var _event = __webpack_require__(32);
+	var _rect = __webpack_require__(32);
 	
-	var _rect = __webpack_require__(35);
+	var _highlight = __webpack_require__(40);
 	
-	var _highlight = __webpack_require__(41);
+	var _text = __webpack_require__(35);
 	
-	var _text = __webpack_require__(36);
+	var _arrow = __webpack_require__(42);
 	
-	var _arrow = __webpack_require__(43);
-	
-	var _view = __webpack_require__(40);
+	var _view = __webpack_require__(39);
 	
 	exports.default = {
-	  addEventListener: _event.addEventListener, removeEventListener: _event.removeEventListener, fireEvent: _event.fireEvent,
-	
 	  disableRect: _rect.disableRect, enableRect: _rect.enableRect,
 	  disableHighlight: _highlight.disableHighlight, enableHighlight: _highlight.enableHighlight,
 	  disableText: _text.disableText, enableText: _text.enableText,
@@ -13652,73 +13638,224 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.fireEvent = fireEvent;
-	exports.addEventListener = addEventListener;
-	exports.removeEventListener = removeEventListener;
+	exports.enableRect = enableRect;
+	exports.disableRect = disableRect;
 	
-	var _events = __webpack_require__(7);
+	var _jquery = __webpack_require__(6);
 	
-	var _events2 = _interopRequireDefault(_events);
+	var _jquery2 = _interopRequireDefault(_jquery);
+	
+	var _deepAssign = __webpack_require__(12);
+	
+	var _deepAssign2 = _interopRequireDefault(_deepAssign);
+	
+	var _PDFAnnoCore = __webpack_require__(8);
+	
+	var _PDFAnnoCore2 = _interopRequireDefault(_PDFAnnoCore);
+	
+	var _appendChild = __webpack_require__(18);
+	
+	var _appendChild2 = _interopRequireDefault(_appendChild);
 	
 	var _utils = __webpack_require__(33);
 	
+	var _text = __webpack_require__(35);
+	
+	var _rect = __webpack_require__(36);
+	
+	var _rect2 = _interopRequireDefault(_rect);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var emitter = new _events2.default();
+	var _type = 'area';
 	
-	var clickNode = void 0;
+	var _enabled = false;
+	var overlay = void 0;
+	var originY = void 0;
+	var originX = void 0;
+	
+	var enableArea = {
+	  page: 0,
+	  minX: 0,
+	  maxX: 0,
+	  minY: 0,
+	  maxY: 0
+	};
 	
 	/**
-	 * Handle document.click event
+	 * Handle document.mousedown event
 	 *
-	 * @param {Event} e The DOM event to be handled
+	 * @param {Event} e The DOM event to handle
 	 */
-	document.addEventListener('click', function handleDocumentClick(e) {
-	  if (!(0, _utils.findSVGAtPoint)(e.clientX, e.clientY)) {
+	function handleDocumentMousedown(e) {
+	  var _getXY = (0, _utils.getXY)(e),
+	      x = _getXY.x,
+	      y = _getXY.y;
+	
+	  originX = x;
+	  originY = y;
+	
+	  enableArea = (0, _utils.getCurrentPage)(e);
+	  if (!enableArea) {
 	    return;
 	  }
 	
-	  var target = (0, _utils.findAnnotationAtPoint)(e.clientX, e.clientY);
+	  overlay = document.createElement('div');
+	  overlay.style.position = 'absolute';
+	  overlay.style.top = originY + 'px';
+	  overlay.style.left = originX + 'px';
+	  overlay.style.width = 0;
+	  overlay.style.height = 0;
+	  overlay.style.border = '2px solid ' + _utils.BORDER_COLOR;
+	  overlay.style.boxSizing = 'border-box';
+	  overlay.style.visibility = 'visible';
+	  (0, _utils.getTmpLayer)().appendChild(overlay);
 	
-	  // Emit annotation:blur if clickNode is no longer clicked
-	  if (clickNode && clickNode !== target) {
-	    emitter.emit('annotation:blur', clickNode);
+	  document.addEventListener('mousemove', handleDocumentMousemove);
+	}
+	
+	/**
+	 * Handle document.mousemove event
+	 *
+	 * @param {Event} e The DOM event to handle
+	 */
+	function handleDocumentMousemove(e) {
+	  var _getXY2 = (0, _utils.getXY)(e),
+	      curX = _getXY2.x,
+	      curY = _getXY2.y;
+	
+	  var x = Math.min(originX, curX);
+	  var y = Math.min(originY, curY);
+	  var w = Math.abs(originX - curX);
+	  var h = Math.abs(originY - curY);
+	
+	  // Restrict in page.
+	  x = Math.min(enableArea.maxX, Math.max(enableArea.minX, x));
+	  y = Math.min(enableArea.maxY, Math.max(enableArea.minY, y));
+	  if (x > enableArea.minX) {
+	    w = Math.min(w, enableArea.maxX - x);
+	  } else {
+	    w = originX - enableArea.minX;
+	  }
+	  if (y > enableArea.minY) {
+	    h = Math.min(h, enableArea.maxY - y);
+	  } else {
+	    h = originY - enableArea.minY;
 	  }
 	
-	  // Emit annotation:click if target was clicked
-	  if (target) {
-	    emitter.emit('annotation:click', target);
+	  // Move and Resize.
+	  overlay.style.left = x + 'px';
+	  overlay.style.top = y + 'px';
+	  overlay.style.width = w + 'px';
+	  overlay.style.height = h + 'px';
+	}
+	
+	/**
+	 * Handle document.mouseup event
+	 *
+	 * @param {Event} e The DOM event to handle
+	 */
+	function handleDocumentMouseup(e) {
+	
+	  if (!overlay) {
+	    return;
 	  }
 	
-	  clickNode = target;
-	});
+	  saveRect({
+	    x: parseInt(overlay.style.left, 10),
+	    y: parseInt(overlay.style.top, 10),
+	    width: parseInt(overlay.style.width, 10),
+	    height: parseInt(overlay.style.height, 10)
+	  });
 	
-	// let mouseOverNode;
-	// document.addEventListener('mousemove', function handleDocumentMousemove(e) {
-	//   let target = findAnnotationAtPoint(e.clientX, e.clientY);
-	//
-	//   // Emit annotation:mouseout if target was mouseout'd
-	//   if (mouseOverNode && !target) {
-	//     emitter.emit('annotation:mouseout', mouseOverNode);
-	//   }
-	//
-	//   // Emit annotation:mouseover if target was mouseover'd
-	//   if (target && mouseOverNode !== target) {
-	//     emitter.emit('annotation:mouseover', target);
-	//   }
-	//
-	//   mouseOverNode = target;
-	// });
+	  (0, _jquery2.default)(overlay).remove();
+	  overlay = null;
 	
-	function fireEvent() {
-	  emitter.emit.apply(emitter, arguments);
-	};
-	function addEventListener() {
-	  emitter.on.apply(emitter, arguments);
-	};
-	function removeEventListener() {
-	  emitter.removeListener.apply(emitter, arguments);
-	};
+	  document.removeEventListener('mousemove', handleDocumentMousemove);
+	}
+	
+	/**
+	 * Save a rect annotation.
+	 *
+	 * @param {Object} rect - The rect to use for annotation.
+	 */
+	function saveRect(rect) {
+	
+	  if (rect.width === 0 || rect.height === 0) {
+	    return;
+	  }
+	
+	  var svg = (0, _utils.getSVGLayer)();
+	
+	  var annotation = (0, _deepAssign2.default)((0, _utils.scaleDown)(svg, rect), {
+	    type: _type
+	  });
+	
+	  var _getMetadata = (0, _utils.getMetadata)(svg),
+	      documentId = _getMetadata.documentId,
+	      pageNumber = _getMetadata.pageNumber;
+	
+	  // Save.
+	
+	
+	  var rectAnnotation = _rect2.default.newInstance(annotation);
+	  rectAnnotation.save();
+	
+	  // Render.
+	  rectAnnotation.render();
+	
+	  // Add an input field.
+	  var x = annotation.x;
+	  var y = annotation.y - 20; // 20 = circle'radius(3px) + input height(14px) + α
+	  var boundingRect = svg.getBoundingClientRect();
+	
+	  x = (0, _utils.scaleUp)(svg, { x: x }).x + boundingRect.left;
+	  y = (0, _utils.scaleUp)(svg, { y: y }).y + boundingRect.top;
+	
+	  (0, _text.addInputField)(x, y, null, null, function (text) {
+	
+	    if (!text) {
+	      return;
+	    }
+	
+	    rectAnnotation.text = text;
+	    rectAnnotation.setTextForceDisplay();
+	    rectAnnotation.render();
+	    rectAnnotation.save();
+	  }, 'text');
+	}
+	
+	/**
+	 * Enable rect behavior
+	 */
+	function enableRect() {
+	
+	  if (_enabled) {
+	    return;
+	  }
+	
+	  _enabled = true;
+	  document.addEventListener('mouseup', handleDocumentMouseup);
+	  document.addEventListener('mousedown', handleDocumentMousedown);
+	
+	  (0, _utils.disableUserSelect)();
+	}
+	
+	/**
+	 * Disable rect behavior
+	 */
+	function disableRect() {
+	
+	  if (!_enabled) {
+	    return;
+	  }
+	
+	  _enabled = false;
+	  document.removeEventListener('mouseup', handleDocumentMouseup);
+	  document.removeEventListener('mousedown', handleDocumentMousedown);
+	
+	  (0, _utils.enableUserSelect)();
+	}
 
 /***/ },
 /* 33 */
@@ -14244,233 +14381,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.enableRect = enableRect;
-	exports.disableRect = disableRect;
-	
-	var _jquery = __webpack_require__(6);
-	
-	var _jquery2 = _interopRequireDefault(_jquery);
-	
-	var _deepAssign = __webpack_require__(12);
-	
-	var _deepAssign2 = _interopRequireDefault(_deepAssign);
-	
-	var _PDFAnnoCore = __webpack_require__(8);
-	
-	var _PDFAnnoCore2 = _interopRequireDefault(_PDFAnnoCore);
-	
-	var _appendChild = __webpack_require__(18);
-	
-	var _appendChild2 = _interopRequireDefault(_appendChild);
-	
-	var _utils = __webpack_require__(33);
-	
-	var _text = __webpack_require__(36);
-	
-	var _rect = __webpack_require__(37);
-	
-	var _rect2 = _interopRequireDefault(_rect);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var _type = 'area';
-	
-	var _enabled = false;
-	var overlay = void 0;
-	var originY = void 0;
-	var originX = void 0;
-	
-	var enableArea = {
-	  page: 0,
-	  minX: 0,
-	  maxX: 0,
-	  minY: 0,
-	  maxY: 0
-	};
-	
-	/**
-	 * Handle document.mousedown event
-	 *
-	 * @param {Event} e The DOM event to handle
-	 */
-	function handleDocumentMousedown(e) {
-	  var _getXY = (0, _utils.getXY)(e),
-	      x = _getXY.x,
-	      y = _getXY.y;
-	
-	  originX = x;
-	  originY = y;
-	
-	  enableArea = (0, _utils.getCurrentPage)(e);
-	  if (!enableArea) {
-	    return;
-	  }
-	
-	  overlay = document.createElement('div');
-	  overlay.style.position = 'absolute';
-	  overlay.style.top = originY + 'px';
-	  overlay.style.left = originX + 'px';
-	  overlay.style.width = 0;
-	  overlay.style.height = 0;
-	  overlay.style.border = '2px solid ' + _utils.BORDER_COLOR;
-	  overlay.style.boxSizing = 'border-box';
-	  overlay.style.visibility = 'visible';
-	  (0, _utils.getTmpLayer)().appendChild(overlay);
-	
-	  document.addEventListener('mousemove', handleDocumentMousemove);
-	}
-	
-	/**
-	 * Handle document.mousemove event
-	 *
-	 * @param {Event} e The DOM event to handle
-	 */
-	function handleDocumentMousemove(e) {
-	  var _getXY2 = (0, _utils.getXY)(e),
-	      curX = _getXY2.x,
-	      curY = _getXY2.y;
-	
-	  var x = Math.min(originX, curX);
-	  var y = Math.min(originY, curY);
-	  var w = Math.abs(originX - curX);
-	  var h = Math.abs(originY - curY);
-	
-	  // Restrict in page.
-	  x = Math.min(enableArea.maxX, Math.max(enableArea.minX, x));
-	  y = Math.min(enableArea.maxY, Math.max(enableArea.minY, y));
-	  if (x > enableArea.minX) {
-	    w = Math.min(w, enableArea.maxX - x);
-	  } else {
-	    w = originX - enableArea.minX;
-	  }
-	  if (y > enableArea.minY) {
-	    h = Math.min(h, enableArea.maxY - y);
-	  } else {
-	    h = originY - enableArea.minY;
-	  }
-	
-	  // Move and Resize.
-	  overlay.style.left = x + 'px';
-	  overlay.style.top = y + 'px';
-	  overlay.style.width = w + 'px';
-	  overlay.style.height = h + 'px';
-	}
-	
-	/**
-	 * Handle document.mouseup event
-	 *
-	 * @param {Event} e The DOM event to handle
-	 */
-	function handleDocumentMouseup(e) {
-	
-	  if (!overlay) {
-	    return;
-	  }
-	
-	  saveRect({
-	    x: parseInt(overlay.style.left, 10),
-	    y: parseInt(overlay.style.top, 10),
-	    width: parseInt(overlay.style.width, 10),
-	    height: parseInt(overlay.style.height, 10)
-	  });
-	
-	  (0, _jquery2.default)(overlay).remove();
-	  overlay = null;
-	
-	  document.removeEventListener('mousemove', handleDocumentMousemove);
-	}
-	
-	/**
-	 * Save a rect annotation.
-	 *
-	 * @param {Object} rect - The rect to use for annotation.
-	 */
-	function saveRect(rect) {
-	
-	  if (rect.width === 0 || rect.height === 0) {
-	    return;
-	  }
-	
-	  var svg = (0, _utils.getSVGLayer)();
-	
-	  var annotation = (0, _deepAssign2.default)((0, _utils.scaleDown)(svg, rect), {
-	    type: _type
-	  });
-	
-	  var _getMetadata = (0, _utils.getMetadata)(svg),
-	      documentId = _getMetadata.documentId,
-	      pageNumber = _getMetadata.pageNumber;
-	
-	  // Save.
-	
-	
-	  var rectAnnotation = _rect2.default.newInstance(annotation);
-	  rectAnnotation.save();
-	
-	  // Render.
-	  rectAnnotation.render();
-	
-	  // Add an input field.
-	  var x = annotation.x;
-	  var y = annotation.y - 20; // 20 = circle'radius(3px) + input height(14px) + α
-	  var boundingRect = svg.getBoundingClientRect();
-	
-	  x = (0, _utils.scaleUp)(svg, { x: x }).x + boundingRect.left;
-	  y = (0, _utils.scaleUp)(svg, { y: y }).y + boundingRect.top;
-	
-	  (0, _text.addInputField)(x, y, null, null, function (text) {
-	
-	    if (!text) {
-	      return;
-	    }
-	
-	    rectAnnotation.text = text;
-	    rectAnnotation.render();
-	    rectAnnotation.save();
-	  }, 'text');
-	}
-	
-	/**
-	 * Enable rect behavior
-	 */
-	function enableRect() {
-	
-	  if (_enabled) {
-	    return;
-	  }
-	
-	  _enabled = true;
-	  document.addEventListener('mouseup', handleDocumentMouseup);
-	  document.addEventListener('mousedown', handleDocumentMousedown);
-	
-	  (0, _utils.disableUserSelect)();
-	}
-	
-	/**
-	 * Disable rect behavior
-	 */
-	function disableRect() {
-	
-	  if (!_enabled) {
-	    return;
-	  }
-	
-	  _enabled = false;
-	  document.removeEventListener('mouseup', handleDocumentMouseup);
-	  document.removeEventListener('mousedown', handleDocumentMousedown);
-	
-	  (0, _utils.enableUserSelect)();
-	}
-
-/***/ },
-/* 36 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
 	exports.addInputField = addInputField;
 	exports.closeInput = closeInput;
 	exports.enableText = enableText;
@@ -14718,7 +14628,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 37 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -14735,11 +14645,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _uuid2 = _interopRequireDefault(_uuid);
 	
-	var _abstract = __webpack_require__(38);
+	var _abstract = __webpack_require__(37);
 	
 	var _abstract2 = _interopRequireDefault(_abstract);
 	
-	var _text = __webpack_require__(39);
+	var _text = __webpack_require__(38);
 	
 	var _text2 = _interopRequireDefault(_text);
 	
@@ -15038,6 +14948,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'enableViewMode',
 	        value: function enableViewMode() {
+	            _get(RectAnnotation.prototype.__proto__ || Object.getPrototypeOf(RectAnnotation.prototype), 'enableViewMode', this).call(this);
 	
 	            this.disableViewMode();
 	
@@ -15053,6 +14964,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'disableViewMode',
 	        value: function disableViewMode() {
+	            _get(RectAnnotation.prototype.__proto__ || Object.getPrototypeOf(RectAnnotation.prototype), 'disableViewMode', this).call(this);
 	            this.$element.find('.anno-rect, circle').off('click mousedown');
 	        }
 	    }], [{
@@ -15078,7 +14990,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 38 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -15153,10 +15065,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'render',
 	        value: function render() {
+	
 	            this.$element.remove();
 	            this.$element = $((0, _appendChild2.default)((0, _utils.getSVGLayer)(), this));
-	            this.setHoverEvent && this.setHoverEvent();
 	            this.textAnnotation && this.textAnnotation.render();
+	
+	            if (!this.hoverEventDisable && this.setHoverEvent) {
+	                this.setHoverEvent();
+	            }
+	
 	            if (window.viewMode) {
 	                this.$element.addClass('--viewMode');
 	            }
@@ -15178,13 +15095,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                if (a) {
 	                    // update.
 	                    a = _this3.createAnnotation(a);
-	                    // console.log('save:update:', a);
 	                    _PDFAnnoCore2.default.getStoreAdapter().editAnnotation(documentId, _this3.uuid, a);
 	                } else {
 	                    // insert.
 	                    a = _this3.createAnnotation();
 	                    _PDFAnnoCore2.default.getStoreAdapter().addAnnotation(documentId, a);
-	                    // console.log('save:insert:', a);
 	                }
 	            });
 	            window.annotationContainer.add(this);
@@ -15295,6 +15210,49 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function createDummyElement() {
 	            return $('<div class="dummy"/>');
 	        }
+	
+	        /**
+	         * Enable a view mode.
+	         */
+	
+	    }, {
+	        key: 'enableViewMode',
+	        value: function enableViewMode() {
+	            this.render();
+	        }
+	
+	        /**
+	         * Disable a view mode.
+	         */
+	
+	    }, {
+	        key: 'disableViewMode',
+	        value: function disableViewMode() {
+	            this.render();
+	        }
+	
+	        /**
+	         * Make the text always visible.
+	         * This state will be reset at entering the view mode.
+	         */
+	
+	    }, {
+	        key: 'setTextForceDisplay',
+	        value: function setTextForceDisplay() {
+	            if (this.textAnnotation) {
+	                this.textAnnotation.textForceDisplay = true;
+	            }
+	        }
+	    }, {
+	        key: 'setDisableHoverEvent',
+	        value: function setDisableHoverEvent() {
+	            this.hoverEventDisable = true;
+	        }
+	    }, {
+	        key: 'setEnableHoverEvent',
+	        value: function setEnableHoverEvent() {
+	            this.hoverEventDisable = false;
+	        }
 	    }]);
 	
 	    return AbstractAnnotation;
@@ -15304,7 +15262,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 39 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -15327,11 +15285,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(33);
 	
-	var _text = __webpack_require__(36);
+	var _text = __webpack_require__(35);
 	
-	var _view = __webpack_require__(40);
+	var _view = __webpack_require__(39);
 	
-	var _abstract = __webpack_require__(38);
+	var _abstract = __webpack_require__(37);
 	
 	var _abstract2 = _interopRequireDefault(_abstract);
 	
@@ -15368,6 +15326,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _this.y = 0;
 	        _this.$element = _this.createDummyElement();
 	
+	        // Updated by parent via AbstractAnnotation#setTextForceDisplay.
+	        _this.textForceDisplay = false;
+	
 	        // parent.on('rectmoveend', this.handleRectMoveEnd);
 	        globalEvent.on('rectmoveend', _this.handleRectMoveEnd);
 	
@@ -15390,6 +15351,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.text = this.parent.text;
 	                this.color = this.parent.color;
 	                _get(TextAnnotation.prototype.__proto__ || Object.getPrototypeOf(TextAnnotation.prototype), 'render', this).call(this);
+	                if (this.textForceDisplay) {
+	                    this.$element.addClass('--visible');
+	                }
 	            }
 	        }
 	
@@ -15516,6 +15480,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'enableViewMode',
 	        value: function enableViewMode() {
 	
+	            // Reset the state that always display a content.
+	            this.textForceDisplay = false;
+	
+	            _get(TextAnnotation.prototype.__proto__ || Object.getPrototypeOf(TextAnnotation.prototype), 'enableViewMode', this).call(this);
 	            if (!this.parent.readOnly) {
 	                this.$element.find('text').off('click').on('click', this.handleClickEvent);
 	            }
@@ -15523,6 +15491,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'disableViewMode',
 	        value: function disableViewMode() {
+	            _get(TextAnnotation.prototype.__proto__ || Object.getPrototypeOf(TextAnnotation.prototype), 'disableViewMode', this).call(this);
 	            this.$element.find('text').off('click', this.handleClickEvent);
 	        }
 	    }]);
@@ -15534,7 +15503,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 40 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -15584,14 +15553,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Set annotations' translucent state.
 	 */
-	function setComponenTranslucent(translucent) {
+	function setComponenTranslucent(translucent) {}
 	
-	    if (translucent) {
-	        (0, _jquery2.default)('svg > *').addClass('--viewMode');
-	    } else {
-	        (0, _jquery2.default)('svg > *').removeClass('--viewMode');
-	    }
-	}
+	// if (translucent) {
+	//     $('svg > *').addClass('--viewMode');
+	
+	// } else {
+	//     $('svg > *').removeClass('--viewMode');
+	// }
+	
 	
 	/**
 	 * Make annotations view mode.
@@ -15612,28 +15582,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function enableViewMode() {
 	    disableViewMode();
+	
+	    window.viewMode = true;
+	
 	    setComponenTranslucent(true);
 	    setAnnotationViewMode();
 	    document.addEventListener('keyup', handleDocumentKeyup);
 	    document.addEventListener('keydown', handleDocumentKeydown);
-	
-	    window.viewMode = true;
 	}
 	
 	/**
 	 * Disable view mode.
 	 */
 	function disableViewMode() {
+	    window.viewMode = false;
 	    setComponenTranslucent(false);
 	    resetAnnotationViewMode();
 	    document.removeEventListener('keyup', handleDocumentKeyup);
 	    document.removeEventListener('keydown', handleDocumentKeydown);
-	
-	    window.viewMode = false;
 	}
 
 /***/ },
-/* 41 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -15650,9 +15620,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(33);
 	
-	var _text = __webpack_require__(36);
+	var _text = __webpack_require__(35);
 	
-	var _highlight = __webpack_require__(42);
+	var _highlight = __webpack_require__(41);
 	
 	var _highlight2 = _interopRequireDefault(_highlight);
 	
@@ -15762,6 +15732,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    document.addEventListener('mouseup', handleDocumentMouseup);
 	
 	    highlightAnnotation.text = text;
+	    highlightAnnotation.setTextForceDisplay();
 	    highlightAnnotation.render();
 	    highlightAnnotation.save();
 	  }, 'text');
@@ -15785,7 +15756,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 42 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -15802,11 +15773,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _uuid2 = _interopRequireDefault(_uuid);
 	
-	var _abstract = __webpack_require__(38);
+	var _abstract = __webpack_require__(37);
 	
 	var _abstract2 = _interopRequireDefault(_abstract);
 	
-	var _text = __webpack_require__(39);
+	var _text = __webpack_require__(38);
 	
 	var _text2 = _interopRequireDefault(_text);
 	
@@ -16013,6 +15984,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'enableViewMode',
 	        value: function enableViewMode() {
+	            _get(HighlightAnnotation.prototype.__proto__ || Object.getPrototypeOf(HighlightAnnotation.prototype), 'enableViewMode', this).call(this);
 	
 	            this.disableViewMode();
 	
@@ -16028,6 +16000,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'disableViewMode',
 	        value: function disableViewMode() {
+	            _get(HighlightAnnotation.prototype.__proto__ || Object.getPrototypeOf(HighlightAnnotation.prototype), 'disableViewMode', this).call(this);
 	            this.$element.find('circle').off('click');
 	        }
 	    }], [{
@@ -16050,7 +16023,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 43 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -16073,13 +16046,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _relation = __webpack_require__(30);
 	
-	var _text = __webpack_require__(36);
+	var _text = __webpack_require__(35);
 	
 	var _uuid = __webpack_require__(14);
 	
 	var _uuid2 = _interopRequireDefault(_uuid);
 	
-	var _arrow = __webpack_require__(44);
+	var _arrow = __webpack_require__(43);
 	
 	var _arrow2 = _interopRequireDefault(_arrow);
 	
@@ -16116,9 +16089,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    arrowAnnotation.direction = _arrowType;
 	    arrowAnnotation.rel1Annotation = _hoverAnnotation;
 	    arrowAnnotation.readOnly = false;
+	    arrowAnnotation.setDisableHoverEvent();
 	
 	    document.addEventListener('mouseup', handleDocumentMouseup);
-	    // document.addEventListener('mousemove', handleDocumentMousemove);
+	
+	    disableAnnotationHoverEvent();
 	
 	    dragging = true;
 	  }
@@ -16150,10 +16125,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var circle = findHitBoundingCircle(e);
 	  if (!hitCircle && circle) {
 	    hitCircle = circle;
-	    (0, _jquery2.default)(hitCircle).addClass('--hover');
+	    (0, _jquery2.default)(hitCircle).parents('g').addClass('--hover');
+	    console.log('up');
 	  } else if (hitCircle && !circle) {
-	    (0, _jquery2.default)(hitCircle).removeClass('--hover');
+	    (0, _jquery2.default)(hitCircle).parents('g').removeClass('--hover');
 	    hitCircle = null;
+	    console.log('down');
 	  }
 	}
 	
@@ -16191,7 +16168,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  dragging = false;
 	
 	  document.removeEventListener('mouseup', handleDocumentMouseup);
-	  // document.removeEventListener('mousemove', handleDocumentMousemove);
+	
+	  enableAnnotationHoverEvent();
 	
 	  // FIXME use drag and drop event, it may be better.
 	
@@ -16212,6 +16190,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	
 	  arrowAnnotation.rel2Annotation = endAnnotation;
+	  arrowAnnotation.setEnableHoverEvent();
 	
 	  arrowAnnotation.save();
 	
@@ -16232,6 +16211,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  (0, _text.addInputField)(x, y, null, null, function (text) {
 	
 	    arrowAnnotation.text = text;
+	    arrowAnnotation.setTextForceDisplay();
 	    arrowAnnotation.save();
 	    arrowAnnotation.render();
 	  }, 'text');
@@ -16249,6 +16229,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	      boundingCircles.push(boundingCircle);
 	    }
 	  });
+	}
+	
+	function disableAnnotationHoverEvent() {
+	  // Disable annotation original hover event,
+	  // bacause the event occur intermittently at mouse dragging.
+	  (0, _jquery2.default)('svg > g').css('pointer-events', 'none');
+	}
+	
+	function enableAnnotationHoverEvent() {
+	  (0, _jquery2.default)('svg > g').css('pointer-events', 'auto');
 	}
 	
 	function disableTextlayer() {
@@ -16342,7 +16332,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 44 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -16359,11 +16349,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _uuid2 = _interopRequireDefault(_uuid);
 	
-	var _abstract = __webpack_require__(38);
+	var _abstract = __webpack_require__(37);
 	
 	var _abstract2 = _interopRequireDefault(_abstract);
 	
-	var _text = __webpack_require__(39);
+	var _text = __webpack_require__(38);
 	
 	var _text2 = _interopRequireDefault(_text);
 	
@@ -16473,6 +16463,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                readOnly: this.readOnly
 	            };
 	        }
+	
+	        /**
+	         * Destroy the annotation.
+	         */
+	
 	    }, {
 	        key: 'destroy',
 	        value: function destroy() {
@@ -16482,13 +16477,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this._rel1Annotation.removeListener('hoverout', this.handleRelHoverOut);
 	                this._rel1Annotation.removeListener('rectmove', this.handleRelMove);
 	                this._rel1Annotation.removeListener('delete', this.handleRelDelete);
+	                delete this._rel1Annotation;
 	            }
 	            if (this._rel2Annotation) {
 	                this._rel2Annotation.removeListener('hoverin', this.handleRelHoverIn);
 	                this._rel2Annotation.removeListener('hoverout', this.handleRelHoverOut);
 	                this._rel2Annotation.removeListener('rectmove', this.handleRelMove);
 	                this._rel2Annotation.removeListener('delete', this.handleRelDelete);
+	                delete this._rel2Annotation;
 	            }
+	
+	            globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
+	            globalEvent.removeListener('enableViewMode', this.enableViewMode);
+	            globalEvent.removeListener('disableViewMode', this.disableViewMode);
+	            globalEvent.removeListener('rectmoveend', this.handleRelMoveEnd);
 	        }
 	
 	        /**
@@ -16675,6 +16677,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'enableViewMode',
 	        value: function enableViewMode() {
+	            _get(ArrowAnnotation.prototype.__proto__ || Object.getPrototypeOf(ArrowAnnotation.prototype), 'enableViewMode', this).call(this);
 	
 	            this.disableViewMode();
 	
@@ -16690,6 +16693,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'disableViewMode',
 	        value: function disableViewMode() {
+	            _get(ArrowAnnotation.prototype.__proto__ || Object.getPrototypeOf(ArrowAnnotation.prototype), 'disableViewMode', this).call(this);
 	            this.$element.find('path').off('click');
 	        }
 	
@@ -16777,13 +16781,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 45 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(46);
+	var content = __webpack_require__(45);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(5)(content, {});
@@ -16803,7 +16807,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 46 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(4)();
@@ -16811,13 +16815,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, "\n/**\n * Utilities.\n */\n.\\--hide {\n  display: none;\n}\n\n/**\n * SVGLayer.\n */\n.annoLayer {}\n.annoLayer > *.\\--viewMode {\n  opacity: 0.5;\n}\n.annoLayer > *.\\--viewMode.\\--emphasis {\n  opacity: 1;\n}\n\n/**\n    各種アノテーション\n*/\n.anno-circle {\n    transition:0.2s;\n    transform-origin: center center;\n}\n.\\--hover .anno-circle {\n  box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;\n  /*transform: scale(2);*/\n  stroke: blue;\n  stroke-width: 5px;\n}\n\n.\\--hover .anno-highlight {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-highlight {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n/**\n  Arrow.\n*/\n.anno-arrow {\n  transition:0.2s;\n}\n.\\--hover .anno-arrow {\n  stroke-width: 2px;\n}\n.\\--selected .anno-arrow {\n}\n.anno-arrow-outline {\n  fill: none;\n  visibility: hidden;\n}\n.\\--selected .anno-arrow-outline {\n  visibility: visible;\n  stroke: black;\n  stroke-width: 2.85px;\n  pointer-events: stroke;\n  stroke-dasharray: 3;\n}\n\n/**\n  Rect.\n*/\n.anno-rect {\n}\n.\\--hover .anno-rect {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-rect {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n\n/**\n  Text.\n*/\n.anno-text {\n}\n.\\--hover .anno-text {\n  fill: rgba(255, 255, 255, 1.0);\n  stroke: black;\n  stroke-width: 0.75px;\n}\n.\\--hover .anno-text ~ text {\n  fill: rgba(255, 0, 0, 1.0);\n}\n.\\--selected .anno-text {\n  stroke: rgba(255, 0, 0, 1.0);\n  stroke-width: 1.5px;\n  fill: rgba(255, 232, 188, 1.0);\n  stroke-dasharray: 3;\n}\n.\\--selected .anno-text ~ text {\n  fill: rgba(0, 0, 0, 1.0);\n}\n\n", ""]);
+	exports.push([module.id, "\n/**\n * Utilities.\n */\n.\\--hide {\n  display: none;\n}\n\n/**\n * SVGLayer.\n */\n.annoLayer {}\n.annoLayer > *.\\--viewMode {\n  opacity: 0.5;\n}\n.annoLayer > *.\\--viewMode.\\--emphasis {\n  opacity: 1;\n}\n\n/**\n    各種アノテーション\n*/\n.anno-circle {\n    transition:0.2s;\n    transform-origin: center center;\n}\n.\\--hover .anno-circle {\n  box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;\n  /*transform: scale(2);*/\n  stroke: blue;\n  stroke-width: 5px;\n}\n\n.\\--hover .anno-highlight {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-highlight {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n/**\n  Arrow.\n*/\n.anno-arrow {\n  transition:0.2s;\n}\n.\\--hover .anno-arrow {\n  stroke-width: 2px;\n}\n.\\--selected .anno-arrow {\n}\n.anno-arrow-outline {\n  fill: none;\n  visibility: hidden;\n}\n.\\--selected .anno-arrow-outline {\n  visibility: visible;\n  stroke: black;\n  stroke-width: 2.85px;\n  pointer-events: stroke;\n  stroke-dasharray: 3;\n}\n\n/**\n  Rect.\n*/\n.anno-rect {\n}\n.\\--hover .anno-rect {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-rect {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n\n/**\n  Text.\n*/\n.anno-text-group, .anno-text-group.\\--viewMode {\n    transition: 0.2s;\n    opacity: 0.01; /* for enabling a hover event. */\n}\n.anno-text-group.\\--hover,\n.anno-text-group.\\--selected,\n.anno-text-group.\\--visible {\n    opacity: 1;\n}\n.anno-text {\n}\n.\\--hover .anno-text {\n  fill: rgba(255, 255, 255, 1.0);\n  stroke: black;\n  stroke-width: 0.75px;\n}\n.\\--hover .anno-text ~ text {\n  fill: rgba(255, 0, 0, 1.0);\n}\n.\\--selected .anno-text {\n  stroke: rgba(255, 0, 0, 1.0);\n  stroke-width: 1.5px;\n  fill: rgba(255, 232, 188, 1.0);\n  stroke-dasharray: 3;\n}\n.\\--selected .anno-text ~ text {\n  fill: rgba(0, 0, 0, 1.0);\n}\n\n", ""]);
 	
 	// exports
 
 
 /***/ },
-/* 47 */
+/* 46 */
 /***/ function(module, exports) {
 
 	"use strict";

@@ -164,6 +164,7 @@ export default class HighlightAnnotation extends AbstractAnnotation {
      * Enable view mode.
      */
     enableViewMode() {
+        super.enableViewMode();
 
         this.disableViewMode();
 
@@ -176,6 +177,7 @@ export default class HighlightAnnotation extends AbstractAnnotation {
      * Disable view mode.
      */
     disableViewMode() {
+        super.disableViewMode();
         this.$element.find('circle').off('click');
     }
 }

@@ -134,6 +134,9 @@ export default class ArrowAnnotation extends AbstractAnnotation {
         };
     }
 
+    /**
+     * Destroy the annotation.
+     */
     destroy() {
         super.destroy();
         if (this._rel1Annotation) {
@@ -141,13 +144,20 @@ export default class ArrowAnnotation extends AbstractAnnotation {
             this._rel1Annotation.removeListener('hoverout', this.handleRelHoverOut);
             this._rel1Annotation.removeListener('rectmove', this.handleRelMove);
             this._rel1Annotation.removeListener('delete', this.handleRelDelete);
+            delete this._rel1Annotation;
         }
         if (this._rel2Annotation) {
             this._rel2Annotation.removeListener('hoverin', this.handleRelHoverIn);
             this._rel2Annotation.removeListener('hoverout', this.handleRelHoverOut);
             this._rel2Annotation.removeListener('rectmove', this.handleRelMove);
             this._rel2Annotation.removeListener('delete', this.handleRelDelete);
+            delete this._rel2Annotation;
         }
+
+        globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
+        globalEvent.removeListener('enableViewMode', this.enableViewMode);
+        globalEvent.removeListener('disableViewMode', this.disableViewMode);
+        globalEvent.removeListener('rectmoveend', this.handleRelMoveEnd);
     }
 
     /**
@@ -286,6 +296,7 @@ export default class ArrowAnnotation extends AbstractAnnotation {
      * Enable view mode.
      */
     enableViewMode() {
+        super.enableViewMode();
 
         this.disableViewMode();
 
@@ -298,6 +309,7 @@ export default class ArrowAnnotation extends AbstractAnnotation {
      * Disable view mode.
      */
     disableViewMode() {
+        super.disableViewMode();
         this.$element.find('path').off('click');
     }
 
