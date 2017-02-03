@@ -136,7 +136,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Remove the annotation layer and the temporary rendering layer.
 	 */
 	function removeAnnoLayer() {
+	    console.log('removeAnnoLayer');
 	    (0, _jquery2.default)('#annoLayer, #tmpLayer').remove();
+	    // annotationContainer.getAllAnnotations().forEach(a => {
+	    //     a.destory();
+	    // });
 	}
 	
 	/*
@@ -199,6 +203,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	function renderAnnotations(svg) {
+	
+	    if (window.annotationContainer.getAllAnnotations().length > 0) {
+	        console.log('aaaaaaaaaaaa');
+	        window.annotationContainer.getAllAnnotations().forEach(function (a) {
+	            a.render();
+	        });
+	        var event = document.createEvent('CustomEvent');
+	        event.initCustomEvent('annotationrendered', true, true, null);
+	        window.dispatchEvent(event);
+	        return;
+	    }
+	
 	    var documentId = getFileName(PDFView.url);
 	    _PDFAnnoCore2.default.getAnnotations(documentId).then(function (annotations) {
 	        _PDFAnnoCore2.default.getStoreAdapter().getSecondaryAnnotations(documentId).then(function (secondaryAnnotations) {
@@ -13758,12 +13774,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return;
 	  }
 	
-	  saveRect({
+	  var rect = {
 	    x: parseInt(overlay.style.left, 10),
 	    y: parseInt(overlay.style.top, 10),
 	    width: parseInt(overlay.style.width, 10),
 	    height: parseInt(overlay.style.height, 10)
-	  });
+	  };
+	
+	  if (rect.width > 0 && rect.height > 0) {
+	    saveRect(rect);
+	  }
 	
 	  (0, _jquery2.default)(overlay).remove();
 	  overlay = null;
@@ -14976,13 +14996,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'enableViewMode',
 	        value: function enableViewMode() {
-	            _get(RectAnnotation.prototype.__proto__ || Object.getPrototypeOf(RectAnnotation.prototype), 'enableViewMode', this).call(this);
 	
-	            this.disableViewMode();
+	            console.log('enableViewMode');
+	
+	            _get(RectAnnotation.prototype.__proto__ || Object.getPrototypeOf(RectAnnotation.prototype), 'enableViewMode', this).call(this);
 	
 	            if (!this.readOnly) {
 	                this.$element.find('.anno-rect, circle').on('click', this.handleClickEvent).on('mousedown', this.handleMouseDownOnRect);
 	            }
+	
+	            console.log('enableViewMode2');
 	        }
 	
 	        /**
@@ -14992,8 +15015,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'disableViewMode',
 	        value: function disableViewMode() {
+	            console.log('disableViewMode');
 	            _get(RectAnnotation.prototype.__proto__ || Object.getPrototypeOf(RectAnnotation.prototype), 'disableViewMode', this).call(this);
 	            this.$element.find('.anno-rect, circle').off('click mousedown');
+	            console.log('disableViewMode2');
 	        }
 	    }], [{
 	        key: 'newInstance',
@@ -15093,6 +15118,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'render',
 	        value: function render() {
+	
+	            console.log('render', this.type);
 	
 	            this.$element.remove();
 	            this.$element = $((0, _appendChild2.default)((0, _utils.getSVGLayer)(), this));
@@ -15424,6 +15451,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function destroy() {
 	            this.$element.remove();
 	            this.$element = this.createDummyElement();
+	            globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
+	            globalEvent.removeListener('enableViewMode', this.enableViewMode);
+	            globalEvent.removeListener('disableViewMode', this.disableViewMode);
 	        }
 	
 	        /**
@@ -16490,6 +16520,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        globalEvent.on('rectmoveend', _this.handleRelMoveEnd);
 	
 	        _this.textAnnotation = new _text2.default(_this);
+	        _this.textAnnotation.on('selected', _this.handleTextSelected);
+	        _this.textAnnotation.on('deselected', _this.handleTextDeselected);
 	        _this.textAnnotation.on('hoverin', _this.handleTextHoverIn);
 	        _this.textAnnotation.on('hoverout', _this.handleTextHoverOut);
 	        _this.textAnnotation.on('textchanged', _this.handleTextChanged);
@@ -16628,6 +16660,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        /**
+	         * Handle a selected event on a text.
+	         */
+	
+	    }, {
+	        key: 'handleTextSelected',
+	        value: function handleTextSelected() {
+	            this.$element.addClass('--selected');
+	        }
+	
+	        /**
+	         * Handle a deselected event on a text.
+	         */
+	
+	    }, {
+	        key: 'handleTextDeselected',
+	        value: function handleTextDeselected() {
+	            this.$element.removeClass('--selected');
+	        }
+	
+	        /**
 	         * The callback for the relational text hoverred in.
 	         */
 	
@@ -16751,6 +16803,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'handleClickEvent',
 	        value: function handleClickEvent() {
 	            this.$element.toggleClass('--selected');
+	            var selected = this.$element.hasClass('--selected');
+	            if (selected) {
+	                this.textAnnotation.select();
+	            } else {
+	                this.textAnnotation.deselect();
+	            }
 	        }
 	
 	        /**
@@ -16939,6 +16997,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _createClass(AnnotationContainer, [{
 	        key: "add",
 	        value: function add(annotation) {
+	
+	            // if (annotation.uuid) {
+	            //     let a = this.findById(annotation.uuid);
+	            //     if (a) {
+	            //         a.destroy();
+	            //         this.remove(a);
+	            //     }
+	            // }
+	
 	            this.set.add(annotation);
 	        }
 	
