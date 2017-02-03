@@ -111,12 +111,16 @@ function handleDocumentMouseup(e) {
     return;
   }
 
-  saveRect({
+  const rect = {
     x      : parseInt(overlay.style.left, 10),
     y      : parseInt(overlay.style.top, 10),
     width  : parseInt(overlay.style.width, 10),
     height : parseInt(overlay.style.height, 10)
-  });
+  };
+
+  if (rect.width > 0 && rect.height > 0) {
+    saveRect(rect);
+  }
 
   $(overlay).remove();
   overlay = null;

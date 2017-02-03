@@ -14,6 +14,15 @@ export default class AnnotationContainer {
      * Add an annotation to the container.
      */
     add(annotation) {
+
+        // if (annotation.uuid) {
+        //     let a = this.findById(annotation.uuid);
+        //     if (a) {
+        //         a.destroy();
+        //         this.remove(a);
+        //     }
+        // }
+
         this.set.add(annotation);
     }
 

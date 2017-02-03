@@ -54,7 +54,11 @@ $('#zoomIn, #zoomOut').on('click', removeAnnoLayer);
  * Remove the annotation layer and the temporary rendering layer.
  */
 function removeAnnoLayer() {
+    console.log('removeAnnoLayer');
     $('#annoLayer, #tmpLayer').remove();
+    // annotationContainer.getAllAnnotations().forEach(a => {
+    //     a.destory();
+    // });
 }
 
 /*
@@ -117,6 +121,18 @@ function renderAnno() {
 }
 
 function renderAnnotations(svg) {
+
+    if (window.annotationContainer.getAllAnnotations().length > 0) {
+        console.log('aaaaaaaaaaaa');
+        window.annotationContainer.getAllAnnotations().forEach(a => {
+            a.render();
+        });
+        var event = document.createEvent('CustomEvent');
+        event.initCustomEvent('annotationrendered', true, true, null);
+        window.dispatchEvent(event);
+        return;
+    }
+
     let documentId = getFileName(PDFView.url);
     PDFAnnoCore.getAnnotations(documentId).then(function(annotations) {
         PDFAnnoCore.getStoreAdapter().getSecondaryAnnotations(documentId).then(function(secondaryAnnotations) {

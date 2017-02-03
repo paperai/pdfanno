@@ -39,6 +39,8 @@ export default class ArrowAnnotation extends AbstractAnnotation {
         globalEvent.on('rectmoveend', this.handleRelMoveEnd);
 
         this.textAnnotation = new TextAnnotation(this);
+        this.textAnnotation.on('selected', this.handleTextSelected);
+        this.textAnnotation.on('deselected', this.handleTextDeselected);
         this.textAnnotation.on('hoverin', this.handleTextHoverIn);
         this.textAnnotation.on('hoverout', this.handleTextHoverOut);
         this.textAnnotation.on('textchanged', this.handleTextChanged);
@@ -200,6 +202,20 @@ export default class ArrowAnnotation extends AbstractAnnotation {
     }
 
     /**
+     * Handle a selected event on a text.
+     */
+    handleTextSelected() {
+        this.$element.addClass('--selected');
+    }
+
+    /**
+     * Handle a deselected event on a text.
+     */
+    handleTextDeselected() {
+        this.$element.removeClass('--selected');
+    }
+
+    /**
      * The callback for the relational text hoverred in.
      */
     handleTextHoverIn() {
@@ -290,6 +306,12 @@ export default class ArrowAnnotation extends AbstractAnnotation {
      */
     handleClickEvent() {
         this.$element.toggleClass('--selected');
+        let selected = this.$element.hasClass('--selected');
+        if (selected) {
+            this.textAnnotation.select();
+        } else {
+            this.textAnnotation.deselect();
+        }
     }
 
     /**
