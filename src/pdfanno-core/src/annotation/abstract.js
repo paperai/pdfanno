@@ -86,11 +86,25 @@ export default class AbstractAnnotation extends EventEmitter {
     }
 
     /**
-     * Dehighlight the annotations.
+     * Dehighlight the annotation.
      */
     dehighlight() {
         this.$element.removeClass('--hover --emphasis');
         this.textAnnotation && this.textAnnotation.dehighlight();
+    }
+
+    /**
+     * Select the annotation.
+     */
+    select() {
+        this.$element.addClass('--selected');
+    }
+
+    /**
+     * Deselect the annotation.
+     */
+    deselect() {
+        this.$element.removeClass('--selected');
     }
 
     /**

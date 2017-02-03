@@ -39,9 +39,9 @@ export default class TextAnnotation extends AbstractAnnotation {
         // parent.on('rectmoveend', this.handleRectMoveEnd);
         globalEvent.on('rectmoveend', this.handleRectMoveEnd);
 
-        window.globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
-        window.globalEvent.on('enableViewMode', this.enableViewMode);
-        window.globalEvent.on('disableViewMode', this.disableViewMode);
+        globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
+        globalEvent.on('enableViewMode', this.enableViewMode);
+        globalEvent.on('disableViewMode', this.disableViewMode);
     }
 
 
@@ -78,46 +78,44 @@ export default class TextAnnotation extends AbstractAnnotation {
         this.$element = this.createDummyElement();
     }
 
+    /**
+     * Delete a text annotation if selected.
+     */
     deleteSelectedAnnotation() {
-        if (this.$element.hasClass('--selected')) {
-            console.log('text:deleteSelectedAnnotation');
-            this.destroy();
-            this.emit('textchanged', null);
-        }
+        super.deleteSelectedAnnotation();
     }
 
-    highlight() {
-        this.$element.addClass('--hover');
-        this.$element.addClass('--emphasis');
-    }
-
-    dehighlight() {
-        this.$element.removeClass('--hover');
-        this.$element.removeClass('--emphasis');
-    }
-
-    handleParentHoverIn() {
-        this.highlight();
-    }
-
-    handleParentHoverOut() {
-        this.dehighlight();
-    }
-
+    /**
+     * Handle a hoverin event.
+     */
     handleHoverInEvent() {
-        this.$element.addClass('--hover');
-        this.$element.addClass('--emphasis');
+        this.highlight();
         this.emit('hoverin');
     }
 
+    /**
+     * Handle a hoverout event.
+     */
     handleHoverOutEvent() {
-        this.$element.removeClass('--hover');
-        this.$element.removeClass('--emphasis');
+        this.dehighlight();
         this.emit('hoverout');
     }
 
+    /**
+     * Handle a click event.
+     */
     handleClickEvent() {
-        this.$element.toggleClass('--selected');
+
+        let next = !this.$element.hasClass('--selected');
+
+        if (next) {
+            super.select();
+            this.emit('selected');
+
+        } else {
+            super.deselect();
+            this.emit('deselected');
+        }
 
         // Check double click.
         let currentTime = (new Date()).getTime();
@@ -127,6 +125,9 @@ export default class TextAnnotation extends AbstractAnnotation {
         this.prevClickTime = currentTime;
     }
 
+    /**
+     * Handle a click event.
+     */
     handleDoubleClickEvent() {
         console.log('handleDoubleClickEvent');
 
