@@ -26,6 +26,8 @@ export default class HighlightAnnotation extends AbstractAnnotation {
         window.globalEvent.on('disableViewMode', this.disableViewMode);
 
         this.textAnnotation = new TextAnnotation(this);
+        this.textAnnotation.on('selected', this.handleTextSelected);
+        this.textAnnotation.on('deselected', this.handleTextDeselected);
         this.textAnnotation.on('hoverin', this.handleTextHoverIn);
         this.textAnnotation.on('hoverout', this.handleTextHoverOut);
         this.textAnnotation.on('textchanged', this.handleTextChanged);
@@ -115,6 +117,20 @@ export default class HighlightAnnotation extends AbstractAnnotation {
     }
 
     /**
+     * Handle a selected event on a text.
+     */
+    handleTextSelected() {
+        this.$element.addClass('--selected');
+    }
+
+    /**
+     * Handle a deselected event on a text.
+     */
+    handleTextDeselected() {
+        this.$element.removeClass('--selected');
+    }
+
+    /**
      * Handle a hovein event on a text.
      */
     handleTextHoverIn() {
@@ -161,6 +177,12 @@ export default class HighlightAnnotation extends AbstractAnnotation {
      */
     handleClickEvent() {
         this.$element.toggleClass('--selected');
+        let selected = this.$element.hasClass('--selected');
+        if (selected) {
+            this.textAnnotation.select();
+        } else {
+            this.textAnnotation.deselect();
+        }
     }
 
     /**

@@ -14695,6 +14695,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        window.globalEvent.on('disableViewMode', _this.disableViewMode);
 	
 	        _this.textAnnotation = new _text2.default(_this);
+	        _this.textAnnotation.on('selected', _this.handleTextSelected);
+	        _this.textAnnotation.on('deselected', _this.handleTextDeselected);
 	        _this.textAnnotation.on('hoverin', _this.handleTextHoverIn);
 	        _this.textAnnotation.on('hoverout', _this.handleTextHoverOut);
 	        _this.textAnnotation.on('textchanged', _this.handleTextChanged);
@@ -14789,6 +14791,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        /**
+	         * Handle a selected event on a text.
+	         */
+	
+	    }, {
+	        key: 'handleTextSelected',
+	        value: function handleTextSelected() {
+	            this.$element.addClass('--selected');
+	        }
+	
+	        /**
+	         * Handle a deselected event on a text.
+	         */
+	
+	    }, {
+	        key: 'handleTextDeselected',
+	        value: function handleTextDeselected() {
+	            this.$element.removeClass('--selected');
+	        }
+	
+	        /**
 	         * Handle a hovein event on a text.
 	         */
 	
@@ -14861,6 +14883,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'handleClickEvent',
 	        value: function handleClickEvent() {
 	            this.$element.toggleClass('--selected');
+	            var selected = this.$element.hasClass('--selected');
+	            if (selected) {
+	                this.textAnnotation.select();
+	            } else {
+	                this.textAnnotation.deselect();
+	            }
 	        }
 	
 	        /**
@@ -15137,7 +15165,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        /**
-	         * Dehighlight the annotations.
+	         * Dehighlight the annotation.
 	         */
 	
 	    }, {
@@ -15145,6 +15173,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function dehighlight() {
 	            this.$element.removeClass('--hover --emphasis');
 	            this.textAnnotation && this.textAnnotation.dehighlight();
+	        }
+	
+	        /**
+	         * Select the annotation.
+	         */
+	
+	    }, {
+	        key: 'select',
+	        value: function select() {
+	            this.$element.addClass('--selected');
+	        }
+	
+	        /**
+	         * Deselect the annotation.
+	         */
+	
+	    }, {
+	        key: 'deselect',
+	        value: function deselect() {
+	            this.$element.removeClass('--selected');
 	        }
 	
 	        /**
@@ -15332,9 +15380,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // parent.on('rectmoveend', this.handleRectMoveEnd);
 	        globalEvent.on('rectmoveend', _this.handleRectMoveEnd);
 	
-	        window.globalEvent.on('deleteSelectedAnnotation', _this.deleteSelectedAnnotation);
-	        window.globalEvent.on('enableViewMode', _this.enableViewMode);
-	        window.globalEvent.on('disableViewMode', _this.disableViewMode);
+	        globalEvent.on('deleteSelectedAnnotation', _this.deleteSelectedAnnotation);
+	        globalEvent.on('enableViewMode', _this.enableViewMode);
+	        globalEvent.on('disableViewMode', _this.disableViewMode);
 	        return _this;
 	    }
 	
@@ -15377,55 +15425,56 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.$element.remove();
 	            this.$element = this.createDummyElement();
 	        }
+	
+	        /**
+	         * Delete a text annotation if selected.
+	         */
+	
 	    }, {
 	        key: 'deleteSelectedAnnotation',
 	        value: function deleteSelectedAnnotation() {
-	            if (this.$element.hasClass('--selected')) {
-	                console.log('text:deleteSelectedAnnotation');
-	                this.destroy();
-	                this.emit('textchanged', null);
-	            }
+	            _get(TextAnnotation.prototype.__proto__ || Object.getPrototypeOf(TextAnnotation.prototype), 'deleteSelectedAnnotation', this).call(this);
 	        }
-	    }, {
-	        key: 'highlight',
-	        value: function highlight() {
-	            this.$element.addClass('--hover');
-	            this.$element.addClass('--emphasis');
-	        }
-	    }, {
-	        key: 'dehighlight',
-	        value: function dehighlight() {
-	            this.$element.removeClass('--hover');
-	            this.$element.removeClass('--emphasis');
-	        }
-	    }, {
-	        key: 'handleParentHoverIn',
-	        value: function handleParentHoverIn() {
-	            this.highlight();
-	        }
-	    }, {
-	        key: 'handleParentHoverOut',
-	        value: function handleParentHoverOut() {
-	            this.dehighlight();
-	        }
+	
+	        /**
+	         * Handle a hoverin event.
+	         */
+	
 	    }, {
 	        key: 'handleHoverInEvent',
 	        value: function handleHoverInEvent() {
-	            this.$element.addClass('--hover');
-	            this.$element.addClass('--emphasis');
+	            this.highlight();
 	            this.emit('hoverin');
 	        }
+	
+	        /**
+	         * Handle a hoverout event.
+	         */
+	
 	    }, {
 	        key: 'handleHoverOutEvent',
 	        value: function handleHoverOutEvent() {
-	            this.$element.removeClass('--hover');
-	            this.$element.removeClass('--emphasis');
+	            this.dehighlight();
 	            this.emit('hoverout');
 	        }
+	
+	        /**
+	         * Handle a click event.
+	         */
+	
 	    }, {
 	        key: 'handleClickEvent',
 	        value: function handleClickEvent() {
-	            this.$element.toggleClass('--selected');
+	
+	            var next = !this.$element.hasClass('--selected');
+	
+	            if (next) {
+	                _get(TextAnnotation.prototype.__proto__ || Object.getPrototypeOf(TextAnnotation.prototype), 'select', this).call(this);
+	                this.emit('selected');
+	            } else {
+	                _get(TextAnnotation.prototype.__proto__ || Object.getPrototypeOf(TextAnnotation.prototype), 'deselect', this).call(this);
+	                this.emit('deselected');
+	            }
 	
 	            // Check double click.
 	            var currentTime = new Date().getTime();
@@ -15434,6 +15483,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	            this.prevClickTime = currentTime;
 	        }
+	
+	        /**
+	         * Handle a click event.
+	         */
+	
 	    }, {
 	        key: 'handleDoubleClickEvent',
 	        value: function handleDoubleClickEvent() {
@@ -15816,6 +15870,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        window.globalEvent.on('disableViewMode', _this.disableViewMode);
 	
 	        _this.textAnnotation = new _text2.default(_this);
+	        _this.textAnnotation.on('selected', _this.handleTextSelected);
+	        _this.textAnnotation.on('deselected', _this.handleTextDeselected);
 	        _this.textAnnotation.on('hoverin', _this.handleTextHoverIn);
 	        _this.textAnnotation.on('hoverout', _this.handleTextHoverOut);
 	        _this.textAnnotation.on('textchanged', _this.handleTextChanged);
@@ -15914,6 +15970,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        /**
+	         * Handle a selected event on a text.
+	         */
+	
+	    }, {
+	        key: 'handleTextSelected',
+	        value: function handleTextSelected() {
+	            this.$element.addClass('--selected');
+	        }
+	
+	        /**
+	         * Handle a deselected event on a text.
+	         */
+	
+	    }, {
+	        key: 'handleTextDeselected',
+	        value: function handleTextDeselected() {
+	            this.$element.removeClass('--selected');
+	        }
+	
+	        /**
 	         * Handle a hovein event on a text.
 	         */
 	
@@ -15978,6 +16054,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'handleClickEvent',
 	        value: function handleClickEvent() {
 	            this.$element.toggleClass('--selected');
+	            var selected = this.$element.hasClass('--selected');
+	            if (selected) {
+	                this.textAnnotation.select();
+	            } else {
+	                this.textAnnotation.deselect();
+	            }
 	        }
 	
 	        /**
