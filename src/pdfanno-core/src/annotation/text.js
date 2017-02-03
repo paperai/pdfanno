@@ -76,6 +76,9 @@ export default class TextAnnotation extends AbstractAnnotation {
     destroy() {
         this.$element.remove();
         this.$element = this.createDummyElement();
+        globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
+        globalEvent.removeListener('enableViewMode', this.enableViewMode);
+        globalEvent.removeListener('disableViewMode', this.disableViewMode);
     }
 
     /**
