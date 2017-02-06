@@ -31,12 +31,15 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
           let annotations = [];
           let containers = _getSecondaryContainers();
           containers.forEach(container => {
-            let tmpAnnotations = (container[documentId] || {}).annotations || [];
+            // let tmpAnnotations = (container[documentId] || {}).annotations || [];
+            let tmpAnnotations = container.annotations || [];
             annotations = annotations.concat(tmpAnnotations);
           });
 
           // Convert coordinate system.
           annotations = annotations.map(a => transformToRenderCoordinate(a));
+
+          console.log('getSecondaryAnnotations:', annotations);
 
           resolve({
             documentId,
@@ -102,21 +105,29 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
 
           // Every documents.
           let container = _getContainer();
-          for (let documentId in container) {
+          // for (let documentId in container) {
 
-            if (!container[documentId].annotations || container[documentId].annotations.length === 0) {
-              continue;
-            }
+            // let annotations = container.annotations;
+
+            // if (!container[documentId].annotations || container[documentId].annotations.length === 0) {
+            //   continue;
+            // }
+
+            // if (!annotations || annotations.length === 0) {
+            //   continue;
+            // }
 
             // Every annotations.
             let indexRect = 1;
             let indexSpan = 1;
             let indexRel  = 1;
             let indexText = 1;
-            let annotations = {};
-            dataExport[documentId] = annotations;
+            // let annotations = {};
+            // dataExport[documentId] = annotations;
+            let annotations = dataExport;
 
-            container[documentId].annotations.forEach(annotation => {
+            // container[documentId].annotations.forEach(annotation => {
+            container.annotations.forEach(annotation => {
 
               // Rect
               if (annotation.type === 'area') {
@@ -159,9 +170,11 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
               // Arrow.
               } else if (annotation.type === 'arrow') {
 
-                let rel1s = container[documentId].annotations.filter(a => a.uuid === annotation.rel1);
+                // let rel1s = container[documentId].annotations.filter(a => a.uuid === annotation.rel1);
+                let rel1s = container.annotations.filter(a => a.uuid === annotation.rel1);
                 let rel1 = rel1s[0];
-                let rel2s = container[documentId].annotations.filter(a => a.uuid === annotation.rel2);
+                // let rel2s = container[documentId].annotations.filter(a => a.uuid === annotation.rel2);
+                let rel2s = container.annotations.filter(a => a.uuid === annotation.rel2);
                 let rel2 = rel2s[0];
 
                 let page;
@@ -183,7 +196,7 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
               }
 
             });
-          }
+          // }
 
           resolve(dataExport);
         });
@@ -244,14 +257,21 @@ function _createContainerFromJson(json, color, isPrimary) {
 
   container.isPrimary = isPrimary;
 
-  for (let documentId in json) {
+  // for (let documentId in json) {
 
     let annotations = [];
-    container[documentId] = { annotations };
+    // container[documentId] = { annotations };
+    container.annotations = annotations;
 
-    for (let key in json[documentId]) {
+    // for (let key in json[documentId]) {
+    for (let key in json) {
 
-      let data = json[documentId][key];
+        if (key === 'version') {
+            continue;
+        }
+
+      // let data = json[documentId][key];
+      let data = json[key];
 
       // Rect.
       if (key.indexOf('rect') === 0) {
@@ -317,7 +337,7 @@ function _createContainerFromJson(json, color, isPrimary) {
           color
         });
       }
-    }
+    // }
   }
 
   return container;
@@ -488,7 +508,8 @@ function _saveContainers(containers) {
 function getAnnotations(documentId) {
   // Primary annotation.
   let container = _getContainer();
-  let annotations = (container[documentId] || {}).annotations || [];
+  // let annotations = (container[documentId] || {}).annotations || [];
+  let annotations = container.annotations || [];
 
   // transform coordinate system.
   annotations = annotations.map(a => transformToRenderCoordinate(a));
@@ -529,7 +550,8 @@ function updateAnnotations(documentId, annotations) {
   let viewBox = PDFView.pdfViewer.getPageView(0).viewport.viewBox;
 
   let container = _getContainer();
-  container[documentId] = { annotations };
+  // container[documentId] = { annotations };
+  container.annotations = annotations;
   _saveContainer(container);
 
   // Notifiy.
