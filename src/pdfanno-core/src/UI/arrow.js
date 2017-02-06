@@ -15,6 +15,11 @@ import uuid from '../utils/uuid';
 
 import ArrowAnnotation from '../annotation/arrow';
 
+/**
+ * the prev annotation rendered at the last.
+ */
+let prevAnnotation;
+
 let _hoverAnnotation = null;
 let arrowAnnotation = null;
 
@@ -154,6 +159,13 @@ function handleDocumentMouseup(e) {
 
   showTextInput();
 
+
+  if (prevAnnotation) {
+    prevAnnotation.resetTextForceDisplay();
+    prevAnnotation.render();
+  }
+  prevAnnotation = arrowAnnotation;
+
 }
 
 function showTextInput() {
@@ -290,5 +302,10 @@ export function disableArrow() {
     }
 
   });
+
+  if (prevAnnotation) {
+    prevAnnotation.resetTextForceDisplay();
+    prevAnnotation.render();
+  }
 
 }

@@ -13680,6 +13680,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
+	/**
+	 * the prev annotation rendered at the last.
+	 */
+	var prevAnnotation = void 0;
+	
 	var _type = 'area';
 	
 	var _enabled = false;
@@ -13840,6 +13845,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    rectAnnotation.render();
 	    rectAnnotation.save();
 	  }, 'text');
+	
+	  if (prevAnnotation) {
+	    prevAnnotation.resetTextForceDisplay();
+	    prevAnnotation.render();
+	  }
+	  prevAnnotation = rectAnnotation;
 	}
 	
 	/**
@@ -13872,6 +13883,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  document.removeEventListener('mousedown', handleDocumentMousedown);
 	
 	  (0, _utils.enableUserSelect)();
+	
+	  if (prevAnnotation) {
+	    prevAnnotation.resetTextForceDisplay();
+	    prevAnnotation.render();
+	  }
 	}
 
 /***/ },
@@ -15319,6 +15335,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	    }, {
+	        key: 'resetTextForceDisplay',
+	        value: function resetTextForceDisplay() {
+	            if (this.textAnnotation) {
+	                this.textAnnotation.textForceDisplay = false;
+	            }
+	        }
+	    }, {
 	        key: 'setDisableHoverEvent',
 	        value: function setDisableHoverEvent() {
 	            this.hoverEventDisable = true;
@@ -15564,9 +15587,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'enableViewMode',
 	        value: function enableViewMode() {
 	
-	            // Reset the state that always display a content.
-	            this.textForceDisplay = false;
-	
 	            _get(TextAnnotation.prototype.__proto__ || Object.getPrototypeOf(TextAnnotation.prototype), 'enableViewMode', this).call(this);
 	            if (!this.parent.readOnly) {
 	                this.$element.find('text').off('click').on('click', this.handleClickEvent);
@@ -15715,6 +15735,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 	
 	/**
+	 * the prev annotation rendered at the last.
+	 */
+	var prevAnnotation = void 0;
+	
+	/**
 	 * Get the current window selection as rects
 	 *
 	 * @return {Array} An Array of rects
@@ -15820,6 +15845,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    highlightAnnotation.render();
 	    highlightAnnotation.save();
 	  }, 'text');
+	
+	  if (prevAnnotation) {
+	    prevAnnotation.resetTextForceDisplay();
+	    prevAnnotation.render();
+	  }
+	  prevAnnotation = highlightAnnotation;
 	}
 	
 	/**
@@ -15837,6 +15868,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	function disableHighlight() {
 	  document.removeEventListener('mouseup', handleDocumentMouseup);
 	  (0, _jquery2.default)('.textLayer').css('z-index', 1);
+	
+	  if (prevAnnotation) {
+	    prevAnnotation.resetTextForceDisplay();
+	    prevAnnotation.render();
+	  }
 	}
 
 /***/ },
@@ -16173,6 +16209,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
+	/**
+	 * the prev annotation rendered at the last.
+	 */
+	var prevAnnotation = void 0;
+	
 	var _hoverAnnotation = null;
 	var arrowAnnotation = null;
 	
@@ -16308,6 +16349,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  arrowAnnotation.save();
 	
 	  showTextInput();
+	
+	  if (prevAnnotation) {
+	    prevAnnotation.resetTextForceDisplay();
+	    prevAnnotation.render();
+	  }
+	  prevAnnotation = arrowAnnotation;
 	}
 	
 	function showTextInput() {
@@ -16442,6 +16489,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 	  });
+	
+	  if (prevAnnotation) {
+	    prevAnnotation.resetTextForceDisplay();
+	    prevAnnotation.render();
+	  }
 	}
 
 /***/ },

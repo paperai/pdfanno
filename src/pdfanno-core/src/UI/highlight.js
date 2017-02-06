@@ -10,6 +10,11 @@ import { addInputField } from './text';
 import HighlightAnnotation from '../annotation/highlight';
 
 /**
+ * the prev annotation rendered at the last.
+ */
+let prevAnnotation;
+
+/**
  * Get the current window selection as rects
  *
  * @return {Array} An Array of rects
@@ -118,6 +123,12 @@ function saveRect(rects) {
 
   }, 'text');
 
+  if (prevAnnotation) {
+    prevAnnotation.resetTextForceDisplay();
+    prevAnnotation.render();
+  }
+  prevAnnotation = highlightAnnotation;
+
 }
 
 /**
@@ -135,4 +146,10 @@ export function enableHighlight() {
 export function disableHighlight() {
   document.removeEventListener('mouseup', handleDocumentMouseup);
   $('.textLayer').css('z-index', 1);
+
+  if (prevAnnotation) {
+    prevAnnotation.resetTextForceDisplay();
+    prevAnnotation.render();
+  }
+
 }

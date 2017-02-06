@@ -173,9 +173,6 @@ export default class TextAnnotation extends AbstractAnnotation {
 
     enableViewMode() {
 
-        // Reset the state that always display a content.
-        this.textForceDisplay = false;
-
         super.enableViewMode();
         if (!this.parent.readOnly) {
             this.$element.find('text').off('click').on('click', this.handleClickEvent);
