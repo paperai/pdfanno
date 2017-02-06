@@ -518,28 +518,6 @@ function getAnnotations(documentId) {
 }
 
 /**
- * Get secondary annotations from annotation container.
- */
-function _getSecondaryAnnotations(documentId) {
-
-  let annotations = [];
-
-  let containers = _getSecondaryContainers();
-
-  containers.forEach(container => {
-    let tmpAnnotations = (container[documentId] || {}).annotations;
-    if (tmpAnnotations) {
-      annotations = annotations.concat(tmpAnnotations);
-    }
-  });
-
-  // transform coordinate system.
-  annotations = annotations.map(a => transformToRenderCoordinate(a));
-
-  return annotations;
-}
-
-/**
  * Save annotations(in arguments) to the annotation container.
  */
 function updateAnnotations(documentId, annotations) {

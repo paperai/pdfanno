@@ -99,7 +99,9 @@ function downloadAnnotation() {
         let blobURL = window.URL.createObjectURL(blob);
         let a = document.createElement('a');
         document.body.appendChild(a); // for firefox working correctly.
-        a.download = 'pdf.anno';
+        let fileName = iframeWindow.getFileName(iframeWindow.PDFView.url);
+        fileName = fileName.split('.')[0] + '.anno';
+        a.download = fileName;
         a.href = blobURL;
         a.click();
         a.parentNode.removeChild(a);
