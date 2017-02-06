@@ -20,6 +20,11 @@ import {
 import { addInputField } from './text';
 import RectAnnotation from '../annotation/rect';
 
+/**
+ * the prev annotation rendered at the last.
+ */
+let prevAnnotation;
+
 const _type = 'area';
 
 let _enabled = false;
@@ -176,6 +181,12 @@ function saveRect(rect) {
 
   }, 'text');
 
+  if (prevAnnotation) {
+    prevAnnotation.resetTextForceDisplay();
+    prevAnnotation.render();
+  }
+  prevAnnotation = rectAnnotation;
+
 }
 
 /**
@@ -204,4 +215,10 @@ export function disableRect() {
   document.removeEventListener('mousedown', handleDocumentMousedown);
 
   enableUserSelect();
+
+  if (prevAnnotation) {
+    prevAnnotation.resetTextForceDisplay();
+    prevAnnotation.render();
+  }
+
 }

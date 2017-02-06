@@ -179,6 +179,12 @@ export default class AbstractAnnotation extends EventEmitter {
         }
     }
 
+    resetTextForceDisplay() {
+        if (this.textAnnotation) {
+            this.textAnnotation.textForceDisplay = false;
+        }
+    }
+
     setDisableHoverEvent() {
         this.hoverEventDisable = true;
     }
