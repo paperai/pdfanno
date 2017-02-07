@@ -53,6 +53,7 @@ export default class TextAnnotation extends AbstractAnnotation {
             assign(this, this.parent.getTextPosition());
             this.text = this.parent.text;
             this.color = this.parent.color;
+            this.parentId = this.parent.uuid;
             super.render();
             if (this.textForceDisplay) {
                 this.$element.addClass('--visible');

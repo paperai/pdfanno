@@ -202,6 +202,7 @@ export default class HighlightAnnotation extends AbstractAnnotation {
      * Disable view mode.
      */
     disableViewMode() {
+        console.log('highlight:disableViewMode');
         super.disableViewMode();
         this.$element.find('circle').off('click');
     }

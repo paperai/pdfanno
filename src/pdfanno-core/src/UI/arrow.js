@@ -88,10 +88,18 @@ function handleDocumentMousemove(e) {
   let circle = findHitBoundingCircle(e);
   if (!hitCircle && circle) {
     hitCircle = circle;
-    $(hitCircle).parents('g').addClass('--hover');
+    let uuid = $(hitCircle).parents('g').data('pdf-annotate-id');
+    let annotation = window.annotationContainer.findById(uuid);
+    if (annotation) {
+        annotation.highlight();
+    }
 
   } else if (hitCircle && !circle) {
-    $(hitCircle).parents('g').removeClass('--hover');
+    let uuid = $(hitCircle).parents('g').data('pdf-annotate-id');
+    let annotation = window.annotationContainer.findById(uuid);
+    if (annotation) {
+        annotation.dehighlight();
+    }
     hitCircle = null;
   }
 
@@ -229,12 +237,10 @@ function deleteBoundingBoxList() {
 }
 
 function handleBoundingCircleHoverIn(annotation) {
-  // console.log('handleBoundingCircleHoverIn');
   _hoverAnnotation = annotation;
 }
 
 function handleBoundingCircleHoverOut(annotation) {
-  // console.log('handleBoundingCircleHoverOut');
   _hoverAnnotation = null;
 }
 
@@ -306,6 +312,7 @@ export function disableArrow() {
   if (prevAnnotation) {
     prevAnnotation.resetTextForceDisplay();
     prevAnnotation.render();
+    prevAnnotation = null;
   }
 
 }
