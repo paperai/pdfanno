@@ -117,6 +117,9 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
             //   continue;
             // }
 
+            let index = 1;
+
+
             // Every annotations.
             let indexRect = 1;
             let indexSpan = 1;
@@ -131,41 +134,59 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
 
               // Rect
               if (annotation.type === 'area') {
-                let key = `rect-${indexRect++}`;
-                annotations[key] = [
-                  annotation.page,
-                  annotation.x,
-                  annotation.y,
-                  annotation.width,
-                  annotation.height,
-                  annotation.text || ''
-                ];
+                // let key = `rect-${indexRect++}`;
+                let key = `${index++}`;
+                annotations[key] = {
+                    type : 'rect',
+                    page : annotation.page,
+                    position : [annotation.x, annotation.y, annotation.width, annotation.height],
+                    label : annotation.text || ''
+                };
+                // annotations[key] = [
+                //   annotation.page,
+                //   annotation.x,
+                //   annotation.y,
+                //   annotation.width,
+                //   annotation.height,
+                //   annotation.text || ''
+                // ];
                 // save tmporary for arrow.
                 annotation.key = key;
-                annotation.page = annotation.page;
+                // annotation.page = annotation.page;
 
               // Highlight.
               } else if (annotation.type === 'highlight') {
                 // rectangles.
-                let data = annotation.rectangles.map(rectangle => {
+                // let data = annotation.rectangles.map(rectangle => {
+                let rectangles = annotation.rectangles.map(rectangle => {
                   return [
-                    rectangle.page,
+                    // rectangle.page,
                     rectangle.x,
                     rectangle.y,
                     rectangle.width,
                     rectangle.height
                   ];
                 });
-                // span text.
-                let text = annotation.text || '';
-                data.push(text);
 
-                let key = `span-${indexSpan++}`;
-                annotations[key] = data;
+                let key = `${index++}`;
+                annotations[key] = {
+                    type : 'span',
+                    page : annotation.rectangles[0].page,  // TODO move page number to annotation.
+                    position : rectangles,
+                    label : annotation.text || ''
+                };
+
+
+                // // span text.
+                // let text = annotation.text || '';
+                // data.push(text);
+
+                // let key = `span-${indexSpan++}`;
+                // annotations[key] = data;
 
                 // save tmporary for arrow.
                 annotation.key = key;
-                annotation.page = pageNumber;
+                // annotation.page = pageNumber;
 
               // Arrow.
               } else if (annotation.type === 'arrow') {
@@ -177,22 +198,29 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                 let rel2s = container.annotations.filter(a => a.uuid === annotation.rel2);
                 let rel2 = rel2s[0];
 
-                let page;
-                if (rel1.type === 'highlight') {
-                  page = rel1.rectangles[0].page;
-                } else {
-                  page = rel1.page;
-                }
+                annotations[`${index++}`] = {
+                    type : 'relation',
+                    dir : annotation.direction,
+                    ids : [rel1.key, rel2.key],
+                    label : annotation.text
+                };
 
-                let data = [
-                  page,
-                  annotation.direction,
-                  rel1.key,
-                  rel2.key,
-                  annotation.text || ''
-                ];
+                // let page;
+                // if (rel1.type === 'highlight') {
+                //   page = rel1.rectangles[0].page;
+                // } else {
+                //   page = rel1.page;
+                // }
 
-                annotations[`rel-${indexRel++}`] = data;
+                // let data = [
+                //   page,
+                //   annotation.direction,
+                //   rel1.key,
+                //   rel2.key,
+                //   annotation.text || ''
+                // ];
+
+                // annotations[`rel-${indexRel++}`] = data;
               }
 
             });
@@ -274,63 +302,83 @@ function _createContainerFromJson(json, color, isPrimary) {
       let data = json[key];
 
       // Rect.
-      if (key.indexOf('rect') === 0) {
+      // if (key.indexOf('rect') === 0) {
+    if (data.type === 'rect') {
         annotations.push({
           class  : 'Annotation',
           type   : 'area',
           uuid   : uuid(),
-          page   : data[0],
-          x      : data[1],
-          y      : data[2],
-          width  : data[3],
-          height : data[4],
-          text   : data[5],
+          // page   : data[0],
+          page   : data.page,
+          // x      : data[1],
+          // y      : data[2],
+          // width  : data[3],
+          // height : data[4],
+          x      : data.position[0],
+          y      : data.position[1],
+          width  : data.position[2],
+          height : data.position[3],
+          text   : data.label,
           readOnly,
           color,
           key    : key // tmp for arrow.
         });
 
       // Highlight.
-      } else if (key.indexOf('span') === 0) {
+      // } else if (key.indexOf('span') === 0) {
+    } else if (data.type === 'span') {
         // rectangles.
-        let rectangles = data.slice(0, data.length-1).map(d => {
+        let rectangles = data.position.map(d => {
           return {
-            page   : d[0],
-            x      : d[1],
-            y      : d[2],
-            width  : d[3],
-            height : d[4]
+            page   : data.page,
+            x      : d[0],
+            y      : d[1],
+            width  : d[2],
+            height : d[3]
           }
         });
         annotations.push({
           class      : 'Annotation',
           type       : 'highlight',
           uuid       : uuid(),
-          page       : data[0][0],
+          page       : data.page,
           color      : '#FFFF00',   // TODO なくてもOK？
           rectangles,
-          text       : data[data.length-1],
+          text       : data.label,
           key        : key,  // tmp for arrow.
           readOnly,
           color
         });
 
       // Arrow.
-      } else if (key.indexOf('rel') === 0) {
+      // } else if (key.indexOf('rel') === 0) {
+      } else if (data.type === 'relation') {
 
         // Find rels.
-        let rel1s = annotations.filter(a => a.key === data[2]);
+        let rel1s = annotations.filter(a => a.key === data.ids[0]);
         let rel1 = rel1s[0];
-        let rel2s = annotations.filter(a => a.key === data[3]);
+        let rel2s = annotations.filter(a => a.key === data.ids[1]);
         let rel2 = rel2s[0];
 
         // Add arrow.
         annotations.push({
           class      : 'Annotation',
           type       : 'arrow',
-          direction  : data[1],
+          direction  : data.dir,
           uuid       : uuid(),
-          text : data[4],
+          text       : data.label,
+          rel1       : rel1.uuid,
+          rel2       : rel2.uuid,
+          readOnly,
+          color
+        });
+
+        console.log('arrow:', {
+          class      : 'Annotation',
+          type       : 'arrow',
+          direction  : data.dir,
+          uuid       : uuid(),
+          text       : data.label,
           rel1       : rel1.uuid,
           rel2       : rel2.uuid,
           readOnly,
