@@ -219,6 +219,7 @@ export function disableRect() {
   if (prevAnnotation) {
     prevAnnotation.resetTextForceDisplay();
     prevAnnotation.render();
+    prevAnnotation = null;
   }
 
 }

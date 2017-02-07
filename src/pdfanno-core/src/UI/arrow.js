@@ -306,6 +306,7 @@ export function disableArrow() {
   if (prevAnnotation) {
     prevAnnotation.resetTextForceDisplay();
     prevAnnotation.render();
+    prevAnnotation = null;
   }
 
 }
