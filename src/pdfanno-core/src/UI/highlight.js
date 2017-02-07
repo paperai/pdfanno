@@ -150,6 +150,7 @@ export function disableHighlight() {
   if (prevAnnotation) {
     prevAnnotation.resetTextForceDisplay();
     prevAnnotation.render();
+    prevAnnotation = null;
   }
 
 }

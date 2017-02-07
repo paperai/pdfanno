@@ -71,6 +71,7 @@ export default function renderText(a, svg) {
     let group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     group.classList.add('anno-text-group');
     group.setAttribute('read-only', a.readOnly === true);
+    group.setAttribute('data-parent-id', a.parentId);
     group.style.visibility = 'visible';
 
     group.appendChild(box);

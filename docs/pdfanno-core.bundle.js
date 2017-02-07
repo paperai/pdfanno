@@ -13239,6 +13239,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 	  group.classList.add('anno-text-group');
 	  group.setAttribute('read-only', a.readOnly === true);
+	  group.setAttribute('data-parent-id', a.parentId);
 	  group.style.visibility = 'visible';
 	
 	  group.appendChild(box);
@@ -13887,6 +13888,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (prevAnnotation) {
 	    prevAnnotation.resetTextForceDisplay();
 	    prevAnnotation.render();
+	    prevAnnotation = null;
 	  }
 	}
 
@@ -15448,6 +15450,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                (0, _deepAssign2.default)(this, this.parent.getTextPosition());
 	                this.text = this.parent.text;
 	                this.color = this.parent.color;
+	                this.parentId = this.parent.uuid;
 	                _get(TextAnnotation.prototype.__proto__ || Object.getPrototypeOf(TextAnnotation.prototype), 'render', this).call(this);
 	                if (this.textForceDisplay) {
 	                    this.$element.addClass('--visible');
@@ -15872,6 +15875,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (prevAnnotation) {
 	    prevAnnotation.resetTextForceDisplay();
 	    prevAnnotation.render();
+	    prevAnnotation = null;
 	  }
 	}
 
@@ -16151,6 +16155,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'disableViewMode',
 	        value: function disableViewMode() {
+	            console.log('highlight:disableViewMode');
 	            _get(HighlightAnnotation.prototype.__proto__ || Object.getPrototypeOf(HighlightAnnotation.prototype), 'disableViewMode', this).call(this);
 	            this.$element.find('circle').off('click');
 	        }
@@ -16199,9 +16204,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _text = __webpack_require__(35);
 	
-	var _uuid = __webpack_require__(14);
+	var _uuid3 = __webpack_require__(14);
 	
-	var _uuid2 = _interopRequireDefault(_uuid);
+	var _uuid4 = _interopRequireDefault(_uuid3);
 	
 	var _arrow = __webpack_require__(43);
 	
@@ -16281,9 +16286,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var circle = findHitBoundingCircle(e);
 	  if (!hitCircle && circle) {
 	    hitCircle = circle;
-	    (0, _jquery2.default)(hitCircle).parents('g').addClass('--hover');
+	    var _uuid = (0, _jquery2.default)(hitCircle).parents('g').data('pdf-annotate-id');
+	    var annotation = window.annotationContainer.findById(_uuid);
+	    if (annotation) {
+	      annotation.highlight();
+	    }
 	  } else if (hitCircle && !circle) {
-	    (0, _jquery2.default)(hitCircle).parents('g').removeClass('--hover');
+	    var _uuid2 = (0, _jquery2.default)(hitCircle).parents('g').data('pdf-annotate-id');
+	    var _annotation = window.annotationContainer.findById(_uuid2);
+	    if (_annotation) {
+	      _annotation.dehighlight();
+	    }
 	    hitCircle = null;
 	  }
 	}
@@ -16417,12 +16430,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	function handleBoundingCircleHoverIn(annotation) {
-	  // console.log('handleBoundingCircleHoverIn');
 	  _hoverAnnotation = annotation;
 	}
 	
 	function handleBoundingCircleHoverOut(annotation) {
-	  // console.log('handleBoundingCircleHoverOut');
 	  _hoverAnnotation = null;
 	}
 	
@@ -16493,6 +16504,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (prevAnnotation) {
 	    prevAnnotation.resetTextForceDisplay();
 	    prevAnnotation.render();
+	    prevAnnotation = null;
 	  }
 	}
 
