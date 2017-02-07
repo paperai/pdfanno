@@ -61,8 +61,6 @@ function initializeAnnoToolButtons() {
         } else if (type === 'rect') {
             window.iframeWindow.PDFAnnoCore.UI.enableRect();
 
-        } else if (type === 'text') {
-            window.iframeWindow.PDFAnnoCore.UI.enableText();
         }
 
         return false;

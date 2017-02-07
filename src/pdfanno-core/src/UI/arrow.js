@@ -194,7 +194,7 @@ function showTextInput() {
     arrowAnnotation.save();
     arrowAnnotation.render();
 
-  }, 'text');
+  });
 }
 
 /**

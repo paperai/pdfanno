@@ -162,7 +162,7 @@ export default class TextAnnotation extends AbstractAnnotation {
 
             enableViewMode(); // TODO Refactoring.
 
-        }, 'text');
+        });
 
     }
 
