@@ -35,6 +35,7 @@
     "gulp": "^3.9.1",
     "gulp-cli": "^1.2.2",
     "style-loader": "^0.13.1",
+    "toml": "^2.3.1",
     "vinyl-source-stream": "^1.1.0",
     "webpack": "1.12.14",
     "webpack-dev-server": "^1.14.1"

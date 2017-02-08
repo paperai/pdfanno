@@ -18,11 +18,6 @@ const TEXT_SIZE = 12;
  */
 const TEXT_COLOR = '#FF0000';
 
-/**
- * The status of text annotation UI.
- */
-let _enabled = false;
-
 /*
  * The input field for adding/editing a text.
  */
@@ -33,20 +28,6 @@ let input = null;
  */
 let _finishCallback = null;
 
-let _returnType = null;
-
-/**
- * Handle document.mouseup event
- *
- * @param {Event} e The DOM event to handle
- */
-function handleDocumentMouseup(e) {
-  if (input) {
-    return;
-  }
-  addInputField(e.clientX, e.clientY);
-}
-
 /**
  * Show an input field for adding a text annotation.
  *
@@ -55,7 +36,7 @@ function handleDocumentMouseup(e) {
  * @param {String} selfId - The annotation id used for registration.
  * @param {Function} finishCallback - The callback function will be called after registration.
  */
-export function addInputField(x, y, selfId=null, text=null, finishCallback=null, returnType='annotation') {
+export function addInputField(x, y, selfId=null, text=null, finishCallback=null) {
 
   // This is a dummy form for adding autocomplete candidates at finishing adding/editing.
   // At the time to finish editing, submit via the submit button, then regist an autocomplete content.
@@ -91,7 +72,6 @@ export function addInputField(x, y, selfId=null, text=null, finishCallback=null,
 
   _finishCallback = finishCallback;
 
-  _returnType = returnType;
 
   input.addEventListener('blur', handleInputBlur);
   input.addEventListener('keyup', handleInputKeyup);
@@ -170,18 +150,7 @@ function saveText() {
   // Add an autocomplete candidate. (Firefox, Chrome)
   $('#autocompleteform [type="submit"]').click();
 
-  if (_returnType === 'annotation') {
-    PDFAnnoCore.getStoreAdapter().addAnnotation(documentId, annotation)
-      .then((annotation) => {
-        appendChild(svg, annotation);
-
-
-        closeInput(annotation);
-    });
-
-  } else {
     closeInput(content);
-  }
 
 }
 
@@ -202,27 +171,5 @@ export function closeInput(textAnnotationOrText) {
   }
 
   _finishCallback = null;
-  _returnType = null;
 
-}
-
-/**
- * Enable text behavior.
- */
-export function enableText() {
-  if (_enabled) { return; }
-
-  _enabled = true;
-  document.addEventListener('mouseup', handleDocumentMouseup);
-}
-
-/**
- * Disable text behavior.
- */
-export function disableText() {
-  if (!_enabled) { return; }
-
-  _enabled = false;
-  document.removeEventListener('mouseup', handleDocumentMouseup);
-  closeInput();
 }

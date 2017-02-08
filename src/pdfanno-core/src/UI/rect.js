@@ -151,8 +151,6 @@ function saveRect(rect) {
     type : _type
   });
 
-  let { documentId, pageNumber } = getMetadata(svg);
-
   // Save.
   let rectAnnotation = RectAnnotation.newInstance(annotation);
   rectAnnotation.save();
@@ -179,7 +177,7 @@ function saveRect(rect) {
     rectAnnotation.render();
     rectAnnotation.save();
 
-  }, 'text');
+  });
 
   if (prevAnnotation) {
     prevAnnotation.resetTextForceDisplay();

@@ -34,6 +34,14 @@ export default class AnnotationContainer {
     }
 
     /**
+     * Remove all annotations.
+     */
+    destroy() {
+        this.set.forEach(a => a.destroy());
+        this.set = new Set();
+    }
+
+    /**
      * Get all annotations from the container.
      */
     getAllAnnotations() {

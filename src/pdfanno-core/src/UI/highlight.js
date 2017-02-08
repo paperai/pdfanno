@@ -121,7 +121,7 @@ function saveRect(rects) {
     highlightAnnotation.render();
     highlightAnnotation.save();
 
-  }, 'text');
+  });
 
   if (prevAnnotation) {
     prevAnnotation.resetTextForceDisplay();

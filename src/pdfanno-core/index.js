@@ -123,7 +123,7 @@ function renderAnno() {
 function renderAnnotations(svg) {
 
     if (window.annotationContainer.getAllAnnotations().length > 0) {
-        console.log('aaaaaaaaaaaa');
+
         window.annotationContainer.getAllAnnotations().forEach(a => {
             a.render();
         });

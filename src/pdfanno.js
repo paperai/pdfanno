@@ -61,8 +61,6 @@ function initializeAnnoToolButtons() {
         } else if (type === 'rect') {
             window.iframeWindow.PDFAnnoCore.UI.enableRect();
 
-        } else if (type === 'text') {
-            window.iframeWindow.PDFAnnoCore.UI.enableText();
         }
 
         return false;
@@ -94,12 +92,14 @@ function initializeAnnoToolButtons() {
 function downloadAnnotation() {
 
     window.iframeWindow.PDFAnnoCore.getStoreAdapter().exportData().then(annotations => {
-        annotations = JSON.stringify(annotations, null, '\t');
+        // annotations = JSON.stringify(annotations, null, '\t');
         let blob = new Blob([annotations]);
         let blobURL = window.URL.createObjectURL(blob);
         let a = document.createElement('a');
         document.body.appendChild(a); // for firefox working correctly.
-        a.download = 'pdf.anno';
+        let fileName = iframeWindow.getFileName(iframeWindow.PDFView.url);
+        fileName = fileName.split('.')[0] + '.anno';
+        a.download = fileName;
         a.href = blobURL;
         a.click();
         a.parentNode.removeChild(a);
@@ -131,6 +131,8 @@ function deleteAllAnnotations() {
     if (!userAnswer) {
         return;
     }
+
+    iframeWindow.annotationContainer.destroy();
 
     let documentId = window.iframeWindow.getFileName(window.iframeWindow.PDFView.url);
     window.iframeWindow.PDFAnnoCore.getStoreAdapter().deleteAnnotations(documentId).then(() => {
@@ -250,7 +252,9 @@ function displayAnnotation(e) {
             fileReader.onload = event => {
                 let annotation = event.target.result;
                 // TODO JSON scheme check ?
-                resolve(JSON.parse(annotation));
+                // resolve(JSON.parse(annotation));
+                console.log('annotation:', annotation);
+                resolve(annotation);
             }
             fileReader.readAsText(files[0]);
         }));
@@ -258,8 +262,10 @@ function displayAnnotation(e) {
     Promise.all(actions).then((annotations) => {
 
         annotations = annotations.map(a => {
-            return a ? a : {};
+            // return a ? a : {};
+            return a ? a : '';
         });
+        console.log('annotations:', annotations);
 
         // Create import data.
         paperData = {

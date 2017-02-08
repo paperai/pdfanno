@@ -113,8 +113,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            window.iframeWindow.PDFAnnoCore.UI.enableArrow('link');
 	        } else if (type === 'rect') {
 	            window.iframeWindow.PDFAnnoCore.UI.enableRect();
-	        } else if (type === 'text') {
-	            window.iframeWindow.PDFAnnoCore.UI.enableText();
 	        }
 	
 	        return false;
@@ -145,12 +143,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	function downloadAnnotation() {
 	
 	    window.iframeWindow.PDFAnnoCore.getStoreAdapter().exportData().then(function (annotations) {
-	        annotations = JSON.stringify(annotations, null, '\t');
+	        // annotations = JSON.stringify(annotations, null, '\t');
 	        var blob = new Blob([annotations]);
 	        var blobURL = window.URL.createObjectURL(blob);
 	        var a = document.createElement('a');
 	        document.body.appendChild(a); // for firefox working correctly.
-	        a.download = 'pdf.anno';
+	        var fileName = iframeWindow.getFileName(iframeWindow.PDFView.url);
+	        fileName = fileName.split('.')[0] + '.anno';
+	        a.download = fileName;
 	        a.href = blobURL;
 	        a.click();
 	        a.parentNode.removeChild(a);
@@ -182,6 +182,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (!userAnswer) {
 	        return;
 	    }
+	
+	    iframeWindow.annotationContainer.destroy();
 	
 	    var documentId = window.iframeWindow.getFileName(window.iframeWindow.PDFView.url);
 	    window.iframeWindow.PDFAnnoCore.getStoreAdapter().deleteAnnotations(documentId).then(function () {
@@ -288,7 +290,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            fileReader.onload = function (event) {
 	                var annotation = event.target.result;
 	                // TODO JSON scheme check ?
-	                resolve(JSON.parse(annotation));
+	                // resolve(JSON.parse(annotation));
+	                console.log('annotation:', annotation);
+	                resolve(annotation);
 	            };
 	            fileReader.readAsText(files[0]);
 	        }));
@@ -296,8 +300,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Promise.all(actions).then(function (annotations) {
 	
 	        annotations = annotations.map(function (a) {
-	            return a ? a : {};
+	            // return a ? a : {};
+	            return a ? a : '';
 	        });
+	        console.log('annotations:', annotations);
 	
 	        // Create import data.
 	        paperData = {
