@@ -1,4 +1,5 @@
 import assign from 'deep-assign';
+import toml from 'toml';
 import uuid from '../utils/uuid';
 import tomlString from '../utils/tomlString';
 import StoreAdapter from './StoreAdapter';
@@ -177,7 +178,18 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
             importAnnotations(data) {
                 return new Promise((resolve, reject) => {
 
+                    console.log('importAnnotations:', data);
+
                     let containers = data.annotations.map((a, i) => {
+
+                        // TOML to JavascriptObject.
+                        if (a) {
+                            console.log('before:', a);
+                            a = toml.parse(a);
+                            console.log('after:', a);
+                        } else {
+                            a = {};
+                        }
 
                         let color = data.colors[i];
                         let isPrimary = (i === data.primary);

@@ -250,7 +250,9 @@ function displayAnnotation(e) {
             fileReader.onload = event => {
                 let annotation = event.target.result;
                 // TODO JSON scheme check ?
-                resolve(JSON.parse(annotation));
+                // resolve(JSON.parse(annotation));
+                console.log('annotation:', annotation);
+                resolve(annotation);
             }
             fileReader.readAsText(files[0]);
         }));
@@ -258,8 +260,10 @@ function displayAnnotation(e) {
     Promise.all(actions).then((annotations) => {
 
         annotations = annotations.map(a => {
-            return a ? a : {};
+            // return a ? a : {};
+            return a ? a : '';
         });
+        console.log('annotations:', annotations);
 
         // Create import data.
         paperData = {
