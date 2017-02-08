@@ -132,6 +132,8 @@ function deleteAllAnnotations() {
         return;
     }
 
+    iframeWindow.annotationContainer.destroy();
+
     let documentId = window.iframeWindow.getFileName(window.iframeWindow.PDFView.url);
     window.iframeWindow.PDFAnnoCore.getStoreAdapter().deleteAnnotations(documentId).then(() => {
         reloadPDFViewer();
