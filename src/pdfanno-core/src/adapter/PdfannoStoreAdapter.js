@@ -162,7 +162,7 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                                 type  : 'relation',
                                 dir   : annotation.direction,
                                 ids   : [ rel1.key, rel2.key ],
-                                label : annotation.text
+                                label : annotation.text || ''
                             };
 
                         }

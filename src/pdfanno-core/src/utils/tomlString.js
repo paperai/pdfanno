@@ -29,5 +29,6 @@ export default function tomlString(obj, root=true) {
 }
 
 function isArray(val) {
-    return 'length' in val;
+    console.log('isArray:', val);
+    return val && 'length' in val;
 }
