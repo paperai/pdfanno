@@ -1,7 +1,9 @@
 import assign from 'deep-assign';
 import uuid from '../utils/uuid';
+import tomlString from '../utils/tomlString';
 import StoreAdapter from './StoreAdapter';
 import ANNO_VERSION from '../version';
+
 
 /**
  * The LocalStorage key for save annotations.
@@ -166,7 +168,9 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
 
                     });
 
-                    resolve(dataExport);
+
+                    resolve(tomlString(dataExport));
+                    // resolve(dataExport);
                 });
             },
 
@@ -313,17 +317,6 @@ function _createContainerFromJson(json, color, isPrimary) {
                     color
                 });
 
-                console.log('arrow:', {
-                    class            : 'Annotation',
-                    type             : 'arrow',
-                    direction    : data.dir,
-                    uuid             : uuid(),
-                    text             : data.label,
-                    rel1             : rel1.uuid,
-                    rel2             : rel2.uuid,
-                    readOnly,
-                    color
-                });
             }
         // }
     }

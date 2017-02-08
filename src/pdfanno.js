@@ -92,7 +92,7 @@ function initializeAnnoToolButtons() {
 function downloadAnnotation() {
 
     window.iframeWindow.PDFAnnoCore.getStoreAdapter().exportData().then(annotations => {
-        annotations = JSON.stringify(annotations, null, '\t');
+        // annotations = JSON.stringify(annotations, null, '\t');
         let blob = new Blob([annotations]);
         let blobURL = window.URL.createObjectURL(blob);
         let a = document.createElement('a');
