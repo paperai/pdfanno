@@ -3,6 +3,13 @@ export default function tomlString(obj, root=true) {
 
     let lines = [];
 
+    // `version` is first.
+    if ('version' in obj) {
+        lines.push(`version = ${obj['version']}`);
+        lines.push('');
+        delete obj['version'];
+    }
+
     Object.keys(obj).forEach(prop => {
 
         let val = obj[prop];
