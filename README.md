@@ -20,7 +20,7 @@ Then,
 3. Annotate the PDF.
 4. Save your annotation file.
 
-PDFAnno does NOT automatically save the user's annotation.  
+For security reasons, PDFAnno does NOT automatically save the user's annotation.  
 
 ### Annotation Tools
 <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-mouse-pointer.png" width="2%"> Selection tool.
@@ -40,32 +40,38 @@ PDFAnno does NOT automatically save the user's annotation.
 DEL: Delete all of current annotations.
 
 ### Annotation File (.anno)
-In PDFAnno, the annotation file (.anno) follows JSON format.  
+In PDFAnno, the annotation file (.anno) follows [TOML](https://github.com/toml-lang/toml) format.  
 Here is an example of the .anno file:
 ```
-{
-  "version": "0.0.1",
-  "P12-1046.pdf": {
-    "span-1": [
-      [1, 95.818, 252.977, 181.761, 10.909],
-      [1, 95.818, 264.806, 107.136, 10.909],
-      "label1"
-    ],
-    "span-2": [
-      [1, 323.863, 230.715, 213.988, 11.590],
-      [1, 313.125, 244.522, 224.829, 10.795],
-      "label2"
-    ],
-    "rel-1": [
-      1, "two-way", "span-1", "span-2", "label3"
-    ],
-  },
-}
+version = 0.1
+
+[1]
+type = "span"
+page = 1
+position = [[95.818, 252.977, 181.761, 10.909], [95.818, 264.806, 107.136, 10.909]]
+label = "label-1"
+
+[2]
+type = "span"
+page = 1
+position = [[323.863, 230.715, 213.988, 11.590], [313.125, 244.522, 224.829, 10.795]]
+label = "label-2"
+
+[3]
+type = "rect"
+page = 1
+position = [323.863, 230.715, 213.988, 11.590]
+label = "label-3"
+
+[4]
+type = "relation"
+dir = "two-way"
+ids = ["1", "2"]
+label = "label-4"
 ```
 
 ### Multi-user Annotation
-PDFAnno allows simultaneous visualization of multi-user's annotation files on the single PDF, which is useful for checking inter-annotator agreement and resolving annotation conflicts.  
-To be written...
+To support multi-user annotation, PDFAnno allows simultaneous visualization of multiple annotations on the single PDF, which is useful for checking inter-annotator agreement and resolving annotation conflicts.  
 
 ## Developer's Guide
 PDFAnno is built on [pdf.js](https://github.com/mozilla/pdf.js) for PDF viewer.
