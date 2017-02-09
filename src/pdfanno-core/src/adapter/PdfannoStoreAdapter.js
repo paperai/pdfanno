@@ -112,7 +112,7 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                     // Annotation index.
                     let index = 1;
 
-                    container.annotations.forEach(annotation => {
+                    (container.annotations || []).forEach(annotation => {
 
                         // Rect
                         if (annotation.type === 'area') {
