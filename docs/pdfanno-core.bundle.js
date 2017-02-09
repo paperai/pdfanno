@@ -11695,7 +11695,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    // Annotation index.
 	                    var index = 1;
 	
-	                    container.annotations.forEach(function (annotation) {
+	                    (container.annotations || []).forEach(function (annotation) {
 	
 	                        // Rect
 	                        if (annotation.type === 'area') {
@@ -16513,6 +16513,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	    var lines = [];
+	
+	    // `version` is first.
+	    if ('version' in obj) {
+	        lines.push('version = ' + obj['version']);
+	        lines.push('');
+	        delete obj['version'];
+	    }
 	
 	    Object.keys(obj).forEach(function (prop) {
 	
