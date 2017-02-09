@@ -69,9 +69,10 @@ dir = "two-way"
 ids = ["1", "2"]
 label = "label-4"
 ```
+where `position` indicates `(x, y, width, height)` of the annotation.
 
 ### Multi-user Annotation
-To support multi-user annotation, PDFAnno allows simultaneous visualization of multiple annotations on the single PDF, which is useful for checking inter-annotator agreement and resolving annotation conflicts.  
+To support multi-user annotation, PDFAnno allows simultaneous visualization of multiple annotation files on the single PDF, which is useful for checking inter-annotator agreement and resolving annotation conflicts.  
 
 ## Developer's Guide
 PDFAnno is built on [pdf.js](https://github.com/mozilla/pdf.js) for PDF viewer.
