@@ -26,24 +26,40 @@
 <div class="main">
 	<div class="container-fluid">
 
-        <div class="row">
+        <div class="row anno-ui" style="margin-bottom: 10px;">
 
-            <label class="btn btn-primary btn-file">
-                Browse <input type="file" style="display: none;">
+            <label class="btn btn-primary btn-file js-file" style="margin-left: 15px;">
+                Browse <input type="file" style="display: none;" webkitdirectory>
             </label>
 
 
-            <div class="dropdown">
-              <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                Dropdown
+            <div id="dropdownPdf" class="dropdown" style="display: inline-block;">
+              <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                <span class="js-text">Select PDF file</span>
                 <span class="caret"></span>
               </button>
               <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                <li><a href="#">Action</a></li>
-                <li><a href="#">Another action</a></li>
-                <li><a href="#">Something else here</a></li>
-                <li role="separator" class="divider"></li>
-                <li><a href="#">Separated link</a></li>
+                <!-- Added by JS. -->
+              </ul>
+            </div>
+
+            <div id="dropdownAnnoPrimary" class="dropdown" style="display: inline-block;">
+              <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                <span class="js-text">Select Anno file</span>
+                <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <!-- Added by JS. -->
+              </ul>
+            </div>
+
+            <div id="dropdownAnnoReference" class="dropdown" style="display: inline-block;">
+              <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                <span class="js-text">Select reference anno files</span>
+                <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                <!-- Added by JS. -->
               </ul>
             </div>
 
@@ -52,6 +68,7 @@
 
 
         <!-- Annotation Select UI -->
+        <!--
 		<div class="row well anno-select-layout">
             <div class="row">
                 <div class="col-xs-6">
@@ -82,6 +99,7 @@
                 </div>
             </div>
 		</div>
+        -->
 
         <!-- Annotation Tools -->
 		<div class="row js-viewer-root">
