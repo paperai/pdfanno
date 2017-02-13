@@ -5,7 +5,7 @@ export default function tomlString(obj, root=true) {
 
     // `version` is first.
     if ('version' in obj) {
-        lines.push(`version = ${obj['version']}`);
+        lines.push(`version = "${obj['version']}"`);
         lines.push('');
         delete obj['version'];
     }

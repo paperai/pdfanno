@@ -184,12 +184,18 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                     let containers = data.annotations.map((a, i) => {
 
                         // TOML to JavascriptObject.
-                        if (a) {
-                            console.log('before:', a);
-                            a = toml.parse(a);
-                            console.log('after:', a);
-                        } else {
-                            a = {};
+                        try {
+                            if (a) {
+                                console.log('before:', a);
+                                a = toml.parse(a);
+                                console.log('after:', a);
+                            } else {
+                                a = {};
+                            }
+
+
+                        } catch (e) {
+                            console.log('ERROR:', e);
                         }
 
                         let color = data.colors[i];

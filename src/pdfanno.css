@@ -1,5 +1,9 @@
 @charset 'utf-8';
 
+.no-visible {
+    visibility: hidden;
+}
+
 /**
  * Viewer size.
  * This height will be override to fit the browser height (by app.js).
@@ -31,3 +35,17 @@
 .anno-select-layout .sp-dd {
     display: none;
 }
+
+
+
+.anno-ui .sp-replacer {
+    padding: 0;
+    border: none;
+}
+.anno-ui .sp-dd {
+    display: none;
+}
+.anno-ui .sp-preview {
+    margin-right: 0;
+}
+
