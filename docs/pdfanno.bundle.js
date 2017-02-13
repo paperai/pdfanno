@@ -60,6 +60,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	__webpack_require__(2);
 	
 	/**
+	 * The data which is loaded via `Browse` button.
+	 */
+	var fileMap = {};
+	
+	/**
 	 * Resize the height of PDFViewer adjusting to the window.
 	 */
 	function resizeHandler() {
@@ -143,13 +148,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	function downloadAnnotation() {
 	
 	    window.iframeWindow.PDFAnnoCore.getStoreAdapter().exportData().then(function (annotations) {
-	        // annotations = JSON.stringify(annotations, null, '\t');
 	        var blob = new Blob([annotations]);
 	        var blobURL = window.URL.createObjectURL(blob);
 	        var a = document.createElement('a');
 	        document.body.appendChild(a); // for firefox working correctly.
 	        var fileName = iframeWindow.getFileName(iframeWindow.PDFView.url);
 	        fileName = fileName.split('.')[0] + '.anno';
+	        if (localStorage.getItem('_pdfanno_primary_annoname')) {
+	            fileName = localStorage.getItem('_pdfanno_primary_annoname');
+	        }
 	        a.download = fileName;
 	        a.href = blobURL;
 	        a.click();
@@ -233,97 +240,98 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	/**
-	 * Setup the UI for loading and selecting annotations.
+	 * Setup the color pickers.
 	 */
-	function setupAnnotationSelectUI() {
+	function setupColorPicker() {
+	
+	    var colors = ['rgb(255, 128, 0)', 'hsv 100 70 50', 'yellow', 'blanchedalmond', 'red', 'green', 'blue', 'violet'];
 	
 	    // Setup colorPickers.
 	    $('.js-anno-palette').spectrum({
 	        showPaletteOnly: true,
 	        showPalette: true,
 	        hideAfterPaletteSelect: true,
-	        palette: [['blanchedalmond', 'rgb(255, 128, 0)', 'hsv 100 70 50', 'yellow'], ['red', 'green', 'blue', 'violet']]
+	        palette: [colors.slice(0, Math.floor(colors.length / 2)), colors.slice(Math.floor(colors.length / 2), colors.length)]
 	    });
 	    // Set initial color.
-	    $('.js-anno-palette').eq(0).spectrum('set', 'red');
-	    $('.js-anno-palette').eq(1).spectrum('set', 'green');
-	    $('.js-anno-palette').eq(2).spectrum('set', 'blue');
-	    $('.js-anno-palette').eq(3).spectrum('set', 'violet');
+	    $('.js-anno-palette').each(function (i, elm) {
+	        $(elm).spectrum('set', colors[i % colors.length]);
+	    });
 	
 	    // Setup behavior.
-	    $('.js-anno-radio, .js-anno-visibility, .js-anno-palette, .js-anno-file').on('change', displayAnnotation);
+	    $('.js-anno-palette').off('change').on('change', displayAnnotation);
 	}
-	
-	/**
-	 * The data which has annotations, colors, primaryIndex.
-	 */
-	var paperData = null;
 	
 	/**
 	 * Load annotation data and display.
 	 */
 	function displayAnnotation(e) {
 	
-	    var updateTarget = $(e.target).attr('name');
+	    var annotations = [];
+	    var colors = [];
+	    var visibilities = [];
+	    var primaryIndex = -1;
 	
-	    // Get the primary index which indicates the editable annotation.
-	    var primaryIndex = parseInt($('.js-anno-radio:checked').val(), 10);
-	
-	    // Get annotation visibilities.
-	    var visibilities = [$('.js-anno-visibility').eq(0).is(':checked'), $('.js-anno-visibility').eq(1).is(':checked'), $('.js-anno-visibility').eq(2).is(':checked'), $('.js-anno-visibility').eq(3).is(':checked')];
-	
-	    // Get annotation colors.
-	    var colors = [$('.js-anno-palette').eq(0).spectrum('get').toHexString(), $('.js-anno-palette').eq(1).spectrum('get').toHexString(), $('.js-anno-palette').eq(2).spectrum('get').toHexString(), $('.js-anno-palette').eq(3).spectrum('get').toHexString()];
-	
-	    // Get annotation data.
-	    var actions = [];
-	    $('.js-anno-file').each(function () {
-	        var files = this.files;
-	
-	        actions.push(new Promise(function (resolve, reject) {
-	
-	            if (files.length === 0) {
-	                return resolve(null);
+	    // Primary annotation.
+	    $('#dropdownAnnoPrimary a').each(function (index, element) {
+	        var $elm = $(element);
+	        if ($elm.find('.fa-check').hasClass('no-visible') === false) {
+	            var annoPath = $elm.find('.js-annoname').text();
+	            if (!fileMap[annoPath]) {
+	                console.log('ERROR');
+	                return;
 	            }
+	            primaryIndex = 0;
+	            annotations.push(fileMap[annoPath]);
+	            visibilities.push(true);
+	            var color = '#FF0000';
+	            colors.push(color);
 	
-	            var fileReader = new FileReader();
-	            fileReader.onload = function (event) {
-	                var annotation = event.target.result;
-	                // TODO JSON scheme check ?
-	                // resolve(JSON.parse(annotation));
-	                console.log('annotation:', annotation);
-	                resolve(annotation);
-	            };
-	            fileReader.readAsText(files[0]);
-	        }));
+	            var filename = annoPath.split('/')[annoPath.split('/').length - 1];
+	            localStorage.setItem('_pdfanno_primary_annoname', filename);
+	            console.log('filename:', filename);
+	        }
 	    });
-	    Promise.all(actions).then(function (annotations) {
 	
-	        annotations = annotations.map(function (a) {
-	            // return a ? a : {};
-	            return a ? a : '';
-	        });
-	        console.log('annotations:', annotations);
+	    // Reference annotations.
+	    $('#dropdownAnnoReference a').each(function (index, element) {
+	        var $elm = $(element);
+	        if ($elm.find('.fa-check').hasClass('no-visible') === false) {
+	            var annoPath = $elm.find('.js-annoname').text();
+	            if (!fileMap[annoPath]) {
+	                console.log('ERROR');
+	                return;
+	            }
+	            annotations.push(fileMap[annoPath]);
+	            visibilities.push(true);
+	            var color = $elm.find('.js-anno-palette').spectrum('get').toHexString();
+	            console.log(color);
+	            colors.push(color);
+	        }
+	    });
+	    console.log('annotations:', annotations);
+	    console.log('colors:', colors);
 	
-	        // Create import data.
-	        paperData = {
-	            num: 4,
-	            primary: primaryIndex,
-	            visibilities: visibilities,
-	            colors: colors,
-	            annotations: annotations,
-	            updateTarget: updateTarget
-	        };
+	    if (annotations.length === 0) {
+	        return;
+	    }
 	
-	        // Pass the data to pdf-annotatejs.
-	        window.iframeWindow.PDFAnnoCore.getStoreAdapter().importAnnotations(paperData).then(function (result) {
+	    // Create import data.
+	    var paperData = {
+	        primary: primaryIndex,
+	        visibilities: visibilities,
+	        colors: colors,
+	        annotations: annotations
+	    };
 	
-	            // Reload the viewer.
-	            reloadPDFViewer();
+	    // Pass the data to pdf-annotatejs.
+	    window.iframeWindow.PDFAnnoCore.getStoreAdapter().importAnnotations(paperData).then(function (result) {
 	
-	            // Reset tools to viewMode.
-	            $('.js-tool-btn[data-type="view"]').click();
-	        });
+	        // Reload the viewer.
+	        reloadPDFViewer();
+	
+	        // Reset tools to viewMode.
+	        $('.js-tool-btn[data-type="view"]').click();
 	    });
 	}
 	
@@ -341,6 +349,195 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function unlistenWindowLeaveEvent() {
 	    $(window).off('beforeunload');
+	}
+	
+	/**
+	 * Clear the dropdowns of annotations.
+	 */
+	function clearAnnotationDropdowns() {
+	    $('#dropdownAnnoPrimary ul').html('');
+	    $('#dropdownAnnoReference ul').html('');
+	    $('#dropdownAnnoPrimary .js-text').text('Select Anno file');
+	    $('#dropdownAnnoReference .js-text').text('Select reference Anno files');
+	}
+	
+	/**
+	 * Clear the dropdown of a PDF file.
+	 */
+	function setupBrowseButton() {
+	
+	    $('.js-file :file').on('change', function (ev) {
+	
+	        var files = ev.target.files;
+	        if (!files || files.length === 0) {
+	            return;
+	        }
+	
+	        var pdfs = [];
+	        var annos = [];
+	
+	        for (var i = 0; i < files.length; i++) {
+	
+	            var file = ev.target.files[i];
+	            var relativePath = file.webkitRelativePath;
+	            if (!relativePath) {
+	                alert('Please select a directory, NOT a file');
+	                return;
+	            }
+	            var ext = relativePath.split('.')[1];
+	            if (!ext) {
+	                continue;
+	            } else if (ext.toLowerCase() === 'pdf') {
+	                pdfs.push(file);
+	            } else if (ext.toLowerCase() === 'anno') {
+	                annos.push(file);
+	            }
+	        }
+	
+	        // pdf.
+	        $('#dropdownPdf .js-text').text('Select PDF file');
+	        $('#dropdownPdf li').remove();
+	        pdfs.forEach(function (file) {
+	            var pdfPath = file.webkitRelativePath;
+	            var snipet = "\n                <li>\n                    <a href=\"#\">\n                        <i class=\"fa fa-check no-visible\" aria-hidden=\"true\"></i>&nbsp;\n                        <span class=\"js-pdfname\">" + pdfPath + "</span>\n                    </a>\n                </li>\n            ";
+	            $('#dropdownPdf ul').append(snipet);
+	        });
+	
+	        // Clear anno dropdowns.
+	        clearAnnotationDropdowns();
+	
+	        fileMap = {};
+	
+	        // Load pdfs.
+	        pdfs.forEach(function (file) {
+	            var fileReader = new FileReader();
+	            fileReader.onload = function (event) {
+	                var pdf = event.target.result;
+	                fileMap[file.webkitRelativePath] = pdf;
+	            };
+	            fileReader.readAsDataURL(file);
+	        });
+	
+	        // Load annos.
+	        annos.forEach(function (file) {
+	            var fileReader = new FileReader();
+	            fileReader.onload = function (event) {
+	                var annotation = event.target.result;
+	                fileMap[file.webkitRelativePath] = annotation;
+	            };
+	            fileReader.readAsText(file);
+	        });
+	    });
+	}
+	
+	/**
+	 * Setup the dropdown of PDFs.
+	 */
+	function setupPdfDropdown() {
+	
+	    $('#dropdownPdf').on('click', 'a', function (e) {
+	
+	        var $this = $(e.currentTarget);
+	        var pdfPath = $this.find('.js-pdfname').text();
+	        $('#dropdownPdf .js-text').text(pdfPath);
+	        console.log(pdfPath);
+	
+	        $('#dropdownPdf .fa-check').addClass('no-visible');
+	        $this.find('.fa-check').removeClass('no-visible');
+	
+	        if (!fileMap[pdfPath]) {
+	            return false;
+	        }
+	
+	        // reload.
+	        localStorage.setItem('_pdfanno_pdf', fileMap[pdfPath]);
+	        var fileName = pdfPath.split('/')[pdfPath.split('/').length - 1];
+	        localStorage.setItem('_pdfanno_pdfname', fileName);
+	        reloadPDFViewer();
+	
+	        // Clear anno dropdowns.
+	        clearAnnotationDropdowns();
+	
+	        // Clear the all annotations.
+	        clearAllAnnotations();
+	
+	        // Setup anno dropdown.
+	        var match = pdfPath.split('.')[0];
+	        Object.keys(fileMap).forEach(function (filePath) {
+	            if (filePath.split('.')[1] === 'anno' && filePath.indexOf(match) === 0) {
+	
+	                var snipet1 = "\n                    <li>\n                        <a href=\"#\">\n                            <i class=\"fa fa-check no-visible\" aria-hidden=\"true\"></i>\n                            <span class=\"js-annoname\">" + filePath + "</span>\n                        </a>\n                    </li>\n                ";
+	                $('#dropdownAnnoPrimary ul').append(snipet1);
+	
+	                var snipet2 = "\n                    <li>\n                        <a href=\"#\">\n                            <i class=\"fa fa-check no-visible\" aria-hidden=\"true\"></i>\n                            <input type=\"text\"  name=\"color\" class=\"js-anno-palette\"  autocomplete=\"off\">\n                            <span class=\"js-annoname\">" + filePath + "</span>\n                        </a>\n                    </li>\n                ";
+	                $('#dropdownAnnoReference ul').append(snipet2);
+	            }
+	        });
+	        // Setup color pallets.
+	        setupColorPicker();
+	
+	        return false;
+	    });
+	}
+	
+	/**
+	 * Setup the dropdown of a primary annotation.
+	 */
+	function setupPrimaryAnnoDropdown() {
+	
+	    $('#dropdownAnnoPrimary').on('click', 'a', function (e) {
+	
+	        var $this = $(e.currentTarget);
+	        var pdfPath = $this.find('.js-annoname').text();
+	        $('#dropdownAnnoPrimary .js-text').text(pdfPath);
+	        console.log(pdfPath);
+	
+	        $('#dropdownAnnoPrimary .fa-check').addClass('no-visible');
+	        $this.find('.fa-check').removeClass('no-visible');
+	
+	        if (!fileMap[pdfPath]) {
+	            return false;
+	        }
+	
+	        // reload.
+	        displayAnnotation();
+	
+	        return false;
+	    });
+	}
+	
+	/**
+	 * Setup the dropdown of reference annotations.
+	 */
+	function setupReferenceAnnoDropdown() {
+	
+	    $('#dropdownAnnoReference').on('click', 'a', function (e) {
+	
+	        var $this = $(e.currentTarget);
+	
+	        $this.find('.fa-check').toggleClass('no-visible');
+	
+	        var annoNames = [];
+	        $('#dropdownAnnoReference a').each(function (index, element) {
+	            var $elm = $(element);
+	            if ($elm.find('.fa-check').hasClass('no-visible') === false) {
+	                annoNames.push($elm.find('.js-annoname').text());
+	            }
+	        });
+	        $('#dropdownAnnoReference .js-text').text(annoNames.join(','));
+	
+	        displayAnnotation();
+	
+	        return false;
+	    });
+	}
+	
+	/**
+	 * Clear the all annotations from the view and storage.
+	 */
+	function clearAllAnnotations() {
+	    var LOCALSTORAGE_KEY2 = '_pdfanno_containers';
+	    localStorage.removeItem(LOCALSTORAGE_KEY2);
 	}
 	
 	/**
@@ -379,21 +576,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	/**
-	    The entry point.
-	*/
+	 *  The entry point.
+	 */
 	window.addEventListener('DOMContentLoaded', function (e) {
 	
 	    // Delete prev annotations.
 	    if (location.search.indexOf('debug') === -1) {
-	        var LOCALSTORAGE_KEY2 = '_pdfanno_containers';
-	        localStorage.removeItem(LOCALSTORAGE_KEY2);
+	        clearAllAnnotations();
 	    }
 	
 	    // Start application.
 	    startApplication();
 	
-	    // Setup the annotation load and select UI.
-	    setupAnnotationSelectUI();
+	    // Setup loading tools for PDFs and Anno files.
+	    setupBrowseButton();
+	    setupPdfDropdown();
+	    setupPrimaryAnnoDropdown();
+	    setupReferenceAnnoDropdown();
 	});
 
 /***/ },
@@ -437,7 +636,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, "@charset 'utf-8';\n\n/**\n * Viewer size.\n * This height will be override to fit the browser height (by app.js).\n */\n.anno-viewer {\n    width: 100%;\n    height: 500px;\n}\n\n/**\n * Annotation Select UI Layout.\n */\n.anno-select-layout {}\n.anno-select-layout .row:first-child {\n    margin-bottom: 10px;\n}\n.anno-select-layout [type=\"radio\"] {\n    margin-right: 5px;\n}\n.anno-select-layout [type=\"file\"] {\n    display: inline-block;\n    margin-left: 5px;\n    line-height: 1em;\n}\n.anno-select-layout .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-select-layout .sp-dd {\n    display: none;\n}\n", ""]);
+	exports.push([module.id, "@charset 'utf-8';\n\n.no-visible {\n    visibility: hidden;\n}\n\n/**\n * Viewer size.\n * This height will be override to fit the browser height (by app.js).\n */\n.anno-viewer {\n    width: 100%;\n    height: 500px;\n}\n\n/**\n * Annotation Select UI Layout.\n */\n.anno-select-layout {}\n.anno-select-layout .row:first-child {\n    margin-bottom: 10px;\n}\n.anno-select-layout [type=\"radio\"] {\n    margin-right: 5px;\n}\n.anno-select-layout [type=\"file\"] {\n    display: inline-block;\n    margin-left: 5px;\n    line-height: 1em;\n}\n.anno-select-layout .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-select-layout .sp-dd {\n    display: none;\n}\n\n\n\n.anno-ui .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-ui .sp-dd {\n    display: none;\n}\n.anno-ui .sp-preview {\n    margin-right: 0;\n}\n\n", ""]);
 	
 	// exports
 
