@@ -11761,12 +11761,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    var containers = data.annotations.map(function (a, i) {
 	
 	                        // TOML to JavascriptObject.
-	                        if (a) {
-	                            console.log('before:', a);
-	                            a = _toml2.default.parse(a);
-	                            console.log('after:', a);
-	                        } else {
-	                            a = {};
+	                        try {
+	                            if (a) {
+	                                console.log('before:', a);
+	                                a = _toml2.default.parse(a);
+	                                console.log('after:', a);
+	                            } else {
+	                                a = {};
+	                            }
+	                        } catch (e) {
+	                            console.log('ERROR:', e);
 	                        }
 	
 	                        var color = data.colors[i];
@@ -16516,7 +16520,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // `version` is first.
 	    if ('version' in obj) {
-	        lines.push('version = ' + obj['version']);
+	        lines.push('version = "' + obj['version'] + '"');
 	        lines.push('');
 	        delete obj['version'];
 	    }
