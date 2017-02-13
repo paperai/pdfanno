@@ -139,13 +139,15 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                                 ];
                             });
 
+                            let text = (annotation.selectedText || '').replace(/\r\n/g, ' ').replace(/\r/g, ' ').replace(/\n/g, ' ');
+
                             let key = `${index++}`;
                             dataExport[key] = {
                                 type     : 'span',
                                 page     : annotation.rectangles[0].page,
                                 position : rectangles,
                                 label    : annotation.text || '',
-                                text     : annotation.selectedText
+                                text
                             };
 
                             // save tmporary for arrow.
