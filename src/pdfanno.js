@@ -2,6 +2,11 @@ require("file?name=dist/index.html!./index.html");
 require("!style!css!./pdfanno.css");
 
 /**
+ * The data which is loaded via `Browse` button.
+ */
+let fileMap = {};
+
+/**
  * Resize the height of PDFViewer adjusting to the window.
  */
 function resizeHandler() {
@@ -92,7 +97,6 @@ function initializeAnnoToolButtons() {
 function downloadAnnotation() {
 
     window.iframeWindow.PDFAnnoCore.getStoreAdapter().exportData().then(annotations => {
-        // annotations = JSON.stringify(annotations, null, '\t');
         let blob = new Blob([annotations]);
         let blobURL = window.URL.createObjectURL(blob);
         let a = document.createElement('a');
@@ -185,9 +189,14 @@ function handleDroppedFile(file) {
 }
 
 /**
- * Setup the UI for loading and selecting annotations.
+ * Setup the color pickers.
  */
-function setupAnnotationSelectUI() {
+function setupColorPicker() {
+
+    const colors = [
+        'rgb(255, 128, 0)', 'hsv 100 70 50', 'yellow', 'blanchedalmond',
+        'red', 'green', 'blue', 'violet'
+    ];
 
     // Setup colorPickers.
     $('.js-anno-palette').spectrum({
@@ -195,41 +204,28 @@ function setupAnnotationSelectUI() {
         showPalette            : true,
         hideAfterPaletteSelect : true,
         palette                : [
-            ['blanchedalmond', 'rgb(255, 128, 0)', 'hsv 100 70 50', 'yellow'],
-            ['red', 'green', 'blue', 'violet']
+            colors.slice(0, Math.floor(colors.length/2)),
+            colors.slice(Math.floor(colors.length/2), colors.length)
         ]
     });
     // Set initial color.
-    let colors = [ 'yellow', 'green', 'blue', 'violet' ];
     $('.js-anno-palette').each((i, elm) => {
-        console.log('cccccccccccccccc:', i, elm, colors.length, colors.length%i);
         $(elm).spectrum('set', colors[ i % colors.length ]);
     });
-    // $('.js-anno-palette').eq(0).spectrum('set', 'yellow');
-    // $('.js-anno-palette').eq(1).spectrum('set', 'green');
-    // $('.js-anno-palette').eq(2).spectrum('set', 'blue');
-    // $('.js-anno-palette').eq(3).spectrum('set', 'violet');
 
     // Setup behavior.
-    $('.js-anno-radio, .js-anno-visibility, .js-anno-palette, .js-anno-file').on('change', displayAnnotation);
+    $('.js-anno-palette').off('change').on('change', displayAnnotation);
 }
-
-/**
- * The data which has annotations, colors, primaryIndex.
- */
-let paperData = null;
 
 /**
  * Load annotation data and display.
  */
 function displayAnnotation(e) {
 
-    console.log('displayAnnotation!!!!!!!');
-
-    let annos = [];
+    let annotations = [];
     let colors = [];
     let visibilities = [];
-    let primaryIndex = -1; // TODO
+    let primaryIndex = -1;
 
     // Primary annotation.
     $('#dropdownAnnoPrimary a').each((index, element) => {
@@ -241,9 +237,9 @@ function displayAnnotation(e) {
                 return;
             }
             primaryIndex = 0;
-            annos.push(fileMap[annoPath]);
+            annotations.push(fileMap[annoPath]);
             visibilities.push(true);
-            let color = '#FF0000';//$elm.find('.js-anno-palette').spectrum('get').toHexString();
+            let color = '#FF0000';
             colors.push(color);
 
             let filename = annoPath.split('/')[annoPath.split('/').length - 1];
@@ -252,6 +248,7 @@ function displayAnnotation(e) {
         }
     });
 
+    // Reference annotations.
     $('#dropdownAnnoReference a').each((index, element) => {
         let $elm = $(element);
         if ($elm.find('.fa-check').hasClass('no-visible') === false) {
@@ -260,96 +257,38 @@ function displayAnnotation(e) {
                 console.log('ERROR');
                 return;
             }
-            annos.push(fileMap[annoPath]);
+            annotations.push(fileMap[annoPath]);
             visibilities.push(true);
             let color = $elm.find('.js-anno-palette').spectrum('get').toHexString();
             console.log(color);
             colors.push(color);
         }
     });
-    console.log('annos:', annos);
+    console.log('annotations:', annotations);
     console.log('colors:', colors);
 
-    if (annos.length === 0) {
+    if (annotations.length === 0) {
         return;
     }
 
-    // 必要？
-    // let updateTarget = $(e.target).attr('name');
+    // Create import data.
+    let paperData = {
+        primary : primaryIndex,
+        visibilities,
+        colors,
+        annotations
+    };
 
-    // Get the primary index which indicates the editable annotation.
-    // let primaryIndex = parseInt($('.js-anno-radio:checked').val(), 10);
+    // Pass the data to pdf-annotatejs.
+    window.iframeWindow.PDFAnnoCore.getStoreAdapter().importAnnotations(paperData).then(result => {
 
-    // Get annotation visibilities.
-    // let visibilities = [
-    //     $('.js-anno-visibility').eq(0).is(':checked'),
-    //     $('.js-anno-visibility').eq(1).is(':checked'),
-    //     $('.js-anno-visibility').eq(2).is(':checked'),
-    //     $('.js-anno-visibility').eq(3).is(':checked'),
-    // ];
+        // Reload the viewer.
+        reloadPDFViewer();
 
-    // Get annotation colors.
-    // let colors = [
-    //     $('.js-anno-palette').eq(0).spectrum('get').toHexString(),
-    //     $('.js-anno-palette').eq(1).spectrum('get').toHexString(),
-    //     $('.js-anno-palette').eq(2).spectrum('get').toHexString(),
-    //     $('.js-anno-palette').eq(3).spectrum('get').toHexString()
-    // ];
+        // Reset tools to viewMode.
+        $('.js-tool-btn[data-type="view"]').click();
+    });
 
-    // Get annotation data.
-    // let actions = [];
-    // $('.js-anno-file').each(function() {
-    //     let files = this.files;
-
-    //     actions.push(new Promise((resolve, reject) => {
-
-    //         if (files.length === 0) {
-    //             return resolve(null);
-    //         }
-
-    //         let fileReader = new FileReader();
-    //         fileReader.onload = event => {
-    //             let annotation = event.target.result;
-    //             // TODO JSON scheme check ?
-    //             // resolve(JSON.parse(annotation));
-    //             console.log('annotation:', annotation);
-    //             resolve(annotation);
-    //         }
-    //         fileReader.readAsText(files[0]);
-    //     }));
-    // });
-    // Promise.all(actions).then((annotations) => {
-
-    //     annotations = annotations.map(a => {
-    //         // return a ? a : {};
-    //         return a ? a : '';
-    //     });
-    //     console.log('annotations:', annotations);
-
-        let annotations = annos;
-
-        // Create import data.
-        paperData = {
-            num     : 4,
-            primary : primaryIndex,
-            visibilities,
-            colors,
-            annotations,
-            // updateTarget
-        };
-
-        // Pass the data to pdf-annotatejs.
-        window.iframeWindow.PDFAnnoCore.getStoreAdapter().importAnnotations(paperData).then(result => {
-
-            console.log('AAAAAAAAAAAAAAAAAAAAAA');
-
-            // Reload the viewer.
-            reloadPDFViewer();
-
-            // Reset tools to viewMode.
-            $('.js-tool-btn[data-type="view"]').click();
-        });
-    // });
 }
 
 /**
@@ -369,64 +308,21 @@ function unlistenWindowLeaveEvent() {
 }
 
 /**
- * Start PDFAnno Application.
+ * Clear the dropdowns of annotations.
  */
-function startApplication() {
-
-    // Alias for convenience.
-    window.iframeWindow = $('#viewer iframe').get(0).contentWindow;
-
-    iframeWindow.addEventListener('DOMContentLoaded', () => {
-
-        // Adjust the height of viewer.
-        adjustViewerSize();
-
-        // Initialize tool buttons' behavior.
-        initializeAnnoToolButtons();
-
-        // Reset the confirm dialog at leaving page.
-        unlistenWindowLeaveEvent();
-    });
-
-    // Set viewMode behavior after annotations rendered.
-    iframeWindow.addEventListener('annotationrendered', () => {
-        window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
-        window.iframeWindow.PDFAnnoCore.UI.enableViewMode();
-    });
-
-    // Handle the pdf user dropped in.
-    iframeWindow.addEventListener('pdfdropped', ev => {
-        handleDroppedFile(ev.detail.file);
-    });
-
-    // Set the confirm dialog at page leaving.
-    iframeWindow.addEventListener('annotationUpdated', listenWindowLeaveEvent);
+function clearAnnotationDropdowns() {
+    $('#dropdownAnnoPrimary ul').html('');
+    $('#dropdownAnnoReference ul').html('');
+    $('#dropdownAnnoPrimary .js-text').text('Select Anno file');
+    $('#dropdownAnnoReference .js-text').text('Select reference Anno files');
 }
 
-let fileMap = {};
-
 /**
-    The entry point.
-*/
-window.addEventListener('DOMContentLoaded', e => {
+ * Clear the dropdown of a PDF file.
+ */
+function setupBrowseButton() {
 
-    // Delete prev annotations.
-    if (location.search.indexOf('debug') === -1) {
-        const LOCALSTORAGE_KEY2 = '_pdfanno_containers';
-        localStorage.removeItem(LOCALSTORAGE_KEY2);
-    }
-
-    // Start application.
-    startApplication();
-
-    // Setup the annotation load and select UI.
-    setupAnnotationSelectUI();
-
-
-    // tmp.
     $('.js-file :file').on('change', ev => {
-
-        console.log('aaaaaaa');
 
         let files = ev.target.files;
         if (!files || files.length === 0) {
@@ -470,66 +366,40 @@ window.addEventListener('DOMContentLoaded', e => {
             $('#dropdownPdf ul').append(snipet);
         });
 
-        // anno file.
-        // $('#dropdownAnno .js-text').text('Select Anno file(s)');
-        // $('#dropdownAnno li').remove();
-        // annos.forEach(file => {
-        //     let annoPath = file.webkitRelativePath;
-        //     let snipet = `
-        //         <li>
-        //             <a href="#">
-        //                 <i class="fa fa-check no-visible" aria-hidden="true"></i>
-        //                 <input type="text"  name="color" class="js-anno-palette"  autocomplete="off">
-        //                 <span class="js-annoname">${annoPath}</span>
-        //             </a>
-        //         </li>
-        //     `;
-        //     $('#dropdownAnno ul').append(snipet);
-        // });
-
         // Clear anno dropdowns.
-        $('#dropdownAnnoPrimary ul').html('');
-        $('#dropdownAnnoReference ul').html('');
-        $('#dropdownAnnoPrimary .js-text').text('Select Anno file');
-        $('#dropdownAnnoReference .js-text').text('Select reference anno files');
+        clearAnnotationDropdowns();
 
         fileMap = {};
 
         // Load pdfs.
         pdfs.forEach(file => {
-
             let fileReader = new FileReader();
             fileReader.onload = event => {
                 let pdf = event.target.result;
                 fileMap[file.webkitRelativePath] = pdf;
-                // localStorage.setItem('_pdfanno_pdf', data);
-                // localStorage.setItem('_pdfanno_pdfname', fileName);
-                // reloadPDFViewer();
             }
             fileReader.readAsDataURL(file);
-
         });
 
         // Load annos.
         annos.forEach(file => {
-
             let fileReader = new FileReader();
             fileReader.onload = event => {
                 let annotation = event.target.result;
                 fileMap[file.webkitRelativePath] = annotation;
             }
             fileReader.readAsText(file);
-
         });
-
-        setTimeout(() => {
-            console.log(fileMap);
-        }, 1000);
-
 
     });
 
-    // tmp.
+}
+
+/**
+ * Setup the dropdown of PDFs.
+ */
+function setupPdfDropdown() {
+
     $('#dropdownPdf').on('click', 'a', e => {
 
         let $this = $(e.currentTarget);
@@ -551,10 +421,10 @@ window.addEventListener('DOMContentLoaded', e => {
         reloadPDFViewer();
 
         // Clear anno dropdowns.
-        $('#dropdownAnnoPrimary ul').html('');
-        $('#dropdownAnnoReference ul').html('');
-        $('#dropdownAnnoPrimary .js-text').text('Select Anno file');
-        $('#dropdownAnnoReference .js-text').text('Select reference anno files');
+        clearAnnotationDropdowns();
+
+        // Clear the all annotations.
+        clearAllAnnotations();
 
         // Setup anno dropdown.
         let match = pdfPath.split('.')[0];
@@ -585,18 +455,18 @@ window.addEventListener('DOMContentLoaded', e => {
             }
         });
         // Setup color pallets.
-        // TODO カラー数を可変にする.
-        setupAnnotationSelectUI();
-
+        setupColorPicker();
 
         return false;
-
     });
+}
 
-    // tmp.
+/**
+ * Setup the dropdown of a primary annotation.
+ */
+function setupPrimaryAnnoDropdown() {
+
     $('#dropdownAnnoPrimary').on('click', 'a', e => {
-
-        console.log('bbbbbbbbb');
 
         let $this = $(e.currentTarget);
         let pdfPath = $this.find('.js-annoname').text();
@@ -612,17 +482,16 @@ window.addEventListener('DOMContentLoaded', e => {
 
         // reload.
         displayAnnotation();
-        // localStorage.setItem('_pdfanno_pdf', fileMap[pdfPath]);
-        // let fileName = pdfPath.split('/')[pdfPath.split('/').length - 1];
-        // localStorage.setItem('_pdfanno_pdfname', fileName);
-        // reloadPDFViewer();
 
         return false;
-
     });
+}
 
+/**
+ * Setup the dropdown of reference annotations.
+ */
+function setupReferenceAnnoDropdown() {
 
-    // tmp.
     $('#dropdownAnnoReference').on('click', 'a', e => {
 
         let $this = $(e.currentTarget);
@@ -643,11 +512,68 @@ window.addEventListener('DOMContentLoaded', e => {
         return false;
 
     });
+}
 
+/**
+ * Clear the all annotations from the view and storage.
+ */
+function clearAllAnnotations() {
+    const LOCALSTORAGE_KEY2 = '_pdfanno_containers';
+    localStorage.removeItem(LOCALSTORAGE_KEY2);
+}
 
+/**
+ * Start PDFAnno Application.
+ */
+function startApplication() {
 
+    // Alias for convenience.
+    window.iframeWindow = $('#viewer iframe').get(0).contentWindow;
 
+    iframeWindow.addEventListener('DOMContentLoaded', () => {
 
+        // Adjust the height of viewer.
+        adjustViewerSize();
 
+        // Initialize tool buttons' behavior.
+        initializeAnnoToolButtons();
+
+        // Reset the confirm dialog at leaving page.
+        unlistenWindowLeaveEvent();
+    });
+
+    // Set viewMode behavior after annotations rendered.
+    iframeWindow.addEventListener('annotationrendered', () => {
+        window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
+        window.iframeWindow.PDFAnnoCore.UI.enableViewMode();
+    });
+
+    // Handle the pdf user dropped in.
+    iframeWindow.addEventListener('pdfdropped', ev => {
+        handleDroppedFile(ev.detail.file);
+    });
+
+    // Set the confirm dialog at page leaving.
+    iframeWindow.addEventListener('annotationUpdated', listenWindowLeaveEvent);
+}
+
+/**
+ *  The entry point.
+ */
+window.addEventListener('DOMContentLoaded', e => {
+
+    // Delete prev annotations.
+    if (location.search.indexOf('debug') === -1) {
+        clearAllAnnotations();
+    }
+
+    // Start application.
+    startApplication();
+
+    // Setup loading tools for PDFs and Anno files.
+    setupBrowseButton();
+    setupPdfDropdown();
+    setupPrimaryAnnoDropdown();
+    setupReferenceAnnoDropdown();
 
 });
