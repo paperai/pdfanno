@@ -17626,6 +17626,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 	
+	  // Adjust the start/end points.
+	  var theta = Math.atan((a.y1 - a.y2) / (a.x1 - a.x2));
+	  var sign = a.x1 < a.x2 ? 1 : -1;
+	  a.x1 += _renderCircle.DEFAULT_RADIUS * Math.cos(theta) * sign;
+	  a.x2 -= _renderCircle.DEFAULT_RADIUS * Math.cos(theta) * sign;
+	  a.y1 += _renderCircle.DEFAULT_RADIUS * Math.sin(theta) * sign;
+	  a.y2 -= _renderCircle.DEFAULT_RADIUS * Math.sin(theta) * sign;
+	
 	  // <svg viewBox="0 0 200 200">
 	  //     <marker id="m_ar" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="strokeWidth" preserveAspectRatio="none" markerWidth="2" markerHeight="3" orient="auto-start-reverse">
 	  //         <polygon points="0,0 0,10 10,5" fill="red" id="ms"/>

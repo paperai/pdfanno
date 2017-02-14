@@ -384,6 +384,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	                alert('Please select a directory, NOT a file');
 	                return;
 	            }
+	            console.log('relativePath:', relativePath);
+	
+	            // Just as a child folder.
+	            if (relativePath.split('/').length !== 2) {
+	                continue;
+	            }
+	
 	            var ext = relativePath.split('.')[1];
 	            if (!ext) {
 	                continue;
