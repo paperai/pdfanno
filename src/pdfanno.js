@@ -330,6 +330,7 @@ function setupBrowseButton() {
 
         let files = ev.target.files;
         if (!files || files.length === 0) {
+            console.log('Not files specified');
             return;
         }
 
