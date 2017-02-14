@@ -331,6 +331,9 @@ function setupBrowseButton() {
         let files = ev.target.files;
         if (!files || files.length === 0) {
             console.log('Not files specified');
+            console.log('ev:', ev);
+            console.log('ev.target:', ev.target);
+            console.log('ev.ev.target.files', ev.target.files);
             return;
         }
 
