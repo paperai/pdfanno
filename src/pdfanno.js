@@ -322,7 +322,11 @@ function clearAnnotationDropdowns() {
  */
 function setupBrowseButton() {
 
+    console.log('aaaaaaaaaaa');
+
     $('.js-file :file').on('change', ev => {
+
+        console.log('bbbbbbbbbb');
 
         let files = ev.target.files;
         if (!files || files.length === 0) {

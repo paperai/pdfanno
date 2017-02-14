@@ -366,7 +366,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function setupBrowseButton() {
 	
+	    console.log('aaaaaaaaaaa');
+	
 	    $('.js-file :file').on('change', function (ev) {
+	
+	        console.log('bbbbbbbbbb');
 	
 	        var files = ev.target.files;
 	        if (!files || files.length === 0) {
