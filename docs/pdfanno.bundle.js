@@ -142,6 +142,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	    $('.js-tool-btn[data-type="view"]').click();
 	}
 	
+	function _getDownloadFileName() {
+	
+	    // The name of Primary Annotation.
+	    var primaryAnnotationName = void 0;
+	    $('#dropdownAnnoPrimary a').each(function (index, element) {
+	        var $elm = $(element);
+	        if ($elm.find('.fa-check').hasClass('no-visible') === false) {
+	            primaryAnnotationName = $elm.find('.js-annoname').text();
+	        }
+	    });
+	    if (primaryAnnotationName) {
+	        return primaryAnnotationName;
+	    }
+	
+	    // The name of PDF.
+	    var pdfFileName = iframeWindow.getFileName(iframeWindow.PDFView.url);
+	    return pdfFileName.split('.')[0] + '.anno';
+	}
+	
 	/**
 	 * Export the primary annotation data for download.
 	 */
@@ -152,12 +171,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var blobURL = window.URL.createObjectURL(blob);
 	        var a = document.createElement('a');
 	        document.body.appendChild(a); // for firefox working correctly.
-	        var fileName = iframeWindow.getFileName(iframeWindow.PDFView.url);
-	        fileName = fileName.split('.')[0] + '.anno';
-	        if (localStorage.getItem('_pdfanno_primary_annoname')) {
-	            fileName = localStorage.getItem('_pdfanno_primary_annoname');
-	        }
-	        a.download = fileName;
+	        a.download = _getDownloadFileName();
 	        a.href = blobURL;
 	        a.click();
 	        a.parentNode.removeChild(a);
@@ -553,7 +567,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                annoNames.push($elm.find('.js-annoname').text());
 	            }
 	        });
-	        $('#dropdownAnnoReference .js-text').text(annoNames.join(','));
+	        if (annoNames.length > 0) {
+	            $('#dropdownAnnoReference .js-text').text(annoNames.join(','));
+	        } else {
+	            $('#dropdownAnnoReference .js-text').text('Select reference Anno files');
+	        }
 	
 	        displayAnnotation();
 	
