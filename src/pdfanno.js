@@ -475,8 +475,12 @@ function setupPdfDropdown() {
                 $('#dropdownAnnoReference ul').append(snipet2);
             }
         });
+
         // Setup color pallets.
         setupColorPicker();
+
+        // Close dropdown.
+        $('#dropdownPdf').click();
 
         return false;
     });
@@ -503,6 +507,9 @@ function setupPrimaryAnnoDropdown() {
 
         // reload.
         displayAnnotation();
+
+        // Close
+        $('#dropdownAnnoPrimary').click();
 
         return false;
     });
