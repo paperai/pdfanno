@@ -322,10 +322,18 @@ function clearAnnotationDropdowns() {
  */
 function setupBrowseButton() {
 
+    console.log('aaaaaaaaaaa');
+
     $('.js-file :file').on('change', ev => {
+
+        console.log('bbbbbbbbbb');
 
         let files = ev.target.files;
         if (!files || files.length === 0) {
+            console.log('Not files specified');
+            console.log('ev:', ev);
+            console.log('ev.target:', ev.target);
+            console.log('ev.ev.target.files', ev.target.files);
             return;
         }
 
@@ -340,7 +348,14 @@ function setupBrowseButton() {
                 alert('Please select a directory, NOT a file');
                 return;
             }
+            console.log('relativePath:', relativePath);
 
+            // Just as a child folder.
+            if (relativePath.split('/').length !== 2) {
+                continue;
+            }
+
+            // Get files only PDFs or Anno files.
             if (relativePath.match(/\.pdf$/i)) {
                 pdfs.push(file);
             } else if (relativePath.match(/\.anno$/i)) {

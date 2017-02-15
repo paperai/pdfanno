@@ -366,10 +366,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function setupBrowseButton() {
 	
+	    console.log('aaaaaaaaaaa');
+	
 	    $('.js-file :file').on('change', function (ev) {
+	
+	        console.log('bbbbbbbbbb');
 	
 	        var files = ev.target.files;
 	        if (!files || files.length === 0) {
+	            console.log('Not files specified');
+	            console.log('ev:', ev);
+	            console.log('ev.target:', ev.target);
+	            console.log('ev.ev.target.files', ev.target.files);
 	            return;
 	        }
 	
@@ -384,6 +392,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	                alert('Please select a directory, NOT a file');
 	                return;
 	            }
+	            console.log('relativePath:', relativePath);
+	
+	            // Just as a child folder.
+	            if (relativePath.split('/').length !== 2) {
+	                continue;
+	            }
+	
 	            var ext = relativePath.split('.')[1];
 	            if (!ext) {
 	                continue;
