@@ -340,12 +340,10 @@ function setupBrowseButton() {
                 alert('Please select a directory, NOT a file');
                 return;
             }
-            let ext = relativePath.split('.')[1];
-            if (!ext) {
-                continue;
-            } else if (ext.toLowerCase() === 'pdf') {
+
+            if (relativePath.match(/\.pdf$/i)) {
                 pdfs.push(file);
-            } else if (ext.toLowerCase() === 'anno') {
+            } else if (relativePath.match(/\.anno$/i)) {
                 annos.push(file);
             }
         }
