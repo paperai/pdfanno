@@ -91,6 +91,25 @@ function initializeAnnoToolButtons() {
     $('.js-tool-btn[data-type="view"]').click();
 }
 
+function _getDownloadFileName() {
+
+    // The name of Primary Annotation.
+    let primaryAnnotationName;
+    $('#dropdownAnnoPrimary a').each((index, element) => {
+        let $elm = $(element);
+        if ($elm.find('.fa-check').hasClass('no-visible') === false) {
+            primaryAnnotationName = $elm.find('.js-annoname').text();
+        }
+    });
+    if (primaryAnnotationName) {
+        return primaryAnnotationName;
+    }
+
+    // The name of PDF.
+    let pdfFileName = iframeWindow.getFileName(iframeWindow.PDFView.url);
+    return pdfFileName.split('.')[0] + '.anno';
+}
+
 /**
  * Export the primary annotation data for download.
  */
@@ -101,12 +120,7 @@ function downloadAnnotation() {
         let blobURL = window.URL.createObjectURL(blob);
         let a = document.createElement('a');
         document.body.appendChild(a); // for firefox working correctly.
-        let fileName = iframeWindow.getFileName(iframeWindow.PDFView.url);
-        fileName = fileName.split('.')[0] + '.anno';
-        if (localStorage.getItem('_pdfanno_primary_annoname')) {
-            fileName = localStorage.getItem('_pdfanno_primary_annoname');
-        }
-        a.download = fileName;
+        a.download = _getDownloadFileName();
         a.href = blobURL;
         a.click();
         a.parentNode.removeChild(a);
