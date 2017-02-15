@@ -239,7 +239,7 @@ function displayAnnotation(e) {
             primaryIndex = 0;
             annotations.push(fileMap[annoPath]);
             visibilities.push(true);
-            let color = '#FF0000';
+            let color = null; // Use the default color used for edit.
             colors.push(color);
 
             let filename = annoPath.split('/')[annoPath.split('/').length - 1];
