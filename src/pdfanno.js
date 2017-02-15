@@ -547,7 +547,11 @@ function setupReferenceAnnoDropdown() {
                 annoNames.push($elm.find('.js-annoname').text());
             }
         });
-        $('#dropdownAnnoReference .js-text').text(annoNames.join(','));
+        if (annoNames.length > 0) {
+            $('#dropdownAnnoReference .js-text').text(annoNames.join(','));
+        } else {
+            $('#dropdownAnnoReference .js-text').text('Select reference Anno files');
+        }
 
         displayAnnotation();
 
