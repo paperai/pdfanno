@@ -317,23 +317,24 @@ function clearAnnotationDropdowns() {
     $('#dropdownAnnoReference .js-text').text('Select reference Anno files');
 }
 
+function _excludeBaseDirName(filePath) {
+    let frgms = filePath.split('/');
+    return frgms[frgms.length - 1];
+}
+
 /**
  * Clear the dropdown of a PDF file.
  */
 function setupBrowseButton() {
 
-    console.log('aaaaaaaaaaa');
-
     $('.js-file :file').on('change', ev => {
 
-        console.log('bbbbbbbbbb');
+        console.log('Browse button starts to work.');
 
         let files = ev.target.files;
         if (!files || files.length === 0) {
+            console.log('ev.target.files', ev.target.files);
             console.log('Not files specified');
-            console.log('ev:', ev);
-            console.log('ev.target:', ev.target);
-            console.log('ev.ev.target.files', ev.target.files);
             return;
         }
 
@@ -348,12 +349,13 @@ function setupBrowseButton() {
                 alert('Please select a directory, NOT a file');
                 return;
             }
-            console.log('relativePath:', relativePath);
 
-            // Just as a child folder.
-            if (relativePath.split('/').length !== 2) {
+            let frgms = relativePath.split('/');
+            if (frgms.length > 2) {
+                console.log('SKIP:', relativePath);
                 continue;
             }
+            console.log('relativePath:', relativePath);
 
             // Get files only PDFs or Anno files.
             if (relativePath.match(/\.pdf$/i)) {
@@ -367,7 +369,7 @@ function setupBrowseButton() {
         $('#dropdownPdf .js-text').text('Select PDF file');
         $('#dropdownPdf li').remove();
         pdfs.forEach(file => {
-            let pdfPath = file.webkitRelativePath;
+            let pdfPath = _excludeBaseDirName(file.webkitRelativePath);
             let snipet = `
                 <li>
                     <a href="#">
@@ -389,7 +391,8 @@ function setupBrowseButton() {
             let fileReader = new FileReader();
             fileReader.onload = event => {
                 let pdf = event.target.result;
-                fileMap[file.webkitRelativePath] = pdf;
+                let fileName = _excludeBaseDirName(file.webkitRelativePath);
+                fileMap[fileName] = pdf;
             }
             fileReader.readAsDataURL(file);
         });
@@ -399,7 +402,8 @@ function setupBrowseButton() {
             let fileReader = new FileReader();
             fileReader.onload = event => {
                 let annotation = event.target.result;
-                fileMap[file.webkitRelativePath] = annotation;
+                let fileName = _excludeBaseDirName(file.webkitRelativePath);
+                fileMap[fileName] = annotation;
             }
             fileReader.readAsText(file);
         });
@@ -440,10 +444,14 @@ function setupPdfDropdown() {
         clearAllAnnotations();
 
         // Setup anno dropdown.
-        let match = pdfPath.split('.')[0];
+        let pdfName = pdfPath.replace(/\.pdf$/i, '');
         Object.keys(fileMap).forEach(filePath => {
-            if (filePath.split('.')[1] === 'anno'
-                && filePath.indexOf(match) === 0) {
+
+            if (!filePath.match(/\.anno$/i)) {
+                return;
+            }
+
+            if (filePath.indexOf(pdfName) === 0) {
 
                 let snipet1 = `
                     <li>
