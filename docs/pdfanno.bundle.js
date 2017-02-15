@@ -284,7 +284,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            primaryIndex = 0;
 	            annotations.push(fileMap[annoPath]);
 	            visibilities.push(true);
-	            var color = '#FF0000';
+	            var color = null; // Use the default color used for edit.
 	            colors.push(color);
 	
 	            var filename = annoPath.split('/')[annoPath.split('/').length - 1];
@@ -361,23 +361,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	    $('#dropdownAnnoReference .js-text').text('Select reference Anno files');
 	}
 	
+	function _excludeBaseDirName(filePath) {
+	    var frgms = filePath.split('/');
+	    return frgms[frgms.length - 1];
+	}
+	
 	/**
 	 * Clear the dropdown of a PDF file.
 	 */
 	function setupBrowseButton() {
 	
-	    console.log('aaaaaaaaaaa');
-	
 	    $('.js-file :file').on('change', function (ev) {
 	
-	        console.log('bbbbbbbbbb');
+	        console.log('Browse button starts to work.');
 	
 	        var files = ev.target.files;
 	        if (!files || files.length === 0) {
+	            console.log('ev.target.files', ev.target.files);
 	            console.log('Not files specified');
-	            console.log('ev:', ev);
-	            console.log('ev.target:', ev.target);
-	            console.log('ev.ev.target.files', ev.target.files);
 	            return;
 	        }
 	
@@ -392,19 +393,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	                alert('Please select a directory, NOT a file');
 	                return;
 	            }
-	            console.log('relativePath:', relativePath);
 	
-	            // Just as a child folder.
-	            if (relativePath.split('/').length !== 2) {
+	            var frgms = relativePath.split('/');
+	            if (frgms.length > 2) {
+	                console.log('SKIP:', relativePath);
 	                continue;
 	            }
+	            console.log('relativePath:', relativePath);
 	
-	            var ext = relativePath.split('.')[1];
-	            if (!ext) {
-	                continue;
-	            } else if (ext.toLowerCase() === 'pdf') {
+	            // Get files only PDFs or Anno files.
+	            if (relativePath.match(/\.pdf$/i)) {
 	                pdfs.push(file);
-	            } else if (ext.toLowerCase() === 'anno') {
+	            } else if (relativePath.match(/\.anno$/i)) {
 	                annos.push(file);
 	            }
 	        }
@@ -413,7 +413,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        $('#dropdownPdf .js-text').text('Select PDF file');
 	        $('#dropdownPdf li').remove();
 	        pdfs.forEach(function (file) {
-	            var pdfPath = file.webkitRelativePath;
+	            var pdfPath = _excludeBaseDirName(file.webkitRelativePath);
 	            var snipet = "\n                <li>\n                    <a href=\"#\">\n                        <i class=\"fa fa-check no-visible\" aria-hidden=\"true\"></i>&nbsp;\n                        <span class=\"js-pdfname\">" + pdfPath + "</span>\n                    </a>\n                </li>\n            ";
 	            $('#dropdownPdf ul').append(snipet);
 	        });
@@ -428,7 +428,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var fileReader = new FileReader();
 	            fileReader.onload = function (event) {
 	                var pdf = event.target.result;
-	                fileMap[file.webkitRelativePath] = pdf;
+	                var fileName = _excludeBaseDirName(file.webkitRelativePath);
+	                fileMap[fileName] = pdf;
 	            };
 	            fileReader.readAsDataURL(file);
 	        });
@@ -438,7 +439,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var fileReader = new FileReader();
 	            fileReader.onload = function (event) {
 	                var annotation = event.target.result;
-	                fileMap[file.webkitRelativePath] = annotation;
+	                var fileName = _excludeBaseDirName(file.webkitRelativePath);
+	                fileMap[fileName] = annotation;
 	            };
 	            fileReader.readAsText(file);
 	        });
@@ -477,9 +479,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        clearAllAnnotations();
 	
 	        // Setup anno dropdown.
-	        var match = pdfPath.split('.')[0];
+	        var pdfName = pdfPath.replace(/\.pdf$/i, '');
 	        Object.keys(fileMap).forEach(function (filePath) {
-	            if (filePath.split('.')[1] === 'anno' && filePath.indexOf(match) === 0) {
+	
+	            if (!filePath.match(/\.anno$/i)) {
+	                return;
+	            }
+	
+	            if (filePath.indexOf(pdfName) === 0) {
 	
 	                var snipet1 = "\n                    <li>\n                        <a href=\"#\">\n                            <i class=\"fa fa-check no-visible\" aria-hidden=\"true\"></i>\n                            <span class=\"js-annoname\">" + filePath + "</span>\n                        </a>\n                    </li>\n                ";
 	                $('#dropdownAnnoPrimary ul').append(snipet1);
@@ -488,8 +495,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	                $('#dropdownAnnoReference ul').append(snipet2);
 	            }
 	        });
+	
 	        // Setup color pallets.
 	        setupColorPicker();
+	
+	        // Close dropdown.
+	        $('#dropdownPdf').click();
 	
 	        return false;
 	    });
@@ -516,6 +527,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // reload.
 	        displayAnnotation();
+	
+	        // Close
+	        $('#dropdownAnnoPrimary').click();
 	
 	        return false;
 	    });
