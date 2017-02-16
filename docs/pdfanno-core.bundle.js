@@ -11385,7 +11385,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     *
 	     * @param {Object} data - the data for import formatted as json.
 	     */
-	    value: function __importAnnotations(data) {
+	    value: function __importAnnotations(data, isPrimary) {
 	      (0, _abstractFunction2.default)('importAnnotations');
 	    }
 	  }, {
@@ -11495,7 +11495,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return this.__importAnnotations;
 	    },
 	    set: function set(fn) {
-	      this.__importAnnotations = function importAnnotations(json) {
+	      this.__importAnnotations = function importAnnotations(json, isPrimary) {
 	        return fn.apply(undefined, arguments);
 	      };
 	    }
@@ -11753,19 +11753,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    // resolve(dataExport);
 	                });
 	            },
-	            importAnnotations: function importAnnotations(data) {
+	            importAnnotations: function importAnnotations(data, isPrimary) {
 	                return new Promise(function (resolve, reject) {
 	
-	                    console.log('importAnnotations:', data);
+	                    // console.log('importAnnotations:', data);
+	
+	                    var currentContainers = _getContainers().filter(function (c) {
+	
+	                        // Remove the primary annotations when importing a new primary ones.
+	                        if (isPrimary) {
+	                            return !c.isPrimary;
+	
+	                            // Otherwise, remove reference annotations.
+	                        } else {
+	                            return c.isPrimary;
+	                        }
+	                    });
 	
 	                    var containers = data.annotations.map(function (a, i) {
 	
 	                        // TOML to JavascriptObject.
 	                        try {
 	                            if (a) {
-	                                console.log('before:', a);
 	                                a = _toml2.default.parse(a);
-	                                console.log('after:', a);
 	                            } else {
 	                                a = {};
 	                            }
@@ -11774,16 +11784,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        }
 	
 	                        var color = data.colors[i];
-	                        var isPrimary = i === data.primary;
-	                        var visible = data.visibilities[i];
 	
-	                        if (visible) {
-	                            return _createContainerFromJson(a, color, isPrimary);
-	                        }
+	                        return _createContainerFromJson(a, color, isPrimary);
 	                    }).filter(function (c) {
 	                        return c;
 	                    });
 	
+	                    containers = currentContainers.concat(containers);
 	                    _saveContainers(containers);
 	                    resolve(true);
 	                });
