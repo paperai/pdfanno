@@ -273,56 +273,58 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	
 	    // Setup behavior.
-	    $('.js-anno-palette').off('change').on('change', displayAnnotation);
+	    $('.js-anno-palette').off('change').on('change', displayAnnotation.bind(false));
 	}
 	
 	/**
 	 * Load annotation data and display.
 	 */
-	function displayAnnotation(e) {
+	function displayAnnotation(isPrimary) {
 	
 	    var annotations = [];
 	    var colors = [];
-	    var visibilities = [];
 	    var primaryIndex = -1;
 	
 	    // Primary annotation.
-	    $('#dropdownAnnoPrimary a').each(function (index, element) {
-	        var $elm = $(element);
-	        if ($elm.find('.fa-check').hasClass('no-visible') === false) {
-	            var annoPath = $elm.find('.js-annoname').text();
-	            if (!fileMap[annoPath]) {
-	                console.log('ERROR');
-	                return;
-	            }
-	            primaryIndex = 0;
-	            annotations.push(fileMap[annoPath]);
-	            visibilities.push(true);
-	            var color = null; // Use the default color used for edit.
-	            colors.push(color);
+	    if (isPrimary) {
+	        $('#dropdownAnnoPrimary a').each(function (index, element) {
+	            var $elm = $(element);
+	            if ($elm.find('.fa-check').hasClass('no-visible') === false) {
+	                var annoPath = $elm.find('.js-annoname').text();
+	                if (!fileMap[annoPath]) {
+	                    console.log('ERROR');
+	                    return;
+	                }
+	                primaryIndex = 0;
+	                annotations.push(fileMap[annoPath]);
+	                var color = null; // Use the default color used for edit.
+	                colors.push(color);
 	
-	            var filename = annoPath.split('/')[annoPath.split('/').length - 1];
-	            localStorage.setItem('_pdfanno_primary_annoname', filename);
-	            console.log('filename:', filename);
-	        }
-	    });
+	                var filename = annoPath.split('/')[annoPath.split('/').length - 1];
+	                localStorage.setItem('_pdfanno_primary_annoname', filename);
+	                console.log('filename:', filename);
+	            }
+	        });
+	    }
 	
 	    // Reference annotations.
-	    $('#dropdownAnnoReference a').each(function (index, element) {
-	        var $elm = $(element);
-	        if ($elm.find('.fa-check').hasClass('no-visible') === false) {
-	            var annoPath = $elm.find('.js-annoname').text();
-	            if (!fileMap[annoPath]) {
-	                console.log('ERROR');
-	                return;
+	    if (!isPrimary) {
+	        $('#dropdownAnnoReference a').each(function (index, element) {
+	            var $elm = $(element);
+	            if ($elm.find('.fa-check').hasClass('no-visible') === false) {
+	                var annoPath = $elm.find('.js-annoname').text();
+	                if (!fileMap[annoPath]) {
+	                    console.log('ERROR');
+	                    return;
+	                }
+	                annotations.push(fileMap[annoPath]);
+	                var color = $elm.find('.js-anno-palette').spectrum('get').toHexString();
+	                console.log(color);
+	                colors.push(color);
 	            }
-	            annotations.push(fileMap[annoPath]);
-	            visibilities.push(true);
-	            var color = $elm.find('.js-anno-palette').spectrum('get').toHexString();
-	            console.log(color);
-	            colors.push(color);
-	        }
-	    });
+	        });
+	    }
+	
 	    console.log('annotations:', annotations);
 	    console.log('colors:', colors);
 	
@@ -333,13 +335,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Create import data.
 	    var paperData = {
 	        primary: primaryIndex,
-	        visibilities: visibilities,
 	        colors: colors,
 	        annotations: annotations
 	    };
 	
 	    // Pass the data to pdf-annotatejs.
-	    window.iframeWindow.PDFAnnoCore.getStoreAdapter().importAnnotations(paperData).then(function (result) {
+	    window.iframeWindow.PDFAnnoCore.getStoreAdapter().importAnnotations(paperData, isPrimary).then(function (result) {
 	
 	        // Reload the viewer.
 	        reloadPDFViewer();
@@ -540,7 +541,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        // reload.
-	        displayAnnotation();
+	        displayAnnotation(true);
 	
 	        // Close
 	        $('#dropdownAnnoPrimary').click();
@@ -573,7 +574,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            $('#dropdownAnnoReference .js-text').text('Select reference Anno files');
 	        }
 	
-	        displayAnnotation();
+	        displayAnnotation(false);
 	
 	        return false;
 	    });

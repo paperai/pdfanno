@@ -145,10 +145,10 @@ export default class StoreAdapter {
    *
    * @param {Object} data - the data for import formatted as json.
    */
-  __importAnnotations(data) { abstractFunction('importAnnotations'); }
+  __importAnnotations(data, isPrimary) { abstractFunction('importAnnotations'); }
   get importAnnotations() { return this.__importAnnotations; }
   set importAnnotations(fn) {
-    this.__importAnnotations = function importAnnotations(json) {
+    this.__importAnnotations = function importAnnotations(json, isPrimary) {
       return fn(...arguments);
     }
   }
