@@ -175,38 +175,44 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                 });
             },
 
-            importAnnotations(data) {
+            importAnnotations(data, isPrimary) {
                 return new Promise((resolve, reject) => {
 
-                    console.log('importAnnotations:', data);
+                    // console.log('importAnnotations:', data);
+
+                    let currentContainers = _getContainers().filter(c => {
+
+                        // Remove the primary annotations when importing a new primary ones.
+                        if (isPrimary) {
+                            return !c.isPrimary;
+
+                        // Otherwise, remove reference annotations.
+                        } else {
+                            return c.isPrimary;
+                        }
+                    });
+
 
                     let containers = data.annotations.map((a, i) => {
 
                         // TOML to JavascriptObject.
                         try {
                             if (a) {
-                                console.log('before:', a);
                                 a = toml.parse(a);
-                                console.log('after:', a);
                             } else {
                                 a = {};
                             }
-
-
                         } catch (e) {
                             console.log('ERROR:', e);
                         }
 
                         let color = data.colors[i];
-                        let isPrimary = (i === data.primary);
-                        let visible = data.visibilities[i];
 
-                        if (visible) {
-                            return _createContainerFromJson(a, color, isPrimary);
-                        }
+                        return _createContainerFromJson(a, color, isPrimary);
 
                     }).filter(c => c);
 
+                    containers = currentContainers.concat(containers);
                     _saveContainers(containers);
                     resolve(true);
                 });

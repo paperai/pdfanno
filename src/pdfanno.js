@@ -228,56 +228,58 @@ function setupColorPicker() {
     });
 
     // Setup behavior.
-    $('.js-anno-palette').off('change').on('change', displayAnnotation);
+    $('.js-anno-palette').off('change').on('change', displayAnnotation.bind(false));
 }
 
 /**
  * Load annotation data and display.
  */
-function displayAnnotation(e) {
+function displayAnnotation(isPrimary) {
 
     let annotations = [];
     let colors = [];
-    let visibilities = [];
     let primaryIndex = -1;
 
     // Primary annotation.
-    $('#dropdownAnnoPrimary a').each((index, element) => {
-        let $elm = $(element);
-        if ($elm.find('.fa-check').hasClass('no-visible') === false) {
-            let annoPath = $elm.find('.js-annoname').text();
-            if (!fileMap[annoPath]) {
-                console.log('ERROR');
-                return;
-            }
-            primaryIndex = 0;
-            annotations.push(fileMap[annoPath]);
-            visibilities.push(true);
-            let color = null; // Use the default color used for edit.
-            colors.push(color);
+    if (isPrimary) {
+        $('#dropdownAnnoPrimary a').each((index, element) => {
+            let $elm = $(element);
+            if ($elm.find('.fa-check').hasClass('no-visible') === false) {
+                let annoPath = $elm.find('.js-annoname').text();
+                if (!fileMap[annoPath]) {
+                    console.log('ERROR');
+                    return;
+                }
+                primaryIndex = 0;
+                annotations.push(fileMap[annoPath]);
+                let color = null; // Use the default color used for edit.
+                colors.push(color);
 
-            let filename = annoPath.split('/')[annoPath.split('/').length - 1];
-            localStorage.setItem('_pdfanno_primary_annoname', filename);
-            console.log('filename:', filename);
-        }
-    });
+                let filename = annoPath.split('/')[annoPath.split('/').length - 1];
+                localStorage.setItem('_pdfanno_primary_annoname', filename);
+                console.log('filename:', filename);
+            }
+        });
+    }
 
     // Reference annotations.
-    $('#dropdownAnnoReference a').each((index, element) => {
-        let $elm = $(element);
-        if ($elm.find('.fa-check').hasClass('no-visible') === false) {
-            let annoPath = $elm.find('.js-annoname').text();
-            if (!fileMap[annoPath]) {
-                console.log('ERROR');
-                return;
+    if (!isPrimary) {
+        $('#dropdownAnnoReference a').each((index, element) => {
+            let $elm = $(element);
+            if ($elm.find('.fa-check').hasClass('no-visible') === false) {
+                let annoPath = $elm.find('.js-annoname').text();
+                if (!fileMap[annoPath]) {
+                    console.log('ERROR');
+                    return;
+                }
+                annotations.push(fileMap[annoPath]);
+                let color = $elm.find('.js-anno-palette').spectrum('get').toHexString();
+                console.log(color);
+                colors.push(color);
             }
-            annotations.push(fileMap[annoPath]);
-            visibilities.push(true);
-            let color = $elm.find('.js-anno-palette').spectrum('get').toHexString();
-            console.log(color);
-            colors.push(color);
-        }
-    });
+        });
+    }
+
     console.log('annotations:', annotations);
     console.log('colors:', colors);
 
@@ -288,13 +290,12 @@ function displayAnnotation(e) {
     // Create import data.
     let paperData = {
         primary : primaryIndex,
-        visibilities,
         colors,
         annotations
     };
 
     // Pass the data to pdf-annotatejs.
-    window.iframeWindow.PDFAnnoCore.getStoreAdapter().importAnnotations(paperData).then(result => {
+    window.iframeWindow.PDFAnnoCore.getStoreAdapter().importAnnotations(paperData, isPrimary).then(result => {
 
         // Reload the viewer.
         reloadPDFViewer();
@@ -520,7 +521,7 @@ function setupPrimaryAnnoDropdown() {
         }
 
         // reload.
-        displayAnnotation();
+        displayAnnotation(true);
 
         // Close
         $('#dropdownAnnoPrimary').click();
@@ -553,7 +554,7 @@ function setupReferenceAnnoDropdown() {
             $('#dropdownAnnoReference .js-text').text('Select reference Anno files');
         }
 
-        displayAnnotation();
+        displayAnnotation(false);
 
         return false;
 
