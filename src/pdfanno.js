@@ -162,47 +162,6 @@ function deleteAllAnnotations() {
 }
 
 /**
- * Check the filename which user dropped in.
- */
-function checkFileCompatibility(fileName, ext) {
-    let fragments = fileName.split('.');
-    if (fragments.length < 2) {
-        return false;
-    }
-    return fragments[1].toLowerCase() === ext;
-}
-
-/**
- * Load user's pdf file.
- */
-function handleDroppedFile(file) {
-
-    // Confirm dialog.
-    let userAnswer = window.confirm('Are you sure to load a new pdf file? Please save your current annotations.');
-    if (!userAnswer) {
-        return;
-    }
-
-    let fileName = file.name;
-
-    // Check compatibility.
-    if (!checkFileCompatibility(fileName, 'pdf')) {
-        return alert(`FILE NOT COMPATIBLE. "*.pdf" can be loaded.\n actual = "${fileName}".`);
-    }
-
-    // Load pdf data, and reload.
-    let fileReader = new FileReader();
-    fileReader.onload = event => {
-        let data = event.target.result;
-        localStorage.setItem('_pdfanno_pdf', data);
-        localStorage.setItem('_pdfanno_pdfname', fileName);
-
-        reloadPDFViewer();
-    }
-    fileReader.readAsDataURL(file);
-}
-
-/**
  * Setup the color pickers.
  */
 function setupColorPicker() {
@@ -279,13 +238,6 @@ function displayAnnotation(isPrimary) {
             }
         });
     }
-
-    console.log('annotations:', annotations);
-    console.log('colors:', colors);
-
-    // if (annotations.length === 0) {
-    //     return;
-    // }
 
     // Create import data.
     let paperData = {
@@ -593,11 +545,6 @@ function startApplication() {
     iframeWindow.addEventListener('annotationrendered', () => {
         window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
         window.iframeWindow.PDFAnnoCore.UI.enableViewMode();
-    });
-
-    // Handle the pdf user dropped in.
-    iframeWindow.addEventListener('pdfdropped', ev => {
-        handleDroppedFile(ev.detail.file);
     });
 
     // Set the confirm dialog at page leaving.
