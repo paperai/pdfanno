@@ -283,9 +283,9 @@ function displayAnnotation(isPrimary) {
     console.log('annotations:', annotations);
     console.log('colors:', colors);
 
-    if (annotations.length === 0) {
-        return;
-    }
+    // if (annotations.length === 0) {
+    //     return;
+    // }
 
     // Create import data.
     let paperData = {
