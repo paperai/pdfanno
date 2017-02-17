@@ -187,7 +187,7 @@ function setupColorPicker() {
     });
 
     // Setup behavior.
-    $('.js-anno-palette').off('change').on('change', displayAnnotation.bind(false));
+    $('.js-anno-palette').off('change').on('change', displayAnnotation.bind(null, false));
 }
 
 /**
@@ -238,6 +238,8 @@ function displayAnnotation(isPrimary) {
             }
         });
     }
+
+    console.log('colors:', colors);
 
     // Create import data.
     let paperData = {
