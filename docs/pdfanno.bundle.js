@@ -213,47 +213,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	/**
-	 * Check the filename which user dropped in.
-	 */
-	function checkFileCompatibility(fileName, ext) {
-	    var fragments = fileName.split('.');
-	    if (fragments.length < 2) {
-	        return false;
-	    }
-	    return fragments[1].toLowerCase() === ext;
-	}
-	
-	/**
-	 * Load user's pdf file.
-	 */
-	function handleDroppedFile(file) {
-	
-	    // Confirm dialog.
-	    var userAnswer = window.confirm('Are you sure to load a new pdf file? Please save your current annotations.');
-	    if (!userAnswer) {
-	        return;
-	    }
-	
-	    var fileName = file.name;
-	
-	    // Check compatibility.
-	    if (!checkFileCompatibility(fileName, 'pdf')) {
-	        return alert("FILE NOT COMPATIBLE. \"*.pdf\" can be loaded.\n actual = \"" + fileName + "\".");
-	    }
-	
-	    // Load pdf data, and reload.
-	    var fileReader = new FileReader();
-	    fileReader.onload = function (event) {
-	        var data = event.target.result;
-	        localStorage.setItem('_pdfanno_pdf', data);
-	        localStorage.setItem('_pdfanno_pdfname', fileName);
-	
-	        reloadPDFViewer();
-	    };
-	    fileReader.readAsDataURL(file);
-	}
-	
-	/**
 	 * Setup the color pickers.
 	 */
 	function setupColorPicker() {
@@ -273,7 +232,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	
 	    // Setup behavior.
-	    $('.js-anno-palette').off('change').on('change', displayAnnotation.bind(false));
+	    $('.js-anno-palette').off('change').on('change', displayAnnotation.bind(null, false));
 	}
 	
 	/**
@@ -325,12 +284,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 	    }
 	
-	    console.log('annotations:', annotations);
 	    console.log('colors:', colors);
-	
-	    // if (annotations.length === 0) {
-	    //     return;
-	    // }
 	
 	    // Create import data.
 	    var paperData = {
@@ -612,11 +566,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    iframeWindow.addEventListener('annotationrendered', function () {
 	        window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
 	        window.iframeWindow.PDFAnnoCore.UI.enableViewMode();
-	    });
-	
-	    // Handle the pdf user dropped in.
-	    iframeWindow.addEventListener('pdfdropped', function (ev) {
-	        handleDroppedFile(ev.detail.file);
 	    });
 	
 	    // Set the confirm dialog at page leaving.

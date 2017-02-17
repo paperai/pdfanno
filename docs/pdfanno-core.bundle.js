@@ -138,9 +138,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	function removeAnnoLayer() {
 	    console.log('removeAnnoLayer');
 	    (0, _jquery2.default)('#annoLayer, #tmpLayer').remove();
-	    // annotationContainer.getAllAnnotations().forEach(a => {
-	    //     a.destory();
-	    // });
 	}
 	
 	/*
@@ -250,38 +247,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            window.dispatchEvent(event);
 	        });
 	    });
-	}
-	
-	function setupPDFDragAndDropLoader() {
-	    (0, _jquery2.default)('body').off('dragover', handleDragOver).on('dragover', handleDragOver).off('drop', handleDroppedFile).on('drop', handleDroppedFile);
-	}
-	setupPDFDragAndDropLoader();
-	
-	function handleDroppedFile(e) {
-	
-	    // console.log('aaa', e.originalEvent.dataTransfer.files[0]);
-	    var file = e.originalEvent.dataTransfer.files[0];
-	
-	    var event = document.createEvent('CustomEvent');
-	    // event.initCustomEvent('pdfdropped', true, true, { originalEvent: e.originalEvent });
-	    event.initCustomEvent('pdfdropped', true, true, { file: file });
-	    window.dispatchEvent(event);
-	
-	    return cancelEvent(e);
-	}
-	
-	function handleDragOver(e) {
-	    // This is the setting to allow D&D for Firefox.
-	    // @see https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/effectAllowed
-	    e.originalEvent.dataTransfer.effectAllowed = 'move';
-	    // Prevent default.
-	    return cancelEvent(e);
-	}
-	
-	// Cancel handler
-	function cancelEvent(e) {
-	    e.preventDefault();
-	    return false;
 	}
 	module.exports = exports['default'];
 
