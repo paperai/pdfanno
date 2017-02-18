@@ -403,6 +403,13 @@ function setupPdfDropdown() {
             return;
         }
 
+        // Confirm to override.
+        if (currentPDFName !== 'Select PDF file') {
+            if (!window.confirm('Are you sure to load another PDF ?')) {
+                return;
+            }
+        }
+
         $('#dropdownPdf .js-text').text(pdfPath);
 
         $('#dropdownPdf .fa-check').addClass('no-visible');
@@ -482,6 +489,14 @@ function setupPrimaryAnnoDropdown() {
             console.log('Not reload. the anno are same.');
             return;
         }
+
+        // Confirm to override.
+        if (currentAnnoName !== 'Select Anno file') {
+            if (!window.confirm('Are you sure to load another Primary Annotation ?')) {
+                return;
+            }
+        }
+
 
         $('#dropdownAnnoPrimary .js-text').text(annoName);
         console.log(annoName);
