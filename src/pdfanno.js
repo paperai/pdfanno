@@ -396,8 +396,14 @@ function setupPdfDropdown() {
 
         let $this = $(e.currentTarget);
         let pdfPath = $this.find('.js-pdfname').text();
+
+        let currentPDFName = $('#dropdownPdf .js-text').text();
+        if (currentPDFName === pdfPath) {
+            console.log('Not reload. the pdf are same.');
+            return;
+        }
+
         $('#dropdownPdf .js-text').text(pdfPath);
-        console.log(pdfPath);
 
         $('#dropdownPdf .fa-check').addClass('no-visible');
         $this.find('.fa-check').removeClass('no-visible');
@@ -469,14 +475,21 @@ function setupPrimaryAnnoDropdown() {
     $('#dropdownAnnoPrimary').on('click', 'a', e => {
 
         let $this = $(e.currentTarget);
-        let pdfPath = $this.find('.js-annoname').text();
-        $('#dropdownAnnoPrimary .js-text').text(pdfPath);
-        console.log(pdfPath);
+        let annoName = $this.find('.js-annoname').text();
+
+        let currentAnnoName = $('#dropdownAnnoPrimary .js-text').text();
+        if (currentAnnoName === annoName) {
+            console.log('Not reload. the anno are same.');
+            return;
+        }
+
+        $('#dropdownAnnoPrimary .js-text').text(annoName);
+        console.log(annoName);
 
         $('#dropdownAnnoPrimary .fa-check').addClass('no-visible');
         $this.find('.fa-check').removeClass('no-visible');
 
-        if (!fileMap[pdfPath]) {
+        if (!fileMap[annoName]) {
             return false;
         }
 
