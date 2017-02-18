@@ -353,6 +353,12 @@ function setupBrowseButton() {
         // Clear anno dropdowns.
         clearAnnotationDropdowns();
 
+        // Initialize PDF Viewer.
+        clearAllAnnotations();
+        localStorage.removeItem('_pdfanno_pdf');
+        localStorage.removeItem('_pdfanno_pdfname');
+        reloadPDFViewer();
+
         fileMap = {};
 
         // Load pdfs.
