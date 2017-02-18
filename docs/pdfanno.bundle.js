@@ -390,6 +390,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // Clear anno dropdowns.
 	        clearAnnotationDropdowns();
 	
+	        // Initialize PDF Viewer.
+	        clearAllAnnotations();
+	        localStorage.removeItem('_pdfanno_pdf');
+	        localStorage.removeItem('_pdfanno_pdfname');
+	        reloadPDFViewer();
+	
 	        fileMap = {};
 	
 	        // Load pdfs.
@@ -425,8 +431,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var $this = $(e.currentTarget);
 	        var pdfPath = $this.find('.js-pdfname').text();
+	
+	        var currentPDFName = $('#dropdownPdf .js-text').text();
+	        if (currentPDFName === pdfPath) {
+	            console.log('Not reload. the pdf are same.');
+	            return;
+	        }
+	
+	        // Confirm to override.
+	        if (currentPDFName !== 'Select PDF file') {
+	            if (!window.confirm('Are you sure to load another PDF ?')) {
+	                return;
+	            }
+	        }
+	
 	        $('#dropdownPdf .js-text').text(pdfPath);
-	        console.log(pdfPath);
 	
 	        $('#dropdownPdf .fa-check').addClass('no-visible');
 	        $this.find('.fa-check').removeClass('no-visible');
@@ -483,14 +502,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	    $('#dropdownAnnoPrimary').on('click', 'a', function (e) {
 	
 	        var $this = $(e.currentTarget);
-	        var pdfPath = $this.find('.js-annoname').text();
-	        $('#dropdownAnnoPrimary .js-text').text(pdfPath);
-	        console.log(pdfPath);
+	        var annoName = $this.find('.js-annoname').text();
+	
+	        var currentAnnoName = $('#dropdownAnnoPrimary .js-text').text();
+	        if (currentAnnoName === annoName) {
+	            console.log('Not reload. the anno are same.');
+	            return;
+	        }
+	
+	        // Confirm to override.
+	        if (currentAnnoName !== 'Select Anno file') {
+	            if (!window.confirm('Are you sure to load another Primary Annotation ?')) {
+	                return;
+	            }
+	        }
+	
+	        $('#dropdownAnnoPrimary .js-text').text(annoName);
+	        console.log(annoName);
 	
 	        $('#dropdownAnnoPrimary .fa-check').addClass('no-visible');
 	        $this.find('.fa-check').removeClass('no-visible');
 	
-	        if (!fileMap[pdfPath]) {
+	        if (!fileMap[annoName]) {
 	            return false;
 	        }
 	
