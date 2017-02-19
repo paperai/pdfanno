@@ -571,8 +571,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Clear the all annotations from the view and storage.
 	 */
 	function clearAllAnnotations() {
-	    var LOCALSTORAGE_KEY2 = '_pdfanno_containers';
-	    localStorage.removeItem(LOCALSTORAGE_KEY2);
+	    localStorage.removeItem('_pdfanno_containers');
+	    localStorage.removeItem('_pdfanno_primary_annoname');
 	}
 	
 	/**

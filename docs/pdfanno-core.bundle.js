@@ -11546,8 +11546,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -11682,12 +11680,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                return [rectangle.x, rectangle.y, rectangle.width, rectangle.height];
 	                            });
 	
+	                            var text = (annotation.selectedText || '').replace(/\r\n/g, ' ').replace(/\r/g, ' ').replace(/\n/g, ' ');
+	
 	                            var _key = '' + index++;
 	                            dataExport[_key] = {
 	                                type: 'span',
-	                                page: annotation.rectangles[0].page, // TODO move page number to annotation.
+	                                page: annotation.rectangles[0].page,
 	                                position: rectangles,
-	                                label: annotation.text || ''
+	                                label: annotation.text || '',
+	                                text: text
 	                            };
 	
 	                            // save tmporary for arrow.
@@ -11825,12 +11826,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                class: 'Annotation',
 	                type: 'area',
 	                uuid: (0, _uuid2.default)(),
-	                // page     : data[0],
 	                page: data.page,
-	                // x            : data[1],
-	                // y            : data[2],
-	                // width    : data[3],
-	                // height : data[4],
 	                x: data.position[0],
 	                y: data.position[1],
 	                width: data.position[2],
@@ -11842,7 +11838,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            });
 	
 	            // Highlight.
-	            // } else if (key.indexOf('span') === 0) {
 	        } else if (data.type === 'span') {
 	            // rectangles.
 	            var rectangles = data.position.map(function (d) {
@@ -11854,17 +11849,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    height: d[3]
 	                };
 	            });
-	            annotations.push(_defineProperty({
+	            annotations.push({
 	                class: 'Annotation',
 	                type: 'highlight',
 	                uuid: (0, _uuid2.default)(),
 	                page: data.page,
-	                color: '#FFFF00', // TODO なくてもOK？
 	                rectangles: rectangles,
 	                text: data.label,
+	                selectedText: data.text,
 	                key: key, // tmp for arrow.
-	                readOnly: readOnly
-	            }, 'color', color));
+	                readOnly: readOnly,
+	                color: color
+	            });
 	
 	            // Arrow.
 	            // } else if (key.indexOf('rel') === 0) {
@@ -19905,13 +19901,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var selection = window.getSelection();
 	    var range = selection.getRangeAt(0);
 	    var rects = range.getClientRects();
+	    var selectedText = selection.toString();
 	
 	    if (rects.length > 0 && rects[0].width > 0 && rects[0].height > 0) {
-	      return rects;
+	      return { rects: rects, selectedText: selectedText };
 	    }
 	  } catch (e) {}
 	
-	  return null;
+	  return { rects: null, selectedText: null };
 	}
 	
 	/**
@@ -19920,8 +19917,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {Event} e The DOM event to handle
 	 */
 	function handleDocumentMouseup(e) {
+	  var _getSelectionRects = getSelectionRects(),
+	      rects = _getSelectionRects.rects,
+	      selectedText = _getSelectionRects.selectedText;
 	
-	  var rects = getSelectionRects();
 	  if (rects) {
 	    var svg = (0, _utils.getSVGLayer)();
 	    saveRect([].concat(_toConsumableArray(rects)).map(function (r) {
@@ -19931,7 +19930,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        width: r.width,
 	        height: r.height
 	      };
-	    }));
+	    }), selectedText);
 	  }
 	
 	  console.log('handleDocumentMouseup:', rects);
@@ -19954,7 +19953,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {Array} rects The rects to use for annotation
 	 * @param {String} color The color of the rects
 	 */
-	function saveRect(rects) {
+	function saveRect(rects, selectedText) {
 	
 	  var svg = (0, _utils.getSVGLayer)();
 	  var boundingRect = svg.getBoundingClientRect();
@@ -19970,7 +19969,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	    }).filter(function (r) {
 	      return r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1;
-	    })
+	    }),
+	    selectedText: selectedText
 	  };
 	
 	  // Save.
@@ -20144,7 +20144,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                rectangles: this.rectangles,
 	                text: this.text,
 	                color: this.color,
-	                readyOnly: this.readOnly
+	                readyOnly: this.readOnly,
+	                selectedText: this.selectedText
 	            };
 	        }
 	
@@ -20321,6 +20322,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            a.text = annotation.text;
 	            a.color = annotation.color;
 	            a.readOnly = annotation.readOnly || false;
+	            a.selectedText = annotation.selectedText;
 	            return a;
 	        }
 	    }]);
