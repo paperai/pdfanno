@@ -139,7 +139,12 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                                 ];
                             });
 
-                            let text = (annotation.selectedText || '').replace(/\r\n/g, ' ').replace(/\r/g, ' ').replace(/\n/g, ' ');
+                            let text = (annotation.selectedText || '')
+                                        .replace(/\r\n/g, ' ')
+                                        .replace(/\r/g, ' ')
+                                        .replace(/\n/g, ' ')
+                                        .replace(/"/g, '')
+                                        .replace(/\\/g, '');
 
                             let key = `${index++}`;
                             dataExport[key] = {
