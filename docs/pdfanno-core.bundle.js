@@ -11680,7 +11680,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                return [rectangle.x, rectangle.y, rectangle.width, rectangle.height];
 	                            });
 	
-	                            var text = (annotation.selectedText || '').replace(/\r\n/g, ' ').replace(/\r/g, ' ').replace(/\n/g, ' ');
+	                            var text = (annotation.selectedText || '').replace(/\r\n/g, ' ').replace(/\r/g, ' ').replace(/\n/g, ' ').replace(/"/g, '').replace(/\\/g, '');
 	
 	                            var _key = '' + index++;
 	                            dataExport[_key] = {
