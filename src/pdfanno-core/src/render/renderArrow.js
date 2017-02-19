@@ -1,6 +1,6 @@
 import setAttributes from '../utils/setAttributes';
 import normalizeColor from '../utils/normalizeColor';
-import renderCircle from './renderCircle';
+import renderCircle, { DEFAULT_RADIUS } from './renderCircle';
 import { findBezierControlPoint } from '../utils/relation.js';
 
 let arrowSecondaryColor = ['green', 'blue', 'purple'];
@@ -28,6 +28,14 @@ export function createArrow(a, id=null) {
       color = '#F00';
     }
   }
+
+  // Adjust the start/end points.
+  let theta = Math.atan((a.y1-a.y2) / (a.x1-a.x2));
+  let sign = (a.x1 < a.x2 ? 1 : -1);
+  a.x1 += DEFAULT_RADIUS * Math.cos(theta) * sign;
+  a.x2 -= DEFAULT_RADIUS * Math.cos(theta) * sign;
+  a.y1 += DEFAULT_RADIUS * Math.sin(theta) * sign;
+  a.y2 -= DEFAULT_RADIUS * Math.sin(theta) * sign;
 
 
 // <svg viewBox="0 0 200 200">

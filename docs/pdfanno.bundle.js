@@ -142,6 +142,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	    $('.js-tool-btn[data-type="view"]').click();
 	}
 	
+	function _getDownloadFileName() {
+	
+	    // The name of Primary Annotation.
+	    var primaryAnnotationName = void 0;
+	    $('#dropdownAnnoPrimary a').each(function (index, element) {
+	        var $elm = $(element);
+	        if ($elm.find('.fa-check').hasClass('no-visible') === false) {
+	            primaryAnnotationName = $elm.find('.js-annoname').text();
+	        }
+	    });
+	    if (primaryAnnotationName) {
+	        return primaryAnnotationName;
+	    }
+	
+	    // The name of PDF.
+	    var pdfFileName = iframeWindow.getFileName(iframeWindow.PDFView.url);
+	    return pdfFileName.split('.')[0] + '.anno';
+	}
+	
 	/**
 	 * Export the primary annotation data for download.
 	 */
@@ -152,12 +171,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var blobURL = window.URL.createObjectURL(blob);
 	        var a = document.createElement('a');
 	        document.body.appendChild(a); // for firefox working correctly.
-	        var fileName = iframeWindow.getFileName(iframeWindow.PDFView.url);
-	        fileName = fileName.split('.')[0] + '.anno';
-	        if (localStorage.getItem('_pdfanno_primary_annoname')) {
-	            fileName = localStorage.getItem('_pdfanno_primary_annoname');
-	        }
-	        a.download = fileName;
+	        a.download = _getDownloadFileName();
 	        a.href = blobURL;
 	        a.click();
 	        a.parentNode.removeChild(a);
@@ -199,47 +213,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	/**
-	 * Check the filename which user dropped in.
-	 */
-	function checkFileCompatibility(fileName, ext) {
-	    var fragments = fileName.split('.');
-	    if (fragments.length < 2) {
-	        return false;
-	    }
-	    return fragments[1].toLowerCase() === ext;
-	}
-	
-	/**
-	 * Load user's pdf file.
-	 */
-	function handleDroppedFile(file) {
-	
-	    // Confirm dialog.
-	    var userAnswer = window.confirm('Are you sure to load a new pdf file? Please save your current annotations.');
-	    if (!userAnswer) {
-	        return;
-	    }
-	
-	    var fileName = file.name;
-	
-	    // Check compatibility.
-	    if (!checkFileCompatibility(fileName, 'pdf')) {
-	        return alert("FILE NOT COMPATIBLE. \"*.pdf\" can be loaded.\n actual = \"" + fileName + "\".");
-	    }
-	
-	    // Load pdf data, and reload.
-	    var fileReader = new FileReader();
-	    fileReader.onload = function (event) {
-	        var data = event.target.result;
-	        localStorage.setItem('_pdfanno_pdf', data);
-	        localStorage.setItem('_pdfanno_pdfname', fileName);
-	
-	        reloadPDFViewer();
-	    };
-	    fileReader.readAsDataURL(file);
-	}
-	
-	/**
 	 * Setup the color pickers.
 	 */
 	function setupColorPicker() {
@@ -259,73 +232,69 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	
 	    // Setup behavior.
-	    $('.js-anno-palette').off('change').on('change', displayAnnotation);
+	    $('.js-anno-palette').off('change').on('change', displayAnnotation.bind(null, false));
 	}
 	
 	/**
 	 * Load annotation data and display.
 	 */
-	function displayAnnotation(e) {
+	function displayAnnotation(isPrimary) {
 	
 	    var annotations = [];
 	    var colors = [];
-	    var visibilities = [];
 	    var primaryIndex = -1;
 	
 	    // Primary annotation.
-	    $('#dropdownAnnoPrimary a').each(function (index, element) {
-	        var $elm = $(element);
-	        if ($elm.find('.fa-check').hasClass('no-visible') === false) {
-	            var annoPath = $elm.find('.js-annoname').text();
-	            if (!fileMap[annoPath]) {
-	                console.log('ERROR');
-	                return;
-	            }
-	            primaryIndex = 0;
-	            annotations.push(fileMap[annoPath]);
-	            visibilities.push(true);
-	            var color = '#FF0000';
-	            colors.push(color);
+	    if (isPrimary) {
+	        $('#dropdownAnnoPrimary a').each(function (index, element) {
+	            var $elm = $(element);
+	            if ($elm.find('.fa-check').hasClass('no-visible') === false) {
+	                var annoPath = $elm.find('.js-annoname').text();
+	                if (!fileMap[annoPath]) {
+	                    console.log('ERROR');
+	                    return;
+	                }
+	                primaryIndex = 0;
+	                annotations.push(fileMap[annoPath]);
+	                var color = null; // Use the default color used for edit.
+	                colors.push(color);
 	
-	            var filename = annoPath.split('/')[annoPath.split('/').length - 1];
-	            localStorage.setItem('_pdfanno_primary_annoname', filename);
-	            console.log('filename:', filename);
-	        }
-	    });
+	                var filename = annoPath.split('/')[annoPath.split('/').length - 1];
+	                localStorage.setItem('_pdfanno_primary_annoname', filename);
+	                console.log('filename:', filename);
+	            }
+	        });
+	    }
 	
 	    // Reference annotations.
-	    $('#dropdownAnnoReference a').each(function (index, element) {
-	        var $elm = $(element);
-	        if ($elm.find('.fa-check').hasClass('no-visible') === false) {
-	            var annoPath = $elm.find('.js-annoname').text();
-	            if (!fileMap[annoPath]) {
-	                console.log('ERROR');
-	                return;
+	    if (!isPrimary) {
+	        $('#dropdownAnnoReference a').each(function (index, element) {
+	            var $elm = $(element);
+	            if ($elm.find('.fa-check').hasClass('no-visible') === false) {
+	                var annoPath = $elm.find('.js-annoname').text();
+	                if (!fileMap[annoPath]) {
+	                    console.log('ERROR');
+	                    return;
+	                }
+	                annotations.push(fileMap[annoPath]);
+	                var color = $elm.find('.js-anno-palette').spectrum('get').toHexString();
+	                console.log(color);
+	                colors.push(color);
 	            }
-	            annotations.push(fileMap[annoPath]);
-	            visibilities.push(true);
-	            var color = $elm.find('.js-anno-palette').spectrum('get').toHexString();
-	            console.log(color);
-	            colors.push(color);
-	        }
-	    });
-	    console.log('annotations:', annotations);
-	    console.log('colors:', colors);
-	
-	    if (annotations.length === 0) {
-	        return;
+	        });
 	    }
+	
+	    console.log('colors:', colors);
 	
 	    // Create import data.
 	    var paperData = {
 	        primary: primaryIndex,
-	        visibilities: visibilities,
 	        colors: colors,
 	        annotations: annotations
 	    };
 	
 	    // Pass the data to pdf-annotatejs.
-	    window.iframeWindow.PDFAnnoCore.getStoreAdapter().importAnnotations(paperData).then(function (result) {
+	    window.iframeWindow.PDFAnnoCore.getStoreAdapter().importAnnotations(paperData, isPrimary).then(function (result) {
 	
 	        // Reload the viewer.
 	        reloadPDFViewer();
@@ -361,6 +330,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    $('#dropdownAnnoReference .js-text').text('Select reference Anno files');
 	}
 	
+	function _excludeBaseDirName(filePath) {
+	    var frgms = filePath.split('/');
+	    return frgms[frgms.length - 1];
+	}
+	
 	/**
 	 * Clear the dropdown of a PDF file.
 	 */
@@ -368,8 +342,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    $('.js-file :file').on('change', function (ev) {
 	
+	        console.log('Browse button starts to work.');
+	
 	        var files = ev.target.files;
 	        if (!files || files.length === 0) {
+	            console.log('ev.target.files', ev.target.files);
+	            console.log('Not files specified');
 	            return;
 	        }
 	
@@ -384,12 +362,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	                alert('Please select a directory, NOT a file');
 	                return;
 	            }
-	            var ext = relativePath.split('.')[1];
-	            if (!ext) {
+	
+	            var frgms = relativePath.split('/');
+	            if (frgms.length > 2) {
+	                console.log('SKIP:', relativePath);
 	                continue;
-	            } else if (ext.toLowerCase() === 'pdf') {
+	            }
+	            console.log('relativePath:', relativePath);
+	
+	            // Get files only PDFs or Anno files.
+	            if (relativePath.match(/\.pdf$/i)) {
 	                pdfs.push(file);
-	            } else if (ext.toLowerCase() === 'anno') {
+	            } else if (relativePath.match(/\.anno$/i)) {
 	                annos.push(file);
 	            }
 	        }
@@ -398,13 +382,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	        $('#dropdownPdf .js-text').text('Select PDF file');
 	        $('#dropdownPdf li').remove();
 	        pdfs.forEach(function (file) {
-	            var pdfPath = file.webkitRelativePath;
+	            var pdfPath = _excludeBaseDirName(file.webkitRelativePath);
 	            var snipet = "\n                <li>\n                    <a href=\"#\">\n                        <i class=\"fa fa-check no-visible\" aria-hidden=\"true\"></i>&nbsp;\n                        <span class=\"js-pdfname\">" + pdfPath + "</span>\n                    </a>\n                </li>\n            ";
 	            $('#dropdownPdf ul').append(snipet);
 	        });
 	
 	        // Clear anno dropdowns.
 	        clearAnnotationDropdowns();
+	
+	        // Initialize PDF Viewer.
+	        clearAllAnnotations();
+	        localStorage.removeItem('_pdfanno_pdf');
+	        localStorage.removeItem('_pdfanno_pdfname');
+	        reloadPDFViewer();
 	
 	        fileMap = {};
 	
@@ -413,7 +403,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var fileReader = new FileReader();
 	            fileReader.onload = function (event) {
 	                var pdf = event.target.result;
-	                fileMap[file.webkitRelativePath] = pdf;
+	                var fileName = _excludeBaseDirName(file.webkitRelativePath);
+	                fileMap[fileName] = pdf;
 	            };
 	            fileReader.readAsDataURL(file);
 	        });
@@ -423,7 +414,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var fileReader = new FileReader();
 	            fileReader.onload = function (event) {
 	                var annotation = event.target.result;
-	                fileMap[file.webkitRelativePath] = annotation;
+	                var fileName = _excludeBaseDirName(file.webkitRelativePath);
+	                fileMap[fileName] = annotation;
 	            };
 	            fileReader.readAsText(file);
 	        });
@@ -439,8 +431,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var $this = $(e.currentTarget);
 	        var pdfPath = $this.find('.js-pdfname').text();
+	
+	        var currentPDFName = $('#dropdownPdf .js-text').text();
+	        if (currentPDFName === pdfPath) {
+	            console.log('Not reload. the pdf are same.');
+	            return;
+	        }
+	
+	        // Confirm to override.
+	        if (currentPDFName !== 'Select PDF file') {
+	            if (!window.confirm('Are you sure to load another PDF ?')) {
+	                return;
+	            }
+	        }
+	
 	        $('#dropdownPdf .js-text').text(pdfPath);
-	        console.log(pdfPath);
 	
 	        $('#dropdownPdf .fa-check').addClass('no-visible');
 	        $this.find('.fa-check').removeClass('no-visible');
@@ -462,9 +467,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        clearAllAnnotations();
 	
 	        // Setup anno dropdown.
-	        var match = pdfPath.split('.')[0];
+	        var pdfName = pdfPath.replace(/\.pdf$/i, '');
 	        Object.keys(fileMap).forEach(function (filePath) {
-	            if (filePath.split('.')[1] === 'anno' && filePath.indexOf(match) === 0) {
+	
+	            if (!filePath.match(/\.anno$/i)) {
+	                return;
+	            }
+	
+	            if (filePath.indexOf(pdfName) === 0) {
 	
 	                var snipet1 = "\n                    <li>\n                        <a href=\"#\">\n                            <i class=\"fa fa-check no-visible\" aria-hidden=\"true\"></i>\n                            <span class=\"js-annoname\">" + filePath + "</span>\n                        </a>\n                    </li>\n                ";
 	                $('#dropdownAnnoPrimary ul').append(snipet1);
@@ -473,8 +483,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	                $('#dropdownAnnoReference ul').append(snipet2);
 	            }
 	        });
+	
 	        // Setup color pallets.
 	        setupColorPicker();
+	
+	        // Close dropdown.
+	        $('#dropdownPdf').click();
 	
 	        return false;
 	    });
@@ -488,19 +502,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	    $('#dropdownAnnoPrimary').on('click', 'a', function (e) {
 	
 	        var $this = $(e.currentTarget);
-	        var pdfPath = $this.find('.js-annoname').text();
-	        $('#dropdownAnnoPrimary .js-text').text(pdfPath);
-	        console.log(pdfPath);
+	        var annoName = $this.find('.js-annoname').text();
+	
+	        var currentAnnoName = $('#dropdownAnnoPrimary .js-text').text();
+	        if (currentAnnoName === annoName) {
+	            console.log('Not reload. the anno are same.');
+	            return;
+	        }
+	
+	        // Confirm to override.
+	        if (currentAnnoName !== 'Select Anno file') {
+	            if (!window.confirm('Are you sure to load another Primary Annotation ?')) {
+	                return;
+	            }
+	        }
+	
+	        $('#dropdownAnnoPrimary .js-text').text(annoName);
+	        console.log(annoName);
 	
 	        $('#dropdownAnnoPrimary .fa-check').addClass('no-visible');
 	        $this.find('.fa-check').removeClass('no-visible');
 	
-	        if (!fileMap[pdfPath]) {
+	        if (!fileMap[annoName]) {
 	            return false;
 	        }
 	
 	        // reload.
-	        displayAnnotation();
+	        displayAnnotation(true);
+	
+	        // Close
+	        $('#dropdownAnnoPrimary').click();
 	
 	        return false;
 	    });
@@ -524,9 +555,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	                annoNames.push($elm.find('.js-annoname').text());
 	            }
 	        });
-	        $('#dropdownAnnoReference .js-text').text(annoNames.join(','));
+	        if (annoNames.length > 0) {
+	            $('#dropdownAnnoReference .js-text').text(annoNames.join(','));
+	        } else {
+	            $('#dropdownAnnoReference .js-text').text('Select reference Anno files');
+	        }
 	
-	        displayAnnotation();
+	        displayAnnotation(false);
 	
 	        return false;
 	    });
@@ -564,11 +599,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    iframeWindow.addEventListener('annotationrendered', function () {
 	        window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
 	        window.iframeWindow.PDFAnnoCore.UI.enableViewMode();
-	    });
-	
-	    // Handle the pdf user dropped in.
-	    iframeWindow.addEventListener('pdfdropped', function (ev) {
-	        handleDroppedFile(ev.detail.file);
 	    });
 	
 	    // Set the confirm dialog at page leaving.

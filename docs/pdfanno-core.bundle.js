@@ -138,9 +138,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	function removeAnnoLayer() {
 	    console.log('removeAnnoLayer');
 	    (0, _jquery2.default)('#annoLayer, #tmpLayer').remove();
-	    // annotationContainer.getAllAnnotations().forEach(a => {
-	    //     a.destory();
-	    // });
 	}
 	
 	/*
@@ -250,38 +247,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            window.dispatchEvent(event);
 	        });
 	    });
-	}
-	
-	function setupPDFDragAndDropLoader() {
-	    (0, _jquery2.default)('body').off('dragover', handleDragOver).on('dragover', handleDragOver).off('drop', handleDroppedFile).on('drop', handleDroppedFile);
-	}
-	setupPDFDragAndDropLoader();
-	
-	function handleDroppedFile(e) {
-	
-	    // console.log('aaa', e.originalEvent.dataTransfer.files[0]);
-	    var file = e.originalEvent.dataTransfer.files[0];
-	
-	    var event = document.createEvent('CustomEvent');
-	    // event.initCustomEvent('pdfdropped', true, true, { originalEvent: e.originalEvent });
-	    event.initCustomEvent('pdfdropped', true, true, { file: file });
-	    window.dispatchEvent(event);
-	
-	    return cancelEvent(e);
-	}
-	
-	function handleDragOver(e) {
-	    // This is the setting to allow D&D for Firefox.
-	    // @see https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/effectAllowed
-	    e.originalEvent.dataTransfer.effectAllowed = 'move';
-	    // Prevent default.
-	    return cancelEvent(e);
-	}
-	
-	// Cancel handler
-	function cancelEvent(e) {
-	    e.preventDefault();
-	    return false;
 	}
 	module.exports = exports['default'];
 
@@ -11385,7 +11350,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     *
 	     * @param {Object} data - the data for import formatted as json.
 	     */
-	    value: function __importAnnotations(data) {
+	    value: function __importAnnotations(data, isPrimary) {
 	      (0, _abstractFunction2.default)('importAnnotations');
 	    }
 	  }, {
@@ -11495,7 +11460,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return this.__importAnnotations;
 	    },
 	    set: function set(fn) {
-	      this.__importAnnotations = function importAnnotations(json) {
+	      this.__importAnnotations = function importAnnotations(json, isPrimary) {
 	        return fn.apply(undefined, arguments);
 	      };
 	    }
@@ -11753,19 +11718,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    // resolve(dataExport);
 	                });
 	            },
-	            importAnnotations: function importAnnotations(data) {
+	            importAnnotations: function importAnnotations(data, isPrimary) {
 	                return new Promise(function (resolve, reject) {
 	
-	                    console.log('importAnnotations:', data);
+	                    // console.log('importAnnotations:', data);
+	
+	                    var currentContainers = _getContainers().filter(function (c) {
+	
+	                        // Remove the primary annotations when importing a new primary ones.
+	                        if (isPrimary) {
+	                            return !c.isPrimary;
+	
+	                            // Otherwise, remove reference annotations.
+	                        } else {
+	                            return c.isPrimary;
+	                        }
+	                    });
 	
 	                    var containers = data.annotations.map(function (a, i) {
 	
 	                        // TOML to JavascriptObject.
 	                        try {
 	                            if (a) {
-	                                console.log('before:', a);
 	                                a = _toml2.default.parse(a);
-	                                console.log('after:', a);
 	                            } else {
 	                                a = {};
 	                            }
@@ -11774,16 +11749,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        }
 	
 	                        var color = data.colors[i];
-	                        var isPrimary = i === data.primary;
-	                        var visible = data.visibilities[i];
 	
-	                        if (visible) {
-	                            return _createContainerFromJson(a, color, isPrimary);
-	                        }
+	                        return _createContainerFromJson(a, color, isPrimary);
 	                    }).filter(function (c) {
 	                        return c;
 	                    });
 	
+	                    containers = currentContainers.concat(containers);
 	                    _saveContainers(containers);
 	                    resolve(true);
 	                });
@@ -16577,7 +16549,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	module.exports = {
 		"name": "pdfanno",
-		"version": "0.0.1",
+		"version": "0.1.0",
 		"description": "",
 		"main": "index.js",
 		"scripts": {
@@ -17625,6 +17597,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	      color = '#F00';
 	    }
 	  }
+	
+	  // Adjust the start/end points.
+	  var theta = Math.atan((a.y1 - a.y2) / (a.x1 - a.x2));
+	  var sign = a.x1 < a.x2 ? 1 : -1;
+	  a.x1 += _renderCircle.DEFAULT_RADIUS * Math.cos(theta) * sign;
+	  a.x2 -= _renderCircle.DEFAULT_RADIUS * Math.cos(theta) * sign;
+	  a.y1 += _renderCircle.DEFAULT_RADIUS * Math.sin(theta) * sign;
+	  a.y2 -= _renderCircle.DEFAULT_RADIUS * Math.sin(theta) * sign;
 	
 	  // <svg viewBox="0 0 200 200">
 	  //     <marker id="m_ar" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="strokeWidth" preserveAspectRatio="none" markerWidth="2" markerHeight="3" orient="auto-start-reverse">
