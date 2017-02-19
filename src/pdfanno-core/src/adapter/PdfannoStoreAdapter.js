@@ -139,12 +139,15 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                                 ];
                             });
 
+                            let text = (annotation.selectedText || '').replace(/\r\n/g, ' ').replace(/\r/g, ' ').replace(/\n/g, ' ');
+
                             let key = `${index++}`;
                             dataExport[key] = {
-                                type : 'span',
-                                page : annotation.rectangles[0].page,    // TODO move page number to annotation.
+                                type     : 'span',
+                                page     : annotation.rectangles[0].page,
                                 position : rectangles,
-                                label : annotation.text || ''
+                                label    : annotation.text || '',
+                                text
                             };
 
                             // save tmporary for arrow.
@@ -276,12 +279,7 @@ function _createContainerFromJson(json, color, isPrimary) {
                     class    : 'Annotation',
                     type     : 'area',
                     uuid     : uuid(),
-                    // page     : data[0],
                     page     : data.page,
-                    // x            : data[1],
-                    // y            : data[2],
-                    // width    : data[3],
-                    // height : data[4],
                     x            : data.position[0],
                     y            : data.position[1],
                     width    : data.position[2],
@@ -293,7 +291,6 @@ function _createContainerFromJson(json, color, isPrimary) {
                 });
 
             // Highlight.
-            // } else if (key.indexOf('span') === 0) {
         } else if (data.type === 'span') {
                 // rectangles.
                 let rectangles = data.position.map(d => {
@@ -306,14 +303,14 @@ function _createContainerFromJson(json, color, isPrimary) {
                     }
                 });
                 annotations.push({
-                    class            : 'Annotation',
-                    type             : 'highlight',
-                    uuid             : uuid(),
-                    page             : data.page,
-                    color            : '#FFFF00',     // TODO なくてもOK？
+                    class        : 'Annotation',
+                    type         : 'highlight',
+                    uuid         : uuid(),
+                    page         : data.page,
                     rectangles,
-                    text             : data.label,
-                    key                : key,    // tmp for arrow.
+                    text         : data.label,
+                    selectedText : data.text,
+                    key          : key,    // tmp for arrow.
                     readOnly,
                     color
                 });

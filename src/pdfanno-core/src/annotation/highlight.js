@@ -37,12 +37,13 @@ export default class HighlightAnnotation extends AbstractAnnotation {
      * Create an instance from an annotation data.
      */
     static newInstance(annotation) {
-        let a        = new HighlightAnnotation();
-        a.uuid       = annotation.uuid || uuid();
-        a.rectangles = annotation.rectangles;
-        a.text       = annotation.text;
-        a.color      = annotation.color;
-        a.readOnly   = annotation.readOnly || false;
+        let a          = new HighlightAnnotation();
+        a.uuid         = annotation.uuid || uuid();
+        a.rectangles   = annotation.rectangles;
+        a.text         = annotation.text;
+        a.color        = annotation.color;
+        a.readOnly     = annotation.readOnly || false;
+        a.selectedText = annotation.selectedText;
         return a;
     }
 
@@ -72,12 +73,13 @@ export default class HighlightAnnotation extends AbstractAnnotation {
      */
     createAnnotation() {
         return {
-            uuid       : this.uuid,
-            type       : this.type,
-            rectangles : this.rectangles,
-            text       : this.text,
-            color      : this.color,
-            readyOnly  : this.readOnly
+            uuid         : this.uuid,
+            type         : this.type,
+            rectangles   : this.rectangles,
+            text         : this.text,
+            color        : this.color,
+            readyOnly    : this.readOnly,
+            selectedText : this.selectedText
         };
     }
 

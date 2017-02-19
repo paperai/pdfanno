@@ -24,14 +24,15 @@ function getSelectionRects() {
     let selection = window.getSelection();
     let range = selection.getRangeAt(0);
     let rects = range.getClientRects();
+    let selectedText = selection.toString();
 
     if (rects.length > 0 && rects[0].width > 0 && rects[0].height > 0) {
-      return rects;
+      return {rects, selectedText};
     }
 
   } catch (e) {}
 
-  return null;
+  return { rects : null, selectedText : null };
 }
 
 
@@ -42,7 +43,7 @@ function getSelectionRects() {
  */
 function handleDocumentMouseup(e) {
 
-  let rects = getSelectionRects();
+  let { rects, selectedText } = getSelectionRects();
   if (rects) {
     let svg = getSVGLayer();
     saveRect([...rects].map((r) => {
@@ -52,7 +53,7 @@ function handleDocumentMouseup(e) {
         width  : r.width,
         height : r.height
       };
-    }));
+    }), selectedText);
   }
 
   console.log('handleDocumentMouseup:', rects);
@@ -75,7 +76,7 @@ function removeSelection() {
  * @param {Array} rects The rects to use for annotation
  * @param {String} color The color of the rects
  */
-function saveRect(rects) {
+function saveRect(rects, selectedText) {
 
   let svg = getSVGLayer();
   let boundingRect = svg.getBoundingClientRect();
@@ -89,7 +90,8 @@ function saveRect(rects) {
         width  : r.width,
         height : r.height
       });
-    }).filter((r) => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1)
+    }).filter((r) => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1),
+    selectedText
   };
 
   // Save.
