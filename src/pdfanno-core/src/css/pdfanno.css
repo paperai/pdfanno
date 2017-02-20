@@ -67,6 +67,15 @@
 }
 
 /**
+ * Span.
+ */
+.anno-span {}
+.anno-span rect {
+    /* Enable the hover event on circles and text even if they are overwraped other spans. */
+    pointer-events: none;
+}
+
+/**
   Rect.
 */
 .anno-rect {
