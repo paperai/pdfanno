@@ -20,7 +20,8 @@ export default function renderHighlight(a, svg) {
   let group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   group.setAttribute('read-only', a.readOnly === true);
   group.setAttribute('data-text', a.text);
-  
+  group.classList.add('anno-span');
+
   a.rectangles.forEach((r) => {
     let rect = createRect(r);
     rect.setAttribute('fill-opacity', 0.2);
