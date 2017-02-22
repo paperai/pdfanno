@@ -162,6 +162,7 @@ export default class RectAnnotation extends AbstractAnnotation {
      * Save a new text.
      */
     handleTextChanged(newText) {
+        console.log('rect:handleTextChanged:', newText);
         this.text = newText;
         this.save();
     }
@@ -279,8 +280,6 @@ export default class RectAnnotation extends AbstractAnnotation {
      */
     enableViewMode() {
 
-        console.log('enableViewMode');
-
         super.enableViewMode();
 
         if (!this.readOnly) {
@@ -288,18 +287,14 @@ export default class RectAnnotation extends AbstractAnnotation {
                 .on('click', this.handleClickEvent)
                 .on('mousedown', this.handleMouseDownOnRect);
         }
-
-        console.log('enableViewMode2');
     }
 
     /**
      * Disable view mode.
      */
     disableViewMode() {
-        console.log('disableViewMode');
         super.disableViewMode();
         this.$element.find('.anno-rect, circle').off('click mousedown');
-        console.log('disableViewMode2');
     }
 
 }

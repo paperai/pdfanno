@@ -61,6 +61,8 @@ function resetAnnotationViewMode() {
  * Enable view mode.
  */
 export function enableViewMode() {
+    console.log('view:enableViewMode');
+
     disableViewMode();
 
     window.viewMode = true;
@@ -76,6 +78,7 @@ export function enableViewMode() {
  * Disable view mode.
  */
 export function disableViewMode() {
+    console.log('view:disableViewMode');
     window.viewMode = false;
     setComponenTranslucent(false);
     resetAnnotationViewMode();

@@ -58,6 +58,8 @@ export default class TextAnnotation extends AbstractAnnotation {
             if (this.textForceDisplay) {
                 this.$element.addClass('--visible');
             }
+        } else {
+            this.$element.remove();
         }
     }
 
@@ -146,21 +148,28 @@ export default class TextAnnotation extends AbstractAnnotation {
         pos.x += rect.left;
         pos.y += rect.top;
 
-        disableViewMode(); // TODO Refactoring.
+        // Disable the keyup event of BackSpace.
+        disableViewMode();
 
         addInputField(pos.x, pos.y, this.uuid, this.text, (text) => {
 
             console.log('callback:', text);
 
-            if (text) {
+            if (text || text === '') {
+                console.log('aaaaaaaaaaaaa', text);
                 this.text = text;
                 this.emit('textchanged', text);
-                this.enableViewMode();
             }
 
             this.render();
+            // this.enableViewMode();
 
-            enableViewMode(); // TODO Refactoring.
+            // Enable the keyup event of BackSpace.
+            enableViewMode();
+
+            if (!this.parent.readOnly) {
+                this.$element.find('text').off('click').on('click', this.handleClickEvent);
+            }
 
         });
 
@@ -174,6 +183,8 @@ export default class TextAnnotation extends AbstractAnnotation {
 
     enableViewMode() {
 
+        console.log('text:enableViewMode');
+
         super.enableViewMode();
         if (!this.parent.readOnly) {
             this.$element.find('text').off('click').on('click', this.handleClickEvent);
@@ -181,6 +192,9 @@ export default class TextAnnotation extends AbstractAnnotation {
     }
 
     disableViewMode() {
+
+        console.log('text:disableViewMode');
+
         super.disableViewMode();
         this.$element.find('text').off('click', this.handleClickEvent);
     }
