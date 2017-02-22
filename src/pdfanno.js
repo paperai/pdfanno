@@ -420,9 +420,13 @@ function setupPdfDropdown() {
         }
 
         // reload.
-        localStorage.setItem('_pdfanno_pdf', fileMap[pdfPath]);
+        // localStorage.setItem('_pdfanno_pdf', fileMap[pdfPath]);
         let fileName = pdfPath.split('/')[pdfPath.split('/').length - 1];
-        localStorage.setItem('_pdfanno_pdfname', fileName);
+        // localStorage.setItem('_pdfanno_pdfname', fileName);
+
+        window.pdf = fileMap[pdfPath];
+        window.pdfName = fileName;
+
         reloadPDFViewer();
 
         // Clear anno dropdowns.
