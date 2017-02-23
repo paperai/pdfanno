@@ -156,7 +156,6 @@ export default class TextAnnotation extends AbstractAnnotation {
             console.log('callback:', text);
 
             if (text || text === '') {
-                console.log('aaaaaaaaaaaaa', text);
                 this.text = text;
                 this.emit('textchanged', text);
             }

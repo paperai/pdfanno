@@ -121,7 +121,6 @@ function saveText() {
 
   let content = input.value.trim();
   if (!content) {
-    console.log('saveText: length 0');
     return closeInput('');
   }
 
