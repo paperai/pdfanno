@@ -121,7 +121,7 @@ function saveText() {
 
   let content = input.value.trim();
   if (!content) {
-    return closeInput();
+    return closeInput('');
   }
 
   let clientX = parseInt(input.style.left, 10);
@@ -158,7 +158,7 @@ function saveText() {
  * Close the input.
  * @param {Object} textAnnotation - the annotation registerd.
  */
-export function closeInput(textAnnotationOrText) {
+export function closeInput(text) {
 
   if (input) {
 
@@ -166,7 +166,7 @@ export function closeInput(textAnnotationOrText) {
     input = null;
 
     if (_finishCallback) {
-      _finishCallback(textAnnotationOrText);
+      _finishCallback(text);
     }
   }
 

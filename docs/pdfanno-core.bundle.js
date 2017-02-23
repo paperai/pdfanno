@@ -18759,7 +18759,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  var content = input.value.trim();
 	  if (!content) {
-	    return closeInput();
+	    return closeInput('');
 	  }
 	
 	  var clientX = parseInt(input.style.left, 10);
@@ -18797,7 +18797,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Close the input.
 	 * @param {Object} textAnnotation - the annotation registerd.
 	 */
-	function closeInput(textAnnotationOrText) {
+	function closeInput(text) {
 	
 	  if (input) {
 	
@@ -18805,7 +18805,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    input = null;
 	
 	    if (_finishCallback) {
-	      _finishCallback(textAnnotationOrText);
+	      _finishCallback(text);
 	    }
 	  }
 	
@@ -19027,6 +19027,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'handleTextChanged',
 	        value: function handleTextChanged(newText) {
+	            console.log('rect:handleTextChanged:', newText);
 	            this.text = newText;
 	            this.save();
 	        }
@@ -19165,15 +19166,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'enableViewMode',
 	        value: function enableViewMode() {
 	
-	            console.log('enableViewMode');
-	
 	            _get(RectAnnotation.prototype.__proto__ || Object.getPrototypeOf(RectAnnotation.prototype), 'enableViewMode', this).call(this);
 	
 	            if (!this.readOnly) {
 	                this.$element.find('.anno-rect, circle').on('click', this.handleClickEvent).on('mousedown', this.handleMouseDownOnRect);
 	            }
-	
-	            console.log('enableViewMode2');
 	        }
 	
 	        /**
@@ -19183,10 +19180,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'disableViewMode',
 	        value: function disableViewMode() {
-	            console.log('disableViewMode');
 	            _get(RectAnnotation.prototype.__proto__ || Object.getPrototypeOf(RectAnnotation.prototype), 'disableViewMode', this).call(this);
 	            this.$element.find('.anno-rect, circle').off('click mousedown');
-	            console.log('disableViewMode2');
 	        }
 	    }], [{
 	        key: 'newInstance',
@@ -19605,6 +19600,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                if (this.textForceDisplay) {
 	                    this.$element.addClass('--visible');
 	                }
+	            } else {
+	                this.$element.remove();
 	            }
 	        }
 	
@@ -19712,21 +19709,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	            pos.x += rect.left;
 	            pos.y += rect.top;
 	
-	            (0, _view.disableViewMode)(); // TODO Refactoring.
+	            // Disable the keyup event of BackSpace.
+	            (0, _view.disableViewMode)();
 	
 	            (0, _text.addInputField)(pos.x, pos.y, this.uuid, this.text, function (text) {
 	
 	                console.log('callback:', text);
 	
-	                if (text) {
+	                if (text || text === '') {
 	                    _this2.text = text;
 	                    _this2.emit('textchanged', text);
-	                    _this2.enableViewMode();
 	                }
 	
 	                _this2.render();
+	                // this.enableViewMode();
 	
-	                (0, _view.enableViewMode)(); // TODO Refactoring.
+	                // Enable the keyup event of BackSpace.
+	                (0, _view.enableViewMode)();
+	
+	                if (!_this2.parent.readOnly) {
+	                    _this2.$element.find('text').off('click').on('click', _this2.handleClickEvent);
+	                }
 	            });
 	        }
 	    }, {
@@ -19740,6 +19743,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'enableViewMode',
 	        value: function enableViewMode() {
 	
+	            console.log('text:enableViewMode');
+	
 	            _get(TextAnnotation.prototype.__proto__ || Object.getPrototypeOf(TextAnnotation.prototype), 'enableViewMode', this).call(this);
 	            if (!this.parent.readOnly) {
 	                this.$element.find('text').off('click').on('click', this.handleClickEvent);
@@ -19748,6 +19753,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'disableViewMode',
 	        value: function disableViewMode() {
+	
+	            console.log('text:disableViewMode');
+	
 	            _get(TextAnnotation.prototype.__proto__ || Object.getPrototypeOf(TextAnnotation.prototype), 'disableViewMode', this).call(this);
 	            this.$element.find('text').off('click', this.handleClickEvent);
 	        }
@@ -19838,6 +19846,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Enable view mode.
 	 */
 	function enableViewMode() {
+	    console.log('view:enableViewMode');
+	
 	    disableViewMode();
 	
 	    window.viewMode = true;
@@ -19852,6 +19862,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Disable view mode.
 	 */
 	function disableViewMode() {
+	    console.log('view:disableViewMode');
 	    window.viewMode = false;
 	    setComponenTranslucent(false);
 	    resetAnnotationViewMode();

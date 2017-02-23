@@ -37,10 +37,10 @@ var DISABLE_AUTO_FETCH_LOADING_BAR_TIMEOUT = 5000;
 
 
 // ********** Extentions. ****************
-let pdfData = localStorage.getItem('_pdfanno_pdf');
-let pdfName = localStorage.getItem('_pdfanno_pdfname');
+let pdfData = window.parent.pdf;
+let pdfName = window.parent.pdfName;
 if (pdfData) {
-  DEFAULT_URL = pdfData;  
+  DEFAULT_URL = pdfData;
   DEFAULT_PDF_NAME = pdfName;
 }
 

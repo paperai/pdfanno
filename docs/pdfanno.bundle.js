@@ -455,9 +455,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        // reload.
-	        localStorage.setItem('_pdfanno_pdf', fileMap[pdfPath]);
+	        window.pdf = fileMap[pdfPath];
 	        var fileName = pdfPath.split('/')[pdfPath.split('/').length - 1];
-	        localStorage.setItem('_pdfanno_pdfname', fileName);
+	        window.pdfName = fileName;
+	
 	        reloadPDFViewer();
 	
 	        // Clear anno dropdowns.
