@@ -1,7 +1,4 @@
 import objectAssign from 'object-assign';
-import renderLine from './renderLine';
-import renderPath from './renderPath';
-import renderPoint from './renderPoint';
 import renderRect from './renderRect';
 import renderSpan from './renderSpan';
 import renderText from './renderText';
@@ -119,23 +116,13 @@ export default function appendChild(svg, annotation, viewport) {
   let child, point;
   switch (annotation.type) {
     case 'area':
-    case 'boundingBox':
       child = renderRect(annotation, svg);
       break;
     case 'span':
       child = renderSpan(annotation, svg);
       break;
-    // case 'strikeout':
-    //   child = renderLine(annotation, svg);
-    //   break;
-    case 'point':
-      child = renderPoint(annotation, svg);
-      break;
     case 'textbox':
       child = renderText(annotation, svg);
-      break;
-    case 'drawing':
-      child = renderPath(annotation, svg);
       break;
     case'arrow':
       child = renderArrow(annotation, svg);
@@ -155,8 +142,6 @@ export default function appendChild(svg, annotation, viewport) {
     child.setAttribute('aria-hidden', true);
     svg.appendChild(transform(child, viewport));
   }
-
-  // console.log('appendChild:', child);
 
   return child;
 }

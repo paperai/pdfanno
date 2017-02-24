@@ -1,5 +1,4 @@
 import setAttributes from '../utils/setAttributes';
-import normalizeColor from '../utils/normalizeColor';
 import renderCircle, { DEFAULT_RADIUS } from './renderCircle';
 import { findBezierControlPoint } from '../utils/relation.js';
 

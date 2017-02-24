@@ -9,4 +9,3 @@ export default {
   disableArrow, enableArrow,
   disableViewMode, enableViewMode
 };
-

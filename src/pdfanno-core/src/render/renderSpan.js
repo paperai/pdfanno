@@ -1,6 +1,5 @@
 import uuid from '../utils/uuid';
 import setAttributes from '../utils/setAttributes';
-import normalizeColor from '../utils/normalizeColor';
 import renderCircle from './renderCircle';
 import { DEFAULT_RADIUS } from './renderCircle';
 
