@@ -8,12 +8,12 @@ import renderText from './renderText';
 
 /**
  * Create SVGRectElements from an annotation definition.
- * This is used for anntations of type `area` and `highlight`.
+ * This is used for anntations of type `span`.
  *
  * @param {Object} a The annotation definition
  * @return {SVGGElement|SVGRectElement} A group of all rects to be rendered
  */
-export default function renderHighlight(a, svg) {
+export default function renderSpan(a, svg) {
 
   let color = a.color || '#FF0';
 
@@ -26,7 +26,7 @@ export default function renderHighlight(a, svg) {
     let rect = createRect(r);
     rect.setAttribute('fill-opacity', 0.2);
     rect.setAttribute('fill', color);
-    rect.classList.add('anno-highlight');
+    rect.classList.add('anno-span');
     group.appendChild(rect);
   });
 

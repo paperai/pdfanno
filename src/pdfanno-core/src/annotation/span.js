@@ -3,9 +3,9 @@ import AbstractAnnotation from './abstract';
 import TextAnnotation from './text';
 
 /**
- * Highlight Annotation.
+ * Span Annotation.
  */
-export default class HighlightAnnotation extends AbstractAnnotation {
+export default class SpanAnnotation extends AbstractAnnotation {
 
     /**
      * Constructor.
@@ -14,7 +14,7 @@ export default class HighlightAnnotation extends AbstractAnnotation {
         super();
 
         this.uuid       = null;
-        this.type       = 'highlight';
+        this.type       = 'span';
         this.rectangles = [];
         this.text       = null;
         this.color      = null;
@@ -37,7 +37,7 @@ export default class HighlightAnnotation extends AbstractAnnotation {
      * Create an instance from an annotation data.
      */
     static newInstance(annotation) {
-        let a          = new HighlightAnnotation();
+        let a          = new SpanAnnotation();
         a.uuid         = annotation.uuid || uuid();
         a.rectangles   = annotation.rectangles;
         a.text         = annotation.text;
@@ -204,7 +204,6 @@ export default class HighlightAnnotation extends AbstractAnnotation {
      * Disable view mode.
      */
     disableViewMode() {
-        console.log('highlight:disableViewMode');
         super.disableViewMode();
         this.$element.find('circle').off('click');
     }

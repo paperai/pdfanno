@@ -18,7 +18,7 @@ import AnnotationContainer from './src/annotation/container';
 window.annotationContainer = new AnnotationContainer();
 
 import RectAnnotation from './src/annotation/rect';
-import HighlightAnnotation from './src/annotation/highlight';
+import SpanAnnotation from './src/annotation/span';
 import ArrowAnnotation from './src/annotation/arrow';
 
 import appendChild from './src/render/appendChild';
@@ -147,10 +147,10 @@ function renderAnnotations(svg) {
                     let rect = RectAnnotation.newInstance(a);
                     rect.render();
                     window.annotationContainer.add(rect);
-                } else if (a.type === 'highlight') {
-                    let highlight = HighlightAnnotation.newInstance(a);
-                    highlight.render();
-                    window.annotationContainer.add(highlight);
+                } else if (a.type === 'span') {
+                    let span = SpanAnnotation.newInstance(a);
+                    span.render();
+                    window.annotationContainer.add(span);
                 } else if (a.type === 'arrow') {
                     let arrowAnnotation = ArrowAnnotation.newInstance(a);
                     arrowAnnotation.render();

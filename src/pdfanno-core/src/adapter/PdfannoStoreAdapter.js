@@ -127,8 +127,8 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                             // save tmporary for arrow.
                             annotation.key = key;
 
-                        // Highlight.
-                        } else if (annotation.type === 'highlight') {
+                        // Span.
+                        } else if (annotation.type === 'span') {
                             // rectangles.
                             let rectangles = annotation.rectangles.map(rectangle => {
                                 return [
@@ -295,7 +295,7 @@ function _createContainerFromJson(json, color, isPrimary) {
                     key        : key // tmp for arrow.
                 });
 
-            // Highlight.
+            // Span.
         } else if (data.type === 'span') {
                 // rectangles.
                 let rectangles = data.position.map(d => {
@@ -309,7 +309,7 @@ function _createContainerFromJson(json, color, isPrimary) {
                 });
                 annotations.push({
                     class        : 'Annotation',
-                    type         : 'highlight',
+                    type         : 'span',
                     uuid         : uuid(),
                     page         : data.page,
                     rectangles,

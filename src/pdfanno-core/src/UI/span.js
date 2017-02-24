@@ -7,7 +7,7 @@ import {
   getSVGLayer
 } from './utils';
 import { addInputField } from './text';
-import HighlightAnnotation from '../annotation/highlight';
+import SpanAnnotation from '../annotation/span';
 
 /**
  * the prev annotation rendered at the last.
@@ -72,7 +72,7 @@ function removeSelection() {
 /**
  * Save a rect annotation
  *
- * @param {String} type The type of rect (area, highlight, strikeout)
+ * @param {String} type The type of rect (span)
  * @param {Array} rects The rects to use for annotation
  * @param {String} color The color of the rects
  */
@@ -95,11 +95,11 @@ function saveRect(rects, selectedText) {
   };
 
   // Save.
-  let highlightAnnotation = HighlightAnnotation.newInstance(annotation);
-  highlightAnnotation.save();
+  let spanAnnotation = SpanAnnotation.newInstance(annotation);
+  spanAnnotation.save();
 
   // Render.
-  highlightAnnotation.render();
+  spanAnnotation.render();
 
 
   // Add an input field.
@@ -118,10 +118,10 @@ function saveRect(rects, selectedText) {
 
     document.addEventListener('mouseup', handleDocumentMouseup);
 
-    highlightAnnotation.text = text;
-    highlightAnnotation.setTextForceDisplay();
-    highlightAnnotation.render();
-    highlightAnnotation.save();
+    spanAnnotation.text = text;
+    spanAnnotation.setTextForceDisplay();
+    spanAnnotation.render();
+    spanAnnotation.save();
 
   });
 
@@ -129,15 +129,15 @@ function saveRect(rects, selectedText) {
     prevAnnotation.resetTextForceDisplay();
     prevAnnotation.render();
   }
-  prevAnnotation = highlightAnnotation;
+  prevAnnotation = spanAnnotation;
 
 }
 
 /**
  * Enable hightlight behavior.
  */
-export function enableHighlight() {
-  this.disableHighlight();
+export function enableSpan() {
+  this.disableSpan();
   document.addEventListener('mouseup', handleDocumentMouseup);
   $('.textLayer').css('z-index', 3); // over svg layer.
 }
@@ -145,7 +145,7 @@ export function enableHighlight() {
 /**
  * Disable hightlight behavior.
  */
-export function disableHighlight() {
+export function disableSpan() {
   document.removeEventListener('mouseup', handleDocumentMouseup);
   $('.textLayer').css('z-index', 1);
 

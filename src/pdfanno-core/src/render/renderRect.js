@@ -6,7 +6,7 @@ import renderText from './renderText';
 
 /**
  * Create SVGRectElements from an annotation definition.
- * This is used for anntations of type `area` and `highlight`.
+ * This is used for anntations of type `area`.
  *
  * @param {Object} a The annotation definition
  * @return {SVGGElement|SVGRectElement} A group of all rects to be rendered
