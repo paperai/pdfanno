@@ -44,21 +44,21 @@
   stroke-dasharray: 3;
 }
 /**
-  Arrow.
+  Relation.
 */
-.anno-arrow {
+.anno-relation {
   transition:0.2s;
 }
-.--hover .anno-arrow {
+.--hover .anno-relation {
   stroke-width: 2px;
 }
-.--selected .anno-arrow {
+.--selected .anno-relation {
 }
-.anno-arrow-outline {
+.anno-relation-outline {
   fill: none;
   visibility: hidden;
 }
-.--selected .anno-arrow-outline {
+.--selected .anno-relation-outline {
   visibility: visible;
   stroke: black;
   stroke-width: 2.85px;

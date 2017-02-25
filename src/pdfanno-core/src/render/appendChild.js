@@ -3,7 +3,7 @@ import renderRect from './renderRect';
 import renderSpan from './renderSpan';
 import renderText from './renderText';
 // **extention**
-import renderArrow from './renderArrow';
+import renderRelation from './renderRelation';
 import renderCircle from './renderCircle';
 
 const isFirefox = /firefox/i.test(navigator.userAgent);
@@ -124,10 +124,10 @@ export default function appendChild(svg, annotation, viewport) {
     case 'textbox':
       child = renderText(annotation, svg);
       break;
-    case'arrow':
-      child = renderArrow(annotation, svg);
+    case 'relation':
+      child = renderRelation(annotation, svg);
       break;
-    case'circle':
+    case 'circle':
       child = renderCircle(annotation, svg);
       break;
   }

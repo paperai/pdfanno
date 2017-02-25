@@ -2,27 +2,27 @@ import setAttributes from '../utils/setAttributes';
 import renderCircle, { DEFAULT_RADIUS } from './renderCircle';
 import { findBezierControlPoint } from '../utils/relation.js';
 
-let arrowSecondaryColor = ['green', 'blue', 'purple'];
+let secondaryColor = ['green', 'blue', 'purple'];
 
 /**
  * Create SVGGElements from an annotation definition.
- * This is used for anntations of type `arrow`.
+ * This is used for anntations of type `relation`.
  *
  * @param {Object} a The annotation definition
- * @return {SVGGElement} A group of an arrow to be rendered
+ * @return {SVGGElement} A group of a relation to be rendered
  */
-export default function renderArrow(a) {
+export default function renderRelation(a) {
 
-    let arrow = createArrow(a);
-    return arrow;
+    let relation = createRelation(a);
+    return relation;
 }
 
-export function createArrow(a, id=null) {
+export function createRelation(a, id=null) {
 
   let color = a.color;
   if (!color) {
     if (a.readOnly) {
-      color = arrowSecondaryColor[a.seq % arrowSecondaryColor.length];
+      color = secondaryColor[a.seq % secondaryColor.length];
     } else {
       color = '#F00';
     }
@@ -61,7 +61,7 @@ export function createArrow(a, id=null) {
     markerWidth: 2,
     markerHeight: 3,
     fill: color,
-    id: 'arrowhead',
+    id: 'relationhead',
     orient: "auto-start-reverse"
   });
   marker.setAttribute('refX', 5);
@@ -83,7 +83,7 @@ export function createArrow(a, id=null) {
   let outline = document.createElementNS('http://www.w3.org/2000/svg', 'path');
   setAttributes(outline, {
     d     : `M ${a.x1} ${a.y1} Q ${control.x} ${control.y} ${a.x2} ${a.y2}`,
-    class : 'anno-arrow-outline'
+    class : 'anno-relation-outline'
   });
   group.appendChild(outline);
 
@@ -91,30 +91,30 @@ export function createArrow(a, id=null) {
   /*
     <path d="M 25 25 Q 175 25 175 175" stroke="blue" fill="none"/>
   */
-  let arrow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-  setAttributes(arrow, {
+  let relation = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  setAttributes(relation, {
     d           : `M ${a.x1} ${a.y1} Q ${control.x} ${control.y} ${a.x2} ${a.y2}`,
     stroke      : color,
     strokeWidth : 1,
     fill        : 'none',
-    class       : 'anno-arrow'
+    class       : 'anno-relation'
   });
 
   // Triangle for the end point.
   if (a.direction === 'one-way' || a.direction === 'two-way') {
-    arrow.setAttribute('marker-end', 'url(#arrowhead)');
+    relation.setAttribute('marker-end', 'url(#relationhead)');
   }
 
   // Triangle for the start point.
   if (a.direction === 'two-way') {
-    arrow.setAttribute('marker-start', 'url(#arrowhead)');
+    relation.setAttribute('marker-start', 'url(#relationhead)');
   }
 
   if (id) {
-    setAttributes(arrow, { id : id });
+    setAttributes(relation, { id : id });
   }
 
-  group.appendChild(arrow);
+  group.appendChild(relation);
 
   return group;
 }

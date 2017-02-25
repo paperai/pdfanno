@@ -19,7 +19,7 @@ window.annotationContainer = new AnnotationContainer();
 
 import RectAnnotation from './src/annotation/rect';
 import SpanAnnotation from './src/annotation/span';
-import ArrowAnnotation from './src/annotation/arrow';
+import RelationAnnotation from './src/annotation/relation';
 
 import appendChild from './src/render/appendChild';
 
@@ -151,10 +151,10 @@ function renderAnnotations(svg) {
                     let span = SpanAnnotation.newInstance(a);
                     span.render();
                     window.annotationContainer.add(span);
-                } else if (a.type === 'arrow') {
-                    let arrowAnnotation = ArrowAnnotation.newInstance(a);
-                    arrowAnnotation.render();
-                    window.annotationContainer.add(arrowAnnotation);
+                } else if (a.type === 'relation') {
+                    let relationAnnotation = RelationAnnotation.newInstance(a);
+                    relationAnnotation.render();
+                    window.annotationContainer.add(relationAnnotation);
                 } else {
                     appendChild(svg, a);
                 }

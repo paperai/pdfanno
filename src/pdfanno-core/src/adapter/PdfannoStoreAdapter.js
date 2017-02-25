@@ -124,7 +124,7 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                                 label    : annotation.text || ''
                             };
 
-                            // save tmporary for arrow.
+                            // save tmporary for relation.
                             annotation.key = key;
 
                         // Span.
@@ -155,11 +155,11 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                                 text
                             };
 
-                            // save tmporary for arrow.
+                            // save tmporary for relation.
                             annotation.key = key;
 
-                        // Arrow.
-                        } else if (annotation.type === 'arrow') {
+                        // Relation.
+                        } else if (annotation.type === 'relation') {
 
                             let rel1s = container.annotations.filter(a => a.uuid === annotation.rel1);
                             let rel1 = rel1s[0];
@@ -274,11 +274,9 @@ function _createContainerFromJson(json, color, isPrimary) {
                         continue;
                 }
 
-            // let data = json[documentId][key];
             let data = json[key];
 
-            // Rect.
-            // if (key.indexOf('rect') === 0) {
+        // Rect.
         if (data.type === 'rect') {
                 annotations.push({
                     class    : 'Annotation',
@@ -292,10 +290,10 @@ function _createContainerFromJson(json, color, isPrimary) {
                     text     : data.label,
                     readOnly,
                     color,
-                    key        : key // tmp for arrow.
+                    key        : key // tmp for relation.
                 });
 
-            // Span.
+        // Span.
         } else if (data.type === 'span') {
                 // rectangles.
                 let rectangles = data.position.map(d => {
@@ -315,13 +313,12 @@ function _createContainerFromJson(json, color, isPrimary) {
                     rectangles,
                     text         : data.label,
                     selectedText : data.text,
-                    key          : key,    // tmp for arrow.
+                    key          : key,    // tmp for relation.
                     readOnly,
                     color
                 });
 
-            // Arrow.
-            // } else if (key.indexOf('rel') === 0) {
+            // Relation.
             } else if (data.type === 'relation') {
 
                 // Find rels.
@@ -330,10 +327,10 @@ function _createContainerFromJson(json, color, isPrimary) {
                 let rel2s = annotations.filter(a => a.key === data.ids[1]);
                 let rel2 = rel2s[0];
 
-                // Add arrow.
+                // Add relation.
                 annotations.push({
                     class            : 'Annotation',
-                    type             : 'arrow',
+                    type             : 'relation',
                     direction    : data.dir,
                     uuid             : uuid(),
                     text             : data.label,
