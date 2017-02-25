@@ -86,7 +86,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	*/
 	function disableAnnotateTools() {
 	    window.iframeWindow.PDFAnnoCore.UI.disableRect();
-	    window.iframeWindow.PDFAnnoCore.UI.disableHighlight();
+	    window.iframeWindow.PDFAnnoCore.UI.disableSpan();
 	    window.iframeWindow.PDFAnnoCore.UI.disableArrow();
 	    window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
 	}
@@ -108,8 +108,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        if (type === 'view') {
 	            window.iframeWindow.PDFAnnoCore.UI.enableViewMode();
-	        } else if (type === 'highlight') {
-	            window.iframeWindow.PDFAnnoCore.UI.enableHighlight();
+	        } else if (type === 'span') {
+	            window.iframeWindow.PDFAnnoCore.UI.enableSpan();
 	        } else if (type === 'arrow') {
 	            window.iframeWindow.PDFAnnoCore.UI.enableArrow('one-way');
 	        } else if (type === 'arrow-two-way') {
