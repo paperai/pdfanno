@@ -1,9 +1,6 @@
 import objectAssign from 'object-assign';
-import renderLine from './renderLine';
-import renderPath from './renderPath';
-import renderPoint from './renderPoint';
 import renderRect from './renderRect';
-import renderHighlight from './renderHighlight';
+import renderSpan from './renderSpan';
 import renderText from './renderText';
 // **extention**
 import renderArrow from './renderArrow';
@@ -57,7 +54,7 @@ export function transform(node, viewport) {
 
   // Let SVG natively transform the element
   node.setAttribute('transform', `scale(${viewport.scale}) rotate(${viewport.rotation}) translate(${trans.x}, ${trans.y})`);
-  
+
   // Manually adjust x/y for nested SVG nodes
   if (!isFirefox && node.nodeName.toLowerCase() === 'svg') {
     node.setAttribute('x', parseInt(node.getAttribute('x'), 10) * viewport.scale);
@@ -69,7 +66,7 @@ export function transform(node, viewport) {
     let height = parseInt(node.getAttribute('height'), 10);
     let path = node.querySelector('path');
     let svg = path.parentNode;
-   
+
     // Scale width/height
     [node, svg, path, node.querySelector('rect')].forEach((n) => {
       n.setAttribute('width', parseInt(n.getAttribute('width'), 10) * viewport.scale);
@@ -78,7 +75,7 @@ export function transform(node, viewport) {
 
     // Transform path but keep scale at 100% since it will be handled natively
     transform(path, objectAssign({}, viewport, { scale: 1 }));
-    
+
     switch(viewport.rotation % 360) {
       case 90:
         node.setAttribute('x', viewport.width - y - width);
@@ -115,27 +112,17 @@ export default function appendChild(svg, annotation, viewport) {
   if (!viewport) {
     viewport = JSON.parse(svg.getAttribute('data-pdf-annotate-viewport'));
   }
-  
+
   let child, point;
   switch (annotation.type) {
     case 'area':
-    case 'boundingBox':
       child = renderRect(annotation, svg);
       break;
-    case 'highlight':
-      child = renderHighlight(annotation, svg);
-      break;
-    // case 'strikeout':
-    //   child = renderLine(annotation, svg);
-    //   break;
-    case 'point':
-      child = renderPoint(annotation, svg);
+    case 'span':
+      child = renderSpan(annotation, svg);
       break;
     case 'textbox':
       child = renderText(annotation, svg);
-      break;
-    case 'drawing':
-      child = renderPath(annotation, svg);
       break;
     case'arrow':
       child = renderArrow(annotation, svg);
@@ -155,8 +142,6 @@ export default function appendChild(svg, annotation, viewport) {
     child.setAttribute('aria-hidden', true);
     svg.appendChild(transform(child, viewport));
   }
-
-  // console.log('appendChild:', child);
 
   return child;
 }

@@ -72,19 +72,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _PDFAnnoCore2 = _interopRequireDefault(_PDFAnnoCore);
 	
-	var _container = __webpack_require__(50);
+	var _container = __webpack_require__(46);
 	
 	var _container2 = _interopRequireDefault(_container);
 	
-	var _rect = __webpack_require__(40);
+	var _rect = __webpack_require__(36);
 	
 	var _rect2 = _interopRequireDefault(_rect);
 	
-	var _highlight = __webpack_require__(45);
+	var _span = __webpack_require__(41);
 	
-	var _highlight2 = _interopRequireDefault(_highlight);
+	var _span2 = _interopRequireDefault(_span);
 	
-	var _arrow = __webpack_require__(47);
+	var _arrow = __webpack_require__(43);
 	
 	var _arrow2 = _interopRequireDefault(_arrow);
 	
@@ -229,10 +229,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    var rect = _rect2.default.newInstance(a);
 	                    rect.render();
 	                    window.annotationContainer.add(rect);
-	                } else if (a.type === 'highlight') {
-	                    var highlight = _highlight2.default.newInstance(a);
-	                    highlight.render();
-	                    window.annotationContainer.add(highlight);
+	                } else if (a.type === 'span') {
+	                    var span = _span2.default.newInstance(a);
+	                    span.render();
+	                    window.annotationContainer.add(span);
 	                } else if (a.type === 'arrow') {
 	                    var arrowAnnotation = _arrow2.default.newInstance(a);
 	                    arrowAnnotation.render();
@@ -11117,13 +11117,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _render2 = _interopRequireDefault(_render);
 	
-	var _UI = __webpack_require__(35);
+	var _UI = __webpack_require__(31);
 	
 	var _UI2 = _interopRequireDefault(_UI);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	__webpack_require__(48);
+	__webpack_require__(44);
 	
 	exports.default = {
 	  /**
@@ -11673,8 +11673,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                            // save tmporary for arrow.
 	                            annotation.key = key;
 	
-	                            // Highlight.
-	                        } else if (annotation.type === 'highlight') {
+	                            // Span.
+	                        } else if (annotation.type === 'span') {
 	                            // rectangles.
 	                            var rectangles = annotation.rectangles.map(function (rectangle) {
 	                                return [rectangle.x, rectangle.y, rectangle.width, rectangle.height];
@@ -11837,7 +11837,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                key: key // tmp for arrow.
 	            });
 	
-	            // Highlight.
+	            // Span.
 	        } else if (data.type === 'span') {
 	            // rectangles.
 	            var rectangles = data.position.map(function (d) {
@@ -11851,7 +11851,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            });
 	            annotations.push({
 	                class: 'Annotation',
-	                type: 'highlight',
+	                type: 'span',
 	                uuid: (0, _uuid2.default)(),
 	                page: data.page,
 	                rectangles: rectangles,
@@ -16563,35 +16563,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _objectAssign2 = _interopRequireDefault(_objectAssign);
 	
-	var _renderLine = __webpack_require__(24);
-	
-	var _renderLine2 = _interopRequireDefault(_renderLine);
-	
-	var _renderPath = __webpack_require__(27);
-	
-	var _renderPath2 = _interopRequireDefault(_renderPath);
-	
-	var _renderPoint = __webpack_require__(28);
-	
-	var _renderPoint2 = _interopRequireDefault(_renderPoint);
-	
-	var _renderRect = __webpack_require__(29);
+	var _renderRect = __webpack_require__(24);
 	
 	var _renderRect2 = _interopRequireDefault(_renderRect);
 	
-	var _renderHighlight = __webpack_require__(32);
+	var _renderSpan = __webpack_require__(28);
 	
-	var _renderHighlight2 = _interopRequireDefault(_renderHighlight);
+	var _renderSpan2 = _interopRequireDefault(_renderSpan);
 	
-	var _renderText = __webpack_require__(31);
+	var _renderText = __webpack_require__(27);
 	
 	var _renderText2 = _interopRequireDefault(_renderText);
 	
-	var _renderArrow = __webpack_require__(33);
+	var _renderArrow = __webpack_require__(29);
 	
 	var _renderArrow2 = _interopRequireDefault(_renderArrow);
 	
-	var _renderCircle = __webpack_require__(30);
+	var _renderCircle = __webpack_require__(26);
 	
 	var _renderCircle2 = _interopRequireDefault(_renderCircle);
 	
@@ -16709,23 +16697,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      point = void 0;
 	  switch (annotation.type) {
 	    case 'area':
-	    case 'boundingBox':
 	      child = (0, _renderRect2.default)(annotation, svg);
 	      break;
-	    case 'highlight':
-	      child = (0, _renderHighlight2.default)(annotation, svg);
-	      break;
-	    // case 'strikeout':
-	    //   child = renderLine(annotation, svg);
-	    //   break;
-	    case 'point':
-	      child = (0, _renderPoint2.default)(annotation, svg);
+	    case 'span':
+	      child = (0, _renderSpan2.default)(annotation, svg);
 	      break;
 	    case 'textbox':
 	      child = (0, _renderText2.default)(annotation, svg);
-	      break;
-	    case 'drawing':
-	      child = (0, _renderPath2.default)(annotation, svg);
 	      break;
 	    case 'arrow':
 	      child = (0, _renderArrow2.default)(annotation, svg);
@@ -16744,8 +16722,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    child.setAttribute('aria-hidden', true);
 	    svg.appendChild(transform(child, viewport));
 	  }
-	
-	  // console.log('appendChild:', child);
 	
 	  return child;
 	}
@@ -16855,253 +16831,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.default = renderLine;
-	
-	var _setAttributes = __webpack_require__(25);
-	
-	var _setAttributes2 = _interopRequireDefault(_setAttributes);
-	
-	var _normalizeColor = __webpack_require__(26);
-	
-	var _normalizeColor2 = _interopRequireDefault(_normalizeColor);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	/**
-	 * Create SVGLineElements from an annotation definition.
-	 * This is used for anntations of type `strikeout`.
-	 *
-	 * @param {Object} a The annotation definition
-	 * @return {SVGGElement} A group of all lines to be rendered
-	 */
-	function renderLine(a) {
-	  var group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-	  (0, _setAttributes2.default)(group, {
-	    stroke: (0, _normalizeColor2.default)(a.color || '#f00'),
-	    strokeWidth: 1
-	  });
-	
-	  a.rectangles.forEach(function (r) {
-	    var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-	
-	    (0, _setAttributes2.default)(line, {
-	      x1: r.x,
-	      y1: r.y,
-	      x2: r.x + r.width,
-	      y2: r.y
-	    });
-	
-	    group.appendChild(line);
-	  });
-	
-	  return group;
-	}
-	module.exports = exports['default'];
-
-/***/ },
-/* 25 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = setAttributes;
-	var UPPER_REGEX = /[A-Z]/g;
-	
-	// Don't convert these attributes from camelCase to hyphenated-attributes
-	var BLACKLIST = ['viewBox'];
-	
-	var keyCase = function keyCase(key) {
-	  if (BLACKLIST.indexOf(key) === -1) {
-	    key = key.replace(UPPER_REGEX, function (match) {
-	      return '-' + match.toLowerCase();
-	    });
-	  }
-	  return key;
-	};
-	
-	/**
-	 * Set attributes for a node from a map
-	 *
-	 * @param {Node} node The node to set attributes on
-	 * @param {Object} attributes The map of key/value pairs to use for attributes
-	 */
-	function setAttributes(node, attributes) {
-	  Object.keys(attributes).forEach(function (key) {
-	    node.setAttribute(keyCase(key), attributes[key]);
-	  });
-	}
-	module.exports = exports['default'];
-
-/***/ },
-/* 26 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = normalizeColor;
-	var REGEX_HASHLESS_HEX = /^([a-f0-9]{6}|[a-f0-9]{3})$/i;
-	
-	/**
-	 * Normalize a color value
-	 *
-	 * @param {String} color The color to normalize
-	 * @return {String}
-	 */
-	function normalizeColor(color) {
-	  if (REGEX_HASHLESS_HEX.test(color)) {
-	    color = "#" + color;
-	  }
-	  return color;
-	}
-	module.exports = exports["default"];
-
-/***/ },
-/* 27 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = renderPath;
-	
-	var _setAttributes = __webpack_require__(25);
-	
-	var _setAttributes2 = _interopRequireDefault(_setAttributes);
-	
-	var _normalizeColor = __webpack_require__(26);
-	
-	var _normalizeColor2 = _interopRequireDefault(_normalizeColor);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	/**
-	 * Create SVGPathElement from an annotation definition.
-	 * This is used for anntations of type `drawing`.
-	 *
-	 * @param {Object} a The annotation definition
-	 * @return {SVGPathElement} The path to be rendered
-	 */
-	function renderPath(a) {
-	  var d = [];
-	  var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-	
-	  for (var i = 0, l = a.lines.length; i < l; i++) {
-	    var p1 = a.lines[i];
-	    var p2 = a.lines[i + 1];
-	    if (p2) {
-	      d.push('M' + p1[0] + ' ' + p1[1] + ' ' + p2[0] + ' ' + p2[1]);
-	    }
-	  }
-	
-	  (0, _setAttributes2.default)(path, {
-	    d: d.join(' ') + 'Z',
-	    stroke: (0, _normalizeColor2.default)(a.color || '#000'),
-	    strokeWidth: a.width || 1,
-	    fill: 'none'
-	  });
-	
-	  return path;
-	}
-	module.exports = exports['default'];
-
-/***/ },
-/* 28 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = renderPoint;
-	
-	var _setAttributes = __webpack_require__(25);
-	
-	var _setAttributes2 = _interopRequireDefault(_setAttributes);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var SIZE = 25;
-	var D = 'M499.968 214.336q-113.832 0 -212.877 38.781t-157.356 104.625 -58.311 142.29q0 62.496 39.897 119.133t112.437 97.929l48.546 27.9 -15.066 53.568q-13.392 50.778 -39.06 95.976 84.816 -35.154 153.45 -95.418l23.994 -21.204 31.806 3.348q38.502 4.464 72.54 4.464 113.832 0 212.877 -38.781t157.356 -104.625 58.311 -142.29 -58.311 -142.29 -157.356 -104.625 -212.877 -38.781z';
-	
-	/**
-	 * Create SVGElement from an annotation definition.
-	 * This is used for anntations of type `comment`.
-	 *
-	 * @param {Object} a The annotation definition
-	 * @return {SVGElement} A svg to be rendered
-	 */
-	function renderPoint(a) {
-	  var outerSVG = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-	  var innerSVG = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-	  var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-	  var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-	
-	  (0, _setAttributes2.default)(outerSVG, {
-	    width: SIZE,
-	    height: SIZE,
-	    x: a.x,
-	    y: a.y
-	  });
-	
-	  (0, _setAttributes2.default)(innerSVG, {
-	    width: SIZE,
-	    height: SIZE,
-	    x: 0,
-	    y: SIZE * 0.05 * -1,
-	    viewBox: '0 0 1000 1000'
-	  });
-	
-	  (0, _setAttributes2.default)(rect, {
-	    width: SIZE,
-	    height: SIZE,
-	    stroke: '#000',
-	    fill: '#ff0'
-	  });
-	
-	  (0, _setAttributes2.default)(path, {
-	    d: D,
-	    strokeWidth: 50,
-	    stroke: '#000',
-	    fill: '#fff'
-	  });
-	
-	  innerSVG.appendChild(path);
-	  outerSVG.appendChild(rect);
-	  outerSVG.appendChild(innerSVG);
-	
-	  return outerSVG;
-	}
-	module.exports = exports['default'];
-
-/***/ },
-/* 29 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
 	exports.default = renderRect;
 	
 	var _setAttributes = __webpack_require__(25);
 	
 	var _setAttributes2 = _interopRequireDefault(_setAttributes);
 	
-	var _renderCircle = __webpack_require__(30);
+	var _renderCircle = __webpack_require__(26);
 	
 	var _renderCircle2 = _interopRequireDefault(_renderCircle);
 	
-	var _renderText = __webpack_require__(31);
+	var _renderText = __webpack_require__(27);
 	
 	var _renderText2 = _interopRequireDefault(_renderText);
 	
@@ -17109,7 +16849,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/**
 	 * Create SVGRectElements from an annotation definition.
-	 * This is used for anntations of type `area` and `highlight`.
+	 * This is used for anntations of type `area`.
 	 *
 	 * @param {Object} a The annotation definition
 	 * @return {SVGGElement|SVGRectElement} A group of all rects to be rendered
@@ -17156,7 +16896,44 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 30 */
+/* 25 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = setAttributes;
+	var UPPER_REGEX = /[A-Z]/g;
+	
+	// Don't convert these attributes from camelCase to hyphenated-attributes
+	var BLACKLIST = ['viewBox'];
+	
+	var keyCase = function keyCase(key) {
+	  if (BLACKLIST.indexOf(key) === -1) {
+	    key = key.replace(UPPER_REGEX, function (match) {
+	      return '-' + match.toLowerCase();
+	    });
+	  }
+	  return key;
+	};
+	
+	/**
+	 * Set attributes for a node from a map
+	 *
+	 * @param {Node} node The node to set attributes on
+	 * @param {Object} attributes The map of key/value pairs to use for attributes
+	 */
+	function setAttributes(node, attributes) {
+	  Object.keys(attributes).forEach(function (key) {
+	    node.setAttribute(keyCase(key), attributes[key]);
+	  });
+	}
+	module.exports = exports['default'];
+
+/***/ },
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -17170,10 +16947,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _setAttributes = __webpack_require__(25);
 	
 	var _setAttributes2 = _interopRequireDefault(_setAttributes);
-	
-	var _normalizeColor = __webpack_require__(26);
-	
-	var _normalizeColor2 = _interopRequireDefault(_normalizeColor);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -17242,7 +17015,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 31 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -17256,11 +17029,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _setAttributes2 = _interopRequireDefault(_setAttributes);
 	
-	var _normalizeColor = __webpack_require__(26);
-	
-	var _normalizeColor2 = _interopRequireDefault(_normalizeColor);
-	
-	var _renderCircle = __webpack_require__(30);
+	var _renderCircle = __webpack_require__(26);
 	
 	var _renderCircle2 = _interopRequireDefault(_renderCircle);
 	
@@ -17344,7 +17113,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 32 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -17352,7 +17121,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.default = renderHighlight;
+	exports.default = renderSpan;
 	
 	var _uuid = __webpack_require__(17);
 	
@@ -17362,15 +17131,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _setAttributes2 = _interopRequireDefault(_setAttributes);
 	
-	var _normalizeColor = __webpack_require__(26);
-	
-	var _normalizeColor2 = _interopRequireDefault(_normalizeColor);
-	
-	var _renderCircle = __webpack_require__(30);
+	var _renderCircle = __webpack_require__(26);
 	
 	var _renderCircle2 = _interopRequireDefault(_renderCircle);
 	
-	var _renderText = __webpack_require__(31);
+	var _renderText = __webpack_require__(27);
 	
 	var _renderText2 = _interopRequireDefault(_renderText);
 	
@@ -17378,12 +17143,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/**
 	 * Create SVGRectElements from an annotation definition.
-	 * This is used for anntations of type `area` and `highlight`.
+	 * This is used for anntations of type `span`.
 	 *
 	 * @param {Object} a The annotation definition
 	 * @return {SVGGElement|SVGRectElement} A group of all rects to be rendered
 	 */
-	function renderHighlight(a, svg) {
+	function renderSpan(a, svg) {
 	
 	  var color = a.color || '#FF0';
 	
@@ -17396,7 +17161,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var rect = createRect(r);
 	    rect.setAttribute('fill-opacity', 0.2);
 	    rect.setAttribute('fill', color);
-	    rect.classList.add('anno-highlight');
+	    rect.classList.add('anno-span');
 	    group.appendChild(rect);
 	  });
 	
@@ -17427,7 +17192,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 33 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -17442,15 +17207,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _setAttributes2 = _interopRequireDefault(_setAttributes);
 	
-	var _normalizeColor = __webpack_require__(26);
-	
-	var _normalizeColor2 = _interopRequireDefault(_normalizeColor);
-	
-	var _renderCircle = __webpack_require__(30);
+	var _renderCircle = __webpack_require__(26);
 	
 	var _renderCircle2 = _interopRequireDefault(_renderCircle);
 	
-	var _relation = __webpack_require__(34);
+	var _relation = __webpack_require__(30);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -17603,7 +17364,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 34 */
+/* 30 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -17719,7 +17480,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 35 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -17728,24 +17489,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 	
-	var _rect = __webpack_require__(36);
+	var _rect = __webpack_require__(32);
 	
-	var _highlight = __webpack_require__(44);
+	var _span = __webpack_require__(40);
 	
-	var _arrow = __webpack_require__(46);
+	var _arrow = __webpack_require__(42);
 	
-	var _view = __webpack_require__(43);
+	var _view = __webpack_require__(39);
 	
 	exports.default = {
 	  disableRect: _rect.disableRect, enableRect: _rect.enableRect,
-	  disableHighlight: _highlight.disableHighlight, enableHighlight: _highlight.enableHighlight,
+	  disableSpan: _span.disableSpan, enableSpan: _span.enableSpan,
 	  disableArrow: _arrow.disableArrow, enableArrow: _arrow.enableArrow,
 	  disableViewMode: _view.disableViewMode, enableViewMode: _view.enableViewMode
 	};
 	module.exports = exports['default'];
 
 /***/ },
-/* 36 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -17772,11 +17533,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _appendChild2 = _interopRequireDefault(_appendChild);
 	
-	var _utils = __webpack_require__(37);
+	var _utils = __webpack_require__(33);
 	
-	var _text = __webpack_require__(39);
+	var _text = __webpack_require__(35);
 	
-	var _rect = __webpack_require__(40);
+	var _rect = __webpack_require__(36);
 	
 	var _rect2 = _interopRequireDefault(_rect);
 	
@@ -17988,7 +17749,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 37 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -18020,7 +17781,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _jquery2 = _interopRequireDefault(_jquery);
 	
-	var _createStylesheet = __webpack_require__(38);
+	var _createStylesheet = __webpack_require__(34);
 	
 	var _createStylesheet2 = _interopRequireDefault(_createStylesheet);
 	
@@ -18462,7 +18223,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 38 */
+/* 34 */
 /***/ function(module, exports) {
 
 	module.exports = function createStyleSheet(blocks) {
@@ -18503,7 +18264,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 39 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -18526,7 +18287,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _appendChild2 = _interopRequireDefault(_appendChild);
 	
-	var _utils = __webpack_require__(37);
+	var _utils = __webpack_require__(33);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -18700,7 +18461,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 40 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -18717,15 +18478,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _uuid2 = _interopRequireDefault(_uuid);
 	
-	var _abstract = __webpack_require__(41);
+	var _abstract = __webpack_require__(37);
 	
 	var _abstract2 = _interopRequireDefault(_abstract);
 	
-	var _text = __webpack_require__(42);
+	var _text = __webpack_require__(38);
 	
 	var _text2 = _interopRequireDefault(_text);
 	
-	var _utils = __webpack_require__(37);
+	var _utils = __webpack_require__(33);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -19093,7 +18854,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 41 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -19116,7 +18877,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _PDFAnnoCore2 = _interopRequireDefault(_PDFAnnoCore);
 	
-	var _utils = __webpack_require__(37);
+	var _utils = __webpack_require__(33);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -19394,7 +19155,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 42 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -19415,13 +19176,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _appendChild2 = _interopRequireDefault(_appendChild);
 	
-	var _utils = __webpack_require__(37);
+	var _utils = __webpack_require__(33);
 	
-	var _text = __webpack_require__(39);
+	var _text = __webpack_require__(35);
 	
-	var _view = __webpack_require__(43);
+	var _view = __webpack_require__(39);
 	
-	var _abstract = __webpack_require__(41);
+	var _abstract = __webpack_require__(37);
 	
 	var _abstract2 = _interopRequireDefault(_abstract);
 	
@@ -19655,7 +19416,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 43 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -19758,7 +19519,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 44 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -19766,20 +19527,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.enableHighlight = enableHighlight;
-	exports.disableHighlight = disableHighlight;
+	exports.enableSpan = enableSpan;
+	exports.disableSpan = disableSpan;
 	
 	var _jquery = __webpack_require__(6);
 	
 	var _jquery2 = _interopRequireDefault(_jquery);
 	
-	var _utils = __webpack_require__(37);
+	var _utils = __webpack_require__(33);
 	
-	var _text = __webpack_require__(39);
+	var _text = __webpack_require__(35);
 	
-	var _highlight = __webpack_require__(45);
+	var _span = __webpack_require__(41);
 	
-	var _highlight2 = _interopRequireDefault(_highlight);
+	var _span2 = _interopRequireDefault(_span);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -19848,7 +19609,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Save a rect annotation
 	 *
-	 * @param {String} type The type of rect (area, highlight, strikeout)
+	 * @param {String} type The type of rect (span)
 	 * @param {Array} rects The rects to use for annotation
 	 * @param {String} color The color of the rects
 	 */
@@ -19873,11 +19634,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	
 	  // Save.
-	  var highlightAnnotation = _highlight2.default.newInstance(annotation);
-	  highlightAnnotation.save();
+	  var spanAnnotation = _span2.default.newInstance(annotation);
+	  spanAnnotation.save();
 	
 	  // Render.
-	  highlightAnnotation.render();
+	  spanAnnotation.render();
 	
 	  // Add an input field.
 	  var x = annotation.rectangles[0].x + 5; // 5 = boundingRadius(3) + 2
@@ -19895,24 +19656,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    document.addEventListener('mouseup', handleDocumentMouseup);
 	
-	    highlightAnnotation.text = text;
-	    highlightAnnotation.setTextForceDisplay();
-	    highlightAnnotation.render();
-	    highlightAnnotation.save();
+	    spanAnnotation.text = text;
+	    spanAnnotation.setTextForceDisplay();
+	    spanAnnotation.render();
+	    spanAnnotation.save();
 	  });
 	
 	  if (prevAnnotation) {
 	    prevAnnotation.resetTextForceDisplay();
 	    prevAnnotation.render();
 	  }
-	  prevAnnotation = highlightAnnotation;
+	  prevAnnotation = spanAnnotation;
 	}
 	
 	/**
 	 * Enable hightlight behavior.
 	 */
-	function enableHighlight() {
-	  this.disableHighlight();
+	function enableSpan() {
+	  this.disableSpan();
 	  document.addEventListener('mouseup', handleDocumentMouseup);
 	  (0, _jquery2.default)('.textLayer').css('z-index', 3); // over svg layer.
 	}
@@ -19920,7 +19681,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Disable hightlight behavior.
 	 */
-	function disableHighlight() {
+	function disableSpan() {
 	  document.removeEventListener('mouseup', handleDocumentMouseup);
 	  (0, _jquery2.default)('.textLayer').css('z-index', 1);
 	
@@ -19932,7 +19693,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 45 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -19949,11 +19710,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _uuid2 = _interopRequireDefault(_uuid);
 	
-	var _abstract = __webpack_require__(41);
+	var _abstract = __webpack_require__(37);
 	
 	var _abstract2 = _interopRequireDefault(_abstract);
 	
-	var _text = __webpack_require__(42);
+	var _text = __webpack_require__(38);
 	
 	var _text2 = _interopRequireDefault(_text);
 	
@@ -19966,21 +19727,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	/**
-	 * Highlight Annotation.
+	 * Span Annotation.
 	 */
-	var HighlightAnnotation = function (_AbstractAnnotation) {
-	    _inherits(HighlightAnnotation, _AbstractAnnotation);
+	var SpanAnnotation = function (_AbstractAnnotation) {
+	    _inherits(SpanAnnotation, _AbstractAnnotation);
 	
 	    /**
 	     * Constructor.
 	     */
-	    function HighlightAnnotation() {
-	        _classCallCheck(this, HighlightAnnotation);
+	    function SpanAnnotation() {
+	        _classCallCheck(this, SpanAnnotation);
 	
-	        var _this = _possibleConstructorReturn(this, (HighlightAnnotation.__proto__ || Object.getPrototypeOf(HighlightAnnotation)).call(this));
+	        var _this = _possibleConstructorReturn(this, (SpanAnnotation.__proto__ || Object.getPrototypeOf(SpanAnnotation)).call(this));
 	
 	        _this.uuid = null;
-	        _this.type = 'highlight';
+	        _this.type = 'span';
 	        _this.rectangles = [];
 	        _this.text = null;
 	        _this.color = null;
@@ -20005,7 +19766,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 	
 	
-	    _createClass(HighlightAnnotation, [{
+	    _createClass(SpanAnnotation, [{
 	        key: 'setHoverEvent',
 	
 	
@@ -20023,7 +19784,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'destroy',
 	        value: function destroy() {
-	            _get(HighlightAnnotation.prototype.__proto__ || Object.getPrototypeOf(HighlightAnnotation.prototype), 'destroy', this).call(this);
+	            _get(SpanAnnotation.prototype.__proto__ || Object.getPrototypeOf(SpanAnnotation.prototype), 'destroy', this).call(this);
 	            this.emit('delete');
 	            window.globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
 	            window.globalEvent.removeListener('enableViewMode', this.enableViewMode);
@@ -20075,7 +19836,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'deleteSelectedAnnotation',
 	        value: function deleteSelectedAnnotation() {
-	            _get(HighlightAnnotation.prototype.__proto__ || Object.getPrototypeOf(HighlightAnnotation.prototype), 'deleteSelectedAnnotation', this).call(this);
+	            _get(SpanAnnotation.prototype.__proto__ || Object.getPrototypeOf(SpanAnnotation.prototype), 'deleteSelectedAnnotation', this).call(this);
 	        }
 	
 	        /**
@@ -20192,7 +19953,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'enableViewMode',
 	        value: function enableViewMode() {
-	            _get(HighlightAnnotation.prototype.__proto__ || Object.getPrototypeOf(HighlightAnnotation.prototype), 'enableViewMode', this).call(this);
+	            _get(SpanAnnotation.prototype.__proto__ || Object.getPrototypeOf(SpanAnnotation.prototype), 'enableViewMode', this).call(this);
 	
 	            this.disableViewMode();
 	
@@ -20208,14 +19969,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'disableViewMode',
 	        value: function disableViewMode() {
-	            console.log('highlight:disableViewMode');
-	            _get(HighlightAnnotation.prototype.__proto__ || Object.getPrototypeOf(HighlightAnnotation.prototype), 'disableViewMode', this).call(this);
+	            _get(SpanAnnotation.prototype.__proto__ || Object.getPrototypeOf(SpanAnnotation.prototype), 'disableViewMode', this).call(this);
 	            this.$element.find('circle').off('click');
 	        }
 	    }], [{
 	        key: 'newInstance',
 	        value: function newInstance(annotation) {
-	            var a = new HighlightAnnotation();
+	            var a = new SpanAnnotation();
 	            a.uuid = annotation.uuid || (0, _uuid2.default)();
 	            a.rectangles = annotation.rectangles;
 	            a.text = annotation.text;
@@ -20226,14 +19986,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }]);
 	
-	    return HighlightAnnotation;
+	    return SpanAnnotation;
 	}(_abstract2.default);
 	
-	exports.default = HighlightAnnotation;
+	exports.default = SpanAnnotation;
 	module.exports = exports['default'];
 
 /***/ },
-/* 46 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -20252,17 +20012,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _appendChild2 = _interopRequireDefault(_appendChild);
 	
-	var _utils = __webpack_require__(37);
+	var _utils = __webpack_require__(33);
 	
-	var _relation = __webpack_require__(34);
+	var _relation = __webpack_require__(30);
 	
-	var _text = __webpack_require__(39);
+	var _text = __webpack_require__(35);
 	
 	var _uuid3 = __webpack_require__(17);
 	
 	var _uuid4 = _interopRequireDefault(_uuid3);
 	
-	var _arrow = __webpack_require__(47);
+	var _arrow = __webpack_require__(43);
 	
 	var _arrow2 = _interopRequireDefault(_arrow);
 	
@@ -20563,7 +20323,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 47 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -20580,15 +20340,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _uuid2 = _interopRequireDefault(_uuid);
 	
-	var _abstract = __webpack_require__(41);
+	var _abstract = __webpack_require__(37);
 	
 	var _abstract2 = _interopRequireDefault(_abstract);
 	
-	var _text = __webpack_require__(42);
+	var _text = __webpack_require__(38);
 	
 	var _text2 = _interopRequireDefault(_text);
 	
-	var _relation = __webpack_require__(34);
+	var _relation = __webpack_require__(30);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -21040,13 +20800,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 48 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(49);
+	var content = __webpack_require__(45);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(5)(content, {});
@@ -21066,7 +20826,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 49 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(4)();
@@ -21074,13 +20834,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, "\n/**\n * Utilities.\n */\n.\\--hide {\n  display: none;\n}\n\n/**\n * SVGLayer.\n */\n.annoLayer {}\n.annoLayer > *.\\--viewMode {\n  opacity: 0.5;\n}\n.annoLayer > *.\\--viewMode.\\--emphasis {\n  opacity: 1;\n}\n\n/**\n    各種アノテーション\n*/\n.anno-circle {\n    transition:0.2s;\n    transform-origin: center center;\n}\n.\\--hover .anno-circle {\n  box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;\n  /*transform: scale(2);*/\n  stroke: blue;\n  stroke-width: 5px;\n}\n\n.\\--hover .anno-highlight {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-highlight {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n/**\n  Arrow.\n*/\n.anno-arrow {\n  transition:0.2s;\n}\n.\\--hover .anno-arrow {\n  stroke-width: 2px;\n}\n.\\--selected .anno-arrow {\n}\n.anno-arrow-outline {\n  fill: none;\n  visibility: hidden;\n}\n.\\--selected .anno-arrow-outline {\n  visibility: visible;\n  stroke: black;\n  stroke-width: 2.85px;\n  pointer-events: stroke;\n  stroke-dasharray: 3;\n}\n\n/**\n * Span.\n */\n.anno-span {}\n.anno-span rect {\n    /* Enable the hover event on circles and text even if they are overwraped other spans. */\n    pointer-events: none;\n}\n\n/**\n  Rect.\n*/\n.anno-rect {\n}\n.\\--hover .anno-rect {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-rect {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n\n/**\n  Text.\n*/\n.anno-text-group, .anno-text-group.\\--viewMode {\n    transition: 0.2s;\n    opacity: 0.01; /* for enabling a hover event. */\n}\n.anno-text-group.\\--hover,\n.anno-text-group.\\--selected,\n.anno-text-group.\\--visible {\n    opacity: 1;\n}\n.anno-text {\n}\n.\\--hover .anno-text {\n  fill: rgba(255, 255, 255, 1.0);\n  stroke: black;\n  stroke-width: 0.75px;\n}\n.\\--hover .anno-text ~ text {\n  fill: rgba(255, 0, 0, 1.0);\n}\n.\\--selected .anno-text {\n  stroke: rgba(255, 0, 0, 1.0);\n  stroke-width: 1.5px;\n  fill: rgba(255, 232, 188, 1.0);\n  stroke-dasharray: 3;\n}\n.\\--selected .anno-text ~ text {\n  fill: rgba(0, 0, 0, 1.0);\n}\n\n", ""]);
+	exports.push([module.id, "\n/**\n * Utilities.\n */\n.\\--hide {\n  display: none;\n}\n\n/**\n * SVGLayer.\n */\n.annoLayer {}\n.annoLayer > *.\\--viewMode {\n  opacity: 0.5;\n}\n.annoLayer > *.\\--viewMode.\\--emphasis {\n  opacity: 1;\n}\n\n/**\n    各種アノテーション\n*/\n.anno-circle {\n    transition:0.2s;\n    transform-origin: center center;\n}\n.\\--hover .anno-circle {\n  box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;\n  /*transform: scale(2);*/\n  stroke: blue;\n  stroke-width: 5px;\n}\n\n.\\--hover .anno-span {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-span {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n/**\n  Arrow.\n*/\n.anno-arrow {\n  transition:0.2s;\n}\n.\\--hover .anno-arrow {\n  stroke-width: 2px;\n}\n.\\--selected .anno-arrow {\n}\n.anno-arrow-outline {\n  fill: none;\n  visibility: hidden;\n}\n.\\--selected .anno-arrow-outline {\n  visibility: visible;\n  stroke: black;\n  stroke-width: 2.85px;\n  pointer-events: stroke;\n  stroke-dasharray: 3;\n}\n\n/**\n * Span.\n */\n.anno-span {}\n.anno-span rect {\n    /* Enable the hover event on circles and text even if they are overwraped other spans. */\n    pointer-events: none;\n}\n\n/**\n  Rect.\n*/\n.anno-rect {\n}\n.\\--hover .anno-rect {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-rect {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n\n/**\n  Text.\n*/\n.anno-text-group, .anno-text-group.\\--viewMode {\n    transition: 0.2s;\n    opacity: 0.01; /* for enabling a hover event. */\n}\n.anno-text-group.\\--hover,\n.anno-text-group.\\--selected,\n.anno-text-group.\\--visible {\n    opacity: 1;\n}\n.anno-text {\n}\n.\\--hover .anno-text {\n  fill: rgba(255, 255, 255, 1.0);\n  stroke: black;\n  stroke-width: 0.75px;\n}\n.\\--hover .anno-text ~ text {\n  fill: rgba(255, 0, 0, 1.0);\n}\n.\\--selected .anno-text {\n  stroke: rgba(255, 0, 0, 1.0);\n  stroke-width: 1.5px;\n  fill: rgba(255, 232, 188, 1.0);\n  stroke-dasharray: 3;\n}\n.\\--selected .anno-text ~ text {\n  fill: rgba(0, 0, 0, 1.0);\n}\n\n", ""]);
 	
 	// exports
 
 
 /***/ },
-/* 50 */
+/* 46 */
 /***/ function(module, exports) {
 
 	"use strict";

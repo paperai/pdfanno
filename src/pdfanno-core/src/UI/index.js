@@ -1,12 +1,11 @@
 import { disableRect, enableRect } from './rect';
-import { disableHighlight, enableHighlight } from './highlight';
+import { disableSpan, enableSpan } from './span';
 import { disableArrow, enableArrow } from './arrow';
 import { disableViewMode, enableViewMode } from './view';
 
 export default {
   disableRect, enableRect,
-  disableHighlight, enableHighlight,
+  disableSpan, enableSpan,
   disableArrow, enableArrow,
   disableViewMode, enableViewMode
 };
-
