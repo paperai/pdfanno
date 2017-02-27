@@ -87,7 +87,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function disableAnnotateTools() {
 	    window.iframeWindow.PDFAnnoCore.UI.disableRect();
 	    window.iframeWindow.PDFAnnoCore.UI.disableSpan();
-	    window.iframeWindow.PDFAnnoCore.UI.disableArrow();
+	    window.iframeWindow.PDFAnnoCore.UI.disableRelation();
 	    window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
 	}
 	
@@ -110,12 +110,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            window.iframeWindow.PDFAnnoCore.UI.enableViewMode();
 	        } else if (type === 'span') {
 	            window.iframeWindow.PDFAnnoCore.UI.enableSpan();
-	        } else if (type === 'arrow') {
-	            window.iframeWindow.PDFAnnoCore.UI.enableArrow('one-way');
-	        } else if (type === 'arrow-two-way') {
-	            window.iframeWindow.PDFAnnoCore.UI.enableArrow('two-way');
+	        } else if (type === 'one-way') {
+	            window.iframeWindow.PDFAnnoCore.UI.enableRelation('one-way');
+	        } else if (type === 'two-way') {
+	            window.iframeWindow.PDFAnnoCore.UI.enableRelation('two-way');
 	        } else if (type === 'link') {
-	            window.iframeWindow.PDFAnnoCore.UI.enableArrow('link');
+	            window.iframeWindow.PDFAnnoCore.UI.enableRelation('link');
 	        } else if (type === 'rect') {
 	            window.iframeWindow.PDFAnnoCore.UI.enableRect();
 	        }

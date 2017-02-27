@@ -84,9 +84,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _span2 = _interopRequireDefault(_span);
 	
-	var _arrow = __webpack_require__(43);
+	var _relation = __webpack_require__(43);
 	
-	var _arrow2 = _interopRequireDefault(_arrow);
+	var _relation2 = _interopRequireDefault(_relation);
 	
 	var _appendChild = __webpack_require__(22);
 	
@@ -233,10 +233,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    var span = _span2.default.newInstance(a);
 	                    span.render();
 	                    window.annotationContainer.add(span);
-	                } else if (a.type === 'arrow') {
-	                    var arrowAnnotation = _arrow2.default.newInstance(a);
-	                    arrowAnnotation.render();
-	                    window.annotationContainer.add(arrowAnnotation);
+	                } else if (a.type === 'relation') {
+	                    var relationAnnotation = _relation2.default.newInstance(a);
+	                    relationAnnotation.render();
+	                    window.annotationContainer.add(relationAnnotation);
 	                } else {
 	                    (0, _appendChild2.default)(svg, a);
 	                }
@@ -11670,7 +11670,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                label: annotation.text || ''
 	                            };
 	
-	                            // save tmporary for arrow.
+	                            // save tmporary for relation.
 	                            annotation.key = key;
 	
 	                            // Span.
@@ -11691,11 +11691,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                text: text
 	                            };
 	
-	                            // save tmporary for arrow.
+	                            // save tmporary for relation.
 	                            annotation.key = _key;
 	
-	                            // Arrow.
-	                        } else if (annotation.type === 'arrow') {
+	                            // Relation.
+	                        } else if (annotation.type === 'relation') {
 	
 	                            var rel1s = container.annotations.filter(function (a) {
 	                                return a.uuid === annotation.rel1;
@@ -11721,8 +11721,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            },
 	            importAnnotations: function importAnnotations(data, isPrimary) {
 	                return new Promise(function (resolve, reject) {
-	
-	                    // console.log('importAnnotations:', data);
 	
 	                    var currentContainers = _getContainers().filter(function (c) {
 	
@@ -11802,13 +11800,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    container.isPrimary = isPrimary;
 	
-	    // for (let documentId in json) {
-	
 	    var annotations = [];
-	    // container[documentId] = { annotations };
 	    container.annotations = annotations;
-	
-	    // for (let key in json[documentId]) {
 	
 	    var _loop = function _loop(key) {
 	
@@ -11816,11 +11809,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return 'continue';
 	        }
 	
-	        // let data = json[documentId][key];
 	        var data = json[key];
 	
 	        // Rect.
-	        // if (key.indexOf('rect') === 0) {
 	        if (data.type === 'rect') {
 	            annotations.push({
 	                class: 'Annotation',
@@ -11834,7 +11825,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                text: data.label,
 	                readOnly: readOnly,
 	                color: color,
-	                key: key // tmp for arrow.
+	                key: key // tmp for relation.
 	            });
 	
 	            // Span.
@@ -11857,29 +11848,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	                rectangles: rectangles,
 	                text: data.label,
 	                selectedText: data.text,
-	                key: key, // tmp for arrow.
+	                key: key, // tmp for relation.
 	                readOnly: readOnly,
 	                color: color
 	            });
 	
-	            // Arrow.
-	            // } else if (key.indexOf('rel') === 0) {
+	            // Relation.
 	        } else if (data.type === 'relation') {
 	
 	            // Find rels.
-	            var rel1s = annotations.filter(function (a) {
+	            var rel1 = annotations.filter(function (a) {
 	                return a.key === data.ids[0];
-	            });
-	            var rel1 = rel1s[0];
-	            var rel2s = annotations.filter(function (a) {
+	            })[0];
+	            var rel2 = annotations.filter(function (a) {
 	                return a.key === data.ids[1];
-	            });
-	            var rel2 = rel2s[0];
+	            })[0];
 	
-	            // Add arrow.
+	            // Add relation.
 	            annotations.push({
 	                class: 'Annotation',
-	                type: 'arrow',
+	                type: 'relation',
 	                direction: data.dir,
 	                uuid: (0, _uuid2.default)(),
 	                text: data.label,
@@ -11889,7 +11877,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                color: color
 	            });
 	        }
-	        // }
 	    };
 	
 	    for (var key in json) {
@@ -16575,9 +16562,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _renderText2 = _interopRequireDefault(_renderText);
 	
-	var _renderArrow = __webpack_require__(29);
+	var _renderRelation = __webpack_require__(29);
 	
-	var _renderArrow2 = _interopRequireDefault(_renderArrow);
+	var _renderRelation2 = _interopRequireDefault(_renderRelation);
 	
 	var _renderCircle = __webpack_require__(26);
 	
@@ -16705,8 +16692,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    case 'textbox':
 	      child = (0, _renderText2.default)(annotation, svg);
 	      break;
-	    case 'arrow':
-	      child = (0, _renderArrow2.default)(annotation, svg);
+	    case 'relation':
+	      child = (0, _renderRelation2.default)(annotation, svg);
 	      break;
 	    case 'circle':
 	      child = (0, _renderCircle2.default)(annotation, svg);
@@ -17200,8 +17187,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.default = renderArrow;
-	exports.createArrow = createArrow;
+	exports.default = renderRelation;
+	exports.createRelation = createRelation;
 	
 	var _setAttributes = __webpack_require__(25);
 	
@@ -17215,29 +17202,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var arrowSecondaryColor = ['green', 'blue', 'purple'];
+	var secondaryColor = ['green', 'blue', 'purple'];
 	
 	/**
 	 * Create SVGGElements from an annotation definition.
-	 * This is used for anntations of type `arrow`.
+	 * This is used for anntations of type `relation`.
 	 *
 	 * @param {Object} a The annotation definition
-	 * @return {SVGGElement} A group of an arrow to be rendered
+	 * @return {SVGGElement} A group of a relation to be rendered
 	 */
-	function renderArrow(a) {
+	function renderRelation(a) {
 	
-	  var arrow = createArrow(a);
-	  return arrow;
+	  var relation = createRelation(a);
+	  return relation;
 	}
 	
-	function createArrow(a) {
+	function createRelation(a) {
 	  var id = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 	
 	
 	  var color = a.color;
 	  if (!color) {
 	    if (a.readOnly) {
-	      color = arrowSecondaryColor[a.seq % arrowSecondaryColor.length];
+	      color = secondaryColor[a.seq % secondaryColor.length];
 	    } else {
 	      color = '#F00';
 	    }
@@ -17275,7 +17262,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    markerWidth: 2,
 	    markerHeight: 3,
 	    fill: color,
-	    id: 'arrowhead',
+	    id: 'relationhead',
 	    orient: "auto-start-reverse"
 	  });
 	  marker.setAttribute('refX', 5);
@@ -17295,37 +17282,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var outline = document.createElementNS('http://www.w3.org/2000/svg', 'path');
 	  (0, _setAttributes2.default)(outline, {
 	    d: 'M ' + a.x1 + ' ' + a.y1 + ' Q ' + control.x + ' ' + control.y + ' ' + a.x2 + ' ' + a.y2,
-	    class: 'anno-arrow-outline'
+	    class: 'anno-relation-outline'
 	  });
 	  group.appendChild(outline);
 	
 	  /*
 	    <path d="M 25 25 Q 175 25 175 175" stroke="blue" fill="none"/>
 	  */
-	  var arrow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-	  (0, _setAttributes2.default)(arrow, {
+	  var relation = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+	  (0, _setAttributes2.default)(relation, {
 	    d: 'M ' + a.x1 + ' ' + a.y1 + ' Q ' + control.x + ' ' + control.y + ' ' + a.x2 + ' ' + a.y2,
 	    stroke: color,
 	    strokeWidth: 1,
 	    fill: 'none',
-	    class: 'anno-arrow'
+	    class: 'anno-relation'
 	  });
 	
 	  // Triangle for the end point.
 	  if (a.direction === 'one-way' || a.direction === 'two-way') {
-	    arrow.setAttribute('marker-end', 'url(#arrowhead)');
+	    relation.setAttribute('marker-end', 'url(#relationhead)');
 	  }
 	
 	  // Triangle for the start point.
 	  if (a.direction === 'two-way') {
-	    arrow.setAttribute('marker-start', 'url(#arrowhead)');
+	    relation.setAttribute('marker-start', 'url(#relationhead)');
 	  }
 	
 	  if (id) {
-	    (0, _setAttributes2.default)(arrow, { id: id });
+	    (0, _setAttributes2.default)(relation, { id: id });
 	  }
 	
-	  group.appendChild(arrow);
+	  group.appendChild(relation);
 	
 	  return group;
 	}
@@ -17493,14 +17480,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _span = __webpack_require__(40);
 	
-	var _arrow = __webpack_require__(42);
+	var _relation = __webpack_require__(42);
 	
 	var _view = __webpack_require__(39);
 	
 	exports.default = {
 	  disableRect: _rect.disableRect, enableRect: _rect.enableRect,
 	  disableSpan: _span.disableSpan, enableSpan: _span.enableSpan,
-	  disableArrow: _arrow.disableArrow, enableArrow: _arrow.enableArrow,
+	  disableRelation: _relation.disableRelation, enableRelation: _relation.enableRelation,
 	  disableViewMode: _view.disableViewMode, enableViewMode: _view.enableViewMode
 	};
 	module.exports = exports['default'];
@@ -20001,8 +19988,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.enableArrow = enableArrow;
-	exports.disableArrow = disableArrow;
+	exports.enableRelation = enableRelation;
+	exports.disableRelation = disableRelation;
 	
 	var _jquery = __webpack_require__(6);
 	
@@ -20018,13 +20005,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _text = __webpack_require__(35);
 	
-	var _uuid3 = __webpack_require__(17);
+	var _relation2 = __webpack_require__(43);
 	
-	var _uuid4 = _interopRequireDefault(_uuid3);
-	
-	var _arrow = __webpack_require__(43);
-	
-	var _arrow2 = _interopRequireDefault(_arrow);
+	var _relation3 = _interopRequireDefault(_relation2);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -20034,15 +20017,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	var prevAnnotation = void 0;
 	
 	var _hoverAnnotation = null;
-	var arrowAnnotation = null;
+	var relationAnnotation = null;
 	
 	var forEach = Array.prototype.forEach;
 	
 	var _enabled = false;
 	
-	var _arrowType = void 0;
-	
-	var arrow = void 0;
+	var _relationType = void 0;
 	
 	var dragging = false;
 	
@@ -20060,11 +20041,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	function handleDocumentMousedown(e) {
 	
 	  if (_hoverAnnotation) {
-	    arrowAnnotation = new _arrow2.default();
-	    arrowAnnotation.direction = _arrowType;
-	    arrowAnnotation.rel1Annotation = _hoverAnnotation;
-	    arrowAnnotation.readOnly = false;
-	    arrowAnnotation.setDisableHoverEvent();
+	    relationAnnotation = new _relation3.default();
+	    relationAnnotation.direction = _relationType;
+	    relationAnnotation.rel1Annotation = _hoverAnnotation;
+	    relationAnnotation.readOnly = false;
+	    relationAnnotation.setDisableHoverEvent();
 	
 	    document.addEventListener('mouseup', handleDocumentMouseup);
 	
@@ -20091,23 +20072,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  if (dragging) {
 	    var p = (0, _utils.scaleDown)(getClientXY(e));
-	    arrowAnnotation.x2 = p.x;
-	    arrowAnnotation.y2 = p.y;
-	    arrowAnnotation.render();
+	    relationAnnotation.x2 = p.x;
+	    relationAnnotation.y2 = p.y;
+	    relationAnnotation.render();
 	  }
 	
 	  // Hover visual event.
 	  var circle = findHitBoundingCircle(e);
 	  if (!hitCircle && circle) {
 	    hitCircle = circle;
-	    var _uuid = (0, _jquery2.default)(hitCircle).parents('g').data('pdf-annotate-id');
-	    var annotation = window.annotationContainer.findById(_uuid);
+	    var uuid = (0, _jquery2.default)(hitCircle).parents('g').data('pdf-annotate-id');
+	    var annotation = window.annotationContainer.findById(uuid);
 	    if (annotation) {
 	      annotation.highlight();
 	    }
 	  } else if (hitCircle && !circle) {
-	    var _uuid2 = (0, _jquery2.default)(hitCircle).parents('g').data('pdf-annotate-id');
-	    var _annotation = window.annotationContainer.findById(_uuid2);
+	    var _uuid = (0, _jquery2.default)(hitCircle).parents('g').data('pdf-annotate-id');
+	    var _annotation = window.annotationContainer.findById(_uuid);
 	    if (_annotation) {
 	      _annotation.dehighlight();
 	    }
@@ -20130,6 +20111,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return null;
 	}
 	
+	/**
+	 * Judge whether the mouse pointer on a circle.
+	 */
 	function isCircleHit(pos, element) {
 	  // <circle cx="100" cy="100" r="100"/>
 	  var r = parseFloat(element.getAttribute('r'));
@@ -20157,23 +20141,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // Find the end position.
 	  var circle = findHitBoundingCircle(e);
 	  if (!circle) {
-	    arrowAnnotation.destroy();
-	    arrowAnnotation = null;
+	    relationAnnotation.destroy();
+	    relationAnnotation = null;
 	    return;
 	  }
 	
 	  var uuid = circle.parentNode.getAttribute('data-pdf-annotate-id');
 	  var endAnnotation = window.annotationContainer.findById(uuid);
-	  if (arrowAnnotation.rel1Annotation === endAnnotation) {
-	    arrowAnnotation.destroy();
-	    arrowAnnotation = null;
+	  if (relationAnnotation.rel1Annotation === endAnnotation) {
+	    relationAnnotation.destroy();
+	    relationAnnotation = null;
 	    return;
 	  }
 	
-	  arrowAnnotation.rel2Annotation = endAnnotation;
-	  arrowAnnotation.setEnableHoverEvent();
+	  relationAnnotation.rel2Annotation = endAnnotation;
+	  relationAnnotation.setEnableHoverEvent();
 	
-	  arrowAnnotation.save();
+	  relationAnnotation.save();
 	
 	  showTextInput();
 	
@@ -20181,13 +20165,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    prevAnnotation.resetTextForceDisplay();
 	    prevAnnotation.render();
 	  }
-	  prevAnnotation = arrowAnnotation;
+	  prevAnnotation = relationAnnotation;
 	}
 	
 	function showTextInput() {
 	
-	  var p1 = arrowAnnotation.rel1Annotation.getBoundingCirclePosition();
-	  var p2 = arrowAnnotation.rel2Annotation.getBoundingCirclePosition();
+	  var p1 = relationAnnotation.rel1Annotation.getBoundingCirclePosition();
+	  var p2 = relationAnnotation.rel2Annotation.getBoundingCirclePosition();
 	  var textPosition = (0, _relation.getRelationTextPosition)(p1.x, p1.y, p2.x, p2.y);
 	
 	  var boundingRect = svg.getBoundingClientRect();
@@ -20197,10 +20181,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  (0, _text.addInputField)(x, y, null, null, function (text) {
 	
-	    arrowAnnotation.text = text;
-	    arrowAnnotation.setTextForceDisplay();
-	    arrowAnnotation.save();
-	    arrowAnnotation.render();
+	    relationAnnotation.text = text;
+	    relationAnnotation.setTextForceDisplay();
+	    relationAnnotation.save();
+	    relationAnnotation.render();
 	  });
 	}
 	
@@ -20252,17 +20236,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	/**
-	 * Enable arrow behavior.
+	 * Enable relation behavior.
 	 */
-	function enableArrow() {
-	  var arrowType = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'one-way';
+	function enableRelation() {
+	  var relationType = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'one-way';
 	
 	  if (_enabled) {
 	    return;
 	  }
 	
 	  _enabled = true;
-	  _arrowType = arrowType;
+	  _relationType = relationType;
 	
 	  createBoundingBoxList();
 	  (0, _utils.disableUserSelect)();
@@ -20286,9 +20270,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	/**
-	 * Disable arrow behavior.
+	 * Disable relation behavior.
 	 */
-	function disableArrow() {
+	function disableRelation() {
 	  if (!_enabled) {
 	    return;
 	  }
@@ -20361,24 +20345,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	var globalEvent = void 0;
 	
 	/**
-	 * Arrow Annotation (one-way / two-way / link)
+	 * Relation Annotation (one-way / two-way / link)
 	 */
 	
-	var ArrowAnnotation = function (_AbstractAnnotation) {
-	    _inherits(ArrowAnnotation, _AbstractAnnotation);
+	var RelationAnnotation = function (_AbstractAnnotation) {
+	    _inherits(RelationAnnotation, _AbstractAnnotation);
 	
 	    /**
 	     * Constructor.
 	     */
-	    function ArrowAnnotation() {
-	        _classCallCheck(this, ArrowAnnotation);
+	    function RelationAnnotation() {
+	        _classCallCheck(this, RelationAnnotation);
 	
-	        var _this = _possibleConstructorReturn(this, (ArrowAnnotation.__proto__ || Object.getPrototypeOf(ArrowAnnotation)).call(this));
+	        var _this = _possibleConstructorReturn(this, (RelationAnnotation.__proto__ || Object.getPrototypeOf(RelationAnnotation)).call(this));
 	
 	        globalEvent = window.globalEvent;
 	
 	        _this.uuid = (0, _uuid2.default)();
-	        _this.type = 'arrow';
+	        _this.type = 'relation';
 	        _this.rel1Annotation = null;
 	        _this.rel2Annotation = null;
 	        _this.text = null;
@@ -20411,7 +20395,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 	
 	
-	    _createClass(ArrowAnnotation, [{
+	    _createClass(RelationAnnotation, [{
 	        key: 'setHoverEvent',
 	
 	
@@ -20435,7 +20419,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         */
 	        value: function render() {
 	            this.setStartEndPosition();
-	            _get(ArrowAnnotation.prototype.__proto__ || Object.getPrototypeOf(ArrowAnnotation.prototype), 'render', this).call(this);
+	            _get(RelationAnnotation.prototype.__proto__ || Object.getPrototypeOf(RelationAnnotation.prototype), 'render', this).call(this);
 	        }
 	
 	        /**
@@ -20464,7 +20448,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'destroy',
 	        value: function destroy() {
-	            _get(ArrowAnnotation.prototype.__proto__ || Object.getPrototypeOf(ArrowAnnotation.prototype), 'destroy', this).call(this);
+	            _get(RelationAnnotation.prototype.__proto__ || Object.getPrototypeOf(RelationAnnotation.prototype), 'destroy', this).call(this);
 	            if (this._rel1Annotation) {
 	                this._rel1Annotation.removeListener('hoverin', this.handleRelHoverIn);
 	                this._rel1Annotation.removeListener('hoverout', this.handleRelHoverOut);
@@ -20493,7 +20477,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'deleteSelectedAnnotation',
 	        value: function deleteSelectedAnnotation() {
-	            _get(ArrowAnnotation.prototype.__proto__ || Object.getPrototypeOf(ArrowAnnotation.prototype), 'deleteSelectedAnnotation', this).call(this);
+	            _get(RelationAnnotation.prototype.__proto__ || Object.getPrototypeOf(RelationAnnotation.prototype), 'deleteSelectedAnnotation', this).call(this);
 	        }
 	
 	        /**
@@ -20696,7 +20680,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'enableViewMode',
 	        value: function enableViewMode() {
-	            _get(ArrowAnnotation.prototype.__proto__ || Object.getPrototypeOf(ArrowAnnotation.prototype), 'enableViewMode', this).call(this);
+	            _get(RelationAnnotation.prototype.__proto__ || Object.getPrototypeOf(RelationAnnotation.prototype), 'enableViewMode', this).call(this);
 	
 	            this.disableViewMode();
 	
@@ -20712,12 +20696,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'disableViewMode',
 	        value: function disableViewMode() {
-	            _get(ArrowAnnotation.prototype.__proto__ || Object.getPrototypeOf(ArrowAnnotation.prototype), 'disableViewMode', this).call(this);
+	            _get(RelationAnnotation.prototype.__proto__ || Object.getPrototypeOf(RelationAnnotation.prototype), 'disableViewMode', this).call(this);
 	            this.$element.find('path').off('click');
 	        }
 	
 	        /**
-	         * Set the start / end points of the arrow.
+	         * Set the start / end points of the relation.
 	         */
 	
 	    }, {
@@ -20780,7 +20764,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }], [{
 	        key: 'newInstance',
 	        value: function newInstance(annotation) {
-	            var a = new ArrowAnnotation();
+	            var a = new RelationAnnotation();
 	            a.uuid = annotation.uuid || (0, _uuid2.default)();
 	            a.direction = annotation.direction;
 	            a.rel1Annotation = window.annotationContainer.findById(annotation.rel1);
@@ -20793,10 +20777,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }]);
 	
-	    return ArrowAnnotation;
+	    return RelationAnnotation;
 	}(_abstract2.default);
 	
-	exports.default = ArrowAnnotation;
+	exports.default = RelationAnnotation;
 	module.exports = exports['default'];
 
 /***/ },
@@ -20834,7 +20818,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, "\n/**\n * Utilities.\n */\n.\\--hide {\n  display: none;\n}\n\n/**\n * SVGLayer.\n */\n.annoLayer {}\n.annoLayer > *.\\--viewMode {\n  opacity: 0.5;\n}\n.annoLayer > *.\\--viewMode.\\--emphasis {\n  opacity: 1;\n}\n\n/**\n    各種アノテーション\n*/\n.anno-circle {\n    transition:0.2s;\n    transform-origin: center center;\n}\n.\\--hover .anno-circle {\n  box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;\n  /*transform: scale(2);*/\n  stroke: blue;\n  stroke-width: 5px;\n}\n\n.\\--hover .anno-span {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-span {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n/**\n  Arrow.\n*/\n.anno-arrow {\n  transition:0.2s;\n}\n.\\--hover .anno-arrow {\n  stroke-width: 2px;\n}\n.\\--selected .anno-arrow {\n}\n.anno-arrow-outline {\n  fill: none;\n  visibility: hidden;\n}\n.\\--selected .anno-arrow-outline {\n  visibility: visible;\n  stroke: black;\n  stroke-width: 2.85px;\n  pointer-events: stroke;\n  stroke-dasharray: 3;\n}\n\n/**\n * Span.\n */\n.anno-span {}\n.anno-span rect {\n    /* Enable the hover event on circles and text even if they are overwraped other spans. */\n    pointer-events: none;\n}\n\n/**\n  Rect.\n*/\n.anno-rect {\n}\n.\\--hover .anno-rect {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-rect {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n\n/**\n  Text.\n*/\n.anno-text-group, .anno-text-group.\\--viewMode {\n    transition: 0.2s;\n    opacity: 0.01; /* for enabling a hover event. */\n}\n.anno-text-group.\\--hover,\n.anno-text-group.\\--selected,\n.anno-text-group.\\--visible {\n    opacity: 1;\n}\n.anno-text {\n}\n.\\--hover .anno-text {\n  fill: rgba(255, 255, 255, 1.0);\n  stroke: black;\n  stroke-width: 0.75px;\n}\n.\\--hover .anno-text ~ text {\n  fill: rgba(255, 0, 0, 1.0);\n}\n.\\--selected .anno-text {\n  stroke: rgba(255, 0, 0, 1.0);\n  stroke-width: 1.5px;\n  fill: rgba(255, 232, 188, 1.0);\n  stroke-dasharray: 3;\n}\n.\\--selected .anno-text ~ text {\n  fill: rgba(0, 0, 0, 1.0);\n}\n\n", ""]);
+	exports.push([module.id, "\n/**\n * Utilities.\n */\n.\\--hide {\n  display: none;\n}\n\n/**\n * SVGLayer.\n */\n.annoLayer {}\n.annoLayer > *.\\--viewMode {\n  opacity: 0.5;\n}\n.annoLayer > *.\\--viewMode.\\--emphasis {\n  opacity: 1;\n}\n\n/**\n    各種アノテーション\n*/\n.anno-circle {\n    transition:0.2s;\n    transform-origin: center center;\n}\n.\\--hover .anno-circle {\n  box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;\n  /*transform: scale(2);*/\n  stroke: blue;\n  stroke-width: 5px;\n}\n\n.\\--hover .anno-span {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-span {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n/**\n  Relation.\n*/\n.anno-relation {\n  transition:0.2s;\n}\n.\\--hover .anno-relation {\n  stroke-width: 2px;\n}\n.\\--selected .anno-relation {\n}\n.anno-relation-outline {\n  fill: none;\n  visibility: hidden;\n}\n.\\--selected .anno-relation-outline {\n  visibility: visible;\n  stroke: black;\n  stroke-width: 2.85px;\n  pointer-events: stroke;\n  stroke-dasharray: 3;\n}\n\n/**\n * Span.\n */\n.anno-span {}\n.anno-span rect {\n    /* Enable the hover event on circles and text even if they are overwraped other spans. */\n    pointer-events: none;\n}\n\n/**\n  Rect.\n*/\n.anno-rect {\n}\n.\\--hover .anno-rect {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-rect {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n\n/**\n  Text.\n*/\n.anno-text-group, .anno-text-group.\\--viewMode {\n    transition: 0.2s;\n    opacity: 0.01; /* for enabling a hover event. */\n}\n.anno-text-group.\\--hover,\n.anno-text-group.\\--selected,\n.anno-text-group.\\--visible {\n    opacity: 1;\n}\n.anno-text {\n}\n.\\--hover .anno-text {\n  fill: rgba(255, 255, 255, 1.0);\n  stroke: black;\n  stroke-width: 0.75px;\n}\n.\\--hover .anno-text ~ text {\n  fill: rgba(255, 0, 0, 1.0);\n}\n.\\--selected .anno-text {\n  stroke: rgba(255, 0, 0, 1.0);\n  stroke-width: 1.5px;\n  fill: rgba(255, 232, 188, 1.0);\n  stroke-dasharray: 3;\n}\n.\\--selected .anno-text ~ text {\n  fill: rgba(0, 0, 0, 1.0);\n}\n\n", ""]);
 	
 	// exports
 
