@@ -3,15 +3,12 @@ import appendChild from '../render/appendChild';
 import {
   disableUserSelect,
   enableUserSelect,
-  findSVGAtPoint,
-  getMetadata,
   scaleDown,
   scaleUp,
   getSVGLayer
 } from './utils';
 import { getRelationTextPosition } from '../utils/relation.js';
 import { addInputField } from './text';
-import uuid from '../utils/uuid';
 
 import RelationAnnotation from '../annotation/relation';
 
@@ -118,6 +115,9 @@ function findHitBoundingCircle(e) {
     return null;
 }
 
+/**
+ * Judge whether the mouse pointer on a circle.
+ */
 function isCircleHit(pos, element) {
     // <circle cx="100" cy="100" r="100"/>
     let r = parseFloat(element.getAttribute('r'));
