@@ -1,6 +1,9 @@
 require("file?name=dist/index.html!./index.html");
 require("!style!css!./pdfanno.css");
 
+import { convertToExportY } from 'pdfanno-core/src/utils/position';
+
+
 /**
  * The data which is loaded via `Browse` button.
  */
@@ -551,6 +554,80 @@ function setupReferenceAnnoDropdown() {
 }
 
 /**
+ * Setup the dropdown for Anno list.
+ */
+function setupAnnoListDropdown() {
+
+
+    $('#dropdownAnnoList').on('click', () => {
+        console.log('clicked');
+
+        // Get displayed annotations.
+        let annotations = iframeWindow.annotationContainer.getAllAnnotations();
+
+        // Filter only Primary.
+        annotations = annotations.filter(a => {
+            return !a.readOnly;
+        });
+
+        // Sort by offsetY.
+        annotations = annotations.sort((a1, a2) => {
+
+            let y1 = (a1.rectancles ? a1.rectancles[0].y : a1.y);
+            let y2 = (a2.rectancles ? a2.rectancles[0].y : a2.y);
+
+            return y1 - y2;
+        });
+
+        // Create elements.
+        let elements = annotations.map(a => {
+
+            let icon;
+            if (a.type === 'span') {
+                icon = '<i class="fa fa-pencil"></i>';
+            } else if (a.type === 'relation' && a.direction === 'one-way') {
+                icon = '<i class="fa fa-long-arrow-right"></i>';
+            } else if (a.type === 'relation' && a.direction === 'two-way') {
+                icon = '<i class="fa fa-arrows-h"></i>';
+            } else if (a.type === 'relation' && a.direction === 'link') {
+                icon = '<i class="fa fa-minus"></i>';
+            } else if (a.type === 'span') {
+                icon = '<i class="fa fa-square-o"></i>';
+            }
+
+            let snipet = `
+                <li>
+                    <a href="#" data-page="1">
+                        ${icon}
+                        <span>${a.text}</span>
+                    </a>
+                </li>
+            `;
+
+            return snipet;
+        });
+
+        $('#dropdownAnnoList ul').append(elements);
+
+
+
+
+
+
+    });
+
+    $('#dropdownAnnoList').on('click', 'a', () => {
+        console.log('clicked2');
+
+        // Close the dropdown.
+        $('#dropdownAnnoList').click();
+    });
+
+
+
+}
+
+/**
  * Clear the all annotations from the view and storage.
  */
 function clearAllAnnotations() {
@@ -606,5 +683,6 @@ window.addEventListener('DOMContentLoaded', e => {
     setupPdfDropdown();
     setupPrimaryAnnoDropdown();
     setupReferenceAnnoDropdown();
+    setupAnnoListDropdown();
 
 });
