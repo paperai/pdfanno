@@ -1,7 +1,7 @@
 require("file?name=dist/index.html!./index.html");
 require("!style!css!./pdfanno.css");
 
-import { convertToExportY } from 'pdfanno-core/src/utils/position';
+import { convertToExportY } from 'core/src/utils/position';
 
 
 /**

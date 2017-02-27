@@ -3,7 +3,7 @@ var webpack = require('webpack');
 module.exports = {
   entry: {
     pdfanno : './src/pdfanno.js',
-    'pdfanno-core' : './src/pdfanno-core/index.js'
+    'pdfanno-core' : './src/core/index.js'
   },
   output: {
     filename: './dist/[name].bundle.js',
