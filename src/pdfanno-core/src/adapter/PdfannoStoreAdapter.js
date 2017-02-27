@@ -124,7 +124,7 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                                 label    : annotation.text || ''
                             };
 
-                            // save tmporary for arrow.
+                            // save tmporary for relation.
                             annotation.key = key;
 
                         // Span.
@@ -155,11 +155,11 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                                 text
                             };
 
-                            // save tmporary for arrow.
+                            // save tmporary for relation.
                             annotation.key = key;
 
-                        // Arrow.
-                        } else if (annotation.type === 'arrow') {
+                        // Relation.
+                        } else if (annotation.type === 'relation') {
 
                             let rel1s = container.annotations.filter(a => a.uuid === annotation.rel1);
                             let rel1 = rel1s[0];
@@ -186,7 +186,6 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
             importAnnotations(data, isPrimary) {
                 return new Promise((resolve, reject) => {
 
-                    // console.log('importAnnotations:', data);
 
                     let currentContainers = _getContainers().filter(c => {
 
@@ -261,90 +260,80 @@ function _createContainerFromJson(json, color, isPrimary) {
 
     container.isPrimary = isPrimary;
 
-    // for (let documentId in json) {
 
         let annotations = [];
-        // container[documentId] = { annotations };
         container.annotations = annotations;
 
-        // for (let key in json[documentId]) {
         for (let key in json) {
 
-                if (key === 'version') {
-                        continue;
-                }
+            if (key === 'version') {
+                    continue;
+            }
 
-            // let data = json[documentId][key];
             let data = json[key];
 
             // Rect.
-            // if (key.indexOf('rect') === 0) {
-        if (data.type === 'rect') {
+            if (data.type === 'rect') {
                 annotations.push({
-                    class    : 'Annotation',
-                    type     : 'area',
-                    uuid     : uuid(),
-                    page     : data.page,
-                    x            : data.position[0],
-                    y            : data.position[1],
-                    width    : data.position[2],
+                    class  : 'Annotation',
+                    type   : 'area',
+                    uuid   : uuid(),
+                    page   : data.page,
+                    x      : data.position[0],
+                    y      : data.position[1],
+                    width  : data.position[2],
                     height : data.position[3],
-                    text     : data.label,
+                    text   : data.label,
                     readOnly,
                     color,
-                    key        : key // tmp for arrow.
+                    key    : key // tmp for relation.
                 });
 
             // Span.
-        } else if (data.type === 'span') {
-                // rectangles.
-                let rectangles = data.position.map(d => {
-                    return {
-                        page     : data.page,
-                        x            : d[0],
-                        y            : d[1],
-                        width    : d[2],
-                        height : d[3]
-                    }
-                });
-                annotations.push({
-                    class        : 'Annotation',
-                    type         : 'span',
-                    uuid         : uuid(),
-                    page         : data.page,
-                    rectangles,
-                    text         : data.label,
-                    selectedText : data.text,
-                    key          : key,    // tmp for arrow.
-                    readOnly,
-                    color
-                });
+            } else if (data.type === 'span') {
+                    // rectangles.
+                    let rectangles = data.position.map(d => {
+                        return {
+                            page   : data.page,
+                            x      : d[0],
+                            y      : d[1],
+                            width  : d[2],
+                            height : d[3]
+                        }
+                    });
+                    annotations.push({
+                        class        : 'Annotation',
+                        type         : 'span',
+                        uuid         : uuid(),
+                        page         : data.page,
+                        rectangles,
+                        text         : data.label,
+                        selectedText : data.text,
+                        key          : key,    // tmp for relation.
+                        readOnly,
+                        color
+                    });
 
-            // Arrow.
-            // } else if (key.indexOf('rel') === 0) {
+            // Relation.
             } else if (data.type === 'relation') {
 
                 // Find rels.
-                let rel1s = annotations.filter(a => a.key === data.ids[0]);
-                let rel1 = rel1s[0];
-                let rel2s = annotations.filter(a => a.key === data.ids[1]);
-                let rel2 = rel2s[0];
+                let rel1 = annotations.filter(a => a.key === data.ids[0])[0];
+                let rel2 = annotations.filter(a => a.key === data.ids[1])[0];
 
-                // Add arrow.
+                // Add relation.
                 annotations.push({
-                    class            : 'Annotation',
-                    type             : 'arrow',
-                    direction    : data.dir,
-                    uuid             : uuid(),
-                    text             : data.label,
-                    rel1             : rel1.uuid,
-                    rel2             : rel2.uuid,
+                    class     : 'Annotation',
+                    type      : 'relation',
+                    direction : data.dir,
+                    uuid      : uuid(),
+                    text      : data.label,
+                    rel1      : rel1.uuid,
+                    rel2      : rel2.uuid,
                     readOnly,
                     color
                 });
-
             }
-        // }
     }
 
     return container;

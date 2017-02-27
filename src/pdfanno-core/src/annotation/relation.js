@@ -6,9 +6,9 @@ import { getRelationTextPosition } from '../utils/relation.js';
 let globalEvent;
 
 /**
- * Arrow Annotation (one-way / two-way / link)
+ * Relation Annotation (one-way / two-way / link)
  */
-export default class ArrowAnnotation extends AbstractAnnotation {
+export default class RelationAnnotation extends AbstractAnnotation {
 
     /**
      * Constructor.
@@ -19,7 +19,7 @@ export default class ArrowAnnotation extends AbstractAnnotation {
         globalEvent = window.globalEvent;
 
         this.uuid           = uuid();
-        this.type           = 'arrow';
+        this.type           = 'relation';
         this.rel1Annotation = null;
         this.rel2Annotation = null;
         this.text           = null;
@@ -50,7 +50,7 @@ export default class ArrowAnnotation extends AbstractAnnotation {
      * Create an instance from an annotation data.
      */
     static newInstance(annotation) {
-        let a            = new ArrowAnnotation();
+        let a            = new RelationAnnotation();
         a.uuid           = annotation.uuid || uuid();
         a.direction      = annotation.direction;
         a.rel1Annotation = window.annotationContainer.findById(annotation.rel1);
@@ -336,7 +336,7 @@ export default class ArrowAnnotation extends AbstractAnnotation {
     }
 
     /**
-     * Set the start / end points of the arrow.
+     * Set the start / end points of the relation.
      */
     setStartEndPosition() {
         if (this._rel1Annotation) {
