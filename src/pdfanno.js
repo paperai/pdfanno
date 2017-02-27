@@ -1,7 +1,7 @@
 require("file?name=dist/index.html!./index.html");
 require("!style!css!./pdfanno.css");
 
-import { convertToExportY } from 'core/src/utils/position';
+import { convertToExportY } from './core/src/utils/position';
 
 
 /**
@@ -553,14 +553,26 @@ function setupReferenceAnnoDropdown() {
     });
 }
 
+function _getY(annotation) {
+
+    if (annotation.rectangles) {
+        return annotation.rectangles[0].y;
+
+    } else if (annotation.y1) {
+        return annotation.y1;
+
+    } else {
+        return annotation.y;
+    }
+}
+
 /**
  * Setup the dropdown for Anno list.
  */
 function setupAnnoListDropdown() {
 
-
+    // Show the list of primary annotations.
     $('#dropdownAnnoList').on('click', () => {
-        console.log('clicked');
 
         // Get displayed annotations.
         let annotations = iframeWindow.annotationContainer.getAllAnnotations();
@@ -572,11 +584,7 @@ function setupAnnoListDropdown() {
 
         // Sort by offsetY.
         annotations = annotations.sort((a1, a2) => {
-
-            let y1 = (a1.rectancles ? a1.rectancles[0].y : a1.y);
-            let y2 = (a2.rectancles ? a2.rectancles[0].y : a2.y);
-
-            return y1 - y2;
+            return _getY(a1) - _getY(a2);
         });
 
         // Create elements.
@@ -591,14 +599,18 @@ function setupAnnoListDropdown() {
                 icon = '<i class="fa fa-arrows-h"></i>';
             } else if (a.type === 'relation' && a.direction === 'link') {
                 icon = '<i class="fa fa-minus"></i>';
-            } else if (a.type === 'span') {
+            } else if (a.type === 'area') {
                 icon = '<i class="fa fa-square-o"></i>';
             }
 
+            let y = _getY(a);
+            let { pageNumber } = convertToExportY(y);
+
+
             let snipet = `
                 <li>
-                    <a href="#" data-page="1">
-                        ${icon}
+                    <a href="#" data-page="${pageNumber}" data-id="${a.uuid}">
+                        ${icon}&nbsp;&nbsp;
                         <span>${a.text}</span>
                     </a>
                 </li>
@@ -607,17 +619,27 @@ function setupAnnoListDropdown() {
             return snipet;
         });
 
-        $('#dropdownAnnoList ul').append(elements);
-
-
-
-
-
+        $('#dropdownAnnoList ul').html(elements);
 
     });
 
-    $('#dropdownAnnoList').on('click', 'a', () => {
-        console.log('clicked2');
+    // Jump to the page that the selected annotation is at.
+    $('#dropdownAnnoList').on('click', 'a', e => {
+
+        // Jump to the page anno rendered at.
+        let page = $(e.currentTarget).data('page');
+        console.log('page:', page);
+        iframeWindow.PDFView.page = page;
+
+        // Highlight.
+        let id = $(e.currentTarget).data('id');
+        let annotation = iframeWindow.annotationContainer.findById(id);
+        if (annotation) {
+            annotation.highlight();
+            setTimeout(() => {
+                annotation.dehighlight();
+            }, 1000);
+        }
 
         // Close the dropdown.
         $('#dropdownAnnoList').click();

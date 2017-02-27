@@ -24,3 +24,15 @@ export function convertToExportY(y) {
 
     return { pageNumber, y : yInPage };
 }
+
+/**
+ * Get a page size of a single PDF page.
+ */
+function getPageSize() {
+
+    let pdfView = window.PDFView || iframeWindow.PDFView;
+
+    let viewBox = pdfView.pdfViewer.getPageView(0).viewport.viewBox;
+    let size = { width : viewBox[2], height : viewBox[3] };
+    return size;
+}
