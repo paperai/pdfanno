@@ -56,8 +56,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 	
-	__webpack_require__(1);
+	var _position = __webpack_require__(1);
+	
 	__webpack_require__(2);
+	__webpack_require__(3);
 	
 	/**
 	 * The data which is loaded via `Browse` button.
@@ -568,6 +570,90 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	}
 	
+	function _getY(annotation) {
+	
+	    if (annotation.rectangles) {
+	        return annotation.rectangles[0].y;
+	    } else if (annotation.y1) {
+	        return annotation.y1;
+	    } else {
+	        return annotation.y;
+	    }
+	}
+	
+	/**
+	 * Setup the dropdown for Anno list.
+	 */
+	function setupAnnoListDropdown() {
+	
+	    // Show the list of primary annotations.
+	    $('#dropdownAnnoList').on('click', function () {
+	
+	        // Get displayed annotations.
+	        var annotations = iframeWindow.annotationContainer.getAllAnnotations();
+	
+	        // Filter only Primary.
+	        annotations = annotations.filter(function (a) {
+	            return !a.readOnly;
+	        });
+	
+	        // Sort by offsetY.
+	        annotations = annotations.sort(function (a1, a2) {
+	            return _getY(a1) - _getY(a2);
+	        });
+	
+	        // Create elements.
+	        var elements = annotations.map(function (a) {
+	
+	            var icon = void 0;
+	            if (a.type === 'span') {
+	                icon = '<i class="fa fa-pencil"></i>';
+	            } else if (a.type === 'relation' && a.direction === 'one-way') {
+	                icon = '<i class="fa fa-long-arrow-right"></i>';
+	            } else if (a.type === 'relation' && a.direction === 'two-way') {
+	                icon = '<i class="fa fa-arrows-h"></i>';
+	            } else if (a.type === 'relation' && a.direction === 'link') {
+	                icon = '<i class="fa fa-minus"></i>';
+	            } else if (a.type === 'area') {
+	                icon = '<i class="fa fa-square-o"></i>';
+	            }
+	
+	            var y = _getY(a);
+	
+	            var _convertToExportY = (0, _position.convertToExportY)(y),
+	                pageNumber = _convertToExportY.pageNumber;
+	
+	            var snipet = "\n                <li>\n                    <a href=\"#\" data-page=\"" + pageNumber + "\" data-id=\"" + a.uuid + "\">\n                        " + icon + "&nbsp;&nbsp;\n                        <span>" + (a.text || '') + "</span>\n                    </a>\n                </li>\n            ";
+	
+	            return snipet;
+	        });
+	
+	        $('#dropdownAnnoList ul').html(elements);
+	    });
+	
+	    // Jump to the page that the selected annotation is at.
+	    $('#dropdownAnnoList').on('click', 'a', function (e) {
+	
+	        // Jump to the page anno rendered at.
+	        var page = $(e.currentTarget).data('page');
+	        console.log('page:', page);
+	        iframeWindow.PDFView.page = page;
+	
+	        // Highlight.
+	        var id = $(e.currentTarget).data('id');
+	        var annotation = iframeWindow.annotationContainer.findById(id);
+	        if (annotation) {
+	            annotation.highlight();
+	            setTimeout(function () {
+	                annotation.dehighlight();
+	            }, 1000);
+	        }
+	
+	        // Close the dropdown.
+	        $('#dropdownAnnoList').click();
+	    });
+	}
+	
 	/**
 	 * Clear the all annotations from the view and storage.
 	 */
@@ -624,25 +710,75 @@ return /******/ (function(modules) { // webpackBootstrap
 	    setupPdfDropdown();
 	    setupPrimaryAnnoDropdown();
 	    setupReferenceAnnoDropdown();
+	    setupAnnoListDropdown();
 	});
 
 /***/ },
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
-	module.exports = __webpack_require__.p + "dist/index.html";
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.convertToExportY = convertToExportY;
+	/**
+	 * The padding of page top.
+	 */
+	var paddingTop = 9;
+	
+	/**
+	 * The padding between pages.
+	 */
+	var paddingBetweenPages = 9;
+	
+	/**
+	 * Convert the `y` position from the local coords to exported json.
+	 */
+	function convertToExportY(y) {
+	
+	  var meta = getPageSize();
+	
+	  y -= paddingTop;
+	
+	  var pageHeight = meta.height + paddingBetweenPages;
+	
+	  var pageNumber = Math.floor(y / pageHeight) + 1;
+	  var yInPage = y - (pageNumber - 1) * pageHeight;
+	
+	  return { pageNumber: pageNumber, y: yInPage };
+	}
+	
+	/**
+	 * Get a page size of a single PDF page.
+	 */
+	function getPageSize() {
+	
+	  var pdfView = window.PDFView || iframeWindow.PDFView;
+	
+	  var viewBox = pdfView.pdfViewer.getPageView(0).viewport.viewBox;
+	  var size = { width: viewBox[2], height: viewBox[3] };
+	  return size;
+	}
 
 /***/ },
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
+	module.exports = __webpack_require__.p + "dist/index.html";
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(3);
+	var content = __webpack_require__(4);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(5)(content, {});
+	var update = __webpack_require__(6)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -659,10 +795,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 3 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(4)();
+	exports = module.exports = __webpack_require__(5)();
 	// imports
 	
 	
@@ -673,7 +809,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 4 */
+/* 5 */
 /***/ function(module, exports) {
 
 	/*
@@ -729,7 +865,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
