@@ -140,7 +140,22 @@ export default function appendChild(svg, annotation, viewport) {
     child.setAttribute('data-pdf-annotate-id', annotation.uuid);
     child.setAttribute('data-pdf-annotate-type', annotation.type);
     child.setAttribute('aria-hidden', true);
-    svg.appendChild(transform(child, viewport));
+
+    let elm = transform(child, viewport);
+
+    if (annotation.type === 'textbox') {
+        svg.appendChild(elm);
+
+    // `text` show above other type elements.
+    } else {
+        let $text = $('.anno-text-group');
+        if ($text.length > 0) {
+            $(elm).insertBefore($text.get(0));
+        } else {
+            svg.appendChild(elm);
+        }
+    }
+
   }
 
   return child;
