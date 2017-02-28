@@ -75,13 +75,70 @@ export function findBezierControlPoint(x1, y1, x2, y2) {
 }
 
 
-export function getRelationTextPosition(x1, y1, x2, y2) {
+export function getRelationTextPosition(x1, y1, x2, y2, text='', parentId=null) {
 
-    let cp = findBezierControlPoint(x1, y1, x2, y2);
+    // texts rendered.
+    let rects = [];
+    $('.anno-text').each(function() {
+        let $this = $(this);
+        // Remove myself.
+        if ($this.parent().data('parent-id') !== parentId)
+        rects.push({
+            x      : parseFloat($this.attr('x')),
+            y      : parseFloat($this.attr('y')),
+            width  : parseFloat($this.attr('width')),
+            height : parseFloat($this.attr('height'))
+        });
+    });
 
-    let x = x2 + (cp.x - x2) * 0.4;
-    let y = y2 + (cp.y - y2) * 0.4;
+    // Set self size.
+    let myWidth  = 200;
+    let myHeight = 15;
 
-    return { x, y };
+    let addY = 5;
+    if (y1 < y2) {
+        addY *= -1;
+    }
+
+    // Find the position not overlap.
+    while (true) {
+
+        let cp = findBezierControlPoint(x1, y1, x2, y2);
+        let x = x2 + (cp.x - x2) * 0.4;
+        let y = y2 + (cp.y - y2) * 0.4;
+
+        let ok = true;
+        for (let i = 0; i < rects.length; i++) {
+            let r = rects[i];
+
+            // Check rects overlap.
+
+            let a_x1 = r.x;
+            let a_x2 = r.x + r.width;
+            let a_y1 = r.y;
+            let a_y2 = r.y + r.height;
+
+            let b_x1 = x;
+            let b_x2 = x + myWidth;
+            let b_y1 = y;
+            let b_y2 = y + myHeight;
+
+            let crossX = a_x1 <= b_x2 && b_x1 <= a_x2;
+            let crossY = a_y1 <= b_y2 && b_y1 <= a_y2;
+
+            if (crossX && crossY) {
+                ok = false;
+                break;
+            }
+        }
+
+        if (ok) {
+            return { x, y };
+        }
+
+        y1 += addY;
+        y2 += addY;
+    }
+
 
 }
