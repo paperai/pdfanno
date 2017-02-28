@@ -77,29 +77,11 @@ export function findBezierControlPoint(x1, y1, x2, y2) {
 
 export function getRelationTextPosition(x1, y1, x2, y2) {
 
-    let textPosition = findBezierControlPoint(x1, y1, x2, y2);
+    let cp = findBezierControlPoint(x1, y1, x2, y2);
 
-    if (x1 < x2) {
-      // right top quadrant.
-      if (y1 > y2) {
-        textPosition.x += 10;
-        textPosition.y -= 20;
-      // right bottom quadrant.
-      } else {
-        textPosition.x += 10;
-        textPosition.y -= 10;
-      }
-    } else {
-      // left top quadrant.
-      if (y1 > y2) {
-        textPosition.x += 10;
-        textPosition.y -= 20;
-      // left bottom quadrant.
-      } else {
-        textPosition.x += 10;
-        textPosition.y += 10;
-      }
-    }
+    let x = x2 + (cp.x - x2) * 0.4;
+    let y = y2 + (cp.y - y2) * 0.4;
 
-    return textPosition;
+    return { x, y };
+
 }
