@@ -611,7 +611,7 @@ function setupAnnoListDropdown() {
                 <li>
                     <a href="#" data-page="${pageNumber}" data-id="${a.uuid}">
                         ${icon}&nbsp;&nbsp;
-                        <span>${a.text}</span>
+                        <span>${a.text || ''}</span>
                     </a>
                 </li>
             `;
