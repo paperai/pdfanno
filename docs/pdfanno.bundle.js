@@ -720,7 +720,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.convertToExportY = convertToExportY;
 	/**
@@ -738,16 +738,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function convertToExportY(y) {
 	
-	    var meta = getPageSize();
+	  var meta = getPageSize();
 	
-	    y -= paddingTop;
+	  y -= paddingTop;
 	
-	    var pageHeight = meta.height + paddingBetweenPages;
+	  var pageHeight = meta.height + paddingBetweenPages;
 	
-	    var pageNumber = Math.floor(y / pageHeight) + 1;
-	    var yInPage = y - (pageNumber - 1) * pageHeight;
+	  var pageNumber = Math.floor(y / pageHeight) + 1;
+	  var yInPage = y - (pageNumber - 1) * pageHeight;
 	
-	    return { pageNumber: pageNumber, y: yInPage };
+	  return { pageNumber: pageNumber, y: yInPage };
 	}
 	
 	/**
@@ -755,11 +755,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function getPageSize() {
 	
-	    var pdfView = window.PDFView || iframeWindow.PDFView;
+	  var pdfView = window.PDFView || iframeWindow.PDFView;
 	
-	    var viewBox = pdfView.pdfViewer.getPageView(0).viewport.viewBox;
-	    var size = { width: viewBox[2], height: viewBox[3] };
-	    return size;
+	  var viewBox = pdfView.pdfViewer.getPageView(0).viewport.viewBox;
+	  var size = { width: viewBox[2], height: viewBox[3] };
+	  return size;
 	}
 
 /***/ },
@@ -803,7 +803,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, "@charset 'utf-8';\r\n\r\n.no-visible {\r\n    visibility: hidden;\r\n}\r\n\r\n/**\r\n * Viewer size.\r\n * This height will be override to fit the browser height (by app.js).\r\n */\r\n.anno-viewer {\r\n    width: 100%;\r\n    height: 500px;\r\n}\r\n\r\n/**\r\n * Annotation Select UI Layout.\r\n */\r\n.anno-select-layout {}\r\n.anno-select-layout .row:first-child {\r\n    margin-bottom: 10px;\r\n}\r\n.anno-select-layout [type=\"radio\"] {\r\n    margin-right: 5px;\r\n}\r\n.anno-select-layout [type=\"file\"] {\r\n    display: inline-block;\r\n    margin-left: 5px;\r\n    line-height: 1em;\r\n}\r\n.anno-select-layout .sp-replacer {\r\n    padding: 0;\r\n    border: none;\r\n}\r\n.anno-select-layout .sp-dd {\r\n    display: none;\r\n}\r\n\r\n\r\n\r\n.anno-ui .sp-replacer {\r\n    padding: 0;\r\n    border: none;\r\n}\r\n.anno-ui .sp-dd {\r\n    display: none;\r\n}\r\n.anno-ui .sp-preview {\r\n    margin-right: 0;\r\n}\r\n\r\n", ""]);
+	exports.push([module.id, "@charset 'utf-8';\n\n.no-visible {\n    visibility: hidden;\n}\n\n/**\n * Viewer size.\n * This height will be override to fit the browser height (by app.js).\n */\n.anno-viewer {\n    width: 100%;\n    height: 500px;\n}\n\n/**\n * Annotation Select UI Layout.\n */\n.anno-select-layout {}\n.anno-select-layout .row:first-child {\n    margin-bottom: 10px;\n}\n.anno-select-layout [type=\"radio\"] {\n    margin-right: 5px;\n}\n.anno-select-layout [type=\"file\"] {\n    display: inline-block;\n    margin-left: 5px;\n    line-height: 1em;\n}\n.anno-select-layout .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-select-layout .sp-dd {\n    display: none;\n}\n\n\n\n.anno-ui .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-ui .sp-dd {\n    display: none;\n}\n.anno-ui .sp-preview {\n    margin-right: 0;\n}\n\n", ""]);
 	
 	// exports
 
