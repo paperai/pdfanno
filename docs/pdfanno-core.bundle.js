@@ -16741,7 +16741,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	    child.setAttribute('data-pdf-annotate-id', annotation.uuid);
 	    child.setAttribute('data-pdf-annotate-type', annotation.type);
 	    child.setAttribute('aria-hidden', true);
-	    svg.appendChild(transform(child, viewport));
+	
+	    var elm = transform(child, viewport);
+	
+	    if (annotation.type === 'textbox') {
+	      svg.appendChild(elm);
+	
+	      // `text` show above other type elements.
+	    } else {
+	      var $text = $('.anno-text-group');
+	      if ($text.length > 0) {
+	        $(elm).insertBefore($text.get(0));
+	      } else {
+	        svg.appendChild(elm);
+	      }
+	    }
 	  }
 	
 	  return child;
@@ -17388,7 +17402,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 31 */
 /***/ function(module, exports) {
 
-	"use strict";
+	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -17472,32 +17486,71 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	function getRelationTextPosition(x1, y1, x2, y2) {
+	  var text = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : '';
+	  var parentId = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
 	
-	  var textPosition = findBezierControlPoint(x1, y1, x2, y2);
 	
-	  if (x1 < x2) {
-	    // right top quadrant.
-	    if (y1 > y2) {
-	      textPosition.x += 10;
-	      textPosition.y -= 20;
-	      // right bottom quadrant.
-	    } else {
-	      textPosition.x += 10;
-	      textPosition.y -= 10;
-	    }
-	  } else {
-	    // left top quadrant.
-	    if (y1 > y2) {
-	      textPosition.x += 10;
-	      textPosition.y -= 20;
-	      // left bottom quadrant.
-	    } else {
-	      textPosition.x += 10;
-	      textPosition.y += 10;
-	    }
+	  // texts rendered.
+	  var rects = [];
+	  $('.anno-text').each(function () {
+	    var $this = $(this);
+	    // Remove myself.
+	    if ($this.parent().data('parent-id') !== parentId) rects.push({
+	      x: parseFloat($this.attr('x')),
+	      y: parseFloat($this.attr('y')),
+	      width: parseFloat($this.attr('width')),
+	      height: parseFloat($this.attr('height'))
+	    });
+	  });
+	
+	  // Set self size.
+	  var myWidth = 200;
+	  var myHeight = 15;
+	
+	  var addY = 5;
+	  if (y1 < y2) {
+	    addY *= -1;
 	  }
 	
-	  return textPosition;
+	  // Find the position not overlap.
+	  while (true) {
+	
+	    var cp = findBezierControlPoint(x1, y1, x2, y2);
+	    var x = x2 + (cp.x - x2) * 0.4;
+	    var y = y2 + (cp.y - y2) * 0.4;
+	
+	    var ok = true;
+	    for (var i = 0; i < rects.length; i++) {
+	      var r = rects[i];
+	
+	      // Check rects overlap.
+	
+	      var a_x1 = r.x;
+	      var a_x2 = r.x + r.width;
+	      var a_y1 = r.y;
+	      var a_y2 = r.y + r.height;
+	
+	      var b_x1 = x;
+	      var b_x2 = x + myWidth;
+	      var b_y1 = y;
+	      var b_y2 = y + myHeight;
+	
+	      var crossX = a_x1 <= b_x2 && b_x1 <= a_x2;
+	      var crossY = a_y1 <= b_y2 && b_y1 <= a_y2;
+	
+	      if (crossX && crossY) {
+	        ok = false;
+	        break;
+	      }
+	    }
+	
+	    if (ok) {
+	      return { x: x, y: y };
+	    }
+	
+	    y1 += addY;
+	    y2 += addY;
+	  }
 	}
 
 /***/ },
@@ -20522,7 +20575,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'getTextPosition',
 	        value: function getTextPosition() {
 	            this.setStartEndPosition();
-	            return (0, _relation.getRelationTextPosition)(this.x1, this.y1, this.x2, this.y2);
+	            return (0, _relation.getRelationTextPosition)(this.x1, this.y1, this.x2, this.y2, this.text, this.uuid);
 	        }
 	
 	        /**
