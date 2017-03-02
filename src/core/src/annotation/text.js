@@ -79,6 +79,7 @@ export default class TextAnnotation extends AbstractAnnotation {
     destroy() {
         this.$element.remove();
         this.$element = this.createDummyElement();
+        globalEvent.removeListener('rectmoveend', this.handleRectMoveEnd);
         globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
         globalEvent.removeListener('enableViewMode', this.enableViewMode);
         globalEvent.removeListener('disableViewMode', this.disableViewMode);
@@ -182,8 +183,6 @@ export default class TextAnnotation extends AbstractAnnotation {
 
     enableViewMode() {
 
-        console.log('text:enableViewMode');
-
         super.enableViewMode();
         if (!this.parent.readOnly) {
             this.$element.find('text').off('click').on('click', this.handleClickEvent);
@@ -191,8 +190,6 @@ export default class TextAnnotation extends AbstractAnnotation {
     }
 
     disableViewMode() {
-
-        console.log('text:disableViewMode');
 
         super.disableViewMode();
         this.$element.find('text').off('click', this.handleClickEvent);

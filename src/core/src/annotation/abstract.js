@@ -32,7 +32,7 @@ export default class AbstractAnnotation extends EventEmitter {
      */
     render() {
 
-        console.log('render', this.type);
+        // console.log('render', this.type);
 
          this.$element.remove();
          this.$element = $(appendChild(getSVGLayer(), this));

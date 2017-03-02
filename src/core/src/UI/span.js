@@ -56,8 +56,6 @@ function handleDocumentMouseup(e) {
     }), selectedText);
   }
 
-  console.log('handleDocumentMouseup:', rects);
-
   removeSelection();
 }
 
