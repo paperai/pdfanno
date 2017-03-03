@@ -38,6 +38,9 @@ export default class RectAnnotation extends AbstractAnnotation {
         window.globalEvent.on('enableViewMode', this.enableViewMode);
         window.globalEvent.on('disableViewMode', this.disableViewMode);
 
+        window.globalEvent.on('enableRelation', this.disableDragAction);
+        window.globalEvent.on('disableRelation', this.enableDragAction);
+
         this.textAnnotation = new TextAnnotation(this.readOnly, this);
         this.textAnnotation.on('selected', this.handleTextSelected);
         this.textAnnotation.on('deselected', this.handleTextDeselected);
@@ -219,6 +222,8 @@ export default class RectAnnotation extends AbstractAnnotation {
 
         document.addEventListener('mousemove', this.handleMouseMoveOnDocument);
         document.addEventListener('mouseup', this.handleMouseUpOnDocument);
+
+        window.globalEvent.emit('rectmovestart');
     }
 
     /**
@@ -275,6 +280,17 @@ export default class RectAnnotation extends AbstractAnnotation {
         document.removeEventListener('mouseup', this.handleMouseUpOnDocument);
     }
 
+    enableDragAction() {
+        this.disableDragAction();
+        this.$element.find('.anno-rect, circle')
+            .on('mousedown', this.handleMouseDownOnRect);
+    }
+
+    disableDragAction() {
+        this.$element.find('.anno-rect, circle')
+            .off('mousedown', this.handleMouseDownOnRect);
+    }
+
     /**
      * Enable view mode.
      */
@@ -283,9 +299,8 @@ export default class RectAnnotation extends AbstractAnnotation {
         super.enableViewMode();
 
         if (!this.readOnly) {
-            this.$element.find('.anno-rect, circle')
-                .on('click', this.handleClickEvent)
-                .on('mousedown', this.handleMouseDownOnRect);
+            this.$element.find('.anno-rect, circle').on('click', this.handleClickEvent);
+            this.enableDragAction();
         }
     }
 
@@ -294,7 +309,8 @@ export default class RectAnnotation extends AbstractAnnotation {
      */
     disableViewMode() {
         super.disableViewMode();
-        this.$element.find('.anno-rect, circle').off('click mousedown');
+        this.$element.find('.anno-rect, circle').off('click');
+        this.disableDragAction();
     }
 
 }

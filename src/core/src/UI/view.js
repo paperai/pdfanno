@@ -1,11 +1,13 @@
 import $ from 'jquery';
 
 /**
- * Prevent page-back behavior.
+ * Disable the action of pageback, if `DEL` or `BackSpace` button pressed.
  */
-function handleDocumentKeydown(e) {
+function disablePagebackAction(e) {
 
-    // enable for <input/>.
+    // console.log('disablePagebackAction:', e);
+
+    // enable any keyboard events for <input/>.
     if (e.target.tagName.toLowerCase() === 'input') {
         return;
     }
@@ -13,27 +15,50 @@ function handleDocumentKeydown(e) {
     // Delete or BackSpace.
     if (e.keyCode == 46 || e.keyCode == 8) {
         e.preventDefault();
+
+        if (e.type === 'keyup') {
+            deleteSelectedAnnotations();
+        }
+
         return false;
     }
 }
 
-/**
- * Delete selected annotations, and prevent page-back behavior.
- */
-function handleDocumentKeyup(e) {
 
-    // enable for <input/>.
-    if (e.target.tagName.toLowerCase() === 'input') {
-        return;
-    }
+// /**
+//  * Prevent page-back behavior.
+//  */
+// function handleDocumentKeydown(e) {
 
-    // Delete or BackSpace.
-    if (e.keyCode == 46 || e.keyCode == 8) {
-        deleteSelectedAnnotations();
-        e.preventDefault();
-        return false;
-    }
-}
+//     // enable for <input/>.
+//     if (e.target.tagName.toLowerCase() === 'input') {
+//         return;
+//     }
+
+//     // Delete or BackSpace.
+//     if (e.keyCode == 46 || e.keyCode == 8) {
+//         e.preventDefault();
+//         return false;
+//     }
+// }
+
+// *
+//  * Delete selected annotations, and prevent page-back behavior.
+
+// function handleDocumentKeyup(e) {
+
+//     // enable for <input/>.
+//     if (e.target.tagName.toLowerCase() === 'input') {
+//         return;
+//     }
+
+//     // Delete or BackSpace.
+//     if (e.keyCode == 46 || e.keyCode == 8) {
+//         deleteSelectedAnnotations();
+//         e.preventDefault();
+//         return false;
+//     }
+// }
 
 /**
  * Delete selected annotations.
@@ -49,12 +74,16 @@ function setAnnotationViewMode() {
     window.globalEvent.emit('enableViewMode');
 }
 
-/**
- * Make annotations NOT view mode.
- */
-function resetAnnotationViewMode() {
-    window.globalEvent.emit('disableViewMode');
-}
+// TODO NO NEED `enableViewMode` event ?
+
+// /**
+//  * Make annotations NOT view mode.
+//  */
+// function resetAnnotationViewMode() {
+//     window.globalEvent.emit('disableViewMode');
+// }
+
+// TODO NO NEED `disableViewMode` event ?
 
 /**
  * Enable view mode.
@@ -68,10 +97,10 @@ export function enableViewMode() {
 
     setAnnotationViewMode();
 
-    document.removeEventListener('keyup', handleDocumentKeyup);
-    document.removeEventListener('keydown', handleDocumentKeydown);
-    document.addEventListener('keyup', handleDocumentKeyup);
-    document.addEventListener('keydown', handleDocumentKeydown);
+    document.removeEventListener('keyup', disablePagebackAction);
+    document.removeEventListener('keydown', disablePagebackAction);
+    document.addEventListener('keyup', disablePagebackAction);
+    document.addEventListener('keydown', disablePagebackAction);
 
 }
 

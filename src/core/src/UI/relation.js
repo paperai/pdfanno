@@ -274,6 +274,8 @@ export function enableRelation(relationType='one-way') {
 
   });
 
+  window.globalEvent.emit('enableRelation');
+
 }
 
 /**
@@ -312,5 +314,7 @@ export function disableRelation() {
     prevAnnotation.render();
     prevAnnotation = null;
   }
+
+  window.globalEvent.emit('disableRelation');
 
 }

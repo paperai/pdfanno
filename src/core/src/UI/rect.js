@@ -47,6 +47,8 @@ let enableArea = {
  */
 function handleDocumentMousedown(e) {
 
+    console.log('aaaaaaaaaaa');
+
   let { x, y } = getXY(e);
   originX = x;
   originY = y;
@@ -188,6 +190,22 @@ function saveRect(rect) {
 }
 
 /**
+ * Cancel rect drawing if an existing rect has got a drag event.
+ */
+function cancelRectDrawing() {
+
+    // After `handleDocumentMousedown`
+    setTimeout(() => {
+        console.log('cancelRectDrawing');
+        document.removeEventListener('mousemove', handleDocumentMousemove);
+        $(overlay).remove();
+        overlay = null;
+    }, 100);
+
+}
+
+
+/**
  * Enable rect behavior
  */
 export function enableRect() {
@@ -199,6 +217,8 @@ export function enableRect() {
   document.addEventListener('mousedown', handleDocumentMousedown);
 
   disableUserSelect();
+
+  window.globalEvent.on('rectmovestart', cancelRectDrawing);
 }
 
 /**
@@ -219,5 +239,7 @@ export function disableRect() {
     prevAnnotation.render();
     prevAnnotation = null;
   }
+
+  window.globalEvent.removeListener('rectmovestart', cancelRectDrawing);
 
 }
