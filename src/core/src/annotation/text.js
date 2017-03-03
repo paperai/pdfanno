@@ -153,9 +153,6 @@ export default class TextAnnotation extends AbstractAnnotation {
         pos.x += rect.left;
         pos.y += rect.top;
 
-        // Disable the keyup event of BackSpace.
-        disableViewMode();
-
         addInputField(pos.x, pos.y, this.uuid, this.text, (text) => {
 
             console.log('callback:', text);
@@ -166,11 +163,6 @@ export default class TextAnnotation extends AbstractAnnotation {
             }
 
             this.render();
-            // this.enableViewMode();
-
-            // Enable the keyup event of BackSpace.
-            // もしかして、inputはBS制御を除外すればいける？
-            enableViewMode();
 
             if (!this.readOnly) {
                 this.$element.find('text').off('click').on('click', this.handleClickEvent);

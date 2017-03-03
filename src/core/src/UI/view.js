@@ -4,6 +4,12 @@ import $ from 'jquery';
  * Prevent page-back behavior.
  */
 function handleDocumentKeydown(e) {
+
+    // enable for <input/>.
+    if (e.target.tagName.toLowerCase() === 'input') {
+        return;
+    }
+
     // Delete or BackSpace.
     if (e.keyCode == 46 || e.keyCode == 8) {
         e.preventDefault();
@@ -15,6 +21,12 @@ function handleDocumentKeydown(e) {
  * Delete selected annotations, and prevent page-back behavior.
  */
 function handleDocumentKeyup(e) {
+
+    // enable for <input/>.
+    if (e.target.tagName.toLowerCase() === 'input') {
+        return;
+    }
+
     // Delete or BackSpace.
     if (e.keyCode == 46 || e.keyCode == 8) {
         deleteSelectedAnnotations();
@@ -28,19 +40,6 @@ function handleDocumentKeyup(e) {
  */
 function deleteSelectedAnnotations() {
     window.globalEvent.emit('deleteSelectedAnnotation');
-}
-
-/**
- * Set annotations' translucent state.
- */
-function setComponenTranslucent(translucent) {
-
-    // if (translucent) {
-    //     $('svg > *').addClass('--viewMode');
-
-    // } else {
-    //     $('svg > *').removeClass('--viewMode');
-    // }
 }
 
 /**
@@ -63,12 +62,14 @@ function resetAnnotationViewMode() {
 export function enableViewMode() {
     console.log('view:enableViewMode');
 
-    disableViewMode();
+    // disableViewMode();
 
     window.viewMode = true;
 
-    setComponenTranslucent(true);
     setAnnotationViewMode();
+
+    document.removeEventListener('keyup', handleDocumentKeyup);
+    document.removeEventListener('keydown', handleDocumentKeydown);
     document.addEventListener('keyup', handleDocumentKeyup);
     document.addEventListener('keydown', handleDocumentKeydown);
 
@@ -80,8 +81,7 @@ export function enableViewMode() {
 export function disableViewMode() {
     console.log('view:disableViewMode');
     window.viewMode = false;
-    setComponenTranslucent(false);
-    resetAnnotationViewMode();
-    document.removeEventListener('keyup', handleDocumentKeyup);
-    document.removeEventListener('keydown', handleDocumentKeydown);
+    // resetAnnotationViewMode();
+    // document.removeEventListener('keyup', handleDocumentKeyup);
+    // document.removeEventListener('keydown', handleDocumentKeydown);
 }
