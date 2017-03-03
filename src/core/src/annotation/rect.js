@@ -38,7 +38,7 @@ export default class RectAnnotation extends AbstractAnnotation {
         window.globalEvent.on('enableViewMode', this.enableViewMode);
         window.globalEvent.on('disableViewMode', this.disableViewMode);
 
-        this.textAnnotation = new TextAnnotation(this);
+        this.textAnnotation = new TextAnnotation(this.readOnly, this);
         this.textAnnotation.on('selected', this.handleTextSelected);
         this.textAnnotation.on('deselected', this.handleTextDeselected);
         this.textAnnotation.on('hoverin', this.handleTextHoverIn);

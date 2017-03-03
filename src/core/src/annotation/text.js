@@ -22,7 +22,7 @@ export default class TextAnnotation extends AbstractAnnotation {
     /**
      * Constructor.
      */
-    constructor(parent) {
+    constructor(readOnly, parent) {
         super();
 
         globalEvent = window.globalEvent;
@@ -31,6 +31,7 @@ export default class TextAnnotation extends AbstractAnnotation {
         this.parent   = parent;
         this.x        = 0;
         this.y        = 0;
+        this.readOnly = readOnly;
         this.$element = this.createDummyElement();
 
         // Updated by parent via AbstractAnnotation#setTextForceDisplay.
@@ -83,6 +84,9 @@ export default class TextAnnotation extends AbstractAnnotation {
         globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
         globalEvent.removeListener('enableViewMode', this.enableViewMode);
         globalEvent.removeListener('disableViewMode', this.disableViewMode);
+
+        // TODO Need Release memory?
+        console.log('delete:text._events:', this._events);
     }
 
     /**
@@ -165,9 +169,10 @@ export default class TextAnnotation extends AbstractAnnotation {
             // this.enableViewMode();
 
             // Enable the keyup event of BackSpace.
+            // もしかして、inputはBS制御を除外すればいける？
             enableViewMode();
 
-            if (!this.parent.readOnly) {
+            if (!this.readOnly) {
                 this.$element.find('text').off('click').on('click', this.handleClickEvent);
             }
 
@@ -184,7 +189,7 @@ export default class TextAnnotation extends AbstractAnnotation {
     enableViewMode() {
 
         super.enableViewMode();
-        if (!this.parent.readOnly) {
+        if (!this.readOnly) {
             this.$element.find('text').off('click').on('click', this.handleClickEvent);
         }
     }

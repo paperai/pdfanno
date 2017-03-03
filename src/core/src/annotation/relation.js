@@ -38,7 +38,7 @@ export default class RelationAnnotation extends AbstractAnnotation {
         globalEvent.on('disableViewMode', this.disableViewMode);
         globalEvent.on('rectmoveend', this.handleRelMoveEnd);
 
-        this.textAnnotation = new TextAnnotation(this);
+        this.textAnnotation = new TextAnnotation(this.readOnly, this);
         this.textAnnotation.on('selected', this.handleTextSelected);
         this.textAnnotation.on('deselected', this.handleTextDeselected);
         this.textAnnotation.on('hoverin', this.handleTextHoverIn);
