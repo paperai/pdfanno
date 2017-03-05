@@ -6,6 +6,7 @@ It offers functions for various types of linguistic annotations, including part-
 It is well-suited for annotating scientific papers with named entities and their relations.
 
 [Online demo](https://paperai.github.io/pdfanno/)  
+Note: Google Chrome is highly recommended.
 
 You can also install PDFAnno via npm:
 ```
@@ -18,10 +19,11 @@ npm install pdfanno
 * Client-only application. No communication with a server.
 
 ## Usage
+1. Visit the [online demo](https://paperai.github.io/pdfanno/) with Chrome.
 1. Specify your root directory via `Browse` button. Put PDF files and annotation files (if any) in the root directory. 
-2. Load the target PDF. If you have an anno file for the PDF, load it as well.
-3. Annotate the PDF as you like.
-4. Save your annotations as a text file via `download` button. If you'd like to continue the annotation, put the annotation file in the root directory.
+1. Load the target PDF. If you have an anno file for the PDF, load it as well.
+1. Annotate the PDF as you like.
+1. Save your annotations as a text file via `download` button. If you'd like to continue the annotation, put the annotation file in the root directory.
 
 For security reasons, PDFAnno does NOT automatically save your annotations.  
 Don't forget to download your current annotations!  
