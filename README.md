@@ -1,4 +1,4 @@
-<p align="center"><img src="https://github.com/paperai/pdfanno/blob/master/pdfanno.gif" width="750"></p>
+<p align="center"><img src="https://github.com/paperai/pdfanno/blob/master/pdfanno.gif" width="850"></p>
 
 # PDFAnno
 PDFAnno is a browser-based linguistic annotation tool for PDF documents.  
