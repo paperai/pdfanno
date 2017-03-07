@@ -12,7 +12,7 @@ npm install pdfanno
 ```
 
 You can download sample PDFs and annotations from here: [pdfanno_material.zip](https://cl.naist.jp/%7Eshindo/pdfanno_material.zip).  
-To view the samples, unzip the samples and specify the directory via `browse` button.
+To view the samples, unzip the samples and specify the directory via `Browse` button.
 
 ## Features
 * Simple and easy-to-use interface.
