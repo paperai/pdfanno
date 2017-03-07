@@ -204,6 +204,7 @@ export default class SpanAnnotation extends AbstractAnnotation {
      * Disable view mode.
      */
     disableViewMode() {
+        console.log('span:disableViewMode');
         super.disableViewMode();
         this.$element.find('circle').off('click');
     }

@@ -218,12 +218,14 @@ export default class RectAnnotation extends AbstractAnnotation {
         this.originalX = this.x;
         this.originalY = this.y;
 
-        disableUserSelect();
+        // disableUserSelect();
 
         document.addEventListener('mousemove', this.handleMouseMoveOnDocument);
         document.addEventListener('mouseup', this.handleMouseUpOnDocument);
 
         window.globalEvent.emit('rectmovestart');
+
+        this.disableTextlayer();
     }
 
     /**
@@ -274,11 +276,24 @@ export default class RectAnnotation extends AbstractAnnotation {
             globalEvent.emit('rectmoveend', this);
         }
 
-        enableUserSelect();
+        // enableUserSelect();
 
         document.removeEventListener('mousemove', this.handleMouseMoveOnDocument);
         document.removeEventListener('mouseup', this.handleMouseUpOnDocument);
+
+        this.enableTextlayer();
     }
+
+    // TODO 共通化？
+    disableTextlayer() {
+      $('.textLayer').hide();
+    }
+
+    // TODO 共通化？
+    enableTextlayer() {
+      $('.textLayer').show();
+    }
+
 
     enableDragAction() {
         this.disableDragAction();

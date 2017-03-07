@@ -120,6 +120,7 @@ function saveRect(rects, selectedText) {
     spanAnnotation.setTextForceDisplay();
     spanAnnotation.render();
     spanAnnotation.save();
+    spanAnnotation.enableViewMode();
 
   });
 
@@ -137,7 +138,9 @@ function saveRect(rects, selectedText) {
 export function enableSpan() {
   this.disableSpan();
   document.addEventListener('mouseup', handleDocumentMouseup);
-  $('.textLayer').css('z-index', 3); // over svg layer.
+
+
+  // $('.textLayer').css('z-index', 3); // over svg layer.
 }
 
 /**
@@ -145,7 +148,9 @@ export function enableSpan() {
  */
 export function disableSpan() {
   document.removeEventListener('mouseup', handleDocumentMouseup);
-  $('.textLayer').css('z-index', 1);
+
+
+  // $('.textLayer').css('z-index', 1);
 
   if (prevAnnotation) {
     prevAnnotation.resetTextForceDisplay();

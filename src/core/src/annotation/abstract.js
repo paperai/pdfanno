@@ -32,9 +32,12 @@ export default class AbstractAnnotation extends EventEmitter {
      */
     render() {
 
-        // console.log('render', this.type);
+        this.$element.remove();
 
-         this.$element.remove();
+        if (this.deleted) {
+            return;
+        }
+
          this.$element = $(appendChild(getSVGLayer(), this));
          this.textAnnotation && this.textAnnotation.render();
 
@@ -77,6 +80,8 @@ export default class AbstractAnnotation extends EventEmitter {
             console.log('deleted');
         });
         this.textAnnotation && this.textAnnotation.destroy();
+
+        this.deleted = true;
     }
 
     /**
