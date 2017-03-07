@@ -1,4 +1,4 @@
-[![PDFAnno](http://img.youtube.com/vi/axjVpKU989I/0.jpg)](http://www.youtube.com/watch?v=axjVpKU989I)
+<p align="center"><img src="https://github.com/paperai/pdfanno/blob/master/pdfanno.gif" width="750"></p>
 
 # PDFAnno
 PDFAnno is a browser-based linguistic annotation tool for PDF documents.  
