@@ -296,6 +296,8 @@ export default class RectAnnotation extends AbstractAnnotation {
      */
     enableViewMode() {
 
+        console.log('rect:enableViewMode');
+
         super.enableViewMode();
 
         if (!this.readOnly) {

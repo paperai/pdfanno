@@ -105,6 +105,14 @@ function handleDocumentMousemove(e) {
   overlay.style.top    = y + 'px';
   overlay.style.width  = w + 'px';
   overlay.style.height = h + 'px';
+
+
+  if (prevAnnotation) {
+    prevAnnotation.resetTextForceDisplay();
+    prevAnnotation.render();
+    prevAnnotation = null;
+  }
+
 }
 
 /**
@@ -178,14 +186,19 @@ function saveRect(rect) {
     rectAnnotation.setTextForceDisplay();
     rectAnnotation.render();
     rectAnnotation.save();
+    rectAnnotation.enableViewMode();
 
   });
 
-  if (prevAnnotation) {
-    prevAnnotation.resetTextForceDisplay();
-    prevAnnotation.render();
-  }
+  // if (prevAnnotation) {
+  //   prevAnnotation.resetTextForceDisplay();
+  //   prevAnnotation.render();
+  // }
   prevAnnotation = rectAnnotation;
+
+  // Enable a drag / click action.
+  // TODO インスタンス生成時にデフォルトで有効にしてもいいかなー.
+  rectAnnotation.enableViewMode();
 
 }
 
@@ -204,6 +217,15 @@ function cancelRectDrawing() {
 
 }
 
+// TODO 共通化？
+function disableTextlayer() {
+  $('.textLayer').hide();
+}
+// TODO 共通化？
+function enableTextlayer() {
+  $('.textLayer').show();
+}
+
 
 /**
  * Enable rect behavior
@@ -216,7 +238,8 @@ export function enableRect() {
   document.addEventListener('mouseup', handleDocumentMouseup);
   document.addEventListener('mousedown', handleDocumentMousedown);
 
-  disableUserSelect();
+  // disableUserSelect();
+  disableTextlayer();
 
   window.globalEvent.on('rectmovestart', cancelRectDrawing);
 }
@@ -232,7 +255,8 @@ export function disableRect() {
   document.removeEventListener('mouseup', handleDocumentMouseup);
   document.removeEventListener('mousedown', handleDocumentMousedown);
 
-  enableUserSelect();
+  // enableUserSelect();
+  enableTextlayer();
 
   if (prevAnnotation) {
     prevAnnotation.resetTextForceDisplay();
