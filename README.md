@@ -1,4 +1,4 @@
-<p align="center"><img src="https://cl.naist.jp/%7Eshindo/pdfanno.gif" width="750"></p>
+[![PDFAnno](http://img.youtube.com/vi/axjVpKU989I/0.jpg)](http://www.youtube.com/watch?v=axjVpKU989I)
 
 # PDFAnno
 PDFAnno is a browser-based linguistic annotation tool for PDF documents.  
