@@ -123,6 +123,7 @@ function renderAnnotations(svg) {
 
         window.annotationContainer.getAllAnnotations().forEach(a => {
             a.render();
+            a.enableViewMode();
         });
         var event = document.createEvent('CustomEvent');
         event.initCustomEvent('annotationrendered', true, true, null);
