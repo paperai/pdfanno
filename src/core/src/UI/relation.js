@@ -169,6 +169,7 @@ function handleDocumentMouseup(e) {
   if (prevAnnotation) {
     prevAnnotation.resetTextForceDisplay();
     prevAnnotation.render();
+    prevAnnotation.enableViewMode();
   }
   prevAnnotation = relationAnnotation;
 
@@ -191,6 +192,7 @@ function showTextInput() {
     relationAnnotation.setTextForceDisplay();
     relationAnnotation.save();
     relationAnnotation.render();
+    relationAnnotation.enableViewMode();
 
   });
 }
@@ -312,6 +314,7 @@ export function disableRelation() {
   if (prevAnnotation) {
     prevAnnotation.resetTextForceDisplay();
     prevAnnotation.render();
+    prevAnnotation.enableViewMode();
     prevAnnotation = null;
   }
 
