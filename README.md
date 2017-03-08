@@ -15,8 +15,8 @@ You can download sample PDFs and annotations from here: [pdfanno_material.zip](h
 To view the samples, unzip the samples and specify the directory via `Browse` button.
 
 ### Contributors
-
-If you have any questions, feel free to open an issue, or contact [@hshindo](https://github.com/hshindo).
+* [hshindo](https://github.com/hshindo)
+* [yoheiMune](https://github.com/yoheiMune)
 
 ## Features
 * Simple and easy-to-use interface.
