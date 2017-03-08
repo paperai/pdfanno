@@ -163,7 +163,7 @@ function handleDocumentMouseup(e) {
 
   relationAnnotation.save();
 
-  showTextInput();
+  showTextInput(relationAnnotation);
 
 
   if (prevAnnotation) {
@@ -173,9 +173,11 @@ function handleDocumentMouseup(e) {
   }
   prevAnnotation = relationAnnotation;
 
+  relationAnnotation = null;
+
 }
 
-function showTextInput() {
+function showTextInput(relationAnnotation) {
 
   let p1 = relationAnnotation.rel1Annotation.getBoundingCirclePosition();
   let p2 = relationAnnotation.rel2Annotation.getBoundingCirclePosition();
