@@ -286,12 +286,12 @@ export default class RectAnnotation extends AbstractAnnotation {
         }
     }
 
-    handleMouseUp(e) {
-        console.log('rect:handleMouseUp: ', e.target);
-    }
-    handleMouseDown(e) {
-        console.log('rect:handleMouseDown: ', e.target);
-    }
+    // handleMouseUp(e) {
+    //     console.log('rect:handleMouseUp: ', e.target);
+    // }
+    // handleMouseDown(e) {
+    //     console.log('rect:handleMouseDown: ', e.target);
+    // }
 
     // TODO 共通化？
     disableTextlayer() {
@@ -305,8 +305,8 @@ export default class RectAnnotation extends AbstractAnnotation {
 
 
     enableDragAction() {
-        this.disableDragAction();
         this.$element.find('.anno-rect, circle')
+            .off('mousedown', this.handleMouseDownOnRect)
             .on('mousedown', this.handleMouseDownOnRect);
     }
 
@@ -329,9 +329,9 @@ export default class RectAnnotation extends AbstractAnnotation {
             this.enableDragAction();
 
             // test.
-            this.$element.find('.anno-rect, circle')
-                .on('mouseup', this.handleMouseUp)
-                .on('mousedown', this.handleMouseDown);
+            // this.$element.find('.anno-rect, circle')
+            //     .on('mouseup', this.handleMouseUp)
+            //     .on('mousedown', this.handleMouseDown);
         }
     }
 
@@ -344,9 +344,9 @@ export default class RectAnnotation extends AbstractAnnotation {
         this.disableDragAction();
 
         // test.
-        this.$element.find('.anno-rect, circle')
-            .off('mouseup', this.handleMouseUp)
-            .off('mousedown', this.handleMouseDown);
+        // this.$element.find('.anno-rect, circle')
+        //     .off('mouseup', this.handleMouseUp)
+        //     .off('mousedown', this.handleMouseDown);
 
     }
 

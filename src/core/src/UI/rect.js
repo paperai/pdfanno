@@ -110,6 +110,7 @@ function handleDocumentMousemove(e) {
   if (prevAnnotation) {
     prevAnnotation.resetTextForceDisplay();
     prevAnnotation.render();
+    prevAnnotation.enableViewMode();
     prevAnnotation = null;
   }
 
@@ -265,6 +266,7 @@ export function disableRect() {
   if (prevAnnotation) {
     prevAnnotation.resetTextForceDisplay();
     prevAnnotation.render();
+    prevAnnotation.enableViewMode();
     prevAnnotation = null;
   }
 
