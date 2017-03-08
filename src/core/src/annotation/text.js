@@ -38,11 +38,12 @@ export default class TextAnnotation extends AbstractAnnotation {
         this.textForceDisplay = false;
 
         // parent.on('rectmoveend', this.handleRectMoveEnd);
-        globalEvent.on('rectmoveend', this.handleRectMoveEnd);
 
-        globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
-        globalEvent.on('enableViewMode', this.enableViewMode);
-        globalEvent.on('disableViewMode', this.disableViewMode);
+        // globalEvent.on('rectmoveend', this.handleRectMoveEnd);
+
+        // globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
+        // globalEvent.on('enableViewMode', this.enableViewMode);
+        // globalEvent.on('disableViewMode', this.disableViewMode);
     }
 
 
@@ -50,6 +51,9 @@ export default class TextAnnotation extends AbstractAnnotation {
      * Render a text.
      */
      render() {
+
+        // TODO 引数で text と position を渡せば、循環参照を無くせる.
+
         if (this.parent.text) {
             assign(this, this.parent.getTextPosition());
             this.text = this.parent.text;
@@ -80,13 +84,18 @@ export default class TextAnnotation extends AbstractAnnotation {
     destroy() {
         this.$element.remove();
         this.$element = this.createDummyElement();
-        globalEvent.removeListener('rectmoveend', this.handleRectMoveEnd);
-        globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
-        globalEvent.removeListener('enableViewMode', this.enableViewMode);
-        globalEvent.removeListener('disableViewMode', this.disableViewMode);
+        // globalEvent.removeListener('rectmoveend', this.handleRectMoveEnd);
+        // globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
+        // globalEvent.removeListener('enableViewMode', this.enableViewMode);
+        // globalEvent.removeListener('disableViewMode', this.disableViewMode);
 
         // TODO Need Release memory?
         console.log('delete:text._events:', this._events);
+
+        // cancel circle reference.
+        // this.parent = null;
+
+        console.log('text:destroy');
     }
 
     /**
@@ -142,7 +151,8 @@ export default class TextAnnotation extends AbstractAnnotation {
     handleDoubleClickEvent() {
         console.log('handleDoubleClickEvent');
 
-        this.destroy();
+        // this.destroy();
+        this.$element.remove();
 
         let svg = getSVGLayer();
         let pos = scaleUp(svg, {
@@ -172,13 +182,14 @@ export default class TextAnnotation extends AbstractAnnotation {
 
     }
 
-    handleRectMoveEnd(rectAnnotation) {
-        if (rectAnnotation === this.parent) {
-            this.enableViewMode();
-        }
-    }
+    // handleRectMoveEnd(rectAnnotation) {
+    //     if (rectAnnotation === this.parent) {
+    //         this.enableViewMode();
+    //     }
+    // }
 
     enableViewMode() {
+        console.log('text:enableViewMode');
 
         super.enableViewMode();
         if (!this.readOnly) {

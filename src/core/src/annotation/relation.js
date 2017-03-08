@@ -318,9 +318,10 @@ export default class RelationAnnotation extends AbstractAnnotation {
      * Enable view mode.
      */
     enableViewMode() {
-        super.enableViewMode();
 
         this.disableViewMode();
+
+        super.enableViewMode();
 
         if (!this.readOnly) {
             this.$element.find('path').on('click', this.handleClickEvent);

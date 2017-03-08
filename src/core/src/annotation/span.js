@@ -191,9 +191,10 @@ export default class SpanAnnotation extends AbstractAnnotation {
      * Enable view mode.
      */
     enableViewMode() {
-        super.enableViewMode();
 
         this.disableViewMode();
+
+        super.enableViewMode();
 
         if (!this.readOnly) {
             this.$element.find('circle').on('click', this.handleClickEvent);
@@ -204,7 +205,6 @@ export default class SpanAnnotation extends AbstractAnnotation {
      * Disable view mode.
      */
     disableViewMode() {
-        console.log('span:disableViewMode');
         super.disableViewMode();
         this.$element.find('circle').off('click');
     }

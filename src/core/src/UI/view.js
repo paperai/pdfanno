@@ -5,9 +5,7 @@ import $ from 'jquery';
  */
 function disablePagebackAction(e) {
 
-    // console.log('disablePagebackAction:', e);
-
-    // enable any keyboard events for <input/>.
+    // Allow any keyboard events for <input/>.
     if (e.target.tagName.toLowerCase() === 'input') {
         return;
     }
@@ -23,42 +21,6 @@ function disablePagebackAction(e) {
         return false;
     }
 }
-
-
-// /**
-//  * Prevent page-back behavior.
-//  */
-// function handleDocumentKeydown(e) {
-
-//     // enable for <input/>.
-//     if (e.target.tagName.toLowerCase() === 'input') {
-//         return;
-//     }
-
-//     // Delete or BackSpace.
-//     if (e.keyCode == 46 || e.keyCode == 8) {
-//         e.preventDefault();
-//         return false;
-//     }
-// }
-
-// *
-//  * Delete selected annotations, and prevent page-back behavior.
-
-// function handleDocumentKeyup(e) {
-
-//     // enable for <input/>.
-//     if (e.target.tagName.toLowerCase() === 'input') {
-//         return;
-//     }
-
-//     // Delete or BackSpace.
-//     if (e.keyCode == 46 || e.keyCode == 8) {
-//         deleteSelectedAnnotations();
-//         e.preventDefault();
-//         return false;
-//     }
-// }
 
 /**
  * Delete selected annotations.
@@ -93,9 +55,9 @@ export function enableViewMode() {
 
     // disableViewMode();
 
-    window.viewMode = true;
+    // window.viewMode = true;
 
-    setAnnotationViewMode();
+    // setAnnotationViewMode();
 
     document.removeEventListener('keyup', disablePagebackAction);
     document.removeEventListener('keydown', disablePagebackAction);
@@ -108,8 +70,8 @@ export function enableViewMode() {
  * Disable view mode.
  */
 export function disableViewMode() {
-    console.log('view:disableViewMode');
-    window.viewMode = false;
+    // console.log('view:disableViewMode');
+    // window.viewMode = false;
     // resetAnnotationViewMode();
     // document.removeEventListener('keyup', handleDocumentKeyup);
     // document.removeEventListener('keydown', handleDocumentKeydown);

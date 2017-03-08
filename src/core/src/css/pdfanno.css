@@ -105,6 +105,10 @@
 .anno-text-group.--visible {
     opacity: 1;
 }
+.anno-text-group text {
+    /* Disable span action when selecting an anno text. */
+    user-select: none;
+}
 .anno-text {
 }
 .--hover .anno-text {

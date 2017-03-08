@@ -45,9 +45,9 @@ export default class AbstractAnnotation extends EventEmitter {
             this.setHoverEvent();
          }
 
-         if (window.viewMode) {
+         // if (window.viewMode) {
           this.$element.addClass('--viewMode');
-         }
+         // }
     }
 
     /**
@@ -165,6 +165,7 @@ export default class AbstractAnnotation extends EventEmitter {
      */
     enableViewMode() {
         this.render();
+        this.textAnnotation && this.textAnnotation.enableViewMode();
     }
 
     /**
@@ -172,6 +173,7 @@ export default class AbstractAnnotation extends EventEmitter {
      */
     disableViewMode() {
         this.render();
+        this.textAnnotation && this.textAnnotation.disableViewMode();
     }
 
     /**

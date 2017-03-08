@@ -26,6 +26,12 @@ function getSelectionRects() {
     let rects = range.getClientRects();
     let selectedText = selection.toString();
 
+    // Bug detect.
+    // This selects loadingIcon and/or loadingSpacer.
+    if (selection.anchorNode && selection.anchorNode.tagName === 'DIV') {
+        return { rects : null, selectedText : null };
+    }
+
     if (rects.length > 0 && rects[0].width > 0 && rects[0].height > 0) {
       return {rects, selectedText};
     }
@@ -46,7 +52,7 @@ function handleDocumentMouseup(e) {
   let { rects, selectedText } = getSelectionRects();
   if (rects) {
     let svg = getSVGLayer();
-    saveRect([...rects].map((r) => {
+    saveSpan([...rects].map((r) => {
       return {
         top    : r.top,
         left   : r.left,
@@ -74,10 +80,12 @@ function removeSelection() {
  * @param {Array} rects The rects to use for annotation
  * @param {String} color The color of the rects
  */
-function saveRect(rects, selectedText) {
+function saveSpan(rects, selectedText) {
 
   let svg = getSVGLayer();
   let boundingRect = svg.getBoundingClientRect();
+
+  console.log('rects:', rects);
 
   // Initialize the annotation
   let annotation = {
@@ -127,6 +135,7 @@ function saveRect(rects, selectedText) {
   if (prevAnnotation) {
     prevAnnotation.resetTextForceDisplay();
     prevAnnotation.render();
+    prevAnnotation.enableViewMode();
   }
   prevAnnotation = spanAnnotation;
 
@@ -155,6 +164,7 @@ export function disableSpan() {
   if (prevAnnotation) {
     prevAnnotation.resetTextForceDisplay();
     prevAnnotation.render();
+    prevAnnotation.enableViewMode();
     prevAnnotation = null;
   }
 
