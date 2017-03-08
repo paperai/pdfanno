@@ -232,6 +232,8 @@ function enableTextlayer() {
  */
 export function enableRect() {
 
+    window.currentType = 'rect';
+
   if (_enabled) { return; }
 
   _enabled = true;
@@ -248,6 +250,8 @@ export function enableRect() {
  * Disable rect behavior
  */
 export function disableRect() {
+
+    window.currentType = null;
 
   if (!_enabled) { return; }
 

@@ -281,7 +281,16 @@ export default class RectAnnotation extends AbstractAnnotation {
         document.removeEventListener('mousemove', this.handleMouseMoveOnDocument);
         document.removeEventListener('mouseup', this.handleMouseUpOnDocument);
 
-        this.enableTextlayer();
+        if (window.currentType !== 'rect') {
+            this.enableTextlayer();
+        }
+    }
+
+    handleMouseUp(e) {
+        console.log('rect:handleMouseUp: ', e.target);
+    }
+    handleMouseDown(e) {
+        console.log('rect:handleMouseDown: ', e.target);
     }
 
     // TODO 共通化？
@@ -318,6 +327,11 @@ export default class RectAnnotation extends AbstractAnnotation {
         if (!this.readOnly) {
             this.$element.find('.anno-rect, circle').on('click', this.handleClickEvent);
             this.enableDragAction();
+
+            // test.
+            this.$element.find('.anno-rect, circle')
+                .on('mouseup', this.handleMouseUp)
+                .on('mousedown', this.handleMouseDown);
         }
     }
 
@@ -328,6 +342,12 @@ export default class RectAnnotation extends AbstractAnnotation {
         super.disableViewMode();
         this.$element.find('.anno-rect, circle').off('click');
         this.disableDragAction();
+
+        // test.
+        this.$element.find('.anno-rect, circle')
+            .off('mouseup', this.handleMouseUp)
+            .off('mousedown', this.handleMouseDown);
+
     }
 
 }
