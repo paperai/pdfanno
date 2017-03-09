@@ -98,6 +98,22 @@ export default class TextAnnotation extends AbstractAnnotation {
         console.log('text:destroy');
     }
 
+    isHit(x, y) {
+
+        let $rect = this.$element.find('rect');
+        let x_ = $rect.attr('x');
+        let y_ = $rect.attr('y');
+        let w_ = $rect.attr('width');
+        let h_ = $rect.attr('height');
+        console.log(x,y,w,h);
+
+
+
+
+        // TODO
+        return false;
+    }
+
     /**
      * Delete a text annotation if selected.
      */

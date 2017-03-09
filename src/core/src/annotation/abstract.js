@@ -84,6 +84,10 @@ export default class AbstractAnnotation extends EventEmitter {
         this.deleted = true;
     }
 
+    isHit(x, y) {
+        return false;
+    }
+
     /**
      * Highlight the annotation.
      */

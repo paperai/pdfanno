@@ -155,9 +155,6 @@ function handleDocumentMouseup(e) {
   mousedownFired = false;
   mousemoveFired = false;
 
-
-  // document.removeEventListener('mouseup', handleDocumentMouseup);
-
   enableAnnotationHoverEvent();
 
   if (clicked) {
@@ -165,6 +162,7 @@ function handleDocumentMouseup(e) {
     if (startAnnotation && startAnnotation.handleClickEvent) {
         startAnnotation.handleClickEvent();
     }
+    startAnnotation = null;
 
     return;
   }
@@ -214,6 +212,9 @@ function handleDocumentMouseup(e) {
 
 }
 
+/**
+ * Show the input field to add a new text.
+ */
 function showTextInput(relationAnnotation) {
 
   let p1 = relationAnnotation.rel1Annotation.getBoundingCirclePosition();

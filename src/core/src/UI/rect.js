@@ -40,6 +40,9 @@ let enableArea = {
   maxY : 0
 };
 
+let mousedownFired = false;
+let mousemoveFired = false;
+
 /**
  * Handle document.mousedown event
  *
@@ -47,7 +50,7 @@ let enableArea = {
  */
 function handleDocumentMousedown(e) {
 
-    console.log('aaaaaaaaaaa');
+  mousedownFired = true;
 
   let { x, y } = getXY(e);
   originX = x;
@@ -69,7 +72,8 @@ function handleDocumentMousedown(e) {
   overlay.style.visibility = 'visible';
   getTmpLayer().appendChild(overlay);
 
-  document.addEventListener('mousemove', handleDocumentMousemove);
+  // document.addEventListener('mousemove', handleDocumentMousemove);
+
 }
 
 /**
@@ -78,6 +82,14 @@ function handleDocumentMousedown(e) {
  * @param {Event} e The DOM event to handle
  */
 function handleDocumentMousemove(e) {
+
+  if (mousedownFired) {
+    mousemoveFired = true;
+  }
+
+  if (!overlay) {
+    return;
+  }
 
   let { x : curX, y : curY } = getXY(e);
 
@@ -116,12 +128,40 @@ function handleDocumentMousemove(e) {
 
 }
 
+function _findAnnotation(e) {
+
+    let { x, y } = scaleDown(getSVGLayer(), getXY(e));
+
+    // TODO
+    // 各AnnoにisHit(x,y)を実装して対応したい.
+}
+
 /**
  * Handle document.mouseup event
  *
  * @param {Event} e The DOM event to handle
  */
 function handleDocumentMouseup(e) {
+
+    let clicked = mousedownFired && !mousemoveFired;
+    let dragged = mousedownFired && mousemoveFired;
+
+    if (clicked) {
+
+        let anno = _findAnnotation(e);
+        if (anno && anno.handleClick) {
+            anno.handleClick();
+        }
+
+        $(overlay).remove();
+        overlay = null;
+
+        return;
+    }
+
+    mousedownFired = false;
+    mousemoveFired = false;
+
 
   if (!overlay) {
     return;
@@ -141,7 +181,7 @@ function handleDocumentMouseup(e) {
   $(overlay).remove();
   overlay = null;
 
-  document.removeEventListener('mousemove', handleDocumentMousemove);
+  // document.removeEventListener('mousemove', handleDocumentMousemove);
 }
 
 /**
@@ -211,7 +251,7 @@ function cancelRectDrawing() {
     // After `handleDocumentMousedown`
     setTimeout(() => {
         console.log('cancelRectDrawing');
-        document.removeEventListener('mousemove', handleDocumentMousemove);
+        // document.removeEventListener('mousemove', handleDocumentMousemove);
         $(overlay).remove();
         overlay = null;
     }, 100);
@@ -240,6 +280,7 @@ export function enableRect() {
   _enabled = true;
   document.addEventListener('mouseup', handleDocumentMouseup);
   document.addEventListener('mousedown', handleDocumentMousedown);
+  document.addEventListener('mousemove', handleDocumentMousemove);
 
   // disableUserSelect();
   disableTextlayer();
@@ -259,6 +300,7 @@ export function disableRect() {
   _enabled = false;
   document.removeEventListener('mouseup', handleDocumentMouseup);
   document.removeEventListener('mousedown', handleDocumentMousedown);
+  document.removeEventListener('mousemove', handleDocumentMousemove);
 
   // enableUserSelect();
   enableTextlayer();
