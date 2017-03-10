@@ -164,11 +164,13 @@ function handleDocumentMouseup(e) {
     }
     startAnnotation = null;
 
+    relationAnnotation && relationAnnotation.destroy();
+    relationAnnotation = null;
+
     return;
   }
 
-
-
+  startAnnotation = null;
 
 
 
