@@ -25,8 +25,8 @@ To view the samples, unzip the samples and specify the directory via `Browse` bu
 * Client-only application. No communication with a server.
 
 ## Usage
-1. Visit the [online demo](https://paperai.github.io/pdfanno/) with Chrome.
-1. Specify your root directory via `Browse` button. Put PDF files and annotation files (if any) in the root directory. 
+1. Visit the [online demo](https://paperai.github.io/pdfanno/) with the latest version of Chrome.
+1. Put PDF files and annotation files (if any) in your directory, then specify the root directory via `Browse` button.
 1. Load the target PDF. If you have an anno file for the PDF, load it as well.
 1. Annotate the PDF as you like.
 1. Save your annotations as a text file via `download` button. If you'd like to continue the annotation, put the annotation file in the root directory.
