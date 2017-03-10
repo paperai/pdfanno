@@ -339,6 +339,8 @@ export function disableRelation() {
 
   deleteBoundingBoxList();
 
+  console.log('3a');
+
   window.annotationContainer.getAllAnnotations().forEach(a => {
 
     if (a.hasBoundingCircle()) {
@@ -355,6 +357,8 @@ export function disableRelation() {
 
   });
 
+  console.log('3b');
+
   if (prevAnnotation) {
     prevAnnotation.resetTextForceDisplay();
     prevAnnotation.render();
@@ -362,6 +366,10 @@ export function disableRelation() {
     prevAnnotation = null;
   }
 
+  console.log('3c');
+
   window.globalEvent.emit('disableRelation');
+
+  console.log('3d');
 
 }

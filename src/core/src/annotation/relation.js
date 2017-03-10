@@ -117,7 +117,8 @@ export default class RelationAnnotation extends AbstractAnnotation {
      */
     render() {
         this.setStartEndPosition();
-        super.render();
+        let result = super.render();
+        console.log('render:relation:', result);
     }
 
     /**

@@ -54,18 +54,22 @@ export default class TextAnnotation extends AbstractAnnotation {
 
         // TODO 引数で text と position を渡せば、循環参照を無くせる.
 
+        let result = false;
+
         if (this.parent.text) {
             assign(this, this.parent.getTextPosition());
             this.text = this.parent.text;
             this.color = this.parent.color;
             this.parentId = this.parent.uuid;
-            super.render();
+            result = super.render();
             if (this.textForceDisplay) {
                 this.$element.addClass('--visible');
             }
         } else {
             this.$element.remove();
         }
+
+        console.log('render:text:', result);
     }
 
     /**
@@ -82,15 +86,16 @@ export default class TextAnnotation extends AbstractAnnotation {
      * Delete a text annotation.
      */
     destroy() {
-        this.$element.remove();
-        this.$element = this.createDummyElement();
+        super.destroy();
+        // this.$element.remove();
+        // this.$element = this.createDummyElement();
         // globalEvent.removeListener('rectmoveend', this.handleRectMoveEnd);
         // globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
         // globalEvent.removeListener('enableViewMode', this.enableViewMode);
         // globalEvent.removeListener('disableViewMode', this.disableViewMode);
 
         // TODO Need Release memory?
-        console.log('delete:text._events:', this._events);
+        // console.log('delete:text._events:', this._events);
 
         // cancel circle reference.
         // this.parent = null;

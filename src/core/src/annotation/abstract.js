@@ -14,6 +14,8 @@ export default class AbstractAnnotation extends EventEmitter {
     constructor() {
       super();
       this.autoBind();
+
+      this.deleted = false;
     }
 
     /**
@@ -35,7 +37,7 @@ export default class AbstractAnnotation extends EventEmitter {
         this.$element.remove();
 
         if (this.deleted) {
-            return;
+            return false;
         }
 
          this.$element = $(appendChild(getSVGLayer(), this));
@@ -48,6 +50,8 @@ export default class AbstractAnnotation extends EventEmitter {
          // if (window.viewMode) {
           this.$element.addClass('--viewMode');
          // }
+
+        return true;
     }
 
     /**
@@ -73,15 +77,18 @@ export default class AbstractAnnotation extends EventEmitter {
      * Delete the annotation from rendering, a container in window, and a container in localStorage.
      */
     destroy() {
-        this.$element.remove();
-        window.annotationContainer.remove(this);
-        let { documentId } = getMetadata(); // TODO Remove this.
-        PDFAnnoCore.getStoreAdapter().deleteAnnotation(documentId, this.uuid).then(() => {
-            console.log('deleted');
-        });
-        this.textAnnotation && this.textAnnotation.destroy();
-
         this.deleted = true;
+        this.$element.remove();
+
+        if (this.uuid) {
+            window.annotationContainer.remove(this);
+            let { documentId } = getMetadata(); // TODO Remove this.
+            PDFAnnoCore.getStoreAdapter().deleteAnnotation(documentId, this.uuid).then(() => {
+                console.log('deleted');
+            });
+            this.textAnnotation && this.textAnnotation.destroy();
+        }
+
     }
 
     isHit(x, y) {
