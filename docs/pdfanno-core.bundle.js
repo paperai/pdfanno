@@ -205,6 +205,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        window.annotationContainer.getAllAnnotations().forEach(function (a) {
 	            a.render();
+	            a.enableViewMode();
 	        });
 	        var event = document.createEvent('CustomEvent');
 	        event.initCustomEvent('annotationrendered', true, true, null);
@@ -225,20 +226,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	            annotations.annotations.forEach(function (a) {
 	
 	                // TODO move to annotation/index.js
+	
+	                var anno = null;
+	
 	                if (a.type === 'area') {
-	                    var rect = _rect2.default.newInstance(a);
-	                    rect.render();
-	                    window.annotationContainer.add(rect);
+	                    anno = _rect2.default.newInstance(a);
 	                } else if (a.type === 'span') {
-	                    var span = _span2.default.newInstance(a);
-	                    span.render();
-	                    window.annotationContainer.add(span);
+	                    anno = _span2.default.newInstance(a);
 	                } else if (a.type === 'relation') {
-	                    var relationAnnotation = _relation2.default.newInstance(a);
-	                    relationAnnotation.render();
-	                    window.annotationContainer.add(relationAnnotation);
-	                } else {
-	                    (0, _appendChild2.default)(svg, a);
+	                    anno = _relation2.default.newInstance(a);
+	                    // } else {
+	                    //     appendChild(svg, a);
+	                }
+	
+	                if (anno) {
+	                    anno.render();
+	                    anno.enableViewMode();
+	                    window.annotationContainer.add(anno);
 	                }
 	            });
 	
@@ -17637,12 +17641,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  maxY: 0
 	};
 	
+	var mousedownFired = false;
+	var mousemoveFired = false;
+	
 	/**
 	 * Handle document.mousedown event
 	 *
 	 * @param {Event} e The DOM event to handle
 	 */
 	function handleDocumentMousedown(e) {
+	
+	  mousedownFired = true;
+	
 	  var _getXY = (0, _utils.getXY)(e),
 	      x = _getXY.x,
 	      y = _getXY.y;
@@ -17666,7 +17676,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  overlay.style.visibility = 'visible';
 	  (0, _utils.getTmpLayer)().appendChild(overlay);
 	
-	  document.addEventListener('mousemove', handleDocumentMousemove);
+	  // document.addEventListener('mousemove', handleDocumentMousemove);
 	}
 	
 	/**
@@ -17675,6 +17685,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {Event} e The DOM event to handle
 	 */
 	function handleDocumentMousemove(e) {
+	
+	  if (mousedownFired) {
+	    mousemoveFired = true;
+	  }
+	
+	  if (!overlay) {
+	    return;
+	  }
+	
 	  var _getXY2 = (0, _utils.getXY)(e),
 	      curX = _getXY2.x,
 	      curY = _getXY2.y;
@@ -17703,6 +17722,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	  overlay.style.top = y + 'px';
 	  overlay.style.width = w + 'px';
 	  overlay.style.height = h + 'px';
+	
+	  if (prevAnnotation) {
+	    prevAnnotation.resetTextForceDisplay();
+	    prevAnnotation.render();
+	    prevAnnotation.enableViewMode();
+	    prevAnnotation = null;
+	  }
+	}
+	
+	function _findAnnotation(e) {
+	  var _scaleDown = (0, _utils.scaleDown)((0, _utils.getSVGLayer)(), (0, _utils.getXY)(e)),
+	      x = _scaleDown.x,
+	      y = _scaleDown.y;
+	
+	  // TODO
+	  // 各AnnoにisHit(x,y)を実装して対応したい.
+	
 	}
 	
 	/**
@@ -17711,6 +17747,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {Event} e The DOM event to handle
 	 */
 	function handleDocumentMouseup(e) {
+	
+	  var clicked = mousedownFired && !mousemoveFired;
+	  var dragged = mousedownFired && mousemoveFired;
+	
+	  if (clicked) {
+	
+	    var anno = _findAnnotation(e);
+	    if (anno && anno.handleClick) {
+	      anno.handleClick();
+	    }
+	
+	    (0, _jquery2.default)(overlay).remove();
+	    overlay = null;
+	
+	    return;
+	  }
+	
+	  mousedownFired = false;
+	  mousemoveFired = false;
 	
 	  if (!overlay) {
 	    return;
@@ -17730,7 +17785,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  (0, _jquery2.default)(overlay).remove();
 	  overlay = null;
 	
-	  document.removeEventListener('mousemove', handleDocumentMousemove);
+	  // document.removeEventListener('mousemove', handleDocumentMousemove);
 	}
 	
 	/**
@@ -17775,19 +17830,49 @@ return /******/ (function(modules) { // webpackBootstrap
 	    rectAnnotation.setTextForceDisplay();
 	    rectAnnotation.render();
 	    rectAnnotation.save();
+	    rectAnnotation.enableViewMode();
 	  });
 	
-	  if (prevAnnotation) {
-	    prevAnnotation.resetTextForceDisplay();
-	    prevAnnotation.render();
-	  }
+	  // if (prevAnnotation) {
+	  //   prevAnnotation.resetTextForceDisplay();
+	  //   prevAnnotation.render();
+	  // }
 	  prevAnnotation = rectAnnotation;
+	
+	  // Enable a drag / click action.
+	  // TODO インスタンス生成時にデフォルトで有効にしてもいいかなー.
+	  rectAnnotation.enableViewMode();
+	}
+	
+	/**
+	 * Cancel rect drawing if an existing rect has got a drag event.
+	 */
+	function cancelRectDrawing() {
+	
+	  // After `handleDocumentMousedown`
+	  setTimeout(function () {
+	    console.log('cancelRectDrawing');
+	    // document.removeEventListener('mousemove', handleDocumentMousemove);
+	    (0, _jquery2.default)(overlay).remove();
+	    overlay = null;
+	  }, 100);
+	}
+	
+	// TODO 共通化？
+	function disableTextlayer() {
+	  (0, _jquery2.default)('.textLayer').hide();
+	}
+	// TODO 共通化？
+	function enableTextlayer() {
+	  (0, _jquery2.default)('.textLayer').show();
 	}
 	
 	/**
 	 * Enable rect behavior
 	 */
 	function enableRect() {
+	
+	  window.currentType = 'rect';
 	
 	  if (_enabled) {
 	    return;
@@ -17796,14 +17881,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _enabled = true;
 	  document.addEventListener('mouseup', handleDocumentMouseup);
 	  document.addEventListener('mousedown', handleDocumentMousedown);
+	  document.addEventListener('mousemove', handleDocumentMousemove);
 	
-	  (0, _utils.disableUserSelect)();
+	  // disableUserSelect();
+	  disableTextlayer();
+	
+	  window.globalEvent.on('rectmovestart', cancelRectDrawing);
 	}
 	
 	/**
 	 * Disable rect behavior
 	 */
 	function disableRect() {
+	
+	  window.currentType = null;
 	
 	  if (!_enabled) {
 	    return;
@@ -17812,14 +17903,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _enabled = false;
 	  document.removeEventListener('mouseup', handleDocumentMouseup);
 	  document.removeEventListener('mousedown', handleDocumentMousedown);
+	  document.removeEventListener('mousemove', handleDocumentMousemove);
 	
-	  (0, _utils.enableUserSelect)();
+	  // enableUserSelect();
+	  enableTextlayer();
 	
 	  if (prevAnnotation) {
 	    prevAnnotation.resetTextForceDisplay();
 	    prevAnnotation.render();
+	    prevAnnotation.enableViewMode();
 	    prevAnnotation = null;
 	  }
+	
+	  window.globalEvent.removeListener('rectmovestart', cancelRectDrawing);
 	}
 
 /***/ },
@@ -18604,7 +18700,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        window.globalEvent.on('enableViewMode', _this.enableViewMode);
 	        window.globalEvent.on('disableViewMode', _this.disableViewMode);
 	
-	        _this.textAnnotation = new _text2.default(_this);
+	        window.globalEvent.on('enableRelation', _this.disableDragAction);
+	        window.globalEvent.on('disableRelation', _this.enableDragAction);
+	
+	        _this.textAnnotation = new _text2.default(_this.readOnly, _this);
 	        _this.textAnnotation.on('selected', _this.handleTextSelected);
 	        _this.textAnnotation.on('deselected', _this.handleTextDeselected);
 	        _this.textAnnotation.on('hoverin', _this.handleTextHoverIn);
@@ -18641,6 +18740,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	            window.globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
 	            window.globalEvent.removeListener('enableViewMode', this.enableViewMode);
 	            window.globalEvent.removeListener('disableViewMode', this.disableViewMode);
+	        }
+	    }, {
+	        key: 'isHit',
+	        value: function isHit(x, y) {
+	            var _textAnnotation;
+	
+	            // TODO
+	            return false || (_textAnnotation = this.textAnnotation).isHit.apply(_textAnnotation, arguments);
 	        }
 	
 	        /**
@@ -18814,10 +18921,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.originalX = this.x;
 	            this.originalY = this.y;
 	
-	            (0, _utils.disableUserSelect)();
+	            // disableUserSelect();
 	
 	            document.addEventListener('mousemove', this.handleMouseMoveOnDocument);
 	            document.addEventListener('mouseup', this.handleMouseUpOnDocument);
+	
+	            window.globalEvent.emit('rectmovestart');
+	
+	            this.disableTextlayer();
 	        }
 	
 	        /**
@@ -18874,10 +18985,47 @@ return /******/ (function(modules) { // webpackBootstrap
 	                globalEvent.emit('rectmoveend', this);
 	            }
 	
-	            (0, _utils.enableUserSelect)();
+	            // enableUserSelect();
 	
 	            document.removeEventListener('mousemove', this.handleMouseMoveOnDocument);
 	            document.removeEventListener('mouseup', this.handleMouseUpOnDocument);
+	
+	            if (window.currentType !== 'rect') {
+	                this.enableTextlayer();
+	            }
+	        }
+	
+	        // handleMouseUp(e) {
+	        //     console.log('rect:handleMouseUp: ', e.target);
+	        // }
+	        // handleMouseDown(e) {
+	        //     console.log('rect:handleMouseDown: ', e.target);
+	        // }
+	
+	        // TODO 共通化？
+	
+	    }, {
+	        key: 'disableTextlayer',
+	        value: function disableTextlayer() {
+	            $('.textLayer').hide();
+	        }
+	
+	        // TODO 共通化？
+	
+	    }, {
+	        key: 'enableTextlayer',
+	        value: function enableTextlayer() {
+	            $('.textLayer').show();
+	        }
+	    }, {
+	        key: 'enableDragAction',
+	        value: function enableDragAction() {
+	            this.$element.find('.anno-rect, circle').off('mousedown', this.handleMouseDownOnRect).on('mousedown', this.handleMouseDownOnRect);
+	        }
+	    }, {
+	        key: 'disableDragAction',
+	        value: function disableDragAction() {
+	            this.$element.find('.anno-rect, circle').off('mousedown', this.handleMouseDownOnRect);
 	        }
 	
 	        /**
@@ -18888,10 +19036,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'enableViewMode',
 	        value: function enableViewMode() {
 	
+	            console.log('rect:enableViewMode');
+	
 	            _get(RectAnnotation.prototype.__proto__ || Object.getPrototypeOf(RectAnnotation.prototype), 'enableViewMode', this).call(this);
 	
 	            if (!this.readOnly) {
-	                this.$element.find('.anno-rect, circle').on('click', this.handleClickEvent).on('mousedown', this.handleMouseDownOnRect);
+	                this.$element.find('.anno-rect, circle').on('click', this.handleClickEvent);
+	                this.enableDragAction();
+	
+	                // test.
+	                // this.$element.find('.anno-rect, circle')
+	                //     .on('mouseup', this.handleMouseUp)
+	                //     .on('mousedown', this.handleMouseDown);
 	            }
 	        }
 	
@@ -18903,7 +19059,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'disableViewMode',
 	        value: function disableViewMode() {
 	            _get(RectAnnotation.prototype.__proto__ || Object.getPrototypeOf(RectAnnotation.prototype), 'disableViewMode', this).call(this);
-	            this.$element.find('.anno-rect, circle').off('click mousedown');
+	            this.$element.find('.anno-rect, circle').off('click');
+	            this.disableDragAction();
+	
+	            // test.
+	            // this.$element.find('.anno-rect, circle')
+	            //     .off('mouseup', this.handleMouseUp)
+	            //     .off('mousedown', this.handleMouseDown);
 	        }
 	    }], [{
 	        key: 'newInstance',
@@ -18976,6 +19138,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var _this = _possibleConstructorReturn(this, (AbstractAnnotation.__proto__ || Object.getPrototypeOf(AbstractAnnotation)).call(this));
 	
 	        _this.autoBind();
+	
+	        _this.deleted = false;
 	        return _this;
 	    }
 	
@@ -19004,9 +19168,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'render',
 	        value: function render() {
 	
-	            console.log('render', this.type);
-	
 	            this.$element.remove();
+	
+	            if (this.deleted) {
+	                return false;
+	            }
+	
 	            this.$element = $((0, _appendChild2.default)((0, _utils.getSVGLayer)(), this));
 	            this.textAnnotation && this.textAnnotation.render();
 	
@@ -19014,9 +19181,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.setHoverEvent();
 	            }
 	
-	            if (window.viewMode) {
-	                this.$element.addClass('--viewMode');
-	            }
+	            // if (window.viewMode) {
+	            this.$element.addClass('--viewMode');
+	            // }
+	
+	            return true;
 	        }
 	
 	        /**
@@ -19052,17 +19221,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'destroy',
 	        value: function destroy() {
+	            this.deleted = true;
 	            this.$element.remove();
-	            window.annotationContainer.remove(this);
 	
-	            var _getMetadata2 = (0, _utils.getMetadata)(),
-	                documentId = _getMetadata2.documentId; // TODO Remove this.
+	            if (this.uuid) {
+	                window.annotationContainer.remove(this);
+	
+	                var _getMetadata2 = (0, _utils.getMetadata)(),
+	                    documentId = _getMetadata2.documentId; // TODO Remove this.
 	
 	
-	            _PDFAnnoCore2.default.getStoreAdapter().deleteAnnotation(documentId, this.uuid).then(function () {
-	                console.log('deleted');
-	            });
-	            this.textAnnotation && this.textAnnotation.destroy();
+	                _PDFAnnoCore2.default.getStoreAdapter().deleteAnnotation(documentId, this.uuid).then(function () {
+	                    console.log('deleted');
+	                });
+	                this.textAnnotation && this.textAnnotation.destroy();
+	            }
+	        }
+	    }, {
+	        key: 'isHit',
+	        value: function isHit(x, y) {
+	            return false;
 	        }
 	
 	        /**
@@ -19179,6 +19357,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'enableViewMode',
 	        value: function enableViewMode() {
 	            this.render();
+	            this.textAnnotation && this.textAnnotation.enableViewMode();
 	        }
 	
 	        /**
@@ -19189,6 +19368,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'disableViewMode',
 	        value: function disableViewMode() {
 	            this.render();
+	            this.textAnnotation && this.textAnnotation.disableViewMode();
 	        }
 	
 	        /**
@@ -19280,7 +19460,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     * Constructor.
 	     */
-	    function TextAnnotation(parent) {
+	    function TextAnnotation(readOnly, parent) {
 	        _classCallCheck(this, TextAnnotation);
 	
 	        var _this = _possibleConstructorReturn(this, (TextAnnotation.__proto__ || Object.getPrototypeOf(TextAnnotation)).call(this));
@@ -19291,17 +19471,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _this.parent = parent;
 	        _this.x = 0;
 	        _this.y = 0;
+	        _this.readOnly = readOnly;
 	        _this.$element = _this.createDummyElement();
 	
 	        // Updated by parent via AbstractAnnotation#setTextForceDisplay.
 	        _this.textForceDisplay = false;
 	
 	        // parent.on('rectmoveend', this.handleRectMoveEnd);
-	        globalEvent.on('rectmoveend', _this.handleRectMoveEnd);
 	
-	        globalEvent.on('deleteSelectedAnnotation', _this.deleteSelectedAnnotation);
-	        globalEvent.on('enableViewMode', _this.enableViewMode);
-	        globalEvent.on('disableViewMode', _this.disableViewMode);
+	        // globalEvent.on('rectmoveend', this.handleRectMoveEnd);
+	
+	        // globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
+	        // globalEvent.on('enableViewMode', this.enableViewMode);
+	        // globalEvent.on('disableViewMode', this.disableViewMode);
 	        return _this;
 	    }
 	
@@ -19313,18 +19495,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _createClass(TextAnnotation, [{
 	        key: 'render',
 	        value: function render() {
+	
+	            // TODO 引数で text と position を渡せば、循環参照を無くせる.
+	
+	            var result = false;
+	
 	            if (this.parent.text) {
 	                (0, _deepAssign2.default)(this, this.parent.getTextPosition());
 	                this.text = this.parent.text;
 	                this.color = this.parent.color;
 	                this.parentId = this.parent.uuid;
-	                _get(TextAnnotation.prototype.__proto__ || Object.getPrototypeOf(TextAnnotation.prototype), 'render', this).call(this);
+	                result = _get(TextAnnotation.prototype.__proto__ || Object.getPrototypeOf(TextAnnotation.prototype), 'render', this).call(this);
 	                if (this.textForceDisplay) {
 	                    this.$element.addClass('--visible');
 	                }
 	            } else {
 	                this.$element.remove();
 	            }
+	
+	            console.log('render:text:', result);
 	        }
 	
 	        /**
@@ -19344,11 +19533,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'destroy',
 	        value: function destroy() {
-	            this.$element.remove();
-	            this.$element = this.createDummyElement();
-	            globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
-	            globalEvent.removeListener('enableViewMode', this.enableViewMode);
-	            globalEvent.removeListener('disableViewMode', this.disableViewMode);
+	            _get(TextAnnotation.prototype.__proto__ || Object.getPrototypeOf(TextAnnotation.prototype), 'destroy', this).call(this);
+	            // this.$element.remove();
+	            // this.$element = this.createDummyElement();
+	            // globalEvent.removeListener('rectmoveend', this.handleRectMoveEnd);
+	            // globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
+	            // globalEvent.removeListener('enableViewMode', this.enableViewMode);
+	            // globalEvent.removeListener('disableViewMode', this.disableViewMode);
+	
+	            // TODO Need Release memory?
+	            // console.log('delete:text._events:', this._events);
+	
+	            // cancel circle reference.
+	            // this.parent = null;
+	
+	            console.log('text:destroy');
+	        }
+	    }, {
+	        key: 'isHit',
+	        value: function isHit(x, y) {
+	
+	            var $rect = this.$element.find('rect');
+	            var x_ = $rect.attr('x');
+	            var y_ = $rect.attr('y');
+	            var w_ = $rect.attr('width');
+	            var h_ = $rect.attr('height');
+	            console.log(x, y, w, h);
+	
+	            // TODO
+	            return false;
 	        }
 	
 	        /**
@@ -19420,7 +19633,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            console.log('handleDoubleClickEvent');
 	
-	            this.destroy();
+	            // this.destroy();
+	            this.$element.remove();
 	
 	            var svg = (0, _utils.getSVGLayer)();
 	            var pos = (0, _utils.scaleUp)(svg, {
@@ -19430,9 +19644,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var rect = svg.getBoundingClientRect();
 	            pos.x += rect.left;
 	            pos.y += rect.top;
-	
-	            // Disable the keyup event of BackSpace.
-	            (0, _view.disableViewMode)();
 	
 	            (0, _text.addInputField)(pos.x, pos.y, this.uuid, this.text, function (text) {
 	
@@ -19444,39 +19655,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	
 	                _this2.render();
-	                // this.enableViewMode();
 	
-	                // Enable the keyup event of BackSpace.
-	                (0, _view.enableViewMode)();
-	
-	                if (!_this2.parent.readOnly) {
+	                if (!_this2.readOnly) {
 	                    _this2.$element.find('text').off('click').on('click', _this2.handleClickEvent);
 	                }
 	            });
 	        }
-	    }, {
-	        key: 'handleRectMoveEnd',
-	        value: function handleRectMoveEnd(rectAnnotation) {
-	            if (rectAnnotation === this.parent) {
-	                this.enableViewMode();
-	            }
-	        }
+	
+	        // handleRectMoveEnd(rectAnnotation) {
+	        //     if (rectAnnotation === this.parent) {
+	        //         this.enableViewMode();
+	        //     }
+	        // }
+	
 	    }, {
 	        key: 'enableViewMode',
 	        value: function enableViewMode() {
-	
 	            console.log('text:enableViewMode');
 	
 	            _get(TextAnnotation.prototype.__proto__ || Object.getPrototypeOf(TextAnnotation.prototype), 'enableViewMode', this).call(this);
-	            if (!this.parent.readOnly) {
+	            if (!this.readOnly) {
 	                this.$element.find('text').off('click').on('click', this.handleClickEvent);
 	            }
 	        }
 	    }, {
 	        key: 'disableViewMode',
 	        value: function disableViewMode() {
-	
-	            console.log('text:disableViewMode');
 	
 	            _get(TextAnnotation.prototype.__proto__ || Object.getPrototypeOf(TextAnnotation.prototype), 'disableViewMode', this).call(this);
 	            this.$element.find('text').off('click', this.handleClickEvent);
@@ -19508,24 +19712,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	/**
-	 * Prevent page-back behavior.
+	 * Disable the action of pageback, if `DEL` or `BackSpace` button pressed.
 	 */
-	function handleDocumentKeydown(e) {
-	    // Delete or BackSpace.
-	    if (e.keyCode == 46 || e.keyCode == 8) {
-	        e.preventDefault();
-	        return false;
-	    }
-	}
+	function disablePagebackAction(e) {
 	
-	/**
-	 * Delete selected annotations, and prevent page-back behavior.
-	 */
-	function handleDocumentKeyup(e) {
+	    // Allow any keyboard events for <input/>.
+	    if (e.target.tagName.toLowerCase() === 'input') {
+	        return;
+	    }
+	
 	    // Delete or BackSpace.
 	    if (e.keyCode == 46 || e.keyCode == 8) {
-	        deleteSelectedAnnotations();
 	        e.preventDefault();
+	
+	        if (e.type === 'keyup') {
+	            deleteSelectedAnnotations();
+	        }
+	
 	        return false;
 	    }
 	}
@@ -19538,31 +19741,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	/**
-	 * Set annotations' translucent state.
-	 */
-	function setComponenTranslucent(translucent) {}
-	
-	// if (translucent) {
-	//     $('svg > *').addClass('--viewMode');
-	
-	// } else {
-	//     $('svg > *').removeClass('--viewMode');
-	// }
-	
-	
-	/**
 	 * Make annotations view mode.
 	 */
 	function setAnnotationViewMode() {
 	    window.globalEvent.emit('enableViewMode');
 	}
 	
-	/**
-	 * Make annotations NOT view mode.
-	 */
-	function resetAnnotationViewMode() {
-	    window.globalEvent.emit('disableViewMode');
-	}
+	// TODO NO NEED `enableViewMode` event ?
+	
+	// /**
+	//  * Make annotations NOT view mode.
+	//  */
+	// function resetAnnotationViewMode() {
+	//     window.globalEvent.emit('disableViewMode');
+	// }
+	
+	// TODO NO NEED `disableViewMode` event ?
 	
 	/**
 	 * Enable view mode.
@@ -19570,26 +19764,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	function enableViewMode() {
 	    console.log('view:enableViewMode');
 	
-	    disableViewMode();
+	    // disableViewMode();
 	
-	    window.viewMode = true;
+	    // window.viewMode = true;
 	
-	    setComponenTranslucent(true);
-	    setAnnotationViewMode();
-	    document.addEventListener('keyup', handleDocumentKeyup);
-	    document.addEventListener('keydown', handleDocumentKeydown);
+	    // setAnnotationViewMode();
+	
+	    document.removeEventListener('keyup', disablePagebackAction);
+	    document.removeEventListener('keydown', disablePagebackAction);
+	    document.addEventListener('keyup', disablePagebackAction);
+	    document.addEventListener('keydown', disablePagebackAction);
 	}
 	
 	/**
 	 * Disable view mode.
 	 */
 	function disableViewMode() {
-	    console.log('view:disableViewMode');
-	    window.viewMode = false;
-	    setComponenTranslucent(false);
-	    resetAnnotationViewMode();
-	    document.removeEventListener('keyup', handleDocumentKeyup);
-	    document.removeEventListener('keydown', handleDocumentKeydown);
+	    // console.log('view:disableViewMode');
+	    // window.viewMode = false;
+	    // resetAnnotationViewMode();
+	    // document.removeEventListener('keyup', handleDocumentKeyup);
+	    // document.removeEventListener('keydown', handleDocumentKeydown);
 	}
 
 /***/ },
@@ -19637,6 +19832,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var rects = range.getClientRects();
 	    var selectedText = selection.toString();
 	
+	    // Bug detect.
+	    // This selects loadingIcon and/or loadingSpacer.
+	    if (selection.anchorNode && selection.anchorNode.tagName === 'DIV') {
+	      return { rects: null, selectedText: null };
+	    }
+	
 	    if (rects.length > 0 && rects[0].width > 0 && rects[0].height > 0) {
 	      return { rects: rects, selectedText: selectedText };
 	    }
@@ -19657,7 +19858,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  if (rects) {
 	    var svg = (0, _utils.getSVGLayer)();
-	    saveRect([].concat(_toConsumableArray(rects)).map(function (r) {
+	    saveSpan([].concat(_toConsumableArray(rects)).map(function (r) {
 	      return {
 	        top: r.top,
 	        left: r.left,
@@ -19666,8 +19867,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      };
 	    }), selectedText);
 	  }
-	
-	  console.log('handleDocumentMouseup:', rects);
 	
 	  removeSelection();
 	}
@@ -19687,10 +19886,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {Array} rects The rects to use for annotation
 	 * @param {String} color The color of the rects
 	 */
-	function saveRect(rects, selectedText) {
+	function saveSpan(rects, selectedText) {
 	
 	  var svg = (0, _utils.getSVGLayer)();
 	  var boundingRect = svg.getBoundingClientRect();
+	
+	  console.log('rects:', rects);
 	
 	  // Initialize the annotation
 	  var annotation = {
@@ -19734,11 +19935,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    spanAnnotation.setTextForceDisplay();
 	    spanAnnotation.render();
 	    spanAnnotation.save();
+	    spanAnnotation.enableViewMode();
 	  });
 	
 	  if (prevAnnotation) {
 	    prevAnnotation.resetTextForceDisplay();
 	    prevAnnotation.render();
+	    prevAnnotation.enableViewMode();
 	  }
 	  prevAnnotation = spanAnnotation;
 	}
@@ -19749,7 +19952,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	function enableSpan() {
 	  this.disableSpan();
 	  document.addEventListener('mouseup', handleDocumentMouseup);
-	  (0, _jquery2.default)('.textLayer').css('z-index', 3); // over svg layer.
+	
+	  // $('.textLayer').css('z-index', 3); // over svg layer.
 	}
 	
 	/**
@@ -19757,11 +19961,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function disableSpan() {
 	  document.removeEventListener('mouseup', handleDocumentMouseup);
-	  (0, _jquery2.default)('.textLayer').css('z-index', 1);
+	
+	  // $('.textLayer').css('z-index', 1);
 	
 	  if (prevAnnotation) {
 	    prevAnnotation.resetTextForceDisplay();
 	    prevAnnotation.render();
+	    prevAnnotation.enableViewMode();
 	    prevAnnotation = null;
 	  }
 	}
@@ -19826,7 +20032,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        window.globalEvent.on('enableViewMode', _this.enableViewMode);
 	        window.globalEvent.on('disableViewMode', _this.disableViewMode);
 	
-	        _this.textAnnotation = new _text2.default(_this);
+	        _this.textAnnotation = new _text2.default(_this.readOnly, _this);
 	        _this.textAnnotation.on('selected', _this.handleTextSelected);
 	        _this.textAnnotation.on('deselected', _this.handleTextDeselected);
 	        _this.textAnnotation.on('hoverin', _this.handleTextHoverIn);
@@ -19860,9 +20066,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function destroy() {
 	            _get(SpanAnnotation.prototype.__proto__ || Object.getPrototypeOf(SpanAnnotation.prototype), 'destroy', this).call(this);
 	            this.emit('delete');
+	
+	            // TODO オブジェクトベースで削除できるようにしたい.
 	            window.globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
 	            window.globalEvent.removeListener('enableViewMode', this.enableViewMode);
 	            window.globalEvent.removeListener('disableViewMode', this.disableViewMode);
+	        }
+	    }, {
+	        key: 'isHit',
+	        value: function isHit(x, y) {
+	            var _textAnnotation;
+	
+	            // TODO
+	            return false || (_textAnnotation = this.textAnnotation).isHit.apply(_textAnnotation, arguments);
 	        }
 	
 	        /**
@@ -20027,9 +20243,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'enableViewMode',
 	        value: function enableViewMode() {
-	            _get(SpanAnnotation.prototype.__proto__ || Object.getPrototypeOf(SpanAnnotation.prototype), 'enableViewMode', this).call(this);
 	
 	            this.disableViewMode();
+	
+	            _get(SpanAnnotation.prototype.__proto__ || Object.getPrototypeOf(SpanAnnotation.prototype), 'enableViewMode', this).call(this);
 	
 	            if (!this.readOnly) {
 	                this.$element.find('circle').on('click', this.handleClickEvent);
@@ -20114,6 +20331,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var dragging = false;
 	
+	var startAnnotation = void 0;
+	var mousedownFired = false;
+	var mousemoveFired = false;
+	
 	var svg = void 0;
 	
 	var boundingCircles = [];
@@ -20127,6 +20348,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function handleDocumentMousedown(e) {
 	
+	  mousedownFired = true;
+	
 	  if (_hoverAnnotation) {
 	    relationAnnotation = new _relation3.default();
 	    relationAnnotation.direction = _relationType;
@@ -20134,11 +20357,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    relationAnnotation.readOnly = false;
 	    relationAnnotation.setDisableHoverEvent();
 	
-	    document.addEventListener('mouseup', handleDocumentMouseup);
+	    // document.addEventListener('mouseup', handleDocumentMouseup);
 	
 	    disableAnnotationHoverEvent();
 	
 	    dragging = true;
+	
+	    startAnnotation = _hoverAnnotation;
 	  }
 	}
 	
@@ -20156,6 +20381,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {Event} e The DOM event to handle
 	 */
 	function handleDocumentMousemove(e) {
+	
+	  if (mousedownFired) {
+	    mousemoveFired = true;
+	  }
 	
 	  if (dragging) {
 	    var p = (0, _utils.scaleDown)(getClientXY(e));
@@ -20217,13 +20446,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function handleDocumentMouseup(e) {
 	
+	  // TODO may not need.
 	  dragging = false;
 	
-	  document.removeEventListener('mouseup', handleDocumentMouseup);
+	  var clicked = mousedownFired && !mousemoveFired;
+	  var dragged = mousedownFired && mousemoveFired;
+	
+	  mousedownFired = false;
+	  mousemoveFired = false;
 	
 	  enableAnnotationHoverEvent();
 	
-	  // FIXME use drag and drop event, it may be better.
+	  if (clicked) {
+	    console.log('clicked', startAnnotation);
+	    if (startAnnotation && startAnnotation.handleClickEvent) {
+	      startAnnotation.handleClickEvent();
+	    }
+	    startAnnotation = null;
+	
+	    relationAnnotation && relationAnnotation.destroy();
+	    relationAnnotation = null;
+	
+	    return;
+	  }
+	
+	  startAnnotation = null;
+	
+	  if (!relationAnnotation) {
+	    return;
+	  }
 	
 	  // Find the end position.
 	  var circle = findHitBoundingCircle(e);
@@ -20246,16 +20497,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  relationAnnotation.save();
 	
-	  showTextInput();
+	  showTextInput(relationAnnotation);
 	
 	  if (prevAnnotation) {
 	    prevAnnotation.resetTextForceDisplay();
 	    prevAnnotation.render();
+	    prevAnnotation.enableViewMode();
 	  }
 	  prevAnnotation = relationAnnotation;
+	
+	  relationAnnotation = null;
 	}
 	
-	function showTextInput() {
+	/**
+	 * Show the input field to add a new text.
+	 */
+	function showTextInput(relationAnnotation) {
 	
 	  var p1 = relationAnnotation.rel1Annotation.getBoundingCirclePosition();
 	  var p2 = relationAnnotation.rel2Annotation.getBoundingCirclePosition();
@@ -20272,6 +20529,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    relationAnnotation.setTextForceDisplay();
 	    relationAnnotation.save();
 	    relationAnnotation.render();
+	    relationAnnotation.enableViewMode();
 	  });
 	}
 	
@@ -20341,6 +20599,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  document.addEventListener('mousedown', handleDocumentMousedown);
 	  document.addEventListener('mousemove', handleDocumentMousemove);
+	  document.addEventListener('mouseup', handleDocumentMouseup);
 	
 	  window.annotationContainer.getAllAnnotations().forEach(function (a) {
 	
@@ -20354,6 +20613,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 	  });
+	
+	  window.globalEvent.emit('enableRelation');
 	}
 	
 	/**
@@ -20367,11 +20628,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _enabled = false;
 	  document.removeEventListener('mousedown', handleDocumentMousedown);
 	  document.removeEventListener('mousemove', handleDocumentMousemove);
+	  document.removeEventListener('mouseup', handleDocumentMouseup);
 	
 	  (0, _utils.enableUserSelect)();
 	  enableTextlayer();
 	
 	  deleteBoundingBoxList();
+	
+	  console.log('3a');
 	
 	  window.annotationContainer.getAllAnnotations().forEach(function (a) {
 	
@@ -20386,11 +20650,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  });
 	
+	  console.log('3b');
+	
 	  if (prevAnnotation) {
 	    prevAnnotation.resetTextForceDisplay();
 	    prevAnnotation.render();
+	    prevAnnotation.enableViewMode();
 	    prevAnnotation = null;
 	  }
+	
+	  console.log('3c');
+	
+	  window.globalEvent.emit('disableRelation');
+	
+	  console.log('3d');
 	}
 
 /***/ },
@@ -20468,7 +20741,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        globalEvent.on('disableViewMode', _this.disableViewMode);
 	        globalEvent.on('rectmoveend', _this.handleRelMoveEnd);
 	
-	        _this.textAnnotation = new _text2.default(_this);
+	        _this.textAnnotation = new _text2.default(_this.readOnly, _this);
 	        _this.textAnnotation.on('selected', _this.handleTextSelected);
 	        _this.textAnnotation.on('deselected', _this.handleTextDeselected);
 	        _this.textAnnotation.on('hoverin', _this.handleTextHoverIn);
@@ -20506,7 +20779,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	         */
 	        value: function render() {
 	            this.setStartEndPosition();
-	            _get(RelationAnnotation.prototype.__proto__ || Object.getPrototypeOf(RelationAnnotation.prototype), 'render', this).call(this);
+	            var result = _get(RelationAnnotation.prototype.__proto__ || Object.getPrototypeOf(RelationAnnotation.prototype), 'render', this).call(this);
+	            console.log('render:relation:', result);
 	        }
 	
 	        /**
@@ -20555,6 +20829,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	            globalEvent.removeListener('enableViewMode', this.enableViewMode);
 	            globalEvent.removeListener('disableViewMode', this.disableViewMode);
 	            globalEvent.removeListener('rectmoveend', this.handleRelMoveEnd);
+	        }
+	    }, {
+	        key: 'isHit',
+	        value: function isHit(x, y) {
+	            var _textAnnotation;
+	
+	            // TODO
+	            return false || (_textAnnotation = this.textAnnotation).isHit.apply(_textAnnotation, arguments);
 	        }
 	
 	        /**
@@ -20767,9 +21049,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'enableViewMode',
 	        value: function enableViewMode() {
-	            _get(RelationAnnotation.prototype.__proto__ || Object.getPrototypeOf(RelationAnnotation.prototype), 'enableViewMode', this).call(this);
 	
 	            this.disableViewMode();
+	
+	            _get(RelationAnnotation.prototype.__proto__ || Object.getPrototypeOf(RelationAnnotation.prototype), 'enableViewMode', this).call(this);
 	
 	            if (!this.readOnly) {
 	                this.$element.find('path').on('click', this.handleClickEvent);
@@ -20905,7 +21188,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, "\n/**\n * Utilities.\n */\n.\\--hide {\n  display: none;\n}\n\n/**\n * SVGLayer.\n */\n.annoLayer {}\n.annoLayer > *.\\--viewMode {\n  opacity: 0.5;\n}\n.annoLayer > *.\\--viewMode.\\--emphasis {\n  opacity: 1;\n}\n\n/**\n    各種アノテーション\n*/\n.anno-circle {\n    transition:0.2s;\n    transform-origin: center center;\n}\n.\\--hover .anno-circle {\n  box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;\n  /*transform: scale(2);*/\n  stroke: blue;\n  stroke-width: 5px;\n}\n\n.\\--hover .anno-span {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-span {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n/**\n  Relation.\n*/\n.anno-relation {\n  transition:0.2s;\n}\n.\\--hover .anno-relation {\n  stroke-width: 2px;\n}\n.\\--selected .anno-relation {\n}\n.anno-relation-outline {\n  fill: none;\n  visibility: hidden;\n}\n.\\--selected .anno-relation-outline {\n  visibility: visible;\n  stroke: black;\n  stroke-width: 2.85px;\n  pointer-events: stroke;\n  stroke-dasharray: 3;\n}\n\n/**\n * Span.\n */\n.anno-span {}\n.anno-span rect {\n    /* Enable the hover event on circles and text even if they are overwraped other spans. */\n    pointer-events: none;\n}\n\n/**\n  Rect.\n*/\n.anno-rect {\n}\n.\\--hover .anno-rect {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-rect {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n\n/**\n  Text.\n*/\n.anno-text-group, .anno-text-group.\\--viewMode {\n    transition: 0.2s;\n    opacity: 0.01; /* for enabling a hover event. */\n}\n.anno-text-group.\\--hover,\n.anno-text-group.\\--selected,\n.anno-text-group.\\--visible {\n    opacity: 1;\n}\n.anno-text {\n}\n.\\--hover .anno-text {\n  fill: rgba(255, 255, 255, 1.0);\n  stroke: black;\n  stroke-width: 0.75px;\n}\n.\\--hover .anno-text ~ text {\n  fill: rgba(255, 0, 0, 1.0);\n}\n.\\--selected .anno-text {\n  stroke: rgba(255, 0, 0, 1.0);\n  stroke-width: 1.5px;\n  fill: rgba(255, 232, 188, 1.0);\n  stroke-dasharray: 3;\n}\n.\\--selected .anno-text ~ text {\n  fill: rgba(0, 0, 0, 1.0);\n}\n\n", ""]);
+	exports.push([module.id, "\n/**\n * Utilities.\n */\n.\\--hide {\n  display: none;\n}\n\n/**\n * SVGLayer.\n */\n.annoLayer {}\n.annoLayer > *.\\--viewMode {\n  opacity: 0.5;\n}\n.annoLayer > *.\\--viewMode.\\--emphasis {\n  opacity: 1;\n}\n\n/**\n    各種アノテーション\n*/\n.anno-circle {\n    transition:0.2s;\n    transform-origin: center center;\n}\n.\\--hover .anno-circle {\n  box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;\n  /*transform: scale(2);*/\n  stroke: blue;\n  stroke-width: 5px;\n}\n\n.\\--hover .anno-span {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-span {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n/**\n  Relation.\n*/\n.anno-relation {\n  transition:0.2s;\n}\n.\\--hover .anno-relation {\n  stroke-width: 2px;\n}\n.\\--selected .anno-relation {\n}\n.anno-relation-outline {\n  fill: none;\n  visibility: hidden;\n}\n.\\--selected .anno-relation-outline {\n  visibility: visible;\n  stroke: black;\n  stroke-width: 2.85px;\n  pointer-events: stroke;\n  stroke-dasharray: 3;\n}\n\n/**\n * Span.\n */\n.anno-span {}\n.anno-span rect {\n    /* Enable the hover event on circles and text even if they are overwraped other spans. */\n    pointer-events: none;\n}\n\n/**\n  Rect.\n*/\n.anno-rect {\n}\n.\\--hover .anno-rect {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-rect {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n\n/**\n  Text.\n*/\n.anno-text-group, .anno-text-group.\\--viewMode {\n    transition: 0.2s;\n    opacity: 0.01; /* for enabling a hover event. */\n}\n.anno-text-group.\\--hover,\n.anno-text-group.\\--selected,\n.anno-text-group.\\--visible {\n    opacity: 1;\n}\n.anno-text-group text {\n    /* Disable span action when selecting an anno text. */\n    user-select: none;\n}\n.anno-text {\n}\n.\\--hover .anno-text {\n  fill: rgba(255, 255, 255, 1.0);\n  stroke: black;\n  stroke-width: 0.75px;\n}\n.\\--hover .anno-text ~ text {\n  fill: rgba(255, 0, 0, 1.0);\n}\n.\\--selected .anno-text {\n  stroke: rgba(255, 0, 0, 1.0);\n  stroke-width: 1.5px;\n  fill: rgba(255, 232, 188, 1.0);\n  stroke-dasharray: 3;\n}\n.\\--selected .anno-text ~ text {\n  fill: rgba(0, 0, 0, 1.0);\n}\n\n", ""]);
 	
 	// exports
 
