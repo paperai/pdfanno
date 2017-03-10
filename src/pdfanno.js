@@ -30,10 +30,15 @@ function adjustViewerSize() {
     Disable annotation tool buttons.
 */
 function disableAnnotateTools() {
+    console.log('1');
     window.iframeWindow.PDFAnnoCore.UI.disableRect();
+    console.log('2');
     window.iframeWindow.PDFAnnoCore.UI.disableSpan();
+    console.log('3');
     window.iframeWindow.PDFAnnoCore.UI.disableRelation();
+    console.log('4');
     window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
+    console.log('5');
 }
 
 /**
@@ -49,10 +54,13 @@ function initializeAnnoToolButtons() {
         $('.js-tool-btn').removeClass('active');
         $button.addClass('active');
 
+        console.log('aaaaaaaa');
         disableAnnotateTools();
+        console.log('bbbbbbbb');
 
         if (type === 'view') {
             window.iframeWindow.PDFAnnoCore.UI.enableViewMode();
+            console.log('ccccccc');
 
         } else if (type === 'span') {
             window.iframeWindow.PDFAnnoCore.UI.enableSpan();

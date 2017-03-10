@@ -28,6 +28,10 @@ let _relationType;
 
 let dragging = false;
 
+let startAnnotation;
+let mousedownFired = false;
+let mousemoveFired = false;
+
 let svg;
 
 let boundingCircles = [];
@@ -41,6 +45,8 @@ let hitCircle = null;
  */
 function handleDocumentMousedown(e) {
 
+    mousedownFired = true;
+
   if (_hoverAnnotation) {
     relationAnnotation = new RelationAnnotation();
     relationAnnotation.direction = _relationType;
@@ -48,11 +54,13 @@ function handleDocumentMousedown(e) {
     relationAnnotation.readOnly = false;
     relationAnnotation.setDisableHoverEvent();
 
-    document.addEventListener('mouseup', handleDocumentMouseup);
+    // document.addEventListener('mouseup', handleDocumentMouseup);
 
     disableAnnotationHoverEvent();
 
     dragging = true;
+
+    startAnnotation = _hoverAnnotation;
   }
 
 }
@@ -71,6 +79,10 @@ function getClientXY(e) {
  * @param {Event} e The DOM event to handle
  */
 function handleDocumentMousemove(e) {
+
+    if (mousedownFired) {
+        mousemoveFired = true;
+    }
 
   if (dragging) {
     let p = scaleDown(getClientXY(e));
@@ -134,13 +146,38 @@ function isCircleHit(pos, element) {
  */
 function handleDocumentMouseup(e) {
 
+  // TODO may not need.
   dragging = false;
 
-  document.removeEventListener('mouseup', handleDocumentMouseup);
+  let clicked = mousedownFired && !mousemoveFired;
+  let dragged = mousedownFired && mousemoveFired;
+
+  mousedownFired = false;
+  mousemoveFired = false;
 
   enableAnnotationHoverEvent();
 
-  // FIXME use drag and drop event, it may be better.
+  if (clicked) {
+    console.log('clicked', startAnnotation);
+    if (startAnnotation && startAnnotation.handleClickEvent) {
+        startAnnotation.handleClickEvent();
+    }
+    startAnnotation = null;
+
+    relationAnnotation && relationAnnotation.destroy();
+    relationAnnotation = null;
+
+    return;
+  }
+
+  startAnnotation = null;
+
+
+
+  if (!relationAnnotation) {
+    return;
+  }
+
 
   // Find the end position.
   let circle = findHitBoundingCircle(e);
@@ -163,18 +200,24 @@ function handleDocumentMouseup(e) {
 
   relationAnnotation.save();
 
-  showTextInput();
+  showTextInput(relationAnnotation);
 
 
   if (prevAnnotation) {
     prevAnnotation.resetTextForceDisplay();
     prevAnnotation.render();
+    prevAnnotation.enableViewMode();
   }
   prevAnnotation = relationAnnotation;
 
+  relationAnnotation = null;
+
 }
 
-function showTextInput() {
+/**
+ * Show the input field to add a new text.
+ */
+function showTextInput(relationAnnotation) {
 
   let p1 = relationAnnotation.rel1Annotation.getBoundingCirclePosition();
   let p2 = relationAnnotation.rel2Annotation.getBoundingCirclePosition();
@@ -191,6 +234,7 @@ function showTextInput() {
     relationAnnotation.setTextForceDisplay();
     relationAnnotation.save();
     relationAnnotation.render();
+    relationAnnotation.enableViewMode();
 
   });
 }
@@ -258,6 +302,7 @@ export function enableRelation(relationType='one-way') {
 
   document.addEventListener('mousedown', handleDocumentMousedown);
   document.addEventListener('mousemove', handleDocumentMousemove);
+  document.addEventListener('mouseup', handleDocumentMouseup);
 
   window.annotationContainer.getAllAnnotations().forEach(a => {
 
@@ -274,6 +319,8 @@ export function enableRelation(relationType='one-way') {
 
   });
 
+  window.globalEvent.emit('enableRelation');
+
 }
 
 /**
@@ -285,11 +332,14 @@ export function disableRelation() {
   _enabled = false;
   document.removeEventListener('mousedown', handleDocumentMousedown);
   document.removeEventListener('mousemove', handleDocumentMousemove);
+  document.removeEventListener('mouseup', handleDocumentMouseup);
 
   enableUserSelect();
   enableTextlayer();
 
   deleteBoundingBoxList();
+
+  console.log('3a');
 
   window.annotationContainer.getAllAnnotations().forEach(a => {
 
@@ -307,10 +357,19 @@ export function disableRelation() {
 
   });
 
+  console.log('3b');
+
   if (prevAnnotation) {
     prevAnnotation.resetTextForceDisplay();
     prevAnnotation.render();
+    prevAnnotation.enableViewMode();
     prevAnnotation = null;
   }
+
+  console.log('3c');
+
+  window.globalEvent.emit('disableRelation');
+
+  console.log('3d');
 
 }

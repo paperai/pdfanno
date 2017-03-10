@@ -38,7 +38,10 @@ export default class RectAnnotation extends AbstractAnnotation {
         window.globalEvent.on('enableViewMode', this.enableViewMode);
         window.globalEvent.on('disableViewMode', this.disableViewMode);
 
-        this.textAnnotation = new TextAnnotation(this);
+        window.globalEvent.on('enableRelation', this.disableDragAction);
+        window.globalEvent.on('disableRelation', this.enableDragAction);
+
+        this.textAnnotation = new TextAnnotation(this.readOnly, this);
         this.textAnnotation.on('selected', this.handleTextSelected);
         this.textAnnotation.on('deselected', this.handleTextDeselected);
         this.textAnnotation.on('hoverin', this.handleTextHoverIn);
@@ -81,6 +84,11 @@ export default class RectAnnotation extends AbstractAnnotation {
         window.globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
         window.globalEvent.removeListener('enableViewMode', this.enableViewMode);
         window.globalEvent.removeListener('disableViewMode', this.disableViewMode);
+    }
+
+    isHit(x, y) {
+        // TODO
+        return false || this.textAnnotation.isHit(...arguments);
     }
 
     /**
@@ -215,10 +223,14 @@ export default class RectAnnotation extends AbstractAnnotation {
         this.originalX = this.x;
         this.originalY = this.y;
 
-        disableUserSelect();
+        // disableUserSelect();
 
         document.addEventListener('mousemove', this.handleMouseMoveOnDocument);
         document.addEventListener('mouseup', this.handleMouseUpOnDocument);
+
+        window.globalEvent.emit('rectmovestart');
+
+        this.disableTextlayer();
     }
 
     /**
@@ -269,10 +281,43 @@ export default class RectAnnotation extends AbstractAnnotation {
             globalEvent.emit('rectmoveend', this);
         }
 
-        enableUserSelect();
+        // enableUserSelect();
 
         document.removeEventListener('mousemove', this.handleMouseMoveOnDocument);
         document.removeEventListener('mouseup', this.handleMouseUpOnDocument);
+
+        if (window.currentType !== 'rect') {
+            this.enableTextlayer();
+        }
+    }
+
+    // handleMouseUp(e) {
+    //     console.log('rect:handleMouseUp: ', e.target);
+    // }
+    // handleMouseDown(e) {
+    //     console.log('rect:handleMouseDown: ', e.target);
+    // }
+
+    // TODO 共通化？
+    disableTextlayer() {
+      $('.textLayer').hide();
+    }
+
+    // TODO 共通化？
+    enableTextlayer() {
+      $('.textLayer').show();
+    }
+
+
+    enableDragAction() {
+        this.$element.find('.anno-rect, circle')
+            .off('mousedown', this.handleMouseDownOnRect)
+            .on('mousedown', this.handleMouseDownOnRect);
+    }
+
+    disableDragAction() {
+        this.$element.find('.anno-rect, circle')
+            .off('mousedown', this.handleMouseDownOnRect);
     }
 
     /**
@@ -280,12 +325,18 @@ export default class RectAnnotation extends AbstractAnnotation {
      */
     enableViewMode() {
 
+        console.log('rect:enableViewMode');
+
         super.enableViewMode();
 
         if (!this.readOnly) {
-            this.$element.find('.anno-rect, circle')
-                .on('click', this.handleClickEvent)
-                .on('mousedown', this.handleMouseDownOnRect);
+            this.$element.find('.anno-rect, circle').on('click', this.handleClickEvent);
+            this.enableDragAction();
+
+            // test.
+            // this.$element.find('.anno-rect, circle')
+            //     .on('mouseup', this.handleMouseUp)
+            //     .on('mousedown', this.handleMouseDown);
         }
     }
 
@@ -294,7 +345,14 @@ export default class RectAnnotation extends AbstractAnnotation {
      */
     disableViewMode() {
         super.disableViewMode();
-        this.$element.find('.anno-rect, circle').off('click mousedown');
+        this.$element.find('.anno-rect, circle').off('click');
+        this.disableDragAction();
+
+        // test.
+        // this.$element.find('.anno-rect, circle')
+        //     .off('mouseup', this.handleMouseUp)
+        //     .off('mousedown', this.handleMouseDown);
+
     }
 
 }

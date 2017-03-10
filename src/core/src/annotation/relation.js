@@ -38,7 +38,7 @@ export default class RelationAnnotation extends AbstractAnnotation {
         globalEvent.on('disableViewMode', this.disableViewMode);
         globalEvent.on('rectmoveend', this.handleRelMoveEnd);
 
-        this.textAnnotation = new TextAnnotation(this);
+        this.textAnnotation = new TextAnnotation(this.readOnly, this);
         this.textAnnotation.on('selected', this.handleTextSelected);
         this.textAnnotation.on('deselected', this.handleTextDeselected);
         this.textAnnotation.on('hoverin', this.handleTextHoverIn);
@@ -117,7 +117,8 @@ export default class RelationAnnotation extends AbstractAnnotation {
      */
     render() {
         this.setStartEndPosition();
-        super.render();
+        let result = super.render();
+        console.log('render:relation:', result);
     }
 
     /**
@@ -160,6 +161,11 @@ export default class RelationAnnotation extends AbstractAnnotation {
         globalEvent.removeListener('enableViewMode', this.enableViewMode);
         globalEvent.removeListener('disableViewMode', this.disableViewMode);
         globalEvent.removeListener('rectmoveend', this.handleRelMoveEnd);
+    }
+
+    isHit(x, y) {
+        // TODO
+        return false || this.textAnnotation.isHit(...arguments);
     }
 
     /**
@@ -318,9 +324,10 @@ export default class RelationAnnotation extends AbstractAnnotation {
      * Enable view mode.
      */
     enableViewMode() {
-        super.enableViewMode();
 
         this.disableViewMode();
+
+        super.enableViewMode();
 
         if (!this.readOnly) {
             this.$element.find('path').on('click', this.handleClickEvent);

@@ -26,6 +26,12 @@ function getSelectionRects() {
     let rects = range.getClientRects();
     let selectedText = selection.toString();
 
+    // Bug detect.
+    // This selects loadingIcon and/or loadingSpacer.
+    if (selection.anchorNode && selection.anchorNode.tagName === 'DIV') {
+        return { rects : null, selectedText : null };
+    }
+
     if (rects.length > 0 && rects[0].width > 0 && rects[0].height > 0) {
       return {rects, selectedText};
     }
@@ -46,7 +52,7 @@ function handleDocumentMouseup(e) {
   let { rects, selectedText } = getSelectionRects();
   if (rects) {
     let svg = getSVGLayer();
-    saveRect([...rects].map((r) => {
+    saveSpan([...rects].map((r) => {
       return {
         top    : r.top,
         left   : r.left,
@@ -55,8 +61,6 @@ function handleDocumentMouseup(e) {
       };
     }), selectedText);
   }
-
-  console.log('handleDocumentMouseup:', rects);
 
   removeSelection();
 }
@@ -76,10 +80,12 @@ function removeSelection() {
  * @param {Array} rects The rects to use for annotation
  * @param {String} color The color of the rects
  */
-function saveRect(rects, selectedText) {
+function saveSpan(rects, selectedText) {
 
   let svg = getSVGLayer();
   let boundingRect = svg.getBoundingClientRect();
+
+  console.log('rects:', rects);
 
   // Initialize the annotation
   let annotation = {
@@ -122,12 +128,14 @@ function saveRect(rects, selectedText) {
     spanAnnotation.setTextForceDisplay();
     spanAnnotation.render();
     spanAnnotation.save();
+    spanAnnotation.enableViewMode();
 
   });
 
   if (prevAnnotation) {
     prevAnnotation.resetTextForceDisplay();
     prevAnnotation.render();
+    prevAnnotation.enableViewMode();
   }
   prevAnnotation = spanAnnotation;
 
@@ -139,7 +147,9 @@ function saveRect(rects, selectedText) {
 export function enableSpan() {
   this.disableSpan();
   document.addEventListener('mouseup', handleDocumentMouseup);
-  $('.textLayer').css('z-index', 3); // over svg layer.
+
+
+  // $('.textLayer').css('z-index', 3); // over svg layer.
 }
 
 /**
@@ -147,11 +157,14 @@ export function enableSpan() {
  */
 export function disableSpan() {
   document.removeEventListener('mouseup', handleDocumentMouseup);
-  $('.textLayer').css('z-index', 1);
+
+
+  // $('.textLayer').css('z-index', 1);
 
   if (prevAnnotation) {
     prevAnnotation.resetTextForceDisplay();
     prevAnnotation.render();
+    prevAnnotation.enableViewMode();
     prevAnnotation = null;
   }
 

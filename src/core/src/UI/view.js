@@ -1,24 +1,23 @@
 import $ from 'jquery';
 
 /**
- * Prevent page-back behavior.
+ * Disable the action of pageback, if `DEL` or `BackSpace` button pressed.
  */
-function handleDocumentKeydown(e) {
-    // Delete or BackSpace.
-    if (e.keyCode == 46 || e.keyCode == 8) {
-        e.preventDefault();
-        return false;
-    }
-}
+function disablePagebackAction(e) {
 
-/**
- * Delete selected annotations, and prevent page-back behavior.
- */
-function handleDocumentKeyup(e) {
+    // Allow any keyboard events for <input/>.
+    if (e.target.tagName.toLowerCase() === 'input') {
+        return;
+    }
+
     // Delete or BackSpace.
     if (e.keyCode == 46 || e.keyCode == 8) {
-        deleteSelectedAnnotations();
         e.preventDefault();
+
+        if (e.type === 'keyup') {
+            deleteSelectedAnnotations();
+        }
+
         return false;
     }
 }
@@ -31,31 +30,22 @@ function deleteSelectedAnnotations() {
 }
 
 /**
- * Set annotations' translucent state.
- */
-function setComponenTranslucent(translucent) {
-
-    // if (translucent) {
-    //     $('svg > *').addClass('--viewMode');
-
-    // } else {
-    //     $('svg > *').removeClass('--viewMode');
-    // }
-}
-
-/**
  * Make annotations view mode.
  */
 function setAnnotationViewMode() {
     window.globalEvent.emit('enableViewMode');
 }
 
-/**
- * Make annotations NOT view mode.
- */
-function resetAnnotationViewMode() {
-    window.globalEvent.emit('disableViewMode');
-}
+// TODO NO NEED `enableViewMode` event ?
+
+// /**
+//  * Make annotations NOT view mode.
+//  */
+// function resetAnnotationViewMode() {
+//     window.globalEvent.emit('disableViewMode');
+// }
+
+// TODO NO NEED `disableViewMode` event ?
 
 /**
  * Enable view mode.
@@ -63,14 +53,16 @@ function resetAnnotationViewMode() {
 export function enableViewMode() {
     console.log('view:enableViewMode');
 
-    disableViewMode();
+    // disableViewMode();
 
-    window.viewMode = true;
+    // window.viewMode = true;
 
-    setComponenTranslucent(true);
-    setAnnotationViewMode();
-    document.addEventListener('keyup', handleDocumentKeyup);
-    document.addEventListener('keydown', handleDocumentKeydown);
+    // setAnnotationViewMode();
+
+    document.removeEventListener('keyup', disablePagebackAction);
+    document.removeEventListener('keydown', disablePagebackAction);
+    document.addEventListener('keyup', disablePagebackAction);
+    document.addEventListener('keydown', disablePagebackAction);
 
 }
 
@@ -78,10 +70,9 @@ export function enableViewMode() {
  * Disable view mode.
  */
 export function disableViewMode() {
-    console.log('view:disableViewMode');
-    window.viewMode = false;
-    setComponenTranslucent(false);
-    resetAnnotationViewMode();
-    document.removeEventListener('keyup', handleDocumentKeyup);
-    document.removeEventListener('keydown', handleDocumentKeydown);
+    // console.log('view:disableViewMode');
+    // window.viewMode = false;
+    // resetAnnotationViewMode();
+    // document.removeEventListener('keyup', handleDocumentKeyup);
+    // document.removeEventListener('keydown', handleDocumentKeydown);
 }

@@ -40,12 +40,17 @@ let enableArea = {
   maxY : 0
 };
 
+let mousedownFired = false;
+let mousemoveFired = false;
+
 /**
  * Handle document.mousedown event
  *
  * @param {Event} e The DOM event to handle
  */
 function handleDocumentMousedown(e) {
+
+  mousedownFired = true;
 
   let { x, y } = getXY(e);
   originX = x;
@@ -67,7 +72,8 @@ function handleDocumentMousedown(e) {
   overlay.style.visibility = 'visible';
   getTmpLayer().appendChild(overlay);
 
-  document.addEventListener('mousemove', handleDocumentMousemove);
+  // document.addEventListener('mousemove', handleDocumentMousemove);
+
 }
 
 /**
@@ -76,6 +82,14 @@ function handleDocumentMousedown(e) {
  * @param {Event} e The DOM event to handle
  */
 function handleDocumentMousemove(e) {
+
+  if (mousedownFired) {
+    mousemoveFired = true;
+  }
+
+  if (!overlay) {
+    return;
+  }
 
   let { x : curX, y : curY } = getXY(e);
 
@@ -103,6 +117,23 @@ function handleDocumentMousemove(e) {
   overlay.style.top    = y + 'px';
   overlay.style.width  = w + 'px';
   overlay.style.height = h + 'px';
+
+
+  if (prevAnnotation) {
+    prevAnnotation.resetTextForceDisplay();
+    prevAnnotation.render();
+    prevAnnotation.enableViewMode();
+    prevAnnotation = null;
+  }
+
+}
+
+function _findAnnotation(e) {
+
+    let { x, y } = scaleDown(getSVGLayer(), getXY(e));
+
+    // TODO
+    // 各AnnoにisHit(x,y)を実装して対応したい.
 }
 
 /**
@@ -111,6 +142,26 @@ function handleDocumentMousemove(e) {
  * @param {Event} e The DOM event to handle
  */
 function handleDocumentMouseup(e) {
+
+    let clicked = mousedownFired && !mousemoveFired;
+    let dragged = mousedownFired && mousemoveFired;
+
+    if (clicked) {
+
+        let anno = _findAnnotation(e);
+        if (anno && anno.handleClick) {
+            anno.handleClick();
+        }
+
+        $(overlay).remove();
+        overlay = null;
+
+        return;
+    }
+
+    mousedownFired = false;
+    mousemoveFired = false;
+
 
   if (!overlay) {
     return;
@@ -130,7 +181,7 @@ function handleDocumentMouseup(e) {
   $(overlay).remove();
   overlay = null;
 
-  document.removeEventListener('mousemove', handleDocumentMousemove);
+  // document.removeEventListener('mousemove', handleDocumentMousemove);
 }
 
 /**
@@ -176,29 +227,65 @@ function saveRect(rect) {
     rectAnnotation.setTextForceDisplay();
     rectAnnotation.render();
     rectAnnotation.save();
+    rectAnnotation.enableViewMode();
 
   });
 
-  if (prevAnnotation) {
-    prevAnnotation.resetTextForceDisplay();
-    prevAnnotation.render();
-  }
+  // if (prevAnnotation) {
+  //   prevAnnotation.resetTextForceDisplay();
+  //   prevAnnotation.render();
+  // }
   prevAnnotation = rectAnnotation;
 
+  // Enable a drag / click action.
+  // TODO インスタンス生成時にデフォルトで有効にしてもいいかなー.
+  rectAnnotation.enableViewMode();
+
 }
+
+/**
+ * Cancel rect drawing if an existing rect has got a drag event.
+ */
+function cancelRectDrawing() {
+
+    // After `handleDocumentMousedown`
+    setTimeout(() => {
+        console.log('cancelRectDrawing');
+        // document.removeEventListener('mousemove', handleDocumentMousemove);
+        $(overlay).remove();
+        overlay = null;
+    }, 100);
+
+}
+
+// TODO 共通化？
+function disableTextlayer() {
+  $('.textLayer').hide();
+}
+// TODO 共通化？
+function enableTextlayer() {
+  $('.textLayer').show();
+}
+
 
 /**
  * Enable rect behavior
  */
 export function enableRect() {
 
+    window.currentType = 'rect';
+
   if (_enabled) { return; }
 
   _enabled = true;
   document.addEventListener('mouseup', handleDocumentMouseup);
   document.addEventListener('mousedown', handleDocumentMousedown);
+  document.addEventListener('mousemove', handleDocumentMousemove);
 
-  disableUserSelect();
+  // disableUserSelect();
+  disableTextlayer();
+
+  window.globalEvent.on('rectmovestart', cancelRectDrawing);
 }
 
 /**
@@ -206,18 +293,25 @@ export function enableRect() {
  */
 export function disableRect() {
 
+    window.currentType = null;
+
   if (!_enabled) { return; }
 
   _enabled = false;
   document.removeEventListener('mouseup', handleDocumentMouseup);
   document.removeEventListener('mousedown', handleDocumentMousedown);
+  document.removeEventListener('mousemove', handleDocumentMousemove);
 
-  enableUserSelect();
+  // enableUserSelect();
+  enableTextlayer();
 
   if (prevAnnotation) {
     prevAnnotation.resetTextForceDisplay();
     prevAnnotation.render();
+    prevAnnotation.enableViewMode();
     prevAnnotation = null;
   }
+
+  window.globalEvent.removeListener('rectmovestart', cancelRectDrawing);
 
 }

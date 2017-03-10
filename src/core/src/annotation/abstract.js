@@ -14,6 +14,8 @@ export default class AbstractAnnotation extends EventEmitter {
     constructor() {
       super();
       this.autoBind();
+
+      this.deleted = false;
     }
 
     /**
@@ -32,9 +34,12 @@ export default class AbstractAnnotation extends EventEmitter {
      */
     render() {
 
-        console.log('render', this.type);
+        this.$element.remove();
 
-         this.$element.remove();
+        if (this.deleted) {
+            return false;
+        }
+
          this.$element = $(appendChild(getSVGLayer(), this));
          this.textAnnotation && this.textAnnotation.render();
 
@@ -42,9 +47,11 @@ export default class AbstractAnnotation extends EventEmitter {
             this.setHoverEvent();
          }
 
-         if (window.viewMode) {
+         // if (window.viewMode) {
           this.$element.addClass('--viewMode');
-         }
+         // }
+
+        return true;
     }
 
     /**
@@ -70,13 +77,22 @@ export default class AbstractAnnotation extends EventEmitter {
      * Delete the annotation from rendering, a container in window, and a container in localStorage.
      */
     destroy() {
+        this.deleted = true;
         this.$element.remove();
-        window.annotationContainer.remove(this);
-        let { documentId } = getMetadata(); // TODO Remove this.
-        PDFAnnoCore.getStoreAdapter().deleteAnnotation(documentId, this.uuid).then(() => {
-            console.log('deleted');
-        });
-        this.textAnnotation && this.textAnnotation.destroy();
+
+        if (this.uuid) {
+            window.annotationContainer.remove(this);
+            let { documentId } = getMetadata(); // TODO Remove this.
+            PDFAnnoCore.getStoreAdapter().deleteAnnotation(documentId, this.uuid).then(() => {
+                console.log('deleted');
+            });
+            this.textAnnotation && this.textAnnotation.destroy();
+        }
+
+    }
+
+    isHit(x, y) {
+        return false;
     }
 
     /**
@@ -160,6 +176,7 @@ export default class AbstractAnnotation extends EventEmitter {
      */
     enableViewMode() {
         this.render();
+        this.textAnnotation && this.textAnnotation.enableViewMode();
     }
 
     /**
@@ -167,6 +184,7 @@ export default class AbstractAnnotation extends EventEmitter {
      */
     disableViewMode() {
         this.render();
+        this.textAnnotation && this.textAnnotation.disableViewMode();
     }
 
     /**

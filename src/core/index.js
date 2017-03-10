@@ -123,6 +123,7 @@ function renderAnnotations(svg) {
 
         window.annotationContainer.getAllAnnotations().forEach(a => {
             a.render();
+            a.enableViewMode();
         });
         var event = document.createEvent('CustomEvent');
         event.initCustomEvent('annotationrendered', true, true, null);
@@ -143,21 +144,28 @@ function renderAnnotations(svg) {
             annotations.annotations.forEach(a => {
 
                 // TODO move to annotation/index.js
+
+                let anno = null;
+
+
                 if (a.type === 'area') {
-                    let rect = RectAnnotation.newInstance(a);
-                    rect.render();
-                    window.annotationContainer.add(rect);
+                    anno = RectAnnotation.newInstance(a);
                 } else if (a.type === 'span') {
-                    let span = SpanAnnotation.newInstance(a);
-                    span.render();
-                    window.annotationContainer.add(span);
+                    anno = SpanAnnotation.newInstance(a);
                 } else if (a.type === 'relation') {
-                    let relationAnnotation = RelationAnnotation.newInstance(a);
-                    relationAnnotation.render();
-                    window.annotationContainer.add(relationAnnotation);
-                } else {
-                    appendChild(svg, a);
+                    anno = RelationAnnotation.newInstance(a);
+                // } else {
+                //     appendChild(svg, a);
                 }
+
+                if (anno) {
+                    anno.render();
+                    anno.enableViewMode();
+                    window.annotationContainer.add(anno);
+
+                }
+
+
             });
 
             var event = document.createEvent('CustomEvent');

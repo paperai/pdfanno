@@ -25,7 +25,7 @@ export default class SpanAnnotation extends AbstractAnnotation {
         window.globalEvent.on('enableViewMode', this.enableViewMode);
         window.globalEvent.on('disableViewMode', this.disableViewMode);
 
-        this.textAnnotation = new TextAnnotation(this);
+        this.textAnnotation = new TextAnnotation(this.readOnly, this);
         this.textAnnotation.on('selected', this.handleTextSelected);
         this.textAnnotation.on('deselected', this.handleTextDeselected);
         this.textAnnotation.on('hoverin', this.handleTextHoverIn);
@@ -63,9 +63,16 @@ export default class SpanAnnotation extends AbstractAnnotation {
     destroy() {
         super.destroy();
         this.emit('delete');
+
+        // TODO オブジェクトベースで削除できるようにしたい.
         window.globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
         window.globalEvent.removeListener('enableViewMode', this.enableViewMode);
         window.globalEvent.removeListener('disableViewMode', this.disableViewMode);
+    }
+
+    isHit(x, y) {
+        // TODO
+        return false || this.textAnnotation.isHit(...arguments);
     }
 
     /**
@@ -191,9 +198,10 @@ export default class SpanAnnotation extends AbstractAnnotation {
      * Enable view mode.
      */
     enableViewMode() {
-        super.enableViewMode();
 
         this.disableViewMode();
+
+        super.enableViewMode();
 
         if (!this.readOnly) {
             this.$element.find('circle').on('click', this.handleClickEvent);

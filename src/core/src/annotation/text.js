@@ -22,7 +22,7 @@ export default class TextAnnotation extends AbstractAnnotation {
     /**
      * Constructor.
      */
-    constructor(parent) {
+    constructor(readOnly, parent) {
         super();
 
         globalEvent = window.globalEvent;
@@ -31,17 +31,19 @@ export default class TextAnnotation extends AbstractAnnotation {
         this.parent   = parent;
         this.x        = 0;
         this.y        = 0;
+        this.readOnly = readOnly;
         this.$element = this.createDummyElement();
 
         // Updated by parent via AbstractAnnotation#setTextForceDisplay.
         this.textForceDisplay = false;
 
         // parent.on('rectmoveend', this.handleRectMoveEnd);
-        globalEvent.on('rectmoveend', this.handleRectMoveEnd);
 
-        globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
-        globalEvent.on('enableViewMode', this.enableViewMode);
-        globalEvent.on('disableViewMode', this.disableViewMode);
+        // globalEvent.on('rectmoveend', this.handleRectMoveEnd);
+
+        // globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
+        // globalEvent.on('enableViewMode', this.enableViewMode);
+        // globalEvent.on('disableViewMode', this.disableViewMode);
     }
 
 
@@ -49,18 +51,25 @@ export default class TextAnnotation extends AbstractAnnotation {
      * Render a text.
      */
      render() {
+
+        // TODO 引数で text と position を渡せば、循環参照を無くせる.
+
+        let result = false;
+
         if (this.parent.text) {
             assign(this, this.parent.getTextPosition());
             this.text = this.parent.text;
             this.color = this.parent.color;
             this.parentId = this.parent.uuid;
-            super.render();
+            result = super.render();
             if (this.textForceDisplay) {
                 this.$element.addClass('--visible');
             }
         } else {
             this.$element.remove();
         }
+
+        console.log('render:text:', result);
     }
 
     /**
@@ -77,11 +86,37 @@ export default class TextAnnotation extends AbstractAnnotation {
      * Delete a text annotation.
      */
     destroy() {
-        this.$element.remove();
-        this.$element = this.createDummyElement();
-        globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
-        globalEvent.removeListener('enableViewMode', this.enableViewMode);
-        globalEvent.removeListener('disableViewMode', this.disableViewMode);
+        super.destroy();
+        // this.$element.remove();
+        // this.$element = this.createDummyElement();
+        // globalEvent.removeListener('rectmoveend', this.handleRectMoveEnd);
+        // globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
+        // globalEvent.removeListener('enableViewMode', this.enableViewMode);
+        // globalEvent.removeListener('disableViewMode', this.disableViewMode);
+
+        // TODO Need Release memory?
+        // console.log('delete:text._events:', this._events);
+
+        // cancel circle reference.
+        // this.parent = null;
+
+        console.log('text:destroy');
+    }
+
+    isHit(x, y) {
+
+        let $rect = this.$element.find('rect');
+        let x_ = $rect.attr('x');
+        let y_ = $rect.attr('y');
+        let w_ = $rect.attr('width');
+        let h_ = $rect.attr('height');
+        console.log(x,y,w,h);
+
+
+
+
+        // TODO
+        return false;
     }
 
     /**
@@ -137,7 +172,8 @@ export default class TextAnnotation extends AbstractAnnotation {
     handleDoubleClickEvent() {
         console.log('handleDoubleClickEvent');
 
-        this.destroy();
+        // this.destroy();
+        this.$element.remove();
 
         let svg = getSVGLayer();
         let pos = scaleUp(svg, {
@@ -147,9 +183,6 @@ export default class TextAnnotation extends AbstractAnnotation {
         let rect = svg.getBoundingClientRect();
         pos.x += rect.left;
         pos.y += rect.top;
-
-        // Disable the keyup event of BackSpace.
-        disableViewMode();
 
         addInputField(pos.x, pos.y, this.uuid, this.text, (text) => {
 
@@ -161,12 +194,8 @@ export default class TextAnnotation extends AbstractAnnotation {
             }
 
             this.render();
-            // this.enableViewMode();
 
-            // Enable the keyup event of BackSpace.
-            enableViewMode();
-
-            if (!this.parent.readOnly) {
+            if (!this.readOnly) {
                 this.$element.find('text').off('click').on('click', this.handleClickEvent);
             }
 
@@ -174,25 +203,22 @@ export default class TextAnnotation extends AbstractAnnotation {
 
     }
 
-    handleRectMoveEnd(rectAnnotation) {
-        if (rectAnnotation === this.parent) {
-            this.enableViewMode();
-        }
-    }
+    // handleRectMoveEnd(rectAnnotation) {
+    //     if (rectAnnotation === this.parent) {
+    //         this.enableViewMode();
+    //     }
+    // }
 
     enableViewMode() {
-
         console.log('text:enableViewMode');
 
         super.enableViewMode();
-        if (!this.parent.readOnly) {
+        if (!this.readOnly) {
             this.$element.find('text').off('click').on('click', this.handleClickEvent);
         }
     }
 
     disableViewMode() {
-
-        console.log('text:disableViewMode');
 
         super.disableViewMode();
         this.$element.find('text').off('click', this.handleClickEvent);
