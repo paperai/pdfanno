@@ -318,6 +318,11 @@ function _excludeBaseDirName(filePath) {
  */
 function setupBrowseButton() {
 
+    // Enable to select the same directory twice.
+    $('.js-file :file').on('click', ev => {
+        $('input[type="file"]').val(null);
+    });
+
     $('.js-file :file').on('change', ev => {
 
         console.log('Browse button starts to work.');
