@@ -30,15 +30,10 @@ function adjustViewerSize() {
     Disable annotation tool buttons.
 */
 function disableAnnotateTools() {
-    console.log('1');
     window.iframeWindow.PDFAnnoCore.UI.disableRect();
-    console.log('2');
     window.iframeWindow.PDFAnnoCore.UI.disableSpan();
-    console.log('3');
     window.iframeWindow.PDFAnnoCore.UI.disableRelation();
-    console.log('4');
     window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
-    console.log('5');
 }
 
 /**
@@ -54,13 +49,10 @@ function initializeAnnoToolButtons() {
         $('.js-tool-btn').removeClass('active');
         $button.addClass('active');
 
-        console.log('aaaaaaaa');
         disableAnnotateTools();
-        console.log('bbbbbbbb');
 
         if (type === 'view') {
             window.iframeWindow.PDFAnnoCore.UI.enableViewMode();
-            console.log('ccccccc');
 
         } else if (type === 'span') {
             window.iframeWindow.PDFAnnoCore.UI.enableSpan();
@@ -394,6 +386,36 @@ function setupBrowseButton() {
             fileReader.readAsText(file);
         });
 
+        // Setup anno / reference dropdown.
+        annos.forEach(file => {
+
+            let fileName = _excludeBaseDirName(file.webkitRelativePath);
+
+            let snipet1 = `
+                <li>
+                    <a href="#">
+                        <i class="fa fa-check no-visible" aria-hidden="true"></i>
+                        <span class="js-annoname">${fileName}</span>
+                    </a>
+                </li>
+            `;
+            $('#dropdownAnnoPrimary ul').append(snipet1);
+
+            let snipet2 = `
+                <li>
+                    <a href="#">
+                        <i class="fa fa-check no-visible" aria-hidden="true"></i>
+                        <input type="text"  name="color" class="js-anno-palette"  autocomplete="off">
+                        <span class="js-annoname">${fileName}</span>
+                    </a>
+                </li>
+            `;
+            $('#dropdownAnnoReference ul').append(snipet2);
+        });
+
+        // Setup color pallets.
+        setupColorPicker();
+
     });
 
 }
@@ -437,48 +459,6 @@ function setupPdfDropdown() {
 
         reloadPDFViewer();
 
-        // Clear anno dropdowns.
-        clearAnnotationDropdowns();
-
-        // Clear the all annotations.
-        clearAllAnnotations();
-
-        // Setup anno dropdown.
-        let pdfName = pdfPath.replace(/\.pdf$/i, '');
-        Object.keys(fileMap).forEach(filePath => {
-
-            if (!filePath.match(/\.anno$/i)) {
-                return;
-            }
-
-            if (filePath.indexOf(pdfName) === 0) {
-
-                let snipet1 = `
-                    <li>
-                        <a href="#">
-                            <i class="fa fa-check no-visible" aria-hidden="true"></i>
-                            <span class="js-annoname">${filePath}</span>
-                        </a>
-                    </li>
-                `;
-                $('#dropdownAnnoPrimary ul').append(snipet1);
-
-                let snipet2 = `
-                    <li>
-                        <a href="#">
-                            <i class="fa fa-check no-visible" aria-hidden="true"></i>
-                            <input type="text"  name="color" class="js-anno-palette"  autocomplete="off">
-                            <span class="js-annoname">${filePath}</span>
-                        </a>
-                    </li>
-                `;
-                $('#dropdownAnnoReference ul').append(snipet2);
-            }
-        });
-
-        // Setup color pallets.
-        setupColorPicker();
-
         // Close dropdown.
         $('#dropdownPdf').click();
 
@@ -508,7 +488,6 @@ function setupPrimaryAnnoDropdown() {
                 return;
             }
         }
-
 
         $('#dropdownAnnoPrimary .js-text').text(annoName);
         console.log(annoName);
