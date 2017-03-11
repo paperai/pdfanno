@@ -36,8 +36,16 @@
     display: none;
 }
 
+/**
+ * Dropdown.
+ */
+.dropdown-menu {
+    overflow: scroll;
+}
 
-
+/**
+ * Color picker.
+ */
 .anno-ui .sp-replacer {
     padding: 0;
     border: none;

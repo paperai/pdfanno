@@ -10,11 +10,30 @@ import { convertToExportY } from './core/src/utils/position';
 let fileMap = {};
 
 /**
- * Resize the height of PDFViewer adjusting to the window.
+ * Resize the height of elements adjusting to the window.
  */
 function resizeHandler() {
+
+    // PDFViewer.
     let height = $(window).innerHeight() - $('#viewer').offset().top;
     $('#viewer iframe').css('height', `${height}px`);
+
+    // Dropdown for PDF.
+    let height1 = $(window).innerHeight() - ($('#dropdownPdf ul').offset().top || 120);
+    $('#dropdownPdf ul').css('max-height', `${height1 - 20}px`);
+
+    // Dropdown for Primary Annos.
+    let height2 = $(window).innerHeight() - ($('#dropdownAnnoPrimary ul').offset().top || 120);
+    $('#dropdownAnnoPrimary ul').css('max-height', `${height2 - 20}px`);
+
+    // Dropdown for Anno list.
+    let height3 = $(window).innerHeight() - ($('#dropdownAnnoList ul').offset().top || 120);
+    $('#dropdownAnnoList ul').css('max-height', `${height3 - 20}px`);
+
+    // Dropdown for Reference Annos.
+    let height4 = $(window).innerHeight() - ($('#dropdownAnnoReference ul').offset().top || 120);
+    $('#dropdownAnnoReference ul').css('max-height', `${height4 - 20}px`);
+
 }
 
 /**
@@ -415,6 +434,9 @@ function setupBrowseButton() {
 
         // Setup color pallets.
         setupColorPicker();
+
+        // Resize dropdown height.
+        resizeHandler();
 
     });
 
