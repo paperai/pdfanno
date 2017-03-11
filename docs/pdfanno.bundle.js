@@ -67,11 +67,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	var fileMap = {};
 	
 	/**
-	 * Resize the height of PDFViewer adjusting to the window.
+	 * Resize the height of elements adjusting to the window.
 	 */
 	function resizeHandler() {
+	
+	    // PDFViewer.
 	    var height = $(window).innerHeight() - $('#viewer').offset().top;
 	    $('#viewer iframe').css('height', height + "px");
+	
+	    // Dropdown for PDF.
+	    var height1 = $(window).innerHeight() - ($('#dropdownPdf ul').offset().top || 120);
+	    $('#dropdownPdf ul').css('max-height', height1 - 20 + "px");
+	
+	    // Dropdown for Primary Annos.
+	    var height2 = $(window).innerHeight() - ($('#dropdownAnnoPrimary ul').offset().top || 120);
+	    $('#dropdownAnnoPrimary ul').css('max-height', height2 - 20 + "px");
+	
+	    // Dropdown for Anno list.
+	    var height3 = $(window).innerHeight() - ($('#dropdownAnnoList ul').offset().top || 120);
+	    $('#dropdownAnnoList ul').css('max-height', height3 - 20 + "px");
+	
+	    // Dropdown for Reference Annos.
+	    var height4 = $(window).innerHeight() - ($('#dropdownAnnoReference ul').offset().top || 120);
+	    $('#dropdownAnnoReference ul').css('max-height', height4 - 20 + "px");
 	}
 	
 	/**
@@ -87,15 +105,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Disable annotation tool buttons.
 	*/
 	function disableAnnotateTools() {
-	    console.log('1');
 	    window.iframeWindow.PDFAnnoCore.UI.disableRect();
-	    console.log('2');
 	    window.iframeWindow.PDFAnnoCore.UI.disableSpan();
-	    console.log('3');
 	    window.iframeWindow.PDFAnnoCore.UI.disableRelation();
-	    console.log('4');
 	    window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
-	    console.log('5');
 	}
 	
 	/**
@@ -111,13 +124,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        $('.js-tool-btn').removeClass('active');
 	        $button.addClass('active');
 	
-	        console.log('aaaaaaaa');
 	        disableAnnotateTools();
-	        console.log('bbbbbbbb');
 	
 	        if (type === 'view') {
 	            window.iframeWindow.PDFAnnoCore.UI.enableViewMode();
-	            console.log('ccccccc');
 	        } else if (type === 'span') {
 	            window.iframeWindow.PDFAnnoCore.UI.enableSpan();
 	        } else if (type === 'one-way') {
@@ -350,6 +360,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function setupBrowseButton() {
 	
+	    // Enable to select the same directory twice.
+	    $('.js-file :file').on('click', function (ev) {
+	        $('input[type="file"]').val(null);
+	    });
+	
 	    $('.js-file :file').on('change', function (ev) {
 	
 	        console.log('Browse button starts to work.');
@@ -429,6 +444,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	            };
 	            fileReader.readAsText(file);
 	        });
+	
+	        // Setup anno / reference dropdown.
+	        annos.forEach(function (file) {
+	
+	            var fileName = _excludeBaseDirName(file.webkitRelativePath);
+	
+	            var snipet1 = "\n                <li>\n                    <a href=\"#\">\n                        <i class=\"fa fa-check no-visible\" aria-hidden=\"true\"></i>\n                        <span class=\"js-annoname\">" + fileName + "</span>\n                    </a>\n                </li>\n            ";
+	            $('#dropdownAnnoPrimary ul').append(snipet1);
+	
+	            var snipet2 = "\n                <li>\n                    <a href=\"#\">\n                        <i class=\"fa fa-check no-visible\" aria-hidden=\"true\"></i>\n                        <input type=\"text\"  name=\"color\" class=\"js-anno-palette\"  autocomplete=\"off\">\n                        <span class=\"js-annoname\">" + fileName + "</span>\n                    </a>\n                </li>\n            ";
+	            $('#dropdownAnnoReference ul').append(snipet2);
+	        });
+	
+	        // Setup color pallets.
+	        setupColorPicker();
+	
+	        // Resize dropdown height.
+	        resizeHandler();
 	    });
 	}
 	
@@ -470,33 +503,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        window.pdfName = fileName;
 	
 	        reloadPDFViewer();
-	
-	        // Clear anno dropdowns.
-	        clearAnnotationDropdowns();
-	
-	        // Clear the all annotations.
-	        clearAllAnnotations();
-	
-	        // Setup anno dropdown.
-	        var pdfName = pdfPath.replace(/\.pdf$/i, '');
-	        Object.keys(fileMap).forEach(function (filePath) {
-	
-	            if (!filePath.match(/\.anno$/i)) {
-	                return;
-	            }
-	
-	            if (filePath.indexOf(pdfName) === 0) {
-	
-	                var snipet1 = "\n                    <li>\n                        <a href=\"#\">\n                            <i class=\"fa fa-check no-visible\" aria-hidden=\"true\"></i>\n                            <span class=\"js-annoname\">" + filePath + "</span>\n                        </a>\n                    </li>\n                ";
-	                $('#dropdownAnnoPrimary ul').append(snipet1);
-	
-	                var snipet2 = "\n                    <li>\n                        <a href=\"#\">\n                            <i class=\"fa fa-check no-visible\" aria-hidden=\"true\"></i>\n                            <input type=\"text\"  name=\"color\" class=\"js-anno-palette\"  autocomplete=\"off\">\n                            <span class=\"js-annoname\">" + filePath + "</span>\n                        </a>\n                    </li>\n                ";
-	                $('#dropdownAnnoReference ul').append(snipet2);
-	            }
-	        });
-	
-	        // Setup color pallets.
-	        setupColorPicker();
 	
 	        // Close dropdown.
 	        $('#dropdownPdf').click();
@@ -811,7 +817,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, "@charset 'utf-8';\n\n.no-visible {\n    visibility: hidden;\n}\n\n/**\n * Viewer size.\n * This height will be override to fit the browser height (by app.js).\n */\n.anno-viewer {\n    width: 100%;\n    height: 500px;\n}\n\n/**\n * Annotation Select UI Layout.\n */\n.anno-select-layout {}\n.anno-select-layout .row:first-child {\n    margin-bottom: 10px;\n}\n.anno-select-layout [type=\"radio\"] {\n    margin-right: 5px;\n}\n.anno-select-layout [type=\"file\"] {\n    display: inline-block;\n    margin-left: 5px;\n    line-height: 1em;\n}\n.anno-select-layout .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-select-layout .sp-dd {\n    display: none;\n}\n\n\n\n.anno-ui .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-ui .sp-dd {\n    display: none;\n}\n.anno-ui .sp-preview {\n    margin-right: 0;\n}\n\n", ""]);
+	exports.push([module.id, "@charset 'utf-8';\n\n.no-visible {\n    visibility: hidden;\n}\n\n/**\n * Viewer size.\n * This height will be override to fit the browser height (by app.js).\n */\n.anno-viewer {\n    width: 100%;\n    height: 500px;\n}\n\n/**\n * Annotation Select UI Layout.\n */\n.anno-select-layout {}\n.anno-select-layout .row:first-child {\n    margin-bottom: 10px;\n}\n.anno-select-layout [type=\"radio\"] {\n    margin-right: 5px;\n}\n.anno-select-layout [type=\"file\"] {\n    display: inline-block;\n    margin-left: 5px;\n    line-height: 1em;\n}\n.anno-select-layout .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-select-layout .sp-dd {\n    display: none;\n}\n\n/**\n * Dropdown.\n */\n.dropdown-menu {\n    overflow: scroll;\n}\n\n/**\n * Color picker.\n */\n.anno-ui .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-ui .sp-dd {\n    display: none;\n}\n.anno-ui .sp-preview {\n    margin-right: 0;\n}\n\n", ""]);
 	
 	// exports
 
