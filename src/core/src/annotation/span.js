@@ -70,11 +70,6 @@ export default class SpanAnnotation extends AbstractAnnotation {
         window.globalEvent.removeListener('disableViewMode', this.disableViewMode);
     }
 
-    isHit(x, y) {
-        // TODO
-        return false || this.textAnnotation.isHit(...arguments);
-    }
-
     /**
      * Create an annotation data for save.
      */

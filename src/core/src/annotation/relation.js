@@ -163,11 +163,6 @@ export default class RelationAnnotation extends AbstractAnnotation {
         globalEvent.removeListener('rectmoveend', this.handleRelMoveEnd);
     }
 
-    isHit(x, y) {
-        // TODO
-        return false || this.textAnnotation.isHit(...arguments);
-    }
-
     /**
      * Delete the annotation if selected.
      */

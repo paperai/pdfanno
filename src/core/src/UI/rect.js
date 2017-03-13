@@ -72,8 +72,6 @@ function handleDocumentMousedown(e) {
   overlay.style.visibility = 'visible';
   getTmpLayer().appendChild(overlay);
 
-  // document.addEventListener('mousemove', handleDocumentMousemove);
-
 }
 
 /**
@@ -83,12 +81,12 @@ function handleDocumentMousedown(e) {
  */
 function handleDocumentMousemove(e) {
 
-  if (mousedownFired) {
-    mousemoveFired = true;
-  }
-
   if (!overlay) {
     return;
+  }
+
+  if (mousedownFired) {
+    mousemoveFired = true;
   }
 
   let { x : curX, y : curY } = getXY(e);
@@ -118,7 +116,6 @@ function handleDocumentMousemove(e) {
   overlay.style.width  = w + 'px';
   overlay.style.height = h + 'px';
 
-
   if (prevAnnotation) {
     prevAnnotation.resetTextForceDisplay();
     prevAnnotation.render();
@@ -130,10 +127,20 @@ function handleDocumentMousemove(e) {
 
 function _findAnnotation(e) {
 
-    let { x, y } = scaleDown(getSVGLayer(), getXY(e));
+    const { x, y } = scaleDown(getSVGLayer(), getXY(e));
 
-    // TODO
-    // 各AnnoにisHit(x,y)を実装して対応したい.
+    let hitAnnotation = null;
+    window.annotationContainer.getAllAnnotations().forEach(a => {
+        if (a.isHit(x, y)) {
+            hitAnnotation = a;
+        } else if (a.isHitText(x, y)) {
+            hitAnnotation = a.textAnnotation;
+        }
+    });
+
+    console.log('hit:', hitAnnotation);
+
+    return hitAnnotation;
 }
 
 /**
@@ -149,8 +156,8 @@ function handleDocumentMouseup(e) {
     if (clicked) {
 
         let anno = _findAnnotation(e);
-        if (anno && anno.handleClick) {
-            anno.handleClick();
+        if (anno) {
+            anno.handleClickEvent();
         }
 
         $(overlay).remove();

@@ -87,36 +87,22 @@ export default class TextAnnotation extends AbstractAnnotation {
      */
     destroy() {
         super.destroy();
-        // this.$element.remove();
-        // this.$element = this.createDummyElement();
-        // globalEvent.removeListener('rectmoveend', this.handleRectMoveEnd);
-        // globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
-        // globalEvent.removeListener('enableViewMode', this.enableViewMode);
-        // globalEvent.removeListener('disableViewMode', this.disableViewMode);
-
-        // TODO Need Release memory?
-        // console.log('delete:text._events:', this._events);
-
-        // cancel circle reference.
-        // this.parent = null;
-
-        console.log('text:destroy');
     }
 
     isHit(x, y) {
 
+        if (!this.parent.text || this.deleted) {
+            return false;
+        }
+
         let $rect = this.$element.find('rect');
-        let x_ = $rect.attr('x');
-        let y_ = $rect.attr('y');
-        let w_ = $rect.attr('width');
-        let h_ = $rect.attr('height');
-        console.log(x,y,w,h);
+        let x1 = parseInt($rect.attr('x'));
+        let y1 = parseInt($rect.attr('y'));
+        let x2 = x1 + parseInt($rect.attr('width'));
+        let y2 = y1 + parseInt($rect.attr('height'));
+        // console.log(x1,x,x2,y1,y,y2);
 
-
-
-
-        // TODO
-        return false;
+        return (x1 <= x && x <= x2) && (y1 <= y && y <= y2);
     }
 
     /**

@@ -91,8 +91,25 @@ export default class AbstractAnnotation extends EventEmitter {
 
     }
 
+    /**
+     * Judge the point within the element.
+     */
     isHit(x, y) {
         return false;
+    }
+
+    /**
+     * Judge the point within the label.
+     */
+    isHitText(x, y) {
+        return this.textAnnotation && this.textAnnotation.isHit(x, y);
+    }
+
+    /**
+     * Handle a click event.
+     */
+    handleClickEvent(e) {
+        // Implemented by a child class.
     }
 
     /**
