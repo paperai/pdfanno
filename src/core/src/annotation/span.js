@@ -23,7 +23,6 @@ export default class SpanAnnotation extends AbstractAnnotation {
 
         window.globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
         window.globalEvent.on('enableViewMode', this.enableViewMode);
-        window.globalEvent.on('disableViewMode', this.disableViewMode);
 
         this.textAnnotation = new TextAnnotation(this.readOnly, this);
         this.textAnnotation.on('selected', this.handleTextSelected);
@@ -67,7 +66,6 @@ export default class SpanAnnotation extends AbstractAnnotation {
         // TODO オブジェクトベースで削除できるようにしたい.
         window.globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
         window.globalEvent.removeListener('enableViewMode', this.enableViewMode);
-        window.globalEvent.removeListener('disableViewMode', this.disableViewMode);
     }
 
     /**

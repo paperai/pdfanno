@@ -29,35 +29,13 @@ function deleteSelectedAnnotations() {
     window.globalEvent.emit('deleteSelectedAnnotation');
 }
 
-/**
- * Make annotations view mode.
- */
-function setAnnotationViewMode() {
-    window.globalEvent.emit('enableViewMode');
-}
-
 // TODO NO NEED `enableViewMode` event ?
-
-// /**
-//  * Make annotations NOT view mode.
-//  */
-// function resetAnnotationViewMode() {
-//     window.globalEvent.emit('disableViewMode');
-// }
-
-// TODO NO NEED `disableViewMode` event ?
 
 /**
  * Enable view mode.
  */
 export function enableViewMode() {
     console.log('view:enableViewMode');
-
-    // disableViewMode();
-
-    // window.viewMode = true;
-
-    // setAnnotationViewMode();
 
     document.removeEventListener('keyup', disablePagebackAction);
     document.removeEventListener('keydown', disablePagebackAction);
@@ -70,9 +48,5 @@ export function enableViewMode() {
  * Disable view mode.
  */
 export function disableViewMode() {
-    // console.log('view:disableViewMode');
-    // window.viewMode = false;
-    // resetAnnotationViewMode();
-    // document.removeEventListener('keyup', handleDocumentKeyup);
-    // document.removeEventListener('keydown', handleDocumentKeydown);
+    // TODO Remove me.
 }

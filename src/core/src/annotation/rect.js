@@ -34,12 +34,11 @@ export default class RectAnnotation extends AbstractAnnotation {
         this.readOnly = false;
         this.$element = this.createDummyElement();
 
-        window.globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
-        window.globalEvent.on('enableViewMode', this.enableViewMode);
-        window.globalEvent.on('disableViewMode', this.disableViewMode);
+        globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
+        globalEvent.on('enableViewMode', this.enableViewMode);
 
-        window.globalEvent.on('enableRelation', this.disableDragAction);
-        window.globalEvent.on('disableRelation', this.enableDragAction);
+        globalEvent.on('enableRelation', this.disableDragAction);
+        globalEvent.on('disableRelation', this.enableDragAction);
 
         this.textAnnotation = new TextAnnotation(this.readOnly, this);
         this.textAnnotation.on('selected', this.handleTextSelected);
@@ -83,7 +82,6 @@ export default class RectAnnotation extends AbstractAnnotation {
         this.emit('delete');
         window.globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
         window.globalEvent.removeListener('enableViewMode', this.enableViewMode);
-        window.globalEvent.removeListener('disableViewMode', this.disableViewMode);
     }
 
     // isHit(x, y) {
@@ -331,11 +329,6 @@ export default class RectAnnotation extends AbstractAnnotation {
         if (!this.readOnly) {
             this.$element.find('.anno-rect, circle').on('click', this.handleClickEvent);
             this.enableDragAction();
-
-            // test.
-            // this.$element.find('.anno-rect, circle')
-            //     .on('mouseup', this.handleMouseUp)
-            //     .on('mousedown', this.handleMouseDown);
         }
     }
 
@@ -346,12 +339,6 @@ export default class RectAnnotation extends AbstractAnnotation {
         super.disableViewMode();
         this.$element.find('.anno-rect, circle').off('click');
         this.disableDragAction();
-
-        // test.
-        // this.$element.find('.anno-rect, circle')
-        //     .off('mouseup', this.handleMouseUp)
-        //     .off('mousedown', this.handleMouseDown);
-
     }
 
 }

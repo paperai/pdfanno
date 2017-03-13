@@ -36,14 +36,6 @@ export default class TextAnnotation extends AbstractAnnotation {
 
         // Updated by parent via AbstractAnnotation#setTextForceDisplay.
         this.textForceDisplay = false;
-
-        // parent.on('rectmoveend', this.handleRectMoveEnd);
-
-        // globalEvent.on('rectmoveend', this.handleRectMoveEnd);
-
-        // globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
-        // globalEvent.on('enableViewMode', this.enableViewMode);
-        // globalEvent.on('disableViewMode', this.disableViewMode);
     }
 
 
@@ -100,7 +92,6 @@ export default class TextAnnotation extends AbstractAnnotation {
         let y1 = parseInt($rect.attr('y'));
         let x2 = x1 + parseInt($rect.attr('width'));
         let y2 = y1 + parseInt($rect.attr('height'));
-        // console.log(x1,x,x2,y1,y,y2);
 
         return (x1 <= x && x <= x2) && (y1 <= y && y <= y2);
     }
