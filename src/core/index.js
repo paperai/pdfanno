@@ -46,15 +46,15 @@ window.addEventListener('pagerendered', function(ev) {
 });
 
 // Adapt to scale change.
-$(window).on('resize', removeAnnoLayer);
-$('#scaleSelect').on('change', removeAnnoLayer);
-$('#zoomIn, #zoomOut').on('click', removeAnnoLayer);
+window.addEventListener('scalechange', () => {
+    console.log('scalechange');
+    removeAnnoLayer();
+});
 
 /*
  * Remove the annotation layer and the temporary rendering layer.
  */
 function removeAnnoLayer() {
-    console.log('removeAnnoLayer');
     $('#annoLayer, #tmpLayer').remove();
 }
 

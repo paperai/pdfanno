@@ -698,7 +698,7 @@ function startApplication() {
 
     // Set viewMode behavior after annotations rendered.
     iframeWindow.addEventListener('annotationrendered', () => {
-        window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
+        // window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
         window.iframeWindow.PDFAnnoCore.UI.enableViewMode();
     });
 
