@@ -1,18 +1,8 @@
 import assign from 'deep-assign';
-import appendChild from '../render/appendChild';
 import { getSVGLayer } from '../UI/utils';
 import { addInputField } from '../UI/text';
-import { enableViewMode, disableViewMode } from '../UI/view';
 import AbstractAnnotation from './abstract';
-import {
-    scaleUp,
-    scaleDown,
-    getMetadata,
-    disableUserSelect,
-    enableUserSelect
-} from '../UI/utils';
-
-let globalEvent;
+import {　scaleUp　} from '../UI/utils';
 
 /**
  * Text Annotation.
@@ -25,8 +15,6 @@ export default class TextAnnotation extends AbstractAnnotation {
     constructor(readOnly, parent) {
         super();
 
-        globalEvent = window.globalEvent;
-
         this.type     = 'textbox';
         this.parent   = parent;
         this.x        = 0;
@@ -36,14 +24,6 @@ export default class TextAnnotation extends AbstractAnnotation {
 
         // Updated by parent via AbstractAnnotation#setTextForceDisplay.
         this.textForceDisplay = false;
-
-        // parent.on('rectmoveend', this.handleRectMoveEnd);
-
-        // globalEvent.on('rectmoveend', this.handleRectMoveEnd);
-
-        // globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
-        // globalEvent.on('enableViewMode', this.enableViewMode);
-        // globalEvent.on('disableViewMode', this.disableViewMode);
     }
 
 
@@ -87,36 +67,21 @@ export default class TextAnnotation extends AbstractAnnotation {
      */
     destroy() {
         super.destroy();
-        // this.$element.remove();
-        // this.$element = this.createDummyElement();
-        // globalEvent.removeListener('rectmoveend', this.handleRectMoveEnd);
-        // globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
-        // globalEvent.removeListener('enableViewMode', this.enableViewMode);
-        // globalEvent.removeListener('disableViewMode', this.disableViewMode);
-
-        // TODO Need Release memory?
-        // console.log('delete:text._events:', this._events);
-
-        // cancel circle reference.
-        // this.parent = null;
-
-        console.log('text:destroy');
     }
 
     isHit(x, y) {
 
+        if (!this.parent.text || this.deleted) {
+            return false;
+        }
+
         let $rect = this.$element.find('rect');
-        let x_ = $rect.attr('x');
-        let y_ = $rect.attr('y');
-        let w_ = $rect.attr('width');
-        let h_ = $rect.attr('height');
-        console.log(x,y,w,h);
+        let x1 = parseInt($rect.attr('x'));
+        let y1 = parseInt($rect.attr('y'));
+        let x2 = x1 + parseInt($rect.attr('width'));
+        let y2 = y1 + parseInt($rect.attr('height'));
 
-
-
-
-        // TODO
-        return false;
+        return (x1 <= x && x <= x2) && (y1 <= y && y <= y2);
     }
 
     /**
@@ -147,6 +112,11 @@ export default class TextAnnotation extends AbstractAnnotation {
      */
     handleClickEvent() {
 
+        // Permit only for editable.
+        if (this.parent.readOnly) {
+            return;
+        }
+
         let next = !this.$element.hasClass('--selected');
 
         if (next) {
@@ -170,9 +140,8 @@ export default class TextAnnotation extends AbstractAnnotation {
      * Handle a click event.
      */
     handleDoubleClickEvent() {
-        console.log('handleDoubleClickEvent');
+        console.log('handleDoubleClickEvent:', this.readOnly, this.parent.readOnly);
 
-        // this.destroy();
         this.$element.remove();
 
         let svg = getSVGLayer();
@@ -202,12 +171,6 @@ export default class TextAnnotation extends AbstractAnnotation {
         });
 
     }
-
-    // handleRectMoveEnd(rectAnnotation) {
-    //     if (rectAnnotation === this.parent) {
-    //         this.enableViewMode();
-    //     }
-    // }
 
     enableViewMode() {
         console.log('text:enableViewMode');

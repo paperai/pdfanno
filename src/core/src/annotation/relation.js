@@ -35,7 +35,6 @@ export default class RelationAnnotation extends AbstractAnnotation {
 
         globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
         globalEvent.on('enableViewMode', this.enableViewMode);
-        globalEvent.on('disableViewMode', this.disableViewMode);
         globalEvent.on('rectmoveend', this.handleRelMoveEnd);
 
         this.textAnnotation = new TextAnnotation(this.readOnly, this);
@@ -159,13 +158,7 @@ export default class RelationAnnotation extends AbstractAnnotation {
 
         globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
         globalEvent.removeListener('enableViewMode', this.enableViewMode);
-        globalEvent.removeListener('disableViewMode', this.disableViewMode);
         globalEvent.removeListener('rectmoveend', this.handleRelMoveEnd);
-    }
-
-    isHit(x, y) {
-        // TODO
-        return false || this.textAnnotation.isHit(...arguments);
     }
 
     /**
