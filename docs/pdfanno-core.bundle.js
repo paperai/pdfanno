@@ -80,11 +80,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _rect2 = _interopRequireDefault(_rect);
 	
-	var _span = __webpack_require__(42);
+	var _span = __webpack_require__(41);
 	
 	var _span2 = _interopRequireDefault(_span);
 	
-	var _relation = __webpack_require__(44);
+	var _relation = __webpack_require__(43);
 	
 	var _relation2 = _interopRequireDefault(_relation);
 	
@@ -17569,11 +17569,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _rect = __webpack_require__(33);
 	
-	var _span = __webpack_require__(41);
+	var _span = __webpack_require__(40);
 	
-	var _relation = __webpack_require__(43);
+	var _relation = __webpack_require__(42);
 	
-	var _view = __webpack_require__(40);
+	var _view = __webpack_require__(44);
 	
 	exports.default = {
 	  disableRect: _rect.disableRect, enableRect: _rect.enableRect,
@@ -17675,8 +17675,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  overlay.style.boxSizing = 'border-box';
 	  overlay.style.visibility = 'visible';
 	  (0, _utils.getTmpLayer)().appendChild(overlay);
-	
-	  // document.addEventListener('mousemove', handleDocumentMousemove);
 	}
 	
 	/**
@@ -17686,12 +17684,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function handleDocumentMousemove(e) {
 	
-	  if (mousedownFired) {
-	    mousemoveFired = true;
-	  }
-	
 	  if (!overlay) {
 	    return;
+	  }
+	
+	  if (mousedownFired) {
+	    mousemoveFired = true;
 	  }
 	
 	  var _getXY2 = (0, _utils.getXY)(e),
@@ -17736,9 +17734,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	      x = _scaleDown.x,
 	      y = _scaleDown.y;
 	
-	  // TODO
-	  // 各AnnoにisHit(x,y)を実装して対応したい.
+	  var hitAnnotation = null;
+	  window.annotationContainer.getAllAnnotations().forEach(function (a) {
+	    if (a.isHit(x, y)) {
+	      hitAnnotation = a;
+	    } else if (a.isHitText(x, y)) {
+	      hitAnnotation = a.textAnnotation;
+	    }
+	  });
 	
+	  console.log('hit:', hitAnnotation);
+	
+	  return hitAnnotation;
 	}
 	
 	/**
@@ -17754,8 +17761,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (clicked) {
 	
 	    var anno = _findAnnotation(e);
-	    if (anno && anno.handleClick) {
-	      anno.handleClick();
+	    if (anno) {
+	      anno.handleClickEvent();
 	    }
 	
 	    (0, _jquery2.default)(overlay).remove();
@@ -18696,12 +18703,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _this.readOnly = false;
 	        _this.$element = _this.createDummyElement();
 	
-	        window.globalEvent.on('deleteSelectedAnnotation', _this.deleteSelectedAnnotation);
-	        window.globalEvent.on('enableViewMode', _this.enableViewMode);
-	        window.globalEvent.on('disableViewMode', _this.disableViewMode);
+	        globalEvent.on('deleteSelectedAnnotation', _this.deleteSelectedAnnotation);
+	        globalEvent.on('enableViewMode', _this.enableViewMode);
 	
-	        window.globalEvent.on('enableRelation', _this.disableDragAction);
-	        window.globalEvent.on('disableRelation', _this.enableDragAction);
+	        globalEvent.on('enableRelation', _this.disableDragAction);
+	        globalEvent.on('disableRelation', _this.enableDragAction);
 	
 	        _this.textAnnotation = new _text2.default(_this.readOnly, _this);
 	        _this.textAnnotation.on('selected', _this.handleTextSelected);
@@ -18739,16 +18745,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.emit('delete');
 	            window.globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
 	            window.globalEvent.removeListener('enableViewMode', this.enableViewMode);
-	            window.globalEvent.removeListener('disableViewMode', this.disableViewMode);
 	        }
-	    }, {
-	        key: 'isHit',
-	        value: function isHit(x, y) {
-	            var _textAnnotation;
 	
-	            // TODO
-	            return false || (_textAnnotation = this.textAnnotation).isHit.apply(_textAnnotation, arguments);
-	        }
+	        // isHit(x, y) {
+	        //     return false || this.textAnnotation.isHit(...arguments);
+	        // }
 	
 	        /**
 	         * Create an annotation data for save.
@@ -19043,11 +19044,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (!this.readOnly) {
 	                this.$element.find('.anno-rect, circle').on('click', this.handleClickEvent);
 	                this.enableDragAction();
-	
-	                // test.
-	                // this.$element.find('.anno-rect, circle')
-	                //     .on('mouseup', this.handleMouseUp)
-	                //     .on('mousedown', this.handleMouseDown);
 	            }
 	        }
 	
@@ -19061,11 +19057,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            _get(RectAnnotation.prototype.__proto__ || Object.getPrototypeOf(RectAnnotation.prototype), 'disableViewMode', this).call(this);
 	            this.$element.find('.anno-rect, circle').off('click');
 	            this.disableDragAction();
-	
-	            // test.
-	            // this.$element.find('.anno-rect, circle')
-	            //     .off('mouseup', this.handleMouseUp)
-	            //     .off('mousedown', this.handleMouseDown);
 	        }
 	    }], [{
 	        key: 'newInstance',
@@ -19237,11 +19228,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.textAnnotation && this.textAnnotation.destroy();
 	            }
 	        }
+	
+	        /**
+	         * Judge the point within the element.
+	         */
+	
 	    }, {
 	        key: 'isHit',
 	        value: function isHit(x, y) {
 	            return false;
 	        }
+	
+	        /**
+	         * Judge the point within the label.
+	         */
+	
+	    }, {
+	        key: 'isHitText',
+	        value: function isHitText(x, y) {
+	            return this.textAnnotation && this.textAnnotation.isHit(x, y);
+	        }
+	
+	        /**
+	         * Handle a click event.
+	         */
+	
+	    }, {
+	        key: 'handleClickEvent',
+	        value: function handleClickEvent(e) {}
+	        // Implemented by a child class.
+	
 	
 	        /**
 	         * Highlight the annotation.
@@ -19426,15 +19442,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _deepAssign2 = _interopRequireDefault(_deepAssign);
 	
-	var _appendChild = __webpack_require__(23);
-	
-	var _appendChild2 = _interopRequireDefault(_appendChild);
-	
 	var _utils = __webpack_require__(34);
 	
 	var _text = __webpack_require__(36);
-	
-	var _view = __webpack_require__(40);
 	
 	var _abstract = __webpack_require__(38);
 	
@@ -19448,12 +19458,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var globalEvent = void 0;
-	
 	/**
 	 * Text Annotation.
 	 */
-	
 	var TextAnnotation = function (_AbstractAnnotation) {
 	    _inherits(TextAnnotation, _AbstractAnnotation);
 	
@@ -19465,8 +19472,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var _this = _possibleConstructorReturn(this, (TextAnnotation.__proto__ || Object.getPrototypeOf(TextAnnotation)).call(this));
 	
-	        globalEvent = window.globalEvent;
-	
 	        _this.type = 'textbox';
 	        _this.parent = parent;
 	        _this.x = 0;
@@ -19476,14 +19481,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // Updated by parent via AbstractAnnotation#setTextForceDisplay.
 	        _this.textForceDisplay = false;
-	
-	        // parent.on('rectmoveend', this.handleRectMoveEnd);
-	
-	        // globalEvent.on('rectmoveend', this.handleRectMoveEnd);
-	
-	        // globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
-	        // globalEvent.on('enableViewMode', this.enableViewMode);
-	        // globalEvent.on('disableViewMode', this.disableViewMode);
 	        return _this;
 	    }
 	
@@ -19534,34 +19531,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'destroy',
 	        value: function destroy() {
 	            _get(TextAnnotation.prototype.__proto__ || Object.getPrototypeOf(TextAnnotation.prototype), 'destroy', this).call(this);
-	            // this.$element.remove();
-	            // this.$element = this.createDummyElement();
-	            // globalEvent.removeListener('rectmoveend', this.handleRectMoveEnd);
-	            // globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
-	            // globalEvent.removeListener('enableViewMode', this.enableViewMode);
-	            // globalEvent.removeListener('disableViewMode', this.disableViewMode);
-	
-	            // TODO Need Release memory?
-	            // console.log('delete:text._events:', this._events);
-	
-	            // cancel circle reference.
-	            // this.parent = null;
-	
-	            console.log('text:destroy');
 	        }
 	    }, {
 	        key: 'isHit',
 	        value: function isHit(x, y) {
 	
-	            var $rect = this.$element.find('rect');
-	            var x_ = $rect.attr('x');
-	            var y_ = $rect.attr('y');
-	            var w_ = $rect.attr('width');
-	            var h_ = $rect.attr('height');
-	            console.log(x, y, w, h);
+	            if (!this.parent.text || this.deleted) {
+	                return false;
+	            }
 	
-	            // TODO
-	            return false;
+	            var $rect = this.$element.find('rect');
+	            var x1 = parseInt($rect.attr('x'));
+	            var y1 = parseInt($rect.attr('y'));
+	            var x2 = x1 + parseInt($rect.attr('width'));
+	            var y2 = y1 + parseInt($rect.attr('height'));
+	
+	            return x1 <= x && x <= x2 && y1 <= y && y <= y2;
 	        }
 	
 	        /**
@@ -19604,6 +19589,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'handleClickEvent',
 	        value: function handleClickEvent() {
 	
+	            // Permit only for editable.
+	            if (this.parent.readOnly) {
+	                return;
+	            }
+	
 	            var next = !this.$element.hasClass('--selected');
 	
 	            if (next) {
@@ -19631,9 +19621,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function handleDoubleClickEvent() {
 	            var _this2 = this;
 	
-	            console.log('handleDoubleClickEvent');
+	            console.log('handleDoubleClickEvent:', this.readOnly, this.parent.readOnly);
 	
-	            // this.destroy();
 	            this.$element.remove();
 	
 	            var svg = (0, _utils.getSVGLayer)();
@@ -19661,13 +19650,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            });
 	        }
-	
-	        // handleRectMoveEnd(rectAnnotation) {
-	        //     if (rectAnnotation === this.parent) {
-	        //         this.enableViewMode();
-	        //     }
-	        // }
-	
 	    }, {
 	        key: 'enableViewMode',
 	        value: function enableViewMode() {
@@ -19700,100 +19682,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.enableViewMode = enableViewMode;
-	exports.disableViewMode = disableViewMode;
-	
-	var _jquery = __webpack_require__(7);
-	
-	var _jquery2 = _interopRequireDefault(_jquery);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	/**
-	 * Disable the action of pageback, if `DEL` or `BackSpace` button pressed.
-	 */
-	function disablePagebackAction(e) {
-	
-	    // Allow any keyboard events for <input/>.
-	    if (e.target.tagName.toLowerCase() === 'input') {
-	        return;
-	    }
-	
-	    // Delete or BackSpace.
-	    if (e.keyCode == 46 || e.keyCode == 8) {
-	        e.preventDefault();
-	
-	        if (e.type === 'keyup') {
-	            deleteSelectedAnnotations();
-	        }
-	
-	        return false;
-	    }
-	}
-	
-	/**
-	 * Delete selected annotations.
-	 */
-	function deleteSelectedAnnotations() {
-	    window.globalEvent.emit('deleteSelectedAnnotation');
-	}
-	
-	/**
-	 * Make annotations view mode.
-	 */
-	function setAnnotationViewMode() {
-	    window.globalEvent.emit('enableViewMode');
-	}
-	
-	// TODO NO NEED `enableViewMode` event ?
-	
-	// /**
-	//  * Make annotations NOT view mode.
-	//  */
-	// function resetAnnotationViewMode() {
-	//     window.globalEvent.emit('disableViewMode');
-	// }
-	
-	// TODO NO NEED `disableViewMode` event ?
-	
-	/**
-	 * Enable view mode.
-	 */
-	function enableViewMode() {
-	    console.log('view:enableViewMode');
-	
-	    // disableViewMode();
-	
-	    // window.viewMode = true;
-	
-	    // setAnnotationViewMode();
-	
-	    document.removeEventListener('keyup', disablePagebackAction);
-	    document.removeEventListener('keydown', disablePagebackAction);
-	    document.addEventListener('keyup', disablePagebackAction);
-	    document.addEventListener('keydown', disablePagebackAction);
-	}
-	
-	/**
-	 * Disable view mode.
-	 */
-	function disableViewMode() {
-	    // console.log('view:disableViewMode');
-	    // window.viewMode = false;
-	    // resetAnnotationViewMode();
-	    // document.removeEventListener('keyup', handleDocumentKeyup);
-	    // document.removeEventListener('keydown', handleDocumentKeydown);
-	}
-
-/***/ },
-/* 41 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
 	exports.enableSpan = enableSpan;
@@ -19807,7 +19695,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _text = __webpack_require__(36);
 	
-	var _span = __webpack_require__(42);
+	var _span = __webpack_require__(41);
 	
 	var _span2 = _interopRequireDefault(_span);
 	
@@ -19973,7 +19861,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 42 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -20030,7 +19918,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        window.globalEvent.on('deleteSelectedAnnotation', _this.deleteSelectedAnnotation);
 	        window.globalEvent.on('enableViewMode', _this.enableViewMode);
-	        window.globalEvent.on('disableViewMode', _this.disableViewMode);
 	
 	        _this.textAnnotation = new _text2.default(_this.readOnly, _this);
 	        _this.textAnnotation.on('selected', _this.handleTextSelected);
@@ -20070,15 +19957,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // TODO オブジェクトベースで削除できるようにしたい.
 	            window.globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
 	            window.globalEvent.removeListener('enableViewMode', this.enableViewMode);
-	            window.globalEvent.removeListener('disableViewMode', this.disableViewMode);
-	        }
-	    }, {
-	        key: 'isHit',
-	        value: function isHit(x, y) {
-	            var _textAnnotation;
-	
-	            // TODO
-	            return false || (_textAnnotation = this.textAnnotation).isHit.apply(_textAnnotation, arguments);
 	        }
 	
 	        /**
@@ -20284,7 +20162,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 43 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -20309,7 +20187,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _text = __webpack_require__(36);
 	
-	var _relation2 = __webpack_require__(44);
+	var _relation2 = __webpack_require__(43);
 	
 	var _relation3 = _interopRequireDefault(_relation2);
 	
@@ -20667,7 +20545,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 44 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -20738,7 +20616,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        globalEvent.on('deleteSelectedAnnotation', _this.deleteSelectedAnnotation);
 	        globalEvent.on('enableViewMode', _this.enableViewMode);
-	        globalEvent.on('disableViewMode', _this.disableViewMode);
 	        globalEvent.on('rectmoveend', _this.handleRelMoveEnd);
 	
 	        _this.textAnnotation = new _text2.default(_this.readOnly, _this);
@@ -20827,16 +20704,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
 	            globalEvent.removeListener('enableViewMode', this.enableViewMode);
-	            globalEvent.removeListener('disableViewMode', this.disableViewMode);
 	            globalEvent.removeListener('rectmoveend', this.handleRelMoveEnd);
-	        }
-	    }, {
-	        key: 'isHit',
-	        value: function isHit(x, y) {
-	            var _textAnnotation;
-	
-	            // TODO
-	            return false || (_textAnnotation = this.textAnnotation).isHit.apply(_textAnnotation, arguments);
 	        }
 	
 	        /**
@@ -21152,6 +21020,74 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports.default = RelationAnnotation;
 	module.exports = exports['default'];
+
+/***/ },
+/* 44 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.enableViewMode = enableViewMode;
+	exports.disableViewMode = disableViewMode;
+	
+	var _jquery = __webpack_require__(7);
+	
+	var _jquery2 = _interopRequireDefault(_jquery);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	/**
+	 * Disable the action of pageback, if `DEL` or `BackSpace` button pressed.
+	 */
+	function disablePagebackAction(e) {
+	
+	    // Allow any keyboard events for <input/>.
+	    if (e.target.tagName.toLowerCase() === 'input') {
+	        return;
+	    }
+	
+	    // Delete or BackSpace.
+	    if (e.keyCode == 46 || e.keyCode == 8) {
+	        e.preventDefault();
+	
+	        if (e.type === 'keyup') {
+	            deleteSelectedAnnotations();
+	        }
+	
+	        return false;
+	    }
+	}
+	
+	/**
+	 * Delete selected annotations.
+	 */
+	function deleteSelectedAnnotations() {
+	    window.globalEvent.emit('deleteSelectedAnnotation');
+	}
+	
+	// TODO NO NEED `enableViewMode` event ?
+	
+	/**
+	 * Enable view mode.
+	 */
+	function enableViewMode() {
+	    console.log('view:enableViewMode');
+	
+	    document.removeEventListener('keyup', disablePagebackAction);
+	    document.removeEventListener('keydown', disablePagebackAction);
+	    document.addEventListener('keyup', disablePagebackAction);
+	    document.addEventListener('keydown', disablePagebackAction);
+	}
+	
+	/**
+	 * Disable view mode.
+	 */
+	function disableViewMode() {
+	    // TODO Remove me.
+	}
 
 /***/ },
 /* 45 */
