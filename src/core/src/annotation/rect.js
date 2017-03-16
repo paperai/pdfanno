@@ -1,11 +1,7 @@
 import uuid from '../utils/uuid';
 import AbstractAnnotation from './abstract';
 import TextAnnotation from './text';
-import {
-    scaleDown,
-    disableUserSelect,
-    enableUserSelect
-} from '../UI/utils';
+import { scaleDown } from '../UI/utils';
 
 let globalEvent;
 
@@ -84,10 +80,6 @@ export default class RectAnnotation extends AbstractAnnotation {
         window.globalEvent.removeListener('enableViewMode', this.enableViewMode);
     }
 
-    // isHit(x, y) {
-    //     return false || this.textAnnotation.isHit(...arguments);
-    // }
-
     /**
      * Create an annotation data for save.
      */
@@ -137,14 +129,14 @@ export default class RectAnnotation extends AbstractAnnotation {
      * Handle a selected event on a text.
      */
     handleTextSelected() {
-        this.$element.addClass('--selected');
+        this.select();
     }
 
     /**
      * Handle a deselected event on a text.
      */
     handleTextDeselected() {
-        this.$element.removeClass('--selected');
+        this.deselect();
     }
 
     /**
@@ -202,13 +194,7 @@ export default class RectAnnotation extends AbstractAnnotation {
      * Handle a click event.
      */
     handleClickEvent() {
-        this.$element.toggleClass('--selected');
-        let selected = this.$element.hasClass('--selected');
-        if (selected) {
-            this.textAnnotation.select();
-        } else {
-            this.textAnnotation.deselect();
-        }
+        this.toggleSelect();
     }
 
     /**
@@ -219,8 +205,6 @@ export default class RectAnnotation extends AbstractAnnotation {
 
         this.originalX = this.x;
         this.originalY = this.y;
-
-        // disableUserSelect();
 
         document.addEventListener('mousemove', this.handleMouseMoveOnDocument);
         document.addEventListener('mouseup', this.handleMouseUpOnDocument);
@@ -274,11 +258,9 @@ export default class RectAnnotation extends AbstractAnnotation {
 
             this.save();
             this.enableViewMode();
-            // this.emit('rectmoveend', this);
             globalEvent.emit('rectmoveend', this);
         }
 
-        // enableUserSelect();
 
         document.removeEventListener('mousemove', this.handleMouseMoveOnDocument);
         document.removeEventListener('mouseup', this.handleMouseUpOnDocument);
@@ -287,13 +269,6 @@ export default class RectAnnotation extends AbstractAnnotation {
             this.enableTextlayer();
         }
     }
-
-    // handleMouseUp(e) {
-    //     console.log('rect:handleMouseUp: ', e.target);
-    // }
-    // handleMouseDown(e) {
-    //     console.log('rect:handleMouseDown: ', e.target);
-    // }
 
     // TODO 共通化？
     disableTextlayer() {

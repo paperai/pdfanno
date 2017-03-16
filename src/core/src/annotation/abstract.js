@@ -40,16 +40,18 @@ export default class AbstractAnnotation extends EventEmitter {
             return false;
         }
 
-         this.$element = $(appendChild(getSVGLayer(), this));
-         this.textAnnotation && this.textAnnotation.render();
+        this.$element = $(appendChild(getSVGLayer(), this));
+        this.textAnnotation && this.textAnnotation.render();
 
-         if (!this.hoverEventDisable && this.setHoverEvent) {
+        if (!this.hoverEventDisable && this.setHoverEvent) {
             this.setHoverEvent();
-         }
+        }
 
-         // if (window.viewMode) {
-          this.$element.addClass('--viewMode');
-         // }
+        this.$element.addClass('--viewMode');
+
+        if (this.selected) {
+            this.$element.addClass('--selected');
+        }
 
         return true;
     }
@@ -132,6 +134,7 @@ export default class AbstractAnnotation extends EventEmitter {
      * Select the annotation.
      */
     select() {
+        this.selected = true;
         this.$element.addClass('--selected');
     }
 
@@ -139,7 +142,24 @@ export default class AbstractAnnotation extends EventEmitter {
      * Deselect the annotation.
      */
     deselect() {
+        this.selected = false;
         this.$element.removeClass('--selected');
+    }
+
+    /**
+     * Toggle the selected state.
+     */
+    toggleSelect() {
+
+        if (this.selected) {
+            this.deselect();
+            this.textAnnotation && this.textAnnotation.deselect();
+
+        } else {
+            this.select();
+            this.textAnnotation && this.textAnnotation.select();
+        }
+
     }
 
     /**

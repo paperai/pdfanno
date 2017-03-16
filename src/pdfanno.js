@@ -62,18 +62,24 @@ function initializeAnnoToolButtons() {
 
     $('.js-tool-btn').off('click').on('click', (e) => {
 
-        let $button = $(e.currentTarget);
-        let type = $button.data('type');
-
-        $('.js-tool-btn').removeClass('active');
-        $button.addClass('active');
-
         disableAnnotateTools();
 
-        if (type === 'view') {
-            window.iframeWindow.PDFAnnoCore.UI.enableViewMode();
+        let $button = $(e.currentTarget);
 
-        } else if (type === 'span') {
+        if ($button.hasClass('active')) {
+            $button
+                .removeClass('active')
+                .blur();
+            return false;
+        }
+
+        $('.js-tool-btn.active').removeClass('active');
+        $button.addClass('active');
+
+        let type = $button.data('type');
+
+
+        if (type === 'span') {
             window.iframeWindow.PDFAnnoCore.UI.enableSpan();
 
         } else if (type === 'one-way') {
@@ -110,7 +116,6 @@ function initializeAnnoToolButtons() {
         return false;
     });
 
-    $('.js-tool-btn[data-type="view"]').click();
 }
 
 function _getDownloadFileName() {
@@ -693,7 +698,7 @@ function startApplication() {
 
     // Set viewMode behavior after annotations rendered.
     iframeWindow.addEventListener('annotationrendered', () => {
-        window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
+        // window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
         window.iframeWindow.PDFAnnoCore.UI.enableViewMode();
     });
 
