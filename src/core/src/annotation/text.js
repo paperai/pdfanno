@@ -1,18 +1,8 @@
 import assign from 'deep-assign';
-import appendChild from '../render/appendChild';
 import { getSVGLayer } from '../UI/utils';
 import { addInputField } from '../UI/text';
-import { enableViewMode, disableViewMode } from '../UI/view';
 import AbstractAnnotation from './abstract';
-import {
-    scaleUp,
-    scaleDown,
-    getMetadata,
-    disableUserSelect,
-    enableUserSelect
-} from '../UI/utils';
-
-let globalEvent;
+import {　scaleUp　} from '../UI/utils';
 
 /**
  * Text Annotation.
@@ -24,8 +14,6 @@ export default class TextAnnotation extends AbstractAnnotation {
      */
     constructor(readOnly, parent) {
         super();
-
-        globalEvent = window.globalEvent;
 
         this.type     = 'textbox';
         this.parent   = parent;
@@ -124,6 +112,11 @@ export default class TextAnnotation extends AbstractAnnotation {
      */
     handleClickEvent() {
 
+        // Permit only for editable.
+        if (this.parent.readOnly) {
+            return;
+        }
+
         let next = !this.$element.hasClass('--selected');
 
         if (next) {
@@ -147,9 +140,8 @@ export default class TextAnnotation extends AbstractAnnotation {
      * Handle a click event.
      */
     handleDoubleClickEvent() {
-        console.log('handleDoubleClickEvent');
+        console.log('handleDoubleClickEvent:', this.readOnly, this.parent.readOnly);
 
-        // this.destroy();
         this.$element.remove();
 
         let svg = getSVGLayer();
@@ -179,12 +171,6 @@ export default class TextAnnotation extends AbstractAnnotation {
         });
 
     }
-
-    // handleRectMoveEnd(rectAnnotation) {
-    //     if (rectAnnotation === this.parent) {
-    //         this.enableViewMode();
-    //     }
-    // }
 
     enableViewMode() {
         console.log('text:enableViewMode');
