@@ -40,16 +40,18 @@ export default class AbstractAnnotation extends EventEmitter {
             return false;
         }
 
-         this.$element = $(appendChild(getSVGLayer(), this));
-         this.textAnnotation && this.textAnnotation.render();
+        this.$element = $(appendChild(getSVGLayer(), this));
+        this.textAnnotation && this.textAnnotation.render();
 
-         if (!this.hoverEventDisable && this.setHoverEvent) {
+        if (!this.hoverEventDisable && this.setHoverEvent) {
             this.setHoverEvent();
-         }
+        }
 
-         // if (window.viewMode) {
-          this.$element.addClass('--viewMode');
-         // }
+        this.$element.addClass('--viewMode');
+
+        if (this.selected) {
+            this.$element.addClass('--selected');
+        }
 
         return true;
     }
