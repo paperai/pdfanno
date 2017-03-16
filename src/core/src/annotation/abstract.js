@@ -132,6 +132,7 @@ export default class AbstractAnnotation extends EventEmitter {
      * Select the annotation.
      */
     select() {
+        this.selected = true;
         this.$element.addClass('--selected');
     }
 
@@ -139,7 +140,21 @@ export default class AbstractAnnotation extends EventEmitter {
      * Deselect the annotation.
      */
     deselect() {
+        this.selected = false;
         this.$element.removeClass('--selected');
+    }
+
+    toggleSelect() {
+
+        if (this.selected) {
+            this.deselect();
+            this.textAnnotation && this.textAnnotation.deselect();
+
+        } else {
+            this.select();
+            this.textAnnotation && this.textAnnotation.select();
+        }
+
     }
 
     /**

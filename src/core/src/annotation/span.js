@@ -122,14 +122,14 @@ export default class SpanAnnotation extends AbstractAnnotation {
      * Handle a selected event on a text.
      */
     handleTextSelected() {
-        this.$element.addClass('--selected');
+        this.select();
     }
 
     /**
      * Handle a deselected event on a text.
      */
     handleTextDeselected() {
-        this.$element.removeClass('--selected');
+        this.deselect();
     }
 
     /**
@@ -178,13 +178,7 @@ export default class SpanAnnotation extends AbstractAnnotation {
      * Handle a click event.
      */
     handleClickEvent() {
-        this.$element.toggleClass('--selected');
-        let selected = this.$element.hasClass('--selected');
-        if (selected) {
-            this.textAnnotation.select();
-        } else {
-            this.textAnnotation.deselect();
-        }
+        this.toggleSelect();
     }
 
     /**
