@@ -128,15 +128,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	
 	// Adapt to scale change.
-	(0, _jquery2.default)(window).on('resize', removeAnnoLayer);
-	(0, _jquery2.default)('#scaleSelect').on('change', removeAnnoLayer);
-	(0, _jquery2.default)('#zoomIn, #zoomOut').on('click', removeAnnoLayer);
+	window.addEventListener('scalechange', function () {
+	    console.log('scalechange');
+	    removeAnnoLayer();
+	});
 	
 	/*
 	 * Remove the annotation layer and the temporary rendering layer.
 	 */
 	function removeAnnoLayer() {
-	    console.log('removeAnnoLayer');
 	    (0, _jquery2.default)('#annoLayer, #tmpLayer').remove();
 	}
 	
@@ -18747,10 +18747,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            window.globalEvent.removeListener('enableViewMode', this.enableViewMode);
 	        }
 	
-	        // isHit(x, y) {
-	        //     return false || this.textAnnotation.isHit(...arguments);
-	        // }
-	
 	        /**
 	         * Create an annotation data for save.
 	         */
@@ -18815,7 +18811,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'handleTextSelected',
 	        value: function handleTextSelected() {
-	            this.$element.addClass('--selected');
+	            this.select();
 	        }
 	
 	        /**
@@ -18825,7 +18821,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'handleTextDeselected',
 	        value: function handleTextDeselected() {
-	            this.$element.removeClass('--selected');
+	            this.deselect();
 	        }
 	
 	        /**
@@ -18901,13 +18897,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'handleClickEvent',
 	        value: function handleClickEvent() {
-	            this.$element.toggleClass('--selected');
-	            var selected = this.$element.hasClass('--selected');
-	            if (selected) {
-	                this.textAnnotation.select();
-	            } else {
-	                this.textAnnotation.deselect();
-	            }
+	            this.toggleSelect();
 	        }
 	
 	        /**
@@ -18921,8 +18911,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            this.originalX = this.x;
 	            this.originalY = this.y;
-	
-	            // disableUserSelect();
 	
 	            document.addEventListener('mousemove', this.handleMouseMoveOnDocument);
 	            document.addEventListener('mouseup', this.handleMouseUpOnDocument);
@@ -18982,11 +18970,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                this.save();
 	                this.enableViewMode();
-	                // this.emit('rectmoveend', this);
 	                globalEvent.emit('rectmoveend', this);
 	            }
-	
-	            // enableUserSelect();
 	
 	            document.removeEventListener('mousemove', this.handleMouseMoveOnDocument);
 	            document.removeEventListener('mouseup', this.handleMouseUpOnDocument);
@@ -18995,13 +18980,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.enableTextlayer();
 	            }
 	        }
-	
-	        // handleMouseUp(e) {
-	        //     console.log('rect:handleMouseUp: ', e.target);
-	        // }
-	        // handleMouseDown(e) {
-	        //     console.log('rect:handleMouseDown: ', e.target);
-	        // }
 	
 	        // TODO 共通化？
 	
@@ -19172,9 +19150,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.setHoverEvent();
 	            }
 	
-	            // if (window.viewMode) {
 	            this.$element.addClass('--viewMode');
-	            // }
+	
+	            if (this.selected) {
+	                this.$element.addClass('--selected');
+	            }
 	
 	            return true;
 	        }
@@ -19288,6 +19268,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'select',
 	        value: function select() {
+	            this.selected = true;
 	            this.$element.addClass('--selected');
 	        }
 	
@@ -19298,7 +19279,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'deselect',
 	        value: function deselect() {
+	            this.selected = false;
 	            this.$element.removeClass('--selected');
+	        }
+	    }, {
+	        key: 'toggleSelect',
+	        value: function toggleSelect() {
+	
+	            if (this.selected) {
+	                this.deselect();
+	                this.textAnnotation && this.textAnnotation.deselect();
+	            } else {
+	                this.select();
+	                this.textAnnotation && this.textAnnotation.select();
+	            }
 	        }
 	
 	        /**
@@ -20028,7 +20022,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'handleTextSelected',
 	        value: function handleTextSelected() {
-	            this.$element.addClass('--selected');
+	            this.select();
 	        }
 	
 	        /**
@@ -20038,7 +20032,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'handleTextDeselected',
 	        value: function handleTextDeselected() {
-	            this.$element.removeClass('--selected');
+	            this.deselect();
 	        }
 	
 	        /**
@@ -20105,13 +20099,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'handleClickEvent',
 	        value: function handleClickEvent() {
-	            this.$element.toggleClass('--selected');
-	            var selected = this.$element.hasClass('--selected');
-	            if (selected) {
-	                this.textAnnotation.select();
-	            } else {
-	                this.textAnnotation.deselect();
-	            }
+	            this.toggleSelect();
 	        }
 	
 	        /**
@@ -20765,7 +20753,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'handleTextSelected',
 	        value: function handleTextSelected() {
-	            this.$element.addClass('--selected');
+	            this.select();
 	        }
 	
 	        /**
@@ -20775,7 +20763,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'handleTextDeselected',
 	        value: function handleTextDeselected() {
-	            this.$element.removeClass('--selected');
+	            this.deselect();
 	        }
 	
 	        /**
@@ -20901,13 +20889,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'handleClickEvent',
 	        value: function handleClickEvent() {
-	            this.$element.toggleClass('--selected');
-	            var selected = this.$element.hasClass('--selected');
-	            if (selected) {
-	                this.textAnnotation.select();
-	            } else {
-	                this.textAnnotation.deselect();
-	            }
+	            this.toggleSelect();
 	        }
 	
 	        /**

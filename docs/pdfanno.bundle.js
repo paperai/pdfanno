@@ -118,17 +118,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    $('.js-tool-btn').off('click').on('click', function (e) {
 	
-	        var $button = $(e.currentTarget);
-	        var type = $button.data('type');
-	
-	        $('.js-tool-btn').removeClass('active');
-	        $button.addClass('active');
-	
 	        disableAnnotateTools();
 	
-	        if (type === 'view') {
-	            window.iframeWindow.PDFAnnoCore.UI.enableViewMode();
-	        } else if (type === 'span') {
+	        var $button = $(e.currentTarget);
+	
+	        if ($button.hasClass('active')) {
+	            $button.removeClass('active').blur();
+	            return false;
+	        }
+	
+	        $('.js-tool-btn.active').removeClass('active');
+	        $button.addClass('active');
+	
+	        var type = $button.data('type');
+	
+	        if (type === 'span') {
 	            window.iframeWindow.PDFAnnoCore.UI.enableSpan();
 	        } else if (type === 'one-way') {
 	            window.iframeWindow.PDFAnnoCore.UI.enableRelation('one-way');
@@ -158,8 +162,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        return false;
 	    });
-	
-	    $('.js-tool-btn[data-type="view"]').click();
 	}
 	
 	function _getDownloadFileName() {
@@ -698,7 +700,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // Set viewMode behavior after annotations rendered.
 	    iframeWindow.addEventListener('annotationrendered', function () {
-	        window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
+	        // window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
 	        window.iframeWindow.PDFAnnoCore.UI.enableViewMode();
 	    });
 	
