@@ -35,8 +35,6 @@ For security reasons, PDFAnno does NOT automatically save your annotations.
 Don't forget to download your current annotations!  
 
 ### Annotation Tools
-<img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-mouse-pointer.png" width="2%"> Selection tool.
-
 <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-pencil.png" width="2%"> Span highlighting. It is disallowed to cross page boundaries.
 
 <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-long-arrow-right.png" width="2%"> One-way relation. This is used for annotating dependency relation between spans.
