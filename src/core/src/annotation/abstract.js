@@ -146,6 +146,9 @@ export default class AbstractAnnotation extends EventEmitter {
         this.$element.removeClass('--selected');
     }
 
+    /**
+     * Toggle the selected state.
+     */
     toggleSelect() {
 
         if (this.selected) {
