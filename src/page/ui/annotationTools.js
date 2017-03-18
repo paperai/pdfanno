@@ -1,12 +1,14 @@
 /**
  * UI parts - Annotations Tools.
  */
+import { reloadPDFViewer } from '../util/display';
+import { unlistenWindowLeaveEvent } from '../util/window';
 
 
 /**
     Set the behavior of the tool buttons for annotations.
 */
-export function setup1() {
+export function setup() {
 
     $('.js-tool-btn').off('click').on('click', (e) => {
 
@@ -66,7 +68,6 @@ export function setup1() {
 
 }
 
-
 /**
     Disable annotation tool buttons.
 */
@@ -75,4 +76,64 @@ function disableAnnotateTools() {
     window.iframeWindow.PDFAnnoCore.UI.disableSpan();
     window.iframeWindow.PDFAnnoCore.UI.disableRelation();
     window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
+}
+
+/**
+ * Delete all annotations.
+ */
+function deleteAllAnnotations() {
+
+    // Comfirm to user.
+    let userAnswer = window.confirm('Are you sure to clear the current annotations?');
+    if (!userAnswer) {
+        return;
+    }
+
+    iframeWindow.annotationContainer.destroy();
+
+    let documentId = window.iframeWindow.getFileName(window.iframeWindow.PDFView.url);
+    window.iframeWindow.PDFAnnoCore.getStoreAdapter().deleteAnnotations(documentId).then(() => {
+        reloadPDFViewer();
+    });
+}
+
+/**
+ * Export the primary annotation data for download.
+ */
+function downloadAnnotation() {
+
+    window.iframeWindow.PDFAnnoCore.getStoreAdapter().exportData().then(annotations => {
+        let blob = new Blob([annotations]);
+        let blobURL = window.URL.createObjectURL(blob);
+        let a = document.createElement('a');
+        document.body.appendChild(a); // for firefox working correctly.
+        a.download = _getDownloadFileName();
+        a.href = blobURL;
+        a.click();
+        a.parentNode.removeChild(a);
+    });
+
+    unlistenWindowLeaveEvent();
+}
+
+/**
+ * Get the anno file name for download.
+ */
+function _getDownloadFileName() {
+
+    // The name of Primary Annotation.
+    let primaryAnnotationName;
+    $('#dropdownAnnoPrimary a').each((index, element) => {
+        let $elm = $(element);
+        if ($elm.find('.fa-check').hasClass('no-visible') === false) {
+            primaryAnnotationName = $elm.find('.js-annoname').text();
+        }
+    });
+    if (primaryAnnotationName) {
+        return primaryAnnotationName;
+    }
+
+    // The name of PDF.
+    let pdfFileName = iframeWindow.getFileName(iframeWindow.PDFView.url);
+    return pdfFileName.split('.')[0] + '.anno';
 }
