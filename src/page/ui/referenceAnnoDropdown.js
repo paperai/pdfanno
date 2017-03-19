@@ -24,7 +24,7 @@ export function setup() {
         if (annoNames.length > 0) {
             $('#dropdownAnnoReference .js-text').text(annoNames.join(','));
         } else {
-            $('#dropdownAnnoReference .js-text').text('Select reference Anno files');
+            $('#dropdownAnnoReference .js-text').text('Select reference files');
         }
 
         displayAnnotation(false);

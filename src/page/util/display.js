@@ -3,7 +3,7 @@
 
 
 
-export function displayAnnotation(isPrimary) {
+export function displayAnnotation(isPrimary, reload=true) {
 
     let annotations = [];
     let colors = [];
@@ -61,11 +61,15 @@ export function displayAnnotation(isPrimary) {
     // Pass the data to pdf-annotatejs.
     window.iframeWindow.PDFAnnoCore.getStoreAdapter().importAnnotations(paperData, isPrimary).then(result => {
 
-        // Reload the viewer.
-        reloadPDFViewer();
+        if (reload) {
+            // Reload the viewer.
+            reloadPDFViewer();
+        }
 
         // Reset tools to viewMode.
-        $('.js-tool-btn[data-type="view"]').click();
+        // $('.js-tool-btn[data-type="view"]').click();
+
+        return true;
     });
 
 }
