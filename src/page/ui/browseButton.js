@@ -38,18 +38,12 @@ export function setup() {
 
         // Initialize PDF Viewer.
         clearAllAnnotations();
-        // localStorage.removeItem('_pdfanno_pdf');
-        // localStorage.removeItem('_pdfanno_pdfname');
-        // reloadPDFViewer();
 
         // Load data.
         loadData(pdfs, annos).then(() => {
-            console.log('completed!!!!!!!!!!!!');
 
             // Display a PDF and annotations.
             display(current, fileMap);
-
-
 
         });
 
@@ -132,9 +126,6 @@ function display(currentDisplay, newFileMap) {
 
 }
 
-
-
-
 /**
  * Get a filename from a path.
  */
@@ -158,9 +149,6 @@ function getCurrentFileNames() {
     text = $('#dropdownAnnoPrimary .js-text').text();
     let primaryAnnotationName = (text !== 'Select Anno file' ? text : null);
 
-    // Reference annos.
-    // text = $('#dropdownAnnoReference .js-text').text();
-    // let referenceAnnotationNames = (text !== 'Select reference files' ? text.split(',') : []);
 
     let referenceAnnotationNames = [];
     let referenceAnnotationColors = [];
@@ -170,12 +158,9 @@ function getCurrentFileNames() {
             let annoName = $elm.find('.js-annoname').text(); // TODO こういうのはJS変数として持っておいたほうがいいかも（選択済のものについて）
             referenceAnnotationNames.push(annoName);
             let color = $elm.find('.js-anno-palette').spectrum('get').toHexString();
-            console.log(color);
             referenceAnnotationColors.push(color);
         }
     });
-
-    console.log('referenceAnnotationColors:', referenceAnnotationColors);
 
     return {
         pdfName,
@@ -185,13 +170,17 @@ function getCurrentFileNames() {
     };
 }
 
-
+/**
+ * Check whether the directory the user specified is valid.
+ */
 function isValidDirectorySelect(files) {
 
+    // Error, if no contents exits.
     if (!files || files.length === 0) {
         return 'Not files specified';
     }
 
+    // Error, if the user select a file - not a directory.
     let relativePath = files[0].webkitRelativePath;
     if (!relativePath) {
         return 'Please select a directory, NOT a file';
@@ -201,6 +190,9 @@ function isValidDirectorySelect(files) {
     return null;
 }
 
+/**
+ * Extract PDFs and annotations from files the user specified.
+ */
 function getContents(files) {
     let pdfs = [];
     let annos = [];
@@ -231,6 +223,9 @@ function getContents(files) {
     };
 }
 
+/**
+ * Setup the contents of the dropdown for PDFs.
+ */
 function setPDFDropdownList(pdfs) {
 
     $('#dropdownPdf .js-text').text('Select PDF file');
@@ -249,6 +244,9 @@ function setPDFDropdownList(pdfs) {
     });
 }
 
+/**
+ * Setup the contents of the dropdowns for primary/reference annotations.
+ */
 function setAnnoDropdownList(annos) {
 
     // Reset.
@@ -276,7 +274,7 @@ function setAnnoDropdownList(annos) {
             <li>
                 <a href="#">
                     <i class="fa fa-check no-visible" aria-hidden="true"></i>
-                    <input type="text"  name="color" class="js-anno-palette"  autocomplete="off">
+                    <input type="text" name="color" class="js-anno-palette" autocomplete="off">
                     <span class="js-annoname">${fileName}</span>
                 </a>
             </li>
@@ -288,6 +286,9 @@ function setAnnoDropdownList(annos) {
     setupColorPicker();
 }
 
+/**
+ * Load PDFs and Annotations from the directory the user specified.
+ */
 function loadData(pdfs, annos) {
 
     window.fileMap = {};
