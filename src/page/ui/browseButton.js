@@ -3,8 +3,6 @@
  */
 import { reloadPDFViewer, clearAllAnnotations, setupColorPicker, displayAnnotation } from '../util/display';
 
-
-
 /**
  * Setup the behavior of a Browse Button.
  */
