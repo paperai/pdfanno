@@ -26,6 +26,9 @@ import appendChild from './src/render/appendChild';
 // Setup Storage.
 PDFAnnoCore.setStoreAdapter(new PDFAnnoCore.PdfannoStoreAdapter());
 
+// Enable a view mode.
+PDFAnnoCore.UI.enableViewMode();
+
 // The event called at page rendered by pdfjs.
 window.addEventListener('pagerendered', function(ev) {
     console.log('pagerendered:', ev.detail.pageNumber);
