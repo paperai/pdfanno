@@ -118,6 +118,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // Reset the confirm dialog at leaving page.
 	        (0, _window.unlistenWindowLeaveEvent)();
+	
+	        var event = document.createEvent('CustomEvent');
+	        event.initCustomEvent('appInitCompleted', true, true, null);
+	        window.dispatchEvent(event);
 	    });
 	
 	    // Set the confirm dialog when leaving a page.
@@ -282,6 +286,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Reload page.
 	    Promise.all([promise1, promise2]).then(function () {
 	        (0, _display.reloadPDFViewer)();
+	
+	        // Restore the state of annotationTools.
+	        var afterLoaded = function afterLoaded() {
+	            window.removeEventListener('appInitCompleted', afterLoaded);
+	            if (window.annotationToolMode !== 'view') {
+	                $('.js-tool-btn[data-type="' + window.annotationToolMode + '"]').removeClass('active').click();
+	            }
+	        };
+	        window.addEventListener('appInitCompleted', afterLoaded);
 	    });
 	}
 	
@@ -944,6 +957,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function setup() {
 	
+	    window.annotationToolMode = 'view';
+	
 	    $('.js-tool-btn').off('click').on('click', function (e) {
 	
 	        disableAnnotateTools();
@@ -959,6 +974,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        $button.addClass('active');
 	
 	        var type = $button.data('type');
+	
+	        window.annotationToolMode = type;
 	
 	        if (type === 'span') {
 	            window.iframeWindow.PDFAnnoCore.UI.enableSpan();
