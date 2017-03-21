@@ -267,11 +267,11 @@ function cancelRectDrawing() {
 
 // TODO 共通化？
 function disableTextlayer() {
-  $('.textLayer').hide();
+  $('body').addClass('disable-text-layer');
 }
 // TODO 共通化？
 function enableTextlayer() {
-  $('.textLayer').show();
+  $('body').removeClass('disable-text-layer');
 }
 
 
@@ -280,9 +280,11 @@ function enableTextlayer() {
  */
 export function enableRect() {
 
+    disableRect();
+
     window.currentType = 'rect';
 
-  if (_enabled) { return; }
+  // if (_enabled) { return; }
 
   _enabled = true;
   document.addEventListener('mouseup', handleDocumentMouseup);
@@ -302,7 +304,7 @@ export function disableRect() {
 
     window.currentType = null;
 
-  if (!_enabled) { return; }
+  // if (!_enabled) { return; }
 
   _enabled = false;
   document.removeEventListener('mouseup', handleDocumentMouseup);

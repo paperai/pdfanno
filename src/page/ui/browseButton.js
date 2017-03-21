@@ -2,6 +2,7 @@
  * UI parts - Browse button.
  */
 import { reloadPDFViewer, clearAllAnnotations, setupColorPicker, displayAnnotation } from '../util/display';
+import { enableAnnotateTool, disableAnnotateTools } from '../util/anno';
 
 /**
  * Setup the behavior of a Browse Button.
@@ -125,7 +126,8 @@ function display(currentDisplay, newFileMap) {
         const afterLoaded = () => {
             window.removeEventListener('appInitCompleted', afterLoaded);
             if (window.annotationToolMode !== 'view') {
-                $(`.js-tool-btn[data-type="${window.annotationToolMode}"]`).removeClass('active').click();
+                disableAnnotateTools();
+                enableAnnotateTool(window.annotationToolMode);
             }
         };
         window.addEventListener('appInitCompleted', afterLoaded);

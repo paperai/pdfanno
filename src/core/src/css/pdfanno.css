@@ -129,3 +129,10 @@
   fill: rgba(0, 0, 0, 1.0);
 }
 
+/**
+ Disable text layers.
+*/
+body.disable-text-layer .textLayer {
+    display: none;
+}
+
