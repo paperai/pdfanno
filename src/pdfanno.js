@@ -50,6 +50,10 @@ function startApplication() {
 
         // Reset the confirm dialog at leaving page.
         unlistenWindowLeaveEvent();
+
+        var event = document.createEvent('CustomEvent');
+        event.initCustomEvent('appInitCompleted', true, true, null);
+        window.dispatchEvent(event);
     });
 
     // Set the confirm dialog when leaving a page.

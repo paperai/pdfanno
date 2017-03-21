@@ -120,6 +120,15 @@ function display(currentDisplay, newFileMap) {
     // Reload page.
     Promise.all([promise1, promise2]).then(() => {
         reloadPDFViewer();
+
+        // Restore the state of annotationTools.
+        const afterLoaded = () => {
+            window.removeEventListener('appInitCompleted', afterLoaded);
+            if (window.annotationToolMode !== 'view') {
+                $(`.js-tool-btn[data-type="${window.annotationToolMode}"]`).removeClass('active').click();
+            }
+        };
+        window.addEventListener('appInitCompleted', afterLoaded);
     });
 
 }

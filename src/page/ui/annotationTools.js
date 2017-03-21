@@ -10,6 +10,8 @@ import { unlistenWindowLeaveEvent } from '../util/window';
 */
 export function setup() {
 
+    window.annotationToolMode = 'view';
+
     $('.js-tool-btn').off('click').on('click', (e) => {
 
         disableAnnotateTools();
@@ -28,6 +30,7 @@ export function setup() {
 
         let type = $button.data('type');
 
+        window.annotationToolMode = type;
 
         if (type === 'span') {
             window.iframeWindow.PDFAnnoCore.UI.enableSpan();
