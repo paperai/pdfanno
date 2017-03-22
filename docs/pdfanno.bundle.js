@@ -56,7 +56,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 	
-	var _browseButton = __webpack_require__(1);
+	var _anno = __webpack_require__(1);
+	
+	var _browseButton = __webpack_require__(2);
 	
 	var browseButton = _interopRequireWildcard(_browseButton);
 	
@@ -64,30 +66,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var pdfDropdown = _interopRequireWildcard(_pdfDropdown);
 	
-	var _primaryAnnoDropdown = __webpack_require__(5);
+	var _primaryAnnoDropdown = __webpack_require__(6);
 	
 	var primaryAnnoDropdown = _interopRequireWildcard(_primaryAnnoDropdown);
 	
-	var _annoListDropdown = __webpack_require__(6);
+	var _annoListDropdown = __webpack_require__(7);
 	
 	var annoListDropdown = _interopRequireWildcard(_annoListDropdown);
 	
-	var _referenceAnnoDropdown = __webpack_require__(8);
+	var _referenceAnnoDropdown = __webpack_require__(9);
 	
 	var referenceAnnoDropdown = _interopRequireWildcard(_referenceAnnoDropdown);
 	
-	var _annotationTools = __webpack_require__(9);
+	var _annotationTools = __webpack_require__(10);
 	
 	var annotationsTools = _interopRequireWildcard(_annotationTools);
 	
-	var _display = __webpack_require__(2);
+	var _display = __webpack_require__(3);
 	
-	var _window = __webpack_require__(10);
+	var _window = __webpack_require__(11);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
-	__webpack_require__(11);
 	__webpack_require__(12);
+	__webpack_require__(13);
 	
 	/**
 	 * The data which is loaded via `Browse` button.
@@ -119,9 +121,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // Reset the confirm dialog at leaving page.
 	        (0, _window.unlistenWindowLeaveEvent)();
 	
-	        var event = document.createEvent('CustomEvent');
-	        event.initCustomEvent('appInitCompleted', true, true, null);
-	        window.dispatchEvent(event);
+	        // Restore the status of AnnoTools.
+	        (0, _anno.disableAnnotateTools)();
+	        (0, _anno.enableAnnotateTool)(window.currentAnnoToolType);
 	    });
 	
 	    // Set the confirm dialog when leaving a page.
@@ -135,7 +137,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // Delete prev annotations.
 	    if (location.search.indexOf('debug') === -1) {
-	        (0, _display.clearAllAnnotations)();
+	        (0, _anno.clearAllAnnotations)();
 	    }
 	
 	    // Start application.
@@ -154,6 +156,58 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 1 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.disableAnnotateTools = disableAnnotateTools;
+	exports.enableAnnotateTool = enableAnnotateTool;
+	exports.clearAllAnnotations = clearAllAnnotations;
+	/**
+	 * Annotations.
+	 */
+	
+	/**
+	    Disable annotation tool buttons.
+	*/
+	function disableAnnotateTools() {
+	    window.iframeWindow.PDFAnnoCore.UI.disableRect();
+	    window.iframeWindow.PDFAnnoCore.UI.disableSpan();
+	    window.iframeWindow.PDFAnnoCore.UI.disableRelation();
+	    window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
+	}
+	
+	/**
+	 * Enable an annotation tool.
+	 */
+	function enableAnnotateTool(type) {
+	
+	    if (type === 'span') {
+	        window.iframeWindow.PDFAnnoCore.UI.enableSpan();
+	    } else if (type === 'one-way') {
+	        window.iframeWindow.PDFAnnoCore.UI.enableRelation('one-way');
+	    } else if (type === 'two-way') {
+	        window.iframeWindow.PDFAnnoCore.UI.enableRelation('two-way');
+	    } else if (type === 'link') {
+	        window.iframeWindow.PDFAnnoCore.UI.enableRelation('link');
+	    } else if (type === 'rect') {
+	        window.iframeWindow.PDFAnnoCore.UI.enableRect();
+	    }
+	}
+	
+	/**
+	 * Clear the all annotations from the view and storage.
+	 */
+	function clearAllAnnotations() {
+	    localStorage.removeItem('_pdfanno_containers');
+	    localStorage.removeItem('_pdfanno_primary_annoname');
+	}
+
+/***/ },
+/* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -163,9 +217,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.setup = setup;
 	
-	var _display = __webpack_require__(2);
+	var _display = __webpack_require__(3);
 	
-	var _anno = __webpack_require__(3);
+	var _anno = __webpack_require__(1);
 	
 	/**
 	 * Setup the behavior of a Browse Button.
@@ -207,7 +261,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        setAnnoDropdownList(annos);
 	
 	        // Initialize PDF Viewer.
-	        (0, _display.clearAllAnnotations)();
+	        (0, _anno.clearAllAnnotations)();
 	
 	        // Load data.
 	        loadData(pdfs, annos).then(function () {
@@ -286,19 +340,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    // Reload page.
-	    Promise.all([promise1, promise2]).then(function () {
-	        (0, _display.reloadPDFViewer)();
-	
-	        // Restore the state of annotationTools.
-	        var afterLoaded = function afterLoaded() {
-	            window.removeEventListener('appInitCompleted', afterLoaded);
-	            if (window.annotationToolMode !== 'view') {
-	                (0, _anno.disableAnnotateTools)();
-	                (0, _anno.enableAnnotateTool)(window.annotationToolMode);
-	            }
-	        };
-	        window.addEventListener('appInitCompleted', afterLoaded);
-	    });
+	    Promise.all([promise1, promise2]).then(_display.reloadPDFViewer);
 	}
 	
 	/**
@@ -485,7 +527,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 2 */
+/* 3 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -495,8 +537,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.displayAnnotation = displayAnnotation;
 	exports.reloadPDFViewer = reloadPDFViewer;
-	exports.clearAllAnnotations = clearAllAnnotations;
 	exports.setupColorPicker = setupColorPicker;
+	
+	
+	/**
+	 * Display annotations an user selected.
+	 */
 	function displayAnnotation(isPrimary) {
 	    var reload = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 	
@@ -562,18 +608,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            reloadPDFViewer();
 	        }
 	
-	        // Reset tools to viewMode.
-	        // $('.js-tool-btn[data-type="view"]').click();
-	
 	        return true;
 	    });
 	}
-	
-	/*
-	var event = document.createEvent('CustomEvent');
-	event.initCustomEvent('annotationrendered', true, true, null);
-	window.dispatchEvent(event);
-	*/
 	
 	/**
 	 * Reload PDF Viewer.
@@ -588,14 +625,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var event = document.createEvent('CustomEvent');
 	    event.initCustomEvent('restartApp', true, true, null);
 	    window.dispatchEvent(event);
-	}
-	
-	/**
-	 * Clear the all annotations from the view and storage.
-	 */
-	function clearAllAnnotations() {
-	    localStorage.removeItem('_pdfanno_containers');
-	    localStorage.removeItem('_pdfanno_primary_annoname');
 	}
 	
 	/**
@@ -622,49 +651,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 3 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.disableAnnotateTools = disableAnnotateTools;
-	exports.enableAnnotateTool = enableAnnotateTool;
-	/**
-	 * Annotations.
-	 */
-	
-	/**
-	    Disable annotation tool buttons.
-	*/
-	function disableAnnotateTools() {
-	    window.iframeWindow.PDFAnnoCore.UI.disableRect();
-	    window.iframeWindow.PDFAnnoCore.UI.disableSpan();
-	    window.iframeWindow.PDFAnnoCore.UI.disableRelation();
-	    window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
-	}
-	
-	/**
-	 * Enable an annotation tool.
-	 */
-	function enableAnnotateTool(type) {
-	
-	    if (type === 'span') {
-	        window.iframeWindow.PDFAnnoCore.UI.enableSpan();
-	    } else if (type === 'one-way') {
-	        window.iframeWindow.PDFAnnoCore.UI.enableRelation('one-way');
-	    } else if (type === 'two-way') {
-	        window.iframeWindow.PDFAnnoCore.UI.enableRelation('two-way');
-	    } else if (type === 'link') {
-	        window.iframeWindow.PDFAnnoCore.UI.enableRelation('link');
-	    } else if (type === 'rect') {
-	        window.iframeWindow.PDFAnnoCore.UI.enableRect();
-	    }
-	}
-
-/***/ },
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -675,7 +661,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.setup = setup;
 	
-	var _display = __webpack_require__(2);
+	var _display = __webpack_require__(3);
+	
+	var _anno = __webpack_require__(1);
+	
+	var _dropdown = __webpack_require__(5);
 	
 	/**
 	 * Setup the dropdown of PDFs.
@@ -709,11 +699,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return false;
 	        }
 	
+	        // Reset Primary/Reference anno dropdowns, and data.
+	        (0, _anno.clearAllAnnotations)();
+	        (0, _dropdown.resetCheckPrimaryAnnoDropdown)();
+	        (0, _dropdown.resetCheckReferenceAnnoDropdown)();
+	
 	        // reload.
 	        window.pdf = fileMap[pdfPath];
 	        var fileName = pdfPath.split('/')[pdfPath.split('/').length - 1];
 	        window.pdfName = fileName;
-	
 	        (0, _display.reloadPDFViewer)();
 	
 	        // Close dropdown.
@@ -727,6 +721,31 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 5 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.resetCheckPrimaryAnnoDropdown = resetCheckPrimaryAnnoDropdown;
+	exports.resetCheckReferenceAnnoDropdown = resetCheckReferenceAnnoDropdown;
+	/**
+	 * Utility functions for dropdown UIs.
+	 */
+	
+	function resetCheckPrimaryAnnoDropdown() {
+	    $('#dropdownAnnoPrimary .js-text').text('Select Anno file');
+	    $('#dropdownAnnoPrimary .fa-check').removeClass('no-visible');
+	}
+	
+	function resetCheckReferenceAnnoDropdown() {
+	    $('#dropdownAnnoReference .js-text').text('Select reference files');
+	    $('#dropdownAnnoReference .fa-check').removeClass('no-visible');
+	}
+
+/***/ },
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -736,7 +755,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.setup = setup;
 	
-	var _display = __webpack_require__(2);
+	var _display = __webpack_require__(3);
 	
 	/**
 	 * Setup a click action of the Primary Annotation Dropdown.
@@ -784,7 +803,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -794,7 +813,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.setup = setup;
 	
-	var _position = __webpack_require__(7);
+	var _position = __webpack_require__(8);
 	
 	/**
 	 * Setup the dropdown for Anno list.
@@ -887,7 +906,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -936,7 +955,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -946,7 +965,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.setup = setup;
 	
-	var _display = __webpack_require__(2);
+	var _display = __webpack_require__(3);
 	
 	/**
 	 * Setup a click action of the Reference Annotation Dropdown.
@@ -981,7 +1000,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -991,18 +1010,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.setup = setup;
 	
-	var _display = __webpack_require__(2);
+	var _display = __webpack_require__(3);
 	
-	var _window = __webpack_require__(10);
+	var _window = __webpack_require__(11);
 	
-	var _anno = __webpack_require__(3);
+	var _anno = __webpack_require__(1);
 	
 	/**
 	    Set the behavior of the tool buttons for annotations.
 	*/
 	function setup() {
 	
-	    window.annotationToolMode = 'view';
+	    window.currentAnnoToolType = 'view';
 	
 	    $('.js-tool-btn').off('click').on('click', function (e) {
 	
@@ -1020,25 +1039,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var type = $button.data('type');
 	
-	        window.annotationToolMode = type;
+	        window.currentAnnoToolType = type;
 	
 	        (0, _anno.enableAnnotateTool)(type);
-	
-	        // if (type === 'span') {
-	        //     window.iframeWindow.PDFAnnoCore.UI.enableSpan();
-	
-	        // } else if (type === 'one-way') {
-	        //     window.iframeWindow.PDFAnnoCore.UI.enableRelation('one-way');
-	
-	        // } else if (type === 'two-way') {
-	        //     window.iframeWindow.PDFAnnoCore.UI.enableRelation('two-way');
-	
-	        // } else if (type === 'link') {
-	        //     window.iframeWindow.PDFAnnoCore.UI.enableRelation('link');
-	
-	        // } else if (type === 'rect') {
-	        //     window.iframeWindow.PDFAnnoCore.UI.enableRect();
-	        // }
 	
 	        return false;
 	    });
@@ -1134,7 +1137,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1192,22 +1195,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__.p + "dist/index.html";
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(13);
+	var content = __webpack_require__(14);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(15)(content, {});
+	var update = __webpack_require__(16)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -1224,10 +1227,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(14)();
+	exports = module.exports = __webpack_require__(15)();
 	// imports
 	
 	
@@ -1238,7 +1241,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports) {
 
 	/*
@@ -1294,7 +1297,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
