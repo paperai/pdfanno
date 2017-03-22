@@ -1,7 +1,7 @@
 require("file?name=dist/index.html!./index.html");
 require("!style!css!./pdfanno.css");
 
-import { enableAnnotateTool, disableAnnotateTools } from './page/util/anno';
+import { enableAnnotateTool, disableAnnotateTools, clearAllAnnotations } from './page/util/anno';
 
 import * as browseButton from './page/ui/browseButton';
 import * as pdfDropdown from './page/ui/pdfDropdown';
@@ -13,7 +13,6 @@ import * as annotationsTools from './page/ui/annotationTools';
 import {
     displayAnnotation,
     reloadPDFViewer,
-    clearAllAnnotations,
     setupColorPicker
 } from './page/util/display';
 

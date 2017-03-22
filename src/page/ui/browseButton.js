@@ -1,8 +1,8 @@
 /**
  * UI parts - Browse button.
  */
-import { reloadPDFViewer, clearAllAnnotations, setupColorPicker, displayAnnotation } from '../util/display';
-import { enableAnnotateTool, disableAnnotateTools } from '../util/anno';
+import { reloadPDFViewer, setupColorPicker, displayAnnotation } from '../util/display';
+import { enableAnnotateTool, disableAnnotateTools, clearAllAnnotations } from '../util/anno';
 
 /**
  * Setup the behavior of a Browse Button.

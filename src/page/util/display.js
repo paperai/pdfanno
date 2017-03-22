@@ -98,15 +98,6 @@ export function reloadPDFViewer() {
     window.dispatchEvent(event);
 }
 
-
-/**
- * Clear the all annotations from the view and storage.
- */
-export function clearAllAnnotations() {
-    localStorage.removeItem('_pdfanno_containers');
-    localStorage.removeItem('_pdfanno_primary_annoname');
-}
-
 /**
  * Setup the color pickers.
  */
