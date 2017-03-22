@@ -123,14 +123,14 @@ function display(currentDisplay, newFileMap) {
         reloadPDFViewer();
 
         // Restore the state of annotationTools.
-        const afterLoaded = () => {
-            window.removeEventListener('appInitCompleted', afterLoaded);
-            if (window.annotationToolMode !== 'view') {
-                disableAnnotateTools();
-                enableAnnotateTool(window.annotationToolMode);
-            }
-        };
-        window.addEventListener('appInitCompleted', afterLoaded);
+        // const afterLoaded = () => {
+        //     window.removeEventListener('appInitCompleted', afterLoaded);
+        //     if (window.annotationToolMode !== 'view') {
+        //         disableAnnotateTools();
+        //         enableAnnotateTool(window.annotationToolMode);
+        //     }
+        // };
+        // window.addEventListener('appInitCompleted', afterLoaded);
     });
 
 }

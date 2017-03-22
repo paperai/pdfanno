@@ -1,6 +1,8 @@
 require("file?name=dist/index.html!./index.html");
 require("!style!css!./pdfanno.css");
 
+import { enableAnnotateTool, disableAnnotateTools } from './page/util/anno';
+
 import * as browseButton from './page/ui/browseButton';
 import * as pdfDropdown from './page/ui/pdfDropdown';
 import * as primaryAnnoDropdown from './page/ui/primaryAnnoDropdown';
@@ -54,6 +56,10 @@ function startApplication() {
         var event = document.createEvent('CustomEvent');
         event.initCustomEvent('appInitCompleted', true, true, null);
         window.dispatchEvent(event);
+
+        // Restore the status of AnnoTools.
+        disableAnnotateTools();
+        enableAnnotateTool(window.annotationToolMode);
     });
 
     // Set the confirm dialog when leaving a page.
