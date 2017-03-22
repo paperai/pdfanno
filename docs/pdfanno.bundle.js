@@ -60,34 +60,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var browseButton = _interopRequireWildcard(_browseButton);
 	
-	var _pdfDropdown = __webpack_require__(3);
+	var _pdfDropdown = __webpack_require__(4);
 	
 	var pdfDropdown = _interopRequireWildcard(_pdfDropdown);
 	
-	var _primaryAnnoDropdown = __webpack_require__(4);
+	var _primaryAnnoDropdown = __webpack_require__(5);
 	
 	var primaryAnnoDropdown = _interopRequireWildcard(_primaryAnnoDropdown);
 	
-	var _annoListDropdown = __webpack_require__(5);
+	var _annoListDropdown = __webpack_require__(6);
 	
 	var annoListDropdown = _interopRequireWildcard(_annoListDropdown);
 	
-	var _referenceAnnoDropdown = __webpack_require__(7);
+	var _referenceAnnoDropdown = __webpack_require__(8);
 	
 	var referenceAnnoDropdown = _interopRequireWildcard(_referenceAnnoDropdown);
 	
-	var _annotationTools = __webpack_require__(8);
+	var _annotationTools = __webpack_require__(9);
 	
 	var annotationsTools = _interopRequireWildcard(_annotationTools);
 	
 	var _display = __webpack_require__(2);
 	
-	var _window = __webpack_require__(9);
+	var _window = __webpack_require__(10);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
-	__webpack_require__(10);
 	__webpack_require__(11);
+	__webpack_require__(12);
 	
 	/**
 	 * The data which is loaded via `Browse` button.
@@ -165,8 +165,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _display = __webpack_require__(2);
 	
+	var _anno = __webpack_require__(3);
+	
 	/**
 	 * Setup the behavior of a Browse Button.
+	 */
+	/**
+	 * UI parts - Browse button.
 	 */
 	function setup() {
 	
@@ -211,10 +216,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            display(current, fileMap);
 	        });
 	    });
-	} /**
-	   * UI parts - Browse button.
-	   */
-	
+	}
 	
 	function display(currentDisplay, newFileMap) {
 	
@@ -291,7 +293,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var afterLoaded = function afterLoaded() {
 	            window.removeEventListener('appInitCompleted', afterLoaded);
 	            if (window.annotationToolMode !== 'view') {
-	                $('.js-tool-btn[data-type="' + window.annotationToolMode + '"]').removeClass('active').click();
+	                (0, _anno.disableAnnotateTools)();
+	                (0, _anno.enableAnnotateTool)(window.annotationToolMode);
 	            }
 	        };
 	        window.addEventListener('appInitCompleted', afterLoaded);
@@ -620,6 +623,49 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 3 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.disableAnnotateTools = disableAnnotateTools;
+	exports.enableAnnotateTool = enableAnnotateTool;
+	/**
+	 * Annotations.
+	 */
+	
+	/**
+	    Disable annotation tool buttons.
+	*/
+	function disableAnnotateTools() {
+	    window.iframeWindow.PDFAnnoCore.UI.disableRect();
+	    window.iframeWindow.PDFAnnoCore.UI.disableSpan();
+	    window.iframeWindow.PDFAnnoCore.UI.disableRelation();
+	    window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
+	}
+	
+	/**
+	 * Enable an annotation tool.
+	 */
+	function enableAnnotateTool(type) {
+	
+	    if (type === 'span') {
+	        window.iframeWindow.PDFAnnoCore.UI.enableSpan();
+	    } else if (type === 'one-way') {
+	        window.iframeWindow.PDFAnnoCore.UI.enableRelation('one-way');
+	    } else if (type === 'two-way') {
+	        window.iframeWindow.PDFAnnoCore.UI.enableRelation('two-way');
+	    } else if (type === 'link') {
+	        window.iframeWindow.PDFAnnoCore.UI.enableRelation('link');
+	    } else if (type === 'rect') {
+	        window.iframeWindow.PDFAnnoCore.UI.enableRect();
+	    }
+	}
+
+/***/ },
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -680,7 +726,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 
 /***/ },
-/* 4 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -738,7 +784,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -748,7 +794,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.setup = setup;
 	
-	var _position = __webpack_require__(6);
+	var _position = __webpack_require__(7);
 	
 	/**
 	 * Setup the dropdown for Anno list.
@@ -841,7 +887,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -890,7 +936,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -935,7 +981,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -947,21 +993,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _display = __webpack_require__(2);
 	
-	var _window = __webpack_require__(9);
+	var _window = __webpack_require__(10);
+	
+	var _anno = __webpack_require__(3);
 	
 	/**
 	    Set the behavior of the tool buttons for annotations.
 	*/
-	/**
-	 * UI parts - Annotations Tools.
-	 */
 	function setup() {
 	
 	    window.annotationToolMode = 'view';
 	
 	    $('.js-tool-btn').off('click').on('click', function (e) {
 	
-	        disableAnnotateTools();
+	        (0, _anno.disableAnnotateTools)();
 	
 	        var $button = $(e.currentTarget);
 	
@@ -977,17 +1022,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        window.annotationToolMode = type;
 	
-	        if (type === 'span') {
-	            window.iframeWindow.PDFAnnoCore.UI.enableSpan();
-	        } else if (type === 'one-way') {
-	            window.iframeWindow.PDFAnnoCore.UI.enableRelation('one-way');
-	        } else if (type === 'two-way') {
-	            window.iframeWindow.PDFAnnoCore.UI.enableRelation('two-way');
-	        } else if (type === 'link') {
-	            window.iframeWindow.PDFAnnoCore.UI.enableRelation('link');
-	        } else if (type === 'rect') {
-	            window.iframeWindow.PDFAnnoCore.UI.enableRect();
-	        }
+	        (0, _anno.enableAnnotateTool)(type);
+	
+	        // if (type === 'span') {
+	        //     window.iframeWindow.PDFAnnoCore.UI.enableSpan();
+	
+	        // } else if (type === 'one-way') {
+	        //     window.iframeWindow.PDFAnnoCore.UI.enableRelation('one-way');
+	
+	        // } else if (type === 'two-way') {
+	        //     window.iframeWindow.PDFAnnoCore.UI.enableRelation('two-way');
+	
+	        // } else if (type === 'link') {
+	        //     window.iframeWindow.PDFAnnoCore.UI.enableRelation('link');
+	
+	        // } else if (type === 'rect') {
+	        //     window.iframeWindow.PDFAnnoCore.UI.enableRect();
+	        // }
 	
 	        return false;
 	    });
@@ -1009,18 +1060,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	}
 	
-	/**
-	    Disable annotation tool buttons.
-	*/
-	function disableAnnotateTools() {
-	    window.iframeWindow.PDFAnnoCore.UI.disableRect();
-	    window.iframeWindow.PDFAnnoCore.UI.disableSpan();
-	    window.iframeWindow.PDFAnnoCore.UI.disableRelation();
-	    window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
-	}
+	// /**
+	//     Disable annotation tool buttons.
+	// */
+	// function disableAnnotateTools() {
+	//     window.iframeWindow.PDFAnnoCore.UI.disableRect();
+	//     window.iframeWindow.PDFAnnoCore.UI.disableSpan();
+	//     window.iframeWindow.PDFAnnoCore.UI.disableRelation();
+	//     window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
+	// }
 	
 	/**
 	 * Delete all annotations.
+	 */
+	/**
+	 * UI parts - Annotations Tools.
 	 */
 	function deleteAllAnnotations() {
 	
@@ -1080,7 +1134,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1138,22 +1192,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__.p + "dist/index.html";
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(12);
+	var content = __webpack_require__(13);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(14)(content, {});
+	var update = __webpack_require__(15)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -1170,10 +1224,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(13)();
+	exports = module.exports = __webpack_require__(14)();
 	// imports
 	
 	
@@ -1184,7 +1238,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports) {
 
 	/*
@@ -1240,7 +1294,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
