@@ -52,13 +52,9 @@ function startApplication() {
         // Reset the confirm dialog at leaving page.
         unlistenWindowLeaveEvent();
 
-        var event = document.createEvent('CustomEvent');
-        event.initCustomEvent('appInitCompleted', true, true, null);
-        window.dispatchEvent(event);
-
         // Restore the status of AnnoTools.
         disableAnnotateTools();
-        enableAnnotateTool(window.annotationToolMode);
+        enableAnnotateTool(window.currentAnnoToolType);
     });
 
     // Set the confirm dialog when leaving a page.

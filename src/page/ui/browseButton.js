@@ -119,19 +119,7 @@ function display(currentDisplay, newFileMap) {
     }
 
     // Reload page.
-    Promise.all([promise1, promise2]).then(() => {
-        reloadPDFViewer();
-
-        // Restore the state of annotationTools.
-        // const afterLoaded = () => {
-        //     window.removeEventListener('appInitCompleted', afterLoaded);
-        //     if (window.annotationToolMode !== 'view') {
-        //         disableAnnotateTools();
-        //         enableAnnotateTool(window.annotationToolMode);
-        //     }
-        // };
-        // window.addEventListener('appInitCompleted', afterLoaded);
-    });
+    Promise.all([promise1, promise2]).then(reloadPDFViewer);
 
 }
 

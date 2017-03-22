@@ -11,7 +11,7 @@ import { enableAnnotateTool, disableAnnotateTools } from '../util/anno';
 */
 export function setup() {
 
-    window.annotationToolMode = 'view';
+    window.currentAnnoToolType = 'view';
 
     $('.js-tool-btn').off('click').on('click', (e) => {
 
@@ -31,25 +31,9 @@ export function setup() {
 
         let type = $button.data('type');
 
-        window.annotationToolMode = type;
+        window.currentAnnoToolType = type;
 
         enableAnnotateTool(type);
-
-        // if (type === 'span') {
-        //     window.iframeWindow.PDFAnnoCore.UI.enableSpan();
-
-        // } else if (type === 'one-way') {
-        //     window.iframeWindow.PDFAnnoCore.UI.enableRelation('one-way');
-
-        // } else if (type === 'two-way') {
-        //     window.iframeWindow.PDFAnnoCore.UI.enableRelation('two-way');
-
-        // } else if (type === 'link') {
-        //     window.iframeWindow.PDFAnnoCore.UI.enableRelation('link');
-
-        // } else if (type === 'rect') {
-        //     window.iframeWindow.PDFAnnoCore.UI.enableRect();
-        // }
 
         return false;
     });

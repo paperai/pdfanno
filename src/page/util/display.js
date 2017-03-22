@@ -1,8 +1,8 @@
 
 
-
-
-
+/**
+ * Display annotations an user selected.
+ */
 export function displayAnnotation(isPrimary, reload=true) {
 
     let annotations = [];
@@ -66,22 +66,10 @@ export function displayAnnotation(isPrimary, reload=true) {
             reloadPDFViewer();
         }
 
-        // Reset tools to viewMode.
-        // $('.js-tool-btn[data-type="view"]').click();
-
         return true;
     });
 
 }
-
-
-/*
-var event = document.createEvent('CustomEvent');
-event.initCustomEvent('annotationrendered', true, true, null);
-window.dispatchEvent(event);
-*/
-
-
 
 /**
  * Reload PDF Viewer.
