@@ -19519,8 +19519,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            } else {
 	                this.$element.remove();
 	            }
-	
-	            console.log('render:text:', result);
 	        }
 	
 	        /**
@@ -20660,8 +20658,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         */
 	        value: function render() {
 	            this.setStartEndPosition();
-	            var result = _get(RelationAnnotation.prototype.__proto__ || Object.getPrototypeOf(RelationAnnotation.prototype), 'render', this).call(this);
-	            console.log('render:relation:', result);
+	            _get(RelationAnnotation.prototype.__proto__ || Object.getPrototypeOf(RelationAnnotation.prototype), 'render', this).call(this);
 	        }
 	
 	        /**

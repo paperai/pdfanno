@@ -736,12 +736,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function resetCheckPrimaryAnnoDropdown() {
 	    $('#dropdownAnnoPrimary .js-text').text('Select Anno file');
-	    $('#dropdownAnnoPrimary .fa-check').removeClass('no-visible');
+	    $('#dropdownAnnoPrimary .fa-check').addClass('no-visible');
 	}
 	
 	function resetCheckReferenceAnnoDropdown() {
 	    $('#dropdownAnnoReference .js-text').text('Select reference files');
-	    $('#dropdownAnnoReference .fa-check').removeClass('no-visible');
+	    $('#dropdownAnnoReference .fa-check').addClass('no-visible');
 	}
 
 /***/ },
