@@ -49,7 +49,6 @@ export default class TextAnnotation extends AbstractAnnotation {
             this.$element.remove();
         }
 
-        console.log('render:text:', result);
     }
 
     /**

@@ -116,8 +116,7 @@ export default class RelationAnnotation extends AbstractAnnotation {
      */
     render() {
         this.setStartEndPosition();
-        let result = super.render();
-        console.log('render:relation:', result);
+        super.render();
     }
 
     /**
@@ -125,14 +124,14 @@ export default class RelationAnnotation extends AbstractAnnotation {
      */
     createAnnotation() {
         return {
-            uuid           : this.uuid,
-            type           : this.type,
-            direction      : this.direction,
-            rel1           : this._rel1Annotation.uuid,
-            rel2           : this._rel2Annotation.uuid,
-            text           : this.text,
-            color          : this.color,
-            readOnly       : this.readOnly
+            uuid      : this.uuid,
+            type      : this.type,
+            direction : this.direction,
+            rel1      : this._rel1Annotation.uuid,
+            rel2      : this._rel2Annotation.uuid,
+            text      : this.text,
+            color     : this.color,
+            readOnly  : this.readOnly
         };
     }
 
