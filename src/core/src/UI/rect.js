@@ -6,16 +6,15 @@ import {
   BORDER_COLOR,
   disableUserSelect,
   enableUserSelect,
-  findSVGAtPoint,
   getMetadata,
-  getOffset,
   scaleDown,
   scaleUp,
   getXY,
   getSVGLayer,
-  getViewerContainer,
   getTmpLayer,
-  getCurrentPage
+  getCurrentPage,
+  disableTextlayer,
+  enableTextlayer
 } from './utils';
 import { addInputField } from './text';
 import RectAnnotation from '../annotation/rect';
@@ -265,14 +264,14 @@ function cancelRectDrawing() {
 
 }
 
-// TODO 共通化？
-function disableTextlayer() {
-  $('body').addClass('disable-text-layer');
-}
-// TODO 共通化？
-function enableTextlayer() {
-  $('body').removeClass('disable-text-layer');
-}
+// // TODO 共通化？
+// function disableTextlayer() {
+//   $('body').addClass('disable-text-layer');
+// }
+// // TODO 共通化？
+// function enableTextlayer() {
+//   $('body').removeClass('disable-text-layer');
+// }
 
 
 /**

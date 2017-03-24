@@ -32,8 +32,6 @@ export default class TextAnnotation extends AbstractAnnotation {
      */
      render() {
 
-        // TODO 引数で text と position を渡せば、循環参照を無くせる.
-
         let result = false;
 
         if (this.parent.text) {
@@ -172,8 +170,6 @@ export default class TextAnnotation extends AbstractAnnotation {
     }
 
     enableViewMode() {
-        console.log('text:enableViewMode');
-
         super.enableViewMode();
         if (!this.readOnly) {
             this.$element.find('text').off('click').on('click', this.handleClickEvent);
@@ -181,7 +177,6 @@ export default class TextAnnotation extends AbstractAnnotation {
     }
 
     disableViewMode() {
-
         super.disableViewMode();
         this.$element.find('text').off('click', this.handleClickEvent);
     }

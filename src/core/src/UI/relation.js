@@ -5,7 +5,9 @@ import {
   enableUserSelect,
   scaleDown,
   scaleUp,
-  getSVGLayer
+  getSVGLayer,
+  disableTextlayer,
+  enableTextlayer
 } from './utils';
 import { getRelationTextPosition } from '../utils/relation.js';
 import { addInputField } from './text';
@@ -25,8 +27,6 @@ let forEach = Array.prototype.forEach;
 let _enabled = false;
 
 let _relationType;
-
-let dragging = false;
 
 let startAnnotation;
 let mousedownFired = false;
@@ -54,11 +54,7 @@ function handleDocumentMousedown(e) {
     relationAnnotation.readOnly = false;
     relationAnnotation.setDisableHoverEvent();
 
-    // document.addEventListener('mouseup', handleDocumentMouseup);
-
     disableAnnotationHoverEvent();
-
-    dragging = true;
 
     startAnnotation = _hoverAnnotation;
   }
@@ -84,12 +80,13 @@ function handleDocumentMousemove(e) {
         mousemoveFired = true;
     }
 
-  if (dragging) {
-    let p = scaleDown(getClientXY(e));
-    relationAnnotation.x2 = p.x;
-    relationAnnotation.y2 = p.y;
-    relationAnnotation.render();
-  }
+    // draw temporary arrow, if now drawing.
+    if (mousedownFired && mousemoveFired) {
+        let p = scaleDown(getClientXY(e));
+        relationAnnotation.x2 = p.x;
+        relationAnnotation.y2 = p.y;
+        relationAnnotation.render();
+    }
 
   // Hover visual event.
   let circle = findHitBoundingCircle(e);
@@ -146,9 +143,6 @@ function isCircleHit(pos, element) {
  */
 function handleDocumentMouseup(e) {
 
-  // TODO may not need.
-  dragging = false;
-
   let clicked = mousedownFired && !mousemoveFired;
   let dragged = mousedownFired && mousemoveFired;
 
@@ -157,8 +151,8 @@ function handleDocumentMouseup(e) {
 
   enableAnnotationHoverEvent();
 
+  // Behave as clicked.
   if (clicked) {
-    console.log('clicked', startAnnotation);
     if (startAnnotation && startAnnotation.handleClickEvent) {
         startAnnotation.handleClickEvent();
     }
@@ -172,12 +166,9 @@ function handleDocumentMouseup(e) {
 
   startAnnotation = null;
 
-
-
   if (!relationAnnotation) {
     return;
   }
-
 
   // Find the end position.
   let circle = findHitBoundingCircle(e);
@@ -263,14 +254,6 @@ function enableAnnotationHoverEvent() {
     $('svg > g').css('pointer-events', 'auto');
 }
 
-function disableTextlayer() {
-  $('.textLayer').hide();
-}
-
-function enableTextlayer() {
-  $('.textLayer').show();
-}
-
 /**
  * TODO wanna remove this.
  */
@@ -339,8 +322,6 @@ export function disableRelation() {
   enableTextlayer();
 
   deleteBoundingBoxList();
-
-  console.log('3a');
 
   window.annotationContainer.getAllAnnotations().forEach(a => {
 
