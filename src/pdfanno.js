@@ -51,6 +51,9 @@ function startApplication() {
 
         // Reset the confirm dialog at leaving page.
         unlistenWindowLeaveEvent();
+    });
+
+    iframeWindow.addEventListener('annotationrendered', () => {
 
         // Restore the status of AnnoTools.
         disableAnnotateTools();

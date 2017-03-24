@@ -291,6 +291,7 @@ function handleBoundingCircleHoverOut(annotation) {
  * Enable relation behavior.
  */
 export function enableRelation(relationType='one-way') {
+
   if (_enabled) { return; }
 
   _enabled = true;
@@ -357,8 +358,6 @@ export function disableRelation() {
 
   });
 
-  console.log('3b');
-
   if (prevAnnotation) {
     prevAnnotation.resetTextForceDisplay();
     prevAnnotation.render();
@@ -366,10 +365,6 @@ export function disableRelation() {
     prevAnnotation = null;
   }
 
-  console.log('3c');
-
   window.globalEvent.emit('disableRelation');
-
-  console.log('3d');
 
 }

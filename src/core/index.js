@@ -157,8 +157,6 @@ function renderAnnotations(svg) {
                     anno = SpanAnnotation.newInstance(a);
                 } else if (a.type === 'relation') {
                     anno = RelationAnnotation.newInstance(a);
-                // } else {
-                //     appendChild(svg, a);
                 }
 
                 if (anno) {
