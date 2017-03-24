@@ -238,8 +238,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    anno = _span2.default.newInstance(a);
 	                } else if (a.type === 'relation') {
 	                    anno = _relation2.default.newInstance(a);
-	                    // } else {
-	                    //     appendChild(svg, a);
 	                }
 	
 	                if (anno) {
@@ -17878,14 +17876,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, 100);
 	}
 	
-	// TODO 共通化？
-	function disableTextlayer() {
-	  (0, _jquery2.default)('body').addClass('disable-text-layer');
-	}
-	// TODO 共通化？
-	function enableTextlayer() {
-	  (0, _jquery2.default)('body').removeClass('disable-text-layer');
-	}
+	// // TODO 共通化？
+	// function disableTextlayer() {
+	//   $('body').addClass('disable-text-layer');
+	// }
+	// // TODO 共通化？
+	// function enableTextlayer() {
+	//   $('body').removeClass('disable-text-layer');
+	// }
+	
 	
 	/**
 	 * Enable rect behavior
@@ -17904,7 +17903,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  document.addEventListener('mousemove', handleDocumentMousemove);
 	
 	  // disableUserSelect();
-	  disableTextlayer();
+	  (0, _utils.disableTextlayer)();
 	
 	  window.globalEvent.on('rectmovestart', cancelRectDrawing);
 	}
@@ -17924,7 +17923,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  document.removeEventListener('mousemove', handleDocumentMousemove);
 	
 	  // enableUserSelect();
-	  enableTextlayer();
+	  (0, _utils.enableTextlayer)();
 	
 	  if (prevAnnotation) {
 	    prevAnnotation.resetTextForceDisplay();
@@ -17946,22 +17945,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 	exports.BORDER_COLOR = undefined;
-	exports.findSVGContainer = findSVGContainer;
-	exports.findSVGAtPoint = findSVGAtPoint;
-	exports.findAnnotationAtPoint = findAnnotationAtPoint;
-	exports.pointIntersectsRect = pointIntersectsRect;
-	exports.getOffsetAnnotationRect = getOffsetAnnotationRect;
-	exports.getAnnotationRect = getAnnotationRect;
 	exports.scaleUp = scaleUp;
 	exports.scaleDown = scaleDown;
-	exports.getScroll = getScroll;
-	exports.getOffset = getOffset;
 	exports.disableUserSelect = disableUserSelect;
 	exports.enableUserSelect = enableUserSelect;
+	exports.disableTextlayer = disableTextlayer;
+	exports.enableTextlayer = enableTextlayer;
 	exports.getMetadata = getMetadata;
 	exports.getXY = getXY;
 	exports.getSVGLayer = getSVGLayer;
-	exports.getViewerContainer = getViewerContainer;
 	exports.getTmpLayer = getTmpLayer;
 	exports.getCurrentPage = getCurrentPage;
 	
@@ -17986,224 +17978,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	});
 	userSelectStyleSheet.setAttribute('data-pdf-annotate-user-select', 'true');
-	
-	/**
-	 * Find the SVGElement that contains all the annotations for a page
-	 *
-	 * @param {Element} node An annotation within that container
-	 * @return {SVGElement} The container SVG or null if it can't be found
-	 */
-	function findSVGContainer(node) {
-	  var parentNode = node;
-	
-	  while ((parentNode = parentNode.parentNode) && parentNode !== document) {
-	    if (parentNode.nodeName.toUpperCase() === 'SVG' && parentNode.getAttribute('data-pdf-annotate-container') === 'true') {
-	      return parentNode;
-	    }
-	  }
-	
-	  return null;
-	}
-	
-	/**
-	 * Find an SVGElement container at a given point
-	 *
-	 * @param {Number} x The x coordinate of the point
-	 * @param {Number} y The y coordinate of the point
-	 * @return {SVGElement} The container SVG or null if one can't be found
-	 */
-	function findSVGAtPoint(x, y) {
-	
-	  // TODO make it a global const.
-	  var svgLayerId = 'annoLayer';
-	
-	  var el = document.getElementById(svgLayerId);
-	  if (!el) {
-	    return;
-	  }
-	
-	  var rect = el.getBoundingClientRect();
-	
-	  if (pointIntersectsRect(x, y, rect)) {
-	
-	    return el;
-	  }
-	
-	  return null;
-	}
-	
-	/**
-	 * Find an Element that represents an annotation at a given point
-	 *
-	 * @param {Number} x The x coordinate of the point
-	 * @param {Number} y The y coordinate of the point
-	 * @return {Element} The annotation element or null if one can't be found
-	 */
-	function findAnnotationAtPoint(x, y) {
-	  var svg = findSVGAtPoint(x, y);
-	  if (!svg) {
-	    return;
-	  }
-	  var elements = svg.querySelectorAll('[data-pdf-annotate-type]');
-	
-	  // Find a target element within SVG
-	  for (var i = 0, l = elements.length; i < l; i++) {
-	    var el = elements[i];
-	    if (pointIntersectsRect(x, y, getOffsetAnnotationRect(el))) {
-	      return el;
-	    }
-	  }
-	
-	  return null;
-	}
-	
-	/**
-	 * Determine if a point intersects a rect
-	 *
-	 * @param {Number} x The x coordinate of the point
-	 * @param {Number} y The y coordinate of the point
-	 * @param {Object} rect The points of a rect (likely from getBoundingClientRect)
-	 * @return {Boolean} True if a collision occurs, otherwise false
-	 */
-	function pointIntersectsRect(x, y, rect) {
-	  return y >= rect.top && y <= rect.bottom && x >= rect.left && x <= rect.right;
-	}
-	
-	/**
-	 * Get the rect of an annotation element accounting for offset.
-	 *
-	 * @param {Element} el The element to get the rect of
-	 * @return {Object} The dimensions of the element
-	 */
-	function getOffsetAnnotationRect(el) {
-	  var rect = getAnnotationRect(el);
-	
-	  var _getOffset = getOffset(el),
-	      offsetLeft = _getOffset.offsetLeft,
-	      offsetTop = _getOffset.offsetTop;
-	
-	  return {
-	    top: rect.top + offsetTop,
-	    left: rect.left + offsetLeft,
-	    right: rect.right + offsetLeft,
-	    bottom: rect.bottom + offsetTop
-	  };
-	}
-	
-	/**
-	 * Get the rect of an annotation element.
-	 *
-	 * @param {Element} el The element to get the rect of
-	 * @return {Object} The dimensions of the element
-	 */
-	function getAnnotationRect(el) {
-	  var h = 0,
-	      w = 0,
-	      x = 0,
-	      y = 0;
-	  var rect = el.getBoundingClientRect();
-	  // TODO this should be calculated somehow
-	  var LINE_OFFSET = 16;
-	
-	  (function () {
-	    switch (el.nodeName.toLowerCase()) {
-	      case 'path':
-	        var minX = void 0,
-	            maxX = void 0,
-	            minY = void 0,
-	            maxY = void 0;
-	
-	        el.getAttribute('d').replace(/Z/, '').split('M').splice(1).forEach(function (p) {
-	          var s = p.split(' ').map(function (i) {
-	            return parseInt(i, 10);
-	          });
-	
-	          if (typeof minX === 'undefined' || s[0] < minX) {
-	            minX = s[0];
-	          }
-	          if (typeof maxX === 'undefined' || s[2] > maxX) {
-	            maxX = s[2];
-	          }
-	          if (typeof minY === 'undefined' || s[1] < minY) {
-	            minY = s[1];
-	          }
-	          if (typeof maxY === 'undefined' || s[3] > maxY) {
-	            maxY = s[3];
-	          }
-	        });
-	
-	        h = maxY - minY;
-	        w = maxX - minX;
-	        x = minX;
-	        y = minY;
-	        break;
-	
-	      case 'line':
-	        h = parseInt(el.getAttribute('y2'), 10) - parseInt(el.getAttribute('y1'), 10);
-	        w = parseInt(el.getAttribute('x2'), 10) - parseInt(el.getAttribute('x1'), 10);
-	        x = parseInt(el.getAttribute('x1'), 10);
-	        y = parseInt(el.getAttribute('y1'), 10);
-	
-	        if (h === 0) {
-	          h += LINE_OFFSET;
-	          y -= LINE_OFFSET / 2;
-	        }
-	        break;
-	
-	      case 'text':
-	        h = rect.height;
-	        w = rect.width;
-	        x = parseInt(el.getAttribute('x'), 10);
-	        y = parseInt(el.getAttribute('y'), 10) - h;
-	        break;
-	
-	      case 'g':
-	        var _getOffset2 = getOffset(el),
-	            offsetLeft = _getOffset2.offsetLeft,
-	            offsetTop = _getOffset2.offsetTop;
-	
-	        h = rect.height;
-	        w = rect.width;
-	        x = rect.left - offsetLeft;
-	        y = rect.top - offsetTop;
-	
-	        if (el.getAttribute('data-pdf-annotate-type') === 'strikeout') {
-	          h += LINE_OFFSET;
-	          y -= LINE_OFFSET / 2;
-	        }
-	        break;
-	
-	      case 'rect':
-	      case 'svg':
-	        h = parseInt(el.getAttribute('height'), 10);
-	        w = parseInt(el.getAttribute('width'), 10);
-	        x = parseInt(el.getAttribute('x'), 10);
-	        y = parseInt(el.getAttribute('y'), 10);
-	        break;
-	    }
-	
-	    // Result provides same properties as getBoundingClientRect
-	  })();
-	
-	  var result = {
-	    top: y,
-	    left: x,
-	    width: w,
-	    height: h,
-	    right: x + w,
-	    bottom: y + h
-	  };
-	
-	  // For the case of nested SVG (point annotations) and grouped
-	  // lines or rects no adjustment needs to be made for scale.
-	  // I assume that the scale is already being handled
-	  // natively by virtue of the `transform` attribute.
-	  if (!['svg', 'g'].includes(el.nodeName.toLowerCase())) {
-	    result = scaleUp(findSVGAtPoint(rect.left, rect.top), result);
-	  }
-	
-	  return result;
-	}
 	
 	/**
 	 * Adjust scale from normalized scale (100%) to rendered scale.
@@ -18258,45 +18032,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	/**
-	 * Get the scroll position of an element, accounting for parent elements
-	 *
-	 * @param {Element} el The element to get the scroll position for
-	 * @return {Object} The scrollTop and scrollLeft position
-	 */
-	function getScroll(el) {
-	  var scrollTop = 0;
-	  var scrollLeft = 0;
-	  var parentNode = el;
-	
-	  while ((parentNode = parentNode.parentNode) && parentNode !== document) {
-	    scrollTop += parentNode.scrollTop;
-	    scrollLeft += parentNode.scrollLeft;
-	  }
-	
-	  return { scrollTop: scrollTop, scrollLeft: scrollLeft };
-	}
-	
-	/**
-	 * Get the offset position of an element, accounting for parent elements
-	 *
-	 * @param {Element} el The element to get the offset position for
-	 * @return {Object} The offsetTop and offsetLeft position
-	 */
-	function getOffset(el) {
-	  var parentNode = el;
-	
-	  while ((parentNode = parentNode.parentNode) && parentNode !== document) {
-	    if (parentNode.nodeName.toUpperCase() === 'SVG') {
-	      break;
-	    }
-	  }
-	
-	  var rect = parentNode.getBoundingClientRect();
-	
-	  return { offsetLeft: rect.left, offsetTop: rect.top };
-	}
-	
-	/**
 	 * Disable user ability to select text on page
 	 */
 	function disableUserSelect() {
@@ -18312,6 +18047,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (userSelectStyleSheet.parentNode) {
 	    userSelectStyleSheet.parentNode.removeChild(userSelectStyleSheet);
 	  }
+	}
+	
+	/**
+	 * Disable all text layers.
+	 */
+	function disableTextlayer() {
+	  (0, _jquery2.default)('body').addClass('disable-text-layer');
+	}
+	
+	/**
+	 * Enable all text layers.
+	 */
+	function enableTextlayer() {
+	  (0, _jquery2.default)('body').removeClass('disable-text-layer');
 	}
 	
 	/**
@@ -18331,43 +18080,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	function getXY(e) {
 	
 	  var rect1 = (0, _jquery2.default)('#pageContainer1')[0].getBoundingClientRect();
-	  // console.log('rect1:', rect1);
 	  var rect2 = (0, _jquery2.default)('#annoLayer')[0].getBoundingClientRect();
-	  // console.log('rect2:', rect2);
 	
 	  var rectTop = rect2.top - rect1.top;
 	  var rectLeft = rect2.left - rect1.left;
-	  // console.log(rectTop, rectLeft);
 	
-	  // let x = e.clientX - rect.left;
-	  // let y = $('#annoLayer').scrollTop() + e.clientY - rect.top;
-	
-	  // let x = e.clientX - rect.left;
-	  // let y = e.clientY + $('#annoLayer').scrollTop() - rect.top;
-	  // let y = e.clientY + $('#annoLayer').scrollTop();
-	  // let y = e.clientY + $('#annoLayer').scrollTop() - rectTop;
 	  var y = e.clientY + (0, _jquery2.default)('#annoLayer').scrollTop() - rect2.top;
-	
-	  // let x = e.clientX - rect.left;
-	  // let x = e.clientX;
-	  // let x = e.clientX - rectLeft;
 	  var x = e.clientX - rect2.left;
-	  // let y = e.clientY - rect.top;
-	
-	  // console.log('e.client:', e.clientX, e.clientY, $('#annoLayer').scrollTop());
-	
-	  // console.log('y:', y, e.clientY, $('#annoLayer').scrollTop(), rect2.top);
 	
 	  return { x: x, y: y };
 	}
 	
 	function getSVGLayer() {
 	  return document.getElementById('annoLayer');
-	}
-	
-	function getViewerContainer() {
-	  // return document.getElementById('viewerContainer');
-	  return document.getElementById('pageContainer1');
 	}
 	
 	function getTmpLayer() {
@@ -18382,7 +18107,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var scrollTop = (0, _jquery2.default)('#annoLayer')[0].getBoundingClientRect().top;
 	  var scrollLeft = (0, _jquery2.default)('#annoLayer')[0].getBoundingClientRect().left;
 	
-	  // let elements = document.querySelectorAll('.page');
 	  var elements = document.querySelectorAll('.canvasWrapper');
 	
 	  for (var i = 0, l = elements.length; i < l; i++) {
@@ -18391,12 +18115,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var pageNumber = i + 1;
 	
-	    // rect.top = $('#annoLayer').scrollTop();
-	    // 927
 	    var minX = rect.left - scrollLeft;
 	    var maxX = rect.right - scrollLeft;
-	    var minY = rect.top - scrollTop; // + 9 * pageNumber;    // 9 = margin
-	    var maxY = rect.bottom - scrollTop; // + 9 * pageNumber;
+	    var minY = rect.top - scrollTop;
+	    var maxY = rect.bottom - scrollTop;
 	
 	    if (minX <= x && x <= maxX && minY <= y && y <= maxY) {
 	
@@ -19503,8 +19225,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'render',
 	        value: function render() {
 	
-	            // TODO 引数で text と position を渡せば、循環参照を無くせる.
-	
 	            var result = false;
 	
 	            if (this.parent.text) {
@@ -19661,8 +19381,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'enableViewMode',
 	        value: function enableViewMode() {
-	            console.log('text:enableViewMode');
-	
 	            _get(TextAnnotation.prototype.__proto__ || Object.getPrototypeOf(TextAnnotation.prototype), 'enableViewMode', this).call(this);
 	            if (!this.readOnly) {
 	                this.$element.find('text').off('click').on('click', this.handleClickEvent);
@@ -19671,7 +19389,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'disableViewMode',
 	        value: function disableViewMode() {
-	
 	            _get(TextAnnotation.prototype.__proto__ || Object.getPrototypeOf(TextAnnotation.prototype), 'disableViewMode', this).call(this);
 	            this.$element.find('text').off('click', this.handleClickEvent);
 	        }
@@ -20209,8 +19926,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _relationType = void 0;
 	
-	var dragging = false;
-	
 	var startAnnotation = void 0;
 	var mousedownFired = false;
 	var mousemoveFired = false;
@@ -20237,11 +19952,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    relationAnnotation.readOnly = false;
 	    relationAnnotation.setDisableHoverEvent();
 	
-	    // document.addEventListener('mouseup', handleDocumentMouseup);
-	
 	    disableAnnotationHoverEvent();
-	
-	    dragging = true;
 	
 	    startAnnotation = _hoverAnnotation;
 	  }
@@ -20266,7 +19977,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    mousemoveFired = true;
 	  }
 	
-	  if (dragging) {
+	  // draw temporary arrow, if now drawing.
+	  if (mousedownFired && mousemoveFired) {
 	    var p = (0, _utils.scaleDown)(getClientXY(e));
 	    relationAnnotation.x2 = p.x;
 	    relationAnnotation.y2 = p.y;
@@ -20326,9 +20038,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function handleDocumentMouseup(e) {
 	
-	  // TODO may not need.
-	  dragging = false;
-	
 	  var clicked = mousedownFired && !mousemoveFired;
 	  var dragged = mousedownFired && mousemoveFired;
 	
@@ -20337,8 +20046,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  enableAnnotationHoverEvent();
 	
+	  // Behave as clicked.
 	  if (clicked) {
-	    console.log('clicked', startAnnotation);
 	    if (startAnnotation && startAnnotation.handleClickEvent) {
 	      startAnnotation.handleClickEvent();
 	    }
@@ -20437,14 +20146,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  (0, _jquery2.default)('svg > g').css('pointer-events', 'auto');
 	}
 	
-	function disableTextlayer() {
-	  (0, _jquery2.default)('.textLayer').hide();
-	}
-	
-	function enableTextlayer() {
-	  (0, _jquery2.default)('.textLayer').show();
-	}
-	
 	/**
 	 * TODO wanna remove this.
 	 */
@@ -20466,6 +20167,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function enableRelation() {
 	  var relationType = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'one-way';
 	
+	
 	  if (_enabled) {
 	    return;
 	  }
@@ -20475,7 +20177,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  createBoundingBoxList();
 	  (0, _utils.disableUserSelect)();
-	  disableTextlayer();
+	  (0, _utils.disableTextlayer)();
 	
 	  document.addEventListener('mousedown', handleDocumentMousedown);
 	  document.addEventListener('mousemove', handleDocumentMousemove);
@@ -20511,11 +20213,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  document.removeEventListener('mouseup', handleDocumentMouseup);
 	
 	  (0, _utils.enableUserSelect)();
-	  enableTextlayer();
+	  (0, _utils.enableTextlayer)();
 	
 	  deleteBoundingBoxList();
-	
-	  console.log('3a');
 	
 	  window.annotationContainer.getAllAnnotations().forEach(function (a) {
 	
@@ -20530,8 +20230,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  });
 	
-	  console.log('3b');
-	
 	  if (prevAnnotation) {
 	    prevAnnotation.resetTextForceDisplay();
 	    prevAnnotation.render();
@@ -20539,11 +20237,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    prevAnnotation = null;
 	  }
 	
-	  console.log('3c');
-	
 	  window.globalEvent.emit('disableRelation');
-	
-	  console.log('3d');
 	}
 
 /***/ },

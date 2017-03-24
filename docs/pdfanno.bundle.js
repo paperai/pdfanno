@@ -120,6 +120,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // Reset the confirm dialog at leaving page.
 	        (0, _window.unlistenWindowLeaveEvent)();
+	    });
+	
+	    iframeWindow.addEventListener('annotationrendered', function () {
 	
 	        // Restore the status of AnnoTools.
 	        (0, _anno.disableAnnotateTools)();
