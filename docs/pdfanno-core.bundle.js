@@ -11811,6 +11811,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                            }
 	                        } catch (e) {
 	                            console.log('ERROR:', e);
+	                            console.log('TOML:\n', a);
 	                        }
 	
 	                        var color = data.colors[i];
