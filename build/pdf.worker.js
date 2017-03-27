@@ -8815,13 +8815,15 @@ var NetworkManager = (function NetworkManagerClosure() {
         }
         xhr.setRequestHeader(property, value);
       }
-      if (this.isHttp && 'begin' in args && 'end' in args) {
-        var rangeStr = args.begin + '-' + (args.end - 1);
-        xhr.setRequestHeader('Range', 'bytes=' + rangeStr);
-        pendingRequest.expectedStatus = 206;
-      } else {
+
+      // 2017.03 Not permit partial request/response, because GithubPage sometime returns error.
+      // if (this.isHttp && 'begin' in args && 'end' in args) {
+      //   var rangeStr = args.begin + '-' + (args.end - 1);
+      //   xhr.setRequestHeader('Range', 'bytes=' + rangeStr);
+      //   pendingRequest.expectedStatus = 206;
+      // } else {
         pendingRequest.expectedStatus = 200;
-      }
+      // }
 
       var useMozChunkedLoading = supportsMozChunked && !!args.onProgressiveData;
       if (useMozChunkedLoading) {
