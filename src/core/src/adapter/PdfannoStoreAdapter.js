@@ -211,6 +211,7 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                             }
                         } catch (e) {
                             console.log('ERROR:', e);
+                            console.log('TOML:\n', a);
                         }
 
                         let color = data.colors[i];
