@@ -4,20 +4,13 @@
 PDFAnno is a browser-based linguistic annotation tool for PDF documents.  
 It offers functions for various types of linguistic annotations, including part-of-speech, named entity, dependency relation, and coreference chain.  
 
-[Online demo](https://paperai.github.io/pdfanno/)  
-**Note: It is highly recommended to use the latest version of Google Chrome.**
+[Online Demo](https://paperai.github.io/pdfanno/)  
+**It is highly recommended to use the latest version of Google Chrome.**
 
 You can also install PDFAnno via npm:
 ```
 npm install pdfanno
 ```
-
-You can download sample PDFs and annotations from here: [pdfanno_material.zip](https://cl.naist.jp/%7Eshindo/pdfanno_material.zip).  
-To view the samples, unzip the samples and specify the directory via `Browse` button.
-
-### Contributors
-* [hshindo](https://github.com/hshindo)
-* [yoheiMune](https://github.com/yoheiMune)
 
 ## Features
 * Simple and easy-to-use interface.
@@ -26,7 +19,8 @@ To view the samples, unzip the samples and specify the directory via `Browse` bu
 
 ## Usage
 1. Visit the [online demo](https://paperai.github.io/pdfanno/) with the latest version of Chrome.
-1. Put PDF files and annotation files (if any) in your directory, then specify the root directory via `Browse` button.
+1. Put PDF files and annotation files (if any) in your directory, then specify the root directory via `Browse` button.  
+You can download sample PDFs and annotations from [here](https://cl.naist.jp/%7Eshindo/pdfanno_material.zip).  
 1. Load the target PDF. If you have an anno file for the PDF, load it as well.
 1. Annotate the PDF as you like.
 1. Save your annotations as a text file via `download` button. If you'd like to continue the annotation, put the annotation file in the root directory.
@@ -86,6 +80,10 @@ To support multi-user annotation, PDFAnno allows to load `reference anno file`.
 For example, if you create `a.anno` and an another annotator creates `b.anno` for the same PDF, load `a.anno` as usual, and load `b.anno` as a reference file. Then PDFAnno renders `a.anno` and `b.anno` with different colors each other. Rendering more than one reference file is also supported.   
 This is useful to check inter-annotator agreement and resolving annotation conflicts.  
 Note that the reference files are rendered as read-only.
+
+### Authors
+* [hshindo](https://github.com/hshindo)
+* [yoheiMune](https://github.com/yoheiMune)
 
 ## Developer's Guide
 PDFAnno is built upon [pdf.js](https://github.com/mozilla/pdf.js) for PDF viewer.
