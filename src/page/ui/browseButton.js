@@ -253,6 +253,16 @@ function setAnnoDropdownList(annos) {
     $('#dropdownAnnoReference .js-text').text('Select reference files');
 
     // Setup anno / reference dropdown.
+    let snipet1 = `
+        <li>
+            <a href="#">
+                <i class="fa fa-check no-visible" aria-hidden="true"></i>
+                <span class="js-annoname"></span>
+            </a>
+        </li>
+    `;
+    $('#dropdownAnnoPrimary ul').append(snipet1);
+
     annos.forEach(file => {
 
         let fileName = _excludeBaseDirName(file.webkitRelativePath);
