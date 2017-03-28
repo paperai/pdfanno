@@ -1,7 +1,7 @@
 /**
  * UI parts - Primary Annotation Dropdown.
  */
-import { displayAnnotation } from '../util/display';
+import { reloadPDFViewer, displayAnnotation } from '../util/display';
 
 /**
  * Setup a click action of the Primary Annotation Dropdown.
@@ -15,26 +15,56 @@ export function setup() {
 
         let currentAnnoName = $('#dropdownAnnoPrimary .js-text').text();
         if (currentAnnoName === annoName) {
-            console.log('Not reload. the anno are same.');
-            return;
+            // console.log('Not reload. the anno are same.');
+            // return;
+
+            // let userAnswer = window.confirm('Are you sure to clear the current annotations?');
+            // if (!userAnswer) {
+            //     return;
+            // }
+
+            $('#dropdownAnnoPrimary .fa-check').addClass('no-visible');
+            $('#dropdownAnnoPrimary .js-text').text('Anno File');
+
+            deleteAllAnnotations();
+
+            // Close
+            $('#dropdownAnnoPrimary').click();
+
+            return false;
+
         }
 
+        // if reset.
+        // if (annoName === '') {
+        //     let userAnswer = window.confirm('Are you sure to clear the current annotations?');
+        //     if (!userAnswer) {
+        //         return;
+        //     }
+
+        //     $('#dropdownAnnoPrimary .fa-check').addClass('no-visible');
+        //     $('#dropdownAnnoPrimary .js-text').text('Anno File');
+
+        //     deleteAllAnnotations();
+
+        //     // Close
+        //     $('#dropdownAnnoPrimary').click();
+
+        //     return false;
+        // }
+
+
         // Confirm to override.
-        if (currentAnnoName !== 'Select Anno file') {
+        if (currentAnnoName !== 'Anno File') {
             if (!window.confirm('Are you sure to load another Primary Annotation ?')) {
                 return;
             }
         }
 
         $('#dropdownAnnoPrimary .js-text').text(annoName);
-        console.log(annoName);
 
         $('#dropdownAnnoPrimary .fa-check').addClass('no-visible');
         $this.find('.fa-check').removeClass('no-visible');
-
-        // if (!fileMap[annoName]) {
-        //     return false;
-        // }
 
         // reload.
         displayAnnotation(true);
@@ -43,5 +73,26 @@ export function setup() {
         $('#dropdownAnnoPrimary').click();
 
         return false;
+    });
+}
+
+
+
+/**
+ * Delete all annotations.
+ */
+function deleteAllAnnotations() {
+
+    // Comfirm to user.
+    // let userAnswer = window.confirm('Are you sure to clear the current annotations?');
+    // if (!userAnswer) {
+    //     return;
+    // }
+
+    iframeWindow.annotationContainer.destroy();
+
+    let documentId = window.iframeWindow.getFileName(window.iframeWindow.PDFView.url);
+    window.iframeWindow.PDFAnnoCore.getStoreAdapter().deleteAnnotations(documentId).then(() => {
+        reloadPDFViewer();
     });
 }

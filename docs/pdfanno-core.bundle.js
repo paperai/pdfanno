@@ -16515,7 +16515,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			"jquery": "^3.1.1",
 			"json-loader": "^0.5.4",
 			"requirejs": "^2.3.2",
-			"toml": "git@github.com:yoheiMune/toml-node.git"
+			"toml": "yoheiMune/toml-node"
 		}
 	};
 

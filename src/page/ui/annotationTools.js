@@ -47,43 +47,11 @@ export function setup() {
 
         if (type === 'download') {
             downloadAnnotation();
-
-        } else if (type === 'delete') {
-            deleteAllAnnotations();
         }
 
         return false;
     });
 
-}
-
-// /**
-//     Disable annotation tool buttons.
-// */
-// function disableAnnotateTools() {
-//     window.iframeWindow.PDFAnnoCore.UI.disableRect();
-//     window.iframeWindow.PDFAnnoCore.UI.disableSpan();
-//     window.iframeWindow.PDFAnnoCore.UI.disableRelation();
-//     window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
-// }
-
-/**
- * Delete all annotations.
- */
-function deleteAllAnnotations() {
-
-    // Comfirm to user.
-    let userAnswer = window.confirm('Are you sure to clear the current annotations?');
-    if (!userAnswer) {
-        return;
-    }
-
-    iframeWindow.annotationContainer.destroy();
-
-    let documentId = window.iframeWindow.getFileName(window.iframeWindow.PDFView.url);
-    window.iframeWindow.PDFAnnoCore.getStoreAdapter().deleteAnnotations(documentId).then(() => {
-        reloadPDFViewer();
-    });
 }
 
 /**

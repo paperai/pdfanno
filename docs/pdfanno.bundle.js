@@ -130,7 +130,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	
 	    // Set the confirm dialog when leaving a page.
-	    iframeWindow.addEventListener('annotationUpdated', _window.listenWindowLeaveEvent);
+	    iframeWindow.addEventListener('annotationUpdated', function () {
+	        (0, _window.listenWindowLeaveEvent)();
+	    });
 	}
 	
 	/**
@@ -363,11 +365,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // a PDF name.
 	    text = $('#dropdownPdf .js-text').text();
-	    var pdfName = text !== 'Select PDF file' ? text : null;
+	    var pdfName = text !== 'PDF File' ? text : null;
 	
 	    // a Primary anno.
 	    text = $('#dropdownAnnoPrimary .js-text').text();
-	    var primaryAnnotationName = text !== 'Select Anno file' ? text : null;
+	    var primaryAnnotationName = text !== 'Anno File' ? text : null;
 	
 	    var referenceAnnotationNames = [];
 	    var referenceAnnotationColors = [];
@@ -447,7 +449,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function setPDFDropdownList(pdfs) {
 	
-	    $('#dropdownPdf .js-text').text('Select PDF file');
+	    $('#dropdownPdf .js-text').text('PDF File');
 	    $('#dropdownPdf li').remove();
 	    pdfs.forEach(function (file) {
 	        var pdfPath = _excludeBaseDirName(file.webkitRelativePath);
@@ -464,8 +466,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Reset.
 	    $('#dropdownAnnoPrimary ul').html('');
 	    $('#dropdownAnnoReference ul').html('');
-	    $('#dropdownAnnoPrimary .js-text').text('Select Anno file');
-	    $('#dropdownAnnoReference .js-text').text('Select reference files');
+	    $('#dropdownAnnoPrimary .js-text').text('Anno File');
+	    $('#dropdownAnnoReference .js-text').text('Reference Files');
 	
 	    // Setup anno / reference dropdown.
 	    annos.forEach(function (file) {
@@ -687,7 +689,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        // Confirm to override.
-	        if (currentPDFName !== 'Select PDF file') {
+	        if (currentPDFName !== 'PDF File') {
 	            if (!window.confirm('Are you sure to load another PDF ?')) {
 	                return;
 	            }
@@ -738,12 +740,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	
 	function resetCheckPrimaryAnnoDropdown() {
-	    $('#dropdownAnnoPrimary .js-text').text('Select Anno file');
+	    $('#dropdownAnnoPrimary .js-text').text('Anno File');
 	    $('#dropdownAnnoPrimary .fa-check').addClass('no-visible');
 	}
 	
 	function resetCheckReferenceAnnoDropdown() {
-	    $('#dropdownAnnoReference .js-text').text('Select reference files');
+	    $('#dropdownAnnoReference .js-text').text('Reference Files');
 	    $('#dropdownAnnoReference .fa-check').addClass('no-visible');
 	}
 
@@ -772,26 +774,55 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var currentAnnoName = $('#dropdownAnnoPrimary .js-text').text();
 	        if (currentAnnoName === annoName) {
-	            console.log('Not reload. the anno are same.');
-	            return;
+	            // console.log('Not reload. the anno are same.');
+	            // return;
+	
+	            // let userAnswer = window.confirm('Are you sure to clear the current annotations?');
+	            // if (!userAnswer) {
+	            //     return;
+	            // }
+	
+	            $('#dropdownAnnoPrimary .fa-check').addClass('no-visible');
+	            $('#dropdownAnnoPrimary .js-text').text('Anno File');
+	
+	            deleteAllAnnotations();
+	
+	            // Close
+	            $('#dropdownAnnoPrimary').click();
+	
+	            return false;
 	        }
 	
+	        // if reset.
+	        // if (annoName === '') {
+	        //     let userAnswer = window.confirm('Are you sure to clear the current annotations?');
+	        //     if (!userAnswer) {
+	        //         return;
+	        //     }
+	
+	        //     $('#dropdownAnnoPrimary .fa-check').addClass('no-visible');
+	        //     $('#dropdownAnnoPrimary .js-text').text('Anno File');
+	
+	        //     deleteAllAnnotations();
+	
+	        //     // Close
+	        //     $('#dropdownAnnoPrimary').click();
+	
+	        //     return false;
+	        // }
+	
+	
 	        // Confirm to override.
-	        if (currentAnnoName !== 'Select Anno file') {
+	        if (currentAnnoName !== 'Anno File') {
 	            if (!window.confirm('Are you sure to load another Primary Annotation ?')) {
 	                return;
 	            }
 	        }
 	
 	        $('#dropdownAnnoPrimary .js-text').text(annoName);
-	        console.log(annoName);
 	
 	        $('#dropdownAnnoPrimary .fa-check').addClass('no-visible');
 	        $this.find('.fa-check').removeClass('no-visible');
-	
-	        // if (!fileMap[annoName]) {
-	        //     return false;
-	        // }
 	
 	        // reload.
 	        (0, _display.displayAnnotation)(true);
@@ -801,9 +832,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        return false;
 	    });
-	} /**
-	   * UI parts - Primary Annotation Dropdown.
-	   */
+	}
+	
+	/**
+	 * Delete all annotations.
+	 */
+	/**
+	 * UI parts - Primary Annotation Dropdown.
+	 */
+	function deleteAllAnnotations() {
+	
+	    // Comfirm to user.
+	    // let userAnswer = window.confirm('Are you sure to clear the current annotations?');
+	    // if (!userAnswer) {
+	    //     return;
+	    // }
+	
+	    iframeWindow.annotationContainer.destroy();
+	
+	    var documentId = window.iframeWindow.getFileName(window.iframeWindow.PDFView.url);
+	    window.iframeWindow.PDFAnnoCore.getStoreAdapter().deleteAnnotations(documentId).then(function () {
+	        (0, _display.reloadPDFViewer)();
+	    });
+	}
 
 /***/ },
 /* 7 */
@@ -991,7 +1042,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (annoNames.length > 0) {
 	            $('#dropdownAnnoReference .js-text').text(annoNames.join(','));
 	        } else {
-	            $('#dropdownAnnoReference .js-text').text('Select reference files');
+	            $('#dropdownAnnoReference .js-text').text('Reference Files');
 	        }
 	
 	        (0, _display.displayAnnotation)(false);
@@ -1058,48 +1109,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        if (type === 'download') {
 	            downloadAnnotation();
-	        } else if (type === 'delete') {
-	            deleteAllAnnotations();
 	        }
 	
 	        return false;
 	    });
 	}
 	
-	// /**
-	//     Disable annotation tool buttons.
-	// */
-	// function disableAnnotateTools() {
-	//     window.iframeWindow.PDFAnnoCore.UI.disableRect();
-	//     window.iframeWindow.PDFAnnoCore.UI.disableSpan();
-	//     window.iframeWindow.PDFAnnoCore.UI.disableRelation();
-	//     window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
-	// }
-	
 	/**
-	 * Delete all annotations.
+	 * Export the primary annotation data for download.
 	 */
 	/**
 	 * UI parts - Annotations Tools.
-	 */
-	function deleteAllAnnotations() {
-	
-	    // Comfirm to user.
-	    var userAnswer = window.confirm('Are you sure to clear the current annotations?');
-	    if (!userAnswer) {
-	        return;
-	    }
-	
-	    iframeWindow.annotationContainer.destroy();
-	
-	    var documentId = window.iframeWindow.getFileName(window.iframeWindow.PDFView.url);
-	    window.iframeWindow.PDFAnnoCore.getStoreAdapter().deleteAnnotations(documentId).then(function () {
-	        (0, _display.reloadPDFViewer)();
-	    });
-	}
-	
-	/**
-	 * Export the primary annotation data for download.
 	 */
 	function downloadAnnotation() {
 	
@@ -1159,6 +1179,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Set the confirm dialog at leaving the page.
 	 */
 	function listenWindowLeaveEvent() {
+	    window.annotationUpdated = true;
 	    $(window).off('beforeunload').on('beforeunload', function () {
 	        return 'You don\'t save the annotations yet.\nAre you sure to leave ?';
 	    });
@@ -1168,6 +1189,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Unset the confirm dialog at leaving the page.
 	 */
 	function unlistenWindowLeaveEvent() {
+	    window.annotationUpdated = false;
 	    $(window).off('beforeunload');
 	}
 	
