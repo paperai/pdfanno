@@ -140,11 +140,11 @@ function getCurrentFileNames() {
 
     // a PDF name.
     text = $('#dropdownPdf .js-text').text();
-    let pdfName = (text !== 'Select PDF file' ? text : null);
+    let pdfName = (text !== 'PDF File' ? text : null);
 
     // a Primary anno.
     text = $('#dropdownAnnoPrimary .js-text').text();
-    let primaryAnnotationName = (text !== 'Select Anno file' ? text : null);
+    let primaryAnnotationName = (text !== 'Anno File' ? text : null);
 
 
     let referenceAnnotationNames = [];
@@ -225,7 +225,7 @@ function getContents(files) {
  */
 function setPDFDropdownList(pdfs) {
 
-    $('#dropdownPdf .js-text').text('Select PDF file');
+    $('#dropdownPdf .js-text').text('PDF File');
     $('#dropdownPdf li').remove();
     pdfs.forEach(file => {
         let pdfPath = _excludeBaseDirName(file.webkitRelativePath);
@@ -249,8 +249,8 @@ function setAnnoDropdownList(annos) {
     // Reset.
     $('#dropdownAnnoPrimary ul').html('');
     $('#dropdownAnnoReference ul').html('');
-    $('#dropdownAnnoPrimary .js-text').text('Select Anno file');
-    $('#dropdownAnnoReference .js-text').text('Select reference files');
+    $('#dropdownAnnoPrimary .js-text').text('Anno File');
+    $('#dropdownAnnoReference .js-text').text('Reference Files');
 
     // Setup anno / reference dropdown.
     let snipet1 = `

@@ -27,7 +27,7 @@ export function setup() {
             }
 
             $('#dropdownAnnoPrimary .fa-check').addClass('no-visible');
-            $('#dropdownAnnoPrimary .js-text').text('Select Anno file');
+            $('#dropdownAnnoPrimary .js-text').text('Anno File');
 
             deleteAllAnnotations();
 
@@ -40,7 +40,7 @@ export function setup() {
 
 
         // Confirm to override.
-        if (currentAnnoName !== 'Select Anno file') {
+        if (currentAnnoName !== 'Anno File') {
             if (!window.confirm('Are you sure to load another Primary Annotation ?')) {
                 return;
             }

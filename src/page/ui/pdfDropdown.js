@@ -22,7 +22,7 @@ export function setup() {
         }
 
         // Confirm to override.
-        if (currentPDFName !== 'Select PDF file') {
+        if (currentPDFName !== 'PDF File') {
             if (!window.confirm('Are you sure to load another PDF ?')) {
                 return;
             }
