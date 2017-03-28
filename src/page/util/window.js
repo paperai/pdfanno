@@ -6,6 +6,7 @@
  * Set the confirm dialog at leaving the page.
  */
 export function listenWindowLeaveEvent() {
+    window.annotationUpdated = true;
     $(window).off('beforeunload').on('beforeunload', () => {
         return 'You don\'t save the annotations yet.\nAre you sure to leave ?';
     });
@@ -15,6 +16,7 @@ export function listenWindowLeaveEvent() {
  * Unset the confirm dialog at leaving the page.
  */
 export function unlistenWindowLeaveEvent() {
+    window.annotationUpdated = false;
     $(window).off('beforeunload');
 }
 

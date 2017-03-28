@@ -61,7 +61,9 @@ function startApplication() {
     });
 
     // Set the confirm dialog when leaving a page.
-    iframeWindow.addEventListener('annotationUpdated', listenWindowLeaveEvent);
+    iframeWindow.addEventListener('annotationUpdated', () => {
+        listenWindowLeaveEvent();
+    });
 }
 
 /**
