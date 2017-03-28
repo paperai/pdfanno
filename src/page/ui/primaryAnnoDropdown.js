@@ -18,10 +18,10 @@ export function setup() {
             // console.log('Not reload. the anno are same.');
             // return;
 
-            let userAnswer = window.confirm('Are you sure to clear the current annotations?');
-            if (!userAnswer) {
-                return;
-            }
+            // let userAnswer = window.confirm('Are you sure to clear the current annotations?');
+            // if (!userAnswer) {
+            //     return;
+            // }
 
             $('#dropdownAnnoPrimary .fa-check').addClass('no-visible');
             $('#dropdownAnnoPrimary .js-text').text('Anno File');
