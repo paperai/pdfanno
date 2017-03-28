@@ -2,7 +2,8 @@
 
 # PDFAnno
 PDFAnno is a browser-based linguistic annotation tool for PDF documents.  
-It offers functions for various types of linguistic annotations, including part-of-speech, named entity, dependency relation, and coreference chain.  
+It offers functions for annotating labels and relations on PDF.  
+For natural language processing, it is suitable for annotating named entity spans, dependency relation, and coreference chain.  
 
 [Online Demo](https://paperai.github.io/pdfanno/)  
 **It is highly recommended to use the latest version of Google Chrome.**
@@ -15,15 +16,16 @@ npm install pdfanno
 ## Features
 * Simple and easy-to-use interface.
 * No installation is required.
-* Client-only application. No communication with a server.
+* Client-only application, i.e., no communication with a server.
 
 ## Usage
 1. Visit the [online demo](https://paperai.github.io/pdfanno/) with the latest version of Chrome.
 1. Put PDF files and annotation files (if any) in your directory, then specify the root directory via `Browse` button.  
 You can download sample PDFs and annotations from [here](https://cl.naist.jp/%7Eshindo/pdfanno_material.zip).  
-1. Load the target PDF. If you have an anno file for the PDF, load it as well.
+1. Load the target PDF. If you have anno file for the PDF, load it as well.
 1. Annotate the PDF as you like.
-1. Save your annotations as a text file via `download` button. If you'd like to continue the annotation, put the annotation file in the root directory.
+1. Save your annotations via `download` button.  
+If you continue the annotation, respecify your directory via `Browse` button to reload the PDF and anno file.
 
 For security reasons, PDFAnno does NOT automatically save your annotations.  
 Don't forget to download your current annotations!  
@@ -40,8 +42,6 @@ Don't forget to download your current annotations!
 <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-square-o.png" width="2%"> Rectangle. It is disallowed to cross page boundaries.
 
 <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-download.png" width="2%"> Download the annotation file.
-
-DEL: Delete all of current annotations.
 
 ### Annotation File (.anno)
 In PDFAnno, the annotation file (.anno) follows [TOML](https://github.com/toml-lang/toml) format.  
