@@ -82,6 +82,17 @@ export function setup() {
         $('#dropdownAnnoList').click();
     });
 
+    // Watch the number of primary annos.
+    function watchPrimaryAnno(e) {
+        const primaryAnnos = iframeWindow.annotationContainer.getAllAnnotations().filter(a => {
+            return !a.readOnly;
+        });
+        $('#dropdownAnnoList .js-count').text(primaryAnnos.length);
+    }
+    $(window)
+        .off('annotationrendered annotationUpdated', watchPrimaryAnno)
+        .on('annotationrendered annotationUpdated', watchPrimaryAnno);
+
 }
 
 /**

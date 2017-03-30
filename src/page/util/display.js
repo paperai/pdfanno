@@ -84,6 +84,13 @@ export function reloadPDFViewer() {
     var event = document.createEvent('CustomEvent');
     event.initCustomEvent('restartApp', true, true, null);
     window.dispatchEvent(event);
+
+    // Catch the event iframe is ready.
+    function iframeReady() {
+        console.log('iframeReady');
+        window.removeEventListener('annotationrendered', iframeReady);
+    }
+    window.addEventListener('annotationrendered', iframeReady);
 }
 
 /**

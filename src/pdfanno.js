@@ -51,6 +51,11 @@ function startApplication() {
 
         // Reset the confirm dialog at leaving page.
         unlistenWindowLeaveEvent();
+
+        var event = document.createEvent('CustomEvent');
+        event.initCustomEvent('iframeDOMContentLoaded', true, true, null);
+        window.dispatchEvent(event);
+
     });
 
     iframeWindow.addEventListener('annotationrendered', () => {
@@ -58,11 +63,19 @@ function startApplication() {
         // Restore the status of AnnoTools.
         disableAnnotateTools();
         enableAnnotateTool(window.currentAnnoToolType);
+
+        var event = document.createEvent('CustomEvent');
+        event.initCustomEvent('annotationrendered', true, true, null);
+        window.dispatchEvent(event);
     });
 
     // Set the confirm dialog when leaving a page.
     iframeWindow.addEventListener('annotationUpdated', () => {
         listenWindowLeaveEvent();
+
+        var event = document.createEvent('CustomEvent');
+        event.initCustomEvent('annotationUpdated', true, true, null);
+        window.dispatchEvent(event);
     });
 }
 
