@@ -774,13 +774,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var currentAnnoName = $('#dropdownAnnoPrimary .js-text').text();
 	        if (currentAnnoName === annoName) {
-	            // console.log('Not reload. the anno are same.');
-	            // return;
 	
-	            // let userAnswer = window.confirm('Are you sure to clear the current annotations?');
-	            // if (!userAnswer) {
-	            //     return;
-	            // }
+	            var userAnswer = window.confirm('Are you sure to clear the current annotations?');
+	            if (!userAnswer) {
+	                return;
+	            }
 	
 	            $('#dropdownAnnoPrimary .fa-check').addClass('no-visible');
 	            $('#dropdownAnnoPrimary .js-text').text('Anno File');
