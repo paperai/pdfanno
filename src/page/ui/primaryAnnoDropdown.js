@@ -33,25 +33,6 @@ export function setup() {
 
         }
 
-        // if reset.
-        // if (annoName === '') {
-        //     let userAnswer = window.confirm('Are you sure to clear the current annotations?');
-        //     if (!userAnswer) {
-        //         return;
-        //     }
-
-        //     $('#dropdownAnnoPrimary .fa-check').addClass('no-visible');
-        //     $('#dropdownAnnoPrimary .js-text').text('Anno File');
-
-        //     deleteAllAnnotations();
-
-        //     // Close
-        //     $('#dropdownAnnoPrimary').click();
-
-        //     return false;
-        // }
-
-
         // Confirm to override.
         if (currentAnnoName !== 'Anno File') {
             if (!window.confirm('Are you sure to load another Primary Annotation ?')) {
