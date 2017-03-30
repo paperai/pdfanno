@@ -45,9 +45,9 @@ Don't forget to download your current annotations!
 
 ### Annotation File (.anno)
 In PDFAnno, the annotation file (.anno) follows [TOML](https://github.com/toml-lang/toml) format.  
-Here is an example of the .anno file:
+Here is an example of .anno file:
 ```
-version = 0.1
+version = 0.2
 
 [1]
 type = "span"
