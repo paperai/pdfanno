@@ -120,6 +120,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // Reset the confirm dialog at leaving page.
 	        (0, _window.unlistenWindowLeaveEvent)();
+	
+	        var event = document.createEvent('CustomEvent');
+	        event.initCustomEvent('iframeDOMContentLoaded', true, true, null);
+	        window.dispatchEvent(event);
 	    });
 	
 	    iframeWindow.addEventListener('annotationrendered', function () {
@@ -127,11 +131,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // Restore the status of AnnoTools.
 	        (0, _anno.disableAnnotateTools)();
 	        (0, _anno.enableAnnotateTool)(window.currentAnnoToolType);
+	
+	        var event = document.createEvent('CustomEvent');
+	        event.initCustomEvent('annotationrendered', true, true, null);
+	        window.dispatchEvent(event);
 	    });
 	
 	    // Set the confirm dialog when leaving a page.
 	    iframeWindow.addEventListener('annotationUpdated', function () {
 	        (0, _window.listenWindowLeaveEvent)();
+	
+	        var event = document.createEvent('CustomEvent');
+	        event.initCustomEvent('annotationUpdated', true, true, null);
+	        window.dispatchEvent(event);
 	    });
 	}
 	
@@ -630,6 +642,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var event = document.createEvent('CustomEvent');
 	    event.initCustomEvent('restartApp', true, true, null);
 	    window.dispatchEvent(event);
+	
+	    // Catch the event iframe is ready.
+	    function iframeReady() {
+	        console.log('iframeReady');
+	        window.removeEventListener('annotationrendered', iframeReady);
+	    }
+	    window.addEventListener('annotationrendered', iframeReady);
 	}
 	
 	/**
@@ -791,25 +810,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return false;
 	        }
 	
-	        // if reset.
-	        // if (annoName === '') {
-	        //     let userAnswer = window.confirm('Are you sure to clear the current annotations?');
-	        //     if (!userAnswer) {
-	        //         return;
-	        //     }
-	
-	        //     $('#dropdownAnnoPrimary .fa-check').addClass('no-visible');
-	        //     $('#dropdownAnnoPrimary .js-text').text('Anno File');
-	
-	        //     deleteAllAnnotations();
-	
-	        //     // Close
-	        //     $('#dropdownAnnoPrimary').click();
-	
-	        //     return false;
-	        // }
-	
-	
 	        // Confirm to override.
 	        if (currentAnnoName !== 'Anno File') {
 	            if (!window.confirm('Are you sure to load another Primary Annotation ?')) {
@@ -938,6 +938,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // Close the dropdown.
 	        $('#dropdownAnnoList').click();
 	    });
+	
+	    // Watch the number of primary annos.
+	    function watchPrimaryAnno(e) {
+	        var primaryAnnos = iframeWindow.annotationContainer.getAllAnnotations().filter(function (a) {
+	            return !a.readOnly;
+	        });
+	        $('#dropdownAnnoList .js-count').text(primaryAnnos.length);
+	    }
+	    $(window).off('annotationrendered annotationUpdated', watchPrimaryAnno).on('annotationrendered annotationUpdated', watchPrimaryAnno);
 	}
 	
 	/**
