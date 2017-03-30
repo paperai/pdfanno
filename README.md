@@ -6,7 +6,7 @@ It offers functions for annotating PDF with labels and relations.
 For natural language processing, it is suitable for annotation with named entity spans, dependency relation, and coreference chain.  
 
 [Online Demo](https://paperai.github.io/pdfanno/) (version 0.2)  
-**It is highly recommended to use the latest version of Google Chrome.**
+**It is highly recommended to use the latest version of Chrome.** (Firefox will also be supported in future.)
 
 You can also install PDFAnno via npm:
 ```
@@ -24,7 +24,7 @@ npm install pdfanno
 You can download sample PDFs and annotations from [here](https://cl.naist.jp/%7Eshindo/pdfanno_material.zip).  
 1. Load the target PDF. If you have anno file for the PDF, load it as well.
 1. Annotate the PDF as you like.
-1. Save your annotations via `download` button.  
+1. Save your annotations via <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-download.png" width="2%"> button.  
 If you continue the annotation, respecify your directory via `Browse` button to reload the PDF and anno file.
 
 For security reasons, PDFAnno does NOT automatically save your annotations.  
