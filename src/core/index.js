@@ -1,3 +1,6 @@
+/**
+    Functions for annotations rendered over a PDF file.
+*/
 import $ from 'jquery';
 import EventEmitter from 'events';
 
