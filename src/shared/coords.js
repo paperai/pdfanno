@@ -16,6 +16,23 @@ export function convertToExportY(y) {
 }
 
 /**
+ * Convert the `y` position from exported json to local coords.
+ */
+export function convertFromExportY(pageNumber, yInPage) {
+
+    let meta = getPageSize();
+
+    let y = yInPage + paddingTop;
+
+    let pagePadding = paddingBetweenPages;
+
+    y += (pageNumber - 1) * (meta.height + pagePadding);
+
+    return y;
+}
+
+
+/**
  * The padding of page top.
  */
 const paddingTop = 9;

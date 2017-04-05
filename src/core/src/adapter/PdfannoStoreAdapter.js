@@ -4,7 +4,7 @@ import uuid from '../utils/uuid';
 import tomlString from '../utils/tomlString';
 import StoreAdapter from './StoreAdapter';
 import ANNO_VERSION from '../version';
-import { convertToExportY } from '../../../shared/coords';
+import { convertToExportY, convertFromExportY } from '../../../shared/coords';
 
 /**
  * The LocalStorage key for save annotations.
@@ -341,15 +341,6 @@ function _createContainerFromJson(json, color, isPrimary) {
 }
 
 /**
- * Get a page size of a single PDF page.
- */
-function getPageSize() {
-    let viewBox = PDFView.pdfViewer.getPageView(0).viewport.viewBox;
-    let size = { width : viewBox[2], height : viewBox[3] };
-    return size;
-}
-
-/**
  * Transform the coords from localData to rendering system.
  */
 function transformToRenderCoordinate(annotation) {
@@ -548,30 +539,4 @@ function findAnnotation(documentId, annotationId) {
         }
     }
     return index;
-}
-
-/**
- * The padding of page top.
- */
-const paddingTop = 9;
-
-/**
- * The padding between pages.
- */
-const paddingBetweenPages = 9;
-
-/**
- * Convert the `y` position from exported json to local coords.
- */
-function convertFromExportY(pageNumber, yInPage) {
-
-    let meta = getPageSize();
-
-    let y = yInPage + paddingTop;
-
-    let pagePadding = paddingBetweenPages;
-
-    y += (pageNumber - 1) * (meta.height + pagePadding);
-
-    return y;
 }
