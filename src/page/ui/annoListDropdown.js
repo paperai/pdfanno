@@ -1,7 +1,7 @@
 /**
  * UI parts - Anno List Dropdown.
  */
-import { convertToExportY } from '../../core/src/utils/position';
+import { convertToExportY } from '../../shared/coords';
 
 /**
  * Setup the dropdown for Anno list.

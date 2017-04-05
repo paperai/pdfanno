@@ -4,7 +4,7 @@ import uuid from '../utils/uuid';
 import tomlString from '../utils/tomlString';
 import StoreAdapter from './StoreAdapter';
 import ANNO_VERSION from '../version';
-import { convertToExportY } from '../utils/position';
+import { convertToExportY } from '../../../shared/coords';
 
 /**
  * The LocalStorage key for save annotations.

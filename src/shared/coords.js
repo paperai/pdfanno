@@ -1,14 +1,4 @@
 /**
- * The padding of page top.
- */
-const paddingTop = 9;
-
-/**
- * The padding between pages.
- */
-const paddingBetweenPages = 9;
-
-/**
  * Convert the `y` position from the local coords to exported json.
  */
 export function convertToExportY(y) {
@@ -24,6 +14,16 @@ export function convertToExportY(y) {
 
     return { pageNumber, y : yInPage };
 }
+
+/**
+ * The padding of page top.
+ */
+const paddingTop = 9;
+
+/**
+ * The padding between pages.
+ */
+const paddingBetweenPages = 9;
 
 /**
  * Get a page size of a single PDF page.
