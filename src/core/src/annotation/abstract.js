@@ -1,6 +1,5 @@
 import EventEmitter from 'events';
 import appendChild from '../render/appendChild';
-import PDFAnnoCore from '../PDFAnnoCore';
 import { getSVGLayer, getMetadata } from '../UI/utils';
 
 /**
@@ -61,15 +60,15 @@ export default class AbstractAnnotation extends EventEmitter {
      */
     save() {
         let { documentId } = getMetadata();
-        PDFAnnoCore.getStoreAdapter().getAnnotation(documentId, this.uuid).then(a => {
+        window.PDFAnnoCore.getStoreAdapter().getAnnotation(documentId, this.uuid).then(a => {
             if (a) {
                 // update.
                 a = this.createAnnotation(a);
-                PDFAnnoCore.getStoreAdapter().editAnnotation(documentId, this.uuid, a);
+                window.PDFAnnoCore.getStoreAdapter().editAnnotation(documentId, this.uuid, a);
             } else {
                 // insert.
                 a = this.createAnnotation();
-                PDFAnnoCore.getStoreAdapter().addAnnotation(documentId, a);
+                window.PDFAnnoCore.getStoreAdapter().addAnnotation(documentId, a);
             }
         });
         window.annotationContainer.add(this);
@@ -85,7 +84,7 @@ export default class AbstractAnnotation extends EventEmitter {
         if (this.uuid) {
             window.annotationContainer.remove(this);
             let { documentId } = getMetadata(); // TODO Remove this.
-            PDFAnnoCore.getStoreAdapter().deleteAnnotation(documentId, this.uuid).then(() => {
+            window.PDFAnnoCore.getStoreAdapter().deleteAnnotation(documentId, this.uuid).then(() => {
                 console.log('deleted');
             });
             this.textAnnotation && this.textAnnotation.destroy();

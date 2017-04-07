@@ -54,6 +54,7 @@ export default class AnnotationContainer {
      * Find an annotation by the id which an annotation has.
      */
     findById(uuid) {
+        uuid = String(uuid); // `uuid` must be string.
         let annotation = null;
         this.set.forEach(a => {
             if (a.uuid === uuid) {

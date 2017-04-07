@@ -2,6 +2,9 @@ import StoreAdapter from './adapter/StoreAdapter';
 import PdfannoStoreAdapter from './adapter/PdfannoStoreAdapter';
 import render from './render';
 import UI from './UI';
+import RectAnnotation from './annotation/rect';
+import SpanAnnotation from './annotation/span';
+import RelationAnnotation from './annotation/relation';
 
 require("!style!css!./css/pdfanno.css");
 
@@ -70,5 +73,21 @@ export default {
    */
   getAnnotations(documentId) {
     return this.getStoreAdapter().getAnnotations(...arguments);
-  }
+  },
+
+  /**
+   * RectAnnotation Class.
+   */
+  RectAnnotation,
+
+  /**
+   * SpanAnnotation Class.
+   */
+  SpanAnnotation,
+
+  /**
+   * RelationAnnotation Class.
+   */
+  RelationAnnotation
+
 }
