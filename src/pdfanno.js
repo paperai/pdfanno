@@ -28,10 +28,12 @@ import * as publicApi from './page/public';
  * Expose public APIs.
  */
 window.add = publicApi.addAnnotation;
+window.addAll = publicApi.addAllAnnotations;
 window.delete = publicApi.deleteAnnotation;
 window.RectAnnotation = publicApi.PublicRectAnnotation;
 window.SpanAnnotation = publicApi.PublicSpanAnnotation;
 window.RelationAnnotation = publicApi.PublicRelationAnnotation;
+window.readTOML = publicApi.readTOML;
 
 /**
  * The data which is loaded via `Browse` button.

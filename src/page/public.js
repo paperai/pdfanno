@@ -1,5 +1,36 @@
 import { convertFromExportY } from '../shared/coords';
 import { enableAnnotateTool, disableAnnotateTools } from './util/anno';
+import toml from 'toml';
+
+/**
+ * Add all annotations.
+ *
+ * This method expect to get argument made from a TOML file parsed by `window.readTOML`.
+ */
+export function addAllAnnotations(tomlObject) {
+
+    for (const key in tomlObject) {
+
+        let data = tomlObject[key];
+
+        if (typeof data !== 'object') {
+            continue;
+        }
+
+        data.id = key;
+
+        if (data.type === 'span') {
+            addAnnotation(new PublicSpanAnnotation(data));
+        } else if (data.type === 'rect') {
+            addAnnotation(new PublicRectAnnotation(data));
+        } else if (data.type === 'relation') {
+            addAnnotation(new PublicRelationAnnotation(data));
+        } else {
+            console.log('Unknown: ', key, data);
+        }
+    }
+
+}
 
 /**
  * Add an annotation, and render it.
@@ -64,18 +95,18 @@ export class PublicRectAnnotation {
  */
 export class PublicSpanAnnotation {
 
-    constructor({ page, positions, label='', text='', id=0 }) {
+    constructor({ page, position, label='', text='', id=0 }) {
 
         // Check inputs.
         if (!page || typeof page !== 'number') {
             throw 'Set the page as number.';
         }
-        if (!positions) {
-            throw 'Set the positions.';
+        if (!position) {
+            throw 'Set the position.';
         }
 
         // Convert.
-        positions = positions.map(p => {
+        position = position.map(p => {
             return {
                 page   : page,
                 x      : p[0],
@@ -87,7 +118,7 @@ export class PublicSpanAnnotation {
 
         let span = window.iframeWindow.PDFAnnoCore.SpanAnnotation.newInstance({
             uuid         : id && String(id), // annotationid must be string.
-            rectangles   : positions,
+            rectangles   : position,
             text         : label,
             color        : '#FFFF00',  // TODO 固定で良い？
             readOnly     : false,      // TODO 固定で良い？
@@ -126,6 +157,9 @@ export class PublicRelationAnnotation {
 
         this.annotation = r;
     }
-
-
 }
+
+/**
+ * TOML parser.
+ */
+export const readTOML = toml.parse;
