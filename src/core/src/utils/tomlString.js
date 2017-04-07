@@ -36,6 +36,5 @@ export default function tomlString(obj, root=true) {
 }
 
 function isArray(val) {
-    console.log('isArray:', val);
     return val && 'length' in val;
 }
