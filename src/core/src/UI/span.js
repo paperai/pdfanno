@@ -85,8 +85,6 @@ function saveSpan(rects, selectedText) {
   let svg = getSVGLayer();
   let boundingRect = svg.getBoundingClientRect();
 
-  console.log('rects:', rects);
-
   // Initialize the annotation
   let annotation = {
     rectangles: [...rects].map((r) => {

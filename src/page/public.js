@@ -1,4 +1,5 @@
 import { convertFromExportY } from '../shared/coords';
+import { enableAnnotateTool, disableAnnotateTools } from './util/anno';
 
 /**
  * Add an annotation, and render it.
@@ -8,8 +9,12 @@ export function addAnnotation(publicAnnotation) {
     let a = publicAnnotation.annotation;
     window.iframeWindow.annotationContainer.add(a);
     a.render();
+    a.enableViewMode();
     a.save();
 
+    // Restore the status of AnnoTools.
+    disableAnnotateTools();
+    enableAnnotateTool(window.currentAnnoToolType);
 }
 
 /**
@@ -39,7 +44,7 @@ export class PublicRectAnnotation {
         }
 
         let rect = iframeWindow.PDFAnnoCore.RectAnnotation.newInstance({
-            uuid     : id,
+            uuid     : id && String(id), // annotationid must be string.
             x        : position[0],
             y        : convertFromExportY(page, position[1]),
             width    : position[2],
@@ -81,7 +86,7 @@ export class PublicSpanAnnotation {
         });
 
         let span = window.iframeWindow.PDFAnnoCore.SpanAnnotation.newInstance({
-            uuid         : id,
+            uuid         : id && String(id), // annotationid must be string.
             rectangles   : positions,
             text         : label,
             color        : '#FFFF00',  // TODO 固定で良い？

@@ -34,15 +34,12 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                     let annotations = [];
                     let containers = _getSecondaryContainers();
                     containers.forEach(container => {
-                        // let tmpAnnotations = (container[documentId] || {}).annotations || [];
                         let tmpAnnotations = container.annotations || [];
                         annotations = annotations.concat(tmpAnnotations);
                     });
 
                     // Convert coordinate system.
                     annotations = annotations.map(a => transformToRenderCoordinate(a));
-
-                    console.log('getSecondaryAnnotations:', annotations);
 
                     resolve({
                         documentId,
