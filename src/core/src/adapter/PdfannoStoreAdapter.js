@@ -176,7 +176,6 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
 
 
                     resolve(tomlString(dataExport));
-                    // resolve(dataExport);
                 });
             },
 
@@ -277,10 +276,10 @@ function _createContainerFromJson(json, color, isPrimary) {
                     type   : 'area',
                     uuid   : uuid(),
                     page   : data.page,
-                    x      : data.position[0],
-                    y      : data.position[1],
-                    width  : data.position[2],
-                    height : data.position[3],
+                    x      : parseFloat(data.position[0]),
+                    y      : parseFloat(data.position[1]),
+                    width  : parseFloat(data.position[2]),
+                    height : parseFloat(data.position[3]),
                     text   : data.label,
                     readOnly,
                     color,
@@ -293,10 +292,10 @@ function _createContainerFromJson(json, color, isPrimary) {
                     let rectangles = data.position.map(d => {
                         return {
                             page   : data.page,
-                            x      : d[0],
-                            y      : d[1],
-                            width  : d[2],
-                            height : d[3]
+                            x      : parseFloat(d[0]),
+                            y      : parseFloat(d[1]),
+                            width  : parseFloat(d[2]),
+                            height : parseFloat(d[3])
                         }
                     });
                     annotations.push({

@@ -10,6 +10,20 @@ export default function tomlString(obj, root=true) {
         delete obj['version'];
     }
 
+    // #paperanno-ja/issues/38
+    // Make all values in `position` as string.
+    if ('position' in obj) {
+        let position = obj.position;
+        position = position.map(p => {
+            if (typeof p === 'number') {
+                return String(p);
+            } else {
+                return p.map(v => String(v));
+            }
+        });
+        obj.position = position;
+    }
+
     Object.keys(obj).forEach(prop => {
 
         let val = obj[prop];
