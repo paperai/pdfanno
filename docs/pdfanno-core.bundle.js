@@ -15894,7 +15894,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    });
 	
 	                    resolve((0, _tomlString2.default)(dataExport));
-	                    // resolve(dataExport);
 	                });
 	            },
 	            importAnnotations: function importAnnotations(data, isPrimary) {
@@ -15997,10 +15996,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                type: 'area',
 	                uuid: (0, _uuid2.default)(),
 	                page: data.page,
-	                x: data.position[0],
-	                y: data.position[1],
-	                width: data.position[2],
-	                height: data.position[3],
+	                x: parseFloat(data.position[0]),
+	                y: parseFloat(data.position[1]),
+	                width: parseFloat(data.position[2]),
+	                height: parseFloat(data.position[3]),
 	                text: data.label,
 	                readOnly: readOnly,
 	                color: color,
@@ -16013,10 +16012,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var rectangles = data.position.map(function (d) {
 	                return {
 	                    page: data.page,
-	                    x: d[0],
-	                    y: d[1],
-	                    width: d[2],
-	                    height: d[3]
+	                    x: parseFloat(d[0]),
+	                    y: parseFloat(d[1]),
+	                    width: parseFloat(d[2]),
+	                    height: parseFloat(d[3])
 	                };
 	            });
 	            annotations.push({
@@ -16427,6 +16426,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	        lines.push('version = "' + obj['version'] + '"');
 	        lines.push('');
 	        delete obj['version'];
+	    }
+	
+	    // #paperanno-ja/issues/38
+	    // Make all values in `position` as string.
+	    if ('position' in obj) {
+	        var position = obj.position;
+	        position = position.map(function (p) {
+	            if (typeof p === 'number') {
+	                return String(p);
+	            } else {
+	                return p.map(function (v) {
+	                    return String(v);
+	                });
+	            }
+	        });
+	        obj.position = position;
 	    }
 	
 	    Object.keys(obj).forEach(function (prop) {
