@@ -31,7 +31,6 @@ export function convertFromExportY(pageNumber, yInPage) {
     return y;
 }
 
-
 /**
  * The padding of page top.
  */
@@ -40,12 +39,12 @@ const paddingTop = 9;
 /**
  * The padding between pages.
  */
-const paddingBetweenPages = 9;
+export const paddingBetweenPages = 9;
 
 /**
  * Get a page size of a single PDF page.
  */
-function getPageSize() {
+export function getPageSize() {
 
     let pdfView = window.PDFView || iframeWindow.PDFView;
 

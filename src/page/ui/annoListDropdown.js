@@ -1,7 +1,7 @@
 /**
  * UI parts - Anno List Dropdown.
  */
-import { convertToExportY } from '../../shared/coords';
+import { convertToExportY, getPageSize, paddingBetweenPages } from '../../shared/coords';
 
 /**
  * Setup the dropdown for Anno list.
@@ -63,15 +63,20 @@ export function setup() {
     // Jump to the page that the selected annotation is at.
     $('#dropdownAnnoList').on('click', 'a', e => {
 
-        // Jump to the page anno rendered at.
-        let page = $(e.currentTarget).data('page');
-        console.log('page:', page);
-        iframeWindow.PDFView.page = page;
-
-        // Highlight.
         let id = $(e.currentTarget).data('id');
         let annotation = iframeWindow.annotationContainer.findById(id);
+
         if (annotation) {
+
+            // scroll to.
+            let _y = annotation.y || annotation.y1 || annotation.rectangles[0].y;
+            let { pageNumber, y } = convertToExportY(_y);
+            console.log('py:', pageNumber, y);
+            _y = (iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.height + 12) * (pageNumber - 1) + y * iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale;
+            _y -= 100;
+            $('#viewer iframe').contents().find('#viewer').parent()[0].scrollTop = _y;
+
+            // highlight.
             annotation.highlight();
             setTimeout(() => {
                 annotation.dehighlight();
