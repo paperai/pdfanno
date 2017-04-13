@@ -71,8 +71,9 @@ export function setup() {
             // scroll to.
             let _y = annotation.y || annotation.y1 || annotation.rectangles[0].y;
             let { pageNumber, y } = convertToExportY(_y);
-            console.log('py:', pageNumber, y);
-            _y = (iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.height + 12) * (pageNumber - 1) + y * iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale;
+            let pageHeight = iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.height;
+            let scale = iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale;
+            _y = (pageHeight + paddingBetweenPages) * (pageNumber - 1) + y * scale;
             _y -= 100;
             $('#viewer iframe').contents().find('#viewer').parent()[0].scrollTop = _y;
 
