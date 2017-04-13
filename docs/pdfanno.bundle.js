@@ -935,15 +935,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Jump to the page that the selected annotation is at.
 	    $('#dropdownAnnoList').on('click', 'a', function (e) {
 	
-	        // Jump to the page anno rendered at.
-	        var page = $(e.currentTarget).data('page');
-	        console.log('page:', page);
-	        iframeWindow.PDFView.page = page;
-	
-	        // Highlight.
 	        var id = $(e.currentTarget).data('id');
 	        var annotation = iframeWindow.annotationContainer.findById(id);
+	
 	        if (annotation) {
+	
+	            // scroll to.
+	            var _y = annotation.y || annotation.y1 || annotation.rectangles[0].y;
+	
+	            var _convertToExportY2 = (0, _coords.convertToExportY)(_y),
+	                pageNumber = _convertToExportY2.pageNumber,
+	                y = _convertToExportY2.y;
+	
+	            var pageHeight = iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.height;
+	            var scale = iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale;
+	            _y = (pageHeight + _coords.paddingBetweenPages) * (pageNumber - 1) + y * scale;
+	            _y -= 100;
+	            $('#viewer iframe').contents().find('#viewer').parent()[0].scrollTop = _y;
+	
+	            // highlight.
 	            annotation.highlight();
 	            setTimeout(function () {
 	                annotation.dehighlight();
@@ -992,6 +1002,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.convertToExportY = convertToExportY;
 	exports.convertFromExportY = convertFromExportY;
+	exports.getPageSize = getPageSize;
 	/**
 	 * Convert the `y` position from the local coords to exported json.
 	 */
@@ -1033,7 +1044,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * The padding between pages.
 	 */
-	var paddingBetweenPages = 9;
+	var paddingBetweenPages = exports.paddingBetweenPages = 9;
 	
 	/**
 	 * Get a page size of a single PDF page.

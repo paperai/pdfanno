@@ -276,6 +276,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.convertToExportY = convertToExportY;
 	exports.convertFromExportY = convertFromExportY;
+	exports.getPageSize = getPageSize;
 	/**
 	 * Convert the `y` position from the local coords to exported json.
 	 */
@@ -317,7 +318,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * The padding between pages.
 	 */
-	var paddingBetweenPages = 9;
+	var paddingBetweenPages = exports.paddingBetweenPages = 9;
 	
 	/**
 	 * Get a page size of a single PDF page.
