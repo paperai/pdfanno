@@ -58,7 +58,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _anno = __webpack_require__(1);
 	
-	var _browseButton = __webpack_require__(2);
+	var _display = __webpack_require__(2);
+	
+	var _browseButton = __webpack_require__(3);
 	
 	var browseButton = _interopRequireWildcard(_browseButton);
 	
@@ -81,8 +83,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _annotationTools = __webpack_require__(10);
 	
 	var annotationsTools = _interopRequireWildcard(_annotationTools);
-	
-	var _display = __webpack_require__(3);
 	
 	var _window = __webpack_require__(11);
 	
@@ -172,6 +172,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        (0, _anno.clearAllAnnotations)();
 	    }
 	
+	    // Reset PDFViwer settings.
+	    (0, _display.resetPDFViewerSettings)();
+	
 	    // Start application.
 	    startApplication();
 	
@@ -240,6 +243,148 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 2 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.displayAnnotation = displayAnnotation;
+	exports.reloadPDFViewer = reloadPDFViewer;
+	exports.resetPDFViewerSettings = resetPDFViewerSettings;
+	exports.setupColorPicker = setupColorPicker;
+	
+	
+	/**
+	 * Display annotations an user selected.
+	 */
+	function displayAnnotation(isPrimary) {
+	    var reload = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+	
+	
+	    var annotations = [];
+	    var colors = [];
+	    var primaryIndex = -1;
+	
+	    // Primary annotation.
+	    if (isPrimary) {
+	        $('#dropdownAnnoPrimary a').each(function (index, element) {
+	            var $elm = $(element);
+	            if ($elm.find('.fa-check').hasClass('no-visible') === false) {
+	                var annoPath = $elm.find('.js-annoname').text();
+	                if (!fileMap[annoPath]) {
+	                    console.log('ERROR');
+	                    return;
+	                }
+	                primaryIndex = 0;
+	                annotations.push(fileMap[annoPath]);
+	                var color = null; // Use the default color used for edit.
+	                colors.push(color);
+	
+	                var filename = annoPath.split('/')[annoPath.split('/').length - 1];
+	                localStorage.setItem('_pdfanno_primary_annoname', filename);
+	                console.log('filename:', filename);
+	            }
+	        });
+	    }
+	
+	    // Reference annotations.
+	    if (!isPrimary) {
+	        $('#dropdownAnnoReference a').each(function (index, element) {
+	            var $elm = $(element);
+	            if ($elm.find('.fa-check').hasClass('no-visible') === false) {
+	                var annoPath = $elm.find('.js-annoname').text();
+	                if (!fileMap[annoPath]) {
+	                    console.log('ERROR');
+	                    return;
+	                }
+	                annotations.push(fileMap[annoPath]);
+	                var color = $elm.find('.js-anno-palette').spectrum('get').toHexString();
+	                console.log(color);
+	                colors.push(color);
+	            }
+	        });
+	    }
+	
+	    console.log('colors:', colors);
+	
+	    // Create import data.
+	    var paperData = {
+	        primary: primaryIndex,
+	        colors: colors,
+	        annotations: annotations
+	    };
+	
+	    // Pass the data to pdf-annotatejs.
+	    window.iframeWindow.PDFAnnoCore.getStoreAdapter().importAnnotations(paperData, isPrimary).then(function (result) {
+	
+	        if (reload) {
+	            // Reload the viewer.
+	            reloadPDFViewer();
+	        }
+	
+	        return true;
+	    });
+	}
+	
+	/**
+	 * Reload PDF Viewer.
+	 */
+	function reloadPDFViewer() {
+	
+	    // Reset setting.
+	    resetPDFViewerSettings();
+	
+	    // Reload pdf.js.
+	    $('#viewer iframe').remove();
+	    $('#viewer').html('<iframe src="./pages/viewer.html" class="anno-viewer" frameborder="0"></iframe>');
+	
+	    // Restart.
+	    var event = document.createEvent('CustomEvent');
+	    event.initCustomEvent('restartApp', true, true, null);
+	    window.dispatchEvent(event);
+	
+	    // Catch the event iframe is ready.
+	    function iframeReady() {
+	        console.log('iframeReady');
+	        window.removeEventListener('annotationrendered', iframeReady);
+	    }
+	    window.addEventListener('annotationrendered', iframeReady);
+	}
+	
+	/**
+	 * Reset PDF Viewer settings.
+	 */
+	function resetPDFViewerSettings() {
+	    localStorage.removeItem('database');
+	}
+	
+	/**
+	 * Setup the color pickers.
+	 */
+	function setupColorPicker() {
+	
+	    var colors = ['rgb(255, 128, 0)', 'hsv 100 70 50', 'yellow', 'blanchedalmond', 'red', 'green', 'blue', 'violet'];
+	
+	    // Setup colorPickers.
+	    $('.js-anno-palette').spectrum({
+	        showPaletteOnly: true,
+	        showPalette: true,
+	        hideAfterPaletteSelect: true,
+	        palette: [colors.slice(0, Math.floor(colors.length / 2)), colors.slice(Math.floor(colors.length / 2), colors.length)]
+	    });
+	    // Set initial color.
+	    $('.js-anno-palette').each(function (i, elm) {
+	        $(elm).spectrum('set', colors[i % colors.length]);
+	    });
+	
+	    // Setup behavior.
+	    $('.js-anno-palette').off('change').on('change', displayAnnotation.bind(null, false));
+	}
+
+/***/ },
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -249,7 +394,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.setup = setup;
 	
-	var _display = __webpack_require__(3);
+	var _display = __webpack_require__(2);
 	
 	var _anno = __webpack_require__(1);
 	
@@ -559,137 +704,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 3 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.displayAnnotation = displayAnnotation;
-	exports.reloadPDFViewer = reloadPDFViewer;
-	exports.setupColorPicker = setupColorPicker;
-	
-	
-	/**
-	 * Display annotations an user selected.
-	 */
-	function displayAnnotation(isPrimary) {
-	    var reload = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-	
-	
-	    var annotations = [];
-	    var colors = [];
-	    var primaryIndex = -1;
-	
-	    // Primary annotation.
-	    if (isPrimary) {
-	        $('#dropdownAnnoPrimary a').each(function (index, element) {
-	            var $elm = $(element);
-	            if ($elm.find('.fa-check').hasClass('no-visible') === false) {
-	                var annoPath = $elm.find('.js-annoname').text();
-	                if (!fileMap[annoPath]) {
-	                    console.log('ERROR');
-	                    return;
-	                }
-	                primaryIndex = 0;
-	                annotations.push(fileMap[annoPath]);
-	                var color = null; // Use the default color used for edit.
-	                colors.push(color);
-	
-	                var filename = annoPath.split('/')[annoPath.split('/').length - 1];
-	                localStorage.setItem('_pdfanno_primary_annoname', filename);
-	                console.log('filename:', filename);
-	            }
-	        });
-	    }
-	
-	    // Reference annotations.
-	    if (!isPrimary) {
-	        $('#dropdownAnnoReference a').each(function (index, element) {
-	            var $elm = $(element);
-	            if ($elm.find('.fa-check').hasClass('no-visible') === false) {
-	                var annoPath = $elm.find('.js-annoname').text();
-	                if (!fileMap[annoPath]) {
-	                    console.log('ERROR');
-	                    return;
-	                }
-	                annotations.push(fileMap[annoPath]);
-	                var color = $elm.find('.js-anno-palette').spectrum('get').toHexString();
-	                console.log(color);
-	                colors.push(color);
-	            }
-	        });
-	    }
-	
-	    console.log('colors:', colors);
-	
-	    // Create import data.
-	    var paperData = {
-	        primary: primaryIndex,
-	        colors: colors,
-	        annotations: annotations
-	    };
-	
-	    // Pass the data to pdf-annotatejs.
-	    window.iframeWindow.PDFAnnoCore.getStoreAdapter().importAnnotations(paperData, isPrimary).then(function (result) {
-	
-	        if (reload) {
-	            // Reload the viewer.
-	            reloadPDFViewer();
-	        }
-	
-	        return true;
-	    });
-	}
-	
-	/**
-	 * Reload PDF Viewer.
-	 */
-	function reloadPDFViewer() {
-	
-	    // Reload pdf.js.
-	    $('#viewer iframe').remove();
-	    $('#viewer').html('<iframe src="./pages/viewer.html" class="anno-viewer" frameborder="0"></iframe>');
-	
-	    // Restart.
-	    var event = document.createEvent('CustomEvent');
-	    event.initCustomEvent('restartApp', true, true, null);
-	    window.dispatchEvent(event);
-	
-	    // Catch the event iframe is ready.
-	    function iframeReady() {
-	        console.log('iframeReady');
-	        window.removeEventListener('annotationrendered', iframeReady);
-	    }
-	    window.addEventListener('annotationrendered', iframeReady);
-	}
-	
-	/**
-	 * Setup the color pickers.
-	 */
-	function setupColorPicker() {
-	
-	    var colors = ['rgb(255, 128, 0)', 'hsv 100 70 50', 'yellow', 'blanchedalmond', 'red', 'green', 'blue', 'violet'];
-	
-	    // Setup colorPickers.
-	    $('.js-anno-palette').spectrum({
-	        showPaletteOnly: true,
-	        showPalette: true,
-	        hideAfterPaletteSelect: true,
-	        palette: [colors.slice(0, Math.floor(colors.length / 2)), colors.slice(Math.floor(colors.length / 2), colors.length)]
-	    });
-	    // Set initial color.
-	    $('.js-anno-palette').each(function (i, elm) {
-	        $(elm).spectrum('set', colors[i % colors.length]);
-	    });
-	
-	    // Setup behavior.
-	    $('.js-anno-palette').off('change').on('change', displayAnnotation.bind(null, false));
-	}
-
-/***/ },
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -700,7 +714,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.setup = setup;
 	
-	var _display = __webpack_require__(3);
+	var _display = __webpack_require__(2);
 	
 	var _anno = __webpack_require__(1);
 	
@@ -794,7 +808,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.setup = setup;
 	
-	var _display = __webpack_require__(3);
+	var _display = __webpack_require__(2);
 	
 	/**
 	 * Setup a click action of the Primary Annotation Dropdown.
@@ -1069,7 +1083,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.setup = setup;
 	
-	var _display = __webpack_require__(3);
+	var _display = __webpack_require__(2);
 	
 	/**
 	 * Setup a click action of the Reference Annotation Dropdown.
@@ -1114,7 +1128,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.setup = setup;
 	
-	var _display = __webpack_require__(3);
+	var _display = __webpack_require__(2);
 	
 	var _window = __webpack_require__(11);
 	

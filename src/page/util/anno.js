@@ -36,7 +36,6 @@ export function enableAnnotateTool(type) {
     }
 }
 
-
 /**
  * Clear the all annotations from the view and storage.
  */

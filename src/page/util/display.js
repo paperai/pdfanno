@@ -76,6 +76,9 @@ export function displayAnnotation(isPrimary, reload=true) {
  */
 export function reloadPDFViewer() {
 
+    // Reset setting.
+    resetPDFViewerSettings();
+
     // Reload pdf.js.
     $('#viewer iframe').remove();
     $('#viewer').html('<iframe src="./pages/viewer.html" class="anno-viewer" frameborder="0"></iframe>');
@@ -92,6 +95,14 @@ export function reloadPDFViewer() {
     }
     window.addEventListener('annotationrendered', iframeReady);
 }
+
+/**
+ * Reset PDF Viewer settings.
+ */
+export function resetPDFViewerSettings() {
+    localStorage.removeItem('database');
+}
+
 
 /**
  * Setup the color pickers.
@@ -121,6 +132,4 @@ export function setupColorPicker() {
     // Setup behavior.
     $('.js-anno-palette').off('change').on('change', displayAnnotation.bind(null, false));
 }
-
-
 
