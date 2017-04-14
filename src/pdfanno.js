@@ -2,6 +2,7 @@ require("file?name=dist/index.html!./index.html");
 require("!style!css!./pdfanno.css");
 
 import { enableAnnotateTool, disableAnnotateTools, clearAllAnnotations } from './page/util/anno';
+import { resetPDFViewerSettings } from './page/util/display';
 
 import * as browseButton from './page/ui/browseButton';
 import * as pdfDropdown from './page/ui/pdfDropdown';
@@ -101,6 +102,9 @@ window.addEventListener('DOMContentLoaded', e => {
     if (location.search.indexOf('debug') === -1) {
         clearAllAnnotations();
     }
+
+    // Reset PDFViwer settings.
+    resetPDFViewerSettings();
 
     // Start application.
     startApplication();
