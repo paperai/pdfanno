@@ -17116,12 +17116,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Default font size for Text.
 	 */
-	var DEFAULT_FONT_SIZE = 12;
-	
-	/**
-	 * Annotation colors for secondary annotations.
-	 */
-	var textSecondaryColor = ['green', 'blue', 'purple'];
+	var DEFAULT_FONT_SIZE = 9.5;
 	
 	/**
 	 * Calculate boundingClientRect that is needed for rendering text.
@@ -17146,21 +17141,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function renderText(a, svg) {
 	
-	  var color = a.color;
-	  if (!color) {
-	    if (a.readOnly) {
-	      color = textSecondaryColor[a.seq % textSecondaryColor.length];
-	    } else {
-	      color = '#F00';
-	    }
-	  }
-	
 	  // Text.
 	  var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
 	  (0, _setAttributes2.default)(text, {
 	    x: a.x,
 	    y: a.y + parseInt(DEFAULT_FONT_SIZE, 10),
-	    fill: color,
+	    fill: a.color || '#F00',
 	    fontSize: DEFAULT_FONT_SIZE
 	  });
 	  text.innerHTML = a.content || a.text;
@@ -17169,9 +17155,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var box = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
 	  var rect = getRect(text, svg);
 	  (0, _setAttributes2.default)(box, {
-	    x: a.x - 2,
+	    x: a.x - 1,
 	    y: a.y,
-	    width: rect.width + 4,
+	    width: rect.width,
 	    height: rect.height,
 	    fill: '#FFFFFF',
 	    class: 'anno-text'
@@ -17183,9 +17169,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  group.setAttribute('read-only', a.readOnly === true);
 	  group.setAttribute('data-parent-id', a.parentId);
 	  group.style.visibility = 'visible';
-	
 	  group.appendChild(box);
 	  group.appendChild(text);
+	
 	  return group;
 	}
 	module.exports = exports['default'];
