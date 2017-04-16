@@ -5,12 +5,7 @@ import { DEFAULT_RADIUS } from './renderCircle';
 /**
  * Default font size for Text.
  */
-const DEFAULT_FONT_SIZE = 12;
-
-/**
- * Annotation colors for secondary annotations.
- */
-let textSecondaryColor = ['green', 'blue', 'purple'];
+const DEFAULT_FONT_SIZE = 9.5;
 
 /**
  * Calculate boundingClientRect that is needed for rendering text.
@@ -35,22 +30,13 @@ function getRect(text, svg) {
  */
 export default function renderText(a, svg) {
 
-    let color = a.color;
-    if (!color) {
-      if (a.readOnly) {
-        color = textSecondaryColor[a.seq % textSecondaryColor.length];
-      } else {
-        color = '#F00';
-      }
-    }
-
     // Text.
     let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     setAttributes(text, {
-        x: a.x,
-        y: a.y + parseInt(DEFAULT_FONT_SIZE, 10),
-        fill: color,
-        fontSize: DEFAULT_FONT_SIZE
+        x        : a.x,
+        y        : a.y + parseInt(DEFAULT_FONT_SIZE, 10),
+        fill     : a.color || '#F00',
+        fontSize : DEFAULT_FONT_SIZE
     });
     text.innerHTML = a.content || a.text;
 
@@ -58,12 +44,12 @@ export default function renderText(a, svg) {
     let box = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
     let rect = getRect(text, svg);
     setAttributes(box, {
-      x: a.x -2,
-      y: a.y,
-      width: rect.width +4,
-      height: rect.height,
-      fill: '#FFFFFF',
-      class : 'anno-text'
+      x      : a.x - 1,
+      y      : a.y,
+      width  : rect.width,
+      height : rect.height,
+      fill   : '#FFFFFF',
+      class  : 'anno-text'
     });
 
     // Group.
@@ -72,8 +58,8 @@ export default function renderText(a, svg) {
     group.setAttribute('read-only', a.readOnly === true);
     group.setAttribute('data-parent-id', a.parentId);
     group.style.visibility = 'visible';
-
     group.appendChild(box);
     group.appendChild(text);
+
     return group;
 }
