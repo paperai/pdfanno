@@ -53,8 +53,11 @@ export function setup() {
     });
 
     $('.js-tool-btn-span').off('click').on('click', e => {
-        window.iframeWindow.PDFAnnoCore.UI.createSpan();
         $(e.currentTarget).blur();
+        const result = window.iframeWindow.PDFAnnoCore.UI.createSpan();
+        if (!result) {
+            alert('Please select a text span first.');
+        }
     });
 
 }

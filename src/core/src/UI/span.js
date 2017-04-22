@@ -61,6 +61,8 @@ function handleDocumentMouseup() {
   }
 
   removeSelection();
+
+  return !!rects;
 }
 
 function removeSelection() {
@@ -141,7 +143,7 @@ function saveSpan(rects, selectedText) {
  * Create a span by current texts selection.
  */
 export function createSpan() {
-    handleDocumentMouseup();
+    return handleDocumentMouseup();
 }
 
 /**
