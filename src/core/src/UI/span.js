@@ -43,11 +43,9 @@ function getSelectionRects() {
 
 
 /**
- * Handle document.mouseup event
- *
- * @param {Event} e The DOM event to handle
+ * Handle document.mouseup event.
  */
-function handleDocumentMouseup(e) {
+function handleDocumentMouseup() {
 
   let { rects, selectedText } = getSelectionRects();
   if (rects) {
@@ -116,11 +114,11 @@ function saveSpan(rects, selectedText) {
 
   // disableUserSelect();
 
-  document.removeEventListener('mouseup', handleDocumentMouseup);
+  // document.removeEventListener('mouseup', handleDocumentMouseup);
 
   addInputField(x, y, null, null, (text) => {
 
-    document.addEventListener('mouseup', handleDocumentMouseup);
+    // document.addEventListener('mouseup', handleDocumentMouseup);
 
     spanAnnotation.text = text;
     spanAnnotation.setTextForceDisplay();
@@ -137,6 +135,13 @@ function saveSpan(rects, selectedText) {
   }
   prevAnnotation = spanAnnotation;
 
+}
+
+/**
+ * Create a span by current texts selection.
+ */
+export function createSpan() {
+    handleDocumentMouseup();
 }
 
 /**

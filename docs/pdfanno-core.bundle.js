@@ -17602,7 +17602,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports.default = {
 	  disableRect: _rect.disableRect, enableRect: _rect.enableRect,
-	  disableSpan: _span.disableSpan, enableSpan: _span.enableSpan,
+	  disableSpan: _span.disableSpan, enableSpan: _span.enableSpan, createSpan: _span.createSpan,
 	  disableRelation: _relation.disableRelation, enableRelation: _relation.enableRelation,
 	  disableViewMode: _view.disableViewMode, enableViewMode: _view.enableViewMode
 	};
@@ -19419,6 +19419,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.createSpan = createSpan;
 	exports.enableSpan = enableSpan;
 	exports.disableSpan = disableSpan;
 	
@@ -19470,11 +19471,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	/**
-	 * Handle document.mouseup event
-	 *
-	 * @param {Event} e The DOM event to handle
+	 * Handle document.mouseup event.
 	 */
-	function handleDocumentMouseup(e) {
+	function handleDocumentMouseup() {
 	  var _getSelectionRects = getSelectionRects(),
 	      rects = _getSelectionRects.rects,
 	      selectedText = _getSelectionRects.selectedText;
@@ -19546,11 +19545,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  // disableUserSelect();
 	
-	  document.removeEventListener('mouseup', handleDocumentMouseup);
+	  // document.removeEventListener('mouseup', handleDocumentMouseup);
 	
 	  (0, _text.addInputField)(x, y, null, null, function (text) {
 	
-	    document.addEventListener('mouseup', handleDocumentMouseup);
+	    // document.addEventListener('mouseup', handleDocumentMouseup);
 	
 	    spanAnnotation.text = text;
 	    spanAnnotation.setTextForceDisplay();
@@ -19565,6 +19564,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    prevAnnotation.enableViewMode();
 	  }
 	  prevAnnotation = spanAnnotation;
+	}
+	
+	/**
+	 * Create a span by current texts selection.
+	 */
+	function createSpan() {
+	  handleDocumentMouseup();
 	}
 	
 	/**
