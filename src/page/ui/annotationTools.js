@@ -52,6 +52,11 @@ export function setup() {
         return false;
     });
 
+    $('.js-tool-btn-span').off('click').on('click', e => {
+        window.iframeWindow.PDFAnnoCore.UI.createSpan();
+        $(e.currentTarget).blur();
+    });
+
 }
 
 /**
