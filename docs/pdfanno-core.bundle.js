@@ -19491,6 +19491,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	
 	  removeSelection();
+	
+	  return !!rects;
 	}
 	
 	function removeSelection() {
@@ -19570,7 +19572,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Create a span by current texts selection.
 	 */
 	function createSpan() {
-	  handleDocumentMouseup();
+	  return handleDocumentMouseup();
 	}
 	
 	/**

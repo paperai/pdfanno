@@ -1179,8 +1179,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	
 	    $('.js-tool-btn-span').off('click').on('click', function (e) {
-	        window.iframeWindow.PDFAnnoCore.UI.createSpan();
 	        $(e.currentTarget).blur();
+	        var result = window.iframeWindow.PDFAnnoCore.UI.createSpan();
+	        if (!result) {
+	            alert('Please select a text span first.');
+	        }
 	    });
 	}
 	
