@@ -1177,6 +1177,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        return false;
 	    });
+	
+	    $('.js-tool-btn-span').off('click').on('click', function (e) {
+	        window.iframeWindow.PDFAnnoCore.UI.createSpan();
+	        $(e.currentTarget).blur();
+	    });
 	}
 	
 	/**
