@@ -76,33 +76,39 @@
         </div>
 
         <!-- Annotation Tools -->
-		<div class="row js-viewer-root">
-			<div class="col-md-12 col-sm-12 col-xs-12">
-                <div class="btn-toolbar" role="toolbar">
-    				<div class="btn-group" role="group">
-    					<a class="btn btn-default js-tool-btn-span" href="#" data-type="span" title="span">
-        					<i class="fa fa-pencil"></i>
-      					</a>
-      					<a class="btn btn-default js-tool-btn" href="#" data-type="one-way" title="one-way relation">
-        					<i class="fa fa-long-arrow-right"></i>
-      					</a>
-    					<a class="btn btn-default js-tool-btn" href="#" data-type="two-way" title="two-way relation">
-        					<i class="fa fa-arrows-h"></i>
-      					</a>
-						<a class="btn btn-default js-tool-btn" href="#" data-type="link" title="link relation">
-        					<i class="fa fa-minus"></i>
-      					</a>
-    					<a class="btn btn-default js-tool-btn" href="#" data-type="rect" title="rectangle">
-        					<i class="fa fa-square-o"></i>
-      					</a>
-    				</div>
+		<div class="row">
+            <div class="col-md-3 col-sm-3 col-xs-3">
+                <div class="btn-toolbar" role="toolbar" style="margin-top: 20px">
+                    <div class="btn-group" role="group">
+                        <a class="btn btn-default js-tool-btn-span" href="#" data-type="span" title="span">
+                            <i class="fa fa-pencil"></i>
+                        </a>
+                        <a class="btn btn-default js-tool-btn" href="#" data-type="one-way" title="one-way relation">
+                            <i class="fa fa-long-arrow-right"></i>
+                        </a>
+                        <a class="btn btn-default js-tool-btn" href="#" data-type="two-way" title="two-way relation">
+                            <i class="fa fa-arrows-h"></i>
+                        </a>
+                        <a class="btn btn-default js-tool-btn" href="#" data-type="link" title="link relation">
+                            <i class="fa fa-minus"></i>
+                        </a>
+                        <a class="btn btn-default js-tool-btn" href="#" data-type="rect" title="rectangle">
+                            <i class="fa fa-square-o"></i>
+                        </a>
+                    </div>
                     <div class="btn-group" role="group">
                         <a class="btn btn-default js-tool-btn2" href="#" data-type="download" title="download">
                             <i class="fa fa-download"></i>
                         </a>
                     </div>
                 </div>
-				<div id="viewer" class="">
+                <div>
+                    <h3>Label</h3>
+                    <input type="text" class="form-control" id="inputLabel" disabled>
+                </div>
+            </div>
+			<div class="col-md-9 col-sm-9 col-xs-9">
+				<div id="viewer">
                     <iframe src="./pages/viewer.html?file=../pdfs/P12-1046.pdf" class="anno-viewer" frameborder="0"></iframe>
 				</div>
 			</div>

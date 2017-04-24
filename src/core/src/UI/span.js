@@ -118,17 +118,30 @@ function saveSpan(rects, selectedText) {
 
   // document.removeEventListener('mouseup', handleDocumentMouseup);
 
-  addInputField(x, y, null, null, (text) => {
 
-    // document.addEventListener('mouseup', handleDocumentMouseup);
+  // New type text.
+  var event = document.createEvent('CustomEvent');
+  event.initCustomEvent('requireTextInput', true, true, { uuid : spanAnnotation.uuid });
+  window.dispatchEvent(event);
 
-    spanAnnotation.text = text;
-    spanAnnotation.setTextForceDisplay();
-    spanAnnotation.render();
-    spanAnnotation.save();
-    spanAnnotation.enableViewMode();
 
-  });
+
+
+
+
+
+
+  // addInputField(x, y, null, null, (text) => {
+
+  //   // document.addEventListener('mouseup', handleDocumentMouseup);
+
+  //   spanAnnotation.text = text;
+  //   spanAnnotation.setTextForceDisplay();
+  //   spanAnnotation.render();
+  //   spanAnnotation.save();
+  //   spanAnnotation.enableViewMode();
+
+  // });
 
   if (prevAnnotation) {
     prevAnnotation.resetTextForceDisplay();

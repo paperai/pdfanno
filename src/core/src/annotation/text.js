@@ -32,20 +32,22 @@ export default class TextAnnotation extends AbstractAnnotation {
      */
      render() {
 
-        let result = false;
+        // 2Col対応で一旦コメントアウト（PDF上にはテキストを表示しない）
 
-        if (this.parent.text) {
-            assign(this, this.parent.getTextPosition());
-            this.text = this.parent.text;
-            this.color = this.parent.color;
-            this.parentId = this.parent.uuid;
-            result = super.render();
-            if (this.textForceDisplay) {
-                this.$element.addClass('--visible');
-            }
-        } else {
-            this.$element.remove();
-        }
+        // let result = false;
+
+        // if (this.parent.text) {
+        //     assign(this, this.parent.getTextPosition());
+        //     this.text = this.parent.text;
+        //     this.color = this.parent.color;
+        //     this.parentId = this.parent.uuid;
+        //     result = super.render();
+        //     if (this.textForceDisplay) {
+        //         this.$element.addClass('--visible');
+        //     }
+        // } else {
+        //     this.$element.remove();
+        // }
 
     }
 

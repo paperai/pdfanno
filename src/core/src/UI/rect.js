@@ -223,19 +223,28 @@ function saveRect(rect) {
   x = scaleUp(svg, {x}).x + boundingRect.left;
   y = scaleUp(svg, {y}).y + boundingRect.top;
 
-  addInputField(x, y, null, null, (text) => {
 
-    if (!text) {
-      return;
-    }
 
-    rectAnnotation.text = text;
-    rectAnnotation.setTextForceDisplay();
-    rectAnnotation.render();
-    rectAnnotation.save();
-    rectAnnotation.enableViewMode();
+  // New type text.
+  var event = document.createEvent('CustomEvent');
+  event.initCustomEvent('requireTextInput', true, true, { uuid : rectAnnotation.uuid });
+  window.dispatchEvent(event);
 
-  });
+
+
+  // addInputField(x, y, null, null, (text) => {
+
+  //   if (!text) {
+  //     return;
+  //   }
+
+  //   rectAnnotation.text = text;
+  //   rectAnnotation.setTextForceDisplay();
+  //   rectAnnotation.render();
+  //   rectAnnotation.save();
+  //   rectAnnotation.enableViewMode();
+
+  // });
 
   // if (prevAnnotation) {
   //   prevAnnotation.resetTextForceDisplay();

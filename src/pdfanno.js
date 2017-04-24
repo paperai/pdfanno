@@ -10,6 +10,7 @@ import * as primaryAnnoDropdown from './page/ui/primaryAnnoDropdown';
 import * as annoListDropdown from './page/ui/annoListDropdown';
 import * as referenceAnnoDropdown from './page/ui/referenceAnnoDropdown';
 import * as annotationsTools from './page/ui/annotationTools';
+import * as inputLabel from './page/ui/inputLabel';
 
 import {
     displayAnnotation,
@@ -90,6 +91,18 @@ function startApplication() {
         var event = document.createEvent('CustomEvent');
         event.initCustomEvent('annotationUpdated', true, true, null);
         window.dispatchEvent(event);
+    });
+
+    // enable text input.
+    iframeWindow.addEventListener('requireTextInput', (e) => {
+        console.log('requireTextInput:', e.detail);
+        inputLabel.enable(e.detail);
+    });
+
+    // disable text input.
+    iframeWindow.addEventListener('disappearTextInput', (e) => {
+        console.log('disappearTextInput:', e.detail);
+        inputLabel.disable(e.detail);
     });
 }
 

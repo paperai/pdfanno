@@ -210,24 +210,33 @@ function handleDocumentMouseup(e) {
  */
 function showTextInput(relationAnnotation) {
 
-  let p1 = relationAnnotation.rel1Annotation.getBoundingCirclePosition();
-  let p2 = relationAnnotation.rel2Annotation.getBoundingCirclePosition();
-  let textPosition = getRelationTextPosition(p1.x, p1.y, p2.x, p2.y);
 
-  let boundingRect = svg.getBoundingClientRect();
+  // New type text.
+  var event = document.createEvent('CustomEvent');
+  event.initCustomEvent('requireTextInput', true, true, { uuid : relationAnnotation.uuid });
+  window.dispatchEvent(event);
 
-  let x = scaleUp(svg, {x : textPosition.x}).x + boundingRect.left;
-  let y = scaleUp(svg, {y : textPosition.y}).y + boundingRect.top;
 
-  addInputField(x, y, null, null, (text) => {
 
-    relationAnnotation.text = text;
-    relationAnnotation.setTextForceDisplay();
-    relationAnnotation.save();
-    relationAnnotation.render();
-    relationAnnotation.enableViewMode();
 
-  });
+  // let p1 = relationAnnotation.rel1Annotation.getBoundingCirclePosition();
+  // let p2 = relationAnnotation.rel2Annotation.getBoundingCirclePosition();
+  // let textPosition = getRelationTextPosition(p1.x, p1.y, p2.x, p2.y);
+
+  // let boundingRect = svg.getBoundingClientRect();
+
+  // let x = scaleUp(svg, {x : textPosition.x}).x + boundingRect.left;
+  // let y = scaleUp(svg, {y : textPosition.y}).y + boundingRect.top;
+
+  // addInputField(x, y, null, null, (text) => {
+
+  //   relationAnnotation.text = text;
+  //   relationAnnotation.setTextForceDisplay();
+  //   relationAnnotation.save();
+  //   relationAnnotation.render();
+  //   relationAnnotation.enableViewMode();
+
+  // });
 }
 
 /**
