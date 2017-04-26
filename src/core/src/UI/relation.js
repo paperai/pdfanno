@@ -10,6 +10,7 @@ import {
   enableTextlayer
 } from './utils';
 import { getRelationTextPosition } from '../utils/relation.js';
+import * as textInput from '../utils/textInput';
 import { addInputField } from './text';
 
 import RelationAnnotation from '../annotation/relation';
@@ -210,11 +211,8 @@ function handleDocumentMouseup(e) {
  */
 function showTextInput(relationAnnotation) {
 
-
-  // New type text.
-  var event = document.createEvent('CustomEvent');
-  event.initCustomEvent('requireTextInput', true, true, { uuid : relationAnnotation.uuid });
-  window.dispatchEvent(event);
+    // New type text.
+    textInput.enable({ uuid : relationAnnotation.uuid, autoFocus : true });
 
 
 

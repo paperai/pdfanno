@@ -18,6 +18,7 @@ import {
 } from './utils';
 import { addInputField } from './text';
 import RectAnnotation from '../annotation/rect';
+import * as textInput from '../utils/textInput';
 
 /**
  * the prev annotation rendered at the last.
@@ -115,12 +116,12 @@ function handleDocumentMousemove(e) {
   overlay.style.width  = w + 'px';
   overlay.style.height = h + 'px';
 
-  if (prevAnnotation) {
-    prevAnnotation.resetTextForceDisplay();
-    prevAnnotation.render();
-    prevAnnotation.enableViewMode();
-    prevAnnotation = null;
-  }
+  // if (prevAnnotation) {
+  //   prevAnnotation.resetTextForceDisplay();
+  //   prevAnnotation.render();
+  //   prevAnnotation.enableViewMode();
+  //   prevAnnotation = null;
+  // }
 
 }
 
@@ -216,20 +217,28 @@ function saveRect(rect) {
   rectAnnotation.render();
 
   // Add an input field.
-  let x = annotation.x;
-  let y = annotation.y - 20; // 20 = circle'radius(3px) + input height(14px) + α
-  let boundingRect = svg.getBoundingClientRect();
+  // let x = annotation.x;
+  // let y = annotation.y - 20; // 20 = circle'radius(3px) + input height(14px) + α
+  // let boundingRect = svg.getBoundingClientRect();
 
-  x = scaleUp(svg, {x}).x + boundingRect.left;
-  y = scaleUp(svg, {y}).y + boundingRect.top;
-
+  // x = scaleUp(svg, {x}).x + boundingRect.left;
+  // y = scaleUp(svg, {y}).y + boundingRect.top;
 
 
   // New type text.
-  var event = document.createEvent('CustomEvent');
-  event.initCustomEvent('requireTextInput', true, true, { uuid : rectAnnotation.uuid });
-  window.dispatchEvent(event);
+  console.log('======================');
+  textInput.enable({ uuid : rectAnnotation.uuid, autoFocus : true , blurListener : () => {
 
+    console.log('aaaa');
+
+
+    // TODO ここで、disableからenableに切り替える.
+    // アノテーションで disable と enable を切り替えられるようにするべし.
+
+    // TODO
+    // BlurListenerが発火する前に、次のtextInput.enableが来ても、アノテーションのenableができるようにする.
+
+  }});
 
 
   // addInputField(x, y, null, null, (text) => {
@@ -250,11 +259,11 @@ function saveRect(rect) {
   //   prevAnnotation.resetTextForceDisplay();
   //   prevAnnotation.render();
   // }
-  prevAnnotation = rectAnnotation;
+  // prevAnnotation = rectAnnotation;
 
-  // Enable a drag / click action.
-  // TODO インスタンス生成時にデフォルトで有効にしてもいいかなー.
-  rectAnnotation.enableViewMode();
+    // Enable a drag / click action.
+    // TODO インスタンス生成時にデフォルトで有効にしてもいいかなー.
+    rectAnnotation.enableViewMode();
 
 }
 

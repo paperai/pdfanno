@@ -94,8 +94,8 @@ function startApplication() {
     });
 
     // enable text input.
-    iframeWindow.addEventListener('requireTextInput', (e) => {
-        console.log('requireTextInput:', e.detail);
+    iframeWindow.addEventListener('enableTextInput', (e) => {
+        console.log('enableTextInput:', e.detail);
         inputLabel.enable(e.detail);
     });
 

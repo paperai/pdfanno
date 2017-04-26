@@ -284,18 +284,16 @@ export default class RelationAnnotation extends AbstractAnnotation {
     /**
      * The callback that is called at hoverred in.
      */
-    handleHoverInEvent() {
-        this.emit('hoverin');
-        this.highlight();
+    handleHoverInEvent(e) {
+        super.handleHoverInEvent(e);
         this.highlightRelAnnotations();
     }
 
     /**
      * The callback that is called at hoverred out.
      */
-    handleHoverOutEvent() {
-        this.emit('hoverout');
-        this.dehighlight();
+    handleHoverOutEvent(e) {
+        super.handleHoverOutEvent(e);
         this.dehighlightRelAnnotations();
     }
 

@@ -1,6 +1,7 @@
 import EventEmitter from 'events';
 import appendChild from '../render/appendChild';
 import { getSVGLayer, getMetadata } from '../UI/utils';
+import * as textInput from '../utils/textInput';
 
 /**
  * Abstract Annotation Class.
@@ -111,6 +112,24 @@ export default class AbstractAnnotation extends EventEmitter {
      */
     handleClickEvent(e) {
         // Implemented by a child class.
+    }
+
+    handleHoverInEvent(e) {
+        console.log('handleHoverInEvent');
+        this.highlight();
+        this.emit('hoverin');
+        // New type text.
+        textInput.enable({ uuid : this.uuid, text : this.text });
+    }
+
+    handleHoverOutEvent(e) {
+        console.log('handleHoverOutEvent');
+        this.dehighlight();
+        this.emit('hoverout');
+        // New type text display.
+        if (!this.selected) {
+            textInput.disable({ uuid : this.uuid });
+        }
     }
 
     /**

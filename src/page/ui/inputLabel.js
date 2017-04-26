@@ -7,36 +7,43 @@
     $inputLabel = $('#inputLabel');
  });
 
-export function enable({ uuid, text, autoFocus=true }) {
+export function enable({ uuid, text, autoFocus, blurListener }) {
     console.log('enableInputLabel:', uuid, text);
     $inputLabel
         .removeAttr('disabled')
         .val(text || '')
-        .one('blur', () => {
+        .off('blur')
+        .off('change')
+        .on('change', () => {
 
             const text = $inputLabel.val() || '';
-            console.log('blur:', uuid, text);
 
             const annotation = window.iframeWindow.annotationContainer.findById(uuid);
             if (annotation) {
                 annotation.text = text;
-                annotation.setTextForceDisplay();
-                annotation.render();
+                // annotation.setTextForceDisplay();
+                // annotation.render();
                 annotation.save();
                 annotation.enableViewMode();
 
-                setTimeout(() => {
-                    annotation.resetTextForceDisplay();
-                    annotation.render();
-                    annotation.enableViewMode();
-                }, 1000);
+                // setTimeout(() => {
+                //     annotation.resetTextForceDisplay();
+                //     annotation.render();
+                //     annotation.enableViewMode();
+                // }, 1000);
             }
+
+            console.log('change:', uuid, text, annotation);
 
             disable({ uuid });
         });
 
     if (autoFocus) {
         $inputLabel.focus();
+    }
+
+    if (blurListener) {
+        $inputLabel.on('blur', blurListener);
     }
 
 };

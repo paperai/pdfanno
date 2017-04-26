@@ -1,6 +1,7 @@
 import uuid from '../utils/uuid';
 import AbstractAnnotation from './abstract';
 import TextAnnotation from './text';
+import * as textInput from '../utils/textInput';
 
 /**
  * Span Annotation.
@@ -160,32 +161,16 @@ export default class SpanAnnotation extends AbstractAnnotation {
      * Handle a hoverin event.
      */
     handleHoverInEvent(e) {
-        this.highlight();
-        this.emit('hoverin');
+        super.handleHoverInEvent(e);
         this.emit('circlehoverin', this);
-
-        // New type text display.
-        this.textDisplayed = true;
-        var event = document.createEvent('CustomEvent');
-        event.initCustomEvent('requireTextInput', true, true, { uuid : this.uuid, text : this.text, autoFocus : false });
-        window.dispatchEvent(event);
     }
 
     /**
      * Handle a hoverout event.
      */
     handleHoverOutEvent(e) {
-        this.dehighlight();
-        this.emit('hoverout');
+        super.handleHoverOutEvent(e);
         this.emit('circlehoverout', this);
-
-        // New type text display.
-        if (!this.selected) {
-            this.textDisplayed = false;
-            var event = document.createEvent('CustomEvent');
-            event.initCustomEvent('disappearTextInput', true, true, { uuid : this.uuid });
-            window.dispatchEvent(event);
-        }
     }
 
     /**
@@ -198,7 +183,7 @@ export default class SpanAnnotation extends AbstractAnnotation {
             // New type text display.
             this.textDisplayed = true;
             var event = document.createEvent('CustomEvent');
-            event.initCustomEvent('requireTextInput', true, true, { uuid : this.uuid, text : this.text, autoFocus : false });
+            event.initCustomEvent('enableTextInput', true, true, { uuid : this.uuid, text : this.text, autoFocus : false });
             window.dispatchEvent(event);
 
         } else {

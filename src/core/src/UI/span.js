@@ -8,6 +8,7 @@ import {
 } from './utils';
 import { addInputField } from './text';
 import SpanAnnotation from '../annotation/span';
+import * as textInput from '../utils/textInput';
 
 /**
  * the prev annotation rendered at the last.
@@ -120,10 +121,7 @@ function saveSpan(rects, selectedText) {
 
 
   // New type text.
-  var event = document.createEvent('CustomEvent');
-  event.initCustomEvent('requireTextInput', true, true, { uuid : spanAnnotation.uuid });
-  window.dispatchEvent(event);
-
+  textInput.enable({ uuid : spanAnnotation.uuid, autoFocus : true });
 
 
 
