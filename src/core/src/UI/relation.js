@@ -77,6 +77,10 @@ function getClientXY(e) {
  */
 function handleDocumentMousemove(e) {
 
+    if (!relationAnnotation) {
+        return;
+    }
+
     if (mousedownFired) {
         mousemoveFired = true;
     }
@@ -212,8 +216,12 @@ function handleDocumentMouseup(e) {
 function showTextInput(relationAnnotation) {
 
     // New type text.
-    textInput.enable({ uuid : relationAnnotation.uuid, autoFocus : true });
-
+    textInput.enable({ uuid : relationAnnotation.uuid, autoFocus : true , blurListener : () => {
+        // relationAnnotation.enable();
+        window.annotationContainer.enableAll();
+    }});
+    // relationAnnotation.disable();
+    window.annotationContainer.disableAll();
 
 
 

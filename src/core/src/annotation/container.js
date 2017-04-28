@@ -63,4 +63,12 @@ export default class AnnotationContainer {
         });
         return annotation;
     }
+
+    enableAll() {
+        this.getAllAnnotations().forEach(a => a.enable());
+    }
+
+    disableAll() {
+        this.getAllAnnotations().forEach(a => a.disable());
+    }
 }

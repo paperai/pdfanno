@@ -300,8 +300,8 @@ export default class RelationAnnotation extends AbstractAnnotation {
     /**
      * The callback that is called at clicked.
      */
-    handleClickEvent() {
-        this.toggleSelect();
+    handleClickEvent(e) {
+        super.handleClickEvent(e);
     }
 
     /**

@@ -3,48 +3,83 @@
  */
 
  let $inputLabel;
+ let $form;
  window.addEventListener('DOMContentLoaded', () => {
     $inputLabel = $('#inputLabel');
+    $form = $('#autocompleteform');
  });
+
+let _blurListener;
 
 export function enable({ uuid, text, autoFocus, blurListener }) {
     console.log('enableInputLabel:', uuid, text);
+
+    if (_blurListener) {
+        _blurListener();
+        _blurListener = null;
+        console.log('old _blurListener is called.');
+    }
+
+    $form
+        .off('submit')
+        .on('submit', cancelSubmit);
+
     $inputLabel
         .removeAttr('disabled')
         .val(text || '')
         .off('blur')
-        .off('change')
-        .on('change', () => {
+        .off('keyup')
+        .on('keyup', () => {
 
-            const text = $inputLabel.val() || '';
+            // const text = $inputLabel.val() || '';
 
-            const annotation = window.iframeWindow.annotationContainer.findById(uuid);
-            if (annotation) {
-                annotation.text = text;
-                // annotation.setTextForceDisplay();
-                // annotation.render();
-                annotation.save();
-                annotation.enableViewMode();
+            // const annotation = window.iframeWindow.annotationContainer.findById(uuid);
+            // if (annotation) {
+            //     annotation.text = text;
+            //     // annotation.setTextForceDisplay();
+            //     // annotation.render();
+            //     annotation.save();
+            //     annotation.enableViewMode();
 
-                // setTimeout(() => {
-                //     annotation.resetTextForceDisplay();
-                //     annotation.render();
-                //     annotation.enableViewMode();
-                // }, 1000);
-            }
+            //     // setTimeout(() => {
+            //     //     annotation.resetTextForceDisplay();
+            //     //     annotation.render();
+            //     //     annotation.enableViewMode();
+            //     // }, 1000);
+            // }
 
-            console.log('change:', uuid, text, annotation);
+            saveText(uuid);
 
-            disable({ uuid });
+            // console.log('keyup:', uuid, text, annotation);
+
+            // disable({ uuid });
         });
 
     if (autoFocus) {
         $inputLabel.focus();
     }
 
-    if (blurListener) {
-        $inputLabel.on('blur', blurListener);
-    }
+    $inputLabel.on('blur', () => {
+
+        if (blurListener) {
+            // $inputLabel.on('blur', blurListener);
+            blurListener();
+            _blurListener = blurListener;
+        }
+
+        saveText(uuid);
+
+        // Add an autocomplete candidate. (Firefox, Chrome)
+        $form.find('[type="submit"]').click();
+
+        disable({ uuid });
+
+    });
+
+    // if (blurListener) {
+    //     $inputLabel.on('blur', blurListener);
+    //     _blurListener = blurListener;
+    // }
 
 };
 
@@ -54,4 +89,30 @@ export function disable({ uuid }) {
     $inputLabel
         .attr('disabled', 'disabled')
         .val('');
+}
+
+function cancelSubmit(e) {
+  e.preventDefault();
+  return false;
+}
+
+function saveText(uuid) {
+
+    const text = $inputLabel.val() || '';
+
+    const annotation = window.iframeWindow.annotationContainer.findById(uuid);
+    if (annotation) {
+        annotation.text = text;
+        // annotation.setTextForceDisplay();
+        // annotation.render();
+        annotation.save();
+        annotation.enableViewMode();
+
+        // setTimeout(() => {
+        //     annotation.resetTextForceDisplay();
+        //     annotation.render();
+        //     annotation.enableViewMode();
+        // }, 1000);
+    }
+
 }

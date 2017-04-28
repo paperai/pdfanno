@@ -195,8 +195,8 @@ export default class RectAnnotation extends AbstractAnnotation {
     /**
      * Handle a click event.
      */
-    handleClickEvent() {
-        this.toggleSelect();
+    handleClickEvent(e) {
+        super.handleClickEvent(e);
     }
 
     /**

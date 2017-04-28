@@ -176,22 +176,8 @@ export default class SpanAnnotation extends AbstractAnnotation {
     /**
      * Handle a click event.
      */
-    handleClickEvent() {
-        this.toggleSelect();
-
-        if (this.selected) {
-            // New type text display.
-            this.textDisplayed = true;
-            var event = document.createEvent('CustomEvent');
-            event.initCustomEvent('enableTextInput', true, true, { uuid : this.uuid, text : this.text, autoFocus : false });
-            window.dispatchEvent(event);
-
-        } else {
-            this.textDisplayed = false;
-            var event = document.createEvent('CustomEvent');
-            event.initCustomEvent('disappearTextInput', true, true, { uuid : this.uuid });
-            window.dispatchEvent(event);
-        }
+    handleClickEvent(e) {
+        super.handleClickEvent(e);
     }
 
     /**

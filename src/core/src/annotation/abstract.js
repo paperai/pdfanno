@@ -49,9 +49,9 @@ export default class AbstractAnnotation extends EventEmitter {
 
         this.$element.addClass('--viewMode');
 
-        if (this.selected) {
-            this.$element.addClass('--selected');
-        }
+        this.selected && this.$element.addClass('--selected');
+
+        this.disabled && this.disable();
 
         return true;
     }
@@ -111,7 +111,26 @@ export default class AbstractAnnotation extends EventEmitter {
      * Handle a click event.
      */
     handleClickEvent(e) {
-        // Implemented by a child class.
+        this.toggleSelect();
+
+        if (this.type !== 'textbox') {
+
+            if (this.selected) {
+
+                console.log('select:', this.uuid, this.text, this);
+                textInput.enable({ uuid : this.uuid, text : this.text });
+
+            } else {
+
+                console.log('deselect:', this.uuid, this);
+                textInput.disable({ uuid : this.uuid });
+
+            }
+
+        }
+
+
+
     }
 
     handleHoverInEvent(e) {
@@ -264,6 +283,16 @@ export default class AbstractAnnotation extends EventEmitter {
 
     setEnableHoverEvent() {
         this.hoverEventDisable = false;
+    }
+
+    enable() {
+        this.disabled = false;
+        this.$element.css('pointer-events', 'auto');
+    }
+
+    disable() {
+        this.disabled = true;
+        this.$element.css('pointer-events', 'none');
     }
 
 }

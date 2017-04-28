@@ -121,8 +121,12 @@ function saveSpan(rects, selectedText) {
 
 
   // New type text.
-  textInput.enable({ uuid : spanAnnotation.uuid, autoFocus : true });
-
+  textInput.enable({ uuid : spanAnnotation.uuid, autoFocus : true , blurListener : () => {
+    // spanAnnotation.enable();
+    window.annotationContainer.enableAll();
+  }});
+  // spanAnnotation.disable();
+  window.annotationContainer.disableAll();
 
 
 

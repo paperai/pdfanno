@@ -70,6 +70,7 @@ function handleDocumentMousedown(e) {
   overlay.style.border = `2px solid ${BORDER_COLOR}`;
   overlay.style.boxSizing = 'border-box';
   overlay.style.visibility = 'visible';
+  overlay.style.pointerEvents = 'none';
   getTmpLayer().appendChild(overlay);
 
 }
@@ -81,40 +82,40 @@ function handleDocumentMousedown(e) {
  */
 function handleDocumentMousemove(e) {
 
-  if (!overlay) {
-    return;
-  }
+    if (!overlay) {
+        return;
+    }
 
-  if (mousedownFired) {
-    mousemoveFired = true;
-  }
+    if (mousedownFired) {
+      mousemoveFired = true;
+    }
 
-  let { x : curX, y : curY } = getXY(e);
+    let { x : curX, y : curY } = getXY(e);
 
-  let x = Math.min(originX, curX);
-  let y = Math.min(originY, curY);
-  let w = Math.abs(originX - curX);
-  let h = Math.abs(originY - curY);
+    let x = Math.min(originX, curX);
+    let y = Math.min(originY, curY);
+    let w = Math.abs(originX - curX);
+    let h = Math.abs(originY - curY);
 
-  // Restrict in page.
-  x = Math.min(enableArea.maxX, Math.max(enableArea.minX, x));
-  y = Math.min(enableArea.maxY, Math.max(enableArea.minY, y));
-  if (x > enableArea.minX) {
-    w = Math.min(w, enableArea.maxX - x);
-  } else {
-    w = originX - enableArea.minX;
-  }
-  if (y > enableArea.minY) {
-    h = Math.min(h, enableArea.maxY - y);
-  } else {
-    h = originY - enableArea.minY;
-  }
+    // Restrict in page.
+    x = Math.min(enableArea.maxX, Math.max(enableArea.minX, x));
+    y = Math.min(enableArea.maxY, Math.max(enableArea.minY, y));
+    if (x > enableArea.minX) {
+      w = Math.min(w, enableArea.maxX - x);
+    } else {
+      w = originX - enableArea.minX;
+    }
+    if (y > enableArea.minY) {
+      h = Math.min(h, enableArea.maxY - y);
+    } else {
+      h = originY - enableArea.minY;
+    }
 
-  // Move and Resize.
-  overlay.style.left   = x + 'px';
-  overlay.style.top    = y + 'px';
-  overlay.style.width  = w + 'px';
-  overlay.style.height = h + 'px';
+    // Move and Resize.
+    overlay.style.left   = x + 'px';
+    overlay.style.top    = y + 'px';
+    overlay.style.width  = w + 'px';
+    overlay.style.height = h + 'px';
 
   // if (prevAnnotation) {
   //   prevAnnotation.resetTextForceDisplay();
@@ -226,19 +227,12 @@ function saveRect(rect) {
 
 
   // New type text.
-  console.log('======================');
   textInput.enable({ uuid : rectAnnotation.uuid, autoFocus : true , blurListener : () => {
-
-    console.log('aaaa');
-
-
-    // TODO ここで、disableからenableに切り替える.
-    // アノテーションで disable と enable を切り替えられるようにするべし.
-
-    // TODO
-    // BlurListenerが発火する前に、次のtextInput.enableが来ても、アノテーションのenableができるようにする.
-
+    // rectAnnotation.enable();
+    window.annotationContainer.enableAll();
   }});
+  // rectAnnotation.disable();
+  window.annotationContainer.disableAll();
 
 
   // addInputField(x, y, null, null, (text) => {
@@ -318,6 +312,8 @@ export function enableRect() {
  * Disable rect behavior
  */
 export function disableRect() {
+
+    console.log('disableRect');
 
     window.currentType = null;
 
