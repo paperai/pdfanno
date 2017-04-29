@@ -176,6 +176,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        console.log('disappearTextInput:', e.detail);
 	        inputLabel.disable(e.detail);
 	    });
+	
+	    iframeWindow.addEventListener('annotationDeleted', function (e) {
+	        console.log('annotationDeleted:', e.detail);
+	        inputLabel.treatAnnotationDeleted(e.detail);
+	    });
 	}
 	
 	/**
@@ -1318,6 +1323,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.enable = enable;
 	exports.disable = disable;
+	exports.treatAnnotationDeleted = treatAnnotationDeleted;
 	/**
 	 * UI parts - Input Label.
 	 */
@@ -1331,6 +1337,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _blurListener = void 0;
 	
+	var currentUUID = void 0;
+	
 	function enable(_ref) {
 	    var uuid = _ref.uuid,
 	        text = _ref.text,
@@ -1338,6 +1346,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        blurListener = _ref.blurListener;
 	
 	    console.log('enableInputLabel:', uuid, text);
+	
+	    currentUUID = uuid;
 	
 	    if (_blurListener) {
 	        _blurListener();
@@ -1380,7 +1390,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    $inputLabel.on('blur', function () {
 	
 	        if (blurListener) {
-	            // $inputLabel.on('blur', blurListener);
 	            blurListener();
 	            _blurListener = blurListener;
 	        }
@@ -1390,7 +1399,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // Add an autocomplete candidate. (Firefox, Chrome)
 	        $form.find('[type="submit"]').click();
 	
-	        disable({ uuid: uuid });
+	        // disable({ uuid });
 	    });
 	
 	    // if (blurListener) {
@@ -1404,7 +1413,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    console.log('disableInputLabel');
 	
+	    currentUUID = null;
+	
 	    $inputLabel.attr('disabled', 'disabled').val('');
+	}
+	
+	function treatAnnotationDeleted(_ref3) {
+	    var uuid = _ref3.uuid;
+	
+	    console.log('treatAnnotationDeleted:', uuid);
+	
+	    if (currentUUID === uuid) {
+	        disable.apply(undefined, arguments);
+	    }
 	}
 	
 	function cancelSubmit(e) {

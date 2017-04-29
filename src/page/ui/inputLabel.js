@@ -11,8 +11,12 @@
 
 let _blurListener;
 
+let currentUUID;
+
 export function enable({ uuid, text, autoFocus, blurListener }) {
     console.log('enableInputLabel:', uuid, text);
+
+    currentUUID = uuid;
 
     if (_blurListener) {
         _blurListener();
@@ -62,7 +66,6 @@ export function enable({ uuid, text, autoFocus, blurListener }) {
     $inputLabel.on('blur', () => {
 
         if (blurListener) {
-            // $inputLabel.on('blur', blurListener);
             blurListener();
             _blurListener = blurListener;
         }
@@ -72,7 +75,7 @@ export function enable({ uuid, text, autoFocus, blurListener }) {
         // Add an autocomplete candidate. (Firefox, Chrome)
         $form.find('[type="submit"]').click();
 
-        disable({ uuid });
+        // disable({ uuid });
 
     });
 
@@ -86,9 +89,19 @@ export function enable({ uuid, text, autoFocus, blurListener }) {
 export function disable({ uuid }) {
     console.log('disableInputLabel');
 
+    currentUUID = null;
+
     $inputLabel
         .attr('disabled', 'disabled')
         .val('');
+}
+
+export function treatAnnotationDeleted({ uuid }) {
+    console.log('treatAnnotationDeleted:', uuid);
+
+    if (currentUUID === uuid) {
+        disable(...arguments);
+    }
 }
 
 function cancelSubmit(e) {

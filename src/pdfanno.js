@@ -104,6 +104,11 @@ function startApplication() {
         console.log('disappearTextInput:', e.detail);
         inputLabel.disable(e.detail);
     });
+
+    iframeWindow.addEventListener('annotationDeleted', e => {
+        console.log('annotationDeleted:', e.detail);
+        inputLabel.treatAnnotationDeleted(e.detail);
+    });
 }
 
 /**

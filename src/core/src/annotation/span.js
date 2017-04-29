@@ -61,12 +61,13 @@ export default class SpanAnnotation extends AbstractAnnotation {
      * Delete the annotation from rendering, a container in window, and a container in localStorage.
      */
     destroy() {
-        super.destroy();
+        let promise = super.destroy();
         this.emit('delete');
 
         // TODO オブジェクトベースで削除できるようにしたい.
         window.globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
         window.globalEvent.removeListener('enableViewMode', this.enableViewMode);
+        return promise;
     }
 
     /**

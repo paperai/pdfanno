@@ -18508,10 +18508,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'destroy',
 	        value: function destroy() {
-	            _get(RectAnnotation.prototype.__proto__ || Object.getPrototypeOf(RectAnnotation.prototype), 'destroy', this).call(this);
+	            var promise = _get(RectAnnotation.prototype.__proto__ || Object.getPrototypeOf(RectAnnotation.prototype), 'destroy', this).call(this);
 	            this.emit('delete');
 	            window.globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
 	            window.globalEvent.removeListener('enableViewMode', this.enableViewMode);
+	            return promise;
 	        }
 	
 	        /**
@@ -18966,6 +18967,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.deleted = true;
 	            this.$element.remove();
 	
+	            var promise = Promise.resolve();
+	
 	            if (this.uuid) {
 	                window.annotationContainer.remove(this);
 	
@@ -18973,11 +18976,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    documentId = _getMetadata2.documentId; // TODO Remove this.
 	
 	
-	                window.PDFAnnoCore.getStoreAdapter().deleteAnnotation(documentId, this.uuid).then(function () {
-	                    console.log('deleted');
-	                });
+	                promise = window.PDFAnnoCore.getStoreAdapter().deleteAnnotation(documentId, this.uuid);
 	                this.textAnnotation && this.textAnnotation.destroy();
 	            }
+	
+	            return promise;
 	        }
 	
 	        /**
@@ -19131,8 +19134,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'deleteSelectedAnnotation',
 	        value: function deleteSelectedAnnotation() {
+	            var _this4 = this;
+	
 	            if (this.isSelected()) {
-	                this.destroy();
+	
+	                this.destroy().then(function () {
+	                    var event = document.createEvent('CustomEvent');
+	                    event.initCustomEvent('annotationDeleted', true, true, { uuid: _this4.uuid });
+	                    window.dispatchEvent(event);
+	                });
+	
 	                return true;
 	            }
 	            return false;
@@ -19385,7 +19396,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'destroy',
 	        value: function destroy() {
-	            _get(TextAnnotation.prototype.__proto__ || Object.getPrototypeOf(TextAnnotation.prototype), 'destroy', this).call(this);
+	            return _get(TextAnnotation.prototype.__proto__ || Object.getPrototypeOf(TextAnnotation.prototype), 'destroy', this).call(this);
 	        }
 	    }, {
 	        key: 'isHit',
@@ -19831,12 +19842,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'destroy',
 	        value: function destroy() {
-	            _get(SpanAnnotation.prototype.__proto__ || Object.getPrototypeOf(SpanAnnotation.prototype), 'destroy', this).call(this);
+	            var promise = _get(SpanAnnotation.prototype.__proto__ || Object.getPrototypeOf(SpanAnnotation.prototype), 'destroy', this).call(this);
 	            this.emit('delete');
 	
 	            // TODO オブジェクトベースで削除できるようにしたい.
 	            window.globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
 	            window.globalEvent.removeListener('enableViewMode', this.enableViewMode);
+	            return promise;
 	        }
 	
 	        /**
@@ -20553,7 +20565,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'destroy',
 	        value: function destroy() {
-	            _get(RelationAnnotation.prototype.__proto__ || Object.getPrototypeOf(RelationAnnotation.prototype), 'destroy', this).call(this);
+	            var promise = _get(RelationAnnotation.prototype.__proto__ || Object.getPrototypeOf(RelationAnnotation.prototype), 'destroy', this).call(this);
 	            if (this._rel1Annotation) {
 	                this._rel1Annotation.removeListener('hoverin', this.handleRelHoverIn);
 	                this._rel1Annotation.removeListener('hoverout', this.handleRelHoverOut);
@@ -20572,6 +20584,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
 	            globalEvent.removeListener('enableViewMode', this.enableViewMode);
 	            globalEvent.removeListener('rectmoveend', this.handleRelMoveEnd);
+	
+	            return promise;
 	        }
 	
 	        /**
