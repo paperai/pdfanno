@@ -65,7 +65,7 @@ export default class TextAnnotation extends AbstractAnnotation {
      * Delete a text annotation.
      */
     destroy() {
-        super.destroy();
+        return super.destroy();
     }
 
     isHit(x, y) {

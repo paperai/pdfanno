@@ -82,15 +82,16 @@ export default class AbstractAnnotation extends EventEmitter {
         this.deleted = true;
         this.$element.remove();
 
+        let promise = Promise.resolve();
+
         if (this.uuid) {
             window.annotationContainer.remove(this);
             let { documentId } = getMetadata(); // TODO Remove this.
-            window.PDFAnnoCore.getStoreAdapter().deleteAnnotation(documentId, this.uuid).then(() => {
-                console.log('deleted');
-            });
+            promise = window.PDFAnnoCore.getStoreAdapter().deleteAnnotation(documentId, this.uuid);
             this.textAnnotation && this.textAnnotation.destroy();
         }
 
+        return promise;
     }
 
     /**
@@ -218,7 +219,13 @@ export default class AbstractAnnotation extends EventEmitter {
      */
     deleteSelectedAnnotation() {
         if (this.isSelected()) {
-            this.destroy();
+
+            this.destroy().then(() => {
+                var event = document.createEvent('CustomEvent');
+                event.initCustomEvent('annotationDeleted', true, true, { uuid : this.uuid });
+                window.dispatchEvent(event);
+            });
+
             return true;
         }
         return false;

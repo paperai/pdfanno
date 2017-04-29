@@ -139,7 +139,7 @@ export default class RelationAnnotation extends AbstractAnnotation {
      * Destroy the annotation.
      */
     destroy() {
-        super.destroy();
+        let promise = super.destroy();
         if (this._rel1Annotation) {
             this._rel1Annotation.removeListener('hoverin', this.handleRelHoverIn);
             this._rel1Annotation.removeListener('hoverout', this.handleRelHoverOut);
@@ -158,6 +158,8 @@ export default class RelationAnnotation extends AbstractAnnotation {
         globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
         globalEvent.removeListener('enableViewMode', this.enableViewMode);
         globalEvent.removeListener('rectmoveend', this.handleRelMoveEnd);
+
+        return promise;
     }
 
     /**

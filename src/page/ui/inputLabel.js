@@ -11,8 +11,12 @@
 
 let _blurListener;
 
+let currentUUID;
+
 export function enable({ uuid, text, autoFocus, blurListener }) {
     console.log('enableInputLabel:', uuid, text);
+
+    currentUUID = uuid;
 
     if (_blurListener) {
         _blurListener();
@@ -86,9 +90,19 @@ export function enable({ uuid, text, autoFocus, blurListener }) {
 export function disable({ uuid }) {
     console.log('disableInputLabel');
 
+    currentUUID = null;
+
     $inputLabel
         .attr('disabled', 'disabled')
         .val('');
+}
+
+export function treatAnnotationDeleted({ uuid }) {
+    console.log('treatAnnotationDeleted:', uuid);
+
+    if (currentUUID === uuid) {
+        disable(...arguments);
+    }
 }
 
 function cancelSubmit(e) {
