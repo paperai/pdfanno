@@ -66,7 +66,6 @@ export function enable({ uuid, text, autoFocus, blurListener }) {
     $inputLabel.on('blur', () => {
 
         if (blurListener) {
-            // $inputLabel.on('blur', blurListener);
             blurListener();
             _blurListener = blurListener;
         }
@@ -76,7 +75,7 @@ export function enable({ uuid, text, autoFocus, blurListener }) {
         // Add an autocomplete candidate. (Firefox, Chrome)
         $form.find('[type="submit"]').click();
 
-        disable({ uuid });
+        // disable({ uuid });
 
     });
 
