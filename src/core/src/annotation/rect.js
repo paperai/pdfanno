@@ -168,8 +168,9 @@ export default class RectAnnotation extends AbstractAnnotation {
      * Handle a hoverin event.
      */
     handleHoverInEvent(e) {
-        this.highlight();
-        this.emit('hoverin');
+        super.handleHoverInEvent(e);
+        // this.highlight();
+        // this.emit('hoverin');
 
         let $elm = $(e.currentTarget);
         if ($elm.prop("tagName") === 'circle') {
@@ -181,8 +182,9 @@ export default class RectAnnotation extends AbstractAnnotation {
      * Handle a hoverout event.
      */
     handleHoverOutEvent(e) {
-        this.dehighlight();
-        this.emit('hoverout');
+        super.handleHoverOutEvent(e);
+        // this.dehighlight();
+        // this.emit('hoverout');
 
         let $elm = $(e.currentTarget);
         if ($elm.prop("tagName") === 'circle') {
@@ -193,8 +195,8 @@ export default class RectAnnotation extends AbstractAnnotation {
     /**
      * Handle a click event.
      */
-    handleClickEvent() {
-        this.toggleSelect();
+    handleClickEvent(e) {
+        super.handleClickEvent(e);
     }
 
     /**

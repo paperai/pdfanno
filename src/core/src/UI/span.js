@@ -8,6 +8,7 @@ import {
 } from './utils';
 import { addInputField } from './text';
 import SpanAnnotation from '../annotation/span';
+import * as textInput from '../utils/textInput';
 
 /**
  * the prev annotation rendered at the last.
@@ -118,17 +119,31 @@ function saveSpan(rects, selectedText) {
 
   // document.removeEventListener('mouseup', handleDocumentMouseup);
 
-  addInputField(x, y, null, null, (text) => {
 
-    // document.addEventListener('mouseup', handleDocumentMouseup);
+  // New type text.
+  textInput.enable({ uuid : spanAnnotation.uuid, autoFocus : true , blurListener : () => {
+    // spanAnnotation.enable();
+    window.annotationContainer.enableAll();
+  }});
+  // spanAnnotation.disable();
+  window.annotationContainer.disableAll();
 
-    spanAnnotation.text = text;
-    spanAnnotation.setTextForceDisplay();
-    spanAnnotation.render();
-    spanAnnotation.save();
-    spanAnnotation.enableViewMode();
 
-  });
+
+
+
+
+  // addInputField(x, y, null, null, (text) => {
+
+  //   // document.addEventListener('mouseup', handleDocumentMouseup);
+
+  //   spanAnnotation.text = text;
+  //   spanAnnotation.setTextForceDisplay();
+  //   spanAnnotation.render();
+  //   spanAnnotation.save();
+  //   spanAnnotation.enableViewMode();
+
+  // });
 
   if (prevAnnotation) {
     prevAnnotation.resetTextForceDisplay();

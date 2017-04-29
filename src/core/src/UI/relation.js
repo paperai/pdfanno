@@ -10,6 +10,7 @@ import {
   enableTextlayer
 } from './utils';
 import { getRelationTextPosition } from '../utils/relation.js';
+import * as textInput from '../utils/textInput';
 import { addInputField } from './text';
 
 import RelationAnnotation from '../annotation/relation';
@@ -75,6 +76,10 @@ function getClientXY(e) {
  * @param {Event} e The DOM event to handle
  */
 function handleDocumentMousemove(e) {
+
+    if (!relationAnnotation) {
+        return;
+    }
 
     if (mousedownFired) {
         mousemoveFired = true;
@@ -210,24 +215,34 @@ function handleDocumentMouseup(e) {
  */
 function showTextInput(relationAnnotation) {
 
-  let p1 = relationAnnotation.rel1Annotation.getBoundingCirclePosition();
-  let p2 = relationAnnotation.rel2Annotation.getBoundingCirclePosition();
-  let textPosition = getRelationTextPosition(p1.x, p1.y, p2.x, p2.y);
+    // New type text.
+    textInput.enable({ uuid : relationAnnotation.uuid, autoFocus : true , blurListener : () => {
+        // relationAnnotation.enable();
+        window.annotationContainer.enableAll();
+    }});
+    // relationAnnotation.disable();
+    window.annotationContainer.disableAll();
 
-  let boundingRect = svg.getBoundingClientRect();
 
-  let x = scaleUp(svg, {x : textPosition.x}).x + boundingRect.left;
-  let y = scaleUp(svg, {y : textPosition.y}).y + boundingRect.top;
 
-  addInputField(x, y, null, null, (text) => {
+  // let p1 = relationAnnotation.rel1Annotation.getBoundingCirclePosition();
+  // let p2 = relationAnnotation.rel2Annotation.getBoundingCirclePosition();
+  // let textPosition = getRelationTextPosition(p1.x, p1.y, p2.x, p2.y);
 
-    relationAnnotation.text = text;
-    relationAnnotation.setTextForceDisplay();
-    relationAnnotation.save();
-    relationAnnotation.render();
-    relationAnnotation.enableViewMode();
+  // let boundingRect = svg.getBoundingClientRect();
 
-  });
+  // let x = scaleUp(svg, {x : textPosition.x}).x + boundingRect.left;
+  // let y = scaleUp(svg, {y : textPosition.y}).y + boundingRect.top;
+
+  // addInputField(x, y, null, null, (text) => {
+
+  //   relationAnnotation.text = text;
+  //   relationAnnotation.setTextForceDisplay();
+  //   relationAnnotation.save();
+  //   relationAnnotation.render();
+  //   relationAnnotation.enableViewMode();
+
+  // });
 }
 
 /**

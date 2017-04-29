@@ -1,6 +1,7 @@
 import uuid from '../utils/uuid';
 import AbstractAnnotation from './abstract';
 import TextAnnotation from './text';
+import * as textInput from '../utils/textInput';
 
 /**
  * Span Annotation.
@@ -160,8 +161,7 @@ export default class SpanAnnotation extends AbstractAnnotation {
      * Handle a hoverin event.
      */
     handleHoverInEvent(e) {
-        this.highlight();
-        this.emit('hoverin');
+        super.handleHoverInEvent(e);
         this.emit('circlehoverin', this);
     }
 
@@ -169,16 +169,15 @@ export default class SpanAnnotation extends AbstractAnnotation {
      * Handle a hoverout event.
      */
     handleHoverOutEvent(e) {
-        this.dehighlight();
-        this.emit('hoverout');
+        super.handleHoverOutEvent(e);
         this.emit('circlehoverout', this);
     }
 
     /**
      * Handle a click event.
      */
-    handleClickEvent() {
-        this.toggleSelect();
+    handleClickEvent(e) {
+        super.handleClickEvent(e);
     }
 
     /**
