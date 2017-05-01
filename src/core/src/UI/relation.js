@@ -285,6 +285,20 @@ function handleBoundingCircleHoverOut(annotation) {
 }
 
 
+export function createRelation(type, anno1, anno2) {
+
+    let annotation = new RelationAnnotation();
+    annotation.direction = type;
+    annotation.rel1Annotation = anno1;
+    annotation.rel2Annotation = anno2;
+    annotation.save();
+    annotation.render();
+
+    showTextInput(annotation);
+
+}
+
+
 /**
  * Enable relation behavior.
  */

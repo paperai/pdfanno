@@ -60,6 +60,32 @@ export function setup() {
         }
     });
 
+    $('.js-tool-btn-rel').off('click').on('click', e => {
+
+        const $button = $(e.currentTarget);
+        const type = $button.data('type');
+
+        let selectedAnnotations = window.iframeWindow.annotationContainer.getSelectedAnnotations();
+        selectedAnnotations = selectedAnnotations.filter(a => {
+            return a.type === 'area' || a.type === 'span';
+        }).sort((a1, a2) => {
+            return (a1.selectedTime - a2.selectedTime); // asc
+        });
+
+        if (selectedAnnotations.length < 2) {
+            return alert('Please select two annotations first.');
+        }
+
+        const first  = selectedAnnotations[selectedAnnotations.length - 2];
+        const second = selectedAnnotations[selectedAnnotations.length - 1];
+
+        console.log('first:second,', first, second);
+
+        window.iframeWindow.PDFAnnoCore.UI.createRelation(type, first, second);
+
+        $button.blur();
+    });
+
 }
 
 /**

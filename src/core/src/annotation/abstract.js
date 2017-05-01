@@ -16,6 +16,8 @@ export default class AbstractAnnotation extends EventEmitter {
       this.autoBind();
 
       this.deleted = false;
+      this.selected = false;
+      this.selectedTime = null;
     }
 
     /**
@@ -173,6 +175,7 @@ export default class AbstractAnnotation extends EventEmitter {
      */
     select() {
         this.selected = true;
+        this.selectedTime = Date.now();
         this.$element.addClass('--selected');
     }
 
@@ -181,6 +184,7 @@ export default class AbstractAnnotation extends EventEmitter {
      */
     deselect() {
         this.selected = false;
+        this.selectedTime = null;
         this.$element.removeClass('--selected');
     }
 
