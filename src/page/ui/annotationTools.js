@@ -55,10 +55,24 @@ export function setup() {
 
     $('.js-tool-btn-span').off('click').on('click', e => {
         $(e.currentTarget).blur();
-        const result = window.iframeWindow.PDFAnnoCore.UI.createSpan();
-        if (!result) {
+        const anno = window.iframeWindow.PDFAnnoCore.UI.createSpan();
+        if (!anno) {
             alert('Please select a text span first.');
         }
+
+        // Check duplicated.
+        // let rects = window.iframeWindow.annotationContainer
+        //                 .getAllAnnotations()
+        //                 .filter(a => a.type === 'span')
+        //                 .filter(a => {
+        //                     if (anno.rectancles.length !== a.rectancles.length) {
+        //                         return false;
+        //                     }
+
+                            // TODO ここから実装する.
+                            // rectの同一判定を.
+                            // rectにもたせたほうがいいのかもしれないぞ...
+
     });
 
     $('.js-tool-btn-rel').off('click').on('click', e => {

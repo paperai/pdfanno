@@ -49,9 +49,10 @@ function getSelectionRects() {
 function handleDocumentMouseup() {
 
   let { rects, selectedText } = getSelectionRects();
+  let annotation;
   if (rects) {
     let svg = getSVGLayer();
-    saveSpan([...rects].map((r) => {
+    annotation = saveSpan([...rects].map((r) => {
       return {
         top    : r.top,
         left   : r.left,
@@ -63,7 +64,7 @@ function handleDocumentMouseup() {
 
   removeSelection();
 
-  return !!rects;
+  return annotation;
 }
 
 function removeSelection() {
@@ -151,6 +152,9 @@ function saveSpan(rects, selectedText) {
     prevAnnotation.enableViewMode();
   }
   prevAnnotation = spanAnnotation;
+
+
+  return spanAnnotation;
 
 }
 
