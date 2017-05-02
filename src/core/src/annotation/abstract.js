@@ -123,16 +123,20 @@ export default class AbstractAnnotation extends EventEmitter {
                 console.log('select:', this.uuid, this.text, this);
                 textInput.enable({ uuid : this.uuid, text : this.text });
 
+                // deselect another annotations.
+                if (window.ctrlPressed === false) {
+                    window.annotationContainer
+                        .getSelectedAnnotations()
+                        .filter(a => a.uuid !== this.uuid)
+                        .forEach(a => a.deselect());
+                }
+
             } else {
 
                 console.log('deselect:', this.uuid, this);
                 textInput.disable({ uuid : this.uuid });
-
             }
-
         }
-
-
 
     }
 
@@ -140,7 +144,7 @@ export default class AbstractAnnotation extends EventEmitter {
         console.log('handleHoverInEvent');
         this.highlight();
         this.emit('hoverin');
-        // New type text.
+
         textInput.enable({ uuid : this.uuid, text : this.text });
     }
 
@@ -148,7 +152,7 @@ export default class AbstractAnnotation extends EventEmitter {
         console.log('handleHoverOutEvent');
         this.dehighlight();
         this.emit('hoverout');
-        // New type text display.
+
         if (!this.selected) {
             textInput.disable({ uuid : this.uuid });
         }

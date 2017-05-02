@@ -32,6 +32,19 @@ PDFAnnoCore.setStoreAdapter(new PDFAnnoCore.PdfannoStoreAdapter());
 // Enable a view mode.
 PDFAnnoCore.UI.enableViewMode();
 
+// Check Ctrl or Cmd button clicked.
+// ** ATTENTION!! ALSO UPDATED by pdfanno.js **
+window.ctrlPressed = false;
+$(document).on('keydown', e => {
+    if (e.keyCode === 17 || e.keyCode === 91) { // 17:ctrlKey, 91:cmdKey
+        window.ctrlPressed = true;
+        console.log('ctrl press!!');
+    }
+}).on('keyup', e => {
+    window.ctrlPressed = false;
+    console.log('ctrl release!!');
+});
+
 // The event called at page rendered by pdfjs.
 window.addEventListener('pagerendered', function(ev) {
     console.log('pagerendered:', ev.detail.pageNumber);
