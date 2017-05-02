@@ -148,4 +148,17 @@ window.addEventListener('DOMContentLoaded', e => {
     annotationsTools.setup();
 
     window.addEventListener('restartApp', startApplication);
+
+    // enable text input.
+    window.addEventListener('enableTextInput', (e) => {
+        console.log('enableTextInput2:', e.detail);
+        inputLabel.enable(e.detail);
+    });
+
+    // disable text input.
+    window.addEventListener('disappearTextInput', (e) => {
+        console.log('disappearTextInput2:', e.detail);
+        inputLabel.disable(e.detail);
+    });
+
 });

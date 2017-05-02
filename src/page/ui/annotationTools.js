@@ -4,6 +4,7 @@
 import { reloadPDFViewer } from '../util/display';
 import { unlistenWindowLeaveEvent } from '../util/window';
 import { enableAnnotateTool, disableAnnotateTools } from '../util/anno';
+import { anyOf } from '../../shared/util';
 
 
 /**
@@ -78,8 +79,35 @@ export function setup() {
 
         const first  = selectedAnnotations[selectedAnnotations.length - 2];
         const second = selectedAnnotations[selectedAnnotations.length - 1];
-
         console.log('first:second,', first, second);
+
+        // Check duplicated.
+        const arrows = window.iframeWindow.annotationContainer
+                        .getAllAnnotations()
+                        .filter(a => a.type === 'relation')
+                        .filter(a => {
+                            return anyOf(a.rel1Annotation.uuid, [first.uuid, second.uuid])
+                                    && anyOf(a.rel2Annotation.uuid, [first.uuid, second.uuid])
+                        });
+        if (arrows.length > 0) {
+            console.log('same found!!!');
+            // Update!!
+            arrows[0].direction = type;
+            arrows[0].rel1Annotation = first;
+            arrows[0].rel2Annotation = second;
+            arrows[0].save();
+            arrows[0].render();
+            arrows[0].enableViewMode();
+            // Show label input.
+            var event = document.createEvent('CustomEvent');
+            event.initCustomEvent('enableTextInput', true, true, {
+                uuid : arrows[0].uuid,
+                text : arrows[0].text
+            });
+            window.dispatchEvent(event);
+            return;
+        }
+
 
         window.iframeWindow.PDFAnnoCore.UI.createRelation(type, first, second);
 

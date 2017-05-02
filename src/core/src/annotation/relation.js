@@ -20,6 +20,7 @@ export default class RelationAnnotation extends AbstractAnnotation {
 
         this.uuid           = uuid();
         this.type           = 'relation';
+        this.direction      = null;
         this.rel1Annotation = null;
         this.rel2Annotation = null;
         this.text           = null;
