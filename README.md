@@ -31,7 +31,7 @@ For security reasons, PDFAnno does NOT automatically save your annotations.
 Don't forget to download your current annotations!  
 
 ## Annotation Tools
-| Tool | Description |
+| Icon | Description |
 |:---:|:---|
 | <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-pencil.png" width="7%"> | Span highlighting. It is disallowed to cross page boundaries. |
 | <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-long-arrow-right.png" width="7%"> | One-way relation. This is used for annotating dependency relation between spans. |
@@ -85,7 +85,7 @@ Note that the reference files are rendered as read-only.
 span = new SpanAnnotation({
   page: 1,
   position:
- [[139.03536681054345,60.237086766202694,155.97302418023767,14.366197183098592]],
+ [["139.03536681054345","60.237086766202694","155.97302418023767","14.366197183098592"]],
   label: 'orange',
   text: 'Ready?',
   id: 1
@@ -99,7 +99,7 @@ window.delete(span);
 ```
 rel = new RelationAnnotation({
   dir: 'link',
-  ids: [1,2],
+  ids: ["1","2"],
   label: 'sample'
 });
 window.add(rel);
@@ -111,8 +111,8 @@ window.delete(rel);
 ```
 rect = new RectAnnotation({
   page:1,
-  position:[9.24324324324326,435.94054054054055,235.7027027027027,44.65945945945946],
-  label: 'aaaa', 
+  position:["9.24324324324326","435.94054054054055","235.7027027027027","44.65945945945946"],
+  label: 'rect-label', 
   id: 2
 });
 window.add(rect);
@@ -124,7 +124,7 @@ window.delete(rect);
 ```
 toml = `
 
-version = "0.2.0"
+version = 0.2
 
 [1]
 type = "span"
