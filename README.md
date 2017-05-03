@@ -85,6 +85,66 @@ Note that the reference files are rendered as read-only.
 * [hshindo](https://github.com/hshindo)
 * [yoheiMune](https://github.com/yoheiMune)
 
+### Annotation API (Experimental)
+`PDFAnno` provides annotation API for external programs.
+
+#### Span
+```
+span = new SpanAnnotation({
+  page: 1,
+  position:
+ [[139.03536681054345,60.237086766202694,155.97302418023767,14.366197183098592]],
+  label: 'orange',
+  text: 'Ready?',
+  id: 1
+});
+window.add(span);
+
+window.delete(span);
+```
+
+#### Relation
+```
+rel = new RelationAnnotation({
+  dir: 'link',
+  ids: [1,2],
+  label: 'sample'
+});
+window.add(rel);
+
+window.delete(rel);
+```
+
+#### Rectangle
+```
+rect = new RectAnnotation({
+  page:1,
+  position:[9.24324324324326,435.94054054054055,235.7027027027027,44.65945945945946],
+  label: 'aaaa', 
+  id: 2
+});
+window.add(rect);
+
+window.delete(rect);
+```
+
+#### Read from TOML
+```
+toml = `
+
+version = "0.2.0"
+
+[1]
+type = "span"
+page = 1
+position = [["139.03536681054345","60.237086766202694","155.97302418023767","14.366197183098592"]]
+label = "orange"
+text = "Ready?"
+`;
+anno = readTOML(toml);
+window.addAll(anno);
+```
+
 ## Developer's Guide
 PDFAnno is built upon [pdf.js](https://github.com/mozilla/pdf.js) for PDF viewer.
 We implement custom layers for rendering annotations on pdf.js.
