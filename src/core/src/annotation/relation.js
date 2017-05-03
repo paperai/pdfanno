@@ -2,6 +2,7 @@ import uuid from '../utils/uuid';
 import AbstractAnnotation from './abstract';
 import TextAnnotation from './text';
 import { getRelationTextPosition } from '../utils/relation.js';
+import { anyOf } from '../../../shared/util';
 
 let globalEvent;
 
@@ -344,4 +345,20 @@ export default class RelationAnnotation extends AbstractAnnotation {
             this.y2 = p.y;
         }
     }
+
+    /**
+     * @{inheritDoc}
+     */
+    equalTo(anno) {
+
+        if (!anno || this.type !== anno) {
+            return false;
+        }
+
+        const isSame = anyOf(this.rel1Annotation.uuid, [anno.rel1Annotation.uuid, anno.rel2Annotation.uuid])
+                        && anyOf(this.rel2Annotation.uuid, [anno.rel1Annotation.uuid, anno.rel2Annotation.uuid])
+
+        return isSame;
+    }
+
 }

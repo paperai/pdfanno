@@ -310,4 +310,11 @@ export default class AbstractAnnotation extends EventEmitter {
         this.$element.css('pointer-events', 'none');
     }
 
+    /**
+     * Check the another annotation is equal to `this`.
+     */
+    equalTo(anotherAnnotation) {
+        // Implement Here.
+        return false;
+    }
 }

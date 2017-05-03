@@ -55,23 +55,47 @@ export function setup() {
 
     $('.js-tool-btn-span').off('click').on('click', e => {
         $(e.currentTarget).blur();
-        const anno = window.iframeWindow.PDFAnnoCore.UI.createSpan();
-        if (!anno) {
-            alert('Please select a text span first.');
+
+        const rects = window.iframeWindow.PDFAnnoCore.UI.getRectangles();
+
+        // Check empty.
+        if (!rects) {
+            return alert('Please select a text span first.');
         }
 
         // Check duplicated.
-        // let rects = window.iframeWindow.annotationContainer
-        //                 .getAllAnnotations()
-        //                 .filter(a => a.type === 'span')
-        //                 .filter(a => {
-        //                     if (anno.rectancles.length !== a.rectancles.length) {
-        //                         return false;
-        //                     }
+        let annos = window.iframeWindow.annotationContainer
+                        .getAllAnnotations()
+                        .filter(a => a.type === 'span')
+                        .filter(a => {
+                            console.log('aaaaa:', rects, a);
+                            if (rects.length !== a.rectangles.length) {
+                                return false;
+                            }
+                            for (let i = 0; i < rects.length; i++) {
+                                if (rects[i].x !== a.rectangles[i].x
+                                    || rects[i].y !== a.rectangles[i].y
+                                    || rects[i].width !== a.rectangles[i].width
+                                    || rects[i].height !== a.rectangles[i].height) {
+                                    return false;
+                                }
+                            }
+                            return true;
+                        });
 
-                            // TODO ここから実装する.
-                            // rectの同一判定を.
-                            // rectにもたせたほうがいいのかもしれないぞ...
+        if (annos.length > 0) {
+            // Show label input.
+            var event = document.createEvent('CustomEvent');
+            event.initCustomEvent('enableTextInput', true, true, {
+                uuid : annos[0].uuid,
+                text : annos[0].text
+            });
+            window.dispatchEvent(event);
+            return;
+        }
+
+        // Create a new rectAnnotation.
+        const anno = window.iframeWindow.PDFAnnoCore.UI.createSpan();
 
     });
 
@@ -103,6 +127,7 @@ export function setup() {
                             return anyOf(a.rel1Annotation.uuid, [first.uuid, second.uuid])
                                     && anyOf(a.rel2Annotation.uuid, [first.uuid, second.uuid])
                         });
+
         if (arrows.length > 0) {
             console.log('same found!!!');
             // Update!!

@@ -158,6 +158,32 @@ function saveSpan(rects, selectedText) {
 
 }
 
+export function getRectangles() {
+
+    let { rects } = getSelectionRects();
+    if (!rects) {
+        return null;
+    }
+    console.log('rects1:', rects);
+
+    let svg = getSVGLayer();
+    let boundingRect = svg.getBoundingClientRect();
+
+    rects = [...rects].map((r) => {
+      return scaleDown(svg, {
+        x      : r.left - boundingRect.left,
+        y      : r.top - boundingRect.top,
+        width  : r.width,
+        height : r.height
+      });
+    }).filter((r) => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1);
+
+    console.log('rects2:', rects);
+
+    return rects;
+
+}
+
 /**
  * Create a span by current texts selection.
  */
