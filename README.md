@@ -33,11 +33,11 @@ Don't forget to download your current annotations!
 ## Annotation Tools
 | Tool | Description |
 |:---:|:---|
-| <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-pencil.png" width="10%"> | Span highlighting. It is disallowed to cross page boundaries. |
-| <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-long-arrow-right.png" width="10%"> | One-way relation. This is used for annotating dependency relation between spans. |
-| <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-arrows-h.png" width="10%"> | Two-way relation. |
-| <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-minus.png" width="10%"> | Link relation. If you want to add non-directional relation between spans, use this. |
-| <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-square-o.png" width="10%"> | Rectangle. It is disallowed to cross page boundaries. |
+| <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-pencil.png" width="7%"> | Span highlighting. It is disallowed to cross page boundaries. |
+| <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-long-arrow-right.png" width="7%"> | One-way relation. This is used for annotating dependency relation between spans. |
+| <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-arrows-h.png" width="7%"> | Two-way relation. |
+| <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-minus.png" width="7%"> | Link relation. If you want to add non-directional relation between spans, use this. |
+| <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-square-o.png" width="7%"> | Rectangle. It is disallowed to cross page boundaries. |
 
 ## Annotation File (.anno)
 In PDFAnno, the annotation file (.anno) follows [TOML](https://github.com/toml-lang/toml) format.  
