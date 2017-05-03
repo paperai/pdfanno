@@ -32,7 +32,7 @@ Don't forget to download your current annotations!
 
 ## Annotation Tools
 | Icon | Description |
-|:---:|:---|
+|:---:|:---:|
 | <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-pencil.png" width="7%"> | Span highlighting. It is disallowed to cross page boundaries. |
 | <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-long-arrow-right.png" width="7%"> | One-way relation. This is used for annotating dependency relation between spans. |
 | <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-arrows-h.png" width="7%"> | Two-way relation. |
