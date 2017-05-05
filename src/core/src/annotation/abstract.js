@@ -16,6 +16,8 @@ export default class AbstractAnnotation extends EventEmitter {
       this.autoBind();
 
       this.deleted = false;
+      this.selected = false;
+      this.selectedTime = null;
     }
 
     /**
@@ -121,16 +123,20 @@ export default class AbstractAnnotation extends EventEmitter {
                 console.log('select:', this.uuid, this.text, this);
                 textInput.enable({ uuid : this.uuid, text : this.text });
 
+                // deselect another annotations.
+                if (window.ctrlPressed === false) {
+                    window.annotationContainer
+                        .getSelectedAnnotations()
+                        .filter(a => a.uuid !== this.uuid)
+                        .forEach(a => a.deselect());
+                }
+
             } else {
 
                 console.log('deselect:', this.uuid, this);
                 textInput.disable({ uuid : this.uuid });
-
             }
-
         }
-
-
 
     }
 
@@ -138,7 +144,7 @@ export default class AbstractAnnotation extends EventEmitter {
         console.log('handleHoverInEvent');
         this.highlight();
         this.emit('hoverin');
-        // New type text.
+
         textInput.enable({ uuid : this.uuid, text : this.text });
     }
 
@@ -146,7 +152,7 @@ export default class AbstractAnnotation extends EventEmitter {
         console.log('handleHoverOutEvent');
         this.dehighlight();
         this.emit('hoverout');
-        // New type text display.
+
         if (!this.selected) {
             textInput.disable({ uuid : this.uuid });
         }
@@ -173,6 +179,7 @@ export default class AbstractAnnotation extends EventEmitter {
      */
     select() {
         this.selected = true;
+        this.selectedTime = Date.now();
         this.$element.addClass('--selected');
     }
 
@@ -181,6 +188,7 @@ export default class AbstractAnnotation extends EventEmitter {
      */
     deselect() {
         this.selected = false;
+        this.selectedTime = null;
         this.$element.removeClass('--selected');
     }
 
@@ -302,4 +310,11 @@ export default class AbstractAnnotation extends EventEmitter {
         this.$element.css('pointer-events', 'none');
     }
 
+    /**
+     * Check the another annotation is equal to `this`.
+     */
+    equalTo(anotherAnnotation) {
+        // Implement Here.
+        return false;
+    }
 }

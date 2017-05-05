@@ -84,20 +84,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var annotationsTools = _interopRequireWildcard(_annotationTools);
 	
-	var _inputLabel = __webpack_require__(12);
+	var _inputLabel = __webpack_require__(13);
 	
 	var inputLabel = _interopRequireWildcard(_inputLabel);
 	
 	var _window = __webpack_require__(11);
 	
-	var _public = __webpack_require__(13);
+	var _public = __webpack_require__(14);
 	
 	var publicApi = _interopRequireWildcard(_public);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
-	__webpack_require__(17);
 	__webpack_require__(18);
+	__webpack_require__(19);
 	
 	/**
 	 * Expose public APIs.
@@ -114,6 +114,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * The data which is loaded via `Browse` button.
 	 */
 	window.fileMap = {};
+	
+	// Check Ctrl or Cmd button clicked.
+	// ** ATTENTION!! ALSO UPDATED by core/index.js **
+	$(document).on('keydown', function (e) {
+	    if (e.keyCode === 17 || e.keyCode === 91) {
+	        // 17:ctrlKey, 91:cmdKey
+	        window.iframeWindow.ctrlPressed = true;
+	        console.log('ctrl press!!2');
+	    }
+	}).on('keyup', function (e) {
+	    window.iframeWindow.ctrlPressed = false;
+	    console.log('ctrl release!!2');
+	});
 	
 	/**
 	    Adjust the height of viewer according to window height.
@@ -208,6 +221,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    annotationsTools.setup();
 	
 	    window.addEventListener('restartApp', startApplication);
+	
+	    // enable text input.
+	    window.addEventListener('enableTextInput', function (e) {
+	        console.log('enableTextInput2:', e.detail);
+	        inputLabel.enable(e.detail);
+	    });
+	
+	    // disable text input.
+	    window.addEventListener('disappearTextInput', function (e) {
+	        console.log('disappearTextInput2:', e.detail);
+	        inputLabel.disable(e.detail);
+	    });
 	});
 
 /***/ },
@@ -1155,9 +1180,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _anno = __webpack_require__(1);
 	
+	var _util = __webpack_require__(12);
+	
 	/**
 	    Set the behavior of the tool buttons for annotations.
 	*/
+	/**
+	 * UI parts - Annotations Tools.
+	 */
 	function setup() {
 	
 	    window.currentAnnoToolType = 'view';
@@ -1201,18 +1231,99 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    $('.js-tool-btn-span').off('click').on('click', function (e) {
 	        $(e.currentTarget).blur();
-	        var result = window.iframeWindow.PDFAnnoCore.UI.createSpan();
-	        if (!result) {
-	            alert('Please select a text span first.');
+	
+	        var rects = window.iframeWindow.PDFAnnoCore.UI.getRectangles();
+	
+	        // Check empty.
+	        if (!rects) {
+	            return alert('Please select a text span first.');
 	        }
+	
+	        // Check duplicated.
+	        var annos = window.iframeWindow.annotationContainer.getAllAnnotations().filter(function (a) {
+	            return a.type === 'span';
+	        }).filter(function (a) {
+	            console.log('aaaaa:', rects, a);
+	            if (rects.length !== a.rectangles.length) {
+	                return false;
+	            }
+	            for (var i = 0; i < rects.length; i++) {
+	                if (rects[i].x !== a.rectangles[i].x || rects[i].y !== a.rectangles[i].y || rects[i].width !== a.rectangles[i].width || rects[i].height !== a.rectangles[i].height) {
+	                    return false;
+	                }
+	            }
+	            return true;
+	        });
+	
+	        if (annos.length > 0) {
+	            // Show label input.
+	            var event = document.createEvent('CustomEvent');
+	            event.initCustomEvent('enableTextInput', true, true, {
+	                uuid: annos[0].uuid,
+	                text: annos[0].text
+	            });
+	            window.dispatchEvent(event);
+	            return;
+	        }
+	
+	        // Create a new rectAnnotation.
+	        var anno = window.iframeWindow.PDFAnnoCore.UI.createSpan();
+	    });
+	
+	    $('.js-tool-btn-rel').off('click').on('click', function (e) {
+	
+	        var $button = $(e.currentTarget);
+	        var type = $button.data('type');
+	
+	        var selectedAnnotations = window.iframeWindow.annotationContainer.getSelectedAnnotations();
+	        selectedAnnotations = selectedAnnotations.filter(function (a) {
+	            return a.type === 'area' || a.type === 'span';
+	        }).sort(function (a1, a2) {
+	            return a1.selectedTime - a2.selectedTime; // asc
+	        });
+	
+	        if (selectedAnnotations.length < 2) {
+	            return alert('Please select two annotations first.');
+	        }
+	
+	        var first = selectedAnnotations[selectedAnnotations.length - 2];
+	        var second = selectedAnnotations[selectedAnnotations.length - 1];
+	        console.log('first:second,', first, second);
+	
+	        // Check duplicated.
+	        var arrows = window.iframeWindow.annotationContainer.getAllAnnotations().filter(function (a) {
+	            return a.type === 'relation';
+	        }).filter(function (a) {
+	            return (0, _util.anyOf)(a.rel1Annotation.uuid, [first.uuid, second.uuid]) && (0, _util.anyOf)(a.rel2Annotation.uuid, [first.uuid, second.uuid]);
+	        });
+	
+	        if (arrows.length > 0) {
+	            console.log('same found!!!');
+	            // Update!!
+	            arrows[0].direction = type;
+	            arrows[0].rel1Annotation = first;
+	            arrows[0].rel2Annotation = second;
+	            arrows[0].save();
+	            arrows[0].render();
+	            arrows[0].enableViewMode();
+	            // Show label input.
+	            var event = document.createEvent('CustomEvent');
+	            event.initCustomEvent('enableTextInput', true, true, {
+	                uuid: arrows[0].uuid,
+	                text: arrows[0].text
+	            });
+	            window.dispatchEvent(event);
+	            return;
+	        }
+	
+	        window.iframeWindow.PDFAnnoCore.UI.createRelation(type, first, second);
+	
+	        $button.blur();
 	    });
 	}
 	
 	/**
 	 * Export the primary annotation data for download.
-	 */
-	/**
-	 * UI parts - Annotations Tools.
 	 */
 	function downloadAnnotation() {
 	
@@ -1314,6 +1425,26 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 12 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.anyOf = anyOf;
+	/**
+	 * Utility.
+	 */
+	
+	function anyOf(target, candidates) {
+	  return candidates.filter(function (c) {
+	    return c === target;
+	  }).length > 0;
+	}
+
+/***/ },
+/* 13 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1454,7 +1585,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1474,7 +1605,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _anno = __webpack_require__(1);
 	
-	var _toml = __webpack_require__(14);
+	var _toml = __webpack_require__(15);
 	
 	var _toml2 = _interopRequireDefault(_toml);
 	
@@ -1665,11 +1796,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	var readTOML = exports.readTOML = _toml2.default.parse;
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var parser = __webpack_require__(15);
-	var compiler = __webpack_require__(16);
+	var parser = __webpack_require__(16);
+	var compiler = __webpack_require__(17);
 	
 	module.exports = {
 	  parse: function(input) {
@@ -1680,7 +1811,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports) {
 
 	module.exports = (function() {
@@ -5527,7 +5658,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -5730,22 +5861,22 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 17 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__.p + "dist/index.html";
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(19);
+	var content = __webpack_require__(20);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(21)(content, {});
+	var update = __webpack_require__(22)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -5762,10 +5893,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 19 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(20)();
+	exports = module.exports = __webpack_require__(21)();
 	// imports
 	
 	
@@ -5776,7 +5907,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 20 */
+/* 21 */
 /***/ function(module, exports) {
 
 	/*
@@ -5832,7 +5963,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 21 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*

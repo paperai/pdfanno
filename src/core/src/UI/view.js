@@ -23,6 +23,16 @@ function disablePagebackAction(e) {
 }
 
 /**
+ * Deselect annotations when pages clicked.
+ */
+function handlePageClick(e) {
+    console.log('handlePageClick');
+    window.annotationContainer
+        .getSelectedAnnotations()
+        .forEach(a => a.deselect());
+}
+
+/**
  * Delete selected annotations.
  */
 function deleteSelectedAnnotations() {
@@ -41,6 +51,10 @@ export function enableViewMode() {
     document.removeEventListener('keydown', disablePagebackAction);
     document.addEventListener('keyup', disablePagebackAction);
     document.addEventListener('keydown', disablePagebackAction);
+
+    $(document)
+        .off('click', handlePageClick)
+        .on('click', '.page', handlePageClick);
 
 }
 
