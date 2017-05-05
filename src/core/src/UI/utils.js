@@ -84,6 +84,7 @@ export function enableUserSelect() {
  * Disable all text layers.
  */
 export function disableTextlayer() {
+    console.log('disableTextlayer');
   $('body').addClass('disable-text-layer');
 }
 
@@ -91,6 +92,7 @@ export function disableTextlayer() {
  * Enable all text layers.
  */
 export function enableTextlayer() {
+    console.log('enableTextlayer');
   $('body').removeClass('disable-text-layer');
 }
 
