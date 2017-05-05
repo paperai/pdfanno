@@ -68,6 +68,7 @@ window.addEventListener('pagerendered', function(ev) {
 window.addEventListener('scalechange', () => {
     console.log('scalechange');
     removeAnnoLayer();
+    renderAnno();
 });
 
 /*
