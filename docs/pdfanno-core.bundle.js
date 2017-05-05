@@ -18122,6 +18122,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Disable all text layers.
 	 */
 	function disableTextlayer() {
+	  console.log('disableTextlayer');
 	  (0, _jquery2.default)('body').addClass('disable-text-layer');
 	}
 	
@@ -18129,6 +18130,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Enable all text layers.
 	 */
 	function enableTextlayer() {
+	  console.log('enableTextlayer');
 	  (0, _jquery2.default)('body').removeClass('disable-text-layer');
 	}
 	
@@ -18791,7 +18793,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'disableTextlayer',
 	        value: function disableTextlayer() {
-	            $('.textLayer').hide();
+	            // $('.textLayer').hide();
+	            $('body').addClass('disable-text-layer');
 	        }
 	
 	        // TODO 共通化？
@@ -18799,7 +18802,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'enableTextlayer',
 	        value: function enableTextlayer() {
-	            $('.textLayer').show();
+	            // $('.textLayer').show();
+	            $('body').removeClass('disable-text-layer');
 	        }
 	    }, {
 	        key: 'enableDragAction',
