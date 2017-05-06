@@ -9,6 +9,7 @@ import * as pdfDropdown from './page/ui/pdfDropdown';
 import * as primaryAnnoDropdown from './page/ui/primaryAnnoDropdown';
 import * as annoListDropdown from './page/ui/annoListDropdown';
 import * as referenceAnnoDropdown from './page/ui/referenceAnnoDropdown';
+import * as downloadButton from './page/ui/downloadButton';
 import * as annotationsTools from './page/ui/annotationTools';
 import * as inputLabel from './page/ui/inputLabel';
 
@@ -145,6 +146,7 @@ window.addEventListener('DOMContentLoaded', e => {
     primaryAnnoDropdown.setup();
     referenceAnnoDropdown.setup();
     annoListDropdown.setup();
+    downloadButton.setup();
     annotationsTools.setup();
 
     window.addEventListener('restartApp', startApplication);
