@@ -50,6 +50,10 @@ export default class AnnotationContainer {
         return list;
     }
 
+    getSelectedAnnotations() {
+        return this.getAllAnnotations().filter(a => a.selected);
+    }
+
     /**
      * Find an annotation by the id which an annotation has.
      */

@@ -49,9 +49,10 @@ function getSelectionRects() {
 function handleDocumentMouseup() {
 
   let { rects, selectedText } = getSelectionRects();
+  let annotation;
   if (rects) {
     let svg = getSVGLayer();
-    saveSpan([...rects].map((r) => {
+    annotation = saveSpan([...rects].map((r) => {
       return {
         top    : r.top,
         left   : r.left,
@@ -63,7 +64,7 @@ function handleDocumentMouseup() {
 
   removeSelection();
 
-  return !!rects;
+  return annotation;
 }
 
 function removeSelection() {
@@ -151,6 +152,35 @@ function saveSpan(rects, selectedText) {
     prevAnnotation.enableViewMode();
   }
   prevAnnotation = spanAnnotation;
+
+
+  return spanAnnotation;
+
+}
+
+export function getRectangles() {
+
+    let { rects } = getSelectionRects();
+    if (!rects) {
+        return null;
+    }
+    console.log('rects1:', rects);
+
+    let svg = getSVGLayer();
+    let boundingRect = svg.getBoundingClientRect();
+
+    rects = [...rects].map((r) => {
+      return scaleDown(svg, {
+        x      : r.left - boundingRect.left,
+        y      : r.top - boundingRect.top,
+        width  : r.width,
+        height : r.height
+      });
+    }).filter((r) => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1);
+
+    console.log('rects2:', rects);
+
+    return rects;
 
 }
 

@@ -30,20 +30,16 @@ If you continue the annotation, respecify your directory via `Browse` button to 
 For security reasons, PDFAnno does NOT automatically save your annotations.  
 Don't forget to download your current annotations!  
 
-### Annotation Tools
-<img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-pencil.png" width="2%"> Span highlighting. It is disallowed to cross page boundaries.
+## Annotation Tools
+| Icon | Description |
+|:---:|:---:|
+| <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-pencil.png" width="7%"> | Span highlighting. It is disallowed to cross page boundaries. |
+| <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-long-arrow-right.png" width="7%"> | One-way relation. This is used for annotating dependency relation between spans. |
+| <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-arrows-h.png" width="7%"> | Two-way relation. |
+| <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-minus.png" width="7%"> | Link relation. If you want to add non-directional relation between spans, use this. |
+| <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-square-o.png" width="7%"> | Rectangle. It is disallowed to cross page boundaries. |
 
-<img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-long-arrow-right.png" width="2%"> One-way relation. This is used for annotating dependency relation between spans.
-
-<img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-arrows-h.png" width="2%"> Two-way relation.
-
-<img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-minus.png" width="2%"> Link relation. If you want to add non-directional relation between spans, use this. This is also useful for grouping multiple spans.
-
-<img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-square-o.png" width="2%"> Rectangle. It is disallowed to cross page boundaries.
-
-<img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-download.png" width="2%"> Download the annotation file.
-
-### Annotation File (.anno)
+## Annotation File (.anno)
 In PDFAnno, the annotation file (.anno) follows [TOML](https://github.com/toml-lang/toml) format.  
 Here is an example of anno file:
 ```
@@ -75,15 +71,71 @@ label = "label-4"
 ```
 where `position` indicates `(x, y, width, height)` of the annotation.  
 
-### Reference Anno File
+## Reference Anno File
 To support multi-user annotation, PDFAnno allows to load `reference anno file`.  
 For example, if you create `a.anno` and an another annotator creates `b.anno` for the same PDF, load `a.anno` as usual, and load `b.anno` as a reference file. Then PDFAnno renders `a.anno` and `b.anno` with different colors each other. Rendering more than one reference file is also supported.   
 This is useful to check inter-annotator agreement and resolving annotation conflicts.  
 Note that the reference files are rendered as read-only.
 
-### Authors
-* [hshindo](https://github.com/hshindo)
-* [yoheiMune](https://github.com/yoheiMune)
+## Annotation API (Experimental)
+`PDFAnno` provides annotation API for external programs.
+
+### Span
+```
+span = new SpanAnnotation({
+  page: 1,
+  position:
+ [["139.03536681054345","60.237086766202694","155.97302418023767","14.366197183098592"]],
+  label: 'orange',
+  text: 'Ready?',
+  id: 1
+});
+window.add(span);
+
+window.delete(span);
+```
+
+### Relation
+```
+rel = new RelationAnnotation({
+  dir: 'link',
+  ids: ["1","2"],
+  label: 'sample'
+});
+window.add(rel);
+
+window.delete(rel);
+```
+
+### Rectangle
+```
+rect = new RectAnnotation({
+  page:1,
+  position:["9.24324324324326","435.94054054054055","235.7027027027027","44.65945945945946"],
+  label: 'rect-label', 
+  id: 2
+});
+window.add(rect);
+
+window.delete(rect);
+```
+
+### Read from TOML
+```
+toml = `
+
+version = 0.2
+
+[1]
+type = "span"
+page = 1
+position = [["139.03536681054345","60.237086766202694","155.97302418023767","14.366197183098592"]]
+label = "orange"
+text = "Ready?"
+`;
+anno = readTOML(toml);
+window.addAll(anno);
+```
 
 ## Developer's Guide
 PDFAnno is built upon [pdf.js](https://github.com/mozilla/pdf.js) for PDF viewer.
@@ -103,6 +155,10 @@ For developing,
 npm run anno:watch
 ```
 This command starts Webpack Dev Server and you can access  [http://localhost:8080/dist/index.html](http://localhost:8080/dist/index.html) in your browser.
+
+## Authors
+* [hshindo](https://github.com/hshindo)
+* [yoheiMune](https://github.com/yoheiMune)
 
 ## LICENSE
 MIT

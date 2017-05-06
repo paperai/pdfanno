@@ -275,12 +275,14 @@ export default class RectAnnotation extends AbstractAnnotation {
 
     // TODO 共通化？
     disableTextlayer() {
-      $('.textLayer').hide();
+      // $('.textLayer').hide();
+      $('body').addClass('disable-text-layer');
     }
 
     // TODO 共通化？
     enableTextlayer() {
-      $('.textLayer').show();
+      // $('.textLayer').show();
+      $('body').removeClass('disable-text-layer');
     }
 
 

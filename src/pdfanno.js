@@ -42,6 +42,18 @@ window.readTOML = publicApi.readTOML;
  */
 window.fileMap = {};
 
+// Check Ctrl or Cmd button clicked.
+// ** ATTENTION!! ALSO UPDATED by core/index.js **
+$(document).on('keydown', e => {
+    if (e.keyCode === 17 || e.keyCode === 91) { // 17:ctrlKey, 91:cmdKey
+        window.iframeWindow.ctrlPressed = true;
+        console.log('ctrl press!!2');
+    }
+}).on('keyup', e => {
+    window.iframeWindow.ctrlPressed = false;
+    console.log('ctrl release!!2');
+});
+
 /**
     Adjust the height of viewer according to window height.
 */
@@ -136,4 +148,17 @@ window.addEventListener('DOMContentLoaded', e => {
     annotationsTools.setup();
 
     window.addEventListener('restartApp', startApplication);
+
+    // enable text input.
+    window.addEventListener('enableTextInput', (e) => {
+        console.log('enableTextInput2:', e.detail);
+        inputLabel.enable(e.detail);
+    });
+
+    // disable text input.
+    window.addEventListener('disappearTextInput', (e) => {
+        console.log('disappearTextInput2:', e.detail);
+        inputLabel.disable(e.detail);
+    });
+
 });
