@@ -80,24 +80,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var referenceAnnoDropdown = _interopRequireWildcard(_referenceAnnoDropdown);
 	
-	var _annotationTools = __webpack_require__(10);
+	var _downloadButton = __webpack_require__(10);
+	
+	var downloadButton = _interopRequireWildcard(_downloadButton);
+	
+	var _annotationTools = __webpack_require__(12);
 	
 	var annotationsTools = _interopRequireWildcard(_annotationTools);
 	
-	var _inputLabel = __webpack_require__(13);
+	var _inputLabel = __webpack_require__(14);
 	
 	var inputLabel = _interopRequireWildcard(_inputLabel);
 	
 	var _window = __webpack_require__(11);
 	
-	var _public = __webpack_require__(14);
+	var _public = __webpack_require__(15);
 	
 	var publicApi = _interopRequireWildcard(_public);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
-	__webpack_require__(18);
 	__webpack_require__(19);
+	__webpack_require__(20);
 	
 	/**
 	 * Expose public APIs.
@@ -218,6 +222,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    primaryAnnoDropdown.setup();
 	    referenceAnnoDropdown.setup();
 	    annoListDropdown.setup();
+	    downloadButton.setup();
 	    annotationsTools.setup();
 	
 	    window.addEventListener('restartApp', startApplication);
@@ -1174,20 +1179,147 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.setup = setup;
 	
-	var _display = __webpack_require__(2);
-	
 	var _window = __webpack_require__(11);
+	
+	/**
+	 * Setup the behavior of a Download Button.
+	 */
+	function setup() {
+	
+	    $('#downloadButton').off('click').on('click', function (e) {
+	
+	        $(e.currentTarget).blur();
+	
+	        downloadAnnotation();
+	
+	        return false;
+	    });
+	}
+	
+	/**
+	 * Export the primary annotation data for download.
+	 */
+	/**
+	 * UI parts - Download Button.
+	 */
+	function downloadAnnotation() {
+	
+	    window.iframeWindow.PDFAnnoCore.getStoreAdapter().exportData().then(function (annotations) {
+	        var blob = new Blob([annotations]);
+	        var blobURL = window.URL.createObjectURL(blob);
+	        var a = document.createElement('a');
+	        document.body.appendChild(a); // for firefox working correctly.
+	        a.download = _getDownloadFileName();
+	        a.href = blobURL;
+	        a.click();
+	        a.parentNode.removeChild(a);
+	    });
+	
+	    (0, _window.unlistenWindowLeaveEvent)();
+	}
+	
+	/**
+	 * Get the file name for download.
+	 */
+	function _getDownloadFileName() {
+	
+	    // The name of Primary Annotation.
+	    var primaryAnnotationName = void 0;
+	    $('#dropdownAnnoPrimary a').each(function (index, element) {
+	        var $elm = $(element);
+	        if ($elm.find('.fa-check').hasClass('no-visible') === false) {
+	            primaryAnnotationName = $elm.find('.js-annoname').text();
+	        }
+	    });
+	    if (primaryAnnotationName) {
+	        return primaryAnnotationName;
+	    }
+	
+	    // The name of PDF.
+	    var pdfFileName = iframeWindow.getFileName(iframeWindow.PDFView.url);
+	    return pdfFileName.split('.')[0] + '.anno';
+	}
+
+/***/ },
+/* 11 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.listenWindowLeaveEvent = listenWindowLeaveEvent;
+	exports.unlistenWindowLeaveEvent = unlistenWindowLeaveEvent;
+	exports.resizeHandler = resizeHandler;
+	/**
+	 * Utility for window.
+	 */
+	
+	/**
+	 * Set the confirm dialog at leaving the page.
+	 */
+	function listenWindowLeaveEvent() {
+	    window.annotationUpdated = true;
+	    $(window).off('beforeunload').on('beforeunload', function () {
+	        return 'You don\'t save the annotations yet.\nAre you sure to leave ?';
+	    });
+	}
+	
+	/**
+	 * Unset the confirm dialog at leaving the page.
+	 */
+	function unlistenWindowLeaveEvent() {
+	    window.annotationUpdated = false;
+	    $(window).off('beforeunload');
+	}
+	
+	/**
+	 * Resize the height of elements adjusting to the window.
+	 */
+	function resizeHandler() {
+	
+	    // PDFViewer.
+	    var height = $(window).innerHeight() - $('#viewer').offset().top;
+	    $('#viewer iframe').css('height', height + 'px');
+	
+	    // Dropdown for PDF.
+	    var height1 = $(window).innerHeight() - ($('#dropdownPdf ul').offset().top || 120);
+	    $('#dropdownPdf ul').css('max-height', height1 - 20 + 'px');
+	
+	    // Dropdown for Primary Annos.
+	    var height2 = $(window).innerHeight() - ($('#dropdownAnnoPrimary ul').offset().top || 120);
+	    $('#dropdownAnnoPrimary ul').css('max-height', height2 - 20 + 'px');
+	
+	    // Dropdown for Anno list.
+	    var height3 = $(window).innerHeight() - ($('#dropdownAnnoList ul').offset().top || 120);
+	    $('#dropdownAnnoList ul').css('max-height', height3 - 20 + 'px');
+	
+	    // Dropdown for Reference Annos.
+	    var height4 = $(window).innerHeight() - ($('#dropdownAnnoReference ul').offset().top || 120);
+	    $('#dropdownAnnoReference ul').css('max-height', height4 - 20 + 'px');
+	}
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.setup = setup;
+	
+	var _display = __webpack_require__(2);
 	
 	var _anno = __webpack_require__(1);
 	
-	var _util = __webpack_require__(12);
+	var _util = __webpack_require__(13);
 	
 	/**
 	    Set the behavior of the tool buttons for annotations.
 	*/
-	/**
-	 * UI parts - Annotations Tools.
-	 */
 	function setup() {
 	
 	    window.currentAnnoToolType = 'view';
@@ -1211,20 +1343,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        window.currentAnnoToolType = type;
 	
 	        (0, _anno.enableAnnotateTool)(type);
-	
-	        return false;
-	    });
-	
-	    $('.js-tool-btn2').off('click').on('click', function (e) {
-	
-	        var $button = $(e.currentTarget);
-	        var type = $button.data('type');
-	
-	        $button.blur();
-	
-	        if (type === 'download') {
-	            downloadAnnotation();
-	        }
 	
 	        return false;
 	    });
@@ -1320,111 +1438,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        $button.blur();
 	    });
-	}
-	
-	/**
-	 * Export the primary annotation data for download.
-	 */
-	function downloadAnnotation() {
-	
-	    window.iframeWindow.PDFAnnoCore.getStoreAdapter().exportData().then(function (annotations) {
-	        var blob = new Blob([annotations]);
-	        var blobURL = window.URL.createObjectURL(blob);
-	        var a = document.createElement('a');
-	        document.body.appendChild(a); // for firefox working correctly.
-	        a.download = _getDownloadFileName();
-	        a.href = blobURL;
-	        a.click();
-	        a.parentNode.removeChild(a);
-	    });
-	
-	    (0, _window.unlistenWindowLeaveEvent)();
-	}
-	
-	/**
-	 * Get the anno file name for download.
-	 */
-	function _getDownloadFileName() {
-	
-	    // The name of Primary Annotation.
-	    var primaryAnnotationName = void 0;
-	    $('#dropdownAnnoPrimary a').each(function (index, element) {
-	        var $elm = $(element);
-	        if ($elm.find('.fa-check').hasClass('no-visible') === false) {
-	            primaryAnnotationName = $elm.find('.js-annoname').text();
-	        }
-	    });
-	    if (primaryAnnotationName) {
-	        return primaryAnnotationName;
-	    }
-	
-	    // The name of PDF.
-	    var pdfFileName = iframeWindow.getFileName(iframeWindow.PDFView.url);
-	    return pdfFileName.split('.')[0] + '.anno';
-	}
+	} /**
+	   * UI parts - Annotations Tools.
+	   */
 
 /***/ },
-/* 11 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.listenWindowLeaveEvent = listenWindowLeaveEvent;
-	exports.unlistenWindowLeaveEvent = unlistenWindowLeaveEvent;
-	exports.resizeHandler = resizeHandler;
-	/**
-	 * Utility for window.
-	 */
-	
-	/**
-	 * Set the confirm dialog at leaving the page.
-	 */
-	function listenWindowLeaveEvent() {
-	    window.annotationUpdated = true;
-	    $(window).off('beforeunload').on('beforeunload', function () {
-	        return 'You don\'t save the annotations yet.\nAre you sure to leave ?';
-	    });
-	}
-	
-	/**
-	 * Unset the confirm dialog at leaving the page.
-	 */
-	function unlistenWindowLeaveEvent() {
-	    window.annotationUpdated = false;
-	    $(window).off('beforeunload');
-	}
-	
-	/**
-	 * Resize the height of elements adjusting to the window.
-	 */
-	function resizeHandler() {
-	
-	    // PDFViewer.
-	    var height = $(window).innerHeight() - $('#viewer').offset().top;
-	    $('#viewer iframe').css('height', height + 'px');
-	
-	    // Dropdown for PDF.
-	    var height1 = $(window).innerHeight() - ($('#dropdownPdf ul').offset().top || 120);
-	    $('#dropdownPdf ul').css('max-height', height1 - 20 + 'px');
-	
-	    // Dropdown for Primary Annos.
-	    var height2 = $(window).innerHeight() - ($('#dropdownAnnoPrimary ul').offset().top || 120);
-	    $('#dropdownAnnoPrimary ul').css('max-height', height2 - 20 + 'px');
-	
-	    // Dropdown for Anno list.
-	    var height3 = $(window).innerHeight() - ($('#dropdownAnnoList ul').offset().top || 120);
-	    $('#dropdownAnnoList ul').css('max-height', height3 - 20 + 'px');
-	
-	    // Dropdown for Reference Annos.
-	    var height4 = $(window).innerHeight() - ($('#dropdownAnnoReference ul').offset().top || 120);
-	    $('#dropdownAnnoReference ul').css('max-height', height4 - 20 + 'px');
-	}
-
-/***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1444,7 +1463,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1585,7 +1604,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1605,7 +1624,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _anno = __webpack_require__(1);
 	
-	var _toml = __webpack_require__(15);
+	var _toml = __webpack_require__(16);
 	
 	var _toml2 = _interopRequireDefault(_toml);
 	
@@ -1796,11 +1815,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	var readTOML = exports.readTOML = _toml2.default.parse;
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var parser = __webpack_require__(16);
-	var compiler = __webpack_require__(17);
+	var parser = __webpack_require__(17);
+	var compiler = __webpack_require__(18);
 	
 	module.exports = {
 	  parse: function(input) {
@@ -1811,7 +1830,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports) {
 
 	module.exports = (function() {
@@ -5658,7 +5677,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 17 */
+/* 18 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -5861,22 +5880,22 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__.p + "dist/index.html";
 
 /***/ },
-/* 19 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(20);
+	var content = __webpack_require__(21);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(22)(content, {});
+	var update = __webpack_require__(23)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -5893,10 +5912,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 20 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(21)();
+	exports = module.exports = __webpack_require__(22)();
 	// imports
 	
 	
@@ -5907,7 +5926,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 21 */
+/* 22 */
 /***/ function(module, exports) {
 
 	/*
@@ -5963,7 +5982,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 22 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
