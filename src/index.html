@@ -4,9 +4,11 @@
 	<title>PDFAnno</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.0/spectrum.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.0/spectrum.min.css">
@@ -83,57 +85,56 @@
 
         <!-- Annotation Tools -->
 		<div class="row">
-            <div class="col-md-3 col-sm-3 col-xs-3">
+            <div id="tools" class="col-md-3 col-sm-3 col-xs-3" style="padding-left: 0; padding-right: 0;">
+                <div style="padding-left: 15px; padding-right: 15px;">
 
-                <ul class="nav nav-tabs">
-                    <li class="active"><a  href="#tab1" data-toggle="tab">Annotation</a></li>
-                    <li><a href="#tab2" data-toggle="tab">tab2</a></li>
-                </ul>
-                <div class="tab-content ">
-                    <div class="tab-pane active" id="tab1">
-                        <div class="btn-toolbar" role="toolbar" style="margin-top: 20px">
-                            <div class="btn-group" role="group">
-                                <a class="btn btn-default js-tool-btn-span" href="#" data-type="span" title="span">
-                                    <i class="fa fa-pencil fa-2x"></i>
-                                </a>
-                                <a class="btn btn-default js-tool-btn-rel" href="#" data-type="one-way" title="one-way relation">
-                                    <i class="fa fa-long-arrow-right fa-2x"></i>
-                                </a>
-                                <a class="btn btn-default js-tool-btn-rel" href="#" data-type="two-way" title="two-way relation">
-                                    <i class="fa fa-arrows-h fa-2x"></i>
-                                </a>
-                                <a class="btn btn-default js-tool-btn-rel" href="#" data-type="link" title="link relation">
-                                    <i class="fa fa-minus fa-2x"></i>
-                                </a>
-							</div>
-							<div class="btn-group" role="group">
-                                <a class="btn btn-default js-tool-btn" href="#" data-type="rect" title="rectangle">
-                                    <i class="fa fa-square-o fa-2x"></i>
-                                </a>
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a  href="#tab1" data-toggle="tab">Annotation</a></li>
+                        <li><a href="#tab2" data-toggle="tab">tab2</a></li>
+                    </ul>
+                    <div class="tab-content ">
+                        <div class="tab-pane active" id="tab1">
+                            <div class="btn-toolbar" role="toolbar" style="margin-top: 20px">
+                                <div class="btn-group" role="group">
+                                    <a class="btn btn-default js-tool-btn-span" href="#" data-type="span" title="span">
+                                        <i class="fa fa-pencil fa-2x"></i>
+                                    </a>
+                                    <a class="btn btn-default js-tool-btn-rel" href="#" data-type="one-way" title="one-way relation">
+                                        <i class="fa fa-long-arrow-right fa-2x"></i>
+                                    </a>
+                                    <a class="btn btn-default js-tool-btn-rel" href="#" data-type="two-way" title="two-way relation">
+                                        <i class="fa fa-arrows-h fa-2x"></i>
+                                    </a>
+                                    <a class="btn btn-default js-tool-btn-rel" href="#" data-type="link" title="link relation">
+                                        <i class="fa fa-minus fa-2x"></i>
+                                    </a>
+    							</div>
+    							<div class="btn-group" role="group">
+                                    <a class="btn btn-default js-tool-btn" href="#" data-type="rect" title="rectangle">
+                                        <i class="fa fa-square-o fa-2x"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div>
+                                <h3>Label</h3>
+                                <form id="autocompleteform" action="./"/>
+                                    <input type="text" class="form-control" id="inputLabel" disabled>
+                                    <input type="submit" value="submit" class="hidden" />
+                                </form>
                             </div>
                         </div>
-                        <div>
-                            <h3>Label</h3>
-                            <form id="autocompleteform" action="./"/>
-                                <input type="text" class="form-control" id="inputLabel" disabled>
-                                <input type="submit" value="submit" class="hidden" />
-                            </form>
+                        <div class="tab-pane" id="tab2">
+                            <!-- No Contens Here -->
                         </div>
                     </div>
-                    <div class="tab-pane" id="tab2">
-                        <!-- No Contens Here -->
-                    </div>
                 </div>
-
-
-
-
-
             </div>
-			<div class="col-md-9 col-sm-9 col-xs-9">
-				<div id="viewer">
-                    <iframe src="./pages/viewer.html?file=../pdfs/P12-1046.pdf" class="anno-viewer" frameborder="0"></iframe>
-				</div>
+			<div id="viewerWrapper" class="col-md-9 col-sm-9 col-xs-9" style="padding-left: 0; padding-right: 0;">
+                <div style="padding-right: 15px;">
+    				<div id="viewer" class="viewer">
+                        <iframe src="./pages/viewer.html?file=../pdfs/P12-1046.pdf" class="anno-viewer" frameborder="0"></iframe>
+    				</div>
+                </div>
 			</div>
 		</div>
 	</div>

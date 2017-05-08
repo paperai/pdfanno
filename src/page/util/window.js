@@ -45,4 +45,7 @@ export function resizeHandler() {
     let height4 = $(window).innerHeight() - ($('#dropdownAnnoReference ul').offset().top || 120);
     $('#dropdownAnnoReference ul').css('max-height', `${height4 - 20}px`);
 
+    // Tools.
+    let height5 = $(window).innerHeight() - $('#tools').offset().top;
+    $('#tools').css('height', `${height5}px`);
 }
