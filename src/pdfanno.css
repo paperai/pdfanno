@@ -12,10 +12,6 @@ input:-webkit-autofill:active {
     visibility: hidden;
 }
 
-.viewer {
-    position: relative;
-}
-
 /**
  * Viewer size.
  * This height will be override to fit the browser height (by app.js).
