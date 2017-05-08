@@ -238,6 +238,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        console.log('disappearTextInput2:', e.detail);
 	        inputLabel.disable(e.detail);
 	    });
+	
+	    // resizable.
+	    (0, _window.setupResizableColumns)();
 	});
 
 /***/ },
@@ -1252,6 +1255,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.listenWindowLeaveEvent = listenWindowLeaveEvent;
 	exports.unlistenWindowLeaveEvent = unlistenWindowLeaveEvent;
 	exports.resizeHandler = resizeHandler;
+	exports.setupResizableColumns = setupResizableColumns;
 	/**
 	 * Utility for window.
 	 */
@@ -1298,6 +1302,81 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Dropdown for Reference Annos.
 	    var height4 = $(window).innerHeight() - ($('#dropdownAnnoReference ul').offset().top || 120);
 	    $('#dropdownAnnoReference ul').css('max-height', height4 - 20 + 'px');
+	
+	    // Tools.
+	    var height5 = $(window).innerHeight() - $('#tools').offset().top;
+	    $('#tools').css('height', height5 + 'px');
+	}
+	
+	function setupResizableColumns() {
+	
+	    // Make resizable.
+	    $('#tools').resizable({
+	        handles: 'e',
+	        alsoResizeReverse: '#viewerWrapper',
+	        start: function start() {
+	            console.log('resize start');
+	            $('#viewer iframe').css({
+	                'pointer-events': 'none'
+	            });
+	        },
+	        stop: function stop() {
+	            console.log('resize stop');
+	            $('#viewer iframe').css({
+	                'pointer-events': 'auto'
+	            });
+	        }
+	    });
+	
+	    // Customize.
+	    $.ui.plugin.add("resizable", "alsoResizeReverse", {
+	
+	        start: function start() {
+	            var that = $(this).resizable("instance"),
+	                o = that.options;
+	
+	            $(o.alsoResizeReverse).each(function () {
+	                var el = $(this);
+	                el.data("ui-resizable-alsoresizeReverse", {
+	                    width: parseInt(el.width(), 10), height: parseInt(el.height(), 10),
+	                    left: parseInt(el.css("left"), 10), top: parseInt(el.css("top"), 10)
+	                });
+	            });
+	        },
+	
+	        resize: function resize(event, ui) {
+	            var that = $(this).resizable("instance"),
+	                o = that.options,
+	                os = that.originalSize,
+	                op = that.originalPosition,
+	                delta = {
+	                height: that.size.height - os.height || 0,
+	                width: that.size.width - os.width || 0,
+	                top: that.position.top - op.top || 0,
+	                left: that.position.left - op.left || 0
+	            };
+	
+	            $(o.alsoResizeReverse).each(function () {
+	                var el = $(this),
+	                    start = $(this).data("ui-resizable-alsoresize-reverse"),
+	                    style = {},
+	                    css = el.parents(ui.originalElement[0]).length ? ["width", "height"] : ["width", "height", "top", "left"];
+	
+	                $.each(css, function (i, prop) {
+	                    var sum = (start[prop] || 0) - (delta[prop] || 0);
+	                    if (sum && sum >= 0) {
+	                        style[prop] = sum || null;
+	                    }
+	                });
+	
+	                el.css(style);
+	            });
+	        },
+	
+	        stop: function stop() {
+	            $(this).removeData("resizable-alsoresize-reverse");
+	        }
+	    });
 	}
 
 /***/ },
@@ -5920,7 +5999,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, "@charset 'utf-8';\n\n/* Super Hack to disable autofill style for Chrome. */\ninput:-webkit-autofill,\ninput:-webkit-autofill:hover,\ninput:-webkit-autofill:focus,\ninput:-webkit-autofill:active {\n    transition: background-color 5000s ease-in-out 0s;\n}\n\n.no-visible {\n    visibility: hidden;\n}\n\n/**\n * Viewer size.\n * This height will be override to fit the browser height (by app.js).\n */\n.anno-viewer {\n    width: 100%;\n    height: 500px;\n}\n\n/**\n * Annotation Select UI Layout.\n */\n.anno-select-layout {}\n.anno-select-layout .row:first-child {\n    margin-bottom: 10px;\n}\n.anno-select-layout [type=\"radio\"] {\n    margin-right: 5px;\n}\n.anno-select-layout [type=\"file\"] {\n    display: inline-block;\n    margin-left: 5px;\n    line-height: 1em;\n}\n.anno-select-layout .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-select-layout .sp-dd {\n    display: none;\n}\n\n/**\n * Dropdown.\n */\n.dropdown-menu {\n    overflow: scroll;\n}\n\n/**\n * Color picker.\n */\n.anno-ui .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-ui .sp-dd {\n    display: none;\n}\n.anno-ui .sp-preview {\n    margin-right: 0;\n}\n\n", ""]);
+	exports.push([module.id, "@charset 'utf-8';\n\n/* Super Hack to disable autofill style for Chrome. */\ninput:-webkit-autofill,\ninput:-webkit-autofill:hover,\ninput:-webkit-autofill:focus,\ninput:-webkit-autofill:active {\n    transition: background-color 5000s ease-in-out 0s;\n}\n\n.no-visible {\n    visibility: hidden;\n}\n\n.viewer {\n    position: relative;\n}\n\n/**\n * Viewer size.\n * This height will be override to fit the browser height (by app.js).\n */\n.anno-viewer {\n    width: 100%;\n    height: 500px;\n}\n\n/**\n * Annotation Select UI Layout.\n */\n.anno-select-layout {}\n.anno-select-layout .row:first-child {\n    margin-bottom: 10px;\n}\n.anno-select-layout [type=\"radio\"] {\n    margin-right: 5px;\n}\n.anno-select-layout [type=\"file\"] {\n    display: inline-block;\n    margin-left: 5px;\n    line-height: 1em;\n}\n.anno-select-layout .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-select-layout .sp-dd {\n    display: none;\n}\n\n/**\n * Dropdown.\n */\n.dropdown-menu {\n    overflow: scroll;\n}\n\n/**\n * Color picker.\n */\n.anno-ui .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-ui .sp-dd {\n    display: none;\n}\n.anno-ui .sp-preview {\n    margin-right: 0;\n}\n\n", ""]);
 	
 	// exports
 

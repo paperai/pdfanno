@@ -22,7 +22,8 @@ import {
 import {
     listenWindowLeaveEvent,
     unlistenWindowLeaveEvent,
-    resizeHandler
+    resizeHandler,
+    setupResizableColumns
 } from './page/util/window';
 
 import * as publicApi from './page/public';
@@ -163,4 +164,12 @@ window.addEventListener('DOMContentLoaded', e => {
         inputLabel.disable(e.detail);
     });
 
+    // resizable.
+    setupResizableColumns();
+
 });
+
+
+
+
+
