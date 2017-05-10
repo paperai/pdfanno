@@ -120,9 +120,6 @@ export default class AbstractAnnotation extends EventEmitter {
 
             if (this.selected) {
 
-                console.log('select:', this.uuid, this.text, this);
-                textInput.enable({ uuid : this.uuid, text : this.text });
-
                 // deselect another annotations.
                 if (window.ctrlPressed === false) {
                     window.annotationContainer
@@ -131,10 +128,22 @@ export default class AbstractAnnotation extends EventEmitter {
                         .forEach(a => a.deselect());
                 }
 
+                // console.log('select:', this.uuid, this.text, this);
+                // textInput.enable({ uuid : this.uuid, text : this.text });
+
+                var event = document.createEvent('CustomEvent');
+                event.initCustomEvent('annotationSelected', true, true, this);
+                window.dispatchEvent(event);
+
             } else {
 
-                console.log('deselect:', this.uuid, this);
-                textInput.disable({ uuid : this.uuid });
+                // console.log('deselect:', this.uuid, this);
+                // textInput.disable({ uuid : this.uuid });
+
+                var event = document.createEvent('CustomEvent');
+                event.initCustomEvent('annotationDeselected', true, true, this);
+                window.dispatchEvent(event);
+
             }
         }
 
@@ -145,7 +154,13 @@ export default class AbstractAnnotation extends EventEmitter {
         this.highlight();
         this.emit('hoverin');
 
-        textInput.enable({ uuid : this.uuid, text : this.text });
+        // if (window.annotationContainer.getSelectedAnnotations().length === 0) {
+        //     textInput.enable({ uuid : this.uuid, text : this.text, disable : true });
+        // }
+
+        var event = document.createEvent('CustomEvent');
+        event.initCustomEvent('annotationHoverIn', true, true, this);
+        window.dispatchEvent(event);
     }
 
     handleHoverOutEvent(e) {
@@ -153,9 +168,14 @@ export default class AbstractAnnotation extends EventEmitter {
         this.dehighlight();
         this.emit('hoverout');
 
-        if (!this.selected) {
-            textInput.disable({ uuid : this.uuid });
-        }
+        // if (window.annotationContainer.getSelectedAnnotations().length === 0) {
+        //     textInput.disable();
+        // }
+
+        var event = document.createEvent('CustomEvent');
+        event.initCustomEvent('annotationHoverOut', true, true, this);
+        window.dispatchEvent(event);
+
     }
 
     /**

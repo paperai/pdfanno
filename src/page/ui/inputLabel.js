@@ -13,7 +13,7 @@ let _blurListener;
 
 let currentUUID;
 
-export function enable({ uuid, text, autoFocus, blurListener }) {
+export function enable({ uuid, text, disable=false, autoFocus=false, blurListener=null }) {
     console.log('enableInputLabel:', uuid, text);
 
     currentUUID = uuid;
@@ -29,35 +29,18 @@ export function enable({ uuid, text, autoFocus, blurListener }) {
         .on('submit', cancelSubmit);
 
     $inputLabel
-        .removeAttr('disabled')
+        .attr('disabled', 'disabled')
         .val(text || '')
         .off('blur')
-        .off('keyup')
-        .on('keyup', () => {
+        .off('keyup');
 
-            // const text = $inputLabel.val() || '';
-
-            // const annotation = window.iframeWindow.annotationContainer.findById(uuid);
-            // if (annotation) {
-            //     annotation.text = text;
-            //     // annotation.setTextForceDisplay();
-            //     // annotation.render();
-            //     annotation.save();
-            //     annotation.enableViewMode();
-
-            //     // setTimeout(() => {
-            //     //     annotation.resetTextForceDisplay();
-            //     //     annotation.render();
-            //     //     annotation.enableViewMode();
-            //     // }, 1000);
-            // }
-
-            saveText(uuid);
-
-            // console.log('keyup:', uuid, text, annotation);
-
-            // disable({ uuid });
-        });
+    if (disable === false) {
+        $inputLabel
+            .removeAttr('disabled')
+            .on('keyup', () => {
+                saveText(uuid);
+            });
+    }
 
     if (autoFocus) {
         $inputLabel.focus();
@@ -74,19 +57,11 @@ export function enable({ uuid, text, autoFocus, blurListener }) {
 
         // Add an autocomplete candidate. (Firefox, Chrome)
         $form.find('[type="submit"]').click();
-
-        // disable({ uuid });
-
     });
-
-    // if (blurListener) {
-    //     $inputLabel.on('blur', blurListener);
-    //     _blurListener = blurListener;
-    // }
 
 };
 
-export function disable({ uuid }) {
+export function disable() {
     console.log('disableInputLabel');
 
     currentUUID = null;
@@ -102,6 +77,39 @@ export function treatAnnotationDeleted({ uuid }) {
     if (currentUUID === uuid) {
         disable(...arguments);
     }
+}
+
+export function handleAnnotationHoverIn(annotation) {
+    if (getSelectedAnnotations().length === 0) {
+        enable({ uuid : annotation.uuid, text : annotation.text, disable : true });
+    }
+}
+
+export function handleAnnotationHoverOut(annotation) {
+    if (getSelectedAnnotations().length === 0) {
+        disable();
+    }
+}
+
+export function handleAnnotationSelected(annotation) {
+    if (getSelectedAnnotations().length === 1) {
+        enable({ uuid : annotation.uuid, text : annotation.text });
+    } else {
+        disable();
+    }
+}
+
+export function handleAnnotationDeselected(annotation) {
+    const annos = getSelectedAnnotations();
+    if (annos.length === 1) {
+        enable({ uuid : annos[0].uuid, text : annos[0].text });
+    } else {
+        disable();
+    }
+}
+
+function getSelectedAnnotations() {
+    return iframeWindow.annotationContainer.getSelectedAnnotations();
 }
 
 function cancelSubmit(e) {

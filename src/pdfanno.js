@@ -114,8 +114,8 @@ function startApplication() {
     });
 
     // disable text input.
-    iframeWindow.addEventListener('disappearTextInput', (e) => {
-        console.log('disappearTextInput:', e.detail);
+    iframeWindow.addEventListener('disappearTextInput', () => {
+        console.log('disappearTextInput');
         inputLabel.disable(e.detail);
     });
 
@@ -123,6 +123,28 @@ function startApplication() {
         console.log('annotationDeleted:', e.detail);
         inputLabel.treatAnnotationDeleted(e.detail);
     });
+
+    iframeWindow.addEventListener('annotationHoverIn' , e => {
+        console.log('annotationHoverIn:', e.detail);
+        inputLabel.handleAnnotationHoverIn(e.detail);
+    });
+
+    iframeWindow.addEventListener('annotationHoverOut' , e => {
+        console.log('annotationHoverOut:', e.detail);
+        inputLabel.handleAnnotationHoverOut(e.detail);
+    });
+
+    iframeWindow.addEventListener('annotationSelected' , e => {
+        console.log('annotationSelected:', e.detail);
+        inputLabel.handleAnnotationSelected(e.detail);
+    });
+
+    iframeWindow.addEventListener('annotationDeselected' , e => {
+        console.log('annotationDeselected:', e.detail);
+        inputLabel.handleAnnotationDeselected(e.detail);
+    });
+
+
 }
 
 /**

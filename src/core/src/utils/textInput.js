@@ -3,23 +3,23 @@
 /**
  * Enable Text input enable.
  */
-export function enable({ uuid, text, autoFocus=false, blurListener }) {
+export function enable({ uuid, text, disable=false, autoFocus=false, blurListener=null }) {
 
-    console.log('textInput.enable:', uuid, text, autoFocus, blurListener);
+    console.log('textInput.enable:', ...arguments);
 
     var event = document.createEvent('CustomEvent');
-    event.initCustomEvent('enableTextInput', true, true, { uuid, text, autoFocus, blurListener });
+    event.initCustomEvent('enableTextInput', true, true, ...arguments);
     window.dispatchEvent(event);
 }
 
 /**
  * Disable the text input.
  */
-export function disable(uuid) {
+export function disable() {
 
-    console.log('textInput.disable:', uuid);
+    console.log('textInput.disable');
 
     var event = document.createEvent('CustomEvent');
-    event.initCustomEvent('disappearTextInput', true, true, { uuid });
+    event.initCustomEvent('disappearTextInput', true, true);
     window.dispatchEvent(event);
 }
