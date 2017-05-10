@@ -217,6 +217,10 @@ function saveRect(rect) {
   // Render.
   rectAnnotation.render();
 
+  // Enable a drag / click action.
+  // TODO インスタンス生成時にデフォルトで有効にしてもいいかなー.
+  rectAnnotation.enableViewMode();
+
   // Add an input field.
   // let x = annotation.x;
   // let y = annotation.y - 20; // 20 = circle'radius(3px) + input height(14px) + α
@@ -225,6 +229,17 @@ function saveRect(rect) {
   // x = scaleUp(svg, {x}).x + boundingRect.left;
   // y = scaleUp(svg, {y}).y + boundingRect.top;
 
+  // Deselect all annotations.
+  window.annotationContainer
+      .getSelectedAnnotations()
+      .forEach(a => a.deselect());
+
+  // Select.
+  // FIXME handlePageClickが発生してキャンセルされちゃう問題の暫定対応.
+  setTimeout(() => {
+    rectAnnotation.select();
+    console.log('aaa:', rectAnnotation.$element.hasClass('--selected'), rectAnnotation.selected);
+  }, 100);
 
   // New type text.
   textInput.enable({ uuid : rectAnnotation.uuid, autoFocus : true , blurListener : () => {
@@ -255,9 +270,6 @@ function saveRect(rect) {
   // }
   // prevAnnotation = rectAnnotation;
 
-    // Enable a drag / click action.
-    // TODO インスタンス生成時にデフォルトで有効にしてもいいかなー.
-    rectAnnotation.enableViewMode();
 
 }
 

@@ -207,6 +207,7 @@ export default class AbstractAnnotation extends EventEmitter {
      * Deselect the annotation.
      */
     deselect() {
+        console.log('deselect');
         this.selected = false;
         this.selectedTime = null;
         this.$element.removeClass('--selected');
@@ -216,6 +217,7 @@ export default class AbstractAnnotation extends EventEmitter {
      * Toggle the selected state.
      */
     toggleSelect() {
+        console.log('toggleSelect:', this.selected);
 
         if (this.selected) {
             this.deselect();
