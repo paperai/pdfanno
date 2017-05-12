@@ -189,14 +189,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	
 	    // disable text input.
-	    iframeWindow.addEventListener('disappearTextInput', function (e) {
-	        console.log('disappearTextInput:', e.detail);
+	    iframeWindow.addEventListener('disappearTextInput', function () {
+	        console.log('disappearTextInput');
 	        inputLabel.disable(e.detail);
 	    });
 	
 	    iframeWindow.addEventListener('annotationDeleted', function (e) {
 	        console.log('annotationDeleted:', e.detail);
 	        inputLabel.treatAnnotationDeleted(e.detail);
+	    });
+	
+	    iframeWindow.addEventListener('annotationHoverIn', function (e) {
+	        console.log('annotationHoverIn:', e.detail);
+	        inputLabel.handleAnnotationHoverIn(e.detail);
+	    });
+	
+	    iframeWindow.addEventListener('annotationHoverOut', function (e) {
+	        console.log('annotationHoverOut:', e.detail);
+	        inputLabel.handleAnnotationHoverOut(e.detail);
+	    });
+	
+	    iframeWindow.addEventListener('annotationSelected', function (e) {
+	        console.log('annotationSelected:', e.detail);
+	        inputLabel.handleAnnotationSelected(e.detail);
+	    });
+	
+	    iframeWindow.addEventListener('annotationDeselected', function () {
+	        console.log('annotationDeselected');
+	        inputLabel.handleAnnotationDeselected();
 	    });
 	}
 	
@@ -265,7 +285,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	function disableAnnotateTools() {
 	    window.iframeWindow.PDFAnnoCore.UI.disableRect();
 	    window.iframeWindow.PDFAnnoCore.UI.disableSpan();
-	    window.iframeWindow.PDFAnnoCore.UI.disableRelation();
 	    window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
 	}
 	
@@ -274,15 +293,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function enableAnnotateTool(type) {
 	
-	    if (type === 'span') {
-	        window.iframeWindow.PDFAnnoCore.UI.enableSpan();
-	    } else if (type === 'one-way') {
-	        window.iframeWindow.PDFAnnoCore.UI.enableRelation('one-way');
-	    } else if (type === 'two-way') {
-	        window.iframeWindow.PDFAnnoCore.UI.enableRelation('two-way');
-	    } else if (type === 'link') {
-	        window.iframeWindow.PDFAnnoCore.UI.enableRelation('link');
-	    } else if (type === 'rect') {
+	    if (type === 'rect') {
 	        window.iframeWindow.PDFAnnoCore.UI.enableRect();
 	    }
 	}
@@ -1553,6 +1564,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.enable = enable;
 	exports.disable = disable;
 	exports.treatAnnotationDeleted = treatAnnotationDeleted;
+	exports.handleAnnotationHoverIn = handleAnnotationHoverIn;
+	exports.handleAnnotationHoverOut = handleAnnotationHoverOut;
+	exports.handleAnnotationSelected = handleAnnotationSelected;
+	exports.handleAnnotationDeselected = handleAnnotationDeselected;
 	/**
 	 * UI parts - Input Label.
 	 */
@@ -1571,8 +1586,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	function enable(_ref) {
 	    var uuid = _ref.uuid,
 	        text = _ref.text,
-	        autoFocus = _ref.autoFocus,
-	        blurListener = _ref.blurListener;
+	        _ref$disable = _ref.disable,
+	        disable = _ref$disable === undefined ? false : _ref$disable,
+	        _ref$autoFocus = _ref.autoFocus,
+	        autoFocus = _ref$autoFocus === undefined ? false : _ref$autoFocus,
+	        _ref$blurListener = _ref.blurListener,
+	        blurListener = _ref$blurListener === undefined ? null : _ref$blurListener;
 	
 	    console.log('enableInputLabel:', uuid, text);
 	
@@ -1586,31 +1605,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    $form.off('submit').on('submit', cancelSubmit);
 	
-	    $inputLabel.removeAttr('disabled').val(text || '').off('blur').off('keyup').on('keyup', function () {
+	    $inputLabel.attr('disabled', 'disabled').val(text || '').off('blur').off('keyup');
 	
-	        // const text = $inputLabel.val() || '';
-	
-	        // const annotation = window.iframeWindow.annotationContainer.findById(uuid);
-	        // if (annotation) {
-	        //     annotation.text = text;
-	        //     // annotation.setTextForceDisplay();
-	        //     // annotation.render();
-	        //     annotation.save();
-	        //     annotation.enableViewMode();
-	
-	        //     // setTimeout(() => {
-	        //     //     annotation.resetTextForceDisplay();
-	        //     //     annotation.render();
-	        //     //     annotation.enableViewMode();
-	        //     // }, 1000);
-	        // }
-	
-	        saveText(uuid);
-	
-	        // console.log('keyup:', uuid, text, annotation);
-	
-	        // disable({ uuid });
-	    });
+	    if (disable === false) {
+	        $inputLabel.removeAttr('disabled').on('keyup', function () {
+	            saveText(uuid);
+	        });
+	    }
 	
 	    if (autoFocus) {
 	        $inputLabel.focus();
@@ -1627,19 +1628,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // Add an autocomplete candidate. (Firefox, Chrome)
 	        $form.find('[type="submit"]').click();
-	
-	        // disable({ uuid });
 	    });
-	
-	    // if (blurListener) {
-	    //     $inputLabel.on('blur', blurListener);
-	    //     _blurListener = blurListener;
-	    // }
 	};
 	
-	function disable(_ref2) {
-	    var uuid = _ref2.uuid;
-	
+	function disable() {
 	    console.log('disableInputLabel');
 	
 	    currentUUID = null;
@@ -1647,14 +1639,47 @@ return /******/ (function(modules) { // webpackBootstrap
 	    $inputLabel.attr('disabled', 'disabled').val('');
 	}
 	
-	function treatAnnotationDeleted(_ref3) {
-	    var uuid = _ref3.uuid;
+	function treatAnnotationDeleted(_ref2) {
+	    var uuid = _ref2.uuid;
 	
 	    console.log('treatAnnotationDeleted:', uuid);
 	
 	    if (currentUUID === uuid) {
 	        disable.apply(undefined, arguments);
 	    }
+	}
+	
+	function handleAnnotationHoverIn(annotation) {
+	    if (getSelectedAnnotations().length === 0) {
+	        enable({ uuid: annotation.uuid, text: annotation.text, disable: true });
+	    }
+	}
+	
+	function handleAnnotationHoverOut(annotation) {
+	    if (getSelectedAnnotations().length === 0) {
+	        disable();
+	    }
+	}
+	
+	function handleAnnotationSelected(annotation) {
+	    if (getSelectedAnnotations().length === 1) {
+	        enable({ uuid: annotation.uuid, text: annotation.text });
+	    } else {
+	        disable();
+	    }
+	}
+	
+	function handleAnnotationDeselected() {
+	    var annos = getSelectedAnnotations();
+	    if (annos.length === 1) {
+	        enable({ uuid: annos[0].uuid, text: annos[0].text });
+	    } else {
+	        disable();
+	    }
+	}
+	
+	function getSelectedAnnotations() {
+	    return iframeWindow.annotationContainer.getSelectedAnnotations();
 	}
 	
 	function cancelSubmit(e) {
@@ -5999,7 +6024,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, "@charset 'utf-8';\n\n/* Super Hack to disable autofill style for Chrome. */\ninput:-webkit-autofill,\ninput:-webkit-autofill:hover,\ninput:-webkit-autofill:focus,\ninput:-webkit-autofill:active {\n    transition: background-color 5000s ease-in-out 0s;\n}\n\n.no-visible {\n    visibility: hidden;\n}\n\n.viewer {\n    position: relative;\n}\n\n/**\n * Viewer size.\n * This height will be override to fit the browser height (by app.js).\n */\n.anno-viewer {\n    width: 100%;\n    height: 500px;\n}\n\n/**\n * Annotation Select UI Layout.\n */\n.anno-select-layout {}\n.anno-select-layout .row:first-child {\n    margin-bottom: 10px;\n}\n.anno-select-layout [type=\"radio\"] {\n    margin-right: 5px;\n}\n.anno-select-layout [type=\"file\"] {\n    display: inline-block;\n    margin-left: 5px;\n    line-height: 1em;\n}\n.anno-select-layout .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-select-layout .sp-dd {\n    display: none;\n}\n\n/**\n * Dropdown.\n */\n.dropdown-menu {\n    overflow: scroll;\n}\n\n/**\n * Color picker.\n */\n.anno-ui .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-ui .sp-dd {\n    display: none;\n}\n.anno-ui .sp-preview {\n    margin-right: 0;\n}\n\n", ""]);
+	exports.push([module.id, "@charset 'utf-8';\n\n/* Super Hack to disable autofill style for Chrome. */\ninput:-webkit-autofill,\ninput:-webkit-autofill:hover,\ninput:-webkit-autofill:focus,\ninput:-webkit-autofill:active {\n    transition: background-color 5000s ease-in-out 0s;\n}\n\n.no-visible {\n    visibility: hidden;\n}\n\n/**\n * Viewer size.\n * This height will be override to fit the browser height (by app.js).\n */\n.anno-viewer {\n    width: 100%;\n    height: 500px;\n}\n\n/**\n * Annotation Select UI Layout.\n */\n.anno-select-layout {}\n.anno-select-layout .row:first-child {\n    margin-bottom: 10px;\n}\n.anno-select-layout [type=\"radio\"] {\n    margin-right: 5px;\n}\n.anno-select-layout [type=\"file\"] {\n    display: inline-block;\n    margin-left: 5px;\n    line-height: 1em;\n}\n.anno-select-layout .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-select-layout .sp-dd {\n    display: none;\n}\n\n/**\n * Dropdown.\n */\n.dropdown-menu {\n    overflow: scroll;\n}\n\n/**\n * Color picker.\n */\n.anno-ui .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-ui .sp-dd {\n    display: none;\n}\n.anno-ui .sp-preview {\n    margin-right: 0;\n}\n\n", ""]);
 	
 	// exports
 
