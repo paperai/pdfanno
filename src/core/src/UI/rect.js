@@ -90,6 +90,8 @@ function handleDocumentMousemove(e) {
       mousemoveFired = true;
     }
 
+    $(document.body).addClass('no-action');
+
     let { x : curX, y : curY } = getXY(e);
 
     let x = Math.min(originX, curX);
@@ -150,6 +152,8 @@ function _findAnnotation(e) {
  * @param {Event} e The DOM event to handle
  */
 function handleDocumentMouseup(e) {
+
+    $(document.body).removeClass('no-action');
 
     let clicked = mousedownFired && !mousemoveFired;
     let dragged = mousedownFired && mousemoveFired;
@@ -217,6 +221,10 @@ function saveRect(rect) {
   // Render.
   rectAnnotation.render();
 
+  // Enable a drag / click action.
+  // TODO インスタンス生成時にデフォルトで有効にしてもいいかなー.
+  rectAnnotation.enableViewMode();
+
   // Add an input field.
   // let x = annotation.x;
   // let y = annotation.y - 20; // 20 = circle'radius(3px) + input height(14px) + α
@@ -225,14 +233,16 @@ function saveRect(rect) {
   // x = scaleUp(svg, {x}).x + boundingRect.left;
   // y = scaleUp(svg, {y}).y + boundingRect.top;
 
+  // Deselect all annotations.
+  window.annotationContainer
+      .getSelectedAnnotations()
+      .forEach(a => a.deselect());
+
+  // Select.
+  rectAnnotation.select();
 
   // New type text.
-  textInput.enable({ uuid : rectAnnotation.uuid, autoFocus : true , blurListener : () => {
-    // rectAnnotation.enable();
-    window.annotationContainer.enableAll();
-  }});
-  // rectAnnotation.disable();
-  window.annotationContainer.disableAll();
+  textInput.enable({ uuid : rectAnnotation.uuid, autoFocus : true });
 
 
   // addInputField(x, y, null, null, (text) => {
@@ -255,9 +265,6 @@ function saveRect(rect) {
   // }
   // prevAnnotation = rectAnnotation;
 
-    // Enable a drag / click action.
-    // TODO インスタンス生成時にデフォルトで有効にしてもいいかなー.
-    rectAnnotation.enableViewMode();
 
 }
 

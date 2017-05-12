@@ -5,6 +5,9 @@
 .--hide {
   display: none;
 }
+.no-action {
+    pointer-events: none;
+}
 
 /**
  * SVGLayer.
@@ -17,8 +20,12 @@
   opacity: 1;
 }
 
+#tmpLayer {
+    pointer-events: auto;
+}
+
 /**
-    各種アノテーション
+    Annotation related.
 */
 .anno-circle {
     transition:0.2s;

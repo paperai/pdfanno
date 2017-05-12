@@ -120,14 +120,20 @@ function saveSpan(rects, selectedText) {
 
   // document.removeEventListener('mouseup', handleDocumentMouseup);
 
+  // Select.
+  spanAnnotation.select();
 
   // New type text.
-  textInput.enable({ uuid : spanAnnotation.uuid, autoFocus : true , blurListener : () => {
-    // spanAnnotation.enable();
-    window.annotationContainer.enableAll();
-  }});
-  // spanAnnotation.disable();
-  window.annotationContainer.disableAll();
+  textInput.enable({ uuid : spanAnnotation.uuid, autoFocus : true });
+
+
+  // // New type text.
+  // textInput.enable({ uuid : spanAnnotation.uuid, autoFocus : true , blurListener : () => {
+  //   // spanAnnotation.enable();
+  //   window.annotationContainer.enableAll();
+  // }});
+  // // spanAnnotation.disable();
+  // window.annotationContainer.disableAll();
 
 
 

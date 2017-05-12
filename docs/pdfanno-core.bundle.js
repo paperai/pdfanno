@@ -17640,7 +17640,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = {
 	  disableRect: _rect.disableRect, enableRect: _rect.enableRect,
 	  disableSpan: _span.disableSpan, enableSpan: _span.enableSpan, createSpan: _span.createSpan, getRectangles: _span.getRectangles,
-	  disableRelation: _relation.disableRelation, enableRelation: _relation.enableRelation, createRelation: _relation.createRelation,
+	  createRelation: _relation.createRelation,
 	  disableViewMode: _view.disableViewMode, enableViewMode: _view.enableViewMode
 	};
 	module.exports = exports['default'];
@@ -17761,6 +17761,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    mousemoveFired = true;
 	  }
 	
+	  (0, _jquery2.default)(document.body).addClass('no-action');
+	
 	  var _getXY2 = (0, _utils.getXY)(e),
 	      curX = _getXY2.x,
 	      curY = _getXY2.y;
@@ -17823,6 +17825,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {Event} e The DOM event to handle
 	 */
 	function handleDocumentMouseup(e) {
+	
+	  (0, _jquery2.default)(document.body).removeClass('no-action');
 	
 	  var clicked = mousedownFired && !mousemoveFired;
 	  var dragged = mousedownFired && mousemoveFired;
@@ -17888,6 +17892,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // Render.
 	  rectAnnotation.render();
 	
+	  // Enable a drag / click action.
+	  // TODO インスタンス生成時にデフォルトで有効にしてもいいかなー.
+	  rectAnnotation.enableViewMode();
+	
 	  // Add an input field.
 	  // let x = annotation.x;
 	  // let y = annotation.y - 20; // 20 = circle'radius(3px) + input height(14px) + α
@@ -17896,14 +17904,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // x = scaleUp(svg, {x}).x + boundingRect.left;
 	  // y = scaleUp(svg, {y}).y + boundingRect.top;
 	
+	  // Deselect all annotations.
+	  window.annotationContainer.getSelectedAnnotations().forEach(function (a) {
+	    return a.deselect();
+	  });
+	
+	  // Select.
+	  rectAnnotation.select();
 	
 	  // New type text.
-	  textInput.enable({ uuid: rectAnnotation.uuid, autoFocus: true, blurListener: function blurListener() {
-	      // rectAnnotation.enable();
-	      window.annotationContainer.enableAll();
-	    } });
-	  // rectAnnotation.disable();
-	  window.annotationContainer.disableAll();
+	  textInput.enable({ uuid: rectAnnotation.uuid, autoFocus: true });
 	
 	  // addInputField(x, y, null, null, (text) => {
 	
@@ -17925,9 +17935,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // }
 	  // prevAnnotation = rectAnnotation;
 	
-	  // Enable a drag / click action.
-	  // TODO インスタンス生成時にデフォルトで有効にしてもいいかなー.
-	  rectAnnotation.enableViewMode();
 	}
 	
 	/**
@@ -18511,9 +18518,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        globalEvent.on('deleteSelectedAnnotation', _this.deleteSelectedAnnotation);
 	        globalEvent.on('enableViewMode', _this.enableViewMode);
 	
-	        globalEvent.on('enableRelation', _this.disableDragAction);
-	        globalEvent.on('disableRelation', _this.enableDragAction);
-	
 	        _this.textAnnotation = new _text2.default(_this.readOnly, _this);
 	        _this.textAnnotation.on('selected', _this.handleTextSelected);
 	        _this.textAnnotation.on('deselected', _this.handleTextDeselected);
@@ -19060,9 +19064,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                if (this.selected) {
 	
-	                    console.log('select:', this.uuid, this.text, this);
-	                    textInput.enable({ uuid: this.uuid, text: this.text });
-	
 	                    // deselect another annotations.
 	                    if (window.ctrlPressed === false) {
 	                        window.annotationContainer.getSelectedAnnotations().filter(function (a) {
@@ -19071,10 +19072,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	                            return a.deselect();
 	                        });
 	                    }
+	
+	                    // console.log('select:', this.uuid, this.text, this);
+	                    // textInput.enable({ uuid : this.uuid, text : this.text });
+	
+	                    var event = document.createEvent('CustomEvent');
+	                    event.initCustomEvent('annotationSelected', true, true, this);
+	                    window.dispatchEvent(event);
 	                } else {
 	
-	                    console.log('deselect:', this.uuid, this);
-	                    textInput.disable({ uuid: this.uuid });
+	                    // console.log('deselect:', this.uuid, this);
+	                    // textInput.disable({ uuid : this.uuid });
+	
+	                    var event = document.createEvent('CustomEvent');
+	                    event.initCustomEvent('annotationDeselected', true, true, this);
+	                    window.dispatchEvent(event);
 	                }
 	            }
 	        }
@@ -19085,7 +19097,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.highlight();
 	            this.emit('hoverin');
 	
-	            textInput.enable({ uuid: this.uuid, text: this.text });
+	            // if (window.annotationContainer.getSelectedAnnotations().length === 0) {
+	            //     textInput.enable({ uuid : this.uuid, text : this.text, disable : true });
+	            // }
+	
+	            var event = document.createEvent('CustomEvent');
+	            event.initCustomEvent('annotationHoverIn', true, true, this);
+	            window.dispatchEvent(event);
 	        }
 	    }, {
 	        key: 'handleHoverOutEvent',
@@ -19094,9 +19112,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.dehighlight();
 	            this.emit('hoverout');
 	
-	            if (!this.selected) {
-	                textInput.disable({ uuid: this.uuid });
-	            }
+	            // if (window.annotationContainer.getSelectedAnnotations().length === 0) {
+	            //     textInput.disable();
+	            // }
+	
+	            var event = document.createEvent('CustomEvent');
+	            event.initCustomEvent('annotationHoverOut', true, true, this);
+	            window.dispatchEvent(event);
 	        }
 	
 	        /**
@@ -19140,6 +19162,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'deselect',
 	        value: function deselect() {
+	            console.log('deselect');
 	            this.selected = false;
 	            this.selectedTime = null;
 	            this.$element.removeClass('--selected');
@@ -19152,6 +19175,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'toggleSelect',
 	        value: function toggleSelect() {
+	            console.log('toggleSelect:', this.selected);
 	
 	            if (this.selected) {
 	                this.deselect();
@@ -19333,29 +19357,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Enable Text input enable.
 	 */
 	function enable(_ref) {
+	    var _console;
+	
 	    var uuid = _ref.uuid,
 	        text = _ref.text,
+	        _ref$disable = _ref.disable,
+	        disable = _ref$disable === undefined ? false : _ref$disable,
 	        _ref$autoFocus = _ref.autoFocus,
 	        autoFocus = _ref$autoFocus === undefined ? false : _ref$autoFocus,
-	        blurListener = _ref.blurListener;
+	        _ref$blurListener = _ref.blurListener,
+	        blurListener = _ref$blurListener === undefined ? null : _ref$blurListener;
 	
 	
-	    console.log('textInput.enable:', uuid, text, autoFocus, blurListener);
+	    (_console = console).log.apply(_console, ['textInput.enable:'].concat(Array.prototype.slice.call(arguments)));
 	
 	    var event = document.createEvent('CustomEvent');
-	    event.initCustomEvent('enableTextInput', true, true, { uuid: uuid, text: text, autoFocus: autoFocus, blurListener: blurListener });
+	    event.initCustomEvent.apply(event, ['enableTextInput', true, true].concat(Array.prototype.slice.call(arguments)));
 	    window.dispatchEvent(event);
 	}
 	
 	/**
 	 * Disable the text input.
 	 */
-	function disable(uuid) {
+	function disable() {
 	
-	    console.log('textInput.disable:', uuid);
+	    console.log('textInput.disable');
 	
 	    var event = document.createEvent('CustomEvent');
-	    event.initCustomEvent('disappearTextInput', true, true, { uuid: uuid });
+	    event.initCustomEvent('disappearTextInput', true, true);
 	    window.dispatchEvent(event);
 	}
 
@@ -19751,14 +19780,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  // document.removeEventListener('mouseup', handleDocumentMouseup);
 	
+	  // Select.
+	  spanAnnotation.select();
 	
 	  // New type text.
-	  textInput.enable({ uuid: spanAnnotation.uuid, autoFocus: true, blurListener: function blurListener() {
-	      // spanAnnotation.enable();
-	      window.annotationContainer.enableAll();
-	    } });
-	  // spanAnnotation.disable();
-	  window.annotationContainer.disableAll();
+	  textInput.enable({ uuid: spanAnnotation.uuid, autoFocus: true });
+	
+	  // // New type text.
+	  // textInput.enable({ uuid : spanAnnotation.uuid, autoFocus : true , blurListener : () => {
+	  //   // spanAnnotation.enable();
+	  //   window.annotationContainer.enableAll();
+	  // }});
+	  // // spanAnnotation.disable();
+	  // window.annotationContainer.disableAll();
+	
 	
 	  // addInputField(x, y, null, null, (text) => {
 	
@@ -20150,395 +20185,56 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	  value: true
+	    value: true
 	});
 	exports.createRelation = createRelation;
-	exports.enableRelation = enableRelation;
-	exports.disableRelation = disableRelation;
 	
 	var _jquery = __webpack_require__(24);
 	
 	var _jquery2 = _interopRequireDefault(_jquery);
 	
-	var _appendChild = __webpack_require__(37);
-	
-	var _appendChild2 = _interopRequireDefault(_appendChild);
-	
-	var _utils = __webpack_require__(48);
-	
-	var _relation = __webpack_require__(45);
-	
 	var _textInput = __webpack_require__(53);
 	
 	var textInput = _interopRequireWildcard(_textInput);
 	
-	var _text = __webpack_require__(50);
+	var _relation = __webpack_require__(58);
 	
-	var _relation2 = __webpack_require__(58);
-	
-	var _relation3 = _interopRequireDefault(_relation2);
+	var _relation2 = _interopRequireDefault(_relation);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	/**
-	 * the prev annotation rendered at the last.
+	 * Create a new Relation annotation.
 	 */
-	var prevAnnotation = void 0;
-	
-	var _hoverAnnotation = null;
-	var relationAnnotation = null;
-	
-	var forEach = Array.prototype.forEach;
-	
-	var _enabled = false;
-	
-	var _relationType = void 0;
-	
-	var startAnnotation = void 0;
-	var mousedownFired = false;
-	var mousemoveFired = false;
-	
-	var svg = void 0;
-	
-	var boundingCircles = [];
-	
-	var hitCircle = null;
-	
-	/**
-	 * Handle document.mousedown event
-	 *
-	 * @param {Event} e The DOM event to handle
-	 */
-	function handleDocumentMousedown(e) {
-	
-	  mousedownFired = true;
-	
-	  if (_hoverAnnotation) {
-	    relationAnnotation = new _relation3.default();
-	    relationAnnotation.direction = _relationType;
-	    relationAnnotation.rel1Annotation = _hoverAnnotation;
-	    relationAnnotation.readOnly = false;
-	    relationAnnotation.setDisableHoverEvent();
-	
-	    disableAnnotationHoverEvent();
-	
-	    startAnnotation = _hoverAnnotation;
-	  }
-	}
-	
-	function getClientXY(e) {
-	  var svg = (0, _utils.getSVGLayer)();
-	  var rect = svg.getBoundingClientRect();
-	  var x = e.clientX - rect.left;
-	  var y = e.clientY - rect.top;
-	  return { x: x, y: y };
-	}
-	
-	/**
-	 * Handle document.mousemove event
-	 *
-	 * @param {Event} e The DOM event to handle
-	 */
-	function handleDocumentMousemove(e) {
-	
-	  if (!relationAnnotation) {
-	    return;
-	  }
-	
-	  if (mousedownFired) {
-	    mousemoveFired = true;
-	  }
-	
-	  // draw temporary arrow, if now drawing.
-	  if (mousedownFired && mousemoveFired) {
-	    var p = (0, _utils.scaleDown)(getClientXY(e));
-	    relationAnnotation.x2 = p.x;
-	    relationAnnotation.y2 = p.y;
-	    relationAnnotation.render();
-	  }
-	
-	  // Hover visual event.
-	  var circle = findHitBoundingCircle(e);
-	  if (!hitCircle && circle) {
-	    hitCircle = circle;
-	    var uuid = (0, _jquery2.default)(hitCircle).parents('g').data('pdf-annotate-id');
-	    var annotation = window.annotationContainer.findById(uuid);
-	    if (annotation) {
-	      annotation.highlight();
-	    }
-	  } else if (hitCircle && !circle) {
-	    var _uuid = (0, _jquery2.default)(hitCircle).parents('g').data('pdf-annotate-id');
-	    var _annotation = window.annotationContainer.findById(_uuid);
-	    if (_annotation) {
-	      _annotation.dehighlight();
-	    }
-	    hitCircle = null;
-	  }
-	}
-	
-	function findHitBoundingCircle(e) {
-	
-	  // Mouse Point.
-	  var point = (0, _utils.scaleDown)(svg, getClientXY(e));
-	
-	  for (var i = 0; i < boundingCircles.length; i++) {
-	    if (isCircleHit(point, boundingCircles[i])) {
-	      return boundingCircles[i];
-	    }
-	  }
-	
-	  // Notfound.
-	  return null;
-	}
-	
-	/**
-	 * Judge whether the mouse pointer on a circle.
-	 */
-	function isCircleHit(pos, element) {
-	  // <circle cx="100" cy="100" r="100"/>
-	  var r = parseFloat(element.getAttribute('r'));
-	  var x = parseFloat(element.getAttribute('cx'));
-	  var y = parseFloat(element.getAttribute('cy'));
-	  var distance = Math.sqrt(Math.pow(pos.x - x, 2) + Math.pow(pos.y - y, 2));
-	  return distance <= r;
-	}
-	
-	/**
-	 * Handle document.mouseup event
-	 *
-	 * @param {Event} e The DOM event to handle
-	 */
-	function handleDocumentMouseup(e) {
-	
-	  var clicked = mousedownFired && !mousemoveFired;
-	  var dragged = mousedownFired && mousemoveFired;
-	
-	  mousedownFired = false;
-	  mousemoveFired = false;
-	
-	  enableAnnotationHoverEvent();
-	
-	  // Behave as clicked.
-	  if (clicked) {
-	    if (startAnnotation && startAnnotation.handleClickEvent) {
-	      startAnnotation.handleClickEvent();
-	    }
-	    startAnnotation = null;
-	
-	    relationAnnotation && relationAnnotation.destroy();
-	    relationAnnotation = null;
-	
-	    return;
-	  }
-	
-	  startAnnotation = null;
-	
-	  if (!relationAnnotation) {
-	    return;
-	  }
-	
-	  // Find the end position.
-	  var circle = findHitBoundingCircle(e);
-	  if (!circle) {
-	    relationAnnotation.destroy();
-	    relationAnnotation = null;
-	    return;
-	  }
-	
-	  var uuid = circle.parentNode.getAttribute('data-pdf-annotate-id');
-	  var endAnnotation = window.annotationContainer.findById(uuid);
-	  if (relationAnnotation.rel1Annotation === endAnnotation) {
-	    relationAnnotation.destroy();
-	    relationAnnotation = null;
-	    return;
-	  }
-	
-	  relationAnnotation.rel2Annotation = endAnnotation;
-	  relationAnnotation.setEnableHoverEvent();
-	
-	  relationAnnotation.save();
-	
-	  showTextInput(relationAnnotation);
-	
-	  if (prevAnnotation) {
-	    prevAnnotation.resetTextForceDisplay();
-	    prevAnnotation.render();
-	    prevAnnotation.enableViewMode();
-	  }
-	  prevAnnotation = relationAnnotation;
-	
-	  relationAnnotation = null;
-	}
-	
-	/**
-	 * Show the input field to add a new text.
-	 */
-	function showTextInput(relationAnnotation) {
-	
-	  // New type text.
-	  textInput.enable({ uuid: relationAnnotation.uuid, autoFocus: true, blurListener: function blurListener() {
-	      // relationAnnotation.enable();
-	      window.annotationContainer.enableAll();
-	    } });
-	  // relationAnnotation.disable();
-	  window.annotationContainer.disableAll();
-	
-	  // let p1 = relationAnnotation.rel1Annotation.getBoundingCirclePosition();
-	  // let p2 = relationAnnotation.rel2Annotation.getBoundingCirclePosition();
-	  // let textPosition = getRelationTextPosition(p1.x, p1.y, p2.x, p2.y);
-	
-	  // let boundingRect = svg.getBoundingClientRect();
-	
-	  // let x = scaleUp(svg, {x : textPosition.x}).x + boundingRect.left;
-	  // let y = scaleUp(svg, {y : textPosition.y}).y + boundingRect.top;
-	
-	  // addInputField(x, y, null, null, (text) => {
-	
-	  //   relationAnnotation.text = text;
-	  //   relationAnnotation.setTextForceDisplay();
-	  //   relationAnnotation.save();
-	  //   relationAnnotation.render();
-	  //   relationAnnotation.enableViewMode();
-	
-	  // });
-	}
-	
-	/**
-	  Show BoundingBox on highlight objects.
-	  FIXME wanna remove this.
-	*/
-	function createBoundingBoxList() {
-	  svg = (0, _utils.getSVGLayer)();
-	  boundingCircles = [];
-	  forEach.call(svg.querySelectorAll('g > [type="boundingCircle"]'), function (boundingCircle) {
-	    if ((0, _jquery2.default)(boundingCircle).closest('g').attr('read-only') !== 'true') {
-	      boundingCircles.push(boundingCircle);
-	    }
-	  });
-	}
-	
-	function disableAnnotationHoverEvent() {
-	  // Disable annotation original hover event,
-	  // bacause the event occur intermittently at mouse dragging.
-	  (0, _jquery2.default)('svg > g').css('pointer-events', 'none');
-	}
-	
-	function enableAnnotationHoverEvent() {
-	  (0, _jquery2.default)('svg > g').css('pointer-events', 'auto');
-	}
-	
-	/**
-	 * TODO wanna remove this.
-	 */
-	function deleteBoundingBoxList() {
-	  boundingCircles = [];
-	}
-	
-	function handleBoundingCircleHoverIn(annotation) {
-	  _hoverAnnotation = annotation;
-	}
-	
-	function handleBoundingCircleHoverOut(annotation) {
-	  _hoverAnnotation = null;
-	}
-	
 	function createRelation(type, anno1, anno2) {
-	  var dryRun = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+	    var dryRun = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 	
 	
-	  var annotation = new _relation3.default();
-	  annotation.direction = type;
-	  annotation.rel1Annotation = anno1;
-	  annotation.rel2Annotation = anno2;
+	    var annotation = new _relation2.default();
+	    annotation.direction = type;
+	    annotation.rel1Annotation = anno1;
+	    annotation.rel2Annotation = anno2;
 	
-	  if (dryRun === false) {
-	    annotation.save();
-	    annotation.render();
-	    showTextInput(annotation);
-	  }
+	    if (dryRun === false) {
+	        annotation.save();
+	        annotation.render();
 	
-	  return annotation;
-	}
+	        // TODO Refactoring.
+	        // Deselect all.
+	        window.annotationContainer.getSelectedAnnotations().forEach(function (a) {
+	            return a.deselect();
+	        });
 	
-	/**
-	 * Enable relation behavior.
-	 */
-	function enableRelation() {
-	  var relationType = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'one-way';
+	        // Select.
+	        annotation.select();
 	
-	
-	  if (_enabled) {
-	    return;
-	  }
-	
-	  _enabled = true;
-	  _relationType = relationType;
-	
-	  createBoundingBoxList();
-	  (0, _utils.disableUserSelect)();
-	  (0, _utils.disableTextlayer)();
-	
-	  document.addEventListener('mousedown', handleDocumentMousedown);
-	  document.addEventListener('mousemove', handleDocumentMousemove);
-	  document.addEventListener('mouseup', handleDocumentMouseup);
-	
-	  window.annotationContainer.getAllAnnotations().forEach(function (a) {
-	
-	    if (a.hasBoundingCircle()) {
-	
-	      if (a.readOnly) {
-	        a.hideBoundingCircle();
-	      } else {
-	        a.on('circlehoverin', handleBoundingCircleHoverIn);
-	        a.on('circlehoverout', handleBoundingCircleHoverOut);
-	      }
+	        // New type text.
+	        textInput.enable({ uuid: annotation.uuid, autoFocus: true });
 	    }
-	  });
 	
-	  window.globalEvent.emit('enableRelation');
-	}
-	
-	/**
-	 * Disable relation behavior.
-	 */
-	function disableRelation() {
-	  if (!_enabled) {
-	    return;
-	  }
-	
-	  _enabled = false;
-	  document.removeEventListener('mousedown', handleDocumentMousedown);
-	  document.removeEventListener('mousemove', handleDocumentMousemove);
-	  document.removeEventListener('mouseup', handleDocumentMouseup);
-	
-	  (0, _utils.enableUserSelect)();
-	  (0, _utils.enableTextlayer)();
-	
-	  deleteBoundingBoxList();
-	
-	  window.annotationContainer.getAllAnnotations().forEach(function (a) {
-	
-	    if (a.hasBoundingCircle()) {
-	
-	      if (a.readOnly) {
-	        a.showBoundingCircle();
-	      } else {
-	        a.removeListener('circlehoverin', handleBoundingCircleHoverIn);
-	        a.removeListener('circlehoverout', handleBoundingCircleHoverOut);
-	      }
-	    }
-	  });
-	
-	  if (prevAnnotation) {
-	    prevAnnotation.resetTextForceDisplay();
-	    prevAnnotation.render();
-	    prevAnnotation.enableViewMode();
-	    prevAnnotation = null;
-	  }
-	
-	  window.globalEvent.emit('disableRelation');
+	    return annotation;
 	}
 
 /***/ },
@@ -21079,6 +20775,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    window.annotationContainer.getSelectedAnnotations().forEach(function (a) {
 	        return a.deselect();
 	    });
+	
+	    var event = document.createEvent('CustomEvent');
+	    event.initCustomEvent('annotationDeselected', true, true, this);
+	    window.dispatchEvent(event);
 	}
 	
 	/**
@@ -21146,7 +20846,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, "\n/**\n * Utilities.\n */\n.\\--hide {\n  display: none;\n}\n\n/**\n * SVGLayer.\n */\n.annoLayer {}\n.annoLayer > *.\\--viewMode {\n  opacity: 0.5;\n}\n.annoLayer > *.\\--viewMode.\\--emphasis {\n  opacity: 1;\n}\n\n/**\n    各種アノテーション\n*/\n.anno-circle {\n    transition:0.2s;\n    transform-origin: center center;\n}\n.\\--hover .anno-circle {\n  box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;\n  /*transform: scale(2);*/\n  stroke: blue;\n  stroke-width: 5px;\n}\n\n.\\--hover .anno-span {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-span {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n/**\n  Relation.\n*/\n.anno-relation {\n  transition:0.2s;\n}\n.\\--hover .anno-relation {\n  stroke-width: 2px;\n}\n.\\--selected .anno-relation {\n}\n.anno-relation-outline {\n  fill: none;\n  visibility: hidden;\n}\n.\\--selected .anno-relation-outline {\n  visibility: visible;\n  stroke: black;\n  stroke-width: 2.85px;\n  pointer-events: stroke;\n  stroke-dasharray: 3;\n}\n\n/**\n * Span.\n */\n.anno-span {}\n.anno-span rect {\n    /* Enable the hover event on circles and text even if they are overwraped other spans. */\n    pointer-events: none;\n}\n\n/**\n  Rect.\n*/\n.anno-rect {\n}\n.\\--hover .anno-rect {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-rect {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n\n/**\n  Text.\n*/\n.anno-text-group, .anno-text-group.\\--viewMode {\n    transition: 0.2s;\n    opacity: 0.01; /* for enabling a hover event. */\n}\n.anno-text-group.\\--hover,\n.anno-text-group.\\--selected,\n.anno-text-group.\\--visible {\n    opacity: 1;\n}\n.anno-text-group text {\n    /* Disable span action when selecting an anno text. */\n    user-select: none;\n}\n.anno-text {\n}\n.\\--hover .anno-text {\n  fill: rgba(255, 255, 255, 1.0);\n  stroke: black;\n  stroke-width: 0.75px;\n}\n.\\--hover .anno-text ~ text {\n  fill: rgba(255, 0, 0, 1.0);\n}\n.\\--selected .anno-text {\n  stroke: rgba(255, 0, 0, 1.0);\n  stroke-width: 1.5px;\n  fill: rgba(255, 232, 188, 1.0);\n  stroke-dasharray: 3;\n}\n.\\--selected .anno-text ~ text {\n  fill: rgba(0, 0, 0, 1.0);\n}\n\n/**\n Disable text layers.\n*/\nbody.disable-text-layer .textLayer {\n    display: none;\n}\n\n", ""]);
+	exports.push([module.id, "\n/**\n * Utilities.\n */\n.\\--hide {\n  display: none;\n}\n.no-action {\n    pointer-events: none;\n}\n\n/**\n * SVGLayer.\n */\n.annoLayer {}\n.annoLayer > *.\\--viewMode {\n  opacity: 0.5;\n}\n.annoLayer > *.\\--viewMode.\\--emphasis {\n  opacity: 1;\n}\n\n#tmpLayer {\n    pointer-events: auto;\n}\n\n/**\n    Annotation related.\n*/\n.anno-circle {\n    transition:0.2s;\n    transform-origin: center center;\n}\n.\\--hover .anno-circle {\n  box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;\n  /*transform: scale(2);*/\n  stroke: blue;\n  stroke-width: 5px;\n}\n\n.\\--hover .anno-span {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-span {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n/**\n  Relation.\n*/\n.anno-relation {\n  transition:0.2s;\n}\n.\\--hover .anno-relation {\n  stroke-width: 2px;\n}\n.\\--selected .anno-relation {\n}\n.anno-relation-outline {\n  fill: none;\n  visibility: hidden;\n}\n.\\--selected .anno-relation-outline {\n  visibility: visible;\n  stroke: black;\n  stroke-width: 2.85px;\n  pointer-events: stroke;\n  stroke-dasharray: 3;\n}\n\n/**\n * Span.\n */\n.anno-span {}\n.anno-span rect {\n    /* Enable the hover event on circles and text even if they are overwraped other spans. */\n    pointer-events: none;\n}\n\n/**\n  Rect.\n*/\n.anno-rect {\n}\n.\\--hover .anno-rect {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-rect {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n\n/**\n  Text.\n*/\n.anno-text-group, .anno-text-group.\\--viewMode {\n    transition: 0.2s;\n    opacity: 0.01; /* for enabling a hover event. */\n}\n.anno-text-group.\\--hover,\n.anno-text-group.\\--selected,\n.anno-text-group.\\--visible {\n    opacity: 1;\n}\n.anno-text-group text {\n    /* Disable span action when selecting an anno text. */\n    user-select: none;\n}\n.anno-text {\n}\n.\\--hover .anno-text {\n  fill: rgba(255, 255, 255, 1.0);\n  stroke: black;\n  stroke-width: 0.75px;\n}\n.\\--hover .anno-text ~ text {\n  fill: rgba(255, 0, 0, 1.0);\n}\n.\\--selected .anno-text {\n  stroke: rgba(255, 0, 0, 1.0);\n  stroke-width: 1.5px;\n  fill: rgba(255, 232, 188, 1.0);\n  stroke-dasharray: 3;\n}\n.\\--selected .anno-text ~ text {\n  fill: rgba(0, 0, 0, 1.0);\n}\n\n/**\n Disable text layers.\n*/\nbody.disable-text-layer .textLayer {\n    display: none;\n}\n\n", ""]);
 	
 	// exports
 
