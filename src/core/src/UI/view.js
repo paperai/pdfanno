@@ -30,6 +30,10 @@ function handlePageClick(e) {
     window.annotationContainer
         .getSelectedAnnotations()
         .forEach(a => a.deselect());
+
+    var event = document.createEvent('CustomEvent');
+    event.initCustomEvent('annotationDeselected', true, true, this);
+    window.dispatchEvent(event);
 }
 
 /**

@@ -139,9 +139,9 @@ function startApplication() {
         inputLabel.handleAnnotationSelected(e.detail);
     });
 
-    iframeWindow.addEventListener('annotationDeselected' , e => {
-        console.log('annotationDeselected:', e.detail);
-        inputLabel.handleAnnotationDeselected(e.detail);
+    iframeWindow.addEventListener('annotationDeselected' , () => {
+        console.log('annotationDeselected');
+        inputLabel.handleAnnotationDeselected();
     });
 
 

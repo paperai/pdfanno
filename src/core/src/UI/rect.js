@@ -90,6 +90,8 @@ function handleDocumentMousemove(e) {
       mousemoveFired = true;
     }
 
+    $(document.body).addClass('no-action');
+
     let { x : curX, y : curY } = getXY(e);
 
     let x = Math.min(originX, curX);
@@ -150,6 +152,8 @@ function _findAnnotation(e) {
  * @param {Event} e The DOM event to handle
  */
 function handleDocumentMouseup(e) {
+
+    $(document.body).removeClass('no-action');
 
     let clicked = mousedownFired && !mousemoveFired;
     let dragged = mousedownFired && mousemoveFired;
@@ -235,11 +239,7 @@ function saveRect(rect) {
       .forEach(a => a.deselect());
 
   // Select.
-  // FIXME handlePageClickが発生してキャンセルされちゃう問題の暫定対応.
-  setTimeout(() => {
-    rectAnnotation.select();
-    console.log('aaa:', rectAnnotation.$element.hasClass('--selected'), rectAnnotation.selected);
-  }, 100);
+  rectAnnotation.select();
 
   // New type text.
   textInput.enable({ uuid : rectAnnotation.uuid, autoFocus : true , blurListener : () => {

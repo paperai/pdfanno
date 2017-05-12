@@ -99,7 +99,7 @@ export function handleAnnotationSelected(annotation) {
     }
 }
 
-export function handleAnnotationDeselected(annotation) {
+export function handleAnnotationDeselected() {
     const annos = getSelectedAnnotations();
     if (annos.length === 1) {
         enable({ uuid : annos[0].uuid, text : annos[0].text });
