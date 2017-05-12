@@ -33,9 +33,6 @@ export default class RectAnnotation extends AbstractAnnotation {
         globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
         globalEvent.on('enableViewMode', this.enableViewMode);
 
-        globalEvent.on('enableRelation', this.disableDragAction);
-        globalEvent.on('disableRelation', this.enableDragAction);
-
         this.textAnnotation = new TextAnnotation(this.readOnly, this);
         this.textAnnotation.on('selected', this.handleTextSelected);
         this.textAnnotation.on('deselected', this.handleTextDeselected);
