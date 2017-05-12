@@ -196,15 +196,22 @@ function handleDocumentMouseup(e) {
 
   relationAnnotation.save();
 
+  // // Select.
+  // relationAnnotation.select();
+
+  // // New type text.
+  // textInput.enable({ uuid : relationAnnotation.uuid, autoFocus : true });
+
+
   showTextInput(relationAnnotation);
 
 
-  if (prevAnnotation) {
-    prevAnnotation.resetTextForceDisplay();
-    prevAnnotation.render();
-    prevAnnotation.enableViewMode();
-  }
-  prevAnnotation = relationAnnotation;
+  // if (prevAnnotation) {
+  //   prevAnnotation.resetTextForceDisplay();
+  //   prevAnnotation.render();
+  //   prevAnnotation.enableViewMode();
+  // }
+  // prevAnnotation = relationAnnotation;
 
   relationAnnotation = null;
 
@@ -215,13 +222,26 @@ function handleDocumentMouseup(e) {
  */
 function showTextInput(relationAnnotation) {
 
+    // TODO Refactoring.
+    // Deselect all.
+    window.annotationContainer
+        .getSelectedAnnotations()
+        .forEach(a => a.deselect());
+
+    // Select.
+    relationAnnotation.select();
+
     // New type text.
-    textInput.enable({ uuid : relationAnnotation.uuid, autoFocus : true , blurListener : () => {
-        // relationAnnotation.enable();
-        window.annotationContainer.enableAll();
-    }});
-    // relationAnnotation.disable();
-    window.annotationContainer.disableAll();
+    textInput.enable({ uuid : relationAnnotation.uuid, autoFocus : true });
+
+
+    // // New type text.
+    // textInput.enable({ uuid : relationAnnotation.uuid, autoFocus : true , blurListener : () => {
+    //     // relationAnnotation.enable();
+    //     window.annotationContainer.enableAll();
+    // }});
+    // // relationAnnotation.disable();
+    // window.annotationContainer.disableAll();
 
 
 

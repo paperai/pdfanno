@@ -242,12 +242,7 @@ function saveRect(rect) {
   rectAnnotation.select();
 
   // New type text.
-  textInput.enable({ uuid : rectAnnotation.uuid, autoFocus : true , blurListener : () => {
-    // rectAnnotation.enable();
-    window.annotationContainer.enableAll();
-  }});
-  // rectAnnotation.disable();
-  window.annotationContainer.disableAll();
+  textInput.enable({ uuid : rectAnnotation.uuid, autoFocus : true });
 
 
   // addInputField(x, y, null, null, (text) => {
