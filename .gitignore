@@ -7,3 +7,6 @@ work/pdf-annotatejs/dist
 
 dist
 jsdoc
+
+# Server Data.
+server-data

@@ -16538,8 +16538,10 @@ return /******/ (function(modules) { // webpackBootstrap
 		"main": "index.js",
 		"scripts": {
 			"anno:start": "npm run anno:publish && NODE_ENV=production node server.js",
+			"anno:start-dev": "npm run anno:dev & NODE_ENV=develop node-dev server.js",
 			"anno:prepare": "gulp prepare",
 			"anno:build": "npm run anno:prepare && webpack",
+			"anno:dev": "npm run anno:prepare && webpack --watch",
 			"anno:watch": "npm run anno:prepare && webpack-dev-server --inline",
 			"anno:publish": "npm run anno:build && gulp publish"
 		},
@@ -16571,7 +16573,8 @@ return /******/ (function(modules) { // webpackBootstrap
 			"style-loader": "^0.13.1",
 			"vinyl-source-stream": "^1.1.0",
 			"webpack": "1.12.14",
-			"webpack-dev-server": "^1.14.1"
+			"webpack-dev-server": "^1.14.1",
+			"webpack-livereload-plugin": "^0.11.0"
 		},
 		"dependencies": {
 			"axios": "^0.15.2",
