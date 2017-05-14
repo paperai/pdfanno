@@ -16537,6 +16537,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		"description": "",
 		"main": "index.js",
 		"scripts": {
+			"anno:start": "npm run anno:publish && NODE_ENV=production node server.js",
 			"anno:prepare": "gulp prepare",
 			"anno:build": "npm run anno:prepare && webpack",
 			"anno:watch": "npm run anno:prepare && webpack-dev-server --inline",

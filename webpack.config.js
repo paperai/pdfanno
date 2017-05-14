@@ -1,4 +1,5 @@
-var webpack = require('webpack');
+const webpack = require('webpack');
+const LiveReloadPlugin = require('webpack-livereload-plugin');
 
 module.exports = {
   entry: {
@@ -23,5 +24,12 @@ module.exports = {
       }
     ]
   },
+  plugins: [
+    // LiveReload(watchの時のみ有効)
+    new LiveReloadPlugin({
+      // LiveReloadのオプション（なんか必要あれば）
+      // https://www.npmjs.com/package/webpack-livereload-plugin
+    })
+  ],
   devtool: 'source-map'
 };
