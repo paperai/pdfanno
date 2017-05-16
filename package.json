@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "anno:start": "npm run anno:publish && NODE_ENV=production node server.js",
-    "anno:start-dev": "npm run anno:dev & NODE_ENV=develop ./node_modules/.bin/node-dev server.js",
+    "anno:start": "npm run anno:publish && cross-env NODE_ENV=production node server.js",
+    "anno:start-dev": "npm run anno:dev & cross-env NODE_ENV=develop ./node_modules/.bin/node-dev server.js",
     "anno:prepare": "gulp prepare",
     "anno:build": "npm run anno:prepare && webpack",
     "anno:dev": "npm run anno:prepare && webpack --watch",
