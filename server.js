@@ -50,7 +50,7 @@ app.post('/api/pdf_upload', (req, res) => {
     if (!fs.existsSync('server-data')) {
         fs.mkdirSync('server-data');
     }
-    fs.writeFileSync('server-data/' + fileName, buf);
+    fs.writeFileSync(path.resolve(__dirname, 'server-data', fileName), buf);
 
     // Response the result.
     res.json({ status : 'OK' });
