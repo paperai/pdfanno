@@ -49,7 +49,8 @@ export function setup() {
         }).then(result => {
             console.log('result:', result);
             setTimeout(() => {
-                alert('Upload completed.');
+                // alert('Upload completed.');
+                $('#uploadResult').text(result.status);
             }, 500); // wait for progress bar animation.
         });
 
