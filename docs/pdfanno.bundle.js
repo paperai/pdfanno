@@ -1456,7 +1456,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }).then(function (result) {
 	            console.log('result:', result);
 	            setTimeout(function () {
-	                alert('Upload completed.');
+	                // alert('Upload completed.');
+	                $('#uploadResult').text(result.status);
 	            }, 500); // wait for progress bar animation.
 	        });
 	
