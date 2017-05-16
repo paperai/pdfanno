@@ -84,24 +84,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var downloadButton = _interopRequireWildcard(_downloadButton);
 	
-	var _annotationTools = __webpack_require__(12);
+	var _uploadButton = __webpack_require__(12);
+	
+	var uploadButton = _interopRequireWildcard(_uploadButton);
+	
+	var _annotationTools = __webpack_require__(13);
 	
 	var annotationsTools = _interopRequireWildcard(_annotationTools);
 	
-	var _inputLabel = __webpack_require__(14);
+	var _inputLabel = __webpack_require__(15);
 	
 	var inputLabel = _interopRequireWildcard(_inputLabel);
 	
 	var _window = __webpack_require__(11);
 	
-	var _public = __webpack_require__(15);
+	var _public = __webpack_require__(16);
 	
 	var publicApi = _interopRequireWildcard(_public);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
-	__webpack_require__(19);
 	__webpack_require__(20);
+	__webpack_require__(21);
 	
 	/**
 	 * Expose public APIs.
@@ -243,6 +247,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    referenceAnnoDropdown.setup();
 	    annoListDropdown.setup();
 	    downloadButton.setup();
+	    uploadButton.setup();
 	    annotationsTools.setup();
 	
 	    window.addEventListener('restartApp', startApplication);
@@ -1392,6 +1397,79 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 12 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.setup = setup;
+	/**
+	 * UI parts - Upload Button.
+	 */
+	
+	function setup() {
+	    $('.js-btn-upload').off('click').on('click', function () {
+	
+	        var pdfFileName = $('#dropdownPdf .js-text').text();
+	        if (!pdfFileName || pdfFileName === 'PDF File') {
+	            return alert('Display a PDF, before upload.');
+	        }
+	        var contentBase64 = window.fileMap[pdfFileName];
+	
+	        var $progressBar = $('.js-upload-progress');
+	
+	        $.ajax({
+	            xhr: function xhr() {
+	                var xhr = new window.XMLHttpRequest();
+	                //Upload progress
+	                xhr.upload.addEventListener("progress", function (evt) {
+	                    if (evt.lengthComputable) {
+	                        var percentComplete = evt.loaded / evt.total;
+	                        //Do something with upload progress
+	                        console.log('uploadProgress:', percentComplete);
+	
+	                        var percent = Math.floor(percentComplete * 100);
+	                        $progressBar.find('.progress-bar').css('width', percent + '%').attr('aria-valuenow', percent).text(percent + '%');
+	                        if (percent === 100) {
+	                            setTimeout(function () {
+	                                $progressBar.addClass('hidden');
+	                            }, 2000);
+	                        }
+	                    }
+	                }, false);
+	                //Download progress
+	                xhr.addEventListener("progress", function (evt) {
+	                    if (evt.lengthComputable) {
+	                        var percentComplete = evt.loaded / evt.total;
+	                        //Do something with download progress
+	                        console.log('downloadProgress:', percentComplete);
+	                    }
+	                }, false);
+	                return xhr;
+	            },
+	            url: '/api/pdf_upload',
+	            method: 'POST',
+	            dataType: 'json',
+	            data: { name: pdfFileName, content: contentBase64 }
+	        }).then(function (result) {
+	            console.log('result:', result);
+	            setTimeout(function () {
+	                // alert('Upload completed.');
+	                $('#uploadResult').text(result.status);
+	            }, 500); // wait for progress bar animation.
+	        });
+	
+	        // Show.
+	        $progressBar.removeClass('hidden').find('.progress-bar').css('width', '0%').attr('aria-valuenow', 0).text('0%');
+	
+	        return false;
+	    });
+	}
+
+/***/ },
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1405,7 +1483,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _anno = __webpack_require__(1);
 	
-	var _util = __webpack_require__(13);
+	var _util = __webpack_require__(14);
 	
 	/**
 	    Set the behavior of the tool buttons for annotations.
@@ -1533,7 +1611,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1553,7 +1631,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1708,7 +1786,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1728,7 +1806,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _anno = __webpack_require__(1);
 	
-	var _toml = __webpack_require__(16);
+	var _toml = __webpack_require__(17);
 	
 	var _toml2 = _interopRequireDefault(_toml);
 	
@@ -1919,11 +1997,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	var readTOML = exports.readTOML = _toml2.default.parse;
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var parser = __webpack_require__(17);
-	var compiler = __webpack_require__(18);
+	var parser = __webpack_require__(18);
+	var compiler = __webpack_require__(19);
 	
 	module.exports = {
 	  parse: function(input) {
@@ -1934,7 +2012,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 17 */
+/* 18 */
 /***/ function(module, exports) {
 
 	module.exports = (function() {
@@ -5781,7 +5859,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -5984,22 +6062,22 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 19 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__.p + "dist/index.html";
 
 /***/ },
-/* 20 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(21);
+	var content = __webpack_require__(22);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(23)(content, {});
+	var update = __webpack_require__(24)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -6016,21 +6094,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 21 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(22)();
+	exports = module.exports = __webpack_require__(23)();
 	// imports
 	
 	
 	// module
-	exports.push([module.id, "@charset 'utf-8';\n\n/* Super Hack to disable autofill style for Chrome. */\ninput:-webkit-autofill,\ninput:-webkit-autofill:hover,\ninput:-webkit-autofill:focus,\ninput:-webkit-autofill:active {\n    transition: background-color 5000s ease-in-out 0s;\n}\n\n.no-visible {\n    visibility: hidden;\n}\n\n/**\n * Viewer size.\n * This height will be override to fit the browser height (by app.js).\n */\n.anno-viewer {\n    width: 100%;\n    height: 500px;\n}\n\n/**\n * Annotation Select UI Layout.\n */\n.anno-select-layout {}\n.anno-select-layout .row:first-child {\n    margin-bottom: 10px;\n}\n.anno-select-layout [type=\"radio\"] {\n    margin-right: 5px;\n}\n.anno-select-layout [type=\"file\"] {\n    display: inline-block;\n    margin-left: 5px;\n    line-height: 1em;\n}\n.anno-select-layout .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-select-layout .sp-dd {\n    display: none;\n}\n\n/**\n * Dropdown.\n */\n.dropdown-menu {\n    overflow: scroll;\n}\n\n/**\n * Color picker.\n */\n.anno-ui .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-ui .sp-dd {\n    display: none;\n}\n.anno-ui .sp-preview {\n    margin-right: 0;\n}\n\n", ""]);
+	exports.push([module.id, "@charset 'utf-8';\n\n/* Super Hack to disable autofill style for Chrome. */\ninput:-webkit-autofill,\ninput:-webkit-autofill:hover,\ninput:-webkit-autofill:focus,\ninput:-webkit-autofill:active {\n    transition: background-color 5000s ease-in-out 0s;\n}\n\n.u-mt-10 {margin-top: 10px;}\n.u-mt-20 {margin-top: 20px;}\n\n.no-visible {\n    visibility: hidden;\n}\n\n/**\n * Viewer size.\n * This height will be override to fit the browser height (by app.js).\n */\n.anno-viewer {\n    width: 100%;\n    height: 500px;\n}\n\n/**\n * Annotation Select UI Layout.\n */\n.anno-select-layout {}\n.anno-select-layout .row:first-child {\n    margin-bottom: 10px;\n}\n.anno-select-layout [type=\"radio\"] {\n    margin-right: 5px;\n}\n.anno-select-layout [type=\"file\"] {\n    display: inline-block;\n    margin-left: 5px;\n    line-height: 1em;\n}\n.anno-select-layout .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-select-layout .sp-dd {\n    display: none;\n}\n\n/**\n * Dropdown.\n */\n.dropdown-menu {\n    overflow: scroll;\n}\n\n/**\n * Color picker.\n */\n.anno-ui .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-ui .sp-dd {\n    display: none;\n}\n.anno-ui .sp-preview {\n    margin-right: 0;\n}\n\n", ""]);
 	
 	// exports
 
 
 /***/ },
-/* 22 */
+/* 23 */
 /***/ function(module, exports) {
 
 	/*
@@ -6086,7 +6164,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 23 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*

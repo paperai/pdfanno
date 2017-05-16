@@ -1,30 +1,62 @@
-let express = require('express');
-let app = express();
+const path = require('path');
+const fs = require('fs');
+const base64 = require('base64');
+const express = require('express');
+const bodyParser = require('body-parser');
+const multer = require('multer');
+const upload = multer();
 
-// for viewer
-app.use('/dist', express.static('dist'));
-app.use('/pages', express.static('pages'));
-app.use('/build', express.static('build'));
-app.use('/pdfs', express.static('pdfs'));
-// app.use('/external', express.static('external'));
-// app.use('/src', express.static('src'));
-// app.use('/node_modules', express.static('node_modules'));
+// Load environment.
+const NODE_ENV = process.env.NODE_ENV;
+const isProduction = NODE_ENV === 'production';
+console.log('isProduction=', isProduction);
 
-// redirect.
+// Set the static root directory.
+let STATIC_ROOT = 'docs';
+if (!isProduction) {
+    STATIC_ROOT = 'dist';
+}
+
+// create Application.
+const app = express();
+
+// Settings for POST request.
+app.use(bodyParser.json({ limit : '50mb' }));
+app.use(bodyParser.urlencoded({ limit : '50mb', expented : true }));
+
+// Setting for static files.
+app.use('/dist', express.static(path.resolve(__dirname, STATIC_ROOT, 'dist')));
+app.use('/pages', express.static(path.resolve(__dirname, STATIC_ROOT, 'pages')));
+app.use('/build', express.static(path.resolve(__dirname, STATIC_ROOT, 'build')));
+app.use('/pdfs', express.static(path.resolve(__dirname, STATIC_ROOT, 'pdfs')));
+app.use('/pdfanno-core.bundle.js', express.static(path.resolve(__dirname, STATIC_ROOT, 'pdfanno-core.bundle.js')));
+app.use('/pdfanno.bundle.js', express.static(path.resolve(__dirname, STATIC_ROOT, 'pdfanno.bundle.js')));
+
+// Rooting : Index file.
 app.get('/', function(req, res) {
-    res.redirect('/dist/index.html');
+    res.type('html');
+    res.send(fs.readFileSync(path.resolve(__dirname, STATIC_ROOT, 'index.html')));
 });
 
-// for api
-app.get('/api/anno/add', function(req, res) {
-    // TODO implement.
-    res.send('ok');
-});
-app.get('/api/anno/get', function(req, res) {
-    // TODO implement.
-    res.send('ok');
+// Rooting(API) : Uploading a pdf.
+app.post('/api/pdf_upload', (req, res) => {
+
+    const fileName = req.body.name;
+    const contentBase64 = req.body.content.replace('data:application/pdf;base64,', '');
+    const buf = Buffer.from(contentBase64, 'base64');
+    console.log(`${fileName} is uploaded. fileSize=${Math.floor(buf.length / 1024)}KB`);
+
+    // Save to dir.
+    if (!fs.existsSync('server-data')) {
+        fs.mkdirSync('server-data');
+    }
+    fs.writeFileSync(path.resolve(__dirname, 'server-data', fileName), buf);
+
+    // Response the result.
+    res.json({ status : 'OK' });
 });
 
-app.listen(3000, function() {
-    console.log('Express app listening on port 3000.');
+// Launch app.
+app.listen(8000, function() {
+    console.log('Express app listening on port 8000.');
 });

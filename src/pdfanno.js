@@ -10,6 +10,7 @@ import * as primaryAnnoDropdown from './page/ui/primaryAnnoDropdown';
 import * as annoListDropdown from './page/ui/annoListDropdown';
 import * as referenceAnnoDropdown from './page/ui/referenceAnnoDropdown';
 import * as downloadButton from './page/ui/downloadButton';
+import * as uploadButton from './page/ui/uploadButton';
 import * as annotationsTools from './page/ui/annotationTools';
 import * as inputLabel from './page/ui/inputLabel';
 
@@ -170,6 +171,7 @@ window.addEventListener('DOMContentLoaded', e => {
     referenceAnnoDropdown.setup();
     annoListDropdown.setup();
     downloadButton.setup();
+    uploadButton.setup();
     annotationsTools.setup();
 
     window.addEventListener('restartApp', startApplication);

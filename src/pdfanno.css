@@ -8,6 +8,9 @@ input:-webkit-autofill:active {
     transition: background-color 5000s ease-in-out 0s;
 }
 
+.u-mt-10 {margin-top: 10px;}
+.u-mt-20 {margin-top: 20px;}
+
 .no-visible {
     visibility: hidden;
 }

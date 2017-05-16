@@ -90,9 +90,9 @@
 
                     <ul class="nav nav-tabs">
                         <li class="active"><a  href="#tab1" data-toggle="tab">Annotation</a></li>
-                        <li><a href="#tab2" data-toggle="tab">tab2</a></li>
+                        <li><a href="#tab2" data-toggle="tab">Auto (Experimental)</a></li>
                     </ul>
-                    <div class="tab-content ">
+                    <div class="tab-content">
                         <div class="tab-pane active" id="tab1">
                             <div class="btn-toolbar" role="toolbar" style="margin-top: 20px">
                                 <div class="btn-group" role="group">
@@ -124,7 +124,20 @@
                             </div>
                         </div>
                         <div class="tab-pane" id="tab2">
-                            <!-- No Contens Here -->
+                            <div class="btn-toolbar u-mt-20" role="toolbar">
+                                <div class="btn-group" role="group">
+                                    <a class="btn btn-default js-btn-upload" href="#" title="upload">
+                                        <i class="fa fa-upload fa-2x"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="progress js-upload-progress hidden u-mt-10">
+                              <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0"
+                              aria-valuemin="0" aria-valuemax="100" style="width:0%">0%</div>
+                            </div>
+                            <div class="u-mt-20">
+                                <textarea id="uploadResult" class="form-control" rows="1"></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
