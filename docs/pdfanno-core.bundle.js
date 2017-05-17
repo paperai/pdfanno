@@ -287,7 +287,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
-	  value: true
+	    value: true
 	});
 	exports.convertToExportY = convertToExportY;
 	exports.convertFromExportY = convertFromExportY;
@@ -297,16 +297,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function convertToExportY(y) {
 	
-	  var meta = getPageSize();
+	    var meta = getPageSize();
 	
-	  y -= paddingTop;
+	    y -= paddingTop;
 	
-	  var pageHeight = meta.height + paddingBetweenPages;
+	    var pageHeight = meta.height + paddingBetweenPages;
 	
-	  var pageNumber = Math.floor(y / pageHeight) + 1;
-	  var yInPage = y - (pageNumber - 1) * pageHeight;
+	    var pageNumber = Math.floor(y / pageHeight) + 1;
+	    var yInPage = y - (pageNumber - 1) * pageHeight;
 	
-	  return { pageNumber: pageNumber, y: yInPage };
+	    return { pageNumber: pageNumber, y: yInPage };
 	}
 	
 	/**
@@ -314,15 +314,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function convertFromExportY(pageNumber, yInPage) {
 	
-	  var meta = getPageSize();
+	    var meta = getPageSize();
 	
-	  var y = yInPage + paddingTop;
+	    var y = yInPage + paddingTop;
 	
-	  var pagePadding = paddingBetweenPages;
+	    var pagePadding = paddingBetweenPages;
 	
-	  y += (pageNumber - 1) * (meta.height + pagePadding);
+	    y += (pageNumber - 1) * (meta.height + pagePadding);
 	
-	  return y;
+	    return y;
 	}
 	
 	/**
@@ -340,11 +340,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function getPageSize() {
 	
-	  var pdfView = window.PDFView || iframeWindow.PDFView;
+	    var pdfView = window.PDFView || iframeWindow.PDFView;
 	
-	  var viewBox = pdfView.pdfViewer.getPageView(0).viewport.viewBox;
-	  var size = { width: viewBox[2], height: viewBox[3] };
-	  return size;
+	    var viewBox = pdfView.pdfViewer.getPageView(0).viewport.viewBox;
+	    var size = { width: viewBox[2], height: viewBox[3] };
+	    return size;
 	}
 
 /***/ },
@@ -4413,7 +4413,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var node = array[i];
 	      if (firstType === null) {
 	        firstType = node.type;
-	      } else if ((node.type === 'Integer' || node.type === 'Float') && (firstType === 'Integer' || firstType === 'Float')) {
+	      } else if ((node.type === "Integer" || node.type === "Float") && (firstType === "Integer" || firstType === "Float")) {
 	        // OK.
 	      } else if (node.type !== firstType) {
 	        genError("Cannot add value of type " + node.type + " to array of type " +
@@ -17144,7 +17144,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	  value: true
+	    value: true
 	});
 	exports.default = renderText;
 	
@@ -17171,10 +17171,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @return {Object} A boundingBox of text element.
 	 */
 	function getRect(text, svg) {
-	  svg.appendChild(text);
-	  var rect = text.getBoundingClientRect();
-	  text.parentNode.removeChild(text);
-	  return rect;
+	    svg.appendChild(text);
+	    var rect = text.getBoundingClientRect();
+	    text.parentNode.removeChild(text);
+	    return rect;
 	}
 	
 	/**
@@ -17186,38 +17186,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function renderText(a, svg) {
 	
-	  // Text.
-	  var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-	  (0, _setAttributes2.default)(text, {
-	    x: a.x,
-	    y: a.y + parseInt(DEFAULT_FONT_SIZE, 10),
-	    fill: a.color || '#F00',
-	    fontSize: DEFAULT_FONT_SIZE
-	  });
-	  text.innerHTML = a.content || a.text;
+	    // Text.
+	    var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+	    (0, _setAttributes2.default)(text, {
+	        x: a.x,
+	        y: a.y + parseInt(DEFAULT_FONT_SIZE, 10),
+	        fill: a.color || '#F00',
+	        fontSize: DEFAULT_FONT_SIZE
+	    });
+	    text.innerHTML = a.content || a.text;
 	
-	  // Background.
-	  var box = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-	  var rect = getRect(text, svg);
-	  (0, _setAttributes2.default)(box, {
-	    x: a.x - 1,
-	    y: a.y,
-	    width: rect.width,
-	    height: rect.height,
-	    fill: '#FFFFFF',
-	    class: 'anno-text'
-	  });
+	    // Background.
+	    var box = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+	    var rect = getRect(text, svg);
+	    (0, _setAttributes2.default)(box, {
+	        x: a.x - 1,
+	        y: a.y,
+	        width: rect.width,
+	        height: rect.height,
+	        fill: '#FFFFFF',
+	        class: 'anno-text'
+	    });
 	
-	  // Group.
-	  var group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-	  group.classList.add('anno-text-group');
-	  group.setAttribute('read-only', a.readOnly === true);
-	  group.setAttribute('data-parent-id', a.parentId);
-	  group.style.visibility = 'visible';
-	  group.appendChild(box);
-	  group.appendChild(text);
+	    // Group.
+	    var group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+	    group.classList.add('anno-text-group');
+	    group.setAttribute('read-only', a.readOnly === true);
+	    group.setAttribute('data-parent-id', a.parentId);
+	    group.style.visibility = 'visible';
+	    group.appendChild(box);
+	    group.appendChild(text);
 	
-	  return group;
+	    return group;
 	}
 	module.exports = exports['default'];
 
@@ -17479,7 +17479,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	  value: true
+	    value: true
 	});
 	exports.findBezierControlPoint = findBezierControlPoint;
 	exports.getRelationTextPosition = getRelationTextPosition;
@@ -17498,133 +17498,133 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function findBezierControlPoint(x1, y1, x2, y2) {
 	
-	  var DISTANCE = 30;
+	    var DISTANCE = 30;
 	
-	  // vertical line.
-	  if (x1 === x2) {
-	    return {
-	      x: x1,
-	      y: (y1 + y2) / 2
-	    };
-	  }
-	
-	  // horizontal line.
-	  if (y1 === y2) {
-	    return {
-	      x: (x1 + x2) / 2,
-	      y: y1 - DISTANCE
-	    };
-	  }
-	
-	  var center = {
-	    x: (x1 + x2) / 2,
-	    y: (y1 + y2) / 2
-	  };
-	
-	  var gradient = (y1 - y2) / (x1 - x2);
-	  gradient = -1 / gradient;
-	
-	  var theta = Math.atan(gradient);
-	  var deltaX = Math.cos(theta) * DISTANCE;
-	  var deltaY = Math.sin(theta) * DISTANCE;
-	
-	  if (x1 < x2) {
-	    // right top quadrant.
-	    if (y1 > y2) {
-	      return {
-	        x: center.x - Math.abs(deltaX),
-	        y: center.y - Math.abs(deltaY)
-	      };
-	      // right bottom quadrant.
-	    } else {
-	      return {
-	        x: center.x + Math.abs(deltaX),
-	        y: center.y - Math.abs(deltaY)
-	      };
+	    // vertical line.
+	    if (x1 === x2) {
+	        return {
+	            x: x1,
+	            y: (y1 + y2) / 2
+	        };
 	    }
-	  } else {
-	    // left top quadrant.
-	    if (y1 > y2) {
-	      return {
-	        x: center.x + Math.abs(deltaX),
-	        y: center.y - Math.abs(deltaY)
-	      };
-	      // left bottom quadrant.
-	    } else {
-	      return {
-	        x: center.x - Math.abs(deltaX),
-	        y: center.y - Math.abs(deltaY)
-	      };
+	
+	    // horizontal line.
+	    if (y1 === y2) {
+	        return {
+	            x: (x1 + x2) / 2,
+	            y: y1 - DISTANCE
+	        };
 	    }
-	  }
+	
+	    var center = {
+	        x: (x1 + x2) / 2,
+	        y: (y1 + y2) / 2
+	    };
+	
+	    var gradient = (y1 - y2) / (x1 - x2);
+	    gradient = -1 / gradient;
+	
+	    var theta = Math.atan(gradient);
+	    var deltaX = Math.cos(theta) * DISTANCE;
+	    var deltaY = Math.sin(theta) * DISTANCE;
+	
+	    if (x1 < x2) {
+	        // right top quadrant.
+	        if (y1 > y2) {
+	            return {
+	                x: center.x - Math.abs(deltaX),
+	                y: center.y - Math.abs(deltaY)
+	            };
+	            // right bottom quadrant.
+	        } else {
+	            return {
+	                x: center.x + Math.abs(deltaX),
+	                y: center.y - Math.abs(deltaY)
+	            };
+	        }
+	    } else {
+	        // left top quadrant.
+	        if (y1 > y2) {
+	            return {
+	                x: center.x + Math.abs(deltaX),
+	                y: center.y - Math.abs(deltaY)
+	            };
+	            // left bottom quadrant.
+	        } else {
+	            return {
+	                x: center.x - Math.abs(deltaX),
+	                y: center.y - Math.abs(deltaY)
+	            };
+	        }
+	    }
 	}
 	
 	function getRelationTextPosition(x1, y1, x2, y2) {
-	  var text = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : '';
-	  var parentId = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
+	    var text = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : '';
+	    var parentId = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
 	
 	
-	  // texts rendered.
-	  var rects = [];
-	  $('.anno-text').each(function () {
-	    var $this = $(this);
-	    // Remove myself.
-	    if ($this.parent().data('parent-id') !== parentId) rects.push({
-	      x: parseFloat($this.attr('x')),
-	      y: parseFloat($this.attr('y')),
-	      width: parseFloat($this.attr('width')),
-	      height: parseFloat($this.attr('height'))
+	    // texts rendered.
+	    var rects = [];
+	    $('.anno-text').each(function () {
+	        var $this = $(this);
+	        // Remove myself.
+	        if ($this.parent().data('parent-id') !== parentId) rects.push({
+	            x: parseFloat($this.attr('x')),
+	            y: parseFloat($this.attr('y')),
+	            width: parseFloat($this.attr('width')),
+	            height: parseFloat($this.attr('height'))
+	        });
 	    });
-	  });
 	
-	  // Set self size.
-	  var myWidth = 200;
-	  var myHeight = 15;
+	    // Set self size.
+	    var myWidth = 200;
+	    var myHeight = 15;
 	
-	  var addY = 5;
-	  if (y1 < y2) {
-	    addY *= -1;
-	  }
-	
-	  // Find the position not overlap.
-	  while (true) {
-	
-	    var cp = findBezierControlPoint(x1, y1, x2, y2);
-	    var x = x2 + (cp.x - x2) * 0.4;
-	    var y = y2 + (cp.y - y2) * 0.4;
-	
-	    var ok = true;
-	    for (var i = 0; i < rects.length; i++) {
-	      var r = rects[i];
-	
-	      // Check rects overlap.
-	
-	      var a_x1 = r.x;
-	      var a_x2 = r.x + r.width;
-	      var a_y1 = r.y;
-	      var a_y2 = r.y + r.height;
-	
-	      var b_x1 = x;
-	      var b_x2 = x + myWidth;
-	      var b_y1 = y;
-	      var b_y2 = y + myHeight;
-	
-	      var crossX = a_x1 <= b_x2 && b_x1 <= a_x2;
-	      var crossY = a_y1 <= b_y2 && b_y1 <= a_y2;
-	
-	      if (crossX && crossY) {
-	        ok = false;
-	        break;
-	      }
+	    var addY = 5;
+	    if (y1 < y2) {
+	        addY *= -1;
 	    }
 	
-	    if (ok) {
-	      return { x: x, y: y };
-	    }
+	    // Find the position not overlap.
+	    while (true) {
 	
-	    y1 += addY;
-	    y2 += addY;
-	  }
+	        var cp = findBezierControlPoint(x1, y1, x2, y2);
+	        var x = x2 + (cp.x - x2) * 0.4;
+	        var y = y2 + (cp.y - y2) * 0.4;
+	
+	        var ok = true;
+	        for (var i = 0; i < rects.length; i++) {
+	            var r = rects[i];
+	
+	            // Check rects overlap.
+	
+	            var a_x1 = r.x;
+	            var a_x2 = r.x + r.width;
+	            var a_y1 = r.y;
+	            var a_y2 = r.y + r.height;
+	
+	            var b_x1 = x;
+	            var b_x2 = x + myWidth;
+	            var b_y1 = y;
+	            var b_y2 = y + myHeight;
+	
+	            var crossX = a_x1 <= b_x2 && b_x1 <= a_x2;
+	            var crossY = a_y1 <= b_y2 && b_y1 <= a_y2;
+	
+	            if (crossX && crossY) {
+	                ok = false;
+	                break;
+	            }
+	        }
+	
+	        if (ok) {
+	            return { x: x, y: y };
+	        }
+	
+	        y1 += addY;
+	        y2 += addY;
+	    }
 	}
 
 /***/ },
@@ -20854,7 +20854,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, "\n/**\n * Utilities.\n */\n.\\--hide {\n  display: none;\n}\n.no-action {\n    pointer-events: none;\n}\n\n/**\n * SVGLayer.\n */\n.annoLayer {}\n.annoLayer > *.\\--viewMode {\n  opacity: 0.5;\n}\n.annoLayer > *.\\--viewMode.\\--emphasis {\n  opacity: 1;\n}\n\n#tmpLayer {\n    pointer-events: auto;\n}\n\n/**\n    Annotation related.\n*/\n.anno-circle {\n    transition:0.2s;\n    transform-origin: center center;\n}\n.\\--hover .anno-circle {\n  box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;\n  /*transform: scale(2);*/\n  stroke: blue;\n  stroke-width: 5px;\n}\n\n.\\--hover .anno-span {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-span {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n/**\n  Relation.\n*/\n.anno-relation {\n  transition:0.2s;\n}\n.\\--hover .anno-relation {\n  stroke-width: 2px;\n}\n.\\--selected .anno-relation {\n}\n.anno-relation-outline {\n  fill: none;\n  visibility: hidden;\n}\n.\\--selected .anno-relation-outline {\n  visibility: visible;\n  stroke: black;\n  stroke-width: 2.85px;\n  pointer-events: stroke;\n  stroke-dasharray: 3;\n}\n\n/**\n * Span.\n */\n.anno-span {}\n.anno-span rect {\n    /* Enable the hover event on circles and text even if they are overwraped other spans. */\n    pointer-events: none;\n}\n\n/**\n  Rect.\n*/\n.anno-rect {\n}\n.\\--hover .anno-rect {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-rect {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n\n/**\n  Text.\n*/\n.anno-text-group, .anno-text-group.\\--viewMode {\n    transition: 0.2s;\n    opacity: 0.01; /* for enabling a hover event. */\n}\n.anno-text-group.\\--hover,\n.anno-text-group.\\--selected,\n.anno-text-group.\\--visible {\n    opacity: 1;\n}\n.anno-text-group text {\n    /* Disable span action when selecting an anno text. */\n    user-select: none;\n}\n.anno-text {\n}\n.\\--hover .anno-text {\n  fill: rgba(255, 255, 255, 1.0);\n  stroke: black;\n  stroke-width: 0.75px;\n}\n.\\--hover .anno-text ~ text {\n  fill: rgba(255, 0, 0, 1.0);\n}\n.\\--selected .anno-text {\n  stroke: rgba(255, 0, 0, 1.0);\n  stroke-width: 1.5px;\n  fill: rgba(255, 232, 188, 1.0);\n  stroke-dasharray: 3;\n}\n.\\--selected .anno-text ~ text {\n  fill: rgba(0, 0, 0, 1.0);\n}\n\n/**\n Disable text layers.\n*/\nbody.disable-text-layer .textLayer {\n    display: none;\n}\n\n", ""]);
+	exports.push([module.id, "\r\n/**\r\n * Utilities.\r\n */\r\n.\\--hide {\r\n  display: none;\r\n}\r\n.no-action {\r\n    pointer-events: none;\r\n}\r\n\r\n/**\r\n * SVGLayer.\r\n */\r\n.annoLayer {}\r\n.annoLayer > *.\\--viewMode {\r\n  opacity: 0.5;\r\n}\r\n.annoLayer > *.\\--viewMode.\\--emphasis {\r\n  opacity: 1;\r\n}\r\n\r\n#tmpLayer {\r\n    pointer-events: auto;\r\n}\r\n\r\n/**\r\n    Annotation related.\r\n*/\r\n.anno-circle {\r\n    transition:0.2s;\r\n    transform-origin: center center;\r\n}\r\n.\\--hover .anno-circle {\r\n  box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;\r\n  /*transform: scale(2);*/\r\n  stroke: blue;\r\n  stroke-width: 5px;\r\n}\r\n\r\n.\\--hover .anno-span {\r\n  /*html*/\r\n  box-shadow: 0 0 0 1px #ccc inset;\r\n  /*svg*/\r\n  stroke: #ccc;\r\n  stroke-width: 0.75px;\r\n}\r\n.\\--selected .anno-span {\r\n  stroke: black;\r\n  stroke-width: 0.5px;\r\n  stroke-dasharray: 3;\r\n}\r\n/**\r\n  Relation.\r\n*/\r\n.anno-relation {\r\n  transition:0.2s;\r\n}\r\n.\\--hover .anno-relation {\r\n  stroke-width: 2px;\r\n}\r\n.\\--selected .anno-relation {\r\n}\r\n.anno-relation-outline {\r\n  fill: none;\r\n  visibility: hidden;\r\n}\r\n.\\--selected .anno-relation-outline {\r\n  visibility: visible;\r\n  stroke: black;\r\n  stroke-width: 2.85px;\r\n  pointer-events: stroke;\r\n  stroke-dasharray: 3;\r\n}\r\n\r\n/**\r\n * Span.\r\n */\r\n.anno-span {}\r\n.anno-span rect {\r\n    /* Enable the hover event on circles and text even if they are overwraped other spans. */\r\n    pointer-events: none;\r\n}\r\n\r\n/**\r\n  Rect.\r\n*/\r\n.anno-rect {\r\n}\r\n.\\--hover .anno-rect {\r\n  /*html*/\r\n  box-shadow: 0 0 0 1px #ccc inset;\r\n  /*svg*/\r\n  stroke: #ccc;\r\n  stroke-width: 0.75px;\r\n}\r\n.\\--selected .anno-rect {\r\n  stroke: black;\r\n  stroke-width: 0.5px;\r\n  stroke-dasharray: 3;\r\n}\r\n\r\n/**\r\n  Text.\r\n*/\r\n.anno-text-group, .anno-text-group.\\--viewMode {\r\n    transition: 0.2s;\r\n    opacity: 0.01; /* for enabling a hover event. */\r\n}\r\n.anno-text-group.\\--hover,\r\n.anno-text-group.\\--selected,\r\n.anno-text-group.\\--visible {\r\n    opacity: 1;\r\n}\r\n.anno-text-group text {\r\n    /* Disable span action when selecting an anno text. */\r\n    user-select: none;\r\n}\r\n.anno-text {\r\n}\r\n.\\--hover .anno-text {\r\n  fill: rgba(255, 255, 255, 1.0);\r\n  stroke: black;\r\n  stroke-width: 0.75px;\r\n}\r\n.\\--hover .anno-text ~ text {\r\n  fill: rgba(255, 0, 0, 1.0);\r\n}\r\n.\\--selected .anno-text {\r\n  stroke: rgba(255, 0, 0, 1.0);\r\n  stroke-width: 1.5px;\r\n  fill: rgba(255, 232, 188, 1.0);\r\n  stroke-dasharray: 3;\r\n}\r\n.\\--selected .anno-text ~ text {\r\n  fill: rgba(0, 0, 0, 1.0);\r\n}\r\n\r\n/**\r\n Disable text layers.\r\n*/\r\nbody.disable-text-layer .textLayer {\r\n    display: none;\r\n}\r\n\r\n", ""]);
 	
 	// exports
 
