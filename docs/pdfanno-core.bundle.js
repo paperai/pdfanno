@@ -16538,8 +16538,8 @@ return /******/ (function(modules) { // webpackBootstrap
 		"description": "",
 		"main": "index.js",
 		"scripts": {
-			"anno:start": "npm run anno:publish && NODE_ENV=production node server.js",
-			"anno:start-dev": "npm run anno:dev & NODE_ENV=develop ./node_modules/.bin/node-dev server.js",
+			"anno:start": "npm run anno:publish && cross-env NODE_ENV=production node server.js",
+			"anno:start-dev": "npm run anno:dev && cross-env NODE_ENV=develop ./node_modules/.bin/node-dev server.js",
 			"anno:prepare": "gulp prepare",
 			"anno:build": "npm run anno:prepare && webpack",
 			"anno:dev": "npm run anno:prepare && webpack --watch",
@@ -16565,6 +16565,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			"babel-preset-stage-1": "^6.16.0",
 			"copy": "^0.3.0",
 			"cpr": "^2.0.0",
+			"cross-env": "^5.0.0",
 			"css-loader": "^0.25.0",
 			"deep-assign": "^2.0.0",
 			"file-loader": "^0.9.0",

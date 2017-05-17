@@ -1414,11 +1414,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var pdfFileName = $('#dropdownPdf .js-text').text();
 	        if (!pdfFileName || pdfFileName === 'PDF File') {
-	            return alert('Display a PDF, before upload.');
+	            return alert('Display a PDF before upload.');
 	        }
 	        var contentBase64 = window.fileMap[pdfFileName];
 	
 	        var $progressBar = $('.js-upload-progress');
+	
+	        var url = $('#serverURL').val();
+	        if (!url) {
+	            return alert('Set server URL.');
+	        }
+	
+	        $('#uploadResult').val("");
 	
 	        $.ajax({
 	            xhr: function xhr() {
@@ -1449,15 +1456,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }, false);
 	                return xhr;
 	            },
-	            url: '/api/pdf_upload',
+	            url: url,
 	            method: 'POST',
-	            dataType: 'json',
-	            data: { name: pdfFileName, content: contentBase64 }
+	            dataType: "text",
+	            data: contentBase64
+	            //dataType : 'json',
+	            //data : { name : pdfFileName, content : contentBase64 }
 	        }).then(function (result) {
 	            console.log('result:', result);
 	            setTimeout(function () {
 	                // alert('Upload completed.');
-	                $('#uploadResult').text(result.status);
+	                var res = JSON.parse(result);
+	                $('#uploadResult').val(res.data);
 	            }, 500); // wait for progress bar animation.
 	        });
 	
