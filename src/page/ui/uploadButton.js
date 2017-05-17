@@ -13,6 +13,8 @@ export function setup() {
 
         const $progressBar = $('.js-upload-progress');
 
+        $('#uploadResult').val("");
+
         $.ajax({
             xhr: function(){
                var xhr = new window.XMLHttpRequest();
@@ -36,7 +38,7 @@ export function setup() {
                xhr.addEventListener("progress", function(evt){
                  if (evt.lengthComputable) {
                    var percentComplete = evt.loaded / evt.total;
-                 //Do something with download progress
+                   //Do something with download progress
                    console.log('downloadProgress:', percentComplete);
                  }
                }, false);
@@ -45,7 +47,7 @@ export function setup() {
             //url : '/api/pdf_upload',
             url : 'http://localhost:9000',
             method : 'POST',
-            dataType: "text",
+            dataType : "text",
             data : contentBase64
             //dataType : 'json',
             //data : { name : pdfFileName, content : contentBase64 }
@@ -53,8 +55,8 @@ export function setup() {
             console.log('result:', result);
             setTimeout(() => {
                 // alert('Upload completed.');
-                var r = JSON.parse(result);
-                $('#uploadResult').val(r.status);
+                var res = JSON.parse(result);
+                $('#uploadResult').val(res.data);
             }, 500); // wait for progress bar animation.
         });
 
