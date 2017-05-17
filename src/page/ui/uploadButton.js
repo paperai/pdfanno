@@ -32,7 +32,7 @@ export function setup() {
                  }
                 }
                }, false);
-             //Download progress
+               //Download progress
                xhr.addEventListener("progress", function(evt){
                  if (evt.lengthComputable) {
                    var percentComplete = evt.loaded / evt.total;
@@ -42,15 +42,19 @@ export function setup() {
                }, false);
                return xhr;
             },
-            url : '/api/pdf_upload',
+            //url : '/api/pdf_upload',
+            url : 'http://localhost:9000',
             method : 'POST',
-            dataType : 'json',
-            data : { name : pdfFileName, content : contentBase64 }
+            dataType: "text",
+            data : contentBase64
+            //dataType : 'json',
+            //data : { name : pdfFileName, content : contentBase64 }
         }).then(result => {
             console.log('result:', result);
             setTimeout(() => {
                 // alert('Upload completed.');
-                $('#uploadResult').text(result.status);
+                var r = JSON.parse(result);
+                $('#uploadResult').val(r.status);
             }, 500); // wait for progress bar animation.
         });
 
