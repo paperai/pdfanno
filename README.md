@@ -5,7 +5,7 @@ PDFAnno is a browser-based linguistic annotation tool for PDF documents.
 It offers functions for annotating PDF with labels and relations.  
 For natural language processing, it is suitable for development of gold-standard data with named entity spans, dependency relations, and coreference chains.  
 
-[Online Demo](https://paperai.github.io/pdfanno/) (version 0.2)  
+[Online Demo](http://pdfanno.hshindo.com/) (version 0.2)  
 **It is highly recommended to use the latest version of Chrome.** (Firefox will also be supported in future.)
 
 You can also install PDFAnno via npm:
@@ -19,7 +19,7 @@ npm install pdfanno
 * Client-only application, i.e., no communication with a server.
 
 ## Usage
-1. Visit the [online demo](https://paperai.github.io/pdfanno/) with the latest version of Chrome.
+1. Visit the [online demo](http://pdfanno.hshindo.com/) with the latest version of Chrome.
 1. Put PDF files and annotation files (if any) in your directory, then specify the directory via `Browse` button.  
 Sample PDFs and annotations are downloadable from [here](https://cl.naist.jp/%7Eshindo/pdfanno_material.zip).  
 1. Load the target PDF. If you have anno file for the PDF, load it as well.
@@ -112,7 +112,7 @@ window.delete(rel);
 rect = new RectAnnotation({
   page:1,
   position:["9.24324324324326","435.94054054054055","235.7027027027027","44.65945945945946"],
-  label: 'rect-label', 
+  label: 'rect-label',
   id: 2
 });
 window.add(rect);
