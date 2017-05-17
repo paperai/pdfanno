@@ -7,11 +7,16 @@ export function setup() {
 
         const pdfFileName = $('#dropdownPdf .js-text').text();
         if (!pdfFileName || pdfFileName === 'PDF File') {
-            return alert('Display a PDF, before upload.');
+            return alert('Display a PDF before upload.');
         }
         const contentBase64 = window.fileMap[pdfFileName];
 
         const $progressBar = $('.js-upload-progress');
+
+        const url = $('#serverURL').val();
+        if (!url) {
+            return alert('Set server URL.');
+        }
 
         $('#uploadResult').val("");
 
@@ -44,8 +49,7 @@ export function setup() {
                }, false);
                return xhr;
             },
-            //url : '/api/pdf_upload',
-            url : 'http://localhost:9000',
+            url : url,
             method : 'POST',
             dataType : "text",
             data : contentBase64
