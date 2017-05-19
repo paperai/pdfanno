@@ -36,13 +36,38 @@ PDFAnnoCore.UI.enableViewMode();
 // ** ATTENTION!! ALSO UPDATED by pdfanno.js **
 window.ctrlPressed = false;
 $(document).on('keydown', e => {
+
+    // Allow any keyboard events for <input/>.
+    if (e.target.tagName.toLowerCase() === 'input') {
+        return;
+    }
+
     if (e.keyCode === 17 || e.keyCode === 91) { // 17:ctrlKey, 91:cmdKey
         window.ctrlPressed = true;
         console.log('ctrl press!!');
+
+    // } else if (e.keyCode === 49) {  // Digit "1"
+    //     console.log('digit_1 press!!');
     }
 }).on('keyup', e => {
+
+    // Allow any keyboard events for <input/>.
+    if (e.target.tagName.toLowerCase() === 'input') {
+        return;
+    }
+
+    if (e.keyCode === 49) {  // Digit "1"
+        // console.log('digit_1 keyup.');
+        var event = document.createEvent('CustomEvent');
+        event.initCustomEvent('digit1Pressed', true, true);
+        window.dispatchEvent(event);
+        return;
+    }
+
+
     window.ctrlPressed = false;
-    console.log('ctrl release!!');
+    // window.digit1Pressed = false;
+    console.log('keyup !!');
 });
 
 // The event called at page rendered by pdfjs.

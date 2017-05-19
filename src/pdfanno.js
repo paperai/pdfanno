@@ -11,7 +11,7 @@ import * as annoListDropdown from './page/ui/annoListDropdown';
 import * as referenceAnnoDropdown from './page/ui/referenceAnnoDropdown';
 import * as downloadButton from './page/ui/downloadButton';
 import * as uploadButton from './page/ui/uploadButton';
-import * as annotationsTools from './page/ui/annotationTools';
+import * as annotationTools from './page/ui/annotationTools';
 import * as inputLabel from './page/ui/inputLabel';
 
 import {
@@ -50,11 +50,23 @@ window.fileMap = {};
 $(document).on('keydown', e => {
     if (e.keyCode === 17 || e.keyCode === 91) { // 17:ctrlKey, 91:cmdKey
         window.iframeWindow.ctrlPressed = true;
-        console.log('ctrl press!!2');
+        console.log('ctrl press2!!');
+    // } else if (e.keyCode === 49) {  // Digit "1"
+    //     window.iframeWindow.digit1Pressed = true;
+    //     console.log('digit_1 press2!!');
     }
 }).on('keyup', e => {
+
+    // Allow any keyboard events for <input/>.
+    if (e.target.tagName.toLowerCase() === 'input') {
+        return;
+    }
+
     window.iframeWindow.ctrlPressed = false;
-    console.log('ctrl release!!2');
+
+    if (e.keyCode === 49) {  // Digit "1"
+        annotationTools.createSpan();
+    }
 });
 
 /**
@@ -145,6 +157,11 @@ function startApplication() {
         inputLabel.handleAnnotationDeselected();
     });
 
+    iframeWindow.addEventListener('digit1Pressed' , () => {
+        console.log('digit1Pressed');
+        annotationTools.createSpan();
+    });
+
 
 }
 
@@ -172,7 +189,7 @@ window.addEventListener('DOMContentLoaded', e => {
     annoListDropdown.setup();
     downloadButton.setup();
     uploadButton.setup();
-    annotationsTools.setup();
+    annotationTools.setup();
 
     window.addEventListener('restartApp', startApplication);
 
