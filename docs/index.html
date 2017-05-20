@@ -124,16 +124,17 @@
                             </div>
                         </div>
                         <div class="tab-pane" id="tab2">
-							<form>
-								<div class="form-group u-mt-20">
-									<h4>Server URL</h4>
-									<input type="text" class="form-control" id="serverURL" value="http://pdfanno.hshindo.com/pdf_upload">
-								</div>
-							</form>
-							<div class="btn-group" role="group">
-								<a class="btn btn-default js-btn-upload" href="#" title="upload">
-									<i class="fa fa-upload fa-2x"></i>
-								</a>
+							<div class="input-group u-mt-20">
+								<input list=servers class="form-control" id="serverURL" placeholder="Server URL">
+								<datalist id=servers>
+									<option selected value="http://pdfanno.hshindo.com/api/autoparse"></option>
+									<option value="http://localhost:4000"></option>
+								</datalist>
+								<span class="input-group-btn">
+									<a class="btn btn-default js-btn-upload" href="#" title="upload">
+										<i class="fa fa-upload fa"></i>
+									</a>
+								</span>
 							</div>
                             <div class="progress js-upload-progress hidden u-mt-10">
                               <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0"
