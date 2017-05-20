@@ -54,12 +54,11 @@ export default class RelationAnnotation extends AbstractAnnotation {
         let a            = new RelationAnnotation();
         a.uuid           = annotation.uuid || uuid();
         a.direction      = annotation.direction;
-        a.rel1Annotation = window.annotationContainer.findById(annotation.rel1);
-        a.rel2Annotation = window.annotationContainer.findById(annotation.rel2);
+        a.rel1Annotation = AbstractAnnotation.isAnnotation(annotation.rel1) ? annotation.rel1 : window.annotationContainer.findById(annotation.rel1);
+        a.rel2Annotation = AbstractAnnotation.isAnnotation(annotation.rel2) ? annotation.rel2 : window.annotationContainer.findById(annotation.rel2);
         a.text           = annotation.text;
         a.color          = annotation.color;
         a.readOnly       = annotation.readOnly || false;
-
         return a;
     }
 

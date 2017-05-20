@@ -154,8 +154,8 @@ export class PublicRelationAnnotation {
 
         let r = iframeWindow.PDFAnnoCore.RelationAnnotation.newInstance({
             direction : dir,
-            rel1      : ids[0],
-            rel2      : ids[1],
+            rel1      : typeof ids[0] === 'object' ? ids[0].annotation : ids[0],
+            rel2      : typeof ids[1] === 'object' ? ids[1].annotation : ids[1],
             text      : label,
             color     : "#FF0000",  // TODO 固定で良い？
             readOnly  : false       // TODO 固定で良い？
