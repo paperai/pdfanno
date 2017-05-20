@@ -74,6 +74,9 @@ export class PublicRectAnnotation {
             throw 'Set the position which includes `x`, `y`, `width` and `height`.';
         }
 
+        // position: String -> Float.
+        position = position.map(p => parseFloat(p));
+
         let rect = iframeWindow.PDFAnnoCore.RectAnnotation.newInstance({
             uuid     : id && String(id), // annotationid must be string.
             x        : position[0],
@@ -104,6 +107,9 @@ export class PublicSpanAnnotation {
         if (!position) {
             throw 'Set the position.';
         }
+
+        // position: String -> Float.
+        position = position.map(p => p.map(pp => parseFloat(pp)));
 
         // Convert.
         position = position.map(p => {
