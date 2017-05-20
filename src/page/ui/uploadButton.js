@@ -18,7 +18,7 @@ export function setup() {
             return alert('Set server URL.');
         }
 
-        $('#uploadResult').val("");
+        $('#uploadResult').val("Waiting for response...");
 
         $.ajax({
             xhr: function(){
@@ -61,23 +61,7 @@ export function setup() {
                 // alert('Upload completed.');
                 var json = JSON.parse(result);
                 $('#uploadResult').val(json.text);
-                var annostr = [
-                    "version = \"0.2.0\"",
-                    "[1]",
-                    "type = \"rect\"",
-                    "page = 3",
-                    "position = [\"106.02108\",\"91.4324\",\"94.08959\",\"105.8508\"]",
-                    "label = \"figa\""
-                ].join("\n");
-                alert(annostr);
-                alert("anno ok");
-                var anno = readTOML(annostr);
-                window.addAll(anno);
-                if (!annostr) {
-                    alert("anno ok");
-                    var anno = readTOML(annostr);
-                    window.addAll(anno);
-                }
+                window.addAll(json.anno);
             }, 500); // wait for progress bar animation.
         });
 
