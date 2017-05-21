@@ -142,7 +142,7 @@ export class PublicSpanAnnotation {
  */
 export class PublicRelationAnnotation {
 
-    constructor({ dir, ids, label='' }) {
+    constructor({ dir, ids, label='', id=0 }) {
 
         // Check inputs.
         if (!dir) {
@@ -153,12 +153,13 @@ export class PublicRelationAnnotation {
         }
 
         let r = iframeWindow.PDFAnnoCore.RelationAnnotation.newInstance({
+            uuid      : id && String(id), // annotationid must be string.
             direction : dir,
             rel1      : typeof ids[0] === 'object' ? ids[0].annotation : ids[0],
             rel2      : typeof ids[1] === 'object' ? ids[1].annotation : ids[1],
             text      : label,
-            color     : "#FF0000",  // TODO 固定で良い？
-            readOnly  : false       // TODO 固定で良い？
+            color     : "#FF0000",
+            readOnly  : false
         });
 
         this.annotation = r;
@@ -169,3 +170,21 @@ export class PublicRelationAnnotation {
  * TOML parser.
  */
 export const readTOML = toml.parse;
+
+
+export function deleteAll(tomlString) {
+    const tomlObject = toml.parse(tomlString);
+    // console.log('tomlObject:', tomlObject);
+
+    Object.keys(tomlObject)
+        .filter(key => key !== 'version')
+        .forEach(key => {
+            console.log('key:', key);
+            window.iframeWindow.annotationContainer.findById(key).destroy();
+        });
+}
+
+export function clear() {
+
+    window.iframeWindow.annotationContainer.getAllAnnotations().forEach(a => a.destroy());
+}
