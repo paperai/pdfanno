@@ -117,6 +117,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	window.SpanAnnotation = publicApi.PublicSpanAnnotation;
 	window.RelationAnnotation = publicApi.PublicRelationAnnotation;
 	window.readTOML = publicApi.readTOML;
+	window.clear = publicApi.clear;
 	
 	/**
 	 * The data which is loaded via `Browse` button.
@@ -780,7 +781,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	        value: true
+	    value: true
 	});
 	exports.setup = setup;
 	
@@ -795,49 +796,49 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function setup() {
 	
-	        $('#dropdownPdf').on('click', 'a', function (e) {
+	    $('#dropdownPdf').on('click', 'a', function (e) {
 	
-	                var $this = $(e.currentTarget);
-	                var pdfPath = $this.find('.js-pdfname').text();
+	        var $this = $(e.currentTarget);
+	        var pdfPath = $this.find('.js-pdfname').text();
 	
-	                var currentPDFName = $('#dropdownPdf .js-text').text();
-	                if (currentPDFName === pdfPath) {
-	                        console.log('Not reload. the pdf are same.');
-	                        return;
-	                }
+	        var currentPDFName = $('#dropdownPdf .js-text').text();
+	        if (currentPDFName === pdfPath) {
+	            console.log('Not reload. the pdf are same.');
+	            return;
+	        }
 	
-	                // Confirm to override.
-	                if (currentPDFName !== 'PDF File') {
-	                        if (!window.confirm('Are you sure to load another PDF ?')) {
-	                                return;
-	                        }
-	                }
+	        // Confirm to override.
+	        if (currentPDFName !== 'PDF File') {
+	            if (!window.confirm('Are you sure to load another PDF ?')) {
+	                return;
+	            }
+	        }
 	
-	                $('#dropdownPdf .js-text').text(pdfPath);
+	        $('#dropdownPdf .js-text').text(pdfPath);
 	
-	                $('#dropdownPdf .fa-check').addClass('no-visible');
-	                $this.find('.fa-check').removeClass('no-visible');
+	        $('#dropdownPdf .fa-check').addClass('no-visible');
+	        $this.find('.fa-check').removeClass('no-visible');
 	
-	                if (!fileMap[pdfPath]) {
-	                        return false;
-	                }
+	        if (!fileMap[pdfPath]) {
+	            return false;
+	        }
 	
-	                // Reset Primary/Reference anno dropdowns, and data.
-	                (0, _anno.clearAllAnnotations)();
-	                (0, _dropdown.resetCheckPrimaryAnnoDropdown)();
-	                (0, _dropdown.resetCheckReferenceAnnoDropdown)();
+	        // Reset Primary/Reference anno dropdowns, and data.
+	        (0, _anno.clearAllAnnotations)();
+	        (0, _dropdown.resetCheckPrimaryAnnoDropdown)();
+	        (0, _dropdown.resetCheckReferenceAnnoDropdown)();
 	
-	                // reload.
-	                window.pdf = fileMap[pdfPath];
-	                var fileName = pdfPath.split('/')[pdfPath.split('/').length - 1];
-	                window.pdfName = fileName;
-	                (0, _display.reloadPDFViewer)();
+	        // reload.
+	        window.pdf = fileMap[pdfPath];
+	        var fileName = pdfPath.split('/')[pdfPath.split('/').length - 1];
+	        window.pdfName = fileName;
+	        (0, _display.reloadPDFViewer)();
 	
-	                // Close dropdown.
-	                $('#dropdownPdf').click();
+	        // Close dropdown.
+	        $('#dropdownPdf').click();
 	
-	                return false;
-	        });
+	        return false;
+	    });
 	} /**
 	   * UI parts - PDF Dropdown.
 	   */
@@ -1082,7 +1083,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.convertToExportY = convertToExportY;
 	exports.convertFromExportY = convertFromExportY;
@@ -1092,16 +1093,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function convertToExportY(y) {
 	
-	    var meta = getPageSize();
+	  var meta = getPageSize();
 	
-	    y -= paddingTop;
+	  y -= paddingTop;
 	
-	    var pageHeight = meta.height + paddingBetweenPages;
+	  var pageHeight = meta.height + paddingBetweenPages;
 	
-	    var pageNumber = Math.floor(y / pageHeight) + 1;
-	    var yInPage = y - (pageNumber - 1) * pageHeight;
+	  var pageNumber = Math.floor(y / pageHeight) + 1;
+	  var yInPage = y - (pageNumber - 1) * pageHeight;
 	
-	    return { pageNumber: pageNumber, y: yInPage };
+	  return { pageNumber: pageNumber, y: yInPage };
 	}
 	
 	/**
@@ -1109,15 +1110,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function convertFromExportY(pageNumber, yInPage) {
 	
-	    var meta = getPageSize();
+	  var meta = getPageSize();
 	
-	    var y = yInPage + paddingTop;
+	  var y = yInPage + paddingTop;
 	
-	    var pagePadding = paddingBetweenPages;
+	  var pagePadding = paddingBetweenPages;
 	
-	    y += (pageNumber - 1) * (meta.height + pagePadding);
+	  y += (pageNumber - 1) * (meta.height + pagePadding);
 	
-	    return y;
+	  return y;
 	}
 	
 	/**
@@ -1135,11 +1136,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function getPageSize() {
 	
-	    var pdfView = window.PDFView || iframeWindow.PDFView;
+	  var pdfView = window.PDFView || iframeWindow.PDFView;
 	
-	    var viewBox = pdfView.pdfViewer.getPageView(0).viewport.viewBox;
-	    var size = { width: viewBox[2], height: viewBox[3] };
-	    return size;
+	  var viewBox = pdfView.pdfViewer.getPageView(0).viewport.viewBox;
+	  var size = { width: viewBox[2], height: viewBox[3] };
+	  return size;
 	}
 
 /***/ },
@@ -1812,6 +1813,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.addAllAnnotations = addAllAnnotations;
 	exports.addAnnotation = addAnnotation;
 	exports.deleteAnnotation = deleteAnnotation;
+	exports.clear = clear;
 	
 	var _coords = __webpack_require__(8);
 	
@@ -1832,6 +1834,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function addAllAnnotations(tomlObject) {
 	
+	    var result = {};
+	
 	    for (var key in tomlObject) {
 	
 	        var data = tomlObject[key];
@@ -1842,16 +1846,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        data.id = key;
 	
+	        var a = void 0;
 	        if (data.type === 'span') {
-	            addAnnotation(new PublicSpanAnnotation(data));
+	            a = new PublicSpanAnnotation(data);
 	        } else if (data.type === 'rect') {
-	            addAnnotation(new PublicRectAnnotation(data));
+	            a = new PublicRectAnnotation(data);
 	        } else if (data.type === 'relation') {
-	            addAnnotation(new PublicRelationAnnotation(data));
+	            a = new PublicRelationAnnotation(data);
 	        } else {
 	            console.log('Unknown: ', key, data);
 	        }
+	
+	        if (a) {
+	            addAnnotation(a);
+	            result[key] = a;
+	        }
 	    }
+	
+	    return result;
 	}
 	
 	/**
@@ -1988,7 +2000,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var dir = _ref3.dir,
 	        ids = _ref3.ids,
 	        _ref3$label = _ref3.label,
-	        label = _ref3$label === undefined ? '' : _ref3$label;
+	        label = _ref3$label === undefined ? '' : _ref3$label,
+	        _ref3$id = _ref3.id,
+	        id = _ref3$id === undefined ? 0 : _ref3$id;
 	
 	    _classCallCheck(this, PublicRelationAnnotation);
 	
@@ -2001,12 +2015,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    var r = iframeWindow.PDFAnnoCore.RelationAnnotation.newInstance({
+	        uuid: id && String(id), // annotationid must be string.
 	        direction: dir,
-	        rel1: ids[0],
-	        rel2: ids[1],
+	        rel1: _typeof(ids[0]) === 'object' ? ids[0].annotation : ids[0],
+	        rel2: _typeof(ids[1]) === 'object' ? ids[1].annotation : ids[1],
 	        text: label,
-	        color: "#FF0000", // TODO 固定で良い？
-	        readOnly: false // TODO 固定で良い？
+	        color: "#FF0000",
+	        readOnly: false
 	    });
 	
 	    this.annotation = r;
@@ -2018,6 +2033,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	var readTOML = exports.readTOML = _toml2.default.parse;
+	
+	/**
+	 * Delete all annotations.
+	 */
+	function clear() {
+	    window.iframeWindow.annotationContainer.getAllAnnotations().forEach(function (a) {
+	        return a.destroy();
+	    });
+	}
 
 /***/ },
 /* 17 */
@@ -6058,7 +6082,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var node = array[i];
 	      if (firstType === null) {
 	        firstType = node.type;
-	      } else if ((node.type === "Integer" || node.type === "Float") && (firstType === "Integer" || firstType === "Float")) {
+	      } else if ((node.type === 'Integer' || node.type === 'Float') && (firstType === 'Integer' || firstType === 'Float')) {
 	        // OK.
 	      } else if (node.type !== firstType) {
 	        genError("Cannot add value of type " + node.type + " to array of type " +
@@ -6125,7 +6149,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, "@charset 'utf-8';\r\n\r\n/* Super Hack to disable autofill style for Chrome. */\r\ninput:-webkit-autofill,\r\ninput:-webkit-autofill:hover,\r\ninput:-webkit-autofill:focus,\r\ninput:-webkit-autofill:active {\r\n    transition: background-color 5000s ease-in-out 0s;\r\n}\r\n\r\n.u-mt-10 {margin-top: 10px;}\r\n.u-mt-20 {margin-top: 20px;}\r\n\r\n.no-visible {\r\n    visibility: hidden;\r\n}\r\n\r\n/**\r\n * Viewer size.\r\n * This height will be override to fit the browser height (by app.js).\r\n */\r\n.anno-viewer {\r\n    width: 100%;\r\n    height: 500px;\r\n}\r\n\r\n/**\r\n * Annotation Select UI Layout.\r\n */\r\n.anno-select-layout {}\r\n.anno-select-layout .row:first-child {\r\n    margin-bottom: 10px;\r\n}\r\n.anno-select-layout [type=\"radio\"] {\r\n    margin-right: 5px;\r\n}\r\n.anno-select-layout [type=\"file\"] {\r\n    display: inline-block;\r\n    margin-left: 5px;\r\n    line-height: 1em;\r\n}\r\n.anno-select-layout .sp-replacer {\r\n    padding: 0;\r\n    border: none;\r\n}\r\n.anno-select-layout .sp-dd {\r\n    display: none;\r\n}\r\n\r\n/**\r\n * Dropdown.\r\n */\r\n.dropdown-menu {\r\n    overflow: scroll;\r\n}\r\n\r\n/**\r\n * Color picker.\r\n */\r\n.anno-ui .sp-replacer {\r\n    padding: 0;\r\n    border: none;\r\n}\r\n.anno-ui .sp-dd {\r\n    display: none;\r\n}\r\n.anno-ui .sp-preview {\r\n    margin-right: 0;\r\n}\r\n\r\n", ""]);
+	exports.push([module.id, "@charset 'utf-8';\n\n/* Super Hack to disable autofill style for Chrome. */\ninput:-webkit-autofill,\ninput:-webkit-autofill:hover,\ninput:-webkit-autofill:focus,\ninput:-webkit-autofill:active {\n    transition: background-color 5000s ease-in-out 0s;\n}\n\n.u-mt-10 {margin-top: 10px;}\n.u-mt-20 {margin-top: 20px;}\n\n.no-visible {\n    visibility: hidden;\n}\n\n/**\n * Viewer size.\n * This height will be override to fit the browser height (by app.js).\n */\n.anno-viewer {\n    width: 100%;\n    height: 500px;\n}\n\n/**\n * Annotation Select UI Layout.\n */\n.anno-select-layout {}\n.anno-select-layout .row:first-child {\n    margin-bottom: 10px;\n}\n.anno-select-layout [type=\"radio\"] {\n    margin-right: 5px;\n}\n.anno-select-layout [type=\"file\"] {\n    display: inline-block;\n    margin-left: 5px;\n    line-height: 1em;\n}\n.anno-select-layout .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-select-layout .sp-dd {\n    display: none;\n}\n\n/**\n * Dropdown.\n */\n.dropdown-menu {\n    overflow: scroll;\n}\n\n/**\n * Color picker.\n */\n.anno-ui .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-ui .sp-dd {\n    display: none;\n}\n.anno-ui .sp-preview {\n    margin-right: 0;\n}\n\n", ""]);
 	
 	// exports
 
