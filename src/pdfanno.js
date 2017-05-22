@@ -39,6 +39,7 @@ window.RectAnnotation = publicApi.PublicRectAnnotation;
 window.SpanAnnotation = publicApi.PublicSpanAnnotation;
 window.RelationAnnotation = publicApi.PublicRelationAnnotation;
 window.readTOML = publicApi.readTOML;
+window.clear = publicApi.clear;
 
 /**
  * The data which is loaded via `Browse` button.
@@ -144,8 +145,6 @@ function startApplication() {
         console.log('annotationDeselected');
         inputLabel.handleAnnotationDeselected();
     });
-
-
 }
 
 /**

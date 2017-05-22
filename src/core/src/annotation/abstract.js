@@ -8,6 +8,14 @@ import * as textInput from '../utils/textInput';
  */
 export default class AbstractAnnotation extends EventEmitter {
 
+
+    /**
+     * Check the argument is an annotation.
+     */
+    static isAnnotation(obj) {
+        return obj && obj.uuid && obj.type;
+    }
+
     /**
      * Constructor.
      */
