@@ -77,8 +77,8 @@ For example, if you create `a.anno` and an another annotator creates `b.anno` fo
 This is useful to check inter-annotator agreement and resolving annotation conflicts.  
 Note that the reference files are rendered as read-only.
 
-## Annotation API (Experimental)
-`PDFAnno` provides annotation API for external programs.
+## Annotation API
+`PDFAnno` provides annotation API.
 
 ### Span
 ```
