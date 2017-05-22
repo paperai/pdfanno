@@ -90,7 +90,6 @@ export class PublicRectAnnotation {
 
         this.annotation = rect;
     }
-
 }
 
 /**
@@ -133,8 +132,6 @@ export class PublicSpanAnnotation {
 
         this.annotation = span;
     }
-
-
 }
 
 /**
@@ -171,20 +168,9 @@ export class PublicRelationAnnotation {
  */
 export const readTOML = toml.parse;
 
-
-export function deleteAll(tomlString) {
-    const tomlObject = toml.parse(tomlString);
-    // console.log('tomlObject:', tomlObject);
-
-    Object.keys(tomlObject)
-        .filter(key => key !== 'version')
-        .forEach(key => {
-            console.log('key:', key);
-            window.iframeWindow.annotationContainer.findById(key).destroy();
-        });
-}
-
+/**
+ * Delete all annotations.
+ */
 export function clear() {
-
     window.iframeWindow.annotationContainer.getAllAnnotations().forEach(a => a.destroy());
 }

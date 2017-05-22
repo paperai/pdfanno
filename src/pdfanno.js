@@ -39,7 +39,6 @@ window.RectAnnotation = publicApi.PublicRectAnnotation;
 window.SpanAnnotation = publicApi.PublicSpanAnnotation;
 window.RelationAnnotation = publicApi.PublicRelationAnnotation;
 window.readTOML = publicApi.readTOML;
-window.deleteAll = publicApi.deleteAll;
 window.clear = publicApi.clear;
 
 /**
@@ -146,8 +145,6 @@ function startApplication() {
         console.log('annotationDeselected');
         inputLabel.handleAnnotationDeselected();
     });
-
-
 }
 
 /**
