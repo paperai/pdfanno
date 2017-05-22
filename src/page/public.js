@@ -9,6 +9,8 @@ import toml from 'toml';
  */
 export function addAllAnnotations(tomlObject) {
 
+    let result = {};
+
     for (const key in tomlObject) {
 
         let data = tomlObject[key];
@@ -19,16 +21,24 @@ export function addAllAnnotations(tomlObject) {
 
         data.id = key;
 
+        let a;
         if (data.type === 'span') {
-            addAnnotation(new PublicSpanAnnotation(data));
+            a = new PublicSpanAnnotation(data);
         } else if (data.type === 'rect') {
-            addAnnotation(new PublicRectAnnotation(data));
+            a = new PublicRectAnnotation(data);
         } else if (data.type === 'relation') {
-            addAnnotation(new PublicRelationAnnotation(data));
+            a = new PublicRelationAnnotation(data);
         } else {
             console.log('Unknown: ', key, data);
         }
+
+        if (a) {
+            addAnnotation(a);
+            result[key] = a;
+        }
     }
+
+    return result;
 
 }
 
