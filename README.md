@@ -130,6 +130,7 @@ position = [["139.03536681054345","60.237086766202694","155.97302418023767","14.
 label = "orange"
 text = "Ready?"
 `;
+
 var anno = readTOML(toml);
 var annoObj = window.addAll(anno);
 window.delete(annoObj["1"]);
