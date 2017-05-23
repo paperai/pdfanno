@@ -139,7 +139,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // then manually have to change the margin.
 	    var scale = PDFView.pdfViewer.getPageView(0).viewport.scale;
 	    var borderWidth = 9 * scale + 'px';
-	    var marginBottom = -8 * scale + 'px';
+	    var marginBottom = -9 * scale + 'px';
 	    (0, _jquery2.default)('.page').css({
 	        'border-top-width': borderWidth,
 	        'border-bottom-width': borderWidth,
