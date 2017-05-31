@@ -117,23 +117,33 @@
                             </div>
                             <div>
                                 <h3>Label</h3>
-                                <form id="autocompleteform" action="./"/>
+<!--                                 <form id="autocompleteform" action="./"/>
                                     <input type="text" class="form-control" id="inputLabel" disabled>
                                     <input type="submit" value="submit" class="hidden" />
-                                </form>
+                                </form> -->
+                                <div class="input-group" class="form-control">
+                                  <input list=labels class="form-control" id="inputLabel" disabled>
+                                  <datalist id=labels><!-- Added by JS. --></datalist>
+                                  <span class="input-group-btn">
+                                    <a class="btn btn-default" href="#" title="edit options" data-toggle="modal" data-target="#datalistModal">
+                                      <i class="fa fa-cog fa"></i>
+                                    </a>
+                                  </span>
+                                </div>
                             </div>
                         </div>
                         <div class="tab-pane" id="tab2">
-							<form>
-								<div class="form-group u-mt-20">
-									<h4>Server URL</h4>
-									<input type="text" class="form-control" id="serverURL" value="http://pdfanno.hshindo.com/pdf_upload">
-								</div>
-							</form>
-							<div class="btn-group" role="group">
-								<a class="btn btn-default js-btn-upload" href="#" title="upload">
-									<i class="fa fa-upload fa-2x"></i>
-								</a>
+							<div class="input-group u-mt-20">
+								<input list=servers class="form-control" id="serverURL" placeholder="Server URL">
+								<datalist id=servers>
+									<option selected value="http://pdfanno.hshindo.com/api/autoparse"></option>
+									<option value="http://localhost:4000"></option>
+								</datalist>
+								<span class="input-group-btn">
+									<a class="btn btn-default js-btn-upload" href="#" title="upload">
+										<i class="fa fa-upload fa"></i>
+									</a>
+								</span>
 							</div>
                             <div class="progress js-upload-progress hidden u-mt-10">
                               <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0"
@@ -156,5 +166,24 @@
 		</div>
 	</div>
 </div>
+
+<!-- Modal Dialog for input's datalist. -->
+<div class="modal fade modal-datalist" id="datalistModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Label presets</h4>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group js-datalist"><!-- Added by JS. --></ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary js-done">Done</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>

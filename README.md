@@ -77,12 +77,12 @@ For example, if you create `a.anno` and an another annotator creates `b.anno` fo
 This is useful to check inter-annotator agreement and resolving annotation conflicts.  
 Note that the reference files are rendered as read-only.
 
-## Annotation API (Experimental)
-`PDFAnno` provides annotation API for external programs.
+## Annotation API
+`PDFAnno` provides annotation API.
 
 ### Span
 ```
-span = new SpanAnnotation({
+var span = new SpanAnnotation({
   page: 1,
   position:
  [["139.03536681054345","60.237086766202694","155.97302418023767","14.366197183098592"]],
@@ -91,38 +91,35 @@ span = new SpanAnnotation({
   id: 1
 });
 window.add(span);
-
 window.delete(span);
 ```
 
 ### Relation
 ```
-rel = new RelationAnnotation({
+var rel = new RelationAnnotation({
   dir: 'link',
   ids: ["1","2"],
   label: 'sample'
 });
 window.add(rel);
-
 window.delete(rel);
 ```
 
 ### Rectangle
 ```
-rect = new RectAnnotation({
+var rect = new RectAnnotation({
   page:1,
   position:["9.24324324324326","435.94054054054055","235.7027027027027","44.65945945945946"],
   label: 'rect-label',
   id: 2
 });
 window.add(rect);
-
 window.delete(rect);
 ```
 
-### Read from TOML
+### Read from TOML or JSON
 ```
-toml = `
+var toml = `
 
 version = 0.2
 
@@ -133,8 +130,13 @@ position = [["139.03536681054345","60.237086766202694","155.97302418023767","14.
 label = "orange"
 text = "Ready?"
 `;
-anno = readTOML(toml);
-window.addAll(anno);
+
+var anno = readTOML(toml);
+var annoObj = window.addAll(anno);
+window.delete(annoObj["1"]);
+
+// delete all annotations
+window.clear();
 ```
 
 ## Developer's Guide

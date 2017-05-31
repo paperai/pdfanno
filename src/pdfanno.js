@@ -39,6 +39,7 @@ window.RectAnnotation = publicApi.PublicRectAnnotation;
 window.SpanAnnotation = publicApi.PublicSpanAnnotation;
 window.RelationAnnotation = publicApi.PublicRelationAnnotation;
 window.readTOML = publicApi.readTOML;
+window.clear = publicApi.clear;
 
 /**
  * The data which is loaded via `Browse` button.
@@ -156,13 +157,10 @@ function startApplication() {
         console.log('annotationDeselected');
         inputLabel.handleAnnotationDeselected();
     });
-
     iframeWindow.addEventListener('digit1Pressed' , () => {
         console.log('digit1Pressed');
         annotationTools.createSpan();
     });
-
-
 }
 
 /**
@@ -190,6 +188,7 @@ window.addEventListener('DOMContentLoaded', e => {
     downloadButton.setup();
     uploadButton.setup();
     annotationTools.setup();
+    inputLabel.setup();
 
     window.addEventListener('restartApp', startApplication);
 

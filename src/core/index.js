@@ -81,11 +81,11 @@ window.addEventListener('pagerendered', function(ev) {
     // then manually have to change the margin.
     let scale = PDFView.pdfViewer.getPageView(0).viewport.scale;
     let borderWidth = `${9 * scale}px`;
-    let marginBottom = `${-8 * scale}px`;
+    let marginBottom = `${-9 * scale}px`;
     $('.page').css({
-        'border-top-width' : borderWidth,
+        'border-top-width'    : borderWidth,
         'border-bottom-width' : borderWidth,
-        'margin-bottom': marginBottom
+        'margin-bottom'       : marginBottom
     });
 });
 

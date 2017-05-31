@@ -18,7 +18,7 @@ export function setup() {
             return alert('Set server URL.');
         }
 
-        $('#uploadResult').val("");
+        $('#uploadResult').val("Waiting for response...");
 
         $.ajax({
             xhr: function(){
@@ -59,8 +59,9 @@ export function setup() {
             console.log('result:', result);
             setTimeout(() => {
                 // alert('Upload completed.');
-                var res = JSON.parse(result);
-                $('#uploadResult').val(res.data);
+                var json = JSON.parse(result);
+                $('#uploadResult').val(json.text);
+                window.addAll(json.anno);
             }, 500); // wait for progress bar animation.
         });
 
