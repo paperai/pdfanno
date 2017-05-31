@@ -68,3 +68,21 @@ input:-webkit-autofill:active {
     margin-right: 0;
 }
 
+/**
+ * Modal dialog for Datalist.
+ */
+.modal-datalist {}
+.modal-datalist .list-group-item {
+    position: relative;
+    padding-right: 38px;
+}
+.modal-datalist .form-control {}
+.modal-datalist .glyphicon-remove {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    margin-top: -7px;
+}
+.modal-datalist .list-group-item:last-child .glyphicon-remove {
+    display: none;
+}

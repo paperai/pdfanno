@@ -172,6 +172,7 @@ window.addEventListener('DOMContentLoaded', e => {
     downloadButton.setup();
     uploadButton.setup();
     annotationsTools.setup();
+    inputLabel.setup();
 
     window.addEventListener('restartApp', startApplication);
 
