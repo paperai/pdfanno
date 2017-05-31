@@ -250,6 +250,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    downloadButton.setup();
 	    uploadButton.setup();
 	    annotationsTools.setup();
+	    inputLabel.setup();
 	
 	    window.addEventListener('restartApp', startApplication);
 	
@@ -1658,6 +1659,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.handleAnnotationHoverOut = handleAnnotationHoverOut;
 	exports.handleAnnotationSelected = handleAnnotationSelected;
 	exports.handleAnnotationDeselected = handleAnnotationDeselected;
+	exports.setup = setup;
 	/**
 	 * UI parts - Input Label.
 	 */
@@ -1795,6 +1797,75 @@ return /******/ (function(modules) { // webpackBootstrap
 	        //     annotation.enableViewMode();
 	        // }, 1000);
 	    }
+	}
+	
+	/**
+	 * Local storage key for datalist.
+	 */
+	var LSKEY_DATALIST = '_pdfanno_datalist';
+	
+	function setDatalist() {
+	
+	    // set datalist.
+	    var datalist = JSON.parse(localStorage.getItem(LSKEY_DATALIST) || '[]');
+	    var options = datalist.map(function (d) {
+	        return '<option value="' + d + '"></option>';
+	    });
+	    $('#labels').html(options);
+	}
+	
+	function setup() {
+	
+	    // set datalist.
+	    setDatalist();
+	
+	    // Setup datalist modal.
+	    $('#datalistModal').off().on('show.bs.modal', function (e) {
+	
+	        // datalist.
+	        var datalist = JSON.parse(localStorage.getItem(LSKEY_DATALIST) || '[]');
+	
+	        // input for new.
+	        datalist.push('');
+	
+	        var snipets = datalist.map(function (d) {
+	            return '\n            <li class="list-group-item">\n                <input class="form-control js-input" value="' + d + '">\n                <span class="glyphicon glyphicon-remove js-delete"></span>\n            </li>\n            ';
+	        });
+	
+	        $('#datalistModal .js-datalist').html(snipets.join(''));
+	    });
+	
+	    $('#datalistModal').on('keyup', '.js-input', function (e) {
+	
+	        var $this = $(e.currentTarget);
+	        var val = $this.val();
+	        var isEnd = $this.parent().is(':last-child');
+	
+	        if (isEnd && val && val.length > 0) {
+	            $('#datalistModal .js-datalist').append('\n                <li class="list-group-item">\n                    <input class="form-control js-input" value="">\n                    <span class="glyphicon glyphicon-remove js-delete"></span>\n                </li>\n            ');
+	        }
+	    });
+	
+	    $('#datalistModal').on('click', '.js-delete', function (e) {
+	        $(e.currentTarget).parent().remove();
+	    });
+	
+	    $('#datalistModal .js-done').on('click', function (e) {
+	
+	        var datalist = [];
+	        $('#datalistModal .js-datalist .js-input').each(function () {
+	            var val = $(this).val();
+	            if (val && val.length > 0) {
+	                datalist.push(val);
+	            }
+	        });
+	
+	        localStorage.setItem(LSKEY_DATALIST, JSON.stringify(datalist));
+	
+	        setDatalist();
+	
+	        $('#datalistModal').modal('hide');
+	    });
 	}
 
 /***/ },
@@ -6149,7 +6220,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, "@charset 'utf-8';\n\n/* Super Hack to disable autofill style for Chrome. */\ninput:-webkit-autofill,\ninput:-webkit-autofill:hover,\ninput:-webkit-autofill:focus,\ninput:-webkit-autofill:active {\n    transition: background-color 5000s ease-in-out 0s;\n}\n\n.u-mt-10 {margin-top: 10px;}\n.u-mt-20 {margin-top: 20px;}\n\n.no-visible {\n    visibility: hidden;\n}\n\n/**\n * Viewer size.\n * This height will be override to fit the browser height (by app.js).\n */\n.anno-viewer {\n    width: 100%;\n    height: 500px;\n}\n\n/**\n * Annotation Select UI Layout.\n */\n.anno-select-layout {}\n.anno-select-layout .row:first-child {\n    margin-bottom: 10px;\n}\n.anno-select-layout [type=\"radio\"] {\n    margin-right: 5px;\n}\n.anno-select-layout [type=\"file\"] {\n    display: inline-block;\n    margin-left: 5px;\n    line-height: 1em;\n}\n.anno-select-layout .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-select-layout .sp-dd {\n    display: none;\n}\n\n/**\n * Dropdown.\n */\n.dropdown-menu {\n    overflow: scroll;\n}\n\n/**\n * Color picker.\n */\n.anno-ui .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-ui .sp-dd {\n    display: none;\n}\n.anno-ui .sp-preview {\n    margin-right: 0;\n}\n\n", ""]);
+	exports.push([module.id, "@charset 'utf-8';\n\n/* Super Hack to disable autofill style for Chrome. */\ninput:-webkit-autofill,\ninput:-webkit-autofill:hover,\ninput:-webkit-autofill:focus,\ninput:-webkit-autofill:active {\n    transition: background-color 5000s ease-in-out 0s;\n}\n\n.u-mt-10 {margin-top: 10px;}\n.u-mt-20 {margin-top: 20px;}\n\n.no-visible {\n    visibility: hidden;\n}\n\n/**\n * Viewer size.\n * This height will be override to fit the browser height (by app.js).\n */\n.anno-viewer {\n    width: 100%;\n    height: 500px;\n}\n\n/**\n * Annotation Select UI Layout.\n */\n.anno-select-layout {}\n.anno-select-layout .row:first-child {\n    margin-bottom: 10px;\n}\n.anno-select-layout [type=\"radio\"] {\n    margin-right: 5px;\n}\n.anno-select-layout [type=\"file\"] {\n    display: inline-block;\n    margin-left: 5px;\n    line-height: 1em;\n}\n.anno-select-layout .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-select-layout .sp-dd {\n    display: none;\n}\n\n/**\n * Dropdown.\n */\n.dropdown-menu {\n    overflow: scroll;\n}\n\n/**\n * Color picker.\n */\n.anno-ui .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-ui .sp-dd {\n    display: none;\n}\n.anno-ui .sp-preview {\n    margin-right: 0;\n}\n\n/**\n * Modal dialog for Datalist.\n */\n.modal-datalist {}\n.modal-datalist .list-group-item {\n    position: relative;\n    padding-right: 38px;\n}\n.modal-datalist .form-control {}\n.modal-datalist .glyphicon-remove {\n    position: absolute;\n    top: 50%;\n    right: 12px;\n    margin-top: -7px;\n}\n.modal-datalist .list-group-item:last-child .glyphicon-remove {\n    display: none;\n}\n", ""]);
 	
 	// exports
 
