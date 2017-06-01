@@ -15,12 +15,6 @@ import * as annotationTools from './page/ui/annotationTools';
 import * as inputLabel from './page/ui/inputLabel';
 
 import {
-    displayAnnotation,
-    reloadPDFViewer,
-    setupColorPicker
-} from './page/util/display';
-
-import {
     listenWindowLeaveEvent,
     unlistenWindowLeaveEvent,
     resizeHandler,
@@ -41,21 +35,16 @@ window.RelationAnnotation = publicApi.PublicRelationAnnotation;
 window.readTOML = publicApi.readTOML;
 window.clear = publicApi.clear;
 
-/**
- * The data which is loaded via `Browse` button.
- */
-window.fileMap = {};
 
 // Check Ctrl or Cmd button clicked.
 // ** ATTENTION!! ALSO UPDATED by core/index.js **
 $(document).on('keydown', e => {
+
     if (e.keyCode === 17 || e.keyCode === 91) { // 17:ctrlKey, 91:cmdKey
         window.iframeWindow.ctrlPressed = true;
         console.log('ctrl press2!!');
-    // } else if (e.keyCode === 49) {  // Digit "1"
-    //     window.iframeWindow.digit1Pressed = true;
-    //     console.log('digit_1 press2!!');
     }
+
 }).on('keyup', e => {
 
     // Allow any keyboard events for <input/>.
@@ -65,8 +54,14 @@ $(document).on('keydown', e => {
 
     window.iframeWindow.ctrlPressed = false;
 
-    if (e.keyCode === 49) {  // Digit "1"
+    if (e.keyCode === 49) {         // Digit "1"
         annotationTools.createSpan();
+    } else if (e.keyCode === 50) {  // Digit "2"
+        annotationTools.createRelation('one-way');
+    } else if (e.keyCode === 51) {  // Digit "3"
+        annotationTools.createRelation('two-way');
+    } else if (e.keyCode === 52) {  // Digit "4"
+        annotationTools.createRelation('link');
     }
 });
 
@@ -158,8 +153,16 @@ function startApplication() {
         inputLabel.handleAnnotationDeselected();
     });
     iframeWindow.addEventListener('digit1Pressed' , () => {
-        console.log('digit1Pressed');
         annotationTools.createSpan();
+    });
+    iframeWindow.addEventListener('digit2Pressed' , () => {
+        annotationTools.createRelation('one-way');
+    });
+    iframeWindow.addEventListener('digit3Pressed' , () => {
+        annotationTools.createRelation('two-way');
+    });
+    iframeWindow.addEventListener('digit4Pressed' , () => {
+        annotationTools.createRelation('link');
     });
 }
 
@@ -169,9 +172,7 @@ function startApplication() {
 window.addEventListener('DOMContentLoaded', e => {
 
     // Delete prev annotations.
-    if (location.search.indexOf('debug') === -1) {
-        clearAllAnnotations();
-    }
+    clearAllAnnotations();
 
     // Reset PDFViwer settings.
     resetPDFViewerSettings();
@@ -194,13 +195,11 @@ window.addEventListener('DOMContentLoaded', e => {
 
     // enable text input.
     window.addEventListener('enableTextInput', (e) => {
-        console.log('enableTextInput2:', e.detail);
         inputLabel.enable(e.detail);
     });
 
     // disable text input.
     window.addEventListener('disappearTextInput', (e) => {
-        console.log('disappearTextInput2:', e.detail);
         inputLabel.disable(e.detail);
     });
 
@@ -208,8 +207,3 @@ window.addEventListener('DOMContentLoaded', e => {
     setupResizableColumns();
 
 });
-
-
-
-
-
