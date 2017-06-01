@@ -216,10 +216,7 @@ function renderAnnotations(svg) {
                     anno.render();
                     anno.enableViewMode();
                     window.annotationContainer.add(anno);
-
                 }
-
-
             });
 
             var event = document.createEvent('CustomEvent');

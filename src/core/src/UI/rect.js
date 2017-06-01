@@ -1,9 +1,7 @@
 import $ from 'jquery';
 import assign from 'deep-assign';
 import PDFAnnoCore from '../PDFAnnoCore';
-import appendChild from '../render/appendChild';
 import {
-  BORDER_COLOR,
   disableUserSelect,
   enableUserSelect,
   getMetadata,
@@ -20,14 +18,8 @@ import { addInputField } from './text';
 import RectAnnotation from '../annotation/rect';
 import * as textInput from '../utils/textInput';
 
-/**
- * the prev annotation rendered at the last.
- */
-let prevAnnotation;
-
 const _type = 'area';
 
-let _enabled = false;
 let overlay;
 let originY;
 let originX;
@@ -67,7 +59,7 @@ function handleDocumentMousedown(e) {
   overlay.style.left = `${originX}px`;
   overlay.style.width = 0;
   overlay.style.height = 0;
-  overlay.style.border = `2px solid ${BORDER_COLOR}`;
+  overlay.style.border = `2px solid #00BFFF`; // Blue.
   overlay.style.boxSizing = 'border-box';
   overlay.style.visibility = 'visible';
   overlay.style.pointerEvents = 'none';
@@ -118,14 +110,6 @@ function handleDocumentMousemove(e) {
     overlay.style.top    = y + 'px';
     overlay.style.width  = w + 'px';
     overlay.style.height = h + 'px';
-
-  // if (prevAnnotation) {
-  //   prevAnnotation.resetTextForceDisplay();
-  //   prevAnnotation.render();
-  //   prevAnnotation.enableViewMode();
-  //   prevAnnotation = null;
-  // }
-
 }
 
 function _findAnnotation(e) {
@@ -193,7 +177,6 @@ function handleDocumentMouseup(e) {
   $(overlay).remove();
   overlay = null;
 
-  // document.removeEventListener('mousemove', handleDocumentMousemove);
 }
 
 /**
@@ -225,14 +208,6 @@ function saveRect(rect) {
   // TODO インスタンス生成時にデフォルトで有効にしてもいいかなー.
   rectAnnotation.enableViewMode();
 
-  // Add an input field.
-  // let x = annotation.x;
-  // let y = annotation.y - 20; // 20 = circle'radius(3px) + input height(14px) + α
-  // let boundingRect = svg.getBoundingClientRect();
-
-  // x = scaleUp(svg, {x}).x + boundingRect.left;
-  // y = scaleUp(svg, {y}).y + boundingRect.top;
-
   // Deselect all annotations.
   window.annotationContainer
       .getSelectedAnnotations()
@@ -241,30 +216,8 @@ function saveRect(rect) {
   // Select.
   rectAnnotation.select();
 
-  // New type text.
+  // Enable input label.
   textInput.enable({ uuid : rectAnnotation.uuid, autoFocus : true });
-
-
-  // addInputField(x, y, null, null, (text) => {
-
-  //   if (!text) {
-  //     return;
-  //   }
-
-  //   rectAnnotation.text = text;
-  //   rectAnnotation.setTextForceDisplay();
-  //   rectAnnotation.render();
-  //   rectAnnotation.save();
-  //   rectAnnotation.enableViewMode();
-
-  // });
-
-  // if (prevAnnotation) {
-  //   prevAnnotation.resetTextForceDisplay();
-  //   prevAnnotation.render();
-  // }
-  // prevAnnotation = rectAnnotation;
-
 
 }
 
@@ -276,22 +229,11 @@ function cancelRectDrawing() {
     // After `handleDocumentMousedown`
     setTimeout(() => {
         console.log('cancelRectDrawing');
-        // document.removeEventListener('mousemove', handleDocumentMousemove);
         $(overlay).remove();
         overlay = null;
     }, 100);
 
 }
-
-// // TODO 共通化？
-// function disableTextlayer() {
-//   $('body').addClass('disable-text-layer');
-// }
-// // TODO 共通化？
-// function enableTextlayer() {
-//   $('body').removeClass('disable-text-layer');
-// }
-
 
 /**
  * Enable rect behavior
@@ -302,9 +244,6 @@ export function enableRect() {
 
     window.currentType = 'rect';
 
-  // if (_enabled) { return; }
-
-  _enabled = true;
   document.addEventListener('mouseup', handleDocumentMouseup);
   document.addEventListener('mousedown', handleDocumentMousedown);
   document.addEventListener('mousemove', handleDocumentMousemove);
@@ -324,22 +263,12 @@ export function disableRect() {
 
     window.currentType = null;
 
-  // if (!_enabled) { return; }
-
-  _enabled = false;
   document.removeEventListener('mouseup', handleDocumentMouseup);
   document.removeEventListener('mousedown', handleDocumentMousedown);
   document.removeEventListener('mousemove', handleDocumentMousemove);
 
   // enableUserSelect();
   enableTextlayer();
-
-  if (prevAnnotation) {
-    prevAnnotation.resetTextForceDisplay();
-    prevAnnotation.render();
-    prevAnnotation.enableViewMode();
-    prevAnnotation = null;
-  }
 
   window.globalEvent.removeListener('rectmovestart', cancelRectDrawing);
 
