@@ -1,7 +1,4 @@
-import $ from 'jquery';
-
 import * as textInput from '../utils/textInput';
-
 import RelationAnnotation from '../annotation/relation';
 
 /**

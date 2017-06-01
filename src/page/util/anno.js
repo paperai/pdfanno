@@ -9,7 +9,6 @@
 */
 export function disableAnnotateTools() {
     window.iframeWindow.PDFAnnoCore.UI.disableRect();
-    window.iframeWindow.PDFAnnoCore.UI.disableSpan();
     window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
 }
 
