@@ -72,7 +72,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _PDFAnnoCore2 = _interopRequireDefault(_PDFAnnoCore);
 	
-	var _container = __webpack_require__(63);
+	var _container = __webpack_require__(64);
 	
 	var _container2 = _interopRequireDefault(_container);
 	
@@ -80,11 +80,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _rect2 = _interopRequireDefault(_rect);
 	
-	var _span = __webpack_require__(57);
+	var _span = __webpack_require__(58);
 	
 	var _span2 = _interopRequireDefault(_span);
 	
-	var _relation = __webpack_require__(59);
+	var _relation = __webpack_require__(60);
 	
 	var _relation2 = _interopRequireDefault(_relation);
 	
@@ -118,14 +118,54 @@ return /******/ (function(modules) { // webpackBootstrap
 	// ** ATTENTION!! ALSO UPDATED by pdfanno.js **
 	window.ctrlPressed = false;
 	(0, _jquery2.default)(document).on('keydown', function (e) {
+	
+	    // Allow any keyboard events for <input/>.
+	    if (e.target.tagName.toLowerCase() === 'input') {
+	        return;
+	    }
+	
 	    if (e.keyCode === 17 || e.keyCode === 91) {
 	        // 17:ctrlKey, 91:cmdKey
 	        window.ctrlPressed = true;
 	        console.log('ctrl press!!');
 	    }
 	}).on('keyup', function (e) {
+	
+	    // Allow any keyboard events for <input/>.
+	    if (e.target.tagName.toLowerCase() === 'input') {
+	        return;
+	    }
+	
+	    if (e.keyCode === 49) {
+	        // Digit "1"
+	        var event = document.createEvent('CustomEvent');
+	        event.initCustomEvent('digit1Pressed', true, true);
+	        window.dispatchEvent(event);
+	        return;
+	    }
+	    if (e.keyCode === 50) {
+	        // Digit "2"
+	        var event = document.createEvent('CustomEvent');
+	        event.initCustomEvent('digit2Pressed', true, true);
+	        window.dispatchEvent(event);
+	        return;
+	    }
+	    if (e.keyCode === 51) {
+	        // Digit "3"
+	        var event = document.createEvent('CustomEvent');
+	        event.initCustomEvent('digit3Pressed', true, true);
+	        window.dispatchEvent(event);
+	        return;
+	    }
+	    if (e.keyCode === 52) {
+	        // Digit "4"
+	        var event = document.createEvent('CustomEvent');
+	        event.initCustomEvent('digit4Pressed', true, true);
+	        window.dispatchEvent(event);
+	        return;
+	    }
+	
 	    window.ctrlPressed = false;
-	    console.log('ctrl release!!');
 	});
 	
 	// The event called at page rendered by pdfjs.
@@ -15314,17 +15354,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _rect2 = _interopRequireDefault(_rect);
 	
-	var _span = __webpack_require__(57);
+	var _span = __webpack_require__(58);
 	
 	var _span2 = _interopRequireDefault(_span);
 	
-	var _relation = __webpack_require__(59);
+	var _relation = __webpack_require__(60);
 	
 	var _relation2 = _interopRequireDefault(_relation);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	__webpack_require__(61);
+	__webpack_require__(62);
 	
 	exports.default = {
 	  /**
@@ -16826,10 +16866,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // If no type was provided for an annotation it will result in node being null.
 	  // Skip appending/transforming if node doesn't exist.
 	  if (child) {
-	    // Set attributes
-	    child.setAttribute('data-pdf-annotate-id', annotation.uuid);
-	    child.setAttribute('data-pdf-annotate-type', annotation.type);
-	    child.setAttribute('aria-hidden', true);
 	
 	    var elm = transform(child, viewport);
 	
@@ -17640,15 +17676,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _rect = __webpack_require__(48);
 	
-	var _span = __webpack_require__(56);
+	var _span = __webpack_require__(57);
 	
-	var _relation = __webpack_require__(58);
+	var _relation = __webpack_require__(59);
 	
-	var _view = __webpack_require__(60);
+	var _view = __webpack_require__(61);
 	
 	exports.default = {
 	  disableRect: _rect.disableRect, enableRect: _rect.enableRect,
-	  disableSpan: _span.disableSpan, enableSpan: _span.enableSpan, createSpan: _span.createSpan, getRectangles: _span.getRectangles,
+	  createSpan: _span.createSpan, getRectangles: _span.getRectangles,
 	  createRelation: _relation.createRelation,
 	  disableViewMode: _view.disableViewMode, enableViewMode: _view.enableViewMode
 	};
@@ -17678,10 +17714,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _PDFAnnoCore2 = _interopRequireDefault(_PDFAnnoCore);
 	
-	var _appendChild = __webpack_require__(38);
-	
-	var _appendChild2 = _interopRequireDefault(_appendChild);
-	
 	var _utils = __webpack_require__(49);
 	
 	var _text = __webpack_require__(51);
@@ -17698,14 +17730,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	/**
-	 * the prev annotation rendered at the last.
-	 */
-	var prevAnnotation = void 0;
-	
 	var _type = 'area';
 	
-	var _enabled = false;
 	var overlay = void 0;
 	var originY = void 0;
 	var originX = void 0;
@@ -17748,7 +17774,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  overlay.style.left = originX + 'px';
 	  overlay.style.width = 0;
 	  overlay.style.height = 0;
-	  overlay.style.border = '2px solid ' + _utils.BORDER_COLOR;
+	  overlay.style.border = '2px solid #00BFFF'; // Blue.
 	  overlay.style.boxSizing = 'border-box';
 	  overlay.style.visibility = 'visible';
 	  overlay.style.pointerEvents = 'none';
@@ -17800,13 +17826,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  overlay.style.top = y + 'px';
 	  overlay.style.width = w + 'px';
 	  overlay.style.height = h + 'px';
-	
-	  // if (prevAnnotation) {
-	  //   prevAnnotation.resetTextForceDisplay();
-	  //   prevAnnotation.render();
-	  //   prevAnnotation.enableViewMode();
-	  //   prevAnnotation = null;
-	  // }
 	}
 	
 	function _findAnnotation(e) {
@@ -17873,8 +17892,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  (0, _jquery2.default)(overlay).remove();
 	  overlay = null;
-	
-	  // document.removeEventListener('mousemove', handleDocumentMousemove);
 	}
 	
 	/**
@@ -17905,14 +17922,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // TODO インスタンス生成時にデフォルトで有効にしてもいいかなー.
 	  rectAnnotation.enableViewMode();
 	
-	  // Add an input field.
-	  // let x = annotation.x;
-	  // let y = annotation.y - 20; // 20 = circle'radius(3px) + input height(14px) + α
-	  // let boundingRect = svg.getBoundingClientRect();
-	
-	  // x = scaleUp(svg, {x}).x + boundingRect.left;
-	  // y = scaleUp(svg, {y}).y + boundingRect.top;
-	
 	  // Deselect all annotations.
 	  window.annotationContainer.getSelectedAnnotations().forEach(function (a) {
 	    return a.deselect();
@@ -17921,29 +17930,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // Select.
 	  rectAnnotation.select();
 	
-	  // New type text.
+	  // Enable input label.
 	  textInput.enable({ uuid: rectAnnotation.uuid, autoFocus: true });
-	
-	  // addInputField(x, y, null, null, (text) => {
-	
-	  //   if (!text) {
-	  //     return;
-	  //   }
-	
-	  //   rectAnnotation.text = text;
-	  //   rectAnnotation.setTextForceDisplay();
-	  //   rectAnnotation.render();
-	  //   rectAnnotation.save();
-	  //   rectAnnotation.enableViewMode();
-	
-	  // });
-	
-	  // if (prevAnnotation) {
-	  //   prevAnnotation.resetTextForceDisplay();
-	  //   prevAnnotation.render();
-	  // }
-	  // prevAnnotation = rectAnnotation;
-	
 	}
 	
 	/**
@@ -17954,21 +17942,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // After `handleDocumentMousedown`
 	  setTimeout(function () {
 	    console.log('cancelRectDrawing');
-	    // document.removeEventListener('mousemove', handleDocumentMousemove);
 	    (0, _jquery2.default)(overlay).remove();
 	    overlay = null;
 	  }, 100);
 	}
-	
-	// // TODO 共通化？
-	// function disableTextlayer() {
-	//   $('body').addClass('disable-text-layer');
-	// }
-	// // TODO 共通化？
-	// function enableTextlayer() {
-	//   $('body').removeClass('disable-text-layer');
-	// }
-	
 	
 	/**
 	 * Enable rect behavior
@@ -17979,9 +17956,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  window.currentType = 'rect';
 	
-	  // if (_enabled) { return; }
-	
-	  _enabled = true;
 	  document.addEventListener('mouseup', handleDocumentMouseup);
 	  document.addEventListener('mousedown', handleDocumentMousedown);
 	  document.addEventListener('mousemove', handleDocumentMousemove);
@@ -18001,22 +17975,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  window.currentType = null;
 	
-	  // if (!_enabled) { return; }
-	
-	  _enabled = false;
 	  document.removeEventListener('mouseup', handleDocumentMouseup);
 	  document.removeEventListener('mousedown', handleDocumentMousedown);
 	  document.removeEventListener('mousemove', handleDocumentMousemove);
 	
 	  // enableUserSelect();
 	  (0, _utils.enableTextlayer)();
-	
-	  if (prevAnnotation) {
-	    prevAnnotation.resetTextForceDisplay();
-	    prevAnnotation.render();
-	    prevAnnotation.enableViewMode();
-	    prevAnnotation = null;
-	  }
 	
 	  window.globalEvent.removeListener('rectmovestart', cancelRectDrawing);
 	}
@@ -18480,7 +18444,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _abstract2 = _interopRequireDefault(_abstract);
 	
-	var _text = __webpack_require__(55);
+	var _text = __webpack_require__(56);
 	
 	var _text2 = _interopRequireDefault(_text);
 	
@@ -18907,6 +18871,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var textInput = _interopRequireWildcard(_textInput);
 	
+	var _event = __webpack_require__(55);
+	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -19113,35 +19079,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            }
 	        }
+	
+	        /**
+	         * Handle a hoverIn event.
+	         */
+	
 	    }, {
 	        key: 'handleHoverInEvent',
 	        value: function handleHoverInEvent(e) {
 	            console.log('handleHoverInEvent');
 	            this.highlight();
 	            this.emit('hoverin');
-	
-	            // if (window.annotationContainer.getSelectedAnnotations().length === 0) {
-	            //     textInput.enable({ uuid : this.uuid, text : this.text, disable : true });
-	            // }
-	
-	            var event = document.createEvent('CustomEvent');
-	            event.initCustomEvent('annotationHoverIn', true, true, this);
-	            window.dispatchEvent(event);
+	            (0, _event.dispatchWindowEvent)('annotationHoverIn', this);
 	        }
+	
+	        /**
+	         * Handle a hoverOut event.
+	         */
+	
 	    }, {
 	        key: 'handleHoverOutEvent',
 	        value: function handleHoverOutEvent(e) {
 	            console.log('handleHoverOutEvent');
 	            this.dehighlight();
 	            this.emit('hoverout');
-	
-	            // if (window.annotationContainer.getSelectedAnnotations().length === 0) {
-	            //     textInput.disable();
-	            // }
-	
-	            var event = document.createEvent('CustomEvent');
-	            event.initCustomEvent('annotationHoverOut', true, true, this);
-	            window.dispatchEvent(event);
+	            (0, _event.dispatchWindowEvent)('annotationHoverOut', this);
 	        }
 	
 	        /**
@@ -19198,7 +19160,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'toggleSelect',
 	        value: function toggleSelect() {
-	            console.log('toggleSelect:', this.selected);
 	
 	            if (this.selected) {
 	                this.deselect();
@@ -19207,26 +19168,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.select();
 	                this.textAnnotation && this.textAnnotation.select();
 	            }
-	        }
-	
-	        /**
-	         * Show the boundingCircle.
-	         */
-	
-	    }, {
-	        key: 'showBoundingCircle',
-	        value: function showBoundingCircle() {
-	            this.$element.find('circle').removeClass('--hide');
-	        }
-	
-	        /**
-	         * Hide the boundingCircle.
-	         */
-	
-	    }, {
-	        key: 'hideBoundingCircle',
-	        value: function hideBoundingCircle() {
-	            this.$element.find('circle').addClass('--hide');
 	        }
 	
 	        /**
@@ -19239,13 +19180,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var _this5 = this;
 	
 	            if (this.isSelected()) {
-	
 	                this.destroy().then(function () {
-	                    var event = document.createEvent('CustomEvent');
-	                    event.initCustomEvent('annotationDeleted', true, true, { uuid: _this5.uuid });
-	                    window.dispatchEvent(event);
+	                    (0, _event.dispatchWindowEvent)('annotationDeleted', { uuid: _this5.uuid });
 	                });
-	
 	                return true;
 	            }
 	            return false;
@@ -19413,6 +19350,25 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 55 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.dispatchWindowEvent = dispatchWindowEvent;
+	/**
+	 * Dispatch a custom event to `window` object.
+	 */
+	function dispatchWindowEvent(eventName, data) {
+	    var event = document.createEvent('CustomEvent');
+	    event.initCustomEvent(eventName, true, true, data);
+	    window.dispatchEvent(event);
+	}
+
+/***/ },
+/* 56 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -19657,7 +19613,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 56 */
+/* 57 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -19667,8 +19623,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.getRectangles = getRectangles;
 	exports.createSpan = createSpan;
-	exports.enableSpan = enableSpan;
-	exports.disableSpan = disableSpan;
 	
 	var _jquery = __webpack_require__(25);
 	
@@ -19676,9 +19630,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(49);
 	
-	var _text = __webpack_require__(51);
-	
-	var _span = __webpack_require__(57);
+	var _span = __webpack_require__(58);
 	
 	var _span2 = _interopRequireDefault(_span);
 	
@@ -19691,11 +19643,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-	
-	/**
-	 * the prev annotation rendered at the last.
-	 */
-	var prevAnnotation = void 0;
 	
 	/**
 	 * Get the current window selection as rects
@@ -19791,51 +19738,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // Render.
 	  spanAnnotation.render();
 	
-	  // Add an input field.
-	  var x = annotation.rectangles[0].x + 5; // 5 = boundingRadius(3) + 2
-	  var y = annotation.rectangles[0].y - 20; // 20 = circle'radius(3px) + input height(14px) + α
-	  var rect = svg.getBoundingClientRect();
-	
-	  x = (0, _utils.scaleUp)(svg, { x: x }).x + rect.left;
-	  y = (0, _utils.scaleUp)(svg, { y: y }).y + rect.top;
-	
-	  // disableUserSelect();
-	
-	  // document.removeEventListener('mouseup', handleDocumentMouseup);
-	
 	  // Select.
 	  spanAnnotation.select();
 	
-	  // New type text.
+	  // Enable label input.
 	  textInput.enable({ uuid: spanAnnotation.uuid, autoFocus: true });
-	
-	  // // New type text.
-	  // textInput.enable({ uuid : spanAnnotation.uuid, autoFocus : true , blurListener : () => {
-	  //   // spanAnnotation.enable();
-	  //   window.annotationContainer.enableAll();
-	  // }});
-	  // // spanAnnotation.disable();
-	  // window.annotationContainer.disableAll();
-	
-	
-	  // addInputField(x, y, null, null, (text) => {
-	
-	  //   // document.addEventListener('mouseup', handleDocumentMouseup);
-	
-	  //   spanAnnotation.text = text;
-	  //   spanAnnotation.setTextForceDisplay();
-	  //   spanAnnotation.render();
-	  //   spanAnnotation.save();
-	  //   spanAnnotation.enableViewMode();
-	
-	  // });
-	
-	  if (prevAnnotation) {
-	    prevAnnotation.resetTextForceDisplay();
-	    prevAnnotation.render();
-	    prevAnnotation.enableViewMode();
-	  }
-	  prevAnnotation = spanAnnotation;
 	
 	  return spanAnnotation;
 	}
@@ -19847,7 +19754,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (!rects) {
 	    return null;
 	  }
-	  console.log('rects1:', rects);
 	
 	  var svg = (0, _utils.getSVGLayer)();
 	  var boundingRect = svg.getBoundingClientRect();
@@ -19863,8 +19769,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1;
 	  });
 	
-	  console.log('rects2:', rects);
-	
 	  return rects;
 	}
 	
@@ -19874,35 +19778,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	function createSpan() {
 	  return handleDocumentMouseup();
 	}
-	
-	/**
-	 * Enable hightlight behavior.
-	 */
-	function enableSpan() {
-	  this.disableSpan();
-	  document.addEventListener('mouseup', handleDocumentMouseup);
-	
-	  // $('.textLayer').css('z-index', 3); // over svg layer.
-	}
-	
-	/**
-	 * Disable hightlight behavior.
-	 */
-	function disableSpan() {
-	  document.removeEventListener('mouseup', handleDocumentMouseup);
-	
-	  // $('.textLayer').css('z-index', 1);
-	
-	  if (prevAnnotation) {
-	    prevAnnotation.resetTextForceDisplay();
-	    prevAnnotation.render();
-	    prevAnnotation.enableViewMode();
-	    prevAnnotation = null;
-	  }
-	}
 
 /***/ },
-/* 57 */
+/* 58 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -19923,7 +19801,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _abstract2 = _interopRequireDefault(_abstract);
 	
-	var _text = __webpack_require__(55);
+	var _text = __webpack_require__(56);
 	
 	var _text2 = _interopRequireDefault(_text);
 	
@@ -20202,7 +20080,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 58 */
+/* 59 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -20212,21 +20090,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.createRelation = createRelation;
 	
-	var _jquery = __webpack_require__(25);
-	
-	var _jquery2 = _interopRequireDefault(_jquery);
-	
 	var _textInput = __webpack_require__(54);
 	
 	var textInput = _interopRequireWildcard(_textInput);
 	
-	var _relation = __webpack_require__(59);
+	var _relation = __webpack_require__(60);
 	
 	var _relation2 = _interopRequireDefault(_relation);
 	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	/**
 	 * Create a new Relation annotation.
@@ -20261,7 +20135,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 59 */
+/* 60 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -20282,7 +20156,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _abstract2 = _interopRequireDefault(_abstract);
 	
-	var _text = __webpack_require__(55);
+	var _text = __webpack_require__(56);
 	
 	var _text2 = _interopRequireDefault(_text);
 	
@@ -20750,7 +20624,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 60 */
+/* 61 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -20834,13 +20708,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 61 */
+/* 62 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(62);
+	var content = __webpack_require__(63);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(24)(content, {});
@@ -20860,7 +20734,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 62 */
+/* 63 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(23)();
@@ -20874,7 +20748,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 63 */
+/* 64 */
 /***/ function(module, exports) {
 
 	"use strict";
