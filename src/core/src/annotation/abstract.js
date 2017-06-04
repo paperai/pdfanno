@@ -2,6 +2,7 @@ import EventEmitter from 'events';
 import appendChild from '../render/appendChild';
 import { getSVGLayer, getMetadata } from '../UI/utils';
 import * as textInput from '../utils/textInput';
+import { dispatchWindowEvent } from '../utils/event';
 
 /**
  * Abstract Annotation Class.
@@ -157,33 +158,24 @@ export default class AbstractAnnotation extends EventEmitter {
 
     }
 
+    /**
+     * Handle a hoverIn event.
+     */
     handleHoverInEvent(e) {
         console.log('handleHoverInEvent');
         this.highlight();
         this.emit('hoverin');
-
-        // if (window.annotationContainer.getSelectedAnnotations().length === 0) {
-        //     textInput.enable({ uuid : this.uuid, text : this.text, disable : true });
-        // }
-
-        var event = document.createEvent('CustomEvent');
-        event.initCustomEvent('annotationHoverIn', true, true, this);
-        window.dispatchEvent(event);
+        dispatchWindowEvent('annotationHoverIn', this);
     }
 
+    /**
+     * Handle a hoverOut event.
+     */
     handleHoverOutEvent(e) {
         console.log('handleHoverOutEvent');
         this.dehighlight();
         this.emit('hoverout');
-
-        // if (window.annotationContainer.getSelectedAnnotations().length === 0) {
-        //     textInput.disable();
-        // }
-
-        var event = document.createEvent('CustomEvent');
-        event.initCustomEvent('annotationHoverOut', true, true, this);
-        window.dispatchEvent(event);
-
+        dispatchWindowEvent('annotationHoverOut', this);
     }
 
     /**
@@ -225,7 +217,6 @@ export default class AbstractAnnotation extends EventEmitter {
      * Toggle the selected state.
      */
     toggleSelect() {
-        console.log('toggleSelect:', this.selected);
 
         if (this.selected) {
             this.deselect();
@@ -239,31 +230,14 @@ export default class AbstractAnnotation extends EventEmitter {
     }
 
     /**
-     * Show the boundingCircle.
-     */
-    showBoundingCircle() {
-        this.$element.find('circle').removeClass('--hide');
-    }
-
-    /**
-     * Hide the boundingCircle.
-     */
-    hideBoundingCircle() {
-        this.$element.find('circle').addClass('--hide');
-    }
-
-    /**
      * Delete the annotation if selected.
      */
     deleteSelectedAnnotation() {
+
         if (this.isSelected()) {
-
             this.destroy().then(() => {
-                var event = document.createEvent('CustomEvent');
-                event.initCustomEvent('annotationDeleted', true, true, { uuid : this.uuid });
-                window.dispatchEvent(event);
+                dispatchWindowEvent('annotationDeleted', { uuid : this.uuid });
             });
-
             return true;
         }
         return false;

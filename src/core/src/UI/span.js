@@ -6,14 +6,8 @@ import {
   scaleUp,
   getSVGLayer
 } from './utils';
-import { addInputField } from './text';
 import SpanAnnotation from '../annotation/span';
 import * as textInput from '../utils/textInput';
-
-/**
- * the prev annotation rendered at the last.
- */
-let prevAnnotation;
 
 /**
  * Get the current window selection as rects
@@ -107,61 +101,13 @@ function saveSpan(rects, selectedText) {
   // Render.
   spanAnnotation.render();
 
-
-  // Add an input field.
-  let x = annotation.rectangles[0].x + 5;  // 5 = boundingRadius(3) + 2
-  let y = annotation.rectangles[0].y - 20; // 20 = circle'radius(3px) + input height(14px) + α
-  let rect = svg.getBoundingClientRect();
-
-  x = scaleUp(svg, {x}).x + rect.left;
-  y = scaleUp(svg, {y}).y + rect.top;
-
-  // disableUserSelect();
-
-  // document.removeEventListener('mouseup', handleDocumentMouseup);
-
   // Select.
   spanAnnotation.select();
 
-  // New type text.
+  // Enable label input.
   textInput.enable({ uuid : spanAnnotation.uuid, autoFocus : true });
 
-
-  // // New type text.
-  // textInput.enable({ uuid : spanAnnotation.uuid, autoFocus : true , blurListener : () => {
-  //   // spanAnnotation.enable();
-  //   window.annotationContainer.enableAll();
-  // }});
-  // // spanAnnotation.disable();
-  // window.annotationContainer.disableAll();
-
-
-
-
-
-
-  // addInputField(x, y, null, null, (text) => {
-
-  //   // document.addEventListener('mouseup', handleDocumentMouseup);
-
-  //   spanAnnotation.text = text;
-  //   spanAnnotation.setTextForceDisplay();
-  //   spanAnnotation.render();
-  //   spanAnnotation.save();
-  //   spanAnnotation.enableViewMode();
-
-  // });
-
-  if (prevAnnotation) {
-    prevAnnotation.resetTextForceDisplay();
-    prevAnnotation.render();
-    prevAnnotation.enableViewMode();
-  }
-  prevAnnotation = spanAnnotation;
-
-
   return spanAnnotation;
-
 }
 
 export function getRectangles() {
@@ -170,7 +116,6 @@ export function getRectangles() {
     if (!rects) {
         return null;
     }
-    console.log('rects1:', rects);
 
     let svg = getSVGLayer();
     let boundingRect = svg.getBoundingClientRect();
@@ -184,10 +129,7 @@ export function getRectangles() {
       });
     }).filter((r) => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1);
 
-    console.log('rects2:', rects);
-
     return rects;
-
 }
 
 /**
@@ -195,33 +137,4 @@ export function getRectangles() {
  */
 export function createSpan() {
     return handleDocumentMouseup();
-}
-
-/**
- * Enable hightlight behavior.
- */
-export function enableSpan() {
-  this.disableSpan();
-  document.addEventListener('mouseup', handleDocumentMouseup);
-
-
-  // $('.textLayer').css('z-index', 3); // over svg layer.
-}
-
-/**
- * Disable hightlight behavior.
- */
-export function disableSpan() {
-  document.removeEventListener('mouseup', handleDocumentMouseup);
-
-
-  // $('.textLayer').css('z-index', 1);
-
-  if (prevAnnotation) {
-    prevAnnotation.resetTextForceDisplay();
-    prevAnnotation.render();
-    prevAnnotation.enableViewMode();
-    prevAnnotation = null;
-  }
-
 }

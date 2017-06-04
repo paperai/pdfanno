@@ -124,16 +124,8 @@ function saveText(uuid) {
     const annotation = window.iframeWindow.annotationContainer.findById(uuid);
     if (annotation) {
         annotation.text = text;
-        // annotation.setTextForceDisplay();
-        // annotation.render();
         annotation.save();
         annotation.enableViewMode();
-
-        // setTimeout(() => {
-        //     annotation.resetTextForceDisplay();
-        //     annotation.render();
-        //     annotation.enableViewMode();
-        // }, 1000);
     }
 
 }

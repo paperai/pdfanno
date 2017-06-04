@@ -90,7 +90,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _annotationTools = __webpack_require__(13);
 	
-	var annotationsTools = _interopRequireWildcard(_annotationTools);
+	var annotationTools = _interopRequireWildcard(_annotationTools);
 	
 	var _inputLabel = __webpack_require__(15);
 	
@@ -119,22 +119,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	window.readTOML = publicApi.readTOML;
 	window.clear = publicApi.clear;
 	
-	/**
-	 * The data which is loaded via `Browse` button.
-	 */
-	window.fileMap = {};
-	
 	// Check Ctrl or Cmd button clicked.
 	// ** ATTENTION!! ALSO UPDATED by core/index.js **
 	$(document).on('keydown', function (e) {
+	
 	    if (e.keyCode === 17 || e.keyCode === 91) {
 	        // 17:ctrlKey, 91:cmdKey
 	        window.iframeWindow.ctrlPressed = true;
-	        console.log('ctrl press!!2');
+	        console.log('ctrl press2!!');
 	    }
 	}).on('keyup', function (e) {
+	
+	    // Allow any keyboard events for <input/>.
+	    if (e.target.tagName.toLowerCase() === 'input') {
+	        return;
+	    }
+	
 	    window.iframeWindow.ctrlPressed = false;
-	    console.log('ctrl release!!2');
+	
+	    if (e.keyCode === 49) {
+	        // Digit "1"
+	        annotationTools.createSpan();
+	    } else if (e.keyCode === 50) {
+	        // Digit "2"
+	        annotationTools.createRelation('one-way');
+	    } else if (e.keyCode === 51) {
+	        // Digit "3"
+	        annotationTools.createRelation('two-way');
+	    } else if (e.keyCode === 52) {
+	        // Digit "4"
+	        annotationTools.createRelation('link');
+	    }
 	});
 	
 	/**
@@ -223,6 +238,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	        console.log('annotationDeselected');
 	        inputLabel.handleAnnotationDeselected();
 	    });
+	    iframeWindow.addEventListener('digit1Pressed', function () {
+	        annotationTools.createSpan();
+	    });
+	    iframeWindow.addEventListener('digit2Pressed', function () {
+	        annotationTools.createRelation('one-way');
+	    });
+	    iframeWindow.addEventListener('digit3Pressed', function () {
+	        annotationTools.createRelation('two-way');
+	    });
+	    iframeWindow.addEventListener('digit4Pressed', function () {
+	        annotationTools.createRelation('link');
+	    });
 	}
 	
 	/**
@@ -231,9 +258,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	window.addEventListener('DOMContentLoaded', function (e) {
 	
 	    // Delete prev annotations.
-	    if (location.search.indexOf('debug') === -1) {
-	        (0, _anno.clearAllAnnotations)();
-	    }
+	    (0, _anno.clearAllAnnotations)();
 	
 	    // Reset PDFViwer settings.
 	    (0, _display.resetPDFViewerSettings)();
@@ -249,20 +274,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    annoListDropdown.setup();
 	    downloadButton.setup();
 	    uploadButton.setup();
-	    annotationsTools.setup();
+	    annotationTools.setup();
 	    inputLabel.setup();
 	
 	    window.addEventListener('restartApp', startApplication);
 	
 	    // enable text input.
 	    window.addEventListener('enableTextInput', function (e) {
-	        console.log('enableTextInput2:', e.detail);
 	        inputLabel.enable(e.detail);
 	    });
 	
 	    // disable text input.
 	    window.addEventListener('disappearTextInput', function (e) {
-	        console.log('disappearTextInput2:', e.detail);
 	        inputLabel.disable(e.detail);
 	    });
 	
@@ -291,7 +314,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	*/
 	function disableAnnotateTools() {
 	    window.iframeWindow.PDFAnnoCore.UI.disableRect();
-	    window.iframeWindow.PDFAnnoCore.UI.disableSpan();
 	    window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
 	}
 	
@@ -1491,6 +1513,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	exports.setup = setup;
+	exports.createSpan = createSpan;
+	exports.createRelation = createRelation;
 	
 	var _display = __webpack_require__(2);
 	
@@ -1530,98 +1554,111 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    $('.js-tool-btn-span').off('click').on('click', function (e) {
 	        $(e.currentTarget).blur();
-	
-	        var rects = window.iframeWindow.PDFAnnoCore.UI.getRectangles();
-	
-	        // Check empty.
-	        if (!rects) {
-	            return alert('Please select a text span first.');
-	        }
-	
-	        // Check duplicated.
-	        var annos = window.iframeWindow.annotationContainer.getAllAnnotations().filter(function (a) {
-	            return a.type === 'span';
-	        }).filter(function (a) {
-	            console.log('aaaaa:', rects, a);
-	            if (rects.length !== a.rectangles.length) {
-	                return false;
-	            }
-	            for (var i = 0; i < rects.length; i++) {
-	                if (rects[i].x !== a.rectangles[i].x || rects[i].y !== a.rectangles[i].y || rects[i].width !== a.rectangles[i].width || rects[i].height !== a.rectangles[i].height) {
-	                    return false;
-	                }
-	            }
-	            return true;
-	        });
-	
-	        if (annos.length > 0) {
-	            // Show label input.
-	            var event = document.createEvent('CustomEvent');
-	            event.initCustomEvent('enableTextInput', true, true, {
-	                uuid: annos[0].uuid,
-	                text: annos[0].text
-	            });
-	            window.dispatchEvent(event);
-	            return;
-	        }
-	
-	        // Create a new rectAnnotation.
-	        var anno = window.iframeWindow.PDFAnnoCore.UI.createSpan();
+	        createSpan();
 	    });
 	
 	    $('.js-tool-btn-rel').off('click').on('click', function (e) {
-	
 	        var $button = $(e.currentTarget);
 	        var type = $button.data('type');
-	
-	        var selectedAnnotations = window.iframeWindow.annotationContainer.getSelectedAnnotations();
-	        selectedAnnotations = selectedAnnotations.filter(function (a) {
-	            return a.type === 'area' || a.type === 'span';
-	        }).sort(function (a1, a2) {
-	            return a1.selectedTime - a2.selectedTime; // asc
-	        });
-	
-	        if (selectedAnnotations.length < 2) {
-	            return alert('Please select two annotations first.');
-	        }
-	
-	        var first = selectedAnnotations[selectedAnnotations.length - 2];
-	        var second = selectedAnnotations[selectedAnnotations.length - 1];
-	        console.log('first:second,', first, second);
-	
-	        // Check duplicated.
-	        var arrows = window.iframeWindow.annotationContainer.getAllAnnotations().filter(function (a) {
-	            return a.type === 'relation';
-	        }).filter(function (a) {
-	            return (0, _util.anyOf)(a.rel1Annotation.uuid, [first.uuid, second.uuid]) && (0, _util.anyOf)(a.rel2Annotation.uuid, [first.uuid, second.uuid]);
-	        });
-	
-	        if (arrows.length > 0) {
-	            console.log('same found!!!');
-	            // Update!!
-	            arrows[0].direction = type;
-	            arrows[0].rel1Annotation = first;
-	            arrows[0].rel2Annotation = second;
-	            arrows[0].save();
-	            arrows[0].render();
-	            arrows[0].enableViewMode();
-	            // Show label input.
-	            var event = document.createEvent('CustomEvent');
-	            event.initCustomEvent('enableTextInput', true, true, {
-	                uuid: arrows[0].uuid,
-	                text: arrows[0].text
-	            });
-	            window.dispatchEvent(event);
-	            return;
-	        }
-	
-	        window.iframeWindow.PDFAnnoCore.UI.createRelation(type, first, second);
-	
+	        createRelation(type);
 	        $button.blur();
 	    });
-	} /**
-	   * UI parts - Annotations Tools.
-	   */
+	}
+	
+	/**
+	 * Create a Span annotation.
+	 */
+	/**
+	 * UI parts - Annotations Tools.
+	 */
+	function createSpan() {
+	
+	    var rects = window.iframeWindow.PDFAnnoCore.UI.getRectangles();
+	
+	    // Check empty.
+	    if (!rects) {
+	        return alert('Please select a text span first.');
+	    }
+	
+	    // Check duplicated.
+	    var annos = window.iframeWindow.annotationContainer.getAllAnnotations().filter(function (a) {
+	        return a.type === 'span';
+	    }).filter(function (a) {
+	        console.log('aaaaa:', rects, a);
+	        if (rects.length !== a.rectangles.length) {
+	            return false;
+	        }
+	        for (var i = 0; i < rects.length; i++) {
+	            if (rects[i].x !== a.rectangles[i].x || rects[i].y !== a.rectangles[i].y || rects[i].width !== a.rectangles[i].width || rects[i].height !== a.rectangles[i].height) {
+	                return false;
+	            }
+	        }
+	        return true;
+	    });
+	
+	    if (annos.length > 0) {
+	        // Show label input.
+	        var event = document.createEvent('CustomEvent');
+	        event.initCustomEvent('enableTextInput', true, true, {
+	            uuid: annos[0].uuid,
+	            text: annos[0].text
+	        });
+	        window.dispatchEvent(event);
+	        return;
+	    }
+	
+	    // Create a new rectAnnotation.
+	    window.iframeWindow.PDFAnnoCore.UI.createSpan();
+	}
+	
+	/**
+	 * Create a Relation annotation.
+	 */
+	function createRelation(type) {
+	
+	    var selectedAnnotations = window.iframeWindow.annotationContainer.getSelectedAnnotations();
+	    selectedAnnotations = selectedAnnotations.filter(function (a) {
+	        return a.type === 'area' || a.type === 'span';
+	    }).sort(function (a1, a2) {
+	        return a1.selectedTime - a2.selectedTime; // asc
+	    });
+	
+	    if (selectedAnnotations.length < 2) {
+	        return alert('Please select two annotations first.');
+	    }
+	
+	    var first = selectedAnnotations[selectedAnnotations.length - 2];
+	    var second = selectedAnnotations[selectedAnnotations.length - 1];
+	    console.log('first:second,', first, second);
+	
+	    // Check duplicated.
+	    var arrows = window.iframeWindow.annotationContainer.getAllAnnotations().filter(function (a) {
+	        return a.type === 'relation';
+	    }).filter(function (a) {
+	        return (0, _util.anyOf)(a.rel1Annotation.uuid, [first.uuid, second.uuid]) && (0, _util.anyOf)(a.rel2Annotation.uuid, [first.uuid, second.uuid]);
+	    });
+	
+	    if (arrows.length > 0) {
+	        console.log('same found!!!');
+	        // Update!!
+	        arrows[0].direction = type;
+	        arrows[0].rel1Annotation = first;
+	        arrows[0].rel2Annotation = second;
+	        arrows[0].save();
+	        arrows[0].render();
+	        arrows[0].enableViewMode();
+	        // Show label input.
+	        var event = document.createEvent('CustomEvent');
+	        event.initCustomEvent('enableTextInput', true, true, {
+	            uuid: arrows[0].uuid,
+	            text: arrows[0].text
+	        });
+	        window.dispatchEvent(event);
+	        return;
+	    }
+	
+	    window.iframeWindow.PDFAnnoCore.UI.createRelation(type, first, second);
+	}
 
 /***/ },
 /* 14 */
@@ -1786,16 +1823,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var annotation = window.iframeWindow.annotationContainer.findById(uuid);
 	    if (annotation) {
 	        annotation.text = text;
-	        // annotation.setTextForceDisplay();
-	        // annotation.render();
 	        annotation.save();
 	        annotation.enableViewMode();
-	
-	        // setTimeout(() => {
-	        //     annotation.resetTextForceDisplay();
-	        //     annotation.render();
-	        //     annotation.enableViewMode();
-	        // }, 1000);
 	    }
 	}
 	

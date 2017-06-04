@@ -36,13 +36,49 @@ PDFAnnoCore.UI.enableViewMode();
 // ** ATTENTION!! ALSO UPDATED by pdfanno.js **
 window.ctrlPressed = false;
 $(document).on('keydown', e => {
+
+    // Allow any keyboard events for <input/>.
+    if (e.target.tagName.toLowerCase() === 'input') {
+        return;
+    }
+
     if (e.keyCode === 17 || e.keyCode === 91) { // 17:ctrlKey, 91:cmdKey
         window.ctrlPressed = true;
         console.log('ctrl press!!');
     }
 }).on('keyup', e => {
+
+    // Allow any keyboard events for <input/>.
+    if (e.target.tagName.toLowerCase() === 'input') {
+        return;
+    }
+
+    if (e.keyCode === 49) {  // Digit "1"
+        var event = document.createEvent('CustomEvent');
+        event.initCustomEvent('digit1Pressed', true, true);
+        window.dispatchEvent(event);
+        return;
+    }
+    if (e.keyCode === 50) {  // Digit "2"
+        var event = document.createEvent('CustomEvent');
+        event.initCustomEvent('digit2Pressed', true, true);
+        window.dispatchEvent(event);
+        return;
+    }
+    if (e.keyCode === 51) {  // Digit "3"
+        var event = document.createEvent('CustomEvent');
+        event.initCustomEvent('digit3Pressed', true, true);
+        window.dispatchEvent(event);
+        return;
+    }
+    if (e.keyCode === 52) {  // Digit "4"
+        var event = document.createEvent('CustomEvent');
+        event.initCustomEvent('digit4Pressed', true, true);
+        window.dispatchEvent(event);
+        return;
+    }
+
     window.ctrlPressed = false;
-    console.log('ctrl release!!');
 });
 
 // The event called at page rendered by pdfjs.
@@ -180,10 +216,7 @@ function renderAnnotations(svg) {
                     anno.render();
                     anno.enableViewMode();
                     window.annotationContainer.add(anno);
-
                 }
-
-
             });
 
             var event = document.createEvent('CustomEvent');
