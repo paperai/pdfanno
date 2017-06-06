@@ -3,13 +3,13 @@ const LiveReloadPlugin = require('webpack-livereload-plugin');
 
 module.exports = {
   entry: {
-    pdfanno : './src/pdfanno.js',
-    'pdfanno-core' : './src/core/index.js'
+    'pdfanno.page' : './src/pdfanno.js',
+    'pdfanno.core' : './src/core/index.js'
   },
   output: {
-    filename: './dist/[name].bundle.js',
-    library: 'PDFAnnoCore',
-    libraryTarget: 'umd'
+    filename      : './dist/[name].bundle.js',
+    library       : 'PDFAnnoCore',
+    libraryTarget : 'umd'
   },
   module: {
     loaders: [

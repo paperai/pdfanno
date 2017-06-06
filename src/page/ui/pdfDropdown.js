@@ -33,7 +33,7 @@ export function setup() {
         $('#dropdownPdf .fa-check').addClass('no-visible');
         $this.find('.fa-check').removeClass('no-visible');
 
-        if (!fileMap[pdfPath]) {
+        if (!window.pdfanno.fileMap[pdfPath]) {
             return false;
         }
 
@@ -43,7 +43,7 @@ export function setup() {
         resetCheckReferenceAnnoDropdown();
 
         // reload.
-        window.pdf = fileMap[pdfPath];
+        window.pdf = window.pdfanno.fileMap[pdfPath];
         let fileName = pdfPath.split('/')[pdfPath.split('/').length - 1];
         window.pdfName = fileName;
         reloadPDFViewer();

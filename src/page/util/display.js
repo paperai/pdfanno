@@ -15,12 +15,12 @@ export function displayAnnotation(isPrimary, reload=true) {
             let $elm = $(element);
             if ($elm.find('.fa-check').hasClass('no-visible') === false) {
                 let annoPath = $elm.find('.js-annoname').text();
-                if (!fileMap[annoPath]) {
+                if (!window.pdfanno.fileMap[annoPath]) {
                     console.log('ERROR');
                     return;
                 }
                 primaryIndex = 0;
-                annotations.push(fileMap[annoPath]);
+                annotations.push(window.pdfanno.fileMap[annoPath]);
                 let color = null; // Use the default color used for edit.
                 colors.push(color);
 
@@ -37,11 +37,11 @@ export function displayAnnotation(isPrimary, reload=true) {
             let $elm = $(element);
             if ($elm.find('.fa-check').hasClass('no-visible') === false) {
                 let annoPath = $elm.find('.js-annoname').text();
-                if (!fileMap[annoPath]) {
+                if (!window.pdfanno.fileMap[annoPath]) {
                     console.log('ERROR');
                     return;
                 }
-                annotations.push(fileMap[annoPath]);
+                annotations.push(window.pdfanno.fileMap[annoPath]);
                 let color = $elm.find('.js-anno-palette').spectrum('get').toHexString();
                 console.log(color);
                 colors.push(color);

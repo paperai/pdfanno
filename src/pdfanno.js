@@ -24,6 +24,11 @@ import {
 import * as publicApi from './page/public';
 
 /**
+ * Global variable.
+ */
+window.pdfanno = {};
+
+/**
  * Expose public APIs.
  */
 window.add = publicApi.addAnnotation;

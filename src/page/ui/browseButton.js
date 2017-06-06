@@ -4,12 +4,14 @@
 import { reloadPDFViewer, setupColorPicker, displayAnnotation } from '../util/display';
 import { enableAnnotateTool, disableAnnotateTools, clearAllAnnotations } from '../util/anno';
 
+import { loadFiles } from '../pdf';
+
 /**
  * Setup the behavior of a Browse Button.
  */
 export function setup() {
 
-    // Enable to select the same directory twice.
+    // Enable to select the same directory twice or more.
     $('.js-file :file').on('click', ev => {
         $('input[type="file"]').val(null);
     });
@@ -23,32 +25,48 @@ export function setup() {
             return alert(error);
         }
 
-        // Get current visuals.
-        const current = getCurrentFileNames();
+        // Load PDF/Anno files, and initialize dropdown lists.
+        loadFiles(files).then((fileMap, pdfNames, annoNames) => {
 
-        // Get contents.
-        const { pdfs, annos } = getContents(files);
+            // Get current visuals.
+            const current = getCurrentFileNames();
 
-        // Setup PDF Dropdown.
-        setPDFDropdownList(pdfs);
+            // Initialize PDF Viewer.
+            clearAllAnnotations();
 
-        // Setup Anno Dropdown.
-        setAnnoDropdownList(annos);
+            // Setup PDF Dropdown.
+            setPDFDropdownList(pdfNames);
 
-        // Initialize PDF Viewer.
-        clearAllAnnotations();
-
-        // Load data.
-        loadData(pdfs, annos).then(() => {
+            // Setup Anno Dropdown.
+            setAnnoDropdownList(annoNames);
 
             // Display a PDF and annotations.
-            display(current, fileMap);
-
+            display(current, window.pdfanno.fileMap);
         });
-
     });
-
 }
+
+/**
+ * Check whether the directory the user specified is valid.
+ */
+function isValidDirectorySelect(files) {
+
+    // Error, if no contents exits.
+    if (!files || files.length === 0) {
+        return 'Not files specified';
+    }
+
+    // Error, if the user select a file - not a directory.
+    let relativePath = files[0].webkitRelativePath;
+    if (!relativePath) {
+        return 'Please select a directory, NOT a file';
+    }
+
+    // OK.
+    return null;
+}
+
+
 
 function display(currentDisplay, newFileMap) {
 
@@ -59,7 +77,7 @@ function display(currentDisplay, newFileMap) {
     // PDF.
     name = currentDisplay.pdfName;
     if (name && newFileMap[name]) {
-        window.pdf = fileMap[name];
+        window.pdf = window.pdfanno.fileMap[name];
         window.pdfName = currentDisplay.pdfName;
 
         $('#dropdownPdf .js-text').text(name);
@@ -168,62 +186,9 @@ function getCurrentFileNames() {
 }
 
 /**
- * Check whether the directory the user specified is valid.
- */
-function isValidDirectorySelect(files) {
-
-    // Error, if no contents exits.
-    if (!files || files.length === 0) {
-        return 'Not files specified';
-    }
-
-    // Error, if the user select a file - not a directory.
-    let relativePath = files[0].webkitRelativePath;
-    if (!relativePath) {
-        return 'Please select a directory, NOT a file';
-    }
-
-    // OK.
-    return null;
-}
-
-/**
- * Extract PDFs and annotations from files the user specified.
- */
-function getContents(files) {
-    let pdfs = [];
-    let annos = [];
-
-    for (let i = 0; i < files.length; i++) {
-
-        let file = files[i];
-        let relativePath = file.webkitRelativePath;
-
-        let frgms = relativePath.split('/');
-        if (frgms.length > 2) {
-            console.log('SKIP:', relativePath);
-            continue;
-        }
-        console.log('relativePath:', relativePath);
-
-        // Get files only PDFs or Anno files.
-        if (relativePath.match(/\.pdf$/i)) {
-            pdfs.push(file);
-        } else if (relativePath.match(/\.anno$/i)) {
-            annos.push(file);
-        }
-    }
-
-    return {
-        pdfs,
-        annos
-    };
-}
-
-/**
  * Setup the contents of the dropdown for PDFs.
  */
-function setPDFDropdownList(pdfs) {
+function setPDFDropdownList(pdfs=[]) {
 
     $('#dropdownPdf .js-text').text('PDF File');
     $('#dropdownPdf li').remove();
@@ -244,7 +209,7 @@ function setPDFDropdownList(pdfs) {
 /**
  * Setup the contents of the dropdowns for primary/reference annotations.
  */
-function setAnnoDropdownList(annos) {
+function setAnnoDropdownList(annos=[]) {
 
     // Reset.
     $('#dropdownAnnoPrimary ul').html('');
@@ -281,52 +246,4 @@ function setAnnoDropdownList(annos) {
 
     // Setup color pallets.
     setupColorPicker();
-}
-
-/**
- * Load PDFs and Annotations from the directory the user specified.
- */
-function loadData(pdfs, annos) {
-
-    window.fileMap = {};
-
-    return new Promise((resolve, reject) => {
-
-        let promises = [];
-
-        // Load pdfs.
-        let p = pdfs.map(file => {
-            return new Promise((resolve, reject) => {
-                let fileReader = new FileReader();
-                fileReader.onload = event => {
-                    let pdf = event.target.result;
-                    let fileName = _excludeBaseDirName(file.webkitRelativePath);
-                    fileMap[fileName] = pdf;
-                    resolve();
-                }
-                fileReader.readAsDataURL(file);
-            });
-        });
-        promises = promises.concat(p);
-
-        // Load annos.
-        p = annos.map(file => {
-            return new Promise((resolve, reject) => {
-                let fileReader = new FileReader();
-                fileReader.onload = event => {
-                    let annotation = event.target.result;
-                    let fileName = _excludeBaseDirName(file.webkitRelativePath);
-                    fileMap[fileName] = annotation;
-                    resolve();
-                }
-                fileReader.readAsText(file);
-            });
-        });
-        promises = promises.concat(p);
-
-        // Wait for complete.
-        Promise.all(promises).then(resolve);
-
-    });
-
 }
