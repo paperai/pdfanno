@@ -4,7 +4,8 @@
 import { reloadPDFViewer, setupColorPicker, displayAnnotation } from '../util/display';
 import { enableAnnotateTool, disableAnnotateTools, clearAllAnnotations } from '../util/anno';
 
-import { loadFiles } from '../pdf';
+// import { loadFiles } from '../pdf';
+import AnnoPage from '../pdf';
 
 /**
  * Setup the behavior of a Browse Button.
@@ -26,7 +27,9 @@ export function setup() {
         }
 
         // Load PDF/Anno files, and initialize dropdown lists.
-        loadFiles(files).then((fileMap, pdfNames, annoNames) => {
+        AnnoPage.loadFiles(files).then((pdfNames, annoNames, pdfDataMap, annoDataMap) => {
+
+            console.log('loadFiles:', pdfNames, annoNames, pdfDataMap, annoDataMap);
 
             // Get current visuals.
             const current = getCurrentFileNames();
@@ -35,13 +38,13 @@ export function setup() {
             clearAllAnnotations();
 
             // Setup PDF Dropdown.
-            setPDFDropdownList(pdfNames);
+            setPDFDropdownList(1);
 
             // Setup Anno Dropdown.
             setAnnoDropdownList(annoNames);
 
             // Display a PDF and annotations.
-            display(current, window.pdfanno.fileMap);
+            display(current, pdfDataMap, annoDataMap);
         });
     });
 }
@@ -68,9 +71,10 @@ function isValidDirectorySelect(files) {
 
 
 
-function display(currentDisplay, newFileMap) {
+function display(currentDisplay, pdfDataMap, annoDataMap) {
 
-    console.log('files:', Object.keys(newFileMap));
+    console.log('files:', Object.keys(pdfDataMap));
+    console.log('files2:', Object.keys(annoDataMap));
 
     let name;
 
@@ -189,6 +193,8 @@ function getCurrentFileNames() {
  * Setup the contents of the dropdown for PDFs.
  */
 function setPDFDropdownList(pdfs=[]) {
+
+    console.log('pdfs:', pdfs);
 
     $('#dropdownPdf .js-text').text('PDF File');
     $('#dropdownPdf li').remove();
