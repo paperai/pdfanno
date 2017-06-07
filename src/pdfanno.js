@@ -3,6 +3,8 @@
 
     ベースのディレクトリ：src/page/pdf
 
+    ※ 以下の「◎」をUIから切り出す必要がありそうです。
+
     Browseボタン
         ・Fileダイアログから読み込んで、PDFとAnnoをメモリ上に保持.
             ◎ loadFiles
