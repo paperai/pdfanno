@@ -9,18 +9,21 @@ import globalVariable from './globalVariable';
 /**
  * Load PDFs and Annos via Browse button.
  */
-export function loadFiles(files) {
+export default function loadFiles(files) {
 
+    // TODO Remove.
     let fileMap = window.pdfanno.fileMap = {};
 
     let { pdfNames, annoNames } = getContents(files);
 
+    // TODO Remove.
     // Save.
     globalVariable.pdfNames = pdfNames.map(f => _excludeBaseDirName(f.webkitRelativePath));
     globalVariable.annoNames = annoNames.map(f => _excludeBaseDirName(f.webkitRelativePath));
 
     return new Promise((resolve, reject) => {
 
+        // TODO Remove.
         // Initialize.
         globalVariable.pdfDataMap = {};
         globalVariable.annoDataMap = {};
@@ -35,7 +38,12 @@ export function loadFiles(files) {
                     let pdf = event.target.result;
                     let fileName = _excludeBaseDirName(file.webkitRelativePath);
                     globalVariable.pdfDataMap[fileName] = pdf;
-                    resolve();
+
+                    resolve({
+                        type    : 'content',
+                        name    : fileName,
+                        content : pdf
+                    });
                 }
                 fileReader.readAsDataURL(file);
             });
@@ -50,7 +58,11 @@ export function loadFiles(files) {
                     let anno = event.target.result;
                     let fileName = _excludeBaseDirName(file.webkitRelativePath);
                     globalVariable.annoDataMap[fileName] = anno;
-                    resolve();
+                    resolve({
+                        type    : 'anno',
+                        name    : fileName,
+                        content : anno
+                    });
                 }
                 fileReader.readAsText(file);
             });
@@ -58,15 +70,14 @@ export function loadFiles(files) {
         promises = promises.concat(p);
 
         // Wait for complete.
-        Promise.all(promises).then(resolve);
+        Promise.all(promises).then(results => {
 
-    }).then(() => {
-        return {
-            pdfNames    : globalVariable.pdfNames,
-            annoNames   : globalVariable.annoNames,
-            pdfDataMap  : globalVariable.pdfDataMap,
-            annoDataMap : globalVariable.annoDataMap
-        };
+            const contents = results.filter(r => r.type === 'content');
+            const annos = results.filter(r => r.type === 'anno');
+
+            resolve({ contents, annos });
+        });
+
     });
 }
 

@@ -26,26 +26,32 @@ export function setup() {
             return alert(error);
         }
 
-        // Load PDF/Anno files, and initialize dropdown lists.
-        AnnoPage.loadFiles(files).then((pdfNames, annoNames, pdfDataMap, annoDataMap) => {
+        window.annoPage.loadFiles(files).then(() => {
 
-            console.log('loadFiles:', pdfNames, annoNames, pdfDataMap, annoDataMap);
-
-            // Get current visuals.
-            const current = getCurrentFileNames();
-
-            // Initialize PDF Viewer.
-            clearAllAnnotations();
-
-            // Setup PDF Dropdown.
-            setPDFDropdownList(1);
-
-            // Setup Anno Dropdown.
-            setAnnoDropdownList(annoNames);
-
-            // Display a PDF and annotations.
-            display(current, pdfDataMap, annoDataMap);
+            console.log('finish!!!');
         });
+
+
+        // // Load PDF/Anno files, and initialize dropdown lists.
+        // AnnoPage.loadFiles(files).then((pdfNames, annoNames, pdfDataMap, annoDataMap) => {
+
+        //     console.log('loadFiles:', pdfNames, annoNames, pdfDataMap, annoDataMap);
+
+        //     // Get current visuals.
+        //     const current = getCurrentFileNames();
+
+        //     // Initialize PDF Viewer.
+        //     clearAllAnnotations();
+
+        //     // Setup PDF Dropdown.
+        //     setPDFDropdownList(1);
+
+        //     // Setup Anno Dropdown.
+        //     setAnnoDropdownList(annoNames);
+
+        //     // Display a PDF and annotations.
+        //     display(current, pdfDataMap, annoDataMap);
+        // });
     });
 }
 

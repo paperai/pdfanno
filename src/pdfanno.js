@@ -152,6 +152,8 @@ import {
 
 import * as publicApi from './page/public';
 
+import PDFAnnoPage from './page/pdf/PDFAnnoPage';
+
 /**
  * Global variable.
  */
@@ -168,6 +170,11 @@ window.SpanAnnotation = publicApi.PublicSpanAnnotation;
 window.RelationAnnotation = publicApi.PublicRelationAnnotation;
 window.readTOML = publicApi.readTOML;
 window.clear = publicApi.clear;
+
+/**
+ * Annotation functions for Page.
+ */
+window.annoPage = new PDFAnnoPage();
 
 
 // Check Ctrl or Cmd button clicked.
