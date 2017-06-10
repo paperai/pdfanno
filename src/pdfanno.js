@@ -185,6 +185,7 @@ window.annoPage = new PDFAnnoPage();
 // ** ATTENTION!! ALSO UPDATED by core/index.js **
 $(document).on('keydown', e => {
 
+    // TODO UIとの依存分離.
     if (e.keyCode === 17 || e.keyCode === 91) { // 17:ctrlKey, 91:cmdKey
         window.iframeWindow.ctrlPressed = true;
     }
@@ -196,104 +197,19 @@ $(document).on('keydown', e => {
         return;
     }
 
+    // TODO UIとの依存分離.
     window.iframeWindow.ctrlPressed = false;
 
     if (e.keyCode === 49) {         // Digit "1"
-        window.annoPage.createSpan();
+        dispatchWindowEvent('digit1Pressed');
     } else if (e.keyCode === 50) {  // Digit "2"
-        window.annoPage.createRelation('one-way');
+        dispatchWindowEvent('digit2Pressed');
     } else if (e.keyCode === 51) {  // Digit "3"
-        window.annoPage.createRelation('two-way');
+        dispatchWindowEvent('digit3Pressed');
     } else if (e.keyCode === 52) {  // Digit "4"
-        window.annoPage.createRelation('link');
+        dispatchWindowEvent('digit4Pressed');
     }
 });
-
-/**
-    Adjust the height of viewer according to window height.
-*/
-function adjustViewerSize() {
-    window.removeEventListener('resize', resizeHandler);
-    window.addEventListener('resize', resizeHandler);
-    resizeHandler();
-}
-
-/**
- * Start PDFAnno Application.
- */
-// TODO Move to PDFAnnoPage.js
-function startApplication() {
-
-    // Alias for convenience.
-    window.iframeWindow = $('#viewer iframe').get(0).contentWindow;
-
-    iframeWindow.addEventListener('DOMContentLoaded', () => {
-
-        // Adjust the height of viewer.
-        adjustViewerSize();
-
-        // Reset the confirm dialog at leaving page.
-        unlistenWindowLeaveEvent();
-    });
-
-    iframeWindow.addEventListener('annotationrendered', () => {
-
-        // Restore the status of AnnoTools.
-        window.annoPage.disableAnnotateFunctions();
-        window.annoPage.enableAnnotateFunction(window.currentAnnoToolType);
-
-        dispatchWindowEvent('annotationrendered');
-    });
-
-    // Set the confirm dialog when leaving a page.
-    iframeWindow.addEventListener('annotationUpdated', () => {
-        listenWindowLeaveEvent();
-        dispatchWindowEvent('annotationUpdated');
-    });
-
-    // enable text input.
-    iframeWindow.addEventListener('enableTextInput', (e) => {
-        dispatchWindowEvent('enableTextInput', e.detail);
-    });
-
-    // disable text input.
-    iframeWindow.addEventListener('disappearTextInput', () => {
-        dispatchWindowEvent('disappearTextInput', e.detail);
-    });
-
-    iframeWindow.addEventListener('annotationDeleted', e => {
-        dispatchWindowEvent('annotationDeleted', e.detail);
-    });
-
-    iframeWindow.addEventListener('annotationHoverIn' , e => {
-        dispatchWindowEvent('annotationHoverIn', e.detail);
-    });
-
-    iframeWindow.addEventListener('annotationHoverOut' , e => {
-        dispatchWindowEvent('annotationHoverOut', e.detail);
-    });
-
-    iframeWindow.addEventListener('annotationSelected' , e => {
-        dispatchWindowEvent('annotationSelected', e.detail);
-    });
-
-    iframeWindow.addEventListener('annotationDeselected' , () => {
-        dispatchWindowEvent('annotationDeselected');
-    });
-
-    iframeWindow.addEventListener('digit1Pressed' , () => {
-        window.annoPage.createSpan();
-    });
-    iframeWindow.addEventListener('digit2Pressed' , () => {
-        window.annoPage.createRelation('one-way');
-    });
-    iframeWindow.addEventListener('digit3Pressed' , () => {
-        window.annoPage.createRelation('two-way');
-    });
-    iframeWindow.addEventListener('digit4Pressed' , () => {
-        window.annoPage.createRelation('link');
-    });
-}
 
 /**
  *  The entry point.
@@ -307,10 +223,11 @@ window.addEventListener('DOMContentLoaded', e => {
     window.annoPage.clearAllAnnotations();
 
     // Reset PDFViwer settings.
+    // TODO UIとの分離.
     resetPDFViewerSettings();
 
     // Start application.
-    startApplication();
+    window.annoPage.startViewerApplication();
 
     // Setup UI parts.
     browseButton.setup();
@@ -323,7 +240,7 @@ window.addEventListener('DOMContentLoaded', e => {
     annotationTools.setup();
     inputLabel.setup();
 
-    window.addEventListener('restartApp', startApplication);
+    window.addEventListener('restartApp', window.annoPage.startViewerApplication);
 
     // resizable.
     setupResizableColumns();

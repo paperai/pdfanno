@@ -1,9 +1,13 @@
 /**
  * Annotation functions for Page.
  */
+// TODO インターフェースを定義する（PDFAnnoPage.jsより）.
 export default class AbstractAnnoPage {
 
     constructor() {
+
+        // Auto-binding.
+        this.autoBind();
 
         // PDFs or HTMLs.
         this.contentFiles = [];
@@ -19,6 +23,17 @@ export default class AbstractAnnoPage {
 
         // // Selected referenceAnnos.
         // this.selectedReferenceAnnoFils = [];
+    }
+
+    /**
+     * Bind the `this` scope of instance methods to `this`.
+     */
+    autoBind() {
+      Object.getOwnPropertyNames(this.constructor.prototype)
+        .filter(prop => typeof this[prop] === 'function')
+        .forEach(method => {
+          this[method] = this[method].bind(this);
+        });
     }
 
 

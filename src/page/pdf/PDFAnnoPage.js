@@ -2,6 +2,14 @@ import AbstractAnnoPage from '../AbstractAnnoPage';
 import loadFiles from './loadFiles';
 import { anyOf, dispatchWindowEvent } from '../../shared/util';
 
+import {
+    listenWindowLeaveEvent,
+    unlistenWindowLeaveEvent,
+    adjustViewerSize,
+    resizeHandler,
+    setupResizableColumns
+} from '../util/window';
+
 /**
  * PDFAnno's Annotation functions for Page produced by .
  */
@@ -9,6 +17,107 @@ export default class PDFAnnoPage extends AbstractAnnoPage {
 
     constructor() {
         super(...arguments);
+        this.setup();
+    }
+
+    setup() {
+        this.listenWindowEvents();
+    }
+
+    listenWindowEvents() {
+        window.addEventListener('digit1Pressed' , () => {
+            this.createSpan();
+        });
+        window.addEventListener('digit2Pressed' , () => {
+            this.createRelation('one-way');
+        });
+        window.addEventListener('digit3Pressed' , () => {
+            this.createRelation('two-way');
+        });
+        window.addEventListener('digit4Pressed' , () => {
+            this.createRelation('link');
+        });
+    }
+
+    /**
+     * Start PDFAnno Application.
+     */
+    startViewerApplication() {
+
+        // TODO Refactoring: "iframeWindow -> window event" make as common.
+
+        // Alias for convenience.
+        window.iframeWindow = $('#viewer iframe').get(0).contentWindow;
+
+        iframeWindow.addEventListener('DOMContentLoaded', () => {
+
+            // Adjust the height of viewer.
+            adjustViewerSize();
+
+            // Reset the confirm dialog at leaving page.
+            unlistenWindowLeaveEvent();
+        });
+
+        iframeWindow.addEventListener('annotationrendered', () => {
+
+            // Restore the status of AnnoTools.
+            this.disableAnnotateFunctions();
+            this.enableAnnotateFunction(window.currentAnnoToolType);
+
+            dispatchWindowEvent('annotationrendered');
+        });
+
+        // Set the confirm dialog when leaving a page.
+        iframeWindow.addEventListener('annotationUpdated', () => {
+            listenWindowLeaveEvent();
+            dispatchWindowEvent('annotationUpdated');
+        });
+
+        // enable text input.
+        iframeWindow.addEventListener('enableTextInput', (e) => {
+            dispatchWindowEvent('enableTextInput', e.detail);
+        });
+
+        // disable text input.
+        iframeWindow.addEventListener('disappearTextInput', () => {
+            dispatchWindowEvent('disappearTextInput', e.detail);
+        });
+
+        iframeWindow.addEventListener('annotationDeleted', e => {
+            dispatchWindowEvent('annotationDeleted', e.detail);
+        });
+
+        iframeWindow.addEventListener('annotationHoverIn' , e => {
+            dispatchWindowEvent('annotationHoverIn', e.detail);
+        });
+
+        iframeWindow.addEventListener('annotationHoverOut' , e => {
+            dispatchWindowEvent('annotationHoverOut', e.detail);
+        });
+
+        iframeWindow.addEventListener('annotationSelected' , e => {
+            dispatchWindowEvent('annotationSelected', e.detail);
+        });
+
+        iframeWindow.addEventListener('annotationDeselected' , () => {
+            dispatchWindowEvent('annotationDeselected');
+        });
+
+        iframeWindow.addEventListener('digit1Pressed' , () => {
+            dispatchWindowEvent('digit1Pressed');
+        });
+
+        iframeWindow.addEventListener('digit2Pressed' , () => {
+            dispatchWindowEvent('digit2Pressed');
+        });
+
+        iframeWindow.addEventListener('digit3Pressed' , () => {
+            dispatchWindowEvent('digit3Pressed');
+        });
+
+        iframeWindow.addEventListener('digit4Pressed' , () => {
+            dispatchWindowEvent('digit4Pressed');
+        });
     }
 
     /**
@@ -82,6 +191,7 @@ export default class PDFAnnoPage extends AbstractAnnoPage {
 
     }
 
+    // TODO Need ?
     displayPrimaryAnnoFile(annoFile) {
 
 
@@ -98,6 +208,7 @@ export default class PDFAnnoPage extends AbstractAnnoPage {
     }
 
 
+    // TODO Need ?
     deleteAllAnnotations() {
         // TODO Implement.
     }
