@@ -13,6 +13,8 @@ export function setup() {
     $('#dropdownPdf').on('click', 'a', e => {
 
         let $this = $(e.currentTarget);
+        // TODO pdfPath to name.
+        // TODO js-pdfname to js-content-name
         let pdfPath = $this.find('.js-pdfname').text();
 
         let currentPDFName = $('#dropdownPdf .js-text').text();
@@ -33,7 +35,12 @@ export function setup() {
         $('#dropdownPdf .fa-check').addClass('no-visible');
         $this.find('.fa-check').removeClass('no-visible');
 
-        if (!window.pdfanno.fileMap[pdfPath]) {
+        // if (!window.pdfanno.fileMap[pdfPath]) {
+        //     return false;
+        // }
+
+        const content = window.annoPage.getContentFile(pdfPath);
+        if (!content) {
             return false;
         }
 
@@ -43,9 +50,11 @@ export function setup() {
         resetCheckReferenceAnnoDropdown();
 
         // reload.
-        window.pdf = window.pdfanno.fileMap[pdfPath];
-        let fileName = pdfPath.split('/')[pdfPath.split('/').length - 1];
-        window.pdfName = fileName;
+        // window.pdf = window.pdfanno.fileMap[pdfPath];
+        // let fileName = pdfPath.split('/')[pdfPath.split('/').length - 1];
+        // window.pdfName = fileName;
+        window.pdf = content.content;
+        window.fileName = content.name;
         reloadPDFViewer();
 
         // Close dropdown.

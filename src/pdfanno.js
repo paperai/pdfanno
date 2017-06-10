@@ -4,7 +4,7 @@
     ベースのディレクトリ：src/page/pdf
 
     ※ 以下の「◎」をUIから切り出す必要があり、それらをAbstractAnnoPageなどのクラスにインターフェースとして定義し、
-    　　　　それをPDFAnnoとHTMLAnnoでそれぞれ実装することで、UIを再利用できる作りにできそうです。    
+    　　　　それをPDFAnnoとHTMLAnnoでそれぞれ実装することで、UIを再利用できる作りにできそうです。
 
     Browseボタン
         ・Fileダイアログから読み込んで、PDFとAnnoをメモリ上に保持.
@@ -15,7 +15,7 @@
     PDFドロップダウン
         ・開くとき
             ・PDF一覧を取得して、一覧表示
-                ◎ getPDFList
+                ◎ getContentList
                     ・メモリ上に存在するPDF一覧を返却する
                     ・引数：なし
                     ・戻り値：PDF一覧（[{name: "a.pdf", content: "xxx"}, {name: "b.pdf", content: "yyy"}]
@@ -312,6 +312,9 @@ function startApplication() {
  *  The entry point.
  */
 window.addEventListener('DOMContentLoaded', e => {
+
+    // Init viewer.
+    window.annoPage.displayViewer();
 
     // Delete prev annotations.
     clearAllAnnotations();

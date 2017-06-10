@@ -15,16 +15,21 @@ export function displayAnnotation(isPrimary, reload=true) {
             let $elm = $(element);
             if ($elm.find('.fa-check').hasClass('no-visible') === false) {
                 let annoPath = $elm.find('.js-annoname').text();
-                if (!window.pdfanno.fileMap[annoPath]) {
+
+                const annoFile = window.annoPage.getAnnoFile(annoPath);
+                // if (!window.pdfanno.fileMap[annoPath]) {
+                if (!annoFile) {
                     console.log('ERROR');
                     return;
                 }
                 primaryIndex = 0;
-                annotations.push(window.pdfanno.fileMap[annoPath]);
+                // annotations.push(window.pdfanno.fileMap[annoPath]);
+                annotations.push(annoFile.content);
                 let color = null; // Use the default color used for edit.
                 colors.push(color);
 
-                let filename = annoPath.split('/')[annoPath.split('/').length - 1];
+                // let filename = annoPath.split('/')[annoPath.split('/').length - 1];
+                let filename = annoFile.name;
                 localStorage.setItem('_pdfanno_primary_annoname', filename);
                 console.log('filename:', filename);
             }
@@ -37,11 +42,16 @@ export function displayAnnotation(isPrimary, reload=true) {
             let $elm = $(element);
             if ($elm.find('.fa-check').hasClass('no-visible') === false) {
                 let annoPath = $elm.find('.js-annoname').text();
-                if (!window.pdfanno.fileMap[annoPath]) {
+
+                const annoFile = window.annoPage.getAnnoFile(annoPath);
+
+                // if (!window.pdfanno.fileMap[annoPath]) {
+                if (!annoFile) {
                     console.log('ERROR');
                     return;
                 }
-                annotations.push(window.pdfanno.fileMap[annoPath]);
+                // annotations.push(window.pdfanno.fileMap[annoPath]);
+                annotations.push(annoFile.content);
                 let color = $elm.find('.js-anno-palette').spectrum('get').toHexString();
                 console.log(color);
                 colors.push(color);

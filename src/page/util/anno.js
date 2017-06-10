@@ -25,6 +25,7 @@ export function enableAnnotateTool(type) {
 /**
  * Clear the all annotations from the view and storage.
  */
+// TODO move to PDFAnno.js
 export function clearAllAnnotations() {
     localStorage.removeItem('_pdfanno_containers');
     localStorage.removeItem('_pdfanno_primary_annoname');

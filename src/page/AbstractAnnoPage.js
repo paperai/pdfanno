@@ -10,6 +10,15 @@ export default class AbstractAnnoPage {
 
         // AnnoFiles,
         this.annoFiles = [];
+
+        // // Selected contents.
+        // this.selectedContentFile = null;
+
+        // // Selected primaryAnno.
+        // this.selectedPrimaryAnnoFile = null;
+
+        // // Selected referenceAnnos.
+        // this.selectedReferenceAnnoFils = [];
     }
 
 

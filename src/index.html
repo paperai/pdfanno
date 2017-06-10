@@ -37,37 +37,46 @@
                 Browse <input type="file" style="display: none;" webkitdirectory>
             </label>
 
-            <div id="dropdownPdf" class="dropdown u-disp-iblock">
-              <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+            <div id="dropdownPdf" class="dropdown" style="display: inline-block;">
+              <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                 <span class="js-text">PDF File</span>
                 <span class="caret"></span>
               </button>
-              <ul class="dropdown-menu"><!-- Added by JS. --></ul>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <!-- Added by JS. -->
+              </ul>
             </div>
 
-            <div id="dropdownAnnoPrimary" class="dropdown u-disp-iblock">
-              <button class="btn btn-default dropdown-toggle" type="button">
+            <div id="dropdownAnnoPrimary" class="dropdown" style="display: inline-block;">
+              <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                 <span class="js-text">Anno File</span>
                 <span class="caret"></span>
               </button>
-              <ul class="dropdown-menu"><!-- Added by JS. --></ul>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <!-- Added by JS. -->
+              </ul>
             </div>
 
-            <div id="dropdownAnnoReference" class="dropdown u-disp-iblock">
-              <button class="btn btn-default dropdown-toggle" type="button">
+            <div id="dropdownAnnoReference" class="dropdown" style="display: inline-block;">
+              <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                 <span class="js-text">Reference Files</span>
                 <span class="caret"></span>
               </button>
-              <ul class="dropdown-menu"><!-- Added by JS. --></ul>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                <!-- Added by JS. -->
+              </ul>
             </div>
 
-			<div id="dropdownAnnoList" class="dropdown u-disp-iblock">
-              <button class="btn btn-default dropdown-toggle" type="button">
+            <div id="dropdownAnnoList" class="dropdown" style="display: inline-block;">
+              <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                 <span class="js-text">Anno List&nbsp;(<span class="js-count">0</span>)</span>
                 <span class="caret"></span>
               </button>
-              <ul class="dropdown-menu"><!-- Added by JS. --></ul>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                <!-- Added by JS. -->
+              </ul>
             </div>
+
 
 			<div class="btn-group" role="group">
 				<a id="downloadButton" class="btn btn-default" href="#" title="download">
@@ -149,7 +158,7 @@
 			<div id="viewerWrapper" class="col-md-9 col-sm-9 col-xs-9" style="padding-left: 0; padding-right: 0;">
                 <div style="padding-right: 15px;">
     				<div id="viewer" class="viewer">
-                        <iframe src="./pages/viewer.html?file=../pdfs/P12-1046.pdf" class="anno-viewer" frameborder="0"></iframe>
+                        <!-- <iframe src="./pages/viewer.html?file=../pdfs/P12-1046.pdf" class="anno-viewer" frameborder="0"></iframe> -->
     				</div>
                 </div>
 			</div>
