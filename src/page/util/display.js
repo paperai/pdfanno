@@ -3,6 +3,7 @@
 /**
  * Display annotations an user selected.
  */
+// TODO move to PDFAnnoPage.js
 export function displayAnnotation(isPrimary, reload=true) {
 
     let annotations = [];

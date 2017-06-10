@@ -1,6 +1,6 @@
 import AbstractAnnoPage from '../AbstractAnnoPage';
-
 import loadFiles from './loadFiles';
+import { anyOf } from '../../shared/util';
 
 /**
  * PDFAnno's Annotation functions for Page produced by .
@@ -30,20 +30,12 @@ export default class PDFAnnoPage extends AbstractAnnoPage {
         });
     }
 
-    getContentFileList() {
-        return this.contentFiles;
-    }
-
     getContentFile(name) {
         const items = this.contentFiles.filter(c => c.name === name);
         if (items.length > 0) {
             return items[0];
         }
         return null;
-    }
-
-    getAnnoFileList() {
-        return this.annoFiles;
     }
 
     getAnnoFile(name) {
@@ -116,6 +108,122 @@ export default class PDFAnnoPage extends AbstractAnnoPage {
     deleteAllAnnotations() {
         // TODO Implement.
     }
+
+
+    /**
+     * Create a Span annotation.
+     */
+    createSpan() {
+
+        const rects = window.iframeWindow.PDFAnnoCore.UI.getRectangles();
+
+        // Check empty.
+        if (!rects) {
+            return alert('Please select a text span first.');
+        }
+
+        // Check duplicated.
+        let annos = window.iframeWindow.annotationContainer
+                        .getAllAnnotations()
+                        .filter(a => a.type === 'span')
+                        .filter(a => {
+                            if (rects.length !== a.rectangles.length) {
+                                return false;
+                            }
+                            for (let i = 0; i < rects.length; i++) {
+                                if (rects[i].x !== a.rectangles[i].x
+                                    || rects[i].y !== a.rectangles[i].y
+                                    || rects[i].width !== a.rectangles[i].width
+                                    || rects[i].height !== a.rectangles[i].height) {
+                                    return false;
+                                }
+                            }
+                            return true;
+                        });
+
+        if (annos.length > 0) {
+            // Show label input.
+            var event = document.createEvent('CustomEvent');
+            event.initCustomEvent('enableTextInput', true, true, {
+                uuid : annos[0].uuid,
+                text : annos[0].text
+            });
+            window.dispatchEvent(event);
+            return;
+        }
+
+        // Create a new rectAnnotation.
+        window.iframeWindow.PDFAnnoCore.UI.createSpan();
+    }
+
+
+    /**
+     * Create a Relation annotation.
+     */
+    createRelation(type) {
+
+        let selectedAnnotations = window.iframeWindow.annotationContainer.getSelectedAnnotations();
+        selectedAnnotations = selectedAnnotations.filter(a => {
+            return a.type === 'area' || a.type === 'span';
+        }).sort((a1, a2) => {
+            return (a1.selectedTime - a2.selectedTime); // asc
+        });
+
+        if (selectedAnnotations.length < 2) {
+            return alert('Please select two annotations first.');
+        }
+
+        const first  = selectedAnnotations[selectedAnnotations.length - 2];
+        const second = selectedAnnotations[selectedAnnotations.length - 1];
+        console.log('first:second,', first, second);
+
+        // Check duplicated.
+        const arrows = window.iframeWindow.annotationContainer
+                        .getAllAnnotations()
+                        .filter(a => a.type === 'relation')
+                        .filter(a => {
+                            return anyOf(a.rel1Annotation.uuid, [first.uuid, second.uuid])
+                                    && anyOf(a.rel2Annotation.uuid, [first.uuid, second.uuid])
+                        });
+
+        if (arrows.length > 0) {
+            console.log('same found!!!');
+            // Update!!
+            arrows[0].direction = type;
+            arrows[0].rel1Annotation = first;
+            arrows[0].rel2Annotation = second;
+            arrows[0].save();
+            arrows[0].render();
+            arrows[0].enableViewMode();
+            // Show label input.
+            var event = document.createEvent('CustomEvent');
+            event.initCustomEvent('enableTextInput', true, true, {
+                uuid : arrows[0].uuid,
+                text : arrows[0].text
+            });
+            window.dispatchEvent(event);
+            return;
+        }
+
+        window.iframeWindow.PDFAnnoCore.UI.createRelation(type, first, second);
+    }
+
+    /**
+        Disable annotation tool buttons.
+    */
+    disableRect() {
+        window.iframeWindow.PDFAnnoCore.UI.disableRect();
+        // TODO 以下のは必要？
+        window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
+    }
+
+    /**
+     * Enable an annotation tool.
+     */
+    enableRect() {
+        window.iframeWindow.PDFAnnoCore.UI.enableRect();
+    }
+
 
 
 }

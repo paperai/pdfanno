@@ -1,6 +1,7 @@
 /**
  * Global data for PDFAnnoPage.
  */
+// TODO No need ?
 class PDFAnnoPageGlobalVariable {
 
     set pdfNames(pdfNames) {
