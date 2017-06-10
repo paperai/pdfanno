@@ -3,6 +3,8 @@
  */
 import { convertToExportY, getPageSize, paddingBetweenPages } from '../../shared/coords';
 
+// TODO UI分離が必要かを確認.
+
 /**
  * Setup the dropdown for Anno list.
  */

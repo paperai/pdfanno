@@ -80,19 +80,19 @@ export function treatAnnotationDeleted({ uuid }) {
         disable(...arguments);
     }
 }
-
+// TODO No export.
 export function handleAnnotationHoverIn(annotation) {
     if (getSelectedAnnotations().length === 0) {
         enable({ uuid : annotation.uuid, text : annotation.text, disable : true });
     }
 }
-
+// TODO No export.
 export function handleAnnotationHoverOut(annotation) {
     if (getSelectedAnnotations().length === 0) {
         disable();
     }
 }
-
+// TODO No export.
 export function handleAnnotationSelected(annotation) {
     if (getSelectedAnnotations().length === 1) {
         enable({ uuid : annotation.uuid, text : annotation.text });
@@ -100,7 +100,7 @@ export function handleAnnotationSelected(annotation) {
         disable();
     }
 }
-
+// TODO No export.
 export function handleAnnotationDeselected() {
     const annos = getSelectedAnnotations();
     if (annos.length === 1) {
@@ -111,9 +111,10 @@ export function handleAnnotationDeselected() {
 }
 
 function getSelectedAnnotations() {
+    // TODO UI分離.
     return iframeWindow.annotationContainer.getSelectedAnnotations();
 }
-
+// TODO No need ?
 function cancelSubmit(e) {
   e.preventDefault();
   return false;
@@ -123,6 +124,7 @@ function saveText(uuid) {
 
     const text = $inputLabel.val() || '';
 
+    // TODO UI分離.
     const annotation = window.iframeWindow.annotationContainer.findById(uuid);
     if (annotation) {
         annotation.text = text;

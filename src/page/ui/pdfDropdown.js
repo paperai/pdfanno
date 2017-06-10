@@ -4,6 +4,8 @@
 import { reloadPDFViewer } from '../util/display';
 import { resetCheckPrimaryAnnoDropdown, resetCheckReferenceAnnoDropdown } from '../util/dropdown';
 
+// TODO Refactoring.
+
 /**
  * Setup the dropdown of PDFs.
  */

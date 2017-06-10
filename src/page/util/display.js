@@ -85,6 +85,8 @@ export function displayAnnotation(isPrimary, reload=true) {
 /**
  * Reload PDF Viewer.
  */
+// TODO Need?
+// TODO UI分離.
 export function reloadPDFViewer() {
 
     // Reset setting.

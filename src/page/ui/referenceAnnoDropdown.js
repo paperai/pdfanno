@@ -27,6 +27,7 @@ export function setup() {
             $('#dropdownAnnoReference .js-text').text('Reference Files');
         }
 
+        // TODO Move to PDFAnnoPage.js.
         displayAnnotation(false);
 
         return false;

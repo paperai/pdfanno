@@ -7,6 +7,7 @@
 */
 export function setup() {
 
+    // TODO Restoreようだけど必要？
     window.currentAnnoToolType = 'view';
 
     // Rect annotation button.

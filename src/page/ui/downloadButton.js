@@ -25,6 +25,7 @@ export function setup() {
  */
 function downloadAnnotation() {
 
+    // TODO UIとの分離.
     window.iframeWindow.PDFAnnoCore.getStoreAdapter().exportData().then(annotations => {
         let blob = new Blob([annotations]);
         let blobURL = window.URL.createObjectURL(blob);

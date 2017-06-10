@@ -3,6 +3,7 @@
  */
 import { reloadPDFViewer, setupColorPicker, displayAnnotation } from '../util/display';
 
+// TODO Refactoring.
 
 // TODO Remove ?
 import AnnoPage from '../pdf';

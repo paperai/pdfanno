@@ -3,6 +3,8 @@
  */
 import { reloadPDFViewer, displayAnnotation } from '../util/display';
 
+// TODO Refactoring.
+
 /**
  * Setup a click action of the Primary Annotation Dropdown.
  */
@@ -69,6 +71,7 @@ function deleteAllAnnotations() {
     //     return;
     // }
 
+    // TODO UIとの分離.
     iframeWindow.annotationContainer.destroy();
 
     let documentId = window.iframeWindow.getFileName(window.iframeWindow.PDFView.url);

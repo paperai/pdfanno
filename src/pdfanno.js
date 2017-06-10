@@ -165,7 +165,7 @@ window.pdfanno = {};
 /**
  * Expose public APIs.
  */
-// TODO UIとの分離の対象です.
+// TODO UIとの分離.
 window.add = publicApi.addAnnotation;
 window.addAll = publicApi.addAllAnnotations;
 window.delete = publicApi.deleteAnnotation;

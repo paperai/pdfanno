@@ -1,6 +1,9 @@
 import { convertFromExportY } from '../shared/coords';
 import toml from 'toml';
 
+// TODO Refactoring.
+// TODO UI分離.
+
 /**
  * Add all annotations.
  *
