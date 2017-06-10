@@ -9,7 +9,8 @@ export function setup() {
         if (!pdfFileName || pdfFileName === 'PDF File') {
             return alert('Display a PDF before upload.');
         }
-        const contentBase64 = window.pdfanno.fileMap[pdfFileName];
+        // const contentBase64 = window.pdfanno.fileMap[pdfFileName];
+        const contentBase64 = window.annoPage.getContentFile(pdfFileName);
 
         const $progressBar = $('.js-upload-progress');
 

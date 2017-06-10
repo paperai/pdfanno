@@ -2,7 +2,7 @@
  * UI parts - Browse button.
  */
 import { reloadPDFViewer, setupColorPicker, displayAnnotation } from '../util/display';
-import { enableAnnotateTool, disableAnnotateTools, clearAllAnnotations } from '../util/anno';
+import { clearAllAnnotations } from '../util/anno';
 
 // TODO clearAllAnnotations は PDFAnnoPage にお引越し.
 
@@ -33,9 +33,8 @@ export function setup() {
             // Get current visuals.
             const current = getCurrentFileNames();
 
-            // TODO move to PDFAnnoPage.js
             // Initialize PDF Viewer.
-            clearAllAnnotations();
+            window.annoPage.clearAllAnnotations();
 
             // Setup PDF Dropdown.
             // setPDFDropdownList(1);
@@ -51,27 +50,6 @@ export function setup() {
             // TODO Browseボタン以前の選択状態の復元と、ビュワーの復元をする.
         });
 
-
-        // // Load PDF/Anno files, and initialize dropdown lists.
-        // AnnoPage.loadFiles(files).then((pdfNames, annoNames, pdfDataMap, annoDataMap) => {
-
-        //     console.log('loadFiles:', pdfNames, annoNames, pdfDataMap, annoDataMap);
-
-        //     // Get current visuals.
-        //     const current = getCurrentFileNames();
-
-        //     // Initialize PDF Viewer.
-        //     clearAllAnnotations();
-
-        //     // Setup PDF Dropdown.
-        //     setPDFDropdownList(1);
-
-        //     // Setup Anno Dropdown.
-        //     setAnnoDropdownList(annoNames);
-
-        //     // Display a PDF and annotations.
-        //     display(current, pdfDataMap, annoDataMap);
-        // });
     });
 }
 

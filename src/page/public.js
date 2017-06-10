@@ -1,5 +1,4 @@
 import { convertFromExportY } from '../shared/coords';
-import { enableAnnotateTool, disableAnnotateTools } from './util/anno';
 import toml from 'toml';
 
 /**
@@ -54,8 +53,8 @@ export function addAnnotation(publicAnnotation) {
     a.save();
 
     // Restore the status of AnnoTools.
-    disableAnnotateTools();
-    enableAnnotateTool(window.currentAnnoToolType);
+    window.annoPage.disableAnnotateFunctions();
+    window.annoPage.enableAnnotateFunction(window.currentAnnoToolType);
 }
 
 /**

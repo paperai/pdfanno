@@ -80,13 +80,6 @@ export default class PDFAnnoPage extends AbstractAnnoPage {
         event.initCustomEvent('restartApp', true, true, null);
         window.dispatchEvent(event);
 
-        // Catch the event iframe is ready.
-        // function iframeReady() {
-        //     console.log('iframeReady');
-        //     window.removeEventListener('annotationrendered', iframeReady);
-        // }
-        // window.addEventListener('annotationrendered', iframeReady);
-
     }
 
     displayPrimaryAnnoFile(annoFile) {
@@ -224,7 +217,30 @@ export default class PDFAnnoPage extends AbstractAnnoPage {
         window.iframeWindow.PDFAnnoCore.UI.enableRect();
     }
 
+    /**
+        Disable annotation tool buttons.
+    */
+    disableAnnotateFunctions() {
+        window.iframeWindow.PDFAnnoCore.UI.disableRect();
+        window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
+    }
 
+    /**
+     * Enable an annotation tool.
+     */
+    enableAnnotateFunction(type) {
+        if (type === 'rect') {
+            window.iframeWindow.PDFAnnoCore.UI.enableRect();
+        }
+    }
+
+    /**
+     * Clear the all annotations from the view and storage.
+     */
+    clearAllAnnotations() {
+        localStorage.removeItem('_pdfanno_containers');
+        localStorage.removeItem('_pdfanno_primary_annoname');
+    }
 
 }
 

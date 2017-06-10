@@ -2,7 +2,6 @@
  * UI parts - PDF Dropdown.
  */
 import { reloadPDFViewer } from '../util/display';
-import { clearAllAnnotations } from '../util/anno';
 import { resetCheckPrimaryAnnoDropdown, resetCheckReferenceAnnoDropdown } from '../util/dropdown';
 
 /**
@@ -45,7 +44,7 @@ export function setup() {
         }
 
         // Reset Primary/Reference anno dropdowns, and data.
-        clearAllAnnotations();
+        window.annoPage.clearAllAnnotations();
         resetCheckPrimaryAnnoDropdown();
         resetCheckReferenceAnnoDropdown();
 

@@ -131,9 +131,9 @@
 require("file?name=dist/index.html!./index.html");
 require("!style!css!./pdfanno.css");
 
-import { enableAnnotateTool, disableAnnotateTools, clearAllAnnotations } from './page/util/anno';
 import { resetPDFViewerSettings } from './page/util/display';
 
+// UIs.
 import * as browseButton from './page/ui/browseButton';
 import * as pdfDropdown from './page/ui/pdfDropdown';
 import * as primaryAnnoDropdown from './page/ui/primaryAnnoDropdown';
@@ -163,6 +163,7 @@ window.pdfanno = {};
 /**
  * Expose public APIs.
  */
+// TODO UIとの分離の対象です.
 window.add = publicApi.addAnnotation;
 window.addAll = publicApi.addAllAnnotations;
 window.delete = publicApi.deleteAnnotation;
@@ -184,7 +185,6 @@ $(document).on('keydown', e => {
 
     if (e.keyCode === 17 || e.keyCode === 91) { // 17:ctrlKey, 91:cmdKey
         window.iframeWindow.ctrlPressed = true;
-        console.log('ctrl press2!!');
     }
 
 }).on('keyup', e => {
@@ -197,13 +197,13 @@ $(document).on('keydown', e => {
     window.iframeWindow.ctrlPressed = false;
 
     if (e.keyCode === 49) {         // Digit "1"
-        annotationTools.createSpan();
+        window.annoPage.createSpan();
     } else if (e.keyCode === 50) {  // Digit "2"
-        annotationTools.createRelation('one-way');
+        window.annoPage.createRelation('one-way');
     } else if (e.keyCode === 51) {  // Digit "3"
-        annotationTools.createRelation('two-way');
+        window.annoPage.createRelation('two-way');
     } else if (e.keyCode === 52) {  // Digit "4"
-        annotationTools.createRelation('link');
+        window.annoPage.createRelation('link');
     }
 });
 
@@ -219,6 +219,7 @@ function adjustViewerSize() {
 /**
  * Start PDFAnno Application.
  */
+// TODO Move to PDFAnnoPage.js
 function startApplication() {
 
     // Alias for convenience.
@@ -231,18 +232,13 @@ function startApplication() {
 
         // Reset the confirm dialog at leaving page.
         unlistenWindowLeaveEvent();
-
-        var event = document.createEvent('CustomEvent');
-        event.initCustomEvent('iframeDOMContentLoaded', true, true, null);
-        window.dispatchEvent(event);
-
     });
 
     iframeWindow.addEventListener('annotationrendered', () => {
 
         // Restore the status of AnnoTools.
-        disableAnnotateTools();
-        enableAnnotateTool(window.currentAnnoToolType);
+        window.annoPage.disableAnnotateFunctions();
+        window.annoPage.enableAnnotateFunction(window.currentAnnoToolType);
 
         var event = document.createEvent('CustomEvent');
         event.initCustomEvent('annotationrendered', true, true, null);
@@ -295,16 +291,16 @@ function startApplication() {
         inputLabel.handleAnnotationDeselected();
     });
     iframeWindow.addEventListener('digit1Pressed' , () => {
-        annotationTools.createSpan();
+        window.annoPage.createSpan();
     });
     iframeWindow.addEventListener('digit2Pressed' , () => {
-        annotationTools.createRelation('one-way');
+        window.annoPage.createRelation('one-way');
     });
     iframeWindow.addEventListener('digit3Pressed' , () => {
-        annotationTools.createRelation('two-way');
+        window.annoPage.createRelation('two-way');
     });
     iframeWindow.addEventListener('digit4Pressed' , () => {
-        annotationTools.createRelation('link');
+        window.annoPage.createRelation('link');
     });
 }
 
@@ -317,7 +313,7 @@ window.addEventListener('DOMContentLoaded', e => {
     window.annoPage.displayViewer();
 
     // Delete prev annotations.
-    clearAllAnnotations();
+    window.annoPage.clearAllAnnotations();
 
     // Reset PDFViwer settings.
     resetPDFViewerSettings();

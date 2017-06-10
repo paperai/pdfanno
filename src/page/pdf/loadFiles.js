@@ -2,7 +2,6 @@
  *  Functions depending on pdfanno-core.js.
  */
 import { reloadPDFViewer, setupColorPicker, displayAnnotation } from '../util/display';
-import { enableAnnotateTool, disableAnnotateTools, clearAllAnnotations } from '../util/anno';
 
 import globalVariable from './globalVariable';
 
