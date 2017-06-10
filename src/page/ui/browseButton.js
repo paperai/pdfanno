@@ -2,11 +2,9 @@
  * UI parts - Browse button.
  */
 import { reloadPDFViewer, setupColorPicker, displayAnnotation } from '../util/display';
-import { clearAllAnnotations } from '../util/anno';
 
-// TODO clearAllAnnotations は PDFAnnoPage にお引越し.
 
-// import { loadFiles } from '../pdf';
+// TODO Remove ?
 import AnnoPage from '../pdf';
 
 /**

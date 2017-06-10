@@ -131,6 +131,8 @@
 require("file?name=dist/index.html!./index.html");
 require("!style!css!./pdfanno.css");
 
+import { dispatchWindowEvent } from './shared/util';
+
 import { resetPDFViewerSettings } from './page/util/display';
 
 // UIs.
@@ -240,56 +242,45 @@ function startApplication() {
         window.annoPage.disableAnnotateFunctions();
         window.annoPage.enableAnnotateFunction(window.currentAnnoToolType);
 
-        var event = document.createEvent('CustomEvent');
-        event.initCustomEvent('annotationrendered', true, true, null);
-        window.dispatchEvent(event);
+        dispatchWindowEvent('annotationrendered');
     });
 
     // Set the confirm dialog when leaving a page.
     iframeWindow.addEventListener('annotationUpdated', () => {
         listenWindowLeaveEvent();
-
-        var event = document.createEvent('CustomEvent');
-        event.initCustomEvent('annotationUpdated', true, true, null);
-        window.dispatchEvent(event);
+        dispatchWindowEvent('annotationUpdated');
     });
 
     // enable text input.
     iframeWindow.addEventListener('enableTextInput', (e) => {
-        console.log('enableTextInput:', e.detail);
-        inputLabel.enable(e.detail);
+        dispatchWindowEvent('enableTextInput', e.detail);
     });
 
     // disable text input.
     iframeWindow.addEventListener('disappearTextInput', () => {
-        console.log('disappearTextInput');
-        inputLabel.disable(e.detail);
+        dispatchWindowEvent('disappearTextInput', e.detail);
     });
 
     iframeWindow.addEventListener('annotationDeleted', e => {
-        console.log('annotationDeleted:', e.detail);
-        inputLabel.treatAnnotationDeleted(e.detail);
+        dispatchWindowEvent('annotationDeleted', e.detail);
     });
 
     iframeWindow.addEventListener('annotationHoverIn' , e => {
-        console.log('annotationHoverIn:', e.detail);
-        inputLabel.handleAnnotationHoverIn(e.detail);
+        dispatchWindowEvent('annotationHoverIn', e.detail);
     });
 
     iframeWindow.addEventListener('annotationHoverOut' , e => {
-        console.log('annotationHoverOut:', e.detail);
-        inputLabel.handleAnnotationHoverOut(e.detail);
+        dispatchWindowEvent('annotationHoverOut', e.detail);
     });
 
     iframeWindow.addEventListener('annotationSelected' , e => {
-        console.log('annotationSelected:', e.detail);
-        inputLabel.handleAnnotationSelected(e.detail);
+        dispatchWindowEvent('annotationSelected', e.detail);
     });
 
     iframeWindow.addEventListener('annotationDeselected' , () => {
-        console.log('annotationDeselected');
-        inputLabel.handleAnnotationDeselected();
+        dispatchWindowEvent('annotationDeselected');
     });
+
     iframeWindow.addEventListener('digit1Pressed' , () => {
         window.annoPage.createSpan();
     });
@@ -333,16 +324,6 @@ window.addEventListener('DOMContentLoaded', e => {
     inputLabel.setup();
 
     window.addEventListener('restartApp', startApplication);
-
-    // enable text input.
-    window.addEventListener('enableTextInput', (e) => {
-        inputLabel.enable(e.detail);
-    });
-
-    // disable text input.
-    window.addEventListener('disappearTextInput', (e) => {
-        inputLabel.disable(e.detail);
-    });
 
     // resizable.
     setupResizableColumns();

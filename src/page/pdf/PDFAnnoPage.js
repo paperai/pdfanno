@@ -1,6 +1,6 @@
 import AbstractAnnoPage from '../AbstractAnnoPage';
 import loadFiles from './loadFiles';
-import { anyOf } from '../../shared/util';
+import { anyOf, dispatchWindowEvent } from '../../shared/util';
 
 /**
  * PDFAnno's Annotation functions for Page produced by .

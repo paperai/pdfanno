@@ -3,6 +3,7 @@
  */
 
  let $inputLabel;
+ // TODO Remove?
  let $form;
  window.addEventListener('DOMContentLoaded', () => {
     $inputLabel = $('#inputLabel');
@@ -71,6 +72,7 @@ export function disable() {
         .val('');
 }
 
+// TODO No export.
 export function treatAnnotationDeleted({ uuid }) {
     console.log('treatAnnotationDeleted:', uuid);
 
@@ -135,6 +137,18 @@ function saveText(uuid) {
  */
 const LSKEY_DATALIST = '_pdfanno_datalist';
 
+export function setup() {
+
+    // set datalist.
+    setDatalist();
+
+    // set actions.
+    setupActions();
+
+    // Start to listen window events.
+    listenWindowEvents();
+}
+
 function setDatalist() {
 
     // set datalist.
@@ -145,11 +159,7 @@ function setDatalist() {
     $('#labels').html(options);
 }
 
-export function setup() {
-
-    // set datalist.
-    setDatalist();
-
+function setupActions() {
     // Setup datalist modal.
     $('#datalistModal').off().on('show.bs.modal', e => {
 
@@ -207,5 +217,46 @@ export function setup() {
         setDatalist();
 
         $('#datalistModal').modal('hide');
+    });
+}
+
+
+function listenWindowEvents() {
+
+    // enable text input.
+    window.addEventListener('enableTextInput', e => {
+        console.log('enableTextInput:', e.detail);
+        enable(e.detail);
+    });
+
+    // disable text input.
+    window.addEventListener('disappearTextInput', e => {
+        console.log('disappearTextInput:', e.detail);
+        disable(e.detail);
+    });
+
+    // handle annotation deleted.
+    window.addEventListener('annotationDeleted', e => {
+        treatAnnotationDeleted(e.detail);
+    });
+
+    // handle annotation hoverIn.
+    window.addEventListener('annotationHoverIn' , e => {
+        handleAnnotationHoverIn(e.detail);
+    });
+
+    // handle annotation hoverOut.
+    window.addEventListener('annotationHoverOut' , e => {
+        handleAnnotationHoverOut(e.detail);
+    });
+
+    // handle annotation selected.
+    window.addEventListener('annotationSelected' , e => {
+        handleAnnotationSelected(e.detail);
+    });
+
+    // handle annotation deselected.
+    window.addEventListener('annotationDeselected' , () => {
+        handleAnnotationDeselected();
     });
 }
