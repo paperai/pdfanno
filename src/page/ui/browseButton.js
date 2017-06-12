@@ -74,14 +74,9 @@ function isValidDirectorySelect(files) {
 
 
 
-// TODO 引数が2つ目以降いらない疑惑.
-// function display(currentDisplay, pdfDataMap, annoDataMap) {
 function display() {
 
     const currentDisplay = getCurrentFileNames();
-
-    // console.log('files:', Object.keys(pdfDataMap));
-    // console.log('files2:', Object.keys(annoDataMap));
 
     let files;
 
@@ -142,74 +137,6 @@ function display() {
         promise2 = displayAnnotation(false, false);
     }
 
-
-
-
-
-
-    // let name;
-
-    // PDF.
-    // name = currentDisplay.pdfName;
-    // if (name && newFileMap[name]) {
-    //     window.pdf = window.pdfanno.fileMap[name];
-    //     window.pdfName = currentDisplay.pdfName;
-
-    //     $('#dropdownPdf .js-text').text(name);
-    //     $('#dropdownPdf a').each((index, element) => {
-    //         let $elm = $(element);
-    //         if ($elm.find('.js-pdfname').text() === name) {
-    //             $elm.find('.fa-check').removeClass('no-visible');
-    //         }
-    //     });
-
-    // } else {
-    //     delete window.pdf;
-    //     delete window.pdfName;
-    // }
-
-    // Primary Annotation.
-    // name = currentDisplay.primaryAnnotationName;
-    // let promise1 = Promise.resolve();
-    // if (name && newFileMap[name]) {
-
-    //     $('#dropdownAnnoPrimary .js-text').text(name);
-    //     $('#dropdownAnnoPrimary a').each((index, element) => {
-    //         let $elm = $(element);
-    //         if ($elm.find('.js-annoname').text() === name) {
-    //             $elm.find('.fa-check').removeClass('no-visible');
-    //         }
-    //     });
-
-    //     promise1 = displayAnnotation(true, false);
-    // }
-
-    // Reference Annotations.
-    // let names = currentDisplay.referenceAnnotationNames;
-    // let colors = currentDisplay.referenceAnnotationColors;
-    // let changed = false;
-    // names = names.filter((name, i) => {
-    //     let found = false;
-    //     if (newFileMap[name]) {
-    //         $('#dropdownAnnoReference a').each((index, element) => {
-    //             let $elm = $(element);
-    //             if ($elm.find('.js-annoname').text() === name) {
-    //                 $elm.find('.fa-check').removeClass('no-visible');
-    //                 $elm.find('.js-anno-palette').spectrum('set', colors[i]);
-
-    //                 console.log('color: ', colors[i]);
-
-    //                 found = true;
-    //             }
-    //         });
-    //     }
-    //     return found;
-    // });
-    // let promise2 = Promise.resolve();
-    // if (names.length > 0) {
-    //     $('#dropdownAnnoReference .js-text').text(names.join(','));
-    //     promise2 = displayAnnotation(false, false);
-    // }
 
     // Reload page.
     Promise.all([promise1, promise2]).then(reloadPDFViewer);

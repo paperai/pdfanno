@@ -10,9 +10,6 @@ import globalVariable from './globalVariable';
  */
 export default function loadFiles(files) {
 
-    // TODO Remove.
-    let fileMap = window.pdfanno.fileMap = {};
-
     let { pdfNames, annoNames } = getContents(files);
 
     // TODO Remove.

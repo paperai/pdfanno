@@ -191,29 +191,6 @@ export default class PDFAnnoPage extends AbstractAnnoPage {
 
     }
 
-    // TODO Need ?
-    displayPrimaryAnnoFile(annoFile) {
-
-
-
-        // reload.
-        displayAnnotation(true);
-
-        // Close
-        $('#dropdownAnnoPrimary').click();
-
-        return false;
-
-
-    }
-
-
-    // TODO Need ?
-    deleteAllAnnotations() {
-        // TODO Implement.
-    }
-
-
     /**
      * Create a Span annotation.
      */
@@ -363,74 +340,3 @@ function resetPDFViewerSettings() {
     localStorage.removeItem('database');
 }
 
-
-/**
- * Display annotations an user selected.
- */
-function displayAnnotation(isPrimary, reload=true) {
-
-    let annotations = [];
-    let colors = [];
-    let primaryIndex = -1;
-
-    // Primary annotation.
-    if (isPrimary) {
-        $('#dropdownAnnoPrimary a').each((index, element) => {
-            let $elm = $(element);
-            if ($elm.find('.fa-check').hasClass('no-visible') === false) {
-                let annoPath = $elm.find('.js-annoname').text();
-                if (!window.pdfanno.fileMap[annoPath]) {
-                    console.log('ERROR');
-                    return;
-                }
-                primaryIndex = 0;
-                annotations.push(window.pdfanno.fileMap[annoPath]);
-                let color = null; // Use the default color used for edit.
-                colors.push(color);
-
-                let filename = annoPath.split('/')[annoPath.split('/').length - 1];
-                localStorage.setItem('_pdfanno_primary_annoname', filename);
-                console.log('filename:', filename);
-            }
-        });
-    }
-
-    // Reference annotations.
-    if (!isPrimary) {
-        $('#dropdownAnnoReference a').each((index, element) => {
-            let $elm = $(element);
-            if ($elm.find('.fa-check').hasClass('no-visible') === false) {
-                let annoPath = $elm.find('.js-annoname').text();
-                if (!window.pdfanno.fileMap[annoPath]) {
-                    console.log('ERROR');
-                    return;
-                }
-                annotations.push(window.pdfanno.fileMap[annoPath]);
-                let color = $elm.find('.js-anno-palette').spectrum('get').toHexString();
-                console.log(color);
-                colors.push(color);
-            }
-        });
-    }
-
-    console.log('colors:', colors);
-
-    // Create import data.
-    let paperData = {
-        primary : primaryIndex,
-        colors,
-        annotations
-    };
-
-    // Pass the data to pdf-annotatejs.
-    window.iframeWindow.PDFAnnoCore.getStoreAdapter().importAnnotations(paperData, isPrimary).then(result => {
-
-        if (reload) {
-            // Reload the viewer.
-            reloadPDFViewer();
-        }
-
-        return true;
-    });
-
-}

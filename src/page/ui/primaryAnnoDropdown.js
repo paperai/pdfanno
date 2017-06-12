@@ -62,7 +62,6 @@ export function setup() {
 /**
  * Delete all annotations.
  */
-// TODO No need ?
 function deleteAllAnnotations() {
 
     // Comfirm to user.
