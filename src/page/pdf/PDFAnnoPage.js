@@ -323,11 +323,99 @@ export default class PDFAnnoPage extends AbstractAnnoPage {
     }
 
     /**
+     * Get all annotations.
+     */
+    getAllAnnotations() {
+        return iframeWindow.annotationContainer.getAllAnnotations();
+    }
+
+    /**
+     * Get selected annotations.
+     */
+    getSelectedAnnotations() {
+        return iframeWindow.annotationContainer.getSelectedAnnotations();
+    }
+
+    /**
+     * Find an annotation by id.
+     */
+    findAnnotationById(id) {
+        return iframeWindow.annotationContainer.findById(id);
+    }
+
+    /**
      * Clear the all annotations from the view and storage.
      */
     clearAllAnnotations() {
+        if (window.iframeWindow) {
+            window.iframeWindow.annotationContainer.getAllAnnotations().forEach(a => a.destroy());
+        }
         localStorage.removeItem('_pdfanno_containers');
         localStorage.removeItem('_pdfanno_primary_annoname');
+    }
+
+    /**
+     * Add an annotation to the container.
+     */
+    addAnnotation(annotation) {
+        window.iframeWindow.annotationContainer.add(annotation);
+    }
+
+    /**
+     * Create a new rect annotation.
+     */
+    createRectAnnotation(options) {
+        return iframeWindow.PDFAnnoCore.RectAnnotation.newInstance(options);
+    }
+
+    /**
+     * Create a new span annotation.
+     */
+    createSpanAnnotation(options) {
+        return iframeWindow.PDFAnnoCore.SpanAnnotation.newInstance(options);
+    }
+
+    /**
+     * Create a new relation annotation.
+     */
+    createRelationAnnotation(options) {
+        return iframeWindow.PDFAnnoCore.RelationAnnotation.newInstance(options);
+    }
+
+    /**
+     * Get the export data of annotations.
+     *
+     * @return {Promise}
+     */
+    exportData() {
+        return window.iframeWindow.PDFAnnoCore.getStoreAdapter().exportData();
+    }
+
+    /**
+     * Get the viewport of the viewer.
+     */
+    getViewerViewport() {
+        return iframeWindow.PDFView.pdfViewer.getPageView(0).viewport;
+    }
+
+    /**
+     * Get the content's name displayed now.
+     */
+    getCurrentContentName() {
+        return iframeWindow.getFileName(iframeWindow.PDFView.url);
+    }
+
+    /**
+     * Manage the ctrl button is enable/disable.
+     */
+    manageCtrlKey(type) {
+
+        if (type === 'on') {
+            window.iframeWindow.ctrlPressed = true;
+
+        } else if (type === 'off') {
+            window.iframeWindow.ctrlPressed = false;
+        }
     }
 
 }

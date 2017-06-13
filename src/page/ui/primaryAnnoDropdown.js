@@ -26,7 +26,7 @@ export function setup() {
             $('#dropdownAnnoPrimary .fa-check').addClass('no-visible');
             $('#dropdownAnnoPrimary .js-text').text('Anno File');
 
-            deleteAllAnnotations();
+            window.annoPage.clearAllAnnotations();
 
             // Close
             $('#dropdownAnnoPrimary').click();
@@ -54,27 +54,5 @@ export function setup() {
         $('#dropdownAnnoPrimary').click();
 
         return false;
-    });
-}
-
-
-
-/**
- * Delete all annotations.
- */
-function deleteAllAnnotations() {
-
-    // Comfirm to user.
-    // let userAnswer = window.confirm('Are you sure to clear the current annotations?');
-    // if (!userAnswer) {
-    //     return;
-    // }
-
-    // TODO UIとの分離.
-    iframeWindow.annotationContainer.destroy();
-
-    let documentId = window.iframeWindow.getFileName(window.iframeWindow.PDFView.url);
-    window.iframeWindow.PDFAnnoCore.getStoreAdapter().deleteAnnotations(documentId).then(() => {
-        reloadPDFViewer();
     });
 }

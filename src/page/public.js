@@ -50,7 +50,7 @@ export function addAllAnnotations(tomlObject) {
 export function addAnnotation(publicAnnotation) {
 
     let a = publicAnnotation.annotation;
-    window.iframeWindow.annotationContainer.add(a);
+    window.annoPage.addAnnotation(a);
     a.render();
     a.enableViewMode();
     a.save();
@@ -89,7 +89,7 @@ export class PublicRectAnnotation {
         // position: String -> Float.
         position = position.map(p => parseFloat(p));
 
-        let rect = iframeWindow.PDFAnnoCore.RectAnnotation.newInstance({
+        let rect = window.annoPage.createRectAnnotation({
             uuid     : id && String(id), // annotationid must be string.
             x        : position[0],
             y        : convertFromExportY(page, position[1]),
@@ -133,7 +133,7 @@ export class PublicSpanAnnotation {
             }
         });
 
-        let span = window.iframeWindow.PDFAnnoCore.SpanAnnotation.newInstance({
+        let span = window.annoPage.createSpanAnnotation({
             uuid         : id && String(id), // annotationid must be string.
             rectangles   : position,
             text         : label,
@@ -161,7 +161,7 @@ export class PublicRelationAnnotation {
             throw 'Set the ids.';
         }
 
-        let r = iframeWindow.PDFAnnoCore.RelationAnnotation.newInstance({
+        let r = window.annoPage.createRelationAnnotation({
             uuid      : id && String(id), // annotationid must be string.
             direction : dir,
             rel1      : typeof ids[0] === 'object' ? ids[0].annotation : ids[0],
@@ -184,5 +184,5 @@ export const readTOML = toml.parse;
  * Delete all annotations.
  */
 export function clear() {
-    window.iframeWindow.annotationContainer.getAllAnnotations().forEach(a => a.destroy());
+    window.annoPage.clearAllAnnotations();
 }

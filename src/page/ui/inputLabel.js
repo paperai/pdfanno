@@ -111,8 +111,7 @@ export function handleAnnotationDeselected() {
 }
 
 function getSelectedAnnotations() {
-    // TODO UI分離.
-    return iframeWindow.annotationContainer.getSelectedAnnotations();
+    return window.annoPage.getSelectedAnnotations();
 }
 // TODO No need ?
 function cancelSubmit(e) {
@@ -124,8 +123,7 @@ function saveText(uuid) {
 
     const text = $inputLabel.val() || '';
 
-    // TODO UI分離.
-    const annotation = window.iframeWindow.annotationContainer.findById(uuid);
+    const annotation = window.annoPage.findAnnotationById(uuid);
     if (annotation) {
         annotation.text = text;
         annotation.save();

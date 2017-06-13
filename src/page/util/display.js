@@ -66,6 +66,7 @@ export function displayAnnotation(isPrimary, reload=true) {
     };
 
     // Pass the data to pdf-annotatejs.
+    // TODO Discard storeAdaptor.
     window.iframeWindow.PDFAnnoCore.getStoreAdapter().importAnnotations(paperData, isPrimary).then(result => {
 
         if (reload) {

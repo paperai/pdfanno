@@ -185,9 +185,8 @@ window.annoPage = new PDFAnnoPage();
 // ** ATTENTION!! ALSO UPDATED by core/index.js **
 $(document).on('keydown', e => {
 
-    // TODO UIとの依存分離.
     if (e.keyCode === 17 || e.keyCode === 91) { // 17:ctrlKey, 91:cmdKey
-        window.iframeWindow.ctrlPressed = true;
+        window.annoPage.manageCtrlKey('on');
     }
 
 }).on('keyup', e => {
@@ -197,8 +196,7 @@ $(document).on('keydown', e => {
         return;
     }
 
-    // TODO UIとの依存分離.
-    window.iframeWindow.ctrlPressed = false;
+    window.annoPage.manageCtrlKey('off');
 
     if (e.keyCode === 49) {         // Digit "1"
         dispatchWindowEvent('digit1Pressed');
