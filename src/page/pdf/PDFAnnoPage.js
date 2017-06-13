@@ -172,13 +172,39 @@ export default class PDFAnnoPage extends AbstractAnnoPage {
 
     displayViewer(contentFile) {
 
-        if (contentFile) {
-            window.pdf = contentFile.content;
-            window.pdfName = contentFile.name;
-        } else {
-            window.pdf = null;
-            window.pdfName = null;
-        }
+        // Reset settings.
+        this.resetPDFViewerSettings();
+
+        // Load PDF.
+        const uint8Array = new Uint8Array(contentFile.content);
+        iframeWindow.PDFViewerApplication.open(uint8Array);
+
+        // if (contentFile) {
+        //     window.pdf = window.atob(contentFile.content);
+        //     window.pdfName = contentFile.name;
+        // } else {
+        //     window.pdf = null;
+        //     window.pdfName = null;
+        // }
+
+        // // Reset setting.
+
+
+        // // Reload pdf.js.
+        // $('#viewer iframe').remove();
+        // $('#viewer').html('<iframe src="./pages/viewer.html?file=../pdfs/P12-1046.pdf" class="anno-viewer" frameborder="0"></iframe>');
+
+        // // Restart.
+        // var event = document.createEvent('CustomEvent');
+        // event.initCustomEvent('restartApp', true, true, null);
+        // window.dispatchEvent(event);
+
+    }
+
+    initializeViewer() {
+
+        window.pdf = null;
+        window.pdfName = null;
 
         // Reset setting.
         this.resetPDFViewerSettings();
@@ -191,7 +217,6 @@ export default class PDFAnnoPage extends AbstractAnnoPage {
         var event = document.createEvent('CustomEvent');
         event.initCustomEvent('restartApp', true, true, null);
         window.dispatchEvent(event);
-
     }
 
     /**

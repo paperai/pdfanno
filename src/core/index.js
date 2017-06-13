@@ -113,6 +113,8 @@ window.addEventListener('scalechange', () => {
 function removeAnnoLayer() {
     $('#annoLayer, #tmpLayer').remove();
 }
+// TODO Refactoring: tricky.
+window.removeAnnoLayer = removeAnnoLayer;
 
 /*
  * Render annotations saved in the storage.
@@ -163,6 +165,10 @@ function renderAnno() {
         position : 'relative'
     }).append($annoLayer).append($tmpLayer);
 
+    // Reset.
+    // window.annotationContainer.destroy();
+    window.annotationContainer.set = new Set();
+
     let svg = $annoLayer.get(0);
     let documentId = getFileName(PDFView.url);
     let viewport = PDFView.pdfViewer.getPageView(0).viewport;
@@ -172,6 +178,9 @@ function renderAnno() {
 
     renderAnnotations(svg);
 }
+
+// TODO Refactoring: tricky.
+window.renderAnno = renderAnno;
 
 function renderAnnotations(svg) {
 

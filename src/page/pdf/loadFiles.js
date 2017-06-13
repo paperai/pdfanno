@@ -17,18 +17,37 @@ export default function loadFiles(files) {
         // Load pdfs.
         let p = pdfNames.map(file => {
             return new Promise((resolve, reject) => {
-                let fileReader = new FileReader();
-                fileReader.onload = event => {
-                    let pdf = event.target.result;
+
+                // Old.
+                // let fileReader = new FileReader();
+                // fileReader.onload = event => {
+                //     let pdf = event.target.result;
+                //     let fileName = _excludeBaseDirName(file.webkitRelativePath);
+
+                //     resolve({
+                //         type    : 'content',
+                //         name    : fileName,
+                //         content : pdf
+                //     });
+                // }
+                // fileReader.readAsDataURL(file);
+
+                // for test.
+                let fileReader2 = new FileReader();
+                fileReader2.onload = event => {
+
+                    let buffer = event.target.result;
                     let fileName = _excludeBaseDirName(file.webkitRelativePath);
 
                     resolve({
                         type    : 'content',
                         name    : fileName,
-                        content : pdf
+                        content : buffer
                     });
+
+                    // window.test = { buffer, fileName };
                 }
-                fileReader.readAsDataURL(file);
+                fileReader2.readAsArrayBuffer(file);
             });
         });
         promises = promises.concat(p);

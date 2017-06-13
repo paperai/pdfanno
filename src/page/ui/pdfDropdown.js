@@ -47,9 +47,10 @@ export function setup() {
         resetCheckReferenceAnnoDropdown();
 
         // reload.
-        window.pdf = content.content;
-        window.fileName = content.name;
-        reloadPDFViewer();
+        window.annoPage.displayViewer(content);
+        // window.pdf = content.content;
+        // window.fileName = content.name;
+        // reloadPDFViewer();
 
         // Close dropdown.
         $('#dropdownPdf').click();

@@ -12,7 +12,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.0/spectrum.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.0/spectrum.min.css">
-    <script type="text/javascript" src="./pdfanno.bundle.js"></script>
+
+    <!-- PDFAnno -->
+    <script type="text/javascript" src="./pdfanno.page.bundle.js"></script>
 </head>
 <body>
 <nav class="navbar navbar-inverse">
@@ -29,9 +31,9 @@
 <div class="main">
 	<div class="container-fluid">
 
-        <div class="row anno-ui" style="margin-bottom: 10px;">
+        <div class="row anno-ui u-mb-10">
 
-            <label class="btn btn-primary btn-file js-file" style="margin-left: 15px;">
+            <label class="btn btn-primary btn-file js-file u-ml-15">
                 Browse <input type="file" style="display: none;" webkitdirectory>
             </label>
 
@@ -65,7 +67,7 @@
               </ul>
             </div>
 
-			<div id="dropdownAnnoList" class="dropdown" style="display: inline-block;">
+            <div id="dropdownAnnoList" class="dropdown" style="display: inline-block;">
               <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                 <span class="js-text">Anno List&nbsp;(<span class="js-count">0</span>)</span>
                 <span class="caret"></span>
@@ -74,6 +76,7 @@
                 <!-- Added by JS. -->
               </ul>
             </div>
+
 
 			<div class="btn-group" role="group">
 				<a id="downloadButton" class="btn btn-default" href="#" title="download">
@@ -110,17 +113,13 @@
                                     </a>
     							</div>
     							<div class="btn-group" role="group">
-                                    <a class="btn btn-default js-tool-btn" href="#" data-type="rect" title="rectangle">
+                                    <a class="btn btn-default js-tool-btn-rect" href="#" data-type="rect" title="rectangle">
                                         <i class="fa fa-square-o fa-2x"></i>
                                     </a>
                                 </div>
                             </div>
                             <div>
                                 <h3>Label</h3>
-<!--                                 <form id="autocompleteform" action="./"/>
-                                    <input type="text" class="form-control" id="inputLabel" disabled>
-                                    <input type="submit" value="submit" class="hidden" />
-                                </form> -->
                                 <div class="input-group" class="form-control">
                                   <input list=labels class="form-control" id="inputLabel" disabled>
                                   <datalist id=labels><!-- Added by JS. --></datalist>
@@ -159,7 +158,7 @@
 			<div id="viewerWrapper" class="col-md-9 col-sm-9 col-xs-9" style="padding-left: 0; padding-right: 0;">
                 <div style="padding-right: 15px;">
     				<div id="viewer" class="viewer">
-                        <iframe src="./pages/viewer.html?file=../pdfs/P12-1046.pdf" class="anno-viewer" frameborder="0"></iframe>
+                        <!-- <iframe src="./pages/viewer.html?file=../pdfs/P12-1046.pdf" class="anno-viewer" frameborder="0"></iframe> -->
     				</div>
                 </div>
 			</div>

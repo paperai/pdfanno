@@ -69,12 +69,15 @@ export function displayAnnotation(isPrimary, reload=true) {
     // TODO Discard storeAdaptor.
     window.iframeWindow.PDFAnnoCore.getStoreAdapter().importAnnotations(paperData, isPrimary).then(result => {
 
-        if (reload) {
-            // Reload the viewer.
-            reloadPDFViewer();
-        }
+        // if (reload) {
+        //     // Reload the viewer.
+        //     reloadPDFViewer();
+        // }
 
-        return true;
+        iframeWindow.removeAnnoLayer();
+        iframeWindow.renderAnno();
+
+        // return true;
     });
 
 }

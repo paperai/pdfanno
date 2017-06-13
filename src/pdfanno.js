@@ -212,7 +212,7 @@ $(document).on('keydown', e => {
 window.addEventListener('DOMContentLoaded', e => {
 
     // Init viewer.
-    window.annoPage.displayViewer();
+    window.annoPage.initializeViewer();
 
     // Delete prev annotations.
     window.annoPage.clearAllAnnotations();
