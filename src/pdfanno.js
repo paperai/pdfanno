@@ -133,8 +133,6 @@ require("!style!css!./pdfanno.css");
 
 import { dispatchWindowEvent } from './shared/util';
 
-import { resetPDFViewerSettings } from './page/util/display';
-
 // UIs.
 import * as browseButton from './page/ui/browseButton';
 import * as pdfDropdown from './page/ui/pdfDropdown';
@@ -165,7 +163,6 @@ window.pdfanno = {};
 /**
  * Expose public APIs.
  */
-// TODO UIとの分離.
 window.add = publicApi.addAnnotation;
 window.addAll = publicApi.addAllAnnotations;
 window.delete = publicApi.deleteAnnotation;
@@ -221,8 +218,7 @@ window.addEventListener('DOMContentLoaded', e => {
     window.annoPage.clearAllAnnotations();
 
     // Reset PDFViwer settings.
-    // TODO UIとの分離.
-    resetPDFViewerSettings();
+    window.annoPage.resetPDFViewerSettings();
 
     // Start application.
     window.annoPage.startViewerApplication();

@@ -3,8 +3,6 @@
  */
 import { reloadPDFViewer, setupColorPicker, displayAnnotation } from '../util/display';
 
-import globalVariable from './globalVariable';
-
 /**
  * Load PDFs and Annos via Browse button.
  */
@@ -12,17 +10,7 @@ export default function loadFiles(files) {
 
     let { pdfNames, annoNames } = getContents(files);
 
-    // TODO Remove.
-    // Save.
-    globalVariable.pdfNames = pdfNames.map(f => _excludeBaseDirName(f.webkitRelativePath));
-    globalVariable.annoNames = annoNames.map(f => _excludeBaseDirName(f.webkitRelativePath));
-
     return new Promise((resolve, reject) => {
-
-        // TODO Remove.
-        // Initialize.
-        globalVariable.pdfDataMap = {};
-        globalVariable.annoDataMap = {};
 
         let promises = [];
 
@@ -33,7 +21,6 @@ export default function loadFiles(files) {
                 fileReader.onload = event => {
                     let pdf = event.target.result;
                     let fileName = _excludeBaseDirName(file.webkitRelativePath);
-                    globalVariable.pdfDataMap[fileName] = pdf;
 
                     resolve({
                         type    : 'content',
@@ -53,7 +40,7 @@ export default function loadFiles(files) {
                 fileReader.onload = event => {
                     let anno = event.target.result;
                     let fileName = _excludeBaseDirName(file.webkitRelativePath);
-                    globalVariable.annoDataMap[fileName] = anno;
+
                     resolve({
                         type    : 'anno',
                         name    : fileName,

@@ -121,7 +121,10 @@ export default class PDFAnnoPage extends AbstractAnnoPage {
     }
 
     /**
-     * @inheritDoc.
+     * Load files(contents and annoFiles).
+     *
+     * @param {Array<File>} files - files user selected in a file dialog.
+     * @return {Promise}
      */
     loadFiles(files) {
         return loadFiles(files).then(result => {
@@ -178,7 +181,7 @@ export default class PDFAnnoPage extends AbstractAnnoPage {
         }
 
         // Reset setting.
-        resetPDFViewerSettings();
+        this.resetPDFViewerSettings();
 
         // Reload pdf.js.
         $('#viewer iframe').remove();
@@ -189,6 +192,13 @@ export default class PDFAnnoPage extends AbstractAnnoPage {
         event.initCustomEvent('restartApp', true, true, null);
         window.dispatchEvent(event);
 
+    }
+
+    /**
+     * Reset the setting of PDFViewer.
+     */
+    resetPDFViewerSettings() {
+        localStorage.removeItem('database');
     }
 
     /**
@@ -419,12 +429,3 @@ export default class PDFAnnoPage extends AbstractAnnoPage {
     }
 
 }
-
-
-/**
- * Reset PDF Viewer settings.
- */
-function resetPDFViewerSettings() {
-    localStorage.removeItem('database');
-}
-

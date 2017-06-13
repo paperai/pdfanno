@@ -1,7 +1,6 @@
 /**
  * Annotation functions for Page.
  */
-// TODO インターフェースを定義する（PDFAnnoPage.jsより）.
 export default class AbstractAnnoPage {
 
     constructor() {
@@ -15,14 +14,6 @@ export default class AbstractAnnoPage {
         // AnnoFiles,
         this.annoFiles = [];
 
-        // // Selected contents.
-        // this.selectedContentFile = null;
-
-        // // Selected primaryAnno.
-        // this.selectedPrimaryAnnoFile = null;
-
-        // // Selected referenceAnnos.
-        // this.selectedReferenceAnnoFils = [];
     }
 
     /**
@@ -35,21 +26,5 @@ export default class AbstractAnnoPage {
           this[method] = this[method].bind(this);
         });
     }
-
-
-    /**
-     * Load files(contents and annoFiles).
-     *
-     * @param {Array<File>} files - files user selected in a file dialog.
-     * @return {Promise}
-     */
-    loadFiles(files) {
-        // TODO Imlemented at a subClass.
-    }
-
-
-
-
-
 
 }

@@ -87,7 +87,7 @@ export function displayAnnotation(isPrimary, reload=true) {
 export function reloadPDFViewer() {
 
     // Reset setting.
-    resetPDFViewerSettings();
+    window.annoPage.resetPDFViewerSettings();
 
     // Reload pdf.js.
     $('#viewer iframe').remove();
@@ -105,14 +105,6 @@ export function reloadPDFViewer() {
     }
     window.addEventListener('annotationrendered', iframeReady);
 }
-
-/**
- * Reset PDF Viewer settings.
- */
-export function resetPDFViewerSettings() {
-    localStorage.removeItem('database');
-}
-
 
 /**
  * Setup the color pickers.

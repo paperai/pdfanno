@@ -72,36 +72,35 @@ export function disable() {
         .val('');
 }
 
-// TODO No export.
-export function treatAnnotationDeleted({ uuid }) {
+function treatAnnotationDeleted({ uuid }) {
     console.log('treatAnnotationDeleted:', uuid);
 
     if (currentUUID === uuid) {
         disable(...arguments);
     }
 }
-// TODO No export.
-export function handleAnnotationHoverIn(annotation) {
+
+function handleAnnotationHoverIn(annotation) {
     if (getSelectedAnnotations().length === 0) {
         enable({ uuid : annotation.uuid, text : annotation.text, disable : true });
     }
 }
-// TODO No export.
-export function handleAnnotationHoverOut(annotation) {
+
+function handleAnnotationHoverOut(annotation) {
     if (getSelectedAnnotations().length === 0) {
         disable();
     }
 }
-// TODO No export.
-export function handleAnnotationSelected(annotation) {
+
+function handleAnnotationSelected(annotation) {
     if (getSelectedAnnotations().length === 1) {
         enable({ uuid : annotation.uuid, text : annotation.text });
     } else {
         disable();
     }
 }
-// TODO No export.
-export function handleAnnotationDeselected() {
+
+function handleAnnotationDeselected() {
     const annos = getSelectedAnnotations();
     if (annos.length === 1) {
         enable({ uuid : annos[0].uuid, text : annos[0].text });
