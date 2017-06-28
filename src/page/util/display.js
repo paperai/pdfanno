@@ -4,7 +4,7 @@
  * Display annotations an user selected.
  */
 // TODO move to PDFAnnoPage.js
-export function displayAnnotation(isPrimary, reload=true) {
+export function displayAnnotation(isPrimary, /*TODO No Need? -> */reload=true) {
 
     let annotations = [];
     let colors = [];
@@ -16,6 +16,8 @@ export function displayAnnotation(isPrimary, reload=true) {
             let $elm = $(element);
             if ($elm.find('.fa-check').hasClass('no-visible') === false) {
                 let annoPath = $elm.find('.js-annoname').text();
+
+                console.log('bbbbbbbbb:', annoPath);
 
                 const annoFile = window.annoPage.getAnnoFile(annoPath);
                 if (!annoFile) {

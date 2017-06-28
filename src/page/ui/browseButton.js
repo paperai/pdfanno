@@ -107,15 +107,25 @@ function display(currentDisplay) {
     //     delete window.pdf;
     //     delete window.pdfName;
 
+
+        // Display the PDF.
+        // window.annoPage.displayViewer(files[0]);
+
     } else {
+
+        // TODO no need?
         contentReloaded = true;
-        reloadPDFViewer();
+
+        // Reset the PDF displayed.
+        window.annoPage.closePDFViewer();
     }
 
     // Restore the check state of a primaryAnno.
     files = window.annoPage.annoFiles.filter(c => c.name === currentDisplay.primaryAnnotationName);
+    // TODO no need ?
     let promise1 = Promise.resolve();
-    if (files.length > 0 && contentReloaded === false) {
+    // if (files.length > 0 && contentReloaded === false) {
+    if (files.length > 0) {
         $('#dropdownAnnoPrimary .js-text').text(currentDisplay.primaryAnnotationName);
         $('#dropdownAnnoPrimary a').each((index, element) => {
             let $elm = $(element);

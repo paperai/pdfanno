@@ -233,6 +233,13 @@ export default class PDFAnnoPage extends AbstractAnnoPage {
 
     }
 
+    closePDFViewer() {
+        if (iframeWindow && iframeWindow.PDFViewerApplication) {
+            iframeWindow.PDFViewerApplication.close();
+            $('#numPages', iframeWindow.document).text('');
+        }
+    }
+
     /**
      * Reset the setting of PDFViewer.
      */
