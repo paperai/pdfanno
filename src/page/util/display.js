@@ -65,27 +65,13 @@ export function displayAnnotation(isPrimary, reload=true) {
         annotations
     };
 
-    // Pass the data to pdf-annotatejs.
-    // TODO Discard storeAdaptor.
-    window.iframeWindow.PDFAnnoCore.getStoreAdapter().importAnnotations(paperData, isPrimary).then(result => {
-
-        // if (reload) {
-        //     // Reload the viewer.
-        //     reloadPDFViewer();
-        // }
-
-        iframeWindow.removeAnnoLayer();
-        iframeWindow.renderAnno();
-
-        // return true;
-    });
-
+    // Import annotations to Viewer.
+    window.annoPage.importAnnotation(paperData, isPrimary);
 }
 
 /**
  * Reload PDF Viewer.
  */
-// TODO Need?
 // TODO UI分離.
 export function reloadPDFViewer() {
 

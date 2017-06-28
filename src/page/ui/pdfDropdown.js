@@ -2,9 +2,6 @@
  * UI parts - PDF Dropdown.
  */
 import { reloadPDFViewer } from '../util/display';
-import { resetCheckPrimaryAnnoDropdown, resetCheckReferenceAnnoDropdown } from '../util/dropdown';
-
-// TODO Refactoring.
 
 /**
  * Setup the dropdown of PDFs.
@@ -13,13 +10,16 @@ export function setup() {
 
     $('#dropdownPdf').on('click', 'a', e => {
 
-        let $this = $(e.currentTarget);
-        // TODO pdfPath to name.
-        // TODO js-pdfname to js-content-name
-        let pdfPath = $this.find('.js-pdfname').text();
+        const $this = $(e.currentTarget);
 
-        let currentPDFName = $('#dropdownPdf .js-text').text();
-        if (currentPDFName === pdfPath) {
+        // Get the name of PDF clicked.
+        const pdfName = $this.find('.js-content-name').text();
+
+        // Get the name of PDF currently displayed.
+        const currentPDFName = $('#dropdownPdf .js-text').text();
+
+        // No action, if the current PDF is selected.
+        if (currentPDFName === pdfName) {
             console.log('Not reload. the pdf are same.');
             return;
         }
@@ -31,30 +31,48 @@ export function setup() {
             }
         }
 
-        $('#dropdownPdf .js-text').text(pdfPath);
+        // Update PDF's name displayed.
+        $('#dropdownPdf .js-text').text(pdfName);
 
+        // Update the dropdown selection.
         $('#dropdownPdf .fa-check').addClass('no-visible');
         $this.find('.fa-check').removeClass('no-visible');
 
-        const content = window.annoPage.getContentFile(pdfPath);
+        // Get the content.
+        const content = window.annoPage.getContentFile(pdfName);
         if (!content) {
             return false;
         }
 
-        // Reset Primary/Reference anno dropdowns, and data.
+        // Reset annotations displayed.
         window.annoPage.clearAllAnnotations();
+
+        // Reset annotations' dropdowns.
         resetCheckPrimaryAnnoDropdown();
         resetCheckReferenceAnnoDropdown();
 
-        // reload.
+        // Display the PDF on the viewer.
         window.annoPage.displayViewer(content);
-        // window.pdf = content.content;
-        // window.fileName = content.name;
-        // reloadPDFViewer();
 
         // Close dropdown.
         $('#dropdownPdf').click();
 
         return false;
     });
+}
+
+/**
+ * Reset the primary annotation dropdown selection.
+ */
+function resetCheckPrimaryAnnoDropdown() {
+    $('#dropdownAnnoPrimary .js-text').text('Anno File');
+    $('#dropdownAnnoPrimary .fa-check').addClass('no-visible');
+}
+
+/**
+ * Reset the reference annotation dropdown selection.
+ */
+function resetCheckReferenceAnnoDropdown() {
+    $('#dropdownAnnoReference .js-text').text('Reference Files');
+    $('#dropdownAnnoReference .fa-check').addClass('no-visible');
 }

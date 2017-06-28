@@ -212,11 +212,25 @@ export default class PDFAnnoPage extends AbstractAnnoPage {
         // Reload pdf.js.
         $('#viewer iframe').remove();
         $('#viewer').html('<iframe src="./pages/viewer.html?file=../pdfs/P12-1046.pdf" class="anno-viewer" frameborder="0"></iframe>');
+        // $('#viewer').html('<iframe src="./pages/viewer.html" class="anno-viewer" frameborder="0"></iframe>');
 
         // Restart.
         var event = document.createEvent('CustomEvent');
         event.initCustomEvent('restartApp', true, true, null);
         window.dispatchEvent(event);
+
+        // Load and initial PDF, and display.
+        // const xhr = new XMLHttpRequest();
+        // xhr.open('GET', '../pdfs/P12-1046.pdf', true);
+        // xhr.responseType = 'arraybuffer';
+        // xhr.onload = function () {
+        //     if (this.status === 200) {
+        //         var uint8Array = new Uint8Array(this.response);
+        //         iframeWindow.PDFViewerApplication.open(uint8Array);
+        //     }
+        // };
+        // xhr.send();
+
     }
 
     /**
@@ -415,6 +429,16 @@ export default class PDFAnnoPage extends AbstractAnnoPage {
      */
     createRelationAnnotation(options) {
         return iframeWindow.PDFAnnoCore.RelationAnnotation.newInstance(options);
+    }
+
+    /**
+     * Import annotations from UI.
+     */
+    importAnnotation(paperData, isPrimary) {
+        iframeWindow.PDFAnnoCore.getStoreAdapter().importAnnotations(paperData, isPrimary).then(result => {
+            iframeWindow.removeAnnoLayer();
+            iframeWindow.renderAnno();
+        });
     }
 
     /**

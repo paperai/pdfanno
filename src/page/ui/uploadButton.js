@@ -2,8 +2,6 @@
  * UI parts - Upload Button.
  */
 
-// TODO Refactoring.
-
 export function setup() {
     $('.js-btn-upload').off('click').on('click', () => {
 
