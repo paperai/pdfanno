@@ -1,4 +1,3 @@
-import AbstractAnnoPage from '../AbstractAnnoPage';
 import loadFiles from './loadFiles';
 import { anyOf, dispatchWindowEvent } from '../../shared/util';
 
@@ -13,10 +12,9 @@ import {
 /**
  * PDFAnno's Annotation functions for Page produced by .
  */
-export default class PDFAnnoPage extends AbstractAnnoPage {
+export default class PDFAnnoPage {
 
     constructor() {
-        super(...arguments);
         this.setup();
     }
 
