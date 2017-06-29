@@ -80,7 +80,10 @@ function display(currentDisplay) {
 
     let files;
 
+    // TODO no need?
     let contentReloaded = false;
+
+    let isPDFClosed = false;
 
     // Restore the check state of a content.
     files = window.annoPage.contentFiles.filter(c => c.name === currentDisplay.pdfName);
@@ -114,7 +117,8 @@ function display(currentDisplay) {
     } else {
 
         // TODO no need?
-        contentReloaded = true;
+        // contentReloaded = true;
+        isPDFClosed = true;
 
         // Reset the PDF displayed.
         window.annoPage.closePDFViewer();
@@ -125,18 +129,19 @@ function display(currentDisplay) {
     // TODO no need ?
     let promise1 = Promise.resolve();
     // if (files.length > 0 && contentReloaded === false) {
-    if (files.length > 0) {
+    if (files.length > 0 && isPDFClosed === false) {
+        console.log('ddddddddddd:', files);
         $('#dropdownAnnoPrimary .js-text').text(currentDisplay.primaryAnnotationName);
         $('#dropdownAnnoPrimary a').each((index, element) => {
             let $elm = $(element);
-            if ($elm.find('.js-annoname').text() === name) {
+            if ($elm.find('.js-annoname').text() === currentDisplay.primaryAnnotationName) {
                 $elm.find('.fa-check').removeClass('no-visible');
             }
         });
         setTimeout(() => {
             console.log('aaaaaaaaaa');
             promise1 = displayAnnotation(true, false);
-        }, 500);
+        }, 100);
     }
 
     // Restore the check states of referenceAnnos.
@@ -159,12 +164,12 @@ function display(currentDisplay) {
         return found;
     });
     let promise2 = Promise.resolve();
-    if (names.length > 0 && contentReloaded === false) {
+    if (names.length > 0 && isPDFClosed === false) {
         $('#dropdownAnnoReference .js-text').text(names.join(','));
 
         setTimeout(() => {
             promise2 = displayAnnotation(false, false);
-        }, 1100);
+        }, 500);
 
     }
 
