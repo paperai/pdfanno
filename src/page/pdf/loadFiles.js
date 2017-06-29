@@ -1,7 +1,6 @@
 /**
  *  Functions depending on pdfanno-core.js.
  */
-import { reloadPDFViewer, setupColorPicker, displayAnnotation } from '../util/display';
 
 /**
  * Load PDFs and Annos via Browse button.
@@ -18,36 +17,17 @@ export default function loadFiles(files) {
         let p = pdfNames.map(file => {
             return new Promise((resolve, reject) => {
 
-                // Old.
-                // let fileReader = new FileReader();
-                // fileReader.onload = event => {
-                //     let pdf = event.target.result;
-                //     let fileName = _excludeBaseDirName(file.webkitRelativePath);
-
-                //     resolve({
-                //         type    : 'content',
-                //         name    : fileName,
-                //         content : pdf
-                //     });
-                // }
-                // fileReader.readAsDataURL(file);
-
-                // for test.
-                let fileReader2 = new FileReader();
-                fileReader2.onload = event => {
-
-                    let buffer = event.target.result;
-                    let fileName = _excludeBaseDirName(file.webkitRelativePath);
+                let fileReader = new FileReader();
+                fileReader.onload = event => {
 
                     resolve({
                         type    : 'content',
-                        name    : fileName,
-                        content : buffer
+                        name    : _excludeBaseDirName(file.webkitRelativePath),
+                        content : event.target.result
                     });
 
-                    // window.test = { buffer, fileName };
                 }
-                fileReader2.readAsArrayBuffer(file);
+                fileReader.readAsArrayBuffer(file);
             });
         });
         promises = promises.concat(p);
@@ -57,13 +37,11 @@ export default function loadFiles(files) {
             return new Promise((resolve, reject) => {
                 let fileReader = new FileReader();
                 fileReader.onload = event => {
-                    let anno = event.target.result;
-                    let fileName = _excludeBaseDirName(file.webkitRelativePath);
 
                     resolve({
                         type    : 'anno',
-                        name    : fileName,
-                        content : anno
+                        name    : _excludeBaseDirName(file.webkitRelativePath),
+                        content : event.target.result
                     });
                 }
                 fileReader.readAsText(file);
@@ -97,10 +75,10 @@ function getContents(files) {
 
         let frgms = relativePath.split('/');
         if (frgms.length > 2) {
-            console.log('SKIP:', relativePath);
+            // console.log('SKIP:', relativePath);
             continue;
         }
-        console.log('relativePath:', relativePath);
+        console.log('Load:', relativePath);
 
         // Get files only PDFs or Anno files.
         if (relativePath.match(/\.pdf$/i)) {

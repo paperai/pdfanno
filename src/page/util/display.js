@@ -1,101 +1,7 @@
-
-
 /**
- * Display annotations an user selected.
+ * The utilities for display.
  */
-// TODO move to PDFAnnoPage.js
-export function displayAnnotation(isPrimary, /*TODO No Need? -> */reload=true) {
 
-    let annotations = [];
-    let colors = [];
-    let primaryIndex = -1;
-
-    // Primary annotation.
-    if (isPrimary) {
-        $('#dropdownAnnoPrimary a').each((index, element) => {
-            let $elm = $(element);
-            if ($elm.find('.fa-check').hasClass('no-visible') === false) {
-                let annoPath = $elm.find('.js-annoname').text();
-
-                console.log('bbbbbbbbb:', annoPath);
-
-                const annoFile = window.annoPage.getAnnoFile(annoPath);
-                if (!annoFile) {
-                    console.log('ERROR');
-                    return;
-                }
-                primaryIndex = 0;
-                annotations.push(annoFile.content);
-                let color = null; // Use the default color used for edit.
-                colors.push(color);
-
-                // let filename = annoPath.split('/')[annoPath.split('/').length - 1];
-                let filename = annoFile.name;
-                localStorage.setItem('_pdfanno_primary_annoname', filename);
-                console.log('filename:', filename);
-            }
-        });
-    }
-
-    // Reference annotations.
-    if (!isPrimary) {
-        $('#dropdownAnnoReference a').each((index, element) => {
-            let $elm = $(element);
-            if ($elm.find('.fa-check').hasClass('no-visible') === false) {
-                let annoPath = $elm.find('.js-annoname').text();
-
-                const annoFile = window.annoPage.getAnnoFile(annoPath);
-
-                if (!annoFile) {
-                    console.log('ERROR');
-                    return;
-                }
-                annotations.push(annoFile.content);
-                let color = $elm.find('.js-anno-palette').spectrum('get').toHexString();
-                console.log(color);
-                colors.push(color);
-            }
-        });
-    }
-
-    console.log('colors:', colors);
-
-    // Create import data.
-    let paperData = {
-        primary : primaryIndex,
-        colors,
-        annotations
-    };
-
-    // Import annotations to Viewer.
-    window.annoPage.importAnnotation(paperData, isPrimary);
-}
-
-/**
- * Reload PDF Viewer.
- */
-// TODO UI分離.
-export function reloadPDFViewer() {
-
-    // Reset setting.
-    window.annoPage.resetPDFViewerSettings();
-
-    // Reload pdf.js.
-    $('#viewer iframe').remove();
-    $('#viewer').html('<iframe src="./pages/viewer.html" class="anno-viewer" frameborder="0"></iframe>');
-
-    // Restart.
-    var event = document.createEvent('CustomEvent');
-    event.initCustomEvent('restartApp', true, true, null);
-    window.dispatchEvent(event);
-
-    // Catch the event iframe is ready.
-    function iframeReady() {
-        console.log('iframeReady');
-        window.removeEventListener('annotationrendered', iframeReady);
-    }
-    window.addEventListener('annotationrendered', iframeReady);
-}
 
 /**
  * Setup the color pickers.
@@ -123,6 +29,6 @@ export function setupColorPicker() {
     });
 
     // Setup behavior.
-    $('.js-anno-palette').off('change').on('change', displayAnnotation.bind(null, false));
+    $('.js-anno-palette').off('change').on('change', window.annoPage.displayAnnotation.bind(null, false));
 }
 

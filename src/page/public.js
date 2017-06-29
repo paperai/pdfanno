@@ -1,9 +1,6 @@
 import { convertFromExportY } from '../shared/coords';
 import toml from 'toml';
 
-// TODO Refactoring.
-// TODO UI分離.
-
 /**
  * Add all annotations.
  *
@@ -96,8 +93,8 @@ export class PublicRectAnnotation {
             width    : position[2],
             height   : position[3],
             text     : label,
-            color    : "#FF0000",  // TODO 固定で良い？
-            readOnly : false       // TODO 固定で良い？
+            color    : "#FF0000",
+            readOnly : false
         });
 
         this.annotation = rect;
@@ -137,8 +134,8 @@ export class PublicSpanAnnotation {
             uuid         : id && String(id), // annotationid must be string.
             rectangles   : position,
             text         : label,
-            color        : '#FFFF00',  // TODO 固定で良い？
-            readOnly     : false,      // TODO 固定で良い？
+            color        : '#FFFF00',
+            readOnly     : false,
             selectedText : text
         });
 

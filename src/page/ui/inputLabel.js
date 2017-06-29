@@ -3,11 +3,8 @@
  */
 
  let $inputLabel;
- // TODO Remove?
- let $form;
  window.addEventListener('DOMContentLoaded', () => {
     $inputLabel = $('#inputLabel');
-    $form = $('#autocompleteform');
  });
 
 let _blurListener;
@@ -25,9 +22,6 @@ export function enable({ uuid, text, disable=false, autoFocus=false, blurListene
         console.log('old _blurListener is called.');
     }
 
-    $form
-        .off('submit')
-        .on('submit', cancelSubmit);
 
     $inputLabel
         .attr('disabled', 'disabled')
@@ -55,9 +49,6 @@ export function enable({ uuid, text, disable=false, autoFocus=false, blurListene
         }
 
         saveText(uuid);
-
-        // Add an autocomplete candidate. (Firefox, Chrome)
-        $form.find('[type="submit"]').click();
     });
 
 };
@@ -111,11 +102,6 @@ function handleAnnotationDeselected() {
 
 function getSelectedAnnotations() {
     return window.annoPage.getSelectedAnnotations();
-}
-// TODO No need ?
-function cancelSubmit(e) {
-  e.preventDefault();
-  return false;
 }
 
 function saveText(uuid) {

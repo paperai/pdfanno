@@ -1,9 +1,6 @@
 /**
  * UI parts - Primary Annotation Dropdown.
  */
-import { reloadPDFViewer, displayAnnotation } from '../util/display';
-
-// TODO Refactoring.
 
 /**
  * Setup a click action of the Primary Annotation Dropdown.
@@ -48,7 +45,7 @@ export function setup() {
         $this.find('.fa-check').removeClass('no-visible');
 
         // reload.
-        displayAnnotation(true);
+        window.annoPage.displayAnnotation(true);
 
         // Close
         $('#dropdownAnnoPrimary').click();

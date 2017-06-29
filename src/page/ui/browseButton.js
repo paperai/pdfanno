@@ -2,7 +2,7 @@
  * UI parts - Browse button.
  */
 
-import { setupColorPicker, displayAnnotation } from '../util/display';
+import { setupColorPicker } from '../util/display';
 
 /**
  * Setup the behavior of a Browse Button.
@@ -103,7 +103,7 @@ function restoreBeforeState(currentDisplay) {
             }
         });
         setTimeout(() => {
-            displayAnnotation(true, false);
+            window.annoPage.displayAnnotation(true, false);
         }, 100);
     }
 
@@ -129,7 +129,7 @@ function restoreBeforeState(currentDisplay) {
     if (names.length > 0 && isPDFClosed === false) {
         $('#dropdownAnnoReference .js-text').text(names.join(','));
         setTimeout(() => {
-            displayAnnotation(false, false);
+            window.annoPage.displayAnnotation(false, false);
         }, 500);
 
     }

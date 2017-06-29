@@ -44,8 +44,6 @@ export default class PDFAnnoPage extends AbstractAnnoPage {
      */
     startViewerApplication() {
 
-        // TODO Refactoring: "iframeWindow -> window event" make as common.
-
         // Alias for convenience.
         window.iframeWindow = $('#viewer iframe').get(0).contentWindow;
 
@@ -350,8 +348,6 @@ export default class PDFAnnoPage extends AbstractAnnoPage {
     */
     disableRect() {
         window.iframeWindow.PDFAnnoCore.UI.disableRect();
-        // TODO 以下のは必要？
-        window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
     }
 
     /**
@@ -362,11 +358,76 @@ export default class PDFAnnoPage extends AbstractAnnoPage {
     }
 
     /**
-        Disable annotation tool buttons.
-    */
+     * Display annotations an user selected.
+     */
+    displayAnnotation(isPrimary) {
+        let annotations = [];
+        let colors = [];
+        let primaryIndex = -1;
+
+        // Primary annotation.
+        if (isPrimary) {
+            $('#dropdownAnnoPrimary a').each((index, element) => {
+                let $elm = $(element);
+                if ($elm.find('.fa-check').hasClass('no-visible') === false) {
+                    let annoPath = $elm.find('.js-annoname').text();
+
+                    const annoFile = window.annoPage.getAnnoFile(annoPath);
+                    if (!annoFile) {
+                        console.log('ERROR');
+                        return;
+                    }
+                    primaryIndex = 0;
+                    annotations.push(annoFile.content);
+                    let color = null; // Use the default color used for edit.
+                    colors.push(color);
+
+                    let filename = annoFile.name;
+                    localStorage.setItem('_pdfanno_primary_annoname', filename);
+                    console.log('filename:', filename);
+                }
+            });
+        }
+
+        // Reference annotations.
+        if (!isPrimary) {
+            $('#dropdownAnnoReference a').each((index, element) => {
+                let $elm = $(element);
+                if ($elm.find('.fa-check').hasClass('no-visible') === false) {
+                    let annoPath = $elm.find('.js-annoname').text();
+
+                    const annoFile = window.annoPage.getAnnoFile(annoPath);
+
+                    if (!annoFile) {
+                        console.log('ERROR');
+                        return;
+                    }
+                    annotations.push(annoFile.content);
+                    let color = $elm.find('.js-anno-palette').spectrum('get').toHexString();
+                    console.log(color);
+                    colors.push(color);
+                }
+            });
+        }
+
+        console.log('colors:', colors);
+
+        // Create import data.
+        let paperData = {
+            primary : primaryIndex,
+            colors,
+            annotations
+        };
+
+        // Import annotations to Viewer.
+        window.annoPage.importAnnotation(paperData, isPrimary);
+    }
+
+    /**
+     *  Disable annotation tool buttons.
+     */
     disableAnnotateFunctions() {
         window.iframeWindow.PDFAnnoCore.UI.disableRect();
-        window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
     }
 
     /**

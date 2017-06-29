@@ -1,7 +1,6 @@
 /**
  * UI parts - PDF Dropdown.
  */
-import { reloadPDFViewer } from '../util/display';
 
 /**
  * Setup the dropdown of PDFs.
