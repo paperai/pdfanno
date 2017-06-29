@@ -1,7 +1,6 @@
 /**
  * UI parts - Primary Annotation Dropdown.
  */
-import { reloadPDFViewer, displayAnnotation } from '../util/display';
 
 /**
  * Setup a click action of the Primary Annotation Dropdown.
@@ -24,7 +23,7 @@ export function setup() {
             $('#dropdownAnnoPrimary .fa-check').addClass('no-visible');
             $('#dropdownAnnoPrimary .js-text').text('Anno File');
 
-            deleteAllAnnotations();
+            window.annoPage.clearAllAnnotations();
 
             // Close
             $('#dropdownAnnoPrimary').click();
@@ -46,32 +45,11 @@ export function setup() {
         $this.find('.fa-check').removeClass('no-visible');
 
         // reload.
-        displayAnnotation(true);
+        window.annoPage.displayAnnotation(true);
 
         // Close
         $('#dropdownAnnoPrimary').click();
 
         return false;
-    });
-}
-
-
-
-/**
- * Delete all annotations.
- */
-function deleteAllAnnotations() {
-
-    // Comfirm to user.
-    // let userAnswer = window.confirm('Are you sure to clear the current annotations?');
-    // if (!userAnswer) {
-    //     return;
-    // }
-
-    iframeWindow.annotationContainer.destroy();
-
-    let documentId = window.iframeWindow.getFileName(window.iframeWindow.PDFView.url);
-    window.iframeWindow.PDFAnnoCore.getStoreAdapter().deleteAnnotations(documentId).then(() => {
-        reloadPDFViewer();
     });
 }

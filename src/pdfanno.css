@@ -10,10 +10,10 @@ input:-webkit-autofill:active {
 
 .u-mt-10 {margin-top: 10px;}
 .u-mt-20 {margin-top: 20px;}
-
-.no-visible {
-    visibility: hidden;
-}
+.u-mb-10 {margin-bottom: 10px;}
+.u-ml-15 {margin-left: 15px;}
+.u-disp-iblock {display: inline-block;}
+.no-visible {visibility: hidden;}
 
 /**
  * Viewer size.

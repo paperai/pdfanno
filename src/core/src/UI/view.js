@@ -61,10 +61,3 @@ export function enableViewMode() {
         .on('click', '.page', handlePageClick);
 
 }
-
-/**
- * Disable view mode.
- */
-export function disableViewMode() {
-    // TODO Remove me.
-}

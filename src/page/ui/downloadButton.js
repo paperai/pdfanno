@@ -25,7 +25,7 @@ export function setup() {
  */
 function downloadAnnotation() {
 
-    window.iframeWindow.PDFAnnoCore.getStoreAdapter().exportData().then(annotations => {
+    window.annoPage.exportData().then(annotations => {
         let blob = new Blob([annotations]);
         let blobURL = window.URL.createObjectURL(blob);
         let a = document.createElement('a');
@@ -57,6 +57,6 @@ function _getDownloadFileName() {
     }
 
     // The name of PDF.
-    let pdfFileName = iframeWindow.getFileName(iframeWindow.PDFView.url);
+    let pdfFileName = window.annoPage.getCurrentContentName();
     return pdfFileName.split('.')[0] + '.anno';
 }

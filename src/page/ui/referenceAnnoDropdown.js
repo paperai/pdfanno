@@ -1,7 +1,6 @@
 /**
  * UI parts - Reference Annotation Dropdown.
  */
-import { displayAnnotation } from '../util/display';
 
 /**
  * Setup a click action of the Reference Annotation Dropdown.
@@ -27,7 +26,7 @@ export function setup() {
             $('#dropdownAnnoReference .js-text').text('Reference Files');
         }
 
-        displayAnnotation(false);
+        window.annoPage.displayAnnotation(false);
 
         return false;
 

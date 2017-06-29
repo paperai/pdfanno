@@ -12,7 +12,7 @@ export function setup() {
     $('#dropdownAnnoList').on('click', () => {
 
         // Get displayed annotations.
-        let annotations = iframeWindow.annotationContainer.getAllAnnotations();
+        let annotations = window.annoPage.getAllAnnotations();
 
         // Filter only Primary.
         annotations = annotations.filter(a => {
@@ -64,15 +64,15 @@ export function setup() {
     $('#dropdownAnnoList').on('click', 'a', e => {
 
         let id = $(e.currentTarget).data('id');
-        let annotation = iframeWindow.annotationContainer.findById(id);
+        let annotation = window.annoPage.findAnnotationById(id);
 
         if (annotation) {
 
             // scroll to.
             let _y = annotation.y || annotation.y1 || annotation.rectangles[0].y;
             let { pageNumber, y } = convertToExportY(_y);
-            let pageHeight = iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.height;
-            let scale = iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale;
+            let pageHeight = window.annoPage.getViewerViewport().height;
+            let scale = window.annoPage.getViewerViewport().scale;
             _y = (pageHeight + paddingBetweenPages) * (pageNumber - 1) + y * scale;
             _y -= 100;
             $('#viewer iframe').contents().find('#viewer').parent()[0].scrollTop = _y;
@@ -90,7 +90,7 @@ export function setup() {
 
     // Watch the number of primary annos.
     function watchPrimaryAnno(e) {
-        const primaryAnnos = iframeWindow.annotationContainer.getAllAnnotations().filter(a => {
+        const primaryAnnos = window.annoPage.getAllAnnotations().filter(a => {
             return !a.readOnly;
         });
         $('#dropdownAnnoList .js-count').text(primaryAnnos.length);

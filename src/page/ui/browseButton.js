@@ -1,15 +1,15 @@
 /**
  * UI parts - Browse button.
  */
-import { reloadPDFViewer, setupColorPicker, displayAnnotation } from '../util/display';
-import { enableAnnotateTool, disableAnnotateTools, clearAllAnnotations } from '../util/anno';
+
+import { setupColorPicker } from '../util/display';
 
 /**
  * Setup the behavior of a Browse Button.
  */
 export function setup() {
 
-    // Enable to select the same directory twice.
+    // Enable to select the same directory twice or more.
     $('.js-file :file').on('click', ev => {
         $('input[type="file"]').val(null);
     });
@@ -23,148 +23,26 @@ export function setup() {
             return alert(error);
         }
 
-        // Get current visuals.
-        const current = getCurrentFileNames();
+        window.annoPage.loadFiles(files).then(() => {
 
-        // Get contents.
-        const { pdfs, annos } = getContents(files);
+            // Get current visuals.
+            const current = getCurrentFileNames();
 
-        // Setup PDF Dropdown.
-        setPDFDropdownList(pdfs);
+            // Initialize PDF Viewer.
+            window.annoPage.clearAllAnnotations();
 
-        // Setup Anno Dropdown.
-        setAnnoDropdownList(annos);
+            // Setup PDF Dropdown.
+            setPDFDropdownList();
 
-        // Initialize PDF Viewer.
-        clearAllAnnotations();
-
-        // Load data.
-        loadData(pdfs, annos).then(() => {
+            // Setup Anno Dropdown.
+            setAnnoDropdownList();
 
             // Display a PDF and annotations.
-            display(current, fileMap);
+            restoreBeforeState(current);
 
         });
 
     });
-
-}
-
-function display(currentDisplay, newFileMap) {
-
-    console.log('files:', Object.keys(newFileMap));
-
-    let name;
-
-    // PDF.
-    name = currentDisplay.pdfName;
-    if (name && newFileMap[name]) {
-        window.pdf = fileMap[name];
-        window.pdfName = currentDisplay.pdfName;
-
-        $('#dropdownPdf .js-text').text(name);
-        $('#dropdownPdf a').each((index, element) => {
-            let $elm = $(element);
-            if ($elm.find('.js-pdfname').text() === name) {
-                $elm.find('.fa-check').removeClass('no-visible');
-            }
-        });
-
-    } else {
-        delete window.pdf;
-        delete window.pdfName;
-    }
-
-    // Primary Annotation.
-    name = currentDisplay.primaryAnnotationName;
-    let promise1 = Promise.resolve();
-    if (name && newFileMap[name]) {
-
-        $('#dropdownAnnoPrimary .js-text').text(name);
-        $('#dropdownAnnoPrimary a').each((index, element) => {
-            let $elm = $(element);
-            if ($elm.find('.js-annoname').text() === name) {
-                $elm.find('.fa-check').removeClass('no-visible');
-            }
-        });
-
-        promise1 = displayAnnotation(true, false);
-    }
-
-    // Reference Annotations.
-    let names = currentDisplay.referenceAnnotationNames;
-    let colors = currentDisplay.referenceAnnotationColors;
-    let changed = false;
-    names = names.filter((name, i) => {
-        let found = false;
-        if (newFileMap[name]) {
-            $('#dropdownAnnoReference a').each((index, element) => {
-                let $elm = $(element);
-                if ($elm.find('.js-annoname').text() === name) {
-                    $elm.find('.fa-check').removeClass('no-visible');
-                    $elm.find('.js-anno-palette').spectrum('set', colors[i]);
-
-                    console.log('color: ', colors[i]);
-
-                    found = true;
-                }
-            });
-        }
-        return found;
-    });
-    let promise2 = Promise.resolve();
-    if (names.length > 0) {
-        $('#dropdownAnnoReference .js-text').text(names.join(','));
-        promise2 = displayAnnotation(false, false);
-    }
-
-    // Reload page.
-    Promise.all([promise1, promise2]).then(reloadPDFViewer);
-
-}
-
-/**
- * Get a filename from a path.
- */
-function _excludeBaseDirName(filePath) {
-    let frgms = filePath.split('/');
-    return frgms[frgms.length - 1];
-}
-
-/**
- * Get the file names which currently are displayed.
- */
-function getCurrentFileNames() {
-
-    let text;
-
-    // a PDF name.
-    text = $('#dropdownPdf .js-text').text();
-    let pdfName = (text !== 'PDF File' ? text : null);
-
-    // a Primary anno.
-    text = $('#dropdownAnnoPrimary .js-text').text();
-    let primaryAnnotationName = (text !== 'Anno File' ? text : null);
-
-
-    let referenceAnnotationNames = [];
-    let referenceAnnotationColors = [];
-    $('#dropdownAnnoReference a').each((index, element) => {
-        let $elm = $(element);
-        if ($elm.find('.fa-check').hasClass('no-visible') === false) {
-            let annoName = $elm.find('.js-annoname').text(); // TODO こういうのはJS変数として持っておいたほうがいいかも（選択済のものについて）
-            referenceAnnotationNames.push(annoName);
-            let color = $elm.find('.js-anno-palette').spectrum('get').toHexString();
-            referenceAnnotationColors.push(color);
-        }
-    });
-
-    return {
-        pdfName,
-        primaryAnnotationName,
-        referenceAnnotationNames,
-        referenceAnnotationColors
-    };
 }
 
 /**
@@ -188,80 +66,153 @@ function isValidDirectorySelect(files) {
 }
 
 /**
- * Extract PDFs and annotations from files the user specified.
+ * Restore the state before Browse button was clicked.
  */
-function getContents(files) {
-    let pdfs = [];
-    let annos = [];
+function restoreBeforeState(currentDisplay) {
 
-    for (let i = 0; i < files.length; i++) {
+    let files;
 
-        let file = files[i];
-        let relativePath = file.webkitRelativePath;
+    let isPDFClosed = false;
 
-        let frgms = relativePath.split('/');
-        if (frgms.length > 2) {
-            console.log('SKIP:', relativePath);
-            continue;
-        }
-        console.log('relativePath:', relativePath);
+    // Restore the check state of a content.
+    files = window.annoPage.contentFiles.filter(c => c.name === currentDisplay.pdfName);
+    if (files.length > 0) {
+        $('#dropdownPdf .js-text').text(files[0].name);
+        $('#dropdownPdf a').each((index, element) => {
+            let $elm = $(element);
+            if ($elm.find('.js-content-name').text() === currentDisplay.pdfName) {
+                $elm.find('.fa-check').removeClass('no-visible');
+            }
+        });
 
-        // Get files only PDFs or Anno files.
-        if (relativePath.match(/\.pdf$/i)) {
-            pdfs.push(file);
-        } else if (relativePath.match(/\.anno$/i)) {
-            annos.push(file);
-        }
+    } else {
+
+        isPDFClosed = true;
+
+        window.annoPage.closePDFViewer();
     }
 
+    // Restore the check state of a primaryAnno.
+    files = window.annoPage.annoFiles.filter(c => c.name === currentDisplay.primaryAnnotationName);
+    if (files.length > 0 && isPDFClosed === false) {
+        $('#dropdownAnnoPrimary .js-text').text(currentDisplay.primaryAnnotationName);
+        $('#dropdownAnnoPrimary a').each((index, element) => {
+            let $elm = $(element);
+            if ($elm.find('.js-annoname').text() === currentDisplay.primaryAnnotationName) {
+                $elm.find('.fa-check').removeClass('no-visible');
+            }
+        });
+        setTimeout(() => {
+            window.annoPage.displayAnnotation(true, false);
+        }, 100);
+    }
+
+    // Restore the check states of referenceAnnos.
+    let names = currentDisplay.referenceAnnotationNames;
+    let colors = currentDisplay.referenceAnnotationColors;
+    names = names.filter((name, i) => {
+        let found = false;
+        let annos = window.annoPage.annoFiles.filter(c => c.name === name);
+        if (annos.length > 0) {
+            $('#dropdownAnnoReference a').each((index, element) => {
+                let $elm = $(element);
+                if ($elm.find('.js-annoname').text() === name) {
+                    $elm.find('.fa-check').removeClass('no-visible');
+                    $elm.find('.js-anno-palette').spectrum('set', colors[i]);
+                    found = true;
+                }
+            });
+        }
+        return found;
+    });
+
+    if (names.length > 0 && isPDFClosed === false) {
+        $('#dropdownAnnoReference .js-text').text(names.join(','));
+        setTimeout(() => {
+            window.annoPage.displayAnnotation(false, false);
+        }, 500);
+
+    }
+
+}
+
+/**
+ * Get the file names which currently are displayed.
+ */
+function getCurrentFileNames() {
+
+    let text;
+
+    // a PDF name.
+    text = $('#dropdownPdf .js-text').text();
+    let pdfName = (text !== 'PDF File' ? text : null);
+
+    // a Primary anno.
+    text = $('#dropdownAnnoPrimary .js-text').text();
+    let primaryAnnotationName = (text !== 'Anno File' ? text : null);
+
+    let referenceAnnotationNames = [];
+    let referenceAnnotationColors = [];
+    $('#dropdownAnnoReference a').each((index, element) => {
+        let $elm = $(element);
+        if ($elm.find('.fa-check').hasClass('no-visible') === false) {
+            let annoName = $elm.find('.js-annoname').text();
+            referenceAnnotationNames.push(annoName);
+            let color = $elm.find('.js-anno-palette').spectrum('get').toHexString();
+            referenceAnnotationColors.push(color);
+        }
+    });
+
     return {
-        pdfs,
-        annos
+        pdfName,
+        primaryAnnotationName,
+        referenceAnnotationNames,
+        referenceAnnotationColors
     };
 }
 
 /**
- * Setup the contents of the dropdown for PDFs.
+ * Reset and setup the PDF dropdown.
  */
-function setPDFDropdownList(pdfs) {
+function setPDFDropdownList() {
 
+    // Reset the state of the PDF dropdown.
     $('#dropdownPdf .js-text').text('PDF File');
     $('#dropdownPdf li').remove();
-    pdfs.forEach(file => {
-        let pdfPath = _excludeBaseDirName(file.webkitRelativePath);
-        let snipet = `
+
+    // Create and setup the dropdown menu.
+    const snipets = window.annoPage.contentFiles.map(content => {
+        return `
             <li>
                 <a href="#">
-                    <i class="fa fa-check no-visible" aria-hidden="true"></i>&nbsp;
-                    <span class="js-pdfname">${pdfPath}</span>
+                    <i class="fa fa-check no-visible"></i>&nbsp;
+                    <span class="js-content-name">${content.name}</span>
                 </a>
             </li>
         `;
-        $('#dropdownPdf ul').append(snipet);
     });
+    $('#dropdownPdf ul').append(snipets.join(''));
 }
 
 /**
- * Setup the contents of the dropdowns for primary/reference annotations.
+ * Reset and setup the primary/reference annotation dropdown.
  */
-function setAnnoDropdownList(annos) {
+function setAnnoDropdownList() {
 
-    // Reset.
+    // Reset the UI of primary/reference anno dropdowns.
     $('#dropdownAnnoPrimary ul').html('');
     $('#dropdownAnnoReference ul').html('');
     $('#dropdownAnnoPrimary .js-text').text('Anno File');
     $('#dropdownAnnoReference .js-text').text('Reference Files');
 
     // Setup anno / reference dropdown.
-    annos.forEach(file => {
-
-        let fileName = _excludeBaseDirName(file.webkitRelativePath);
+    window.annoPage.annoFiles.forEach(file => {
 
         let snipet1 = `
             <li>
                 <a href="#">
                     <i class="fa fa-check no-visible" aria-hidden="true"></i>
-                    <span class="js-annoname">${fileName}</span>
+                    <span class="js-annoname">${file.name}</span>
                 </a>
             </li>
         `;
@@ -272,7 +223,7 @@ function setAnnoDropdownList(annos) {
                 <a href="#">
                     <i class="fa fa-check no-visible" aria-hidden="true"></i>
                     <input type="text" name="color" class="js-anno-palette" autocomplete="off">
-                    <span class="js-annoname">${fileName}</span>
+                    <span class="js-annoname">${file.name}</span>
                 </a>
             </li>
         `;
@@ -281,52 +232,4 @@ function setAnnoDropdownList(annos) {
 
     // Setup color pallets.
     setupColorPicker();
-}
-
-/**
- * Load PDFs and Annotations from the directory the user specified.
- */
-function loadData(pdfs, annos) {
-
-    window.fileMap = {};
-
-    return new Promise((resolve, reject) => {
-
-        let promises = [];
-
-        // Load pdfs.
-        let p = pdfs.map(file => {
-            return new Promise((resolve, reject) => {
-                let fileReader = new FileReader();
-                fileReader.onload = event => {
-                    let pdf = event.target.result;
-                    let fileName = _excludeBaseDirName(file.webkitRelativePath);
-                    fileMap[fileName] = pdf;
-                    resolve();
-                }
-                fileReader.readAsDataURL(file);
-            });
-        });
-        promises = promises.concat(p);
-
-        // Load annos.
-        p = annos.map(file => {
-            return new Promise((resolve, reject) => {
-                let fileReader = new FileReader();
-                fileReader.onload = event => {
-                    let annotation = event.target.result;
-                    let fileName = _excludeBaseDirName(file.webkitRelativePath);
-                    fileMap[fileName] = annotation;
-                    resolve();
-                }
-                fileReader.readAsText(file);
-            });
-        });
-        promises = promises.concat(p);
-
-        // Wait for complete.
-        Promise.all(promises).then(resolve);
-
-    });
-
 }

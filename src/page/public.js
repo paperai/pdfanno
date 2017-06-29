@@ -1,5 +1,4 @@
 import { convertFromExportY } from '../shared/coords';
-import { enableAnnotateTool, disableAnnotateTools } from './util/anno';
 import toml from 'toml';
 
 /**
@@ -48,14 +47,14 @@ export function addAllAnnotations(tomlObject) {
 export function addAnnotation(publicAnnotation) {
 
     let a = publicAnnotation.annotation;
-    window.iframeWindow.annotationContainer.add(a);
+    window.annoPage.addAnnotation(a);
     a.render();
     a.enableViewMode();
     a.save();
 
     // Restore the status of AnnoTools.
-    disableAnnotateTools();
-    enableAnnotateTool(window.currentAnnoToolType);
+    window.annoPage.disableAnnotateFunctions();
+    window.annoPage.enableAnnotateFunction(window.currentAnnoToolType);
 }
 
 /**
@@ -87,15 +86,15 @@ export class PublicRectAnnotation {
         // position: String -> Float.
         position = position.map(p => parseFloat(p));
 
-        let rect = iframeWindow.PDFAnnoCore.RectAnnotation.newInstance({
+        let rect = window.annoPage.createRectAnnotation({
             uuid     : id && String(id), // annotationid must be string.
             x        : position[0],
             y        : convertFromExportY(page, position[1]),
             width    : position[2],
             height   : position[3],
             text     : label,
-            color    : "#FF0000",  // TODO 固定で良い？
-            readOnly : false       // TODO 固定で良い？
+            color    : "#FF0000",
+            readOnly : false
         });
 
         this.annotation = rect;
@@ -131,12 +130,12 @@ export class PublicSpanAnnotation {
             }
         });
 
-        let span = window.iframeWindow.PDFAnnoCore.SpanAnnotation.newInstance({
+        let span = window.annoPage.createSpanAnnotation({
             uuid         : id && String(id), // annotationid must be string.
             rectangles   : position,
             text         : label,
-            color        : '#FFFF00',  // TODO 固定で良い？
-            readOnly     : false,      // TODO 固定で良い？
+            color        : '#FFFF00',
+            readOnly     : false,
             selectedText : text
         });
 
@@ -159,7 +158,7 @@ export class PublicRelationAnnotation {
             throw 'Set the ids.';
         }
 
-        let r = iframeWindow.PDFAnnoCore.RelationAnnotation.newInstance({
+        let r = window.annoPage.createRelationAnnotation({
             uuid      : id && String(id), // annotationid must be string.
             direction : dir,
             rel1      : typeof ids[0] === 'object' ? ids[0].annotation : ids[0],
@@ -182,5 +181,5 @@ export const readTOML = toml.parse;
  * Delete all annotations.
  */
 export function clear() {
-    window.iframeWindow.annotationContainer.getAllAnnotations().forEach(a => a.destroy());
+    window.annoPage.clearAllAnnotations();
 }

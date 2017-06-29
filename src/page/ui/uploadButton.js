@@ -9,7 +9,20 @@ export function setup() {
         if (!pdfFileName || pdfFileName === 'PDF File') {
             return alert('Display a PDF before upload.');
         }
-        const contentBase64 = window.fileMap[pdfFileName];
+        const conentFile = window.annoPage.getContentFile(pdfFileName);
+
+        function arrayBufferToBase64( buffer ) {
+            var binary = '';
+            var bytes = new Uint8Array( buffer );
+            var len = bytes.byteLength;
+            for (var i = 0; i < len; i++) {
+                binary += String.fromCharCode( bytes[ i ] );
+            }
+            return window.btoa( binary );
+        }
+
+        const contentBase64 = arrayBufferToBase64(conentFile.content);
+
 
         const $progressBar = $('.js-upload-progress');
 

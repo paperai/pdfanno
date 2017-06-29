@@ -3,10 +3,8 @@
  */
 
  let $inputLabel;
- let $form;
  window.addEventListener('DOMContentLoaded', () => {
     $inputLabel = $('#inputLabel');
-    $form = $('#autocompleteform');
  });
 
 let _blurListener;
@@ -24,9 +22,6 @@ export function enable({ uuid, text, disable=false, autoFocus=false, blurListene
         console.log('old _blurListener is called.');
     }
 
-    $form
-        .off('submit')
-        .on('submit', cancelSubmit);
 
     $inputLabel
         .attr('disabled', 'disabled')
@@ -54,9 +49,6 @@ export function enable({ uuid, text, disable=false, autoFocus=false, blurListene
         }
 
         saveText(uuid);
-
-        // Add an autocomplete candidate. (Firefox, Chrome)
-        $form.find('[type="submit"]').click();
     });
 
 };
@@ -71,7 +63,7 @@ export function disable() {
         .val('');
 }
 
-export function treatAnnotationDeleted({ uuid }) {
+function treatAnnotationDeleted({ uuid }) {
     console.log('treatAnnotationDeleted:', uuid);
 
     if (currentUUID === uuid) {
@@ -79,19 +71,19 @@ export function treatAnnotationDeleted({ uuid }) {
     }
 }
 
-export function handleAnnotationHoverIn(annotation) {
+function handleAnnotationHoverIn(annotation) {
     if (getSelectedAnnotations().length === 0) {
         enable({ uuid : annotation.uuid, text : annotation.text, disable : true });
     }
 }
 
-export function handleAnnotationHoverOut(annotation) {
+function handleAnnotationHoverOut(annotation) {
     if (getSelectedAnnotations().length === 0) {
         disable();
     }
 }
 
-export function handleAnnotationSelected(annotation) {
+function handleAnnotationSelected(annotation) {
     if (getSelectedAnnotations().length === 1) {
         enable({ uuid : annotation.uuid, text : annotation.text });
     } else {
@@ -99,7 +91,7 @@ export function handleAnnotationSelected(annotation) {
     }
 }
 
-export function handleAnnotationDeselected() {
+function handleAnnotationDeselected() {
     const annos = getSelectedAnnotations();
     if (annos.length === 1) {
         enable({ uuid : annos[0].uuid, text : annos[0].text });
@@ -109,19 +101,14 @@ export function handleAnnotationDeselected() {
 }
 
 function getSelectedAnnotations() {
-    return iframeWindow.annotationContainer.getSelectedAnnotations();
-}
-
-function cancelSubmit(e) {
-  e.preventDefault();
-  return false;
+    return window.annoPage.getSelectedAnnotations();
 }
 
 function saveText(uuid) {
 
     const text = $inputLabel.val() || '';
 
-    const annotation = window.iframeWindow.annotationContainer.findById(uuid);
+    const annotation = window.annoPage.findAnnotationById(uuid);
     if (annotation) {
         annotation.text = text;
         annotation.save();
@@ -135,6 +122,18 @@ function saveText(uuid) {
  */
 const LSKEY_DATALIST = '_pdfanno_datalist';
 
+export function setup() {
+
+    // set datalist.
+    setDatalist();
+
+    // set actions.
+    setupActions();
+
+    // Start to listen window events.
+    listenWindowEvents();
+}
+
 function setDatalist() {
 
     // set datalist.
@@ -145,11 +144,7 @@ function setDatalist() {
     $('#labels').html(options);
 }
 
-export function setup() {
-
-    // set datalist.
-    setDatalist();
-
+function setupActions() {
     // Setup datalist modal.
     $('#datalistModal').off().on('show.bs.modal', e => {
 
@@ -207,5 +202,46 @@ export function setup() {
         setDatalist();
 
         $('#datalistModal').modal('hide');
+    });
+}
+
+
+function listenWindowEvents() {
+
+    // enable text input.
+    window.addEventListener('enableTextInput', e => {
+        console.log('enableTextInput:', e.detail);
+        enable(e.detail);
+    });
+
+    // disable text input.
+    window.addEventListener('disappearTextInput', e => {
+        console.log('disappearTextInput:', e.detail);
+        disable(e.detail);
+    });
+
+    // handle annotation deleted.
+    window.addEventListener('annotationDeleted', e => {
+        treatAnnotationDeleted(e.detail);
+    });
+
+    // handle annotation hoverIn.
+    window.addEventListener('annotationHoverIn' , e => {
+        handleAnnotationHoverIn(e.detail);
+    });
+
+    // handle annotation hoverOut.
+    window.addEventListener('annotationHoverOut' , e => {
+        handleAnnotationHoverOut(e.detail);
+    });
+
+    // handle annotation selected.
+    window.addEventListener('annotationSelected' , e => {
+        handleAnnotationSelected(e.detail);
+    });
+
+    // handle annotation deselected.
+    window.addEventListener('annotationDeselected' , () => {
+        handleAnnotationDeselected();
     });
 }
