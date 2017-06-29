@@ -62,45 +62,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var browseButton = _interopRequireWildcard(_browseButton);
 	
-	var _pdfDropdown = __webpack_require__(51);
+	var _pdfDropdown = __webpack_require__(50);
 	
 	var pdfDropdown = _interopRequireWildcard(_pdfDropdown);
 	
-	var _primaryAnnoDropdown = __webpack_require__(53);
+	var _primaryAnnoDropdown = __webpack_require__(51);
 	
 	var primaryAnnoDropdown = _interopRequireWildcard(_primaryAnnoDropdown);
 	
-	var _annoListDropdown = __webpack_require__(54);
+	var _annoListDropdown = __webpack_require__(52);
 	
 	var annoListDropdown = _interopRequireWildcard(_annoListDropdown);
 	
-	var _referenceAnnoDropdown = __webpack_require__(55);
+	var _referenceAnnoDropdown = __webpack_require__(53);
 	
 	var referenceAnnoDropdown = _interopRequireWildcard(_referenceAnnoDropdown);
 	
-	var _downloadButton = __webpack_require__(56);
+	var _downloadButton = __webpack_require__(54);
 	
 	var downloadButton = _interopRequireWildcard(_downloadButton);
 	
-	var _uploadButton = __webpack_require__(58);
+	var _uploadButton = __webpack_require__(56);
 	
 	var uploadButton = _interopRequireWildcard(_uploadButton);
 	
-	var _annotationTools = __webpack_require__(59);
+	var _annotationTools = __webpack_require__(57);
 	
 	var annotationTools = _interopRequireWildcard(_annotationTools);
 	
-	var _inputLabel = __webpack_require__(60);
+	var _inputLabel = __webpack_require__(58);
 	
 	var inputLabel = _interopRequireWildcard(_inputLabel);
 	
-	var _window = __webpack_require__(57);
+	var _window = __webpack_require__(55);
 	
-	var _public = __webpack_require__(61);
+	var _public = __webpack_require__(59);
 	
 	var publicApi = _interopRequireWildcard(_public);
 	
-	var _PDFAnnoPage = __webpack_require__(62);
+	var _PDFAnnoPage = __webpack_require__(60);
 	
 	var _PDFAnnoPage2 = _interopRequireDefault(_PDFAnnoPage);
 	
@@ -108,138 +108,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
-	/*
-	    UIの非依存.
-	
-	    ベースのディレクトリ：src/page/pdf
-	
-	    ※ 以下の「◎」をUIから切り出す必要があり、それらをAbstractAnnoPageなどのクラスにインターフェースとして定義し、
-	    　　　　それをPDFAnnoとHTMLAnnoでそれぞれ実装することで、UIを再利用できる作りにできそうです。
-	
-	    Browseボタン
-	        ・Fileダイアログから読み込んで、PDFとAnnoをメモリ上に保持.
-	            ◎ loadFiles
-	                ・PDFとAnnoを読み込んでメモリ上に保持する.
-	                ・引数：files
-	                ・戻り値：Promise（処理終了時にresolve）
-	    PDFドロップダウン
-	        ・開くとき
-	            ・PDF一覧を取得して、一覧表示
-	                ◎ getContentList
-	                    ・メモリ上に存在するPDF一覧を返却する
-	                    ・引数：なし
-	                    ・戻り値：PDF一覧（[{name: "a.pdf", content: "xxx"}, {name: "b.pdf", content: "yyy"}]
-	                ◎ getDisplayedPDF
-	                    ・現在ビュワーに表示しているPDFを返却する（リストボックスの`チェックマーク`に利用）
-	                    ・引数：なし
-	                    ・戻り値：PDF情報（{name: "a.pdf", content: "xxx"}）、選択なしの場合はnull
-	        ・Click
-	            ・選択されたPDFをViewerに表示
-	                ◎ displayPDF
-	                    ・引数で指定されたPDFをビュワーに表示する
-	                    ・引数：PDF名
-	                    ・戻り値：なし
-	    Annoドロップダウン
-	        ・開くとき
-	            ・Anno一覧を取得して、一覧表示
-	                ◎ getAnnoFileList
-	                    ・メモリ上に存在するAnnoFile一覧を返却する
-	                    ・引数：なし
-	                    ・戻り値：Anno一覧（[{name: "a.anno", content: "xxx"}, {name: "b.anno", content: "yyy"}]
-	                ◎ getDisplayedPrimaryAnnoFile
-	                    ・現在ビュワーに表示しているPrimaryAnnoFileを返却する（リストボックスの`チェックマーク`に利用）
-	                    ・引数：なし
-	                    ・戻り値：Anno情報（{name: "a.anno", content: "xxx"}）、選択なしの場合はnull
-	        ・Click
-	            ・選択されたAnnoをPrimaryとしてViewerに表示
-	                ◎ displayPrimaryAnnoFile
-	                    ・引数で指定されたPrimaryAnnoFileをビュワーに表示する
-	                    ・引数：AnnoFile名
-	                    ・戻り値：なし
-	    Referenceドロップダウン
-	        ・開くとき
-	            ・Anno一覧を取得して、一覧表示
-	                ◎ getAnnoFileList
-	                    ・同上
-	                ◎ getDisplayedReferenceAnnoFiles
-	                    ・現在ビュワーに表示しているReferenceAnnoFileを返却する（リストボックスの`チェックマーク`に利用）
-	                    ・引数：なし
-	                    ・戻り値：AnnoFile一覧（[{name: "a.anno", content: "xxx"}, {name: "b.anno", content: "xxx"}]）、選択なしの場合は空配列
-	        ・Click
-	            ・選択されたAnnoをReferenceとしてViewerに表示
-	                ◎ displayReferenceAnnoFiles
-	                    ・引数で指定されたAnnoFileを追加/削除し、ビュワーに表示する
-	                    ・引数1：AnnoFile名
-	                    ・引数2：処理タイプ（Add / Remove）
-	                    ・戻り値：なし
-	    AnnoListドロップダウン
-	        ・開くとき
-	            ・表示中のPrimaryAnno一覧を取得して、一覧表示
-	                ◎ getPrimaryAnnos
-	                    ・現在ビュワーに表示しているPrimaryAnno一覧を返却する.
-	                    ・引数：なし
-	                    ・戻り値：PrimaryAnno一覧（[アノテーション情報]）
-	        ・Click
-	            ・選択されたAnnoまでスクロールして強調表示
-	                ◎ scrollToAnno
-	                    ・引数で指定されたPrimaryAnnoまでビュワーをスクロールする.
-	                    ・引数：アノテーション情報（またはアノテーションのid）
-	                    ・戻り値：なし
-	    Downloadボタン
-	        ・表示中のPrimaryAnnoをダウンロードできる
-	                ◎ getPrimaryAnnosAsTOML
-	                    ・現在ビュワーに表示しているPrimaryAnno一覧をTOML形式で返却する.
-	                    ・引数：なし
-	                    ・戻り値：TOMLファイル
-	    Viewer
-	        ・ビュワーを表示する
-	            ◎ displayViewer
-	                ・ビュワーを表示します
-	                ・引数：なし
-	                ・戻り値：なし
-	    アノテーションツール（Span, Arrow, Rect）
-	        ・アノテーションをPrimaryとして新規追加する
-	            ◎ addSpan
-	                ・Spanを追加します.
-	                ・引数：なし
-	                ・戻り値：追加成功の場合はOK、NGの場合はエラー理由（文字列未選択など）
-	            ◎ addRelation
-	                ・Relationを追加します.
-	                ・引数：タイプ（two-way / one-way / link）
-	                ・戻り値：追加成功の場合はOK、NGの場合はエラー理由（アノテーション未選択など）
-	            ◎ enableRectMode
-	                ・Rectを描画する状態にします.
-	                ・引数：なし
-	                ・戻り値：なし
-	            ◎ disableRectMode
-	                ・Rectの描画状態を解除します.
-	                ・引数：なし
-	                ・戻り値：なし
-	    ラベル入力
-	        ・ラベルの表示
-	            ・requestEnableLabel（PDFAnno -> UI へ Window.Event経由で呼び出す）
-	                ・ラベルインプットに情報を表示します
-	                ・引数1：テキスト
-	                ・引数2：状態（読み取り専用 / 書き込み可）
-	                ・引数3：アノテーションID
-	                ・戻り値：なし
-	            ・requestDisableLabel（PDFAnno -> UI へ Window.Event経由で呼び出す）
-	                ・ラベルインプットを初期状態に戻す
-	                ・引数：なし
-	                ・戻り値：なし
-	        ・ラベルの入力と更新
-	            ◎ updateLabel
-	                ・アノテーションの保持するラベルを更新する.（ユーザーの入力に応じて）
-	                ・引数1：アノテーションID
-	                ・引数2：変更後のテキスト
-	                ・戻り値：なし
-	    PDFアップロード
-	        ・表示中のPDFをサーバーへアップロード
-	            ◎ getDisplayedPDF
-	                ・同上
-	*/
-	__webpack_require__(65);
-	__webpack_require__(66);
+	__webpack_require__(62);
+	__webpack_require__(63);
 	
 	// UIs.
 	
@@ -4855,17 +4725,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _display = __webpack_require__(49);
 	
-	var _pdf = __webpack_require__(50);
-	
-	var _pdf2 = _interopRequireDefault(_pdf);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
 	/**
 	 * Setup the behavior of a Browse Button.
-	 */
-	/**
-	 * UI parts - Browse button.
 	 */
 	function setup() {
 	
@@ -4892,17 +4753,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            window.annoPage.clearAllAnnotations();
 	
 	            // Setup PDF Dropdown.
-	            // setPDFDropdownList(1);
 	            setPDFDropdownList();
 	
 	            // Setup Anno Dropdown.
 	            setAnnoDropdownList();
 	
 	            // Display a PDF and annotations.
-	            // display(current, pdfDataMap, annoDataMap);
-	            display();
-	
-	            // TODO Browseボタン以前の選択状態の復元と、ビュワーの復元をする.
+	            restoreBeforeState(current);
 	        });
 	    });
 	}
@@ -4910,11 +4767,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Check whether the directory the user specified is valid.
 	 */
+	/**
+	 * UI parts - Browse button.
+	 */
 	
-	
-	// TODO Refactoring.
-	
-	// TODO Remove ?
 	function isValidDirectorySelect(files) {
 	
 	    // Error, if no contents exits.
@@ -4932,52 +4788,54 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return null;
 	}
 	
-	function display() {
-	
-	    var currentDisplay = getCurrentFileNames();
+	/**
+	 * Restore the state before Browse button was clicked.
+	 */
+	function restoreBeforeState(currentDisplay) {
 	
 	    var files = void 0;
+	
+	    var isPDFClosed = false;
 	
 	    // Restore the check state of a content.
 	    files = window.annoPage.contentFiles.filter(function (c) {
 	        return c.name === currentDisplay.pdfName;
 	    });
 	    if (files.length > 0) {
-	        window.pdf = files[0].content;
-	        window.pdfName = files[0].name;
-	
-	        $('#dropdownPdf .js-text').text(name);
+	        $('#dropdownPdf .js-text').text(files[0].name);
 	        $('#dropdownPdf a').each(function (index, element) {
 	            var $elm = $(element);
-	            if ($elm.find('.js-pdfname').text() === currentDisplay.pdfName) {
+	            if ($elm.find('.js-content-name').text() === currentDisplay.pdfName) {
 	                $elm.find('.fa-check').removeClass('no-visible');
 	            }
 	        });
 	    } else {
-	        delete window.pdf;
-	        delete window.pdfName;
+	
+	        isPDFClosed = true;
+	
+	        window.annoPage.closePDFViewer();
 	    }
 	
 	    // Restore the check state of a primaryAnno.
 	    files = window.annoPage.annoFiles.filter(function (c) {
 	        return c.name === currentDisplay.primaryAnnotationName;
 	    });
-	    var promise1 = Promise.resolve();
-	    if (files.length > 0) {
+	    if (files.length > 0 && isPDFClosed === false) {
 	        $('#dropdownAnnoPrimary .js-text').text(currentDisplay.primaryAnnotationName);
 	        $('#dropdownAnnoPrimary a').each(function (index, element) {
 	            var $elm = $(element);
-	            if ($elm.find('.js-annoname').text() === name) {
+	            if ($elm.find('.js-annoname').text() === currentDisplay.primaryAnnotationName) {
 	                $elm.find('.fa-check').removeClass('no-visible');
 	            }
 	        });
-	        promise1 = (0, _display.displayAnnotation)(true, false);
+	        setTimeout(function () {
+	            window.annoPage.displayAnnotation(true, false);
+	        }, 100);
 	    }
 	
 	    // Restore the check states of referenceAnnos.
 	    var names = currentDisplay.referenceAnnotationNames;
 	    var colors = currentDisplay.referenceAnnotationColors;
-	    var changed = false;
 	    names = names.filter(function (name, i) {
 	        var found = false;
 	        var annos = window.annoPage.annoFiles.filter(function (c) {
@@ -4995,29 +4853,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return found;
 	    });
-	    var promise2 = Promise.resolve();
-	    if (names.length > 0) {
+	
+	    if (names.length > 0 && isPDFClosed === false) {
 	        $('#dropdownAnnoReference .js-text').text(names.join(','));
-	        promise2 = (0, _display.displayAnnotation)(false, false);
+	        setTimeout(function () {
+	            window.annoPage.displayAnnotation(false, false);
+	        }, 500);
 	    }
-	
-	    // Reload page.
-	    Promise.all([promise1, promise2]).then(_display.reloadPDFViewer);
-	}
-	
-	/**
-	 * Get a filename from a path.
-	 */
-	// TODO No need ?
-	function _excludeBaseDirName(filePath) {
-	    var frgms = filePath.split('/');
-	    return frgms[frgms.length - 1];
 	}
 	
 	/**
 	 * Get the file names which currently are displayed.
 	 */
-	// TODO Refactoring independent from UI.
 	function getCurrentFileNames() {
 	
 	    var text = void 0;
@@ -5035,7 +4882,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    $('#dropdownAnnoReference a').each(function (index, element) {
 	        var $elm = $(element);
 	        if ($elm.find('.fa-check').hasClass('no-visible') === false) {
-	            var annoName = $elm.find('.js-annoname').text(); // TODO こういうのはJS変数として持っておいたほうがいいかも（選択済のものについて）
+	            var annoName = $elm.find('.js-annoname').text();
 	            referenceAnnotationNames.push(annoName);
 	            var color = $elm.find('.js-anno-palette').spectrum('get').toHexString();
 	            referenceAnnotationColors.push(color);
@@ -5051,93 +4898,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	/**
-	 * Setup the contents of the dropdown for PDFs.
+	 * Reset and setup the PDF dropdown.
 	 */
-	// function setPDFDropdownList(pdfs=[]) {
-	
-	//     console.log('pdfs:', pdfs);
-	
-	//     $('#dropdownPdf .js-text').text('PDF File');
-	//     $('#dropdownPdf li').remove();
-	//     pdfs.forEach(file => {
-	//         let pdfPath = _excludeBaseDirName(file.webkitRelativePath);
-	//         let snipet = `
-	//             <li>
-	//                 <a href="#">
-	//                     <i class="fa fa-check no-visible" aria-hidden="true"></i>&nbsp;
-	//                     <span class="js-pdfname">${pdfPath}</span>
-	//                 </a>
-	//             </li>
-	//         `;
-	//         $('#dropdownPdf ul').append(snipet);
-	//     });
-	// }
 	function setPDFDropdownList() {
 	
-	    var pdfs = window.annoPage.contentFiles;
-	
-	    console.log('pdfs:', pdfs);
-	
+	    // Reset the state of the PDF dropdown.
 	    $('#dropdownPdf .js-text').text('PDF File');
 	    $('#dropdownPdf li').remove();
-	    pdfs.forEach(function (pdf) {
-	        // let pdfPath = _excludeBaseDirName(pdf.webkitRelativePath);
-	        // let pdfPath = _excludeBaseDirName()
-	        var snipet = '\n            <li>\n                <a href="#">\n                    <i class="fa fa-check no-visible"></i>&nbsp;\n                    <span class="js-pdfname">' + pdf.name + '</span>\n                </a>\n            </li>\n        ';
-	        $('#dropdownPdf ul').append(snipet);
+	
+	    // Create and setup the dropdown menu.
+	    var snipets = window.annoPage.contentFiles.map(function (content) {
+	        return '\n            <li>\n                <a href="#">\n                    <i class="fa fa-check no-visible"></i>&nbsp;\n                    <span class="js-content-name">' + content.name + '</span>\n                </a>\n            </li>\n        ';
 	    });
+	    $('#dropdownPdf ul').append(snipets.join(''));
 	}
 	
 	/**
-	 * Setup the contents of the dropdowns for primary/reference annotations.
+	 * Reset and setup the primary/reference annotation dropdown.
 	 */
-	// function setAnnoDropdownList(annos=[]) {
-	
-	//     // Reset.
-	//     $('#dropdownAnnoPrimary ul').html('');
-	//     $('#dropdownAnnoReference ul').html('');
-	//     $('#dropdownAnnoPrimary .js-text').text('Anno File');
-	//     $('#dropdownAnnoReference .js-text').text('Reference Files');
-	
-	//     // Setup anno / reference dropdown.
-	//     annos.forEach(file => {
-	
-	//         let fileName = _excludeBaseDirName(file.webkitRelativePath);
-	
-	//         let snipet1 = `
-	//             <li>
-	//                 <a href="#">
-	//                     <i class="fa fa-check no-visible" aria-hidden="true"></i>
-	//                     <span class="js-annoname">${fileName}</span>
-	//                 </a>
-	//             </li>
-	//         `;
-	//         $('#dropdownAnnoPrimary ul').append(snipet1);
-	
-	//         let snipet2 = `
-	//             <li>
-	//                 <a href="#">
-	//                     <i class="fa fa-check no-visible" aria-hidden="true"></i>
-	//                     <input type="text" name="color" class="js-anno-palette" autocomplete="off">
-	//                     <span class="js-annoname">${fileName}</span>
-	//                 </a>
-	//             </li>
-	//         `;
-	//         $('#dropdownAnnoReference ul').append(snipet2);
-	//     });
-	
-	//     // Setup color pallets.
-	//     setupColorPicker();
-	// }
-	
-	
 	function setAnnoDropdownList() {
 	
-	    // const annoFiles = window.annoPage.annoFiles;
-	
-	    // console.log('setAnnoDropdownList:', window.annoPage.annoFiles);
-	
-	    // Reset.
+	    // Reset the UI of primary/reference anno dropdowns.
 	    $('#dropdownAnnoPrimary ul').html('');
 	    $('#dropdownAnnoReference ul').html('');
 	    $('#dropdownAnnoPrimary .js-text').text('Anno File');
@@ -5145,10 +4926,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // Setup anno / reference dropdown.
 	    window.annoPage.annoFiles.forEach(function (file) {
-	
-	        console.log('anno:', file.name);
-	
-	        // let fileName = _excludeBaseDirName(file.webkitRelativePath);
 	
 	        var snipet1 = '\n            <li>\n                <a href="#">\n                    <i class="fa fa-check no-visible" aria-hidden="true"></i>\n                    <span class="js-annoname">' + file.name + '</span>\n                </a>\n            </li>\n        ';
 	        $('#dropdownAnnoPrimary ul').append(snipet1);
@@ -5160,8 +4937,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Setup color pallets.
 	    (0, _display.setupColorPicker)();
 	}
-	
-	// console.log('getCurrentFileNames:', getCurrentFileNames);
 
 /***/ },
 /* 49 */
@@ -5172,120 +4947,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.displayAnnotation = displayAnnotation;
-	exports.reloadPDFViewer = reloadPDFViewer;
 	exports.setupColorPicker = setupColorPicker;
-	
-	
 	/**
-	 * Display annotations an user selected.
+	 * The utilities for display.
 	 */
-	// TODO move to PDFAnnoPage.js
-	function displayAnnotation(isPrimary) {
-	    var reload = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-	
-	
-	    var annotations = [];
-	    var colors = [];
-	    var primaryIndex = -1;
-	
-	    // Primary annotation.
-	    if (isPrimary) {
-	        $('#dropdownAnnoPrimary a').each(function (index, element) {
-	            var $elm = $(element);
-	            if ($elm.find('.fa-check').hasClass('no-visible') === false) {
-	                var annoPath = $elm.find('.js-annoname').text();
-	
-	                var annoFile = window.annoPage.getAnnoFile(annoPath);
-	                if (!annoFile) {
-	                    console.log('ERROR');
-	                    return;
-	                }
-	                primaryIndex = 0;
-	                annotations.push(annoFile.content);
-	                var color = null; // Use the default color used for edit.
-	                colors.push(color);
-	
-	                // let filename = annoPath.split('/')[annoPath.split('/').length - 1];
-	                var filename = annoFile.name;
-	                localStorage.setItem('_pdfanno_primary_annoname', filename);
-	                console.log('filename:', filename);
-	            }
-	        });
-	    }
-	
-	    // Reference annotations.
-	    if (!isPrimary) {
-	        $('#dropdownAnnoReference a').each(function (index, element) {
-	            var $elm = $(element);
-	            if ($elm.find('.fa-check').hasClass('no-visible') === false) {
-	                var annoPath = $elm.find('.js-annoname').text();
-	
-	                var annoFile = window.annoPage.getAnnoFile(annoPath);
-	
-	                if (!annoFile) {
-	                    console.log('ERROR');
-	                    return;
-	                }
-	                annotations.push(annoFile.content);
-	                var color = $elm.find('.js-anno-palette').spectrum('get').toHexString();
-	                console.log(color);
-	                colors.push(color);
-	            }
-	        });
-	    }
-	
-	    console.log('colors:', colors);
-	
-	    // Create import data.
-	    var paperData = {
-	        primary: primaryIndex,
-	        colors: colors,
-	        annotations: annotations
-	    };
-	
-	    // Pass the data to pdf-annotatejs.
-	    // TODO Discard storeAdaptor.
-	    window.iframeWindow.PDFAnnoCore.getStoreAdapter().importAnnotations(paperData, isPrimary).then(function (result) {
-	
-	        // if (reload) {
-	        //     // Reload the viewer.
-	        //     reloadPDFViewer();
-	        // }
-	
-	        iframeWindow.removeAnnoLayer();
-	        iframeWindow.renderAnno();
-	
-	        // return true;
-	    });
-	}
-	
-	/**
-	 * Reload PDF Viewer.
-	 */
-	// TODO Need?
-	// TODO UI分離.
-	function reloadPDFViewer() {
-	
-	    // Reset setting.
-	    window.annoPage.resetPDFViewerSettings();
-	
-	    // Reload pdf.js.
-	    $('#viewer iframe').remove();
-	    $('#viewer').html('<iframe src="./pages/viewer.html" class="anno-viewer" frameborder="0"></iframe>');
-	
-	    // Restart.
-	    var event = document.createEvent('CustomEvent');
-	    event.initCustomEvent('restartApp', true, true, null);
-	    window.dispatchEvent(event);
-	
-	    // Catch the event iframe is ready.
-	    function iframeReady() {
-	        console.log('iframeReady');
-	        window.removeEventListener('annotationrendered', iframeReady);
-	    }
-	    window.addEventListener('annotationrendered', iframeReady);
-	}
 	
 	/**
 	 * Setup the color pickers.
@@ -5307,21 +4972,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	
 	    // Setup behavior.
-	    $('.js-anno-palette').off('change').on('change', displayAnnotation.bind(null, false));
+	    $('.js-anno-palette').off('change').on('change', window.annoPage.displayAnnotation.bind(null, false));
 	}
 
 /***/ },
 /* 50 */
 /***/ function(module, exports) {
-
-	/**
-	 *  PDFAnnoPage functions.
-	 */
-	"use strict";
-
-/***/ },
-/* 51 */
-/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -5329,30 +4985,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	exports.setup = setup;
-	
-	var _display = __webpack_require__(49);
-	
-	var _dropdown = __webpack_require__(52);
-	
-	// TODO Refactoring.
+	/**
+	 * UI parts - PDF Dropdown.
+	 */
 	
 	/**
 	 * Setup the dropdown of PDFs.
-	 */
-	/**
-	 * UI parts - PDF Dropdown.
 	 */
 	function setup() {
 	
 	    $('#dropdownPdf').on('click', 'a', function (e) {
 	
 	        var $this = $(e.currentTarget);
-	        // TODO pdfPath to name.
-	        // TODO js-pdfname to js-content-name
-	        var pdfPath = $this.find('.js-pdfname').text();
 	
+	        // Get the name of PDF clicked.
+	        var pdfName = $this.find('.js-content-name').text();
+	
+	        // Get the name of PDF currently displayed.
 	        var currentPDFName = $('#dropdownPdf .js-text').text();
-	        if (currentPDFName === pdfPath) {
+	
+	        // No action, if the current PDF is selected.
+	        if (currentPDFName === pdfName) {
 	            console.log('Not reload. the pdf are same.');
 	            return;
 	        }
@@ -5364,26 +5017,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	
-	        $('#dropdownPdf .js-text').text(pdfPath);
+	        // Update PDF's name displayed.
+	        $('#dropdownPdf .js-text').text(pdfName);
 	
+	        // Update the dropdown selection.
 	        $('#dropdownPdf .fa-check').addClass('no-visible');
 	        $this.find('.fa-check').removeClass('no-visible');
 	
-	        var content = window.annoPage.getContentFile(pdfPath);
+	        // Get the content.
+	        var content = window.annoPage.getContentFile(pdfName);
 	        if (!content) {
 	            return false;
 	        }
 	
-	        // Reset Primary/Reference anno dropdowns, and data.
+	        // Reset annotations displayed.
 	        window.annoPage.clearAllAnnotations();
-	        (0, _dropdown.resetCheckPrimaryAnnoDropdown)();
-	        (0, _dropdown.resetCheckReferenceAnnoDropdown)();
 	
-	        // reload.
+	        // Reset annotations' dropdowns.
+	        resetCheckPrimaryAnnoDropdown();
+	        resetCheckReferenceAnnoDropdown();
+	
+	        // Display the PDF on the viewer.
 	        window.annoPage.displayViewer(content);
-	        // window.pdf = content.content;
-	        // window.fileName = content.name;
-	        // reloadPDFViewer();
 	
 	        // Close dropdown.
 	        $('#dropdownPdf').click();
@@ -5391,9 +5046,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return false;
 	    });
 	}
+	
+	/**
+	 * Reset the primary annotation dropdown selection.
+	 */
+	function resetCheckPrimaryAnnoDropdown() {
+	    $('#dropdownAnnoPrimary .js-text').text('Anno File');
+	    $('#dropdownAnnoPrimary .fa-check').addClass('no-visible');
+	}
+	
+	/**
+	 * Reset the reference annotation dropdown selection.
+	 */
+	function resetCheckReferenceAnnoDropdown() {
+	    $('#dropdownAnnoReference .js-text').text('Reference Files');
+	    $('#dropdownAnnoReference .fa-check').addClass('no-visible');
+	}
 
 /***/ },
-/* 52 */
+/* 51 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -5401,38 +5072,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.resetCheckPrimaryAnnoDropdown = resetCheckPrimaryAnnoDropdown;
-	exports.resetCheckReferenceAnnoDropdown = resetCheckReferenceAnnoDropdown;
-	/**
-	 * Utility functions for dropdown UIs.
-	 */
-	
-	// TODO Need?
-	function resetCheckPrimaryAnnoDropdown() {
-	    $('#dropdownAnnoPrimary .js-text').text('Anno File');
-	    $('#dropdownAnnoPrimary .fa-check').addClass('no-visible');
-	}
-	
-	// TODO Need?
-	function resetCheckReferenceAnnoDropdown() {
-	    $('#dropdownAnnoReference .js-text').text('Reference Files');
-	    $('#dropdownAnnoReference .fa-check').addClass('no-visible');
-	}
-
-/***/ },
-/* 53 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
 	exports.setup = setup;
-	
-	var _display = __webpack_require__(49);
-	
-	// TODO Refactoring.
+	/**
+	 * UI parts - Primary Annotation Dropdown.
+	 */
 	
 	/**
 	 * Setup a click action of the Primary Annotation Dropdown.
@@ -5476,19 +5119,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        $this.find('.fa-check').removeClass('no-visible');
 	
 	        // reload.
-	        (0, _display.displayAnnotation)(true);
+	        window.annoPage.displayAnnotation(true);
 	
 	        // Close
 	        $('#dropdownAnnoPrimary').click();
 	
 	        return false;
 	    });
-	} /**
-	   * UI parts - Primary Annotation Dropdown.
-	   */
+	}
 
 /***/ },
-/* 54 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5610,8 +5251,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 55 */
-/***/ function(module, exports, __webpack_require__) {
+/* 53 */
+/***/ function(module, exports) {
 
 	'use strict';
 	
@@ -5619,8 +5260,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	exports.setup = setup;
-	
-	var _display = __webpack_require__(49);
+	/**
+	 * UI parts - Reference Annotation Dropdown.
+	 */
 	
 	/**
 	 * Setup a click action of the Reference Annotation Dropdown.
@@ -5646,17 +5288,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	            $('#dropdownAnnoReference .js-text').text('Reference Files');
 	        }
 	
-	        // TODO Move to PDFAnnoPage.js.
-	        (0, _display.displayAnnotation)(false);
+	        window.annoPage.displayAnnotation(false);
 	
 	        return false;
 	    });
-	} /**
-	   * UI parts - Reference Annotation Dropdown.
-	   */
+	}
 
 /***/ },
-/* 56 */
+/* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5666,7 +5305,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.setup = setup;
 	
-	var _window = __webpack_require__(57);
+	var _window = __webpack_require__(55);
 	
 	/**
 	 * Setup the behavior of a Download Button.
@@ -5691,7 +5330,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function downloadAnnotation() {
 	
-	    // TODO UIとの分離.
 	    window.annoPage.exportData().then(function (annotations) {
 	        var blob = new Blob([annotations]);
 	        var blobURL = window.URL.createObjectURL(blob);
@@ -5729,7 +5367,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 57 */
+/* 55 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -5875,7 +5513,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 58 */
+/* 56 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -5887,8 +5525,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * UI parts - Upload Button.
 	 */
-	
-	// TODO Refactoring.
 	
 	function setup() {
 	    $('.js-btn-upload').off('click').on('click', function () {
@@ -5973,7 +5609,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 59 */
+/* 57 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -5990,9 +5626,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Set the behavior of the tool buttons for annotations.
 	*/
 	function setup() {
-	
-	    // TODO Restoreようだけど必要？
-	    window.currentAnnoToolType = 'view';
 	
 	    // Rect annotation button.
 	    $('.js-tool-btn-rect').off('click').on('click', function (e) {
@@ -6030,7 +5663,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 60 */
+/* 58 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -6046,11 +5679,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	
 	var $inputLabel = void 0;
-	// TODO Remove?
-	var $form = void 0;
 	window.addEventListener('DOMContentLoaded', function () {
 	    $inputLabel = $('#inputLabel');
-	    $form = $('#autocompleteform');
 	});
 	
 	var _blurListener = void 0;
@@ -6077,8 +5707,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        console.log('old _blurListener is called.');
 	    }
 	
-	    $form.off('submit').on('submit', cancelSubmit);
-	
 	    $inputLabel.attr('disabled', 'disabled').val(text || '').off('blur').off('keyup');
 	
 	    if (disable === false) {
@@ -6099,9 +5727,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        saveText(uuid);
-	
-	        // Add an autocomplete candidate. (Firefox, Chrome)
-	        $form.find('[type="submit"]').click();
 	    });
 	};
 	
@@ -6154,11 +5779,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function getSelectedAnnotations() {
 	    return window.annoPage.getSelectedAnnotations();
-	}
-	// TODO No need ?
-	function cancelSubmit(e) {
-	    e.preventDefault();
-	    return false;
 	}
 	
 	function saveText(uuid) {
@@ -6291,7 +5911,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 61 */
+/* 59 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6317,9 +5937,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	// TODO Refactoring.
-	// TODO UI分離.
 	
 	/**
 	 * Add all annotations.
@@ -6423,8 +6040,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        width: position[2],
 	        height: position[3],
 	        text: label,
-	        color: "#FF0000", // TODO 固定で良い？
-	        readOnly: false // TODO 固定で良い？
+	        color: "#FF0000",
+	        readOnly: false
 	    });
 	
 	    this.annotation = rect;
@@ -6477,8 +6094,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        uuid: id && String(id), // annotationid must be string.
 	        rectangles: position,
 	        text: label,
-	        color: '#FFFF00', // TODO 固定で良い？
-	        readOnly: false, // TODO 固定で良い？
+	        color: '#FFFF00',
+	        readOnly: false,
 	        selectedText: text
 	    });
 	
@@ -6536,7 +6153,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 62 */
+/* 60 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6547,39 +6164,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _AbstractAnnoPage2 = __webpack_require__(63);
-	
-	var _AbstractAnnoPage3 = _interopRequireDefault(_AbstractAnnoPage2);
-	
-	var _loadFiles2 = __webpack_require__(64);
+	var _loadFiles2 = __webpack_require__(61);
 	
 	var _loadFiles3 = _interopRequireDefault(_loadFiles2);
 	
 	var _util = __webpack_require__(41);
 	
-	var _window = __webpack_require__(57);
+	var _window = __webpack_require__(55);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
 	/**
 	 * PDFAnno's Annotation functions for Page produced by .
 	 */
-	var PDFAnnoPage = function (_AbstractAnnoPage) {
-	    _inherits(PDFAnnoPage, _AbstractAnnoPage);
-	
+	var PDFAnnoPage = function () {
 	    function PDFAnnoPage() {
 	        _classCallCheck(this, PDFAnnoPage);
 	
-	        var _this = _possibleConstructorReturn(this, (PDFAnnoPage.__proto__ || Object.getPrototypeOf(PDFAnnoPage)).apply(this, arguments));
-	
-	        _this.setup();
-	        return _this;
+	        this.setup();
 	    }
 	
 	    _createClass(PDFAnnoPage, [{
@@ -6590,19 +6194,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'listenWindowEvents',
 	        value: function listenWindowEvents() {
-	            var _this2 = this;
+	            var _this = this;
 	
 	            window.addEventListener('digit1Pressed', function () {
-	                _this2.createSpan();
+	                _this.createSpan();
 	            });
 	            window.addEventListener('digit2Pressed', function () {
-	                _this2.createRelation('one-way');
+	                _this.createRelation('one-way');
 	            });
 	            window.addEventListener('digit3Pressed', function () {
-	                _this2.createRelation('two-way');
+	                _this.createRelation('two-way');
 	            });
 	            window.addEventListener('digit4Pressed', function () {
-	                _this2.createRelation('link');
+	                _this.createRelation('link');
 	            });
 	        }
 	
@@ -6613,9 +6217,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'startViewerApplication',
 	        value: function startViewerApplication() {
-	            var _this3 = this;
-	
-	            // TODO Refactoring: "iframeWindow -> window event" make as common.
+	            var _this2 = this;
 	
 	            // Alias for convenience.
 	            window.iframeWindow = $('#viewer iframe').get(0).contentWindow;
@@ -6632,8 +6234,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            iframeWindow.addEventListener('annotationrendered', function () {
 	
 	                // Restore the status of AnnoTools.
-	                _this3.disableAnnotateFunctions();
-	                _this3.enableAnnotateFunction(window.currentAnnoToolType);
+	                _this2.disableAnnotateFunctions();
+	                _this2.enableAnnotateFunction(window.currentAnnoToolType);
 	
 	                (0, _util.dispatchWindowEvent)('annotationrendered');
 	            });
@@ -6701,15 +6303,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'loadFiles',
 	        value: function loadFiles(files) {
-	            var _this4 = this;
+	            var _this3 = this;
 	
 	            return (0, _loadFiles3.default)(files).then(function (result) {
-	                _this4.contentFiles = result.contents.map(function (c) {
+	                _this3.contentFiles = result.contents.map(function (c) {
 	                    return Object.assign(c, {
 	                        selected: false
 	                    });
 	                });
-	                _this4.annoFiles = result.annos.map(function (a) {
+	                _this3.annoFiles = result.annos.map(function (a) {
 	                    return Object.assign(a, {
 	                        primary: false,
 	                        reference: false
@@ -6797,11 +6399,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // Reload pdf.js.
 	            $('#viewer iframe').remove();
 	            $('#viewer').html('<iframe src="./pages/viewer.html?file=../pdfs/P12-1046.pdf" class="anno-viewer" frameborder="0"></iframe>');
+	            // $('#viewer').html('<iframe src="./pages/viewer.html" class="anno-viewer" frameborder="0"></iframe>');
 	
 	            // Restart.
 	            var event = document.createEvent('CustomEvent');
 	            event.initCustomEvent('restartApp', true, true, null);
 	            window.dispatchEvent(event);
+	
+	            // Load and initial PDF, and display.
+	            // const xhr = new XMLHttpRequest();
+	            // xhr.open('GET', '../pdfs/P12-1046.pdf', true);
+	            // xhr.responseType = 'arraybuffer';
+	            // xhr.onload = function () {
+	            //     if (this.status === 200) {
+	            //         var uint8Array = new Uint8Array(this.response);
+	            //         iframeWindow.PDFViewerApplication.open(uint8Array);
+	            //     }
+	            // };
+	            // xhr.send();
+	        }
+	    }, {
+	        key: 'closePDFViewer',
+	        value: function closePDFViewer() {
+	            if (iframeWindow && iframeWindow.PDFViewerApplication) {
+	                iframeWindow.PDFViewerApplication.close();
+	                $('#numPages', iframeWindow.document).text('');
+	            }
 	        }
 	
 	        /**
@@ -6919,8 +6542,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'disableRect',
 	        value: function disableRect() {
 	            window.iframeWindow.PDFAnnoCore.UI.disableRect();
-	            // TODO 以下のは必要？
-	            window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
 	        }
 	
 	        /**
@@ -6934,14 +6555,82 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        /**
-	            Disable annotation tool buttons.
-	        */
+	         * Display annotations an user selected.
+	         */
+	
+	    }, {
+	        key: 'displayAnnotation',
+	        value: function displayAnnotation(isPrimary) {
+	            var annotations = [];
+	            var colors = [];
+	            var primaryIndex = -1;
+	
+	            // Primary annotation.
+	            if (isPrimary) {
+	                $('#dropdownAnnoPrimary a').each(function (index, element) {
+	                    var $elm = $(element);
+	                    if ($elm.find('.fa-check').hasClass('no-visible') === false) {
+	                        var annoPath = $elm.find('.js-annoname').text();
+	
+	                        var annoFile = window.annoPage.getAnnoFile(annoPath);
+	                        if (!annoFile) {
+	                            console.log('ERROR');
+	                            return;
+	                        }
+	                        primaryIndex = 0;
+	                        annotations.push(annoFile.content);
+	                        var color = null; // Use the default color used for edit.
+	                        colors.push(color);
+	
+	                        var filename = annoFile.name;
+	                        localStorage.setItem('_pdfanno_primary_annoname', filename);
+	                        console.log('filename:', filename);
+	                    }
+	                });
+	            }
+	
+	            // Reference annotations.
+	            if (!isPrimary) {
+	                $('#dropdownAnnoReference a').each(function (index, element) {
+	                    var $elm = $(element);
+	                    if ($elm.find('.fa-check').hasClass('no-visible') === false) {
+	                        var annoPath = $elm.find('.js-annoname').text();
+	
+	                        var annoFile = window.annoPage.getAnnoFile(annoPath);
+	
+	                        if (!annoFile) {
+	                            console.log('ERROR');
+	                            return;
+	                        }
+	                        annotations.push(annoFile.content);
+	                        var color = $elm.find('.js-anno-palette').spectrum('get').toHexString();
+	                        console.log(color);
+	                        colors.push(color);
+	                    }
+	                });
+	            }
+	
+	            console.log('colors:', colors);
+	
+	            // Create import data.
+	            var paperData = {
+	                primary: primaryIndex,
+	                colors: colors,
+	                annotations: annotations
+	            };
+	
+	            // Import annotations to Viewer.
+	            window.annoPage.importAnnotation(paperData, isPrimary);
+	        }
+	
+	        /**
+	         *  Disable annotation tool buttons.
+	         */
 	
 	    }, {
 	        key: 'disableAnnotateFunctions',
 	        value: function disableAnnotateFunctions() {
 	            window.iframeWindow.PDFAnnoCore.UI.disableRect();
-	            window.iframeWindow.PDFAnnoCore.UI.disableViewMode();
 	        }
 	
 	        /**
@@ -7043,6 +6732,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        /**
+	         * Import annotations from UI.
+	         */
+	
+	    }, {
+	        key: 'importAnnotation',
+	        value: function importAnnotation(paperData, isPrimary) {
+	            iframeWindow.PDFAnnoCore.getStoreAdapter().importAnnotations(paperData, isPrimary).then(function (result) {
+	                iframeWindow.removeAnnoLayer();
+	                iframeWindow.renderAnno();
+	            });
+	        }
+	
+	        /**
 	         * Get the export data of annotations.
 	         *
 	         * @return {Promise}
@@ -7091,13 +6793,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }]);
 	
 	    return PDFAnnoPage;
-	}(_AbstractAnnoPage3.default);
+	}();
 	
 	exports.default = PDFAnnoPage;
 	module.exports = exports['default'];
 
 /***/ },
-/* 63 */
+/* 61 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -7105,64 +6807,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	/**
-	 * Annotation functions for Page.
-	 */
-	var AbstractAnnoPage = function () {
-	    function AbstractAnnoPage() {
-	        _classCallCheck(this, AbstractAnnoPage);
-	
-	        // Auto-binding.
-	        this.autoBind();
-	
-	        // PDFs or HTMLs.
-	        this.contentFiles = [];
-	
-	        // AnnoFiles,
-	        this.annoFiles = [];
-	    }
-	
-	    /**
-	     * Bind the `this` scope of instance methods to `this`.
-	     */
-	
-	
-	    _createClass(AbstractAnnoPage, [{
-	        key: 'autoBind',
-	        value: function autoBind() {
-	            var _this = this;
-	
-	            Object.getOwnPropertyNames(this.constructor.prototype).filter(function (prop) {
-	                return typeof _this[prop] === 'function';
-	            }).forEach(function (method) {
-	                _this[method] = _this[method].bind(_this);
-	            });
-	        }
-	    }]);
-	
-	    return AbstractAnnoPage;
-	}();
-	
-	exports.default = AbstractAnnoPage;
-	module.exports = exports['default'];
-
-/***/ },
-/* 64 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
 	exports.default = loadFiles;
-	
-	var _display = __webpack_require__(49);
+	/**
+	 *  Functions depending on pdfanno-core.js.
+	 */
 	
 	/**
 	 * Load PDFs and Annos via Browse button.
@@ -7180,36 +6828,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var p = pdfNames.map(function (file) {
 	            return new Promise(function (resolve, reject) {
 	
-	                // Old.
-	                // let fileReader = new FileReader();
-	                // fileReader.onload = event => {
-	                //     let pdf = event.target.result;
-	                //     let fileName = _excludeBaseDirName(file.webkitRelativePath);
-	
-	                //     resolve({
-	                //         type    : 'content',
-	                //         name    : fileName,
-	                //         content : pdf
-	                //     });
-	                // }
-	                // fileReader.readAsDataURL(file);
-	
-	                // for test.
-	                var fileReader2 = new FileReader();
-	                fileReader2.onload = function (event) {
-	
-	                    var buffer = event.target.result;
-	                    var fileName = _excludeBaseDirName(file.webkitRelativePath);
+	                var fileReader = new FileReader();
+	                fileReader.onload = function (event) {
 	
 	                    resolve({
 	                        type: 'content',
-	                        name: fileName,
-	                        content: buffer
+	                        name: _excludeBaseDirName(file.webkitRelativePath),
+	                        content: event.target.result
 	                    });
-	
-	                    // window.test = { buffer, fileName };
 	                };
-	                fileReader2.readAsArrayBuffer(file);
+	                fileReader.readAsArrayBuffer(file);
 	            });
 	        });
 	        promises = promises.concat(p);
@@ -7219,13 +6847,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return new Promise(function (resolve, reject) {
 	                var fileReader = new FileReader();
 	                fileReader.onload = function (event) {
-	                    var anno = event.target.result;
-	                    var fileName = _excludeBaseDirName(file.webkitRelativePath);
 	
 	                    resolve({
 	                        type: 'anno',
-	                        name: fileName,
-	                        content: anno
+	                        name: _excludeBaseDirName(file.webkitRelativePath),
+	                        content: event.target.result
 	                    });
 	                };
 	                fileReader.readAsText(file);
@@ -7251,9 +6877,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Extract PDFs and annotations from files the user specified.
 	 */
-	/**
-	 *  Functions depending on pdfanno-core.js.
-	 */
 	function getContents(files) {
 	    var pdfNames = [];
 	    var annoNames = [];
@@ -7265,10 +6888,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var frgms = relativePath.split('/');
 	        if (frgms.length > 2) {
-	            console.log('SKIP:', relativePath);
+	            // console.log('SKIP:', relativePath);
 	            continue;
 	        }
-	        console.log('relativePath:', relativePath);
+	        console.log('Load:', relativePath);
 	
 	        // Get files only PDFs or Anno files.
 	        if (relativePath.match(/\.pdf$/i)) {
@@ -7294,19 +6917,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 65 */
+/* 62 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__.p + "dist/index.html";
 
 /***/ },
-/* 66 */
+/* 63 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(67);
+	var content = __webpack_require__(64);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(46)(content, {});
@@ -7326,7 +6949,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 67 */
+/* 64 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(45)();

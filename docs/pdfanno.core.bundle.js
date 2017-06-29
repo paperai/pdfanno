@@ -17350,7 +17350,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  disableRect: _rect.disableRect, enableRect: _rect.enableRect,
 	  createSpan: _span.createSpan, getRectangles: _span.getRectangles,
 	  createRelation: _relation.createRelation,
-	  disableViewMode: _view.disableViewMode, enableViewMode: _view.enableViewMode
+	  enableViewMode: _view.enableViewMode
 	};
 	module.exports = exports['default'];
 
@@ -19025,7 +19025,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Dispatch a custom event to `window` object.
 	 */
-	// TODO Use shared/util/dispatchWindowEvent instead.
 	function dispatchWindowEvent(eventName, data) {
 	    var event = document.createEvent('CustomEvent');
 	    event.initCustomEvent(eventName, true, true, data);
@@ -20328,7 +20327,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	exports.enableViewMode = enableViewMode;
-	exports.disableViewMode = disableViewMode;
 	
 	var _jquery = __webpack_require__(1);
 	
@@ -20393,13 +20391,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    document.addEventListener('keydown', disablePagebackAction);
 	
 	    (0, _jquery2.default)(document).off('click', handlePageClick).on('click', '.page', handlePageClick);
-	}
-	
-	/**
-	 * Disable view mode.
-	 */
-	function disableViewMode() {
-	    // TODO Remove me.
 	}
 
 /***/ },
