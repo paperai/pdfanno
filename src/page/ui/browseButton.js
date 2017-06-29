@@ -1,12 +1,8 @@
 /**
  * UI parts - Browse button.
  */
-import { reloadPDFViewer, setupColorPicker, displayAnnotation } from '../util/display';
 
-// TODO Refactoring.
-
-// TODO Remove ?
-import AnnoPage from '../pdf';
+import { setupColorPicker, displayAnnotation } from '../util/display';
 
 /**
  * Setup the behavior of a Browse Button.
@@ -36,17 +32,14 @@ export function setup() {
             window.annoPage.clearAllAnnotations();
 
             // Setup PDF Dropdown.
-            // setPDFDropdownList(1);
             setPDFDropdownList();
 
             // Setup Anno Dropdown.
             setAnnoDropdownList();
 
             // Display a PDF and annotations.
-            // display(current, pdfDataMap, annoDataMap);
-            display(current);
+            restoreBeforeState(current);
 
-            // TODO Browseボタン以前の選択状態の復元と、ビュワーの復元をする.
         });
 
     });
@@ -72,26 +65,18 @@ function isValidDirectorySelect(files) {
     return null;
 }
 
-
-// TODO 前回状態の復元をする
-function display(currentDisplay) {
-
-    console.log('current:', currentDisplay);
+/**
+ * Restore the state before Browse button was clicked.
+ */
+function restoreBeforeState(currentDisplay) {
 
     let files;
-
-    // TODO no need?
-    let contentReloaded = false;
 
     let isPDFClosed = false;
 
     // Restore the check state of a content.
     files = window.annoPage.contentFiles.filter(c => c.name === currentDisplay.pdfName);
     if (files.length > 0) {
-        // console.log('aaaaaaaa');
-        // window.pdf = files[0].content;
-        // window.pdfName = files[0].name;
-
         $('#dropdownPdf .js-text').text(files[0].name);
         $('#dropdownPdf a').each((index, element) => {
             let $elm = $(element);
@@ -100,37 +85,16 @@ function display(currentDisplay) {
             }
         });
 
-        // const contentFile = files[0];
-        // setTimeout(() => {
-        //     console.log('contentFile:', contentFile);
-        //     window.annoPage.displayViewer(contentFile);
-        // }, 700); // wait for loading iframeWindow.
-
-    // } else {
-    //     delete window.pdf;
-    //     delete window.pdfName;
-
-
-        // Display the PDF.
-        // window.annoPage.displayViewer(files[0]);
-
     } else {
 
-        // TODO no need?
-        // contentReloaded = true;
         isPDFClosed = true;
 
-        // Reset the PDF displayed.
         window.annoPage.closePDFViewer();
     }
 
     // Restore the check state of a primaryAnno.
     files = window.annoPage.annoFiles.filter(c => c.name === currentDisplay.primaryAnnotationName);
-    // TODO no need ?
-    let promise1 = Promise.resolve();
-    // if (files.length > 0 && contentReloaded === false) {
     if (files.length > 0 && isPDFClosed === false) {
-        console.log('ddddddddddd:', files);
         $('#dropdownAnnoPrimary .js-text').text(currentDisplay.primaryAnnotationName);
         $('#dropdownAnnoPrimary a').each((index, element) => {
             let $elm = $(element);
@@ -139,15 +103,13 @@ function display(currentDisplay) {
             }
         });
         setTimeout(() => {
-            console.log('aaaaaaaaaa');
-            promise1 = displayAnnotation(true, false);
+            displayAnnotation(true, false);
         }, 100);
     }
 
     // Restore the check states of referenceAnnos.
     let names = currentDisplay.referenceAnnotationNames;
     let colors = currentDisplay.referenceAnnotationColors;
-    let changed = false;
     names = names.filter((name, i) => {
         let found = false;
         let annos = window.annoPage.annoFiles.filter(c => c.name === name);
@@ -163,36 +125,20 @@ function display(currentDisplay) {
         }
         return found;
     });
-    let promise2 = Promise.resolve();
+
     if (names.length > 0 && isPDFClosed === false) {
         $('#dropdownAnnoReference .js-text').text(names.join(','));
-
         setTimeout(() => {
-            promise2 = displayAnnotation(false, false);
+            displayAnnotation(false, false);
         }, 500);
 
     }
 
-
-    // Reload page.
-    // reloadPDFViewer();
-    // Promise.all([promise1, promise2]).then(reloadPDFViewer);
-
-}
-
-/**
- * Get a filename from a path.
- */
- // TODO No need ?
-function _excludeBaseDirName(filePath) {
-    let frgms = filePath.split('/');
-    return frgms[frgms.length - 1];
 }
 
 /**
  * Get the file names which currently are displayed.
  */
-// TODO Refactoring independent from UI.
 function getCurrentFileNames() {
 
     let text;
@@ -205,13 +151,12 @@ function getCurrentFileNames() {
     text = $('#dropdownAnnoPrimary .js-text').text();
     let primaryAnnotationName = (text !== 'Anno File' ? text : null);
 
-
     let referenceAnnotationNames = [];
     let referenceAnnotationColors = [];
     $('#dropdownAnnoReference a').each((index, element) => {
         let $elm = $(element);
         if ($elm.find('.fa-check').hasClass('no-visible') === false) {
-            let annoName = $elm.find('.js-annoname').text(); // TODO こういうのはJS変数として持っておいたほうがいいかも（選択済のものについて）
+            let annoName = $elm.find('.js-annoname').text();
             referenceAnnotationNames.push(annoName);
             let color = $elm.find('.js-anno-palette').spectrum('get').toHexString();
             referenceAnnotationColors.push(color);
