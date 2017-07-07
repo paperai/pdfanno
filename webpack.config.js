@@ -1,5 +1,13 @@
+const path = require('path');
 const webpack = require('webpack');
 const LiveReloadPlugin = require('webpack-livereload-plugin');
+
+
+let resolves = [];
+if (process.env.ANNO_UI === 'YES') {
+    console.log('ANNO_UI DEPLOYMENT MODE.')
+    // resolves.push(path.resolve('../anno-ui/src'))
+}
 
 module.exports = {
   entry: {
@@ -31,5 +39,8 @@ module.exports = {
       // https://www.npmjs.com/package/webpack-livereload-plugin
     })
   ],
+  resolve : {
+    root : resolves
+  },
   devtool: 'source-map'
 };

@@ -4,6 +4,16 @@ require("!style!css!./pdfanno.css");
 import { dispatchWindowEvent } from './shared/util';
 
 // UIs.
+// import * as annoUI from 'anno-ui';
+// require('anno-ui');
+// require('index');
+
+import * as annoUI from 'anno-ui';
+console.log('annoUI: ', annoUI, annoUI.browseButton);
+
+
+
+// UIs.
 import * as browseButton from './page/ui/browseButton';
 import * as pdfDropdown from './page/ui/pdfDropdown';
 import * as primaryAnnoDropdown from './page/ui/primaryAnnoDropdown';

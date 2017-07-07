@@ -16023,7 +16023,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var node = array[i];
 	      if (firstType === null) {
 	        firstType = node.type;
-	      } else if ((node.type === 'Integer' || node.type === 'Float') && (firstType === 'Integer' || firstType === 'Float')) {
+	      } else if ((node.type === "Integer" || node.type === "Float") && (firstType === "Integer" || firstType === "Float")) {
 	        // OK.
 	      } else if (node.type !== firstType) {
 	        genError("Cannot add value of type " + node.type + " to array of type " +
@@ -16225,7 +16225,8 @@ return /******/ (function(modules) { // webpackBootstrap
 			"json-loader": "^0.5.4",
 			"multer": "^1.3.0",
 			"requirejs": "^2.3.2",
-			"toml": "yoheiMune/toml-node"
+			"toml": "yoheiMune/toml-node",
+			"anno-ui": "paperai/anno-ui#initial"
 		}
 	};
 
