@@ -27,7 +27,7 @@ module.exports = {
         loader: 'babel-loader',
         query: {
           presets: ['es2015', 'stage-1'],
-          plugins: ['add-module-exports']
+          // plugins: ['add-module-exports']
         }
       }
     ]
@@ -39,8 +39,8 @@ module.exports = {
       // https://www.npmjs.com/package/webpack-livereload-plugin
     })
   ],
-  resolve : {
-    root : resolves
-  },
+  // resolve : {
+  //   root : resolves
+  // },
   devtool: 'source-map'
 };

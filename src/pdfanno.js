@@ -8,8 +8,10 @@ import { dispatchWindowEvent } from './shared/util';
 // require('anno-ui');
 // require('index');
 
-import * as annoUI from 'anno-ui';
-console.log('annoUI: ', annoUI, annoUI.browseButton);
+// import * as annoUI from 'anno-ui';
+// console.log('annoUI: ', annoUI, annoUI.browseButton);
+
+import annoUI from 'anno-ui';
 
 
 
