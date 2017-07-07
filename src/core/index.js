@@ -15,6 +15,7 @@ window.globalEvent = new EventEmitter();
 // (setting from webpack.config.js)
 import PDFAnnoCore from './src/PDFAnnoCore';
 export default PDFAnnoCore;
+// module.exports = PDFAnnoCore;
 
 
 import AnnotationContainer from './src/annotation/container';

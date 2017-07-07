@@ -72,15 +72,15 @@ export default class AbstractAnnotation extends EventEmitter {
      */
     save() {
         let { documentId } = getMetadata();
-        window.PDFAnnoCore.getStoreAdapter().getAnnotation(documentId, this.uuid).then(a => {
+        window.PDFAnnoCore.default.getStoreAdapter().getAnnotation(documentId, this.uuid).then(a => {
             if (a) {
                 // update.
                 a = this.createAnnotation(a);
-                window.PDFAnnoCore.getStoreAdapter().editAnnotation(documentId, this.uuid, a);
+                window.PDFAnnoCore.default.getStoreAdapter().editAnnotation(documentId, this.uuid, a);
             } else {
                 // insert.
                 a = this.createAnnotation();
-                window.PDFAnnoCore.getStoreAdapter().addAnnotation(documentId, a);
+                window.PDFAnnoCore.default.getStoreAdapter().addAnnotation(documentId, a);
             }
         });
         window.annotationContainer.add(this);
@@ -98,7 +98,7 @@ export default class AbstractAnnotation extends EventEmitter {
         if (this.uuid) {
             window.annotationContainer.remove(this);
             let { documentId } = getMetadata(); // TODO Remove this.
-            promise = window.PDFAnnoCore.getStoreAdapter().deleteAnnotation(documentId, this.uuid);
+            promise = window.PDFAnnoCore.default.getStoreAdapter().deleteAnnotation(documentId, this.uuid);
             this.textAnnotation && this.textAnnotation.destroy();
         }
 

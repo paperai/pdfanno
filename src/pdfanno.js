@@ -1,5 +1,5 @@
-require("file?name=dist/index.html!./index.html");
-require("!style!css!./pdfanno.css");
+require("file-loader?name=dist/index.html!./index.html");
+require("!style-loader!css-loader!./pdfanno.css");
 
 import { dispatchWindowEvent } from './shared/util';
 
@@ -11,7 +11,7 @@ import { dispatchWindowEvent } from './shared/util';
 // import * as annoUI from 'anno-ui';
 // console.log('annoUI: ', annoUI, annoUI.browseButton);
 
-import annoUI from 'anno-ui';
+import * as annoUI from 'anno-ui';
 
 
 
@@ -21,7 +21,7 @@ import * as pdfDropdown from './page/ui/pdfDropdown';
 import * as primaryAnnoDropdown from './page/ui/primaryAnnoDropdown';
 import * as annoListDropdown from './page/ui/annoListDropdown';
 import * as referenceAnnoDropdown from './page/ui/referenceAnnoDropdown';
-import * as downloadButton from './page/ui/downloadButton';
+// import * as downloadButton from './page/ui/downloadButton';
 import * as uploadButton from './page/ui/uploadButton';
 import * as annotationTools from './page/ui/annotationTools';
 import * as inputLabel from './page/ui/inputLabel';
@@ -111,10 +111,22 @@ window.addEventListener('DOMContentLoaded', e => {
     primaryAnnoDropdown.setup();
     referenceAnnoDropdown.setup();
     annoListDropdown.setup();
-    downloadButton.setup();
+    // downloadButton.setup();
     uploadButton.setup();
     annotationTools.setup();
     inputLabel.setup();
+
+
+
+
+    // Download button.
+    annoUI.downloadButton.setup({
+        getAnnotationTOMLString : window.annoPage.exportData,
+        getCurrentContentName   : window.annoPage.getCurrentContentName
+    });
+
+
+
 
     window.addEventListener('restartApp', window.annoPage.startViewerApplication);
 

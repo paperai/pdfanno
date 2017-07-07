@@ -248,7 +248,7 @@ export default class PDFAnnoPage {
      */
     createSpan() {
 
-        const rects = window.iframeWindow.PDFAnnoCore.UI.getRectangles();
+        const rects = window.iframeWindow.PDFAnnoCore.default.UI.getRectangles();
 
         // Check empty.
         if (!rects) {
@@ -286,7 +286,7 @@ export default class PDFAnnoPage {
         }
 
         // Create a new rectAnnotation.
-        window.iframeWindow.PDFAnnoCore.UI.createSpan();
+        window.iframeWindow.PDFAnnoCore.default.UI.createSpan();
     }
 
 
@@ -338,21 +338,21 @@ export default class PDFAnnoPage {
             return;
         }
 
-        window.iframeWindow.PDFAnnoCore.UI.createRelation(type, first, second);
+        window.iframeWindow.PDFAnnoCore.default.UI.createRelation(type, first, second);
     }
 
     /**
         Disable annotation tool buttons.
     */
     disableRect() {
-        window.iframeWindow.PDFAnnoCore.UI.disableRect();
+        window.iframeWindow.PDFAnnoCore.default.UI.disableRect();
     }
 
     /**
      * Enable an annotation tool.
      */
     enableRect() {
-        window.iframeWindow.PDFAnnoCore.UI.enableRect();
+        window.iframeWindow.PDFAnnoCore.default.UI.enableRect();
     }
 
     /**
@@ -425,7 +425,7 @@ export default class PDFAnnoPage {
      *  Disable annotation tool buttons.
      */
     disableAnnotateFunctions() {
-        window.iframeWindow.PDFAnnoCore.UI.disableRect();
+        window.iframeWindow.PDFAnnoCore.default.UI.disableRect();
     }
 
     /**
@@ -433,7 +433,7 @@ export default class PDFAnnoPage {
      */
     enableAnnotateFunction(type) {
         if (type === 'rect') {
-            window.iframeWindow.PDFAnnoCore.UI.enableRect();
+            window.iframeWindow.PDFAnnoCore.default.UI.enableRect();
         }
     }
 
@@ -480,28 +480,28 @@ export default class PDFAnnoPage {
      * Create a new rect annotation.
      */
     createRectAnnotation(options) {
-        return iframeWindow.PDFAnnoCore.RectAnnotation.newInstance(options);
+        return iframeWindow.PDFAnnoCore.default.RectAnnotation.newInstance(options);
     }
 
     /**
      * Create a new span annotation.
      */
     createSpanAnnotation(options) {
-        return iframeWindow.PDFAnnoCore.SpanAnnotation.newInstance(options);
+        return iframeWindow.PDFAnnoCore.default.SpanAnnotation.newInstance(options);
     }
 
     /**
      * Create a new relation annotation.
      */
     createRelationAnnotation(options) {
-        return iframeWindow.PDFAnnoCore.RelationAnnotation.newInstance(options);
+        return iframeWindow.PDFAnnoCore.default.RelationAnnotation.newInstance(options);
     }
 
     /**
      * Import annotations from UI.
      */
     importAnnotation(paperData, isPrimary) {
-        iframeWindow.PDFAnnoCore.getStoreAdapter().importAnnotations(paperData, isPrimary).then(result => {
+        iframeWindow.PDFAnnoCore.default.getStoreAdapter().importAnnotations(paperData, isPrimary).then(result => {
             iframeWindow.removeAnnoLayer();
             iframeWindow.renderAnno();
         });
@@ -513,7 +513,7 @@ export default class PDFAnnoPage {
      * @return {Promise}
      */
     exportData() {
-        return window.iframeWindow.PDFAnnoCore.getStoreAdapter().exportData();
+        return window.iframeWindow.PDFAnnoCore.default.getStoreAdapter().exportData();
     }
 
     /**
