@@ -15,7 +15,16 @@ import {
 export default class PDFAnnoPage {
 
     constructor() {
+        this.autoBind();
         this.setup();
+    }
+
+    autoBind() {
+      Object.getOwnPropertyNames(this.constructor.prototype)
+        .filter(prop => typeof this[prop] === 'function')
+        .forEach(method => {
+          this[method] = this[method].bind(this);
+        });
     }
 
     setup() {
@@ -359,6 +368,13 @@ export default class PDFAnnoPage {
      * Display annotations an user selected.
      */
     displayAnnotation(isPrimary) {
+
+        // Check the viewer not clised.
+        if ($('#numPages', iframeWindow.document).text() === '') {
+            return;
+        }
+
+
         let annotations = [];
         let colors = [];
         let primaryIndex = -1;
