@@ -64,32 +64,14 @@ window.clear = publicApi.clear;
 window.annoPage = new PDFAnnoPage();
 
 
-// Check Ctrl or Cmd button clicked.
-// ** ATTENTION!! ALSO UPDATED by core/index.js **
-$(document).on('keydown', e => {
+// Manage ctrlKey (cmdKey on Mac).
+window.addEventListener('manageCtrlKey', e => {
+    window.annoPage.manageCtrlKey(e.detail);
+});
 
-    if (e.keyCode === 17 || e.keyCode === 91) { // 17:ctrlKey, 91:cmdKey
-        window.annoPage.manageCtrlKey('on');
-    }
-
-}).on('keyup', e => {
-
-    // Allow any keyboard events for <input/>.
-    if (e.target.tagName.toLowerCase() === 'input') {
-        return;
-    }
-
-    window.annoPage.manageCtrlKey('off');
-
-    if (e.keyCode === 49) {         // Digit "1"
-        dispatchWindowEvent('digit1Pressed');
-    } else if (e.keyCode === 50) {  // Digit "2"
-        dispatchWindowEvent('digit2Pressed');
-    } else if (e.keyCode === 51) {  // Digit "3"
-        dispatchWindowEvent('digit3Pressed');
-    } else if (e.keyCode === 52) {  // Digit "4"
-        dispatchWindowEvent('digit4Pressed');
-    }
+// Manage digitKey.
+window.addEventListener('digitKeyPressed', e => {
+    dispatchWindowEvent(`digit${e.detail}Pressed`);
 });
 
 /**
@@ -125,16 +107,8 @@ window.addEventListener('DOMContentLoaded', e => {
     // Start application.
     window.annoPage.startViewerApplication();
 
-    // Setup UI parts.
-    // browseButton.setup();
-    // pdfDropdown.setup();
-    // primaryAnnoDropdown.setup();
-    // referenceAnnoDropdown.setup();
-    // annoListDropdown.setup();
-    // downloadButton.setup();
-    // uploadButton.setup();
-    // annotationTools.setup();
-    // inputLabel.setup();
+    // Start event listeners.
+    annoUI.event.setup();
 
     // Browse button.
     annoUI.browseButton.setup({
