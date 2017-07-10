@@ -1,3 +1,0 @@
-/**
- *  PDFAnnoPage functions.
- */

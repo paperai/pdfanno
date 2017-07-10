@@ -1,45 +1,18 @@
 require("file-loader?name=dist/index.html!./index.html");
-require("!style-loader!css-loader!./pdfanno.css");
 
-import { dispatchWindowEvent } from './shared/util';
-
-import { convertToExportY, getPageSize, paddingBetweenPages } from './shared/coords';
-
-// UIs.
-// import * as annoUI from 'anno-ui';
-// require('anno-ui');
-// require('index');
-
-// import * as annoUI from 'anno-ui';
-// console.log('annoUI: ', annoUI, annoUI.browseButton);
-
-// UIs.
+// UI parts.
 import * as annoUI from 'anno-ui';
 
-
-
-// TODO ファイル自体も削除.
-// UIs.
-// import * as browseButton from './page/ui/browseButton';
-// import * as pdfDropdown from './page/ui/pdfDropdown';
-// import * as primaryAnnoDropdown from './page/ui/primaryAnnoDropdown';
-// import * as annoListDropdown from './page/ui/annoListDropdown';
-// import * as referenceAnnoDropdown from './page/ui/referenceAnnoDropdown';
-// import * as downloadButton from './page/ui/downloadButton';
-// import * as uploadButton from './page/ui/uploadButton';
-// import * as annotationTools from './page/ui/annotationTools';
-// import * as inputLabel from './page/ui/inputLabel';
-
+import { dispatchWindowEvent } from './shared/util';
+import { convertToExportY, getPageSize, paddingBetweenPages } from './shared/coords';
 import {
     listenWindowLeaveEvent,
     unlistenWindowLeaveEvent,
-    resizeHandler,
-    setupResizableColumns
+    resizeHandler
 } from './page/util/window';
-
 import * as publicApi from './page/public';
-
 import PDFAnnoPage from './page/pdf/PDFAnnoPage';
+
 
 /**
  * Global variable.
@@ -59,7 +32,7 @@ window.readTOML = publicApi.readTOML;
 window.clear = publicApi.clear;
 
 /**
- * Annotation functions for Page.
+ * Annotation functions for a page.
  */
 window.annoPage = new PDFAnnoPage();
 
@@ -95,17 +68,20 @@ function _getY(annotation) {
  */
 window.addEventListener('DOMContentLoaded', e => {
 
-    // Init viewer.
-    window.annoPage.initializeViewer();
-
     // Delete prev annotations.
     window.annoPage.clearAllAnnotations();
 
     // Reset PDFViwer settings.
     window.annoPage.resetPDFViewerSettings();
 
+    // Init viewer.
+    window.annoPage.initializeViewer();
+
     // Start application.
     window.annoPage.startViewerApplication();
+
+    // resizable.
+    annoUI.util.setupResizableColumns();
 
     // Start event listeners.
     annoUI.event.setup();
@@ -195,7 +171,8 @@ window.addEventListener('DOMContentLoaded', e => {
     // Download button.
     annoUI.downloadButton.setup({
         getAnnotationTOMLString : window.annoPage.exportData,
-        getCurrentContentName   : window.annoPage.getCurrentContentName
+        getCurrentContentName   : window.annoPage.getCurrentContentName,
+        unlistenWindowLeaveEvent : unlistenWindowLeaveEvent
     });
 
     // AnnoTool: rect.
@@ -236,13 +213,7 @@ window.addEventListener('DOMContentLoaded', e => {
                 return null;
             }
             return window.annoPage.getContentFile(pdfFileName);
-        },
+        }
     });
-
-
-    window.addEventListener('restartApp', window.annoPage.startViewerApplication);
-
-    // resizable.
-    setupResizableColumns();
 
 });

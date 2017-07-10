@@ -184,26 +184,6 @@ export default class PDFAnnoPage {
         const uint8Array = new Uint8Array(contentFile.content);
         iframeWindow.PDFViewerApplication.open(uint8Array);
 
-        // if (contentFile) {
-        //     window.pdf = window.atob(contentFile.content);
-        //     window.pdfName = contentFile.name;
-        // } else {
-        //     window.pdf = null;
-        //     window.pdfName = null;
-        // }
-
-        // // Reset setting.
-
-
-        // // Reload pdf.js.
-        // $('#viewer iframe').remove();
-        // $('#viewer').html('<iframe src="./pages/viewer.html?file=../pdfs/P12-1046.pdf" class="anno-viewer" frameborder="0"></iframe>');
-
-        // // Restart.
-        // var event = document.createEvent('CustomEvent');
-        // event.initCustomEvent('restartApp', true, true, null);
-        // window.dispatchEvent(event);
-
     }
 
     initializeViewer() {
@@ -217,24 +197,6 @@ export default class PDFAnnoPage {
         // Reload pdf.js.
         $('#viewer iframe').remove();
         $('#viewer').html('<iframe src="./pages/viewer.html?file=../pdfs/P12-1046.pdf" class="anno-viewer" frameborder="0"></iframe>');
-        // $('#viewer').html('<iframe src="./pages/viewer.html" class="anno-viewer" frameborder="0"></iframe>');
-
-        // Restart.
-        var event = document.createEvent('CustomEvent');
-        event.initCustomEvent('restartApp', true, true, null);
-        window.dispatchEvent(event);
-
-        // Load and initial PDF, and display.
-        // const xhr = new XMLHttpRequest();
-        // xhr.open('GET', '../pdfs/P12-1046.pdf', true);
-        // xhr.responseType = 'arraybuffer';
-        // xhr.onload = function () {
-        //     if (this.status === 200) {
-        //         var uint8Array = new Uint8Array(this.response);
-        //         iframeWindow.PDFViewerApplication.open(uint8Array);
-        //     }
-        // };
-        // xhr.send();
 
     }
 
