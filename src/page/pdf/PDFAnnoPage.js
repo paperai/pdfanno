@@ -15,7 +15,16 @@ import {
 export default class PDFAnnoPage {
 
     constructor() {
+        this.autoBind();
         this.setup();
+    }
+
+    autoBind() {
+      Object.getOwnPropertyNames(this.constructor.prototype)
+        .filter(prop => typeof this[prop] === 'function')
+        .forEach(method => {
+          this[method] = this[method].bind(this);
+        });
     }
 
     setup() {
@@ -175,26 +184,6 @@ export default class PDFAnnoPage {
         const uint8Array = new Uint8Array(contentFile.content);
         iframeWindow.PDFViewerApplication.open(uint8Array);
 
-        // if (contentFile) {
-        //     window.pdf = window.atob(contentFile.content);
-        //     window.pdfName = contentFile.name;
-        // } else {
-        //     window.pdf = null;
-        //     window.pdfName = null;
-        // }
-
-        // // Reset setting.
-
-
-        // // Reload pdf.js.
-        // $('#viewer iframe').remove();
-        // $('#viewer').html('<iframe src="./pages/viewer.html?file=../pdfs/P12-1046.pdf" class="anno-viewer" frameborder="0"></iframe>');
-
-        // // Restart.
-        // var event = document.createEvent('CustomEvent');
-        // event.initCustomEvent('restartApp', true, true, null);
-        // window.dispatchEvent(event);
-
     }
 
     initializeViewer() {
@@ -208,24 +197,6 @@ export default class PDFAnnoPage {
         // Reload pdf.js.
         $('#viewer iframe').remove();
         $('#viewer').html('<iframe src="./pages/viewer.html?file=../pdfs/P12-1046.pdf" class="anno-viewer" frameborder="0"></iframe>');
-        // $('#viewer').html('<iframe src="./pages/viewer.html" class="anno-viewer" frameborder="0"></iframe>');
-
-        // Restart.
-        var event = document.createEvent('CustomEvent');
-        event.initCustomEvent('restartApp', true, true, null);
-        window.dispatchEvent(event);
-
-        // Load and initial PDF, and display.
-        // const xhr = new XMLHttpRequest();
-        // xhr.open('GET', '../pdfs/P12-1046.pdf', true);
-        // xhr.responseType = 'arraybuffer';
-        // xhr.onload = function () {
-        //     if (this.status === 200) {
-        //         var uint8Array = new Uint8Array(this.response);
-        //         iframeWindow.PDFViewerApplication.open(uint8Array);
-        //     }
-        // };
-        // xhr.send();
 
     }
 
@@ -248,7 +219,7 @@ export default class PDFAnnoPage {
      */
     createSpan() {
 
-        const rects = window.iframeWindow.PDFAnnoCore.UI.getRectangles();
+        const rects = window.iframeWindow.PDFAnnoCore.default.UI.getRectangles();
 
         // Check empty.
         if (!rects) {
@@ -286,7 +257,7 @@ export default class PDFAnnoPage {
         }
 
         // Create a new rectAnnotation.
-        window.iframeWindow.PDFAnnoCore.UI.createSpan();
+        window.iframeWindow.PDFAnnoCore.default.UI.createSpan();
     }
 
 
@@ -338,27 +309,34 @@ export default class PDFAnnoPage {
             return;
         }
 
-        window.iframeWindow.PDFAnnoCore.UI.createRelation(type, first, second);
+        window.iframeWindow.PDFAnnoCore.default.UI.createRelation(type, first, second);
     }
 
     /**
         Disable annotation tool buttons.
     */
     disableRect() {
-        window.iframeWindow.PDFAnnoCore.UI.disableRect();
+        window.iframeWindow.PDFAnnoCore.default.UI.disableRect();
     }
 
     /**
      * Enable an annotation tool.
      */
     enableRect() {
-        window.iframeWindow.PDFAnnoCore.UI.enableRect();
+        window.iframeWindow.PDFAnnoCore.default.UI.enableRect();
     }
 
     /**
      * Display annotations an user selected.
      */
     displayAnnotation(isPrimary) {
+
+        // Check the viewer not clised.
+        if ($('#numPages', iframeWindow.document).text() === '') {
+            return;
+        }
+
+
         let annotations = [];
         let colors = [];
         let primaryIndex = -1;
@@ -425,7 +403,7 @@ export default class PDFAnnoPage {
      *  Disable annotation tool buttons.
      */
     disableAnnotateFunctions() {
-        window.iframeWindow.PDFAnnoCore.UI.disableRect();
+        window.iframeWindow.PDFAnnoCore.default.UI.disableRect();
     }
 
     /**
@@ -433,7 +411,7 @@ export default class PDFAnnoPage {
      */
     enableAnnotateFunction(type) {
         if (type === 'rect') {
-            window.iframeWindow.PDFAnnoCore.UI.enableRect();
+            window.iframeWindow.PDFAnnoCore.default.UI.enableRect();
         }
     }
 
@@ -480,28 +458,28 @@ export default class PDFAnnoPage {
      * Create a new rect annotation.
      */
     createRectAnnotation(options) {
-        return iframeWindow.PDFAnnoCore.RectAnnotation.newInstance(options);
+        return iframeWindow.PDFAnnoCore.default.RectAnnotation.newInstance(options);
     }
 
     /**
      * Create a new span annotation.
      */
     createSpanAnnotation(options) {
-        return iframeWindow.PDFAnnoCore.SpanAnnotation.newInstance(options);
+        return iframeWindow.PDFAnnoCore.default.SpanAnnotation.newInstance(options);
     }
 
     /**
      * Create a new relation annotation.
      */
     createRelationAnnotation(options) {
-        return iframeWindow.PDFAnnoCore.RelationAnnotation.newInstance(options);
+        return iframeWindow.PDFAnnoCore.default.RelationAnnotation.newInstance(options);
     }
 
     /**
      * Import annotations from UI.
      */
     importAnnotation(paperData, isPrimary) {
-        iframeWindow.PDFAnnoCore.getStoreAdapter().importAnnotations(paperData, isPrimary).then(result => {
+        iframeWindow.PDFAnnoCore.default.getStoreAdapter().importAnnotations(paperData, isPrimary).then(result => {
             iframeWindow.removeAnnoLayer();
             iframeWindow.renderAnno();
         });
@@ -513,7 +491,7 @@ export default class PDFAnnoPage {
      * @return {Promise}
      */
     exportData() {
-        return window.iframeWindow.PDFAnnoCore.getStoreAdapter().exportData();
+        return window.iframeWindow.PDFAnnoCore.default.getStoreAdapter().exportData();
     }
 
     /**

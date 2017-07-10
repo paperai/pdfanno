@@ -7,6 +7,8 @@ gulp.task('prepare', function() {
     fs.copySync('build', path.join('dist', 'build'));
     fs.copySync('pages', path.join('dist', 'pages'));
     fs.copySync('pdfs', path.join('dist', 'pdfs'));
+    // fs.copySync(path.join('node_modules', 'anno-ui', 'dist', 'anno-ui.bundle.js'), path.join('dist', 'anno-ui.bundle.js'));
+    // fs.copySync(path.join('node_modules', 'anno-ui', 'dist', 'anno-ui.bundle.js.map'), path.join('dist', 'anno-ui.bundle.js.map'));
 });
 
 gulp.task('publish', function() {

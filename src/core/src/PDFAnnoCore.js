@@ -6,7 +6,7 @@ import RectAnnotation from './annotation/rect';
 import SpanAnnotation from './annotation/span';
 import RelationAnnotation from './annotation/relation';
 
-require("!style!css!./css/pdfanno.css");
+require("!style-loader!css-loader!./css/pdfanno.css");
 
 export default {
   /**
