@@ -1,2 +1,0 @@
-!function(n){function e(o){if(r[o])return r[o].exports;var t=r[o]={i:o,l:!1,exports:{}};return n[o].call(t.exports,t,t.exports,e),t.l=!0,t.exports}var r={};e.m=n,e.c=r,e.d=function(n,r,o){e.o(n,r)||Object.defineProperty(n,r,{configurable:!1,enumerable:!0,get:o})},e.n=function(n){var r=n&&n.__esModule?function(){return n.default}:function(){return n};return e.d(r,"a",r),r},e.o=function(n,e){return Object.prototype.hasOwnProperty.call(n,e)},e.p="",e(e.s=0)}([function(n,e){console.log("Hello from anno-ui.js!!!!")}]);
-//# sourceMappingURL=anno-ui.bundle.js.map

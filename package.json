@@ -55,6 +55,7 @@
     "json-loader": "^0.5.4",
     "multer": "^1.3.0",
     "requirejs": "^2.3.3",
-    "toml": "github:yoheiMune/toml-node"
+    "toml": "github:yoheiMune/toml-node",
+    "anno-ui": "github:paperai/anno-ui"
   }
 }
