@@ -18516,7 +18516,9 @@ module.exports = {
 		"anno:dev": "npm run anno:prepare && webpack --watch",
 		"anno:watch": "npm run anno:prepare && webpack-dev-server --inline",
 		"anno:watch-ui": "npm run anno:prepare && cross-env ANNO_UI=YES webpack-dev-server --inline",
-		"anno:publish": "npm run anno:build && gulp publish"
+		"anno:publish": "npm run anno:build && gulp publish",
+		"anno:server2": "NODE_ENV=production node server2.js",
+		"anno:server2-dev": "NODE_ENV=develop ./node_modules/.bin/node-dev server2.js"
 	},
 	"repository": {
 		"type": "git",
@@ -18552,6 +18554,7 @@ module.exports = {
 		"webpack-livereload-plugin": "^0.11.0"
 	},
 	"dependencies": {
+		"anno-ui": "github:paperai/anno-ui",
 		"axios": "^0.15.2",
 		"body-parser": "^1.17.2",
 		"create-stylesheet": "^0.3.0",
@@ -18559,9 +18562,9 @@ module.exports = {
 		"jquery": "^3.2.1",
 		"json-loader": "^0.5.4",
 		"multer": "^1.3.0",
+		"request": "^2.81.0",
 		"requirejs": "^2.3.3",
-		"toml": "github:yoheiMune/toml-node",
-		"anno-ui": "github:paperai/anno-ui"
+		"toml": "github:yoheiMune/toml-node"
 	}
 };
 

@@ -61,6 +61,8 @@ export default class PDFAnnoPage {
 
             // Reset the confirm dialog at leaving page.
             unlistenWindowLeaveEvent();
+
+            dispatchWindowEvent('iframeReady');
         });
 
         iframeWindow.addEventListener('annotationrendered', () => {
