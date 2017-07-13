@@ -4547,6 +4547,38 @@ window.addEventListener('DOMContentLoaded', e => {
         }
     });
 
+    // Display a PDF specified via URL query parameter.
+    window.addEventListener('iframeReady', () => {
+
+        let pdfURL;
+        (location.search || '').replace('?', '').split('&')
+            .filter(a => a)
+            .forEach(fragment => {
+                let [ key, value ] = fragment.split('=');
+                if (key && key.toLowerCase() === 'pdf') {
+                    pdfURL = value;
+                }
+        });
+
+        if (pdfURL) {
+
+            console.log('pdfURL=', pdfURL);
+
+            // Load a PDF as ArrayBuffer.
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/load_pdf?url=' + window.encodeURIComponent(pdfURL), true);
+            xhr.responseType = 'arraybuffer';
+            xhr.onload = function () {
+                if (this.status === 200) {
+                    setTimeout(() => {
+                        window.annoPage.displayViewer({ content : this.response });
+                    }, 1000);
+                }
+            };
+            xhr.send();
+        }
+    });
+
 });
 
 
@@ -6745,6 +6777,8 @@ class PDFAnnoPage {
 
             // Reset the confirm dialog at leaving page.
             __WEBPACK_IMPORTED_MODULE_2__util_window__["c" /* unlistenWindowLeaveEvent */]();
+
+            __WEBPACK_IMPORTED_MODULE_1__shared_util__["b" /* dispatchWindowEvent */]('iframeReady');
         });
 
         iframeWindow.addEventListener('annotationrendered', () => {
