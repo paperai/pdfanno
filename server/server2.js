@@ -36,7 +36,9 @@ app.get('/', function(req, res) {
 });
 
 // Routing: PDF Loader.
-// example: http://localhost:8001/?pdf=http://www.yoheim.net/tmp/pdf-sample.pdf
+// example:
+//      http://localhost:8001/?pdf=http://www.yoheim.net/tmp/pdf-sample.pdf
+//      http://localhost:8001/?pdf=https://arxiv.org/pdf/1707.03141
 app.get('/load_pdf', (req, res) => {
 
     const pdfURL = req.query.url;
@@ -46,6 +48,7 @@ app.get('/load_pdf', (req, res) => {
         method   : 'GET',
         url      : pdfURL,
         headers : {
+            // behave as a browser.
             'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.19 Safari/537.36'
         },
         encoding : null     // treat a response as a binary.
