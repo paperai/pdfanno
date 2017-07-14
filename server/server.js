@@ -12,9 +12,9 @@ const isProduction = NODE_ENV === 'production';
 console.log('isProduction=', isProduction);
 
 // Set the static root directory.
-let STATIC_ROOT = 'docs';
+let STATIC_ROOT = '../docs';
 if (!isProduction) {
-    STATIC_ROOT = 'dist';
+    STATIC_ROOT = '../dist';
 }
 
 // create Application.
