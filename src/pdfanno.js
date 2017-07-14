@@ -72,13 +72,7 @@ window.addEventListener('DOMContentLoaded', e => {
     window.annoPage.clearAllAnnotations();
 
     // Reset PDFViwer settings.
-    window.annoPage.resetPDFViewerSettings();
-
-    // Init viewer.
-    window.annoPage.initializeViewer();
-
-    // Start application.
-    window.annoPage.startViewerApplication();
+    // window.annoPage.resetPDFViewerSettings();
 
     // resizable.
     annoUI.util.setupResizableColumns();
@@ -217,7 +211,7 @@ window.addEventListener('DOMContentLoaded', e => {
     });
 
     // Display a PDF specified via URL query parameter.
-    window.addEventListener('iframeReady', () => {
+    // window.addEventListener('iframeReady', () => {
 
         let pdfURL;
         (location.search || '').replace('?', '').split('&')
@@ -239,13 +233,38 @@ window.addEventListener('DOMContentLoaded', e => {
             xhr.responseType = 'arraybuffer';
             xhr.onload = function () {
                 if (this.status === 200) {
-                    setTimeout(() => {
-                        window.annoPage.displayViewer({ content : this.response });
-                    }, 1000);
+
+                    // Init viewer.
+                    window.annoPage.initializeViewer(null);
+                    // Start application.
+                    window.annoPage.startViewerApplication();
+
+                    window.addEventListener('iframeReady', () => {
+                        console.log('ccccccc');
+                        setTimeout(() => {
+                            console.log('bbbbbbbb');
+                            window.annoPage.displayViewer({ content : this.response });
+                        }, 500);
+                    });
                 }
             };
             xhr.send();
+
+        } else {
+
+            // Init viewer.
+            window.annoPage.initializeViewer();
+            // Start application.
+            window.annoPage.startViewerApplication();
         }
-    });
+    // });
+
+
+    // // Init viewer.
+    // window.annoPage.initializeViewer();
+
+    // // Start application.
+    // window.annoPage.startViewerApplication();
+
 
 });

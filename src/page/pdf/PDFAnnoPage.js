@@ -188,7 +188,7 @@ export default class PDFAnnoPage {
 
     }
 
-    initializeViewer() {
+    initializeViewer(initialPDFPath = '../pdfs/P12-1046.pdf') {
 
         window.pdf = null;
         window.pdfName = null;
@@ -196,9 +196,14 @@ export default class PDFAnnoPage {
         // Reset setting.
         this.resetPDFViewerSettings();
 
+        let url = './pages/viewer.html';
+        if (initialPDFPath) {
+            url += '?file=' + initialPDFPath;
+        }
+
         // Reload pdf.js.
         $('#viewer iframe').remove();
-        $('#viewer').html('<iframe src="./pages/viewer.html?file=../pdfs/P12-1046.pdf" class="anno-viewer" frameborder="0"></iframe>');
+        $('#viewer').html('<iframe src="' + url + '" class="anno-viewer" frameborder="0"></iframe>');
 
     }
 
