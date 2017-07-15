@@ -72,13 +72,7 @@ window.addEventListener('DOMContentLoaded', e => {
     window.annoPage.clearAllAnnotations();
 
     // Reset PDFViwer settings.
-    window.annoPage.resetPDFViewerSettings();
-
-    // Init viewer.
-    window.annoPage.initializeViewer();
-
-    // Start application.
-    window.annoPage.startViewerApplication();
+    // window.annoPage.resetPDFViewerSettings();
 
     // resizable.
     annoUI.util.setupResizableColumns();
@@ -217,35 +211,50 @@ window.addEventListener('DOMContentLoaded', e => {
     });
 
     // Display a PDF specified via URL query parameter.
-    window.addEventListener('iframeReady', () => {
 
-        let pdfURL;
-        (location.search || '').replace('?', '').split('&')
-            .filter(a => a)
-            .forEach(fragment => {
-                let [ key, value ] = fragment.split('=');
-                if (key && key.toLowerCase() === 'pdf') {
-                    pdfURL = value;
-                }
-        });
-
-        if (pdfURL) {
-
-            console.log('pdfURL=', pdfURL);
-
-            // Load a PDF as ArrayBuffer.
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', '/load_pdf?url=' + window.encodeURIComponent(pdfURL), true);
-            xhr.responseType = 'arraybuffer';
-            xhr.onload = function () {
-                if (this.status === 200) {
-                    setTimeout(() => {
-                        window.annoPage.displayViewer({ content : this.response });
-                    }, 1000);
-                }
-            };
-            xhr.send();
-        }
+    let pdfURL;
+    (location.search || '').replace('?', '').split('&')
+        .filter(a => a)
+        .forEach(fragment => {
+            let [ key, value ] = fragment.split('=');
+            if (key && key.toLowerCase() === 'pdf') {
+                pdfURL = value;
+            }
     });
+
+    if (pdfURL) {
+
+        console.log('pdfURL=', pdfURL);
+
+        // Load a PDF as ArrayBuffer.
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/load_pdf?url=' + window.encodeURIComponent(pdfURL), true);
+        xhr.responseType = 'arraybuffer';
+        xhr.onload = function () {
+            if (this.status === 200) {
+
+                // Init viewer.
+                window.annoPage.initializeViewer(null);
+                // Start application.
+                window.annoPage.startViewerApplication();
+
+                window.addEventListener('iframeReady', () => {
+                    console.log('ccccccc');
+                    setTimeout(() => {
+                        console.log('bbbbbbbb');
+                        window.annoPage.displayViewer({ content : this.response });
+                    }, 500);
+                });
+            }
+        };
+        xhr.send();
+
+    } else {
+
+        // Init viewer.
+        window.annoPage.initializeViewer();
+        // Start application.
+        window.annoPage.startViewerApplication();
+    }
 
 });
