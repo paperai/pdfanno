@@ -4,16 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "anno:start": "npm run anno:publish && cross-env NODE_ENV=production node server.js",
-    "anno:start-dev": "npm run anno:dev && cross-env NODE_ENV=develop ./node_modules/.bin/node-dev server.js",
-    "anno:prepare": "gulp prepare",
-    "anno:build": "npm run anno:prepare && webpack",
-    "anno:dev": "npm run anno:prepare && webpack --watch",
-    "anno:watch": "npm run anno:prepare && webpack-dev-server --inline",
-    "anno:watch-ui": "npm run anno:prepare && cross-env ANNO_UI=YES webpack-dev-server --inline",
-    "anno:publish": "npm run anno:build && gulp publish",
-    "anno:server2": "cross-env NODE_ENV=production node server/server2.js",
-    "anno:server2-dev": "cross-env NODE_ENV=develop ./node_modules/.bin/node-dev server/server2.js"
+    "_prepare": "gulp prepare",
+    "watch": "npm run _prepare && webpack --watch",
+    "dev": "npm run _prepare && webpack-dev-server --inline",
+    "publish": "npm run _prepare && webpack && gulp publish",
+    "server": "cross-env NODE_ENV=production node server/server.js",
+    "server-dev": "cross-env NODE_ENV=develop ./node_modules/.bin/node-dev server/server.js"
   },
   "repository": {
     "type": "git",

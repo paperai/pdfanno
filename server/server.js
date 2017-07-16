@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-const base64 = require('base64');
+const request = require('request');
 const express = require('express');
 const bodyParser = require('body-parser');
 const multer = require('multer');
@@ -29,8 +29,8 @@ app.use('/dist', express.static(path.resolve(__dirname, STATIC_ROOT, 'dist')));
 app.use('/pages', express.static(path.resolve(__dirname, STATIC_ROOT, 'pages')));
 app.use('/build', express.static(path.resolve(__dirname, STATIC_ROOT, 'build')));
 app.use('/pdfs', express.static(path.resolve(__dirname, STATIC_ROOT, 'pdfs')));
-app.use('/pdfanno-core.bundle.js', express.static(path.resolve(__dirname, STATIC_ROOT, 'pdfanno-core.bundle.js')));
-app.use('/pdfanno.bundle.js', express.static(path.resolve(__dirname, STATIC_ROOT, 'pdfanno.bundle.js')));
+app.use('/pdfanno.core.bundle.js', express.static(path.resolve(__dirname, STATIC_ROOT, 'pdfanno.core.bundle.js')));
+app.use('/pdfanno.page.bundle.js', express.static(path.resolve(__dirname, STATIC_ROOT, 'pdfanno.page.bundle.js')));
 
 // Rooting : Index file.
 app.get('/', function(req, res) {
@@ -54,6 +54,33 @@ app.post('/api/pdf_upload', (req, res) => {
 
     // Response the result.
     res.json({ status : 'OK' });
+});
+
+// Routing: PDF Loader.
+// example:
+//      http://localhost:8000/?pdf=http://www.yoheim.net/tmp/pdf-sample.pdf
+//      http://localhost:8000/?pdf=https://arxiv.org/pdf/1707.03141
+app.get('/load_pdf', (req, res) => {
+
+    const pdfURL = req.query.url;
+    console.log('pdfURL=', pdfURL);
+
+    const reqConfig = {
+        method   : 'GET',
+        url      : pdfURL,
+        headers : {
+            // behave as a browser.
+            'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.19 Safari/537.36'
+        },
+        encoding : null     // treat a response as a binary.
+    };
+
+    request(reqConfig, function(error, response, body) {
+
+        res.setHeader('Content-Length', body.length);
+        res.write(body, 'binary');
+        res.end();
+    });
 });
 
 // Launch app.

@@ -239,9 +239,7 @@ window.addEventListener('DOMContentLoaded', e => {
                 window.annoPage.startViewerApplication();
 
                 window.addEventListener('iframeReady', () => {
-                    console.log('ccccccc');
                     setTimeout(() => {
-                        console.log('bbbbbbbb');
                         window.annoPage.displayViewer({ content : this.response });
                     }, 500);
                 });
