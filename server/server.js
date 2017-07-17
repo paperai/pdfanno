@@ -3,8 +3,6 @@ const fs = require('fs');
 const request = require('request');
 const express = require('express');
 const bodyParser = require('body-parser');
-const multer = require('multer');
-const upload = multer();
 
 // Load environment.
 const NODE_ENV = process.env.NODE_ENV;
@@ -41,8 +39,10 @@ app.get('/', function(req, res) {
 // Rooting(API) : Uploading a pdf.
 app.post('/api/pdf_upload', (req, res) => {
 
-    const fileName = req.body.name;
-    const contentBase64 = req.body.content.replace('data:application/pdf;base64,', '');
+    console.log('Object.keys(req.body)[0]:', Object.keys(req.body)[0].slice(0,100))
+
+    const fileName = 'tmp.pdf';
+    const contentBase64 = Object.keys(req.body)[0].replace('data:application/pdf;base64,', '');
     const buf = Buffer.from(contentBase64, 'base64');
     console.log(`${fileName} is uploaded. fileSize=${Math.floor(buf.length / 1024)}KB`);
 
