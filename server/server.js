@@ -31,10 +31,10 @@ app.use('/pdfanno.core.bundle.js', express.static(path.resolve(__dirname, STATIC
 app.use('/pdfanno.page.bundle.js', express.static(path.resolve(__dirname, STATIC_ROOT, 'pdfanno.page.bundle.js')));
 
 // Rooting : Index file.
-app.get('/', function(req, res) {
-    res.type('html');
-    res.send(fs.readFileSync(path.resolve(__dirname, STATIC_ROOT, 'index.html')));
-});
+// app.get('/', function(req, res) {
+//     res.type('html');
+//     res.send(fs.readFileSync(path.resolve(__dirname, STATIC_ROOT, 'index.html')));
+// });
 
 // Rooting(API) : Uploading a pdf.
 app.post('/api/pdf_upload', (req, res) => {
