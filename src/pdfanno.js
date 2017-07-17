@@ -13,6 +13,14 @@ import {
 import * as publicApi from './page/public';
 import PDFAnnoPage from './page/pdf/PDFAnnoPage';
 
+/**
+ * API root point.
+ */
+let API_ROOT = 'http://localhost:8000';
+if (process.env.NODE_ENV === 'production') {
+    console.log('PRODUCTION MODE');
+    API_ROOT = 'https://pdfanno.hshindo.com';
+}
 
 /**
  * Global variable.
@@ -228,7 +236,7 @@ window.addEventListener('DOMContentLoaded', e => {
 
         // Load a PDF as ArrayBuffer.
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', '/load_pdf?url=' + window.encodeURIComponent(pdfURL), true);
+        xhr.open('GET', API_ROOT + '/load_pdf?url=' + window.encodeURIComponent(pdfURL), true);
         xhr.responseType = 'arraybuffer';
         xhr.onload = function () {
             if (this.status === 200) {
@@ -239,9 +247,7 @@ window.addEventListener('DOMContentLoaded', e => {
                 window.annoPage.startViewerApplication();
 
                 window.addEventListener('iframeReady', () => {
-                    console.log('ccccccc');
                     setTimeout(() => {
-                        console.log('bbbbbbbb');
                         window.annoPage.displayViewer({ content : this.response });
                     }, 500);
                 });

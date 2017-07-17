@@ -1,10 +1,8 @@
 const path = require('path');
 const fs = require('fs');
-const base64 = require('base64');
+const request = require('request');
 const express = require('express');
 const bodyParser = require('body-parser');
-const multer = require('multer');
-const upload = multer();
 
 // Load environment.
 const NODE_ENV = process.env.NODE_ENV;
@@ -29,8 +27,8 @@ app.use('/dist', express.static(path.resolve(__dirname, STATIC_ROOT, 'dist')));
 app.use('/pages', express.static(path.resolve(__dirname, STATIC_ROOT, 'pages')));
 app.use('/build', express.static(path.resolve(__dirname, STATIC_ROOT, 'build')));
 app.use('/pdfs', express.static(path.resolve(__dirname, STATIC_ROOT, 'pdfs')));
-app.use('/pdfanno-core.bundle.js', express.static(path.resolve(__dirname, STATIC_ROOT, 'pdfanno-core.bundle.js')));
-app.use('/pdfanno.bundle.js', express.static(path.resolve(__dirname, STATIC_ROOT, 'pdfanno.bundle.js')));
+app.use('/pdfanno.core.bundle.js', express.static(path.resolve(__dirname, STATIC_ROOT, 'pdfanno.core.bundle.js')));
+app.use('/pdfanno.page.bundle.js', express.static(path.resolve(__dirname, STATIC_ROOT, 'pdfanno.page.bundle.js')));
 
 // Rooting : Index file.
 app.get('/', function(req, res) {
@@ -41,8 +39,10 @@ app.get('/', function(req, res) {
 // Rooting(API) : Uploading a pdf.
 app.post('/api/pdf_upload', (req, res) => {
 
-    const fileName = req.body.name;
-    const contentBase64 = req.body.content.replace('data:application/pdf;base64,', '');
+    console.log('Object.keys(req.body)[0]:', Object.keys(req.body)[0].slice(0,100))
+
+    const fileName = 'tmp.pdf';
+    const contentBase64 = Object.keys(req.body)[0].replace('data:application/pdf;base64,', '');
     const buf = Buffer.from(contentBase64, 'base64');
     console.log(`${fileName} is uploaded. fileSize=${Math.floor(buf.length / 1024)}KB`);
 
@@ -54,6 +54,33 @@ app.post('/api/pdf_upload', (req, res) => {
 
     // Response the result.
     res.json({ status : 'OK' });
+});
+
+// Routing: PDF Loader.
+// example:
+//      http://localhost:8000/?pdf=http://www.yoheim.net/tmp/pdf-sample.pdf
+//      http://localhost:8000/?pdf=https://arxiv.org/pdf/1707.03141
+app.get('/load_pdf', (req, res) => {
+
+    const pdfURL = req.query.url;
+    console.log('pdfURL=', pdfURL);
+
+    const reqConfig = {
+        method   : 'GET',
+        url      : pdfURL,
+        headers : {
+            // behave as a browser.
+            'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.19 Safari/537.36'
+        },
+        // treat a response as a binary.
+        encoding : null
+    };
+
+    request(reqConfig, function(error, response, body) {
+        res.setHeader('Content-Length', body.length);
+        res.write(body, 'binary');
+        res.end();
+    });
 });
 
 // Launch app.
