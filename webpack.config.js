@@ -9,7 +9,7 @@ if (process.env.ANNO_UI === 'YES') {
     // resolves.push(path.resolve('../anno-ui/src'))
 }
 
-module.exports = {
+let config = {
   entry: {
     'pdfanno.page' : './src/pdfanno.js',
     'pdfanno.core' : './src/core/index.js'
@@ -47,3 +47,17 @@ module.exports = {
   // },
   devtool: 'source-map'
 };
+
+if (process.env.NODE_ENV === 'production') {
+
+    config.plugins.push(new webpack.DefinePlugin({
+        'process.env' : {
+            'NODE_ENV' : '"production"'
+        }
+    }));
+}
+
+
+
+
+module.exports = config;

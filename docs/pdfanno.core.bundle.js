@@ -82,8 +82,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__ = __webpack_require__(4);
 
 
-let forEach = Array.prototype.forEach;
-
 const DEFAULT_RADIUS = 3;
 /* harmony export (immutable) */ __webpack_exports__["a"] = DEFAULT_RADIUS;
 
@@ -124,7 +122,7 @@ function adjustPoint(x, y, radius) {
   while(true) {
 
     let good = true;
-    forEach.call(circles, circle => {
+    Array.prototype.forEach.call(circles, circle => {
       let x1 = parseFloat(circle.getAttribute('cx'));
       let y1 = parseFloat(circle.getAttribute('cy'));
       let r1 = parseFloat(circle.getAttribute('r'));
@@ -18509,16 +18507,12 @@ module.exports = {
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"anno:start": "npm run anno:publish && cross-env NODE_ENV=production node server.js",
-		"anno:start-dev": "npm run anno:dev && cross-env NODE_ENV=develop ./node_modules/.bin/node-dev server.js",
-		"anno:prepare": "gulp prepare",
-		"anno:build": "npm run anno:prepare && webpack",
-		"anno:dev": "npm run anno:prepare && webpack --watch",
-		"anno:watch": "npm run anno:prepare && webpack-dev-server --inline",
-		"anno:watch-ui": "npm run anno:prepare && cross-env ANNO_UI=YES webpack-dev-server --inline",
-		"anno:publish": "npm run anno:build && gulp publish",
-		"anno:server2": "cross-env NODE_ENV=production node server/server2.js",
-		"anno:server2-dev": "cross-env NODE_ENV=develop ./node_modules/.bin/node-dev server/server2.js"
+		"_prepare": "gulp prepare",
+		"watch": "npm run _prepare && webpack --watch",
+		"dev": "npm run _prepare && webpack-dev-server --inline",
+		"publish": "npm run _prepare && cross-env NODE_ENV=production webpack && gulp publish",
+		"server": "cross-env NODE_ENV=production node server/server.js",
+		"server-dev": "cross-env NODE_ENV=develop ./node_modules/.bin/node-dev server/server.js"
 	},
 	"repository": {
 		"type": "git",

@@ -1,7 +1,5 @@
 import setAttributes from '../utils/setAttributes';
 
-let forEach = Array.prototype.forEach;
-
 export const DEFAULT_RADIUS = 3;
 
 /**
@@ -40,7 +38,7 @@ function adjustPoint(x, y, radius) {
   while(true) {
 
     let good = true;
-    forEach.call(circles, circle => {
+    Array.prototype.forEach.call(circles, circle => {
       let x1 = parseFloat(circle.getAttribute('cx'));
       let y1 = parseFloat(circle.getAttribute('cy'));
       let r1 = parseFloat(circle.getAttribute('r'));
