@@ -18508,8 +18508,8 @@ module.exports = {
 	"main": "index.js",
 	"scripts": {
 		"_prepare": "gulp prepare",
-		"watch": "npm run _prepare && webpack --watch",
 		"dev": "npm run _prepare && webpack-dev-server --inline",
+		"watch": "npm run _prepare && webpack --watch",
 		"publish": "npm run _prepare && cross-env NODE_ENV=production webpack && gulp publish",
 		"server": "cross-env NODE_ENV=production node server/server.js",
 		"server-dev": "cross-env NODE_ENV=develop ./node_modules/.bin/node-dev server/server.js"

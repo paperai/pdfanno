@@ -4344,8 +4344,10 @@ __webpack_require__(26);
 
 
 
+/**
+ * API root point.
+ */
 let API_ROOT = 'http://localhost:8000';
-
 if (true) {
     console.log('PRODUCTION MODE');
     API_ROOT = 'https://pdfanno.hshindo.com';
