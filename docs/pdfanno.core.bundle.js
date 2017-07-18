@@ -18548,7 +18548,7 @@ module.exports = {
 		"webpack-livereload-plugin": "^0.11.0"
 	},
 	"dependencies": {
-		"anno-ui": "github:paperai/anno-ui",
+		"anno-ui": "^0.1.0",
 		"axios": "^0.15.2",
 		"body-parser": "^1.17.2",
 		"create-stylesheet": "^0.3.0",
