@@ -155,9 +155,13 @@
                     </div>
                 </div>
             </div>
-			<div id="viewerWrapper" class="col-md-9 col-sm-9 col-xs-9" style="padding-left: 0; padding-right: 0;">
+			<div id="viewerWrapper" class="col-md-9 col-sm-9 col-xs-9" style="padding-left: 0; padding-right: 0; position: relative;">
                 <div style="padding-right: 15px;">
     				<div id="viewer" class="viewer"><!-- Added by JS. --></div>
+                </div>
+                <div id="pdfLoading" class="loader-container">
+                    <div class="loader"></div>
+                    <p>Loading PDF ...</p>
                 </div>
 			</div>
 		</div>
@@ -181,6 +185,46 @@
         </div>
     </div>
 </div>
+
+
+<style>
+    .loader-container {
+        position: absolute;
+        top: 100px;
+        left: 50%;
+        width: 200px;
+        height: 200px;
+        margin-left: -150px;
+        /*margin-top: -150px;*/
+        background-color: #333;
+        padding: 16px;
+        box-shadow: 0 0 10px rgba(0,0,0,.5);
+        transition: opacity .3s ease-in-out;
+    }
+    .loader-container.close {
+        opacity: 0;
+    }
+    .loader {
+        border: 16px solid #f3f3f3; /* Light grey */
+        border-top: 16px solid #3498db; /* Blue */
+        border-radius: 50%;
+        width: 120px;
+        height: 120px;
+        animation: spin 1.5s ease-in-out infinite;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    .loader-container p {
+        margin-top: 16px;
+        font-size: 16px;
+        text-align: center;
+        color: white;
+    }
+</style>
 
 </body>
 </html>

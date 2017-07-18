@@ -16,7 +16,7 @@ import PDFAnnoPage from './page/pdf/PDFAnnoPage';
 /**
  * API root point.
  */
-let API_ROOT = 'http://localhost:8000';
+let API_ROOT = 'http://localhost:3000';
 if (process.env.NODE_ENV === 'production') {
     console.log('PRODUCTION MODE');
     API_ROOT = 'https://pdfanno.hshindo.com';
@@ -251,7 +251,18 @@ window.addEventListener('DOMContentLoaded', e => {
                         window.annoPage.displayViewer({ content : this.response });
                     }, 500);
                 });
+
+                window.addEventListener('pagerendered', () => {
+                    $('#pdfLoading').addClass('close');
+                    setTimeout(function() {
+                        $('#pdfLoading').remove();
+                    }, 1000);
+                });
             }
+        };
+        xhr.timeout = 10000; // 10s
+        xhr.ontimeout = function () {
+            alert('Failed to load the PDF.');
         };
         xhr.send();
 
@@ -267,10 +278,8 @@ window.addEventListener('DOMContentLoaded', e => {
         window.annoPage.startViewerApplication();
 
         window.addEventListener('pagerendered', () => {
-            setTimeout(() => {
-                window.annoPage.closePDFViewer();
-                $('#viewer').css('opacity', '1');
-            }, 1000);
+            window.annoPage.closePDFViewer();
+            $('#viewer').css('opacity', '1');
         });
     }
 
