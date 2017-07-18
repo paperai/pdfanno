@@ -7,7 +7,9 @@ const bodyParser = require('body-parser');
 // Load environment.
 const NODE_ENV = process.env.NODE_ENV;
 const isProduction = NODE_ENV === 'production';
+const isDevelopment = NODE_ENV === 'develop';
 console.log('isProduction=', isProduction);
+console.log('isDevelopment=', isDevelopment);
 
 // Set the static root directory.
 let STATIC_ROOT = '../docs';
@@ -31,10 +33,13 @@ app.use('/pdfanno.core.bundle.js', express.static(path.resolve(__dirname, STATIC
 app.use('/pdfanno.page.bundle.js', express.static(path.resolve(__dirname, STATIC_ROOT, 'pdfanno.page.bundle.js')));
 
 // Rooting : Index file.
-// app.get('/', function(req, res) {
-//     res.type('html');
-//     res.send(fs.readFileSync(path.resolve(__dirname, STATIC_ROOT, 'index.html')));
-// });
+if (isDevelopment) {
+    app.get('/', function(req, res) {
+        res.type('html');
+        res.send(fs.readFileSync(path.resolve(__dirname, STATIC_ROOT, 'index.html')));
+    });
+}
+
 
 // Rooting(API) : Uploading a pdf.
 app.post('/api/pdf_upload', (req, res) => {
@@ -83,7 +88,13 @@ app.get('/load_pdf', (req, res) => {
     });
 });
 
+// Port.
+let port = 1000;
+if (isDevelopment) {
+    port = 3000;
+}
+
 // Launch app.
-app.listen(1000, function() {
-    console.log('Express app listening on port 1000.');
+app.listen(port, function() {
+    console.log(`Express app listening on port ${port}.`);
 });
