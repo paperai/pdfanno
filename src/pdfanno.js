@@ -257,10 +257,21 @@ window.addEventListener('DOMContentLoaded', e => {
 
     } else {
 
+        // If no PDF is specified, display the blank viewer.
+
+        $('#viewer').css('opacity', '0');
+
         // Init viewer.
         window.annoPage.initializeViewer();
         // Start application.
         window.annoPage.startViewerApplication();
+
+        window.addEventListener('pagerendered', () => {
+            setTimeout(() => {
+                window.annoPage.closePDFViewer();
+                $('#viewer').css('opacity', '1');
+            }, 1000);
+        });
     }
 
 });
