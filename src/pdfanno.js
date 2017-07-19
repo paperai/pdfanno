@@ -234,6 +234,9 @@ window.addEventListener('DOMContentLoaded', e => {
 
         console.log('pdfURL=', pdfURL);
 
+        // Show loading.
+        $('#pdfLoading').removeClass('hidden');
+
         // Load a PDF as ArrayBuffer.
         var xhr = new XMLHttpRequest();
         xhr.open('GET', API_ROOT + '/load_pdf?url=' + window.encodeURIComponent(pdfURL), true);
@@ -255,7 +258,7 @@ window.addEventListener('DOMContentLoaded', e => {
                 window.addEventListener('pagerendered', () => {
                     $('#pdfLoading').addClass('close');
                     setTimeout(function() {
-                        $('#pdfLoading').remove();
+                        $('#pdfLoading').addClass('hidden');
                     }, 1000);
                 });
             }
