@@ -1,4 +1,5 @@
 require("file-loader?name=dist/index.html!./index.html");
+require("!style-loader!css-loader!./pdfanno.css");
 
 // UI parts.
 import * as annoUI from 'anno-ui';
