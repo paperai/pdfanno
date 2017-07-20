@@ -65,6 +65,10 @@ export default class PDFAnnoPage {
             dispatchWindowEvent('iframeReady');
         });
 
+        iframeWindow.addEventListener('pagerendered', () => {
+            dispatchWindowEvent('pagerendered');
+        });
+
         iframeWindow.addEventListener('annotationrendered', () => {
 
             // Restore the status of AnnoTools.

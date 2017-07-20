@@ -1,4 +1,5 @@
 require("file-loader?name=dist/index.html!./index.html");
+require("!style-loader!css-loader!./pdfanno.css");
 
 // UI parts.
 import * as annoUI from 'anno-ui';
@@ -16,7 +17,7 @@ import PDFAnnoPage from './page/pdf/PDFAnnoPage';
 /**
  * API root point.
  */
-let API_ROOT = 'http://localhost:8000';
+let API_ROOT = 'http://localhost:3000';
 if (process.env.NODE_ENV === 'production') {
     console.log('PRODUCTION MODE');
     API_ROOT = 'https://pdfanno.hshindo.com';
@@ -234,6 +235,9 @@ window.addEventListener('DOMContentLoaded', e => {
 
         console.log('pdfURL=', pdfURL);
 
+        // Show loading.
+        $('#pdfLoading').removeClass('hidden');
+
         // Load a PDF as ArrayBuffer.
         var xhr = new XMLHttpRequest();
         xhr.open('GET', API_ROOT + '/load_pdf?url=' + window.encodeURIComponent(pdfURL), true);
@@ -251,16 +255,36 @@ window.addEventListener('DOMContentLoaded', e => {
                         window.annoPage.displayViewer({ content : this.response });
                     }, 500);
                 });
+
+                window.addEventListener('pagerendered', () => {
+                    $('#pdfLoading').addClass('close');
+                    setTimeout(function() {
+                        $('#pdfLoading').addClass('hidden');
+                    }, 1000);
+                });
             }
+        };
+        xhr.timeout = 10000; // 10s
+        xhr.ontimeout = function () {
+            alert('Failed to load the PDF.');
         };
         xhr.send();
 
     } else {
 
+        // If no PDF is specified, display the blank viewer.
+
+        $('#viewer').css('opacity', '0');
+
         // Init viewer.
         window.annoPage.initializeViewer();
         // Start application.
         window.annoPage.startViewerApplication();
+
+        window.addEventListener('pagerendered', () => {
+            window.annoPage.closePDFViewer();
+            $('#viewer').css('opacity', '1');
+        });
     }
 
 });
