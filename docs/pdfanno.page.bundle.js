@@ -4903,9 +4903,12 @@ window.addEventListener('DOMContentLoaded', e => {
                 });
             }
         };
-        xhr.timeout = 10000; // 10s
+        xhr.timeout = 120 * 1000; // 120s
         xhr.ontimeout = function () {
-            alert('Failed to load the PDF.');
+            $('#pdfLoading').addClass('hidden');
+            setTimeout(() => {
+                alert('Failed to load the PDF.');
+            }, 100);
         };
         xhr.send();
 
