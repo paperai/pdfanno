@@ -205,7 +205,9 @@ window.addEventListener('DOMContentLoaded', e => {
                 annotation.save();
                 annotation.enableViewMode();
             }
-        }
+        },
+        createSpanAnnotation : window.annoPage.createSpan,
+        createRelAnnotation : window.annoPage.createRelation
     });
 
     // Upload button.

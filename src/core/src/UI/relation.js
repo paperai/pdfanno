@@ -4,29 +4,35 @@ import RelationAnnotation from '../annotation/relation';
 /**
  * Create a new Relation annotation.
  */
-export function createRelation(type, anno1, anno2, dryRun=false) {
+export function createRelation({ type, anno1, anno2, text }) {
+
+    // for old style.
+    if (arguments.length === 3) {
+        type = arguments[0];
+        anno1 = arguments[1];
+        anno2 = arguments[2];
+    }
 
     let annotation = new RelationAnnotation();
     annotation.direction = type;
     annotation.rel1Annotation = anno1;
     annotation.rel2Annotation = anno2;
+    annotation.text = text;
 
-    if (dryRun === false) {
-        annotation.save();
-        annotation.render();
+    annotation.save();
+    annotation.render();
 
-        // TODO Refactoring.
-        // Deselect all.
-        window.annotationContainer
-            .getSelectedAnnotations()
-            .forEach(a => a.deselect());
+    // TODO Refactoring.
+    // Deselect all.
+    window.annotationContainer
+        .getSelectedAnnotations()
+        .forEach(a => a.deselect());
 
-        // Select.
-        annotation.select();
+    // Select.
+    annotation.select();
 
-        // New type text.
-        textInput.enable({ uuid : annotation.uuid, autoFocus : true });
-    }
+    // New type text.
+    textInput.enable({ uuid : annotation.uuid, autoFocus : true, text });
 
     return annotation;
 }

@@ -228,7 +228,7 @@ export default class PDFAnnoPage {
     /**
      * Create a Span annotation.
      */
-    createSpan() {
+    createSpan({ text = null }) {
 
         const rects = window.iframeWindow.PDFAnnoCore.default.UI.getRectangles();
 
@@ -257,6 +257,8 @@ export default class PDFAnnoPage {
                         });
 
         if (annos.length > 0) {
+            annos[0].text = text;
+            annos[0].save();
             // Show label input.
             var event = document.createEvent('CustomEvent');
             event.initCustomEvent('enableTextInput', true, true, {
@@ -268,14 +270,19 @@ export default class PDFAnnoPage {
         }
 
         // Create a new rectAnnotation.
-        window.iframeWindow.PDFAnnoCore.default.UI.createSpan();
+        window.iframeWindow.PDFAnnoCore.default.UI.createSpan({ text });
     }
 
 
     /**
      * Create a Relation annotation.
      */
-    createRelation(type) {
+    createRelation({ type, text = null }) {
+
+        // for old style.
+        if (arguments.length === 1 && typeof arguments[0] === 'string') {
+            type = arguments[0];
+        }
 
         let selectedAnnotations = window.iframeWindow.annotationContainer.getSelectedAnnotations();
         selectedAnnotations = selectedAnnotations.filter(a => {
@@ -307,6 +314,7 @@ export default class PDFAnnoPage {
             arrows[0].direction = type;
             arrows[0].rel1Annotation = first;
             arrows[0].rel2Annotation = second;
+            arrows[0].text = text;
             arrows[0].save();
             arrows[0].render();
             arrows[0].enableViewMode();
@@ -320,7 +328,12 @@ export default class PDFAnnoPage {
             return;
         }
 
-        window.iframeWindow.PDFAnnoCore.default.UI.createRelation(type, first, second);
+        window.iframeWindow.PDFAnnoCore.default.UI.createRelation({
+            type,
+            anno1 : first,
+            anno2 : second,
+            text
+        });
     }
 
     /**
