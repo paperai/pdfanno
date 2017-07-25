@@ -229,7 +229,7 @@ export default class PDFAnnoPage {
     /**
      * Create a Span annotation.
      */
-    createSpan({ text = null }) {
+    createSpan({ text = null } = {}) {
 
         const rects = window.iframeWindow.PDFAnnoCore.default.UI.getRectangles();
 
@@ -278,7 +278,7 @@ export default class PDFAnnoPage {
     /**
      * Create a Relation annotation.
      */
-    createRelation({ type, text = null }) {
+    createRelation({ type, text = null } = {}) {
 
         // for old style.
         if (arguments.length === 1 && typeof arguments[0] === 'string') {
