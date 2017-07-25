@@ -85,6 +85,12 @@ $(document).on('keydown', e => {
 // The event called at page rendered by pdfjs.
 window.addEventListener('pagerendered', function(ev) {
     console.log('pagerendered:', ev.detail.pageNumber);
+
+    // No action, if the viewer is closed.
+    if (!PDFView.pdfViewer.getPageView(0)) {
+        return;
+    }
+
     renderAnno();
 
     // Issue Fix.
@@ -121,6 +127,11 @@ window.removeAnnoLayer = removeAnnoLayer;
  * Render annotations saved in the storage.
  */
 function renderAnno() {
+
+    // No action, if the viewer is closed.
+    if (!PDFView.pdfViewer.getPageView(0)) {
+        return;
+    }
 
     // TODO make it a global const.
     const svgLayerId = 'annoLayer';

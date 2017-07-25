@@ -205,7 +205,9 @@ window.addEventListener('DOMContentLoaded', e => {
                 annotation.save();
                 annotation.enableViewMode();
             }
-        }
+        },
+        createSpanAnnotation : window.annoPage.createSpan,
+        createRelAnnotation : window.annoPage.createRelation
     });
 
     // Upload button.
@@ -284,10 +286,12 @@ window.addEventListener('DOMContentLoaded', e => {
         // Start application.
         window.annoPage.startViewerApplication();
 
-        window.addEventListener('pagerendered', () => {
+        const fn = () => {
             window.annoPage.closePDFViewer();
             $('#viewer').css('opacity', '1');
-        });
+            window.removeEventListener('pagerendered', fn);
+        };
+        window.addEventListener('pagerendered', fn);
     }
 
 });

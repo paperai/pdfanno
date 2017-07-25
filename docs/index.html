@@ -4,6 +4,7 @@
 	<title>PDFAnno</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.18.1/build/cssreset/cssreset-min.css">
     <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -76,14 +77,11 @@
                 <!-- Added by JS. -->
               </ul>
             </div>
-
-
 			<div class="btn-group" role="group">
 				<a id="downloadButton" class="btn btn-default" href="#" title="download">
 					<i class="fa fa-download"></i>
 				</a>
 			</div>
-
         </div>
 
         <!-- Annotation Tools -->
@@ -96,41 +94,24 @@
                         <li><a href="#tab2" data-toggle="tab">Server (Experimental)</a></li>
                     </ul>
                     <div class="tab-content">
-                        <div class="tab-pane active" id="tab1">
-                            <div class="btn-toolbar" role="toolbar" style="margin-top: 20px">
-                                <div class="btn-group" role="group">
-                                    <a class="btn btn-default js-tool-btn-span" href="#" data-type="span" title="span">
-                                        <i class="fa fa-pencil fa-2x"></i>
-                                    </a>
-                                    <a class="btn btn-default js-tool-btn-rel" href="#" data-type="one-way" title="one-way relation">
-                                        <i class="fa fa-long-arrow-right fa-2x"></i>
-                                    </a>
-                                    <a class="btn btn-default js-tool-btn-rel" href="#" data-type="two-way" title="two-way relation">
-                                        <i class="fa fa-arrows-h fa-2x"></i>
-                                    </a>
-                                    <a class="btn btn-default js-tool-btn-rel" href="#" data-type="link" title="link relation">
-                                        <i class="fa fa-minus fa-2x"></i>
-                                    </a>
-    							</div>
-    							<div class="btn-group" role="group">
-                                    <a class="btn btn-default js-tool-btn-rect" href="#" data-type="rect" title="rectangle">
-                                        <i class="fa fa-square-o fa-2x"></i>
-                                    </a>
+                        <div id="tab1" class="tab-pane active">
+                            <div class="u-mt-20">
+                                <input list=labels class="form-control" id="inputLabel" disabled>
+                                <ul class="nav nav-tabs u-mt-10">
+                                    <li class="active"><a  href="#tab" data-toggle="tab" class="js-label-tab" data-type="span"><i class="fa fa-pencil fa-2x"></i></a></li>
+                                    <li><a  href="#tab" data-toggle="tab" class="js-label-tab" data-type="one-way"><i class="fa fa-long-arrow-right fa-2x"></i></a></li>
+                                    <li><a  href="#tab" data-toggle="tab" class="js-label-tab" data-type="two-way"><i class="fa fa-arrows-h fa-2x"></i></a></li>
+                                    <li><a  href="#tab" data-toggle="tab" class="js-label-tab" data-type="link"><i class="fa fa-minus fa-2x"></i></a></li>
+                                </ul>
+                                <div class="tab-content js-label-tab-content">
+                                    <!-- Added by JS -->
+                                </div>
+                                <div class="mt-10">
+                                    <a href="#" class="js-export-label">export labels</a>&nbsp;&nbsp;/&nbsp;&nbsp;<a href="#" class="js-import-label">import labels</a>
+                                    <input type="file" class="hidden js-import-file" accept=".conf">
                                 </div>
                             </div>
-                            <div>
-                                <h3>Label</h3>
-                                <div class="input-group" class="form-control">
-                                  <input list=labels class="form-control" id="inputLabel" disabled>
-                                  <datalist id=labels><!-- Added by JS. --></datalist>
-                                  <span class="input-group-btn">
-                                    <a class="btn btn-default" href="#" title="edit options" data-toggle="modal" data-target="#datalistModal">
-                                      <i class="fa fa-cog fa"></i>
-                                    </a>
-                                  </span>
-                                </div>
-                            </div>
-                        </div>
+                        </div> <!-- /#tab1 -->
                         <div class="tab-pane" id="tab2">
 							<div class="input-group u-mt-20">
 								<input list=servers class="form-control" id="serverURL" placeholder="Server URL">
@@ -151,7 +132,7 @@
                             <div class="u-mt-20">
                                 <textarea id="uploadResult" class="form-control" rows="30" wrap="off"></textarea>
                             </div>
-                        </div>
+                        </div> <!-- /#tab2 -->
                     </div>
                 </div>
             </div>
@@ -166,24 +147,6 @@
 			</div>
 		</div>
 	</div>
-</div>
-
-<!-- Modal Dialog for input's datalist. -->
-<div class="modal fade modal-datalist" id="datalistModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Label presets</h4>
-            </div>
-            <div class="modal-body">
-                <ul class="list-group js-datalist"><!-- Added by JS. --></ul>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary js-done">Done</button>
-            </div>
-        </div>
-    </div>
 </div>
 
 </body>

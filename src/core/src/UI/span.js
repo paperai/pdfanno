@@ -40,7 +40,7 @@ function getSelectionRects() {
 /**
  * Handle document.mouseup event.
  */
-function handleDocumentMouseup() {
+function handleDocumentMouseup(text) {
 
   let { rects, selectedText } = getSelectionRects();
   let annotation;
@@ -53,7 +53,7 @@ function handleDocumentMouseup() {
         width  : r.width,
         height : r.height
       };
-    }), selectedText);
+    }), selectedText, text);
   }
 
   removeSelection();
@@ -76,7 +76,7 @@ function removeSelection() {
  * @param {Array} rects The rects to use for annotation
  * @param {String} color The color of the rects
  */
-function saveSpan(rects, selectedText) {
+function saveSpan(rects, selectedText, text) {
 
   let svg = getSVGLayer();
   let boundingRect = svg.getBoundingClientRect();
@@ -91,7 +91,8 @@ function saveSpan(rects, selectedText) {
         height : r.height
       });
     }).filter((r) => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1),
-    selectedText
+    selectedText,
+    text
   };
 
   // Save.
@@ -105,7 +106,7 @@ function saveSpan(rects, selectedText) {
   spanAnnotation.select();
 
   // Enable label input.
-  textInput.enable({ uuid : spanAnnotation.uuid, autoFocus : true });
+  textInput.enable({ uuid : spanAnnotation.uuid, autoFocus : true, text });
 
   return spanAnnotation;
 }
@@ -135,6 +136,6 @@ export function getRectangles() {
 /**
  * Create a span by current texts selection.
  */
-export function createSpan() {
-    return handleDocumentMouseup();
+export function createSpan({ text = null }) {
+    return handleDocumentMouseup(text);
 }

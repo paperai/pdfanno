@@ -17995,6 +17995,12 @@ __WEBPACK_IMPORTED_MODULE_0_jquery___default.a(document).on('keydown', e => {
 // The event called at page rendered by pdfjs.
 window.addEventListener('pagerendered', function(ev) {
     console.log('pagerendered:', ev.detail.pageNumber);
+
+    // No action, if the viewer is closed.
+    if (!PDFView.pdfViewer.getPageView(0)) {
+        return;
+    }
+
     renderAnno();
 
     // Issue Fix.
@@ -18031,6 +18037,11 @@ window.removeAnnoLayer = removeAnnoLayer;
  * Render annotations saved in the storage.
  */
 function renderAnno() {
+
+    // No action, if the viewer is closed.
+    if (!PDFView.pdfViewer.getPageView(0)) {
+        return;
+    }
 
     // TODO make it a global const.
     const svgLayerId = 'annoLayer';
@@ -19730,7 +19741,7 @@ function getSelectionRects() {
 /**
  * Handle document.mouseup event.
  */
-function handleDocumentMouseup() {
+function handleDocumentMouseup(text) {
 
   let { rects, selectedText } = getSelectionRects();
   let annotation;
@@ -19743,7 +19754,7 @@ function handleDocumentMouseup() {
         width  : r.width,
         height : r.height
       };
-    }), selectedText);
+    }), selectedText, text);
   }
 
   removeSelection();
@@ -19766,7 +19777,7 @@ function removeSelection() {
  * @param {Array} rects The rects to use for annotation
  * @param {String} color The color of the rects
  */
-function saveSpan(rects, selectedText) {
+function saveSpan(rects, selectedText, text) {
 
   let svg = __WEBPACK_IMPORTED_MODULE_1__utils__["f" /* getSVGLayer */]();
   let boundingRect = svg.getBoundingClientRect();
@@ -19781,7 +19792,8 @@ function saveSpan(rects, selectedText) {
         height : r.height
       });
     }).filter((r) => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1),
-    selectedText
+    selectedText,
+    text
   };
 
   // Save.
@@ -19795,7 +19807,7 @@ function saveSpan(rects, selectedText) {
   spanAnnotation.select();
 
   // Enable label input.
-  __WEBPACK_IMPORTED_MODULE_3__utils_textInput__["a" /* enable */]({ uuid : spanAnnotation.uuid, autoFocus : true });
+  __WEBPACK_IMPORTED_MODULE_3__utils_textInput__["a" /* enable */]({ uuid : spanAnnotation.uuid, autoFocus : true, text });
 
   return spanAnnotation;
 }
@@ -19825,8 +19837,8 @@ function getRectangles() {
 /**
  * Create a span by current texts selection.
  */
-function createSpan() {
-    return handleDocumentMouseup();
+function createSpan({ text = null }) {
+    return handleDocumentMouseup(text);
 }
 
 
@@ -19844,29 +19856,35 @@ function createSpan() {
 /**
  * Create a new Relation annotation.
  */
-function createRelation(type, anno1, anno2, dryRun=false) {
+function createRelation({ type, anno1, anno2, text }) {
+
+    // for old style.
+    if (arguments.length === 3) {
+        type = arguments[0];
+        anno1 = arguments[1];
+        anno2 = arguments[2];
+    }
 
     let annotation = new __WEBPACK_IMPORTED_MODULE_1__annotation_relation__["a" /* default */]();
     annotation.direction = type;
     annotation.rel1Annotation = anno1;
     annotation.rel2Annotation = anno2;
+    annotation.text = text;
 
-    if (dryRun === false) {
-        annotation.save();
-        annotation.render();
+    annotation.save();
+    annotation.render();
 
-        // TODO Refactoring.
-        // Deselect all.
-        window.annotationContainer
-            .getSelectedAnnotations()
-            .forEach(a => a.deselect());
+    // TODO Refactoring.
+    // Deselect all.
+    window.annotationContainer
+        .getSelectedAnnotations()
+        .forEach(a => a.deselect());
 
-        // Select.
-        annotation.select();
+    // Select.
+    annotation.select();
 
-        // New type text.
-        __WEBPACK_IMPORTED_MODULE_0__utils_textInput__["a" /* enable */]({ uuid : annotation.uuid, autoFocus : true });
-    }
+    // New type text.
+    __WEBPACK_IMPORTED_MODULE_0__utils_textInput__["a" /* enable */]({ uuid : annotation.uuid, autoFocus : true, text });
 
     return annotation;
 }
