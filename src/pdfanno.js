@@ -286,10 +286,12 @@ window.addEventListener('DOMContentLoaded', e => {
         // Start application.
         window.annoPage.startViewerApplication();
 
-        window.addEventListener('pagerendered', () => {
+        const fn = () => {
             window.annoPage.closePDFViewer();
             $('#viewer').css('opacity', '1');
-        });
+            window.removeEventListener('pagerendered', fn);
+        };
+        window.addEventListener('pagerendered', fn);
     }
 
 });

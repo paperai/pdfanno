@@ -212,6 +212,7 @@ export default class PDFAnnoPage {
     }
 
     closePDFViewer() {
+        console.log('closePDFViewer');
         if (iframeWindow && iframeWindow.PDFViewerApplication) {
             iframeWindow.PDFViewerApplication.close();
             $('#numPages', iframeWindow.document).text('');
