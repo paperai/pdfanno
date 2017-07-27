@@ -19,7 +19,7 @@ npm install pdfanno
 * Client-only application, i.e., no communication with a server.
 
 ## Usage
-1. Visit the [online demo](http://pdfanno.hshindo.com/) with the latest version of Chrome.
+1. Visit the [online demo](https://paperai.github.io/pdfanno/?pdf=http://www.aclweb.org/anthology/P12-1046) with the latest version of Chrome.
 1. Put PDF files and annotation files (if any) in your directory, then specify the directory via `Browse` button.  
 Sample PDFs and annotations are downloadable from [here](https://cl.naist.jp/%7Eshindo/pdfanno_material.zip).  
 1. Load the target PDF. If you have anno file for the PDF, load it as well.
