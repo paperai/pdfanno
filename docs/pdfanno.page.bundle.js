@@ -5295,7 +5295,7 @@ exports = module.exports = __webpack_require__(4)(undefined);
 
 
 // module
-exports.push([module.i, "@charset 'utf-8';\n\n/* Super Hack to disable autofill style for Chrome. */\ninput:-webkit-autofill,\ninput:-webkit-autofill:hover,\ninput:-webkit-autofill:focus,\ninput:-webkit-autofill:active {\n    transition: background-color 5000s ease-in-out 0s;\n}\n\n.u-mt-10 {margin-top: 10px;}\n.u-mt-20 {margin-top: 20px;}\n.u-mb-10 {margin-bottom: 10px;}\n.u-ml-15 {margin-left: 15px;}\n.u-disp-iblock {display: inline-block;}\n.no-visible {visibility: hidden;}\n.no-action {pointer-events: none;}\n\n/**\n * Viewer size.\n * This height will be override to fit the browser height (by pdfanno.js).\n */\n.anno-viewer {\n    width: 100%;\n    height: 500px;\n}\n\n/**\n * Annotation Select UI Layout.\n */\n.anno-select-layout {}\n.anno-select-layout .row:first-child {\n    margin-bottom: 10px;\n}\n.anno-select-layout [type=\"radio\"] {\n    margin-right: 5px;\n}\n.anno-select-layout [type=\"file\"] {\n    display: inline-block;\n    margin-left: 5px;\n    line-height: 1em;\n}\n.anno-select-layout .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-select-layout .sp-dd {\n    display: none;\n}\n\n/**\n * Dropdown.\n */\n.dropdown-menu {\n    overflow: scroll;\n}\n\n/**\n * Color picker.\n */\n.anno-ui .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-ui .sp-dd {\n    display: none;\n}\n.anno-ui .sp-preview {\n    margin-right: 0;\n}\n\n/**\n * Label list.\n */\n.label-list {}\n.label-list li {\n    display: flex;\n    align-items: center;\n    padding: 0 10px;\n    border-bottom: 1px solid #eee;\n}\n.label-list li:last-child {\n    padding-top: 5px;\n    padding-bottom: 5px;\n    border-bottom: 0 solid rgba(0,0,0,0);\n}\n.label-list__btn {\n    width: 30px;\n    height: 30px;\n    line-height: 30px;\n    font-size: 16px;\n    text-align: center;\n    cursor: pointer;\n    transition: all 1.5 ease-in-out;\n    border-radius: 3px;\n    background-color: white;\n    margin-right: 10px;\n    flex: 0 0 30px;\n}\n.label-list__btn:hover {\n    box-shadow: 0 1px 3px rgba(0,0,0,.3);\n}\n.label-list__text {\n    flex-grow: 1;\n    cursor: pointer;\n}\n.label-list__input {\n    flex-grow: 1;\n    padding: 2px 5px;\n}\n", ""]);
+exports.push([module.i, "@charset 'utf-8';\n\n/* Reset CSS */\nhtml{color:#000;background:#FFF}body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,textarea,p,blockquote,th,td{margin:0;padding:0}table{border-collapse:collapse;border-spacing:0}fieldset,img{border:0}address,caption,cite,code,dfn,em,strong,th,var{font-style:normal;font-weight:normal}ol,ul{list-style:none}caption,th{text-align:left}h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal}q:before,q:after{content:''}abbr,acronym{border:0;font-variant:normal}sup{vertical-align:text-top}sub{vertical-align:text-bottom}input,textarea,select{font-family:inherit;font-size:inherit;font-weight:inherit;*font-size:100%}legend{color:#000}\n\n/* Super Hack to disable autofill style for Chrome. */\ninput:-webkit-autofill,\ninput:-webkit-autofill:hover,\ninput:-webkit-autofill:focus,\ninput:-webkit-autofill:active {\n    transition: background-color 5000s ease-in-out 0s;\n}\n\n.u-mt-10 {margin-top: 10px;}\n.u-mt-20 {margin-top: 20px;}\n.u-mb-10 {margin-bottom: 10px;}\n.u-ml-15 {margin-left: 15px;}\n.u-disp-iblock {display: inline-block;}\n.no-visible {visibility: hidden;}\n.no-action {pointer-events: none;}\n\n/**\n * Viewer size.\n * This height will be override to fit the browser height (by pdfanno.js).\n */\n.anno-viewer {\n    width: 100%;\n    height: 500px;\n}\n\n/**\n * Annotation Select UI Layout.\n */\n.anno-select-layout {}\n.anno-select-layout .row:first-child {\n    margin-bottom: 10px;\n}\n.anno-select-layout [type=\"radio\"] {\n    margin-right: 5px;\n}\n.anno-select-layout [type=\"file\"] {\n    display: inline-block;\n    margin-left: 5px;\n    line-height: 1em;\n}\n.anno-select-layout .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-select-layout .sp-dd {\n    display: none;\n}\n\n/**\n * Dropdown.\n */\n.dropdown-menu {\n    overflow: scroll;\n}\n\n/**\n * Color picker.\n */\n.anno-ui .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-ui .sp-dd {\n    display: none;\n}\n.anno-ui .sp-preview {\n    margin-right: 0;\n}\n\n/**\n * Label list.\n */\n.label-list {}\n.label-list li {\n    display: flex;\n    align-items: center;\n    padding: 0 10px;\n    border-bottom: 1px solid #eee;\n}\n.label-list li:last-child {\n    padding-top: 5px;\n    padding-bottom: 5px;\n    border-bottom: 0 solid rgba(0,0,0,0);\n}\n.label-list__btn {\n    width: 30px;\n    height: 30px;\n    line-height: 30px;\n    font-size: 16px;\n    text-align: center;\n    cursor: pointer;\n    transition: all 1.5 ease-in-out;\n    border-radius: 3px;\n    background-color: white;\n    margin-right: 10px;\n    flex: 0 0 30px;\n}\n.label-list__btn:hover {\n    box-shadow: 0 1px 3px rgba(0,0,0,.3);\n}\n.label-list__text {\n    flex-grow: 1;\n    cursor: pointer;\n}\n.label-list__input {\n    flex-grow: 1;\n    padding: 2px 5px;\n}\n", ""]);
 
 // exports
 
@@ -6637,28 +6637,29 @@ function seupTabClick() {
     $('.js-label-tab').on('click', e => {
 
         const type = $(e.currentTarget).data('type');
-        const labelObject = getLabelListData()[type] || { labels : [] };
-        const labels = ['&nbsp;', ...(labelObject.labels)];
+        let d = getLabelListData();
+        const labelObject = d[type] || {};
+        let labels;
+        if (labelObject.labels === undefined) {
+            labels = ['&lt;Empty Label&gt;'];
+        } else {
+            labels = labelObject.labels;
+        }
+
+        labelObject.labels = labels;
+        d[type] = labelObject;
+        saveLabelListData(d);
 
         currentTab = type;
 
         let $ul = $(`<ul class="tab-pane active label-list" data-type="${type}"/>`);
         labels.forEach((label, index) => {
-            if (index === 0) {
-                $ul.append(`
-                    <li>
-                        <div class="label-list__btn no-action"></div>
-                        <div class="label-list__text js-label">${label}</div>
-                    </li>
-                `);
-            } else {
-                $ul.append(`
-                    <li>
-                        <div class="label-list__btn js-label-trash" data-index="${index}"><i class="fa fa-trash-o"></i></div>
-                        <div class="label-list__text js-label">${label}</div>
-                    </li>
-                `);
-            }
+            $ul.append(`
+                <li>
+                    <div class="label-list__btn js-label-trash" data-index="${index}"><i class="fa fa-trash-o"></i></div>
+                    <div class="label-list__text js-label">${label}</div>
+                </li>
+            `);
         });
         $ul.append(`
             <li>
@@ -6678,7 +6679,7 @@ function setupLabelAddButton() {
 
     $('.js-label-tab-content').on('click', '.js-add-label-button', e => {
 
-        const
+        let
             $this = $(e.currentTarget),
             text = $this.parent().find('input').val().trim(),
             type = $this.parents('[data-type]').data('type');
@@ -6706,8 +6707,10 @@ function setupLabelTrashButton() {
 
         const
             $this = $(e.currentTarget),
-            idx   = $this.data('index') - 1,
+            idx   = $this.data('index'),
             type  = $this.parents('[data-type]').data('type');
+
+        console.log('trash:', idx, type);
 
         let d = getLabelListData();
         let labelObject = d[type] || { labels : [] };
@@ -6725,10 +6728,14 @@ function setupLabelText() {
 
     $('.js-label-tab-content').on('click', '.js-label', e => {
 
-        const
+        let
             $this = $(e.currentTarget),
             text = $this.text().trim(),
             type  = $this.parents('[data-type]').data('type');
+
+        if (text === '<Empty Label>') {
+            text = '';
+        }
 
         if (type === 'span') {
             _createSpanAnnotation({ text });
@@ -6753,10 +6760,24 @@ function setupImportExportLink() {
     $('.js-export-label').on('click', () => {
 
         let data = getLabelListData();
+
+        // Remove : "&lt;Empty Label&gt;"
+        Object.keys(data).forEach(key => {
+            let labelObject = data[key];
+            let labels = (labelObject.labels || []).filter(label => {
+                return label !== '&lt;Empty Label&gt;';
+            });
+            labelObject.labels = labels;
+        });
+
+        // Set version.
         data.version = __WEBPACK_IMPORTED_MODULE_2__package_json___default.a.version;
+
+        // Conver to TOML style.
         const toml = __WEBPACK_IMPORTED_MODULE_1__utils__["tomlString"](data);
         console.log(toml);
 
+        // Download.
         let blob = new Blob([toml]);
         let blobURL = window.URL.createObjectURL(blob);
         let a = document.createElement('a');
