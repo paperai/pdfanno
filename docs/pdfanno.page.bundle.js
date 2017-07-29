@@ -6565,14 +6565,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_toml__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_toml___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_toml__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__package_json__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__package_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__package_json__);
 /**
  * UI parts - Input Label.
  */
 
 
-
+// import packageJson from '../../../package.json';
 
 // LocalStorage key to save label data.
 const LSKEY_LABEL_LIST = 'pdfanno-label-list';
@@ -6641,7 +6639,7 @@ function seupTabClick() {
         const labelObject = d[type] || {};
         let labels;
         if (labelObject.labels === undefined) {
-            labels = ['&lt;Empty Label&gt;'];
+            labels = ['&nbsp;'];
         } else {
             labels = labelObject.labels;
         }
@@ -6684,10 +6682,8 @@ function setupLabelAddButton() {
             text = $this.parent().find('input').val().trim(),
             type = $this.parents('[data-type]').data('type');
 
-        // No action for no input.
         if (!text) {
-            alert('Please input label first.');
-            return;
+            text = '&nbsp;';
         }
 
         let d = getLabelListData();
@@ -6730,7 +6726,7 @@ function setupLabelText() {
 
         let
             $this = $(e.currentTarget),
-            text = $this.text().trim(),
+            text = $this.text().trim().replace(/&nbsp;/g, ''),
             type  = $this.parents('[data-type]').data('type');
 
         if (text === '<Empty Label>') {
@@ -6761,17 +6757,17 @@ function setupImportExportLink() {
 
         let data = getLabelListData();
 
-        // Remove : "&lt;Empty Label&gt;"
+        // Transform '&nbsp;' to white space.
         Object.keys(data).forEach(key => {
             let labelObject = data[key];
-            let labels = (labelObject.labels || []).filter(label => {
-                return label !== '&lt;Empty Label&gt;';
+            let labels = (labelObject.labels || []).map(label => {
+                if (label === '&nbsp;') {
+                    label = '';
+                }
+                return label;
             });
             labelObject.labels = labels;
         });
-
-        // Set version.
-        data.version = __WEBPACK_IMPORTED_MODULE_2__package_json___default.a.version;
 
         // Conver to TOML style.
         const toml = __WEBPACK_IMPORTED_MODULE_1__utils__["tomlString"](data);
@@ -6782,7 +6778,7 @@ function setupImportExportLink() {
         let blobURL = window.URL.createObjectURL(blob);
         let a = document.createElement('a');
         document.body.appendChild(a); // for firefox working correctly.
-        a.download = 'labels.conf';
+        a.download = 'pdfanno.conf';
         a.href = blobURL;
         a.click();
         a.parentNode.removeChild(a);
@@ -6812,6 +6808,19 @@ function setupImportExportLink() {
             const tomlString = event.target.result;
             try {
                 const labelData = __WEBPACK_IMPORTED_MODULE_0_toml___default.a.parse(tomlString);
+
+                // whitespace to '&nbsp;'
+                Object.keys(labelData).forEach(key => {
+                    let labelObject = labelData[key];
+                    let labels = (labelObject.labels || []).map(label => {
+                        if (label === '') {
+                            label = '&nbsp;';
+                        }
+                        return label;
+                    });
+                    labelObject.labels = labels;
+                });
+
                 saveLabelListData(labelData);
                 // Re-render.
                 $(`.js-label-tab[data-type="${currentTab}"]`).click();
@@ -11108,47 +11117,7 @@ module.exports = {
 
 
 /***/ }),
-/* 20 */
-/***/ (function(module, exports) {
-
-module.exports = {
-	"name": "anno-ui",
-	"version": "0.1.0",
-	"description": "",
-	"main": "dist/index.js",
-	"files": [
-		"dist",
-		"README.md"
-	],
-	"scripts": {
-		"build": "webpack",
-		"watch": "webpack --watch",
-		"dev": "cross-env NODE_ENV=development webpack-dev-server"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/paperai/anno-ui.git"
-	},
-	"keywords": [],
-	"author": "",
-	"license": "ISC",
-	"bugs": {
-		"url": "https://github.com/paperai/anno-ui/issues"
-	},
-	"homepage": "https://github.com/paperai/anno-ui#readme",
-	"devDependencies": {
-		"cross-env": "^5.0.1",
-		"css-loader": "^0.28.4",
-		"style-loader": "^0.18.2",
-		"webpack": "^3.0.0",
-		"webpack-dev-server": "^2.5.0",
-		"webpack-livereload-plugin": "^0.11.0",
-		"toml": "github:yoheiMune/toml-node"
-	},
-	"dependencies": {}
-};
-
-/***/ }),
+/* 20 */,
 /* 21 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
