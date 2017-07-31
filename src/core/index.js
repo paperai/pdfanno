@@ -56,25 +56,25 @@ $(document).on('keydown', e => {
 
     if (e.keyCode === 49) {  // Digit "1"
         var event = document.createEvent('CustomEvent');
-        event.initCustomEvent('digit1Pressed', true, true);
+        event.initCustomEvent('digit1Pressed', true, true, null);
         window.dispatchEvent(event);
         return;
     }
     if (e.keyCode === 50) {  // Digit "2"
         var event = document.createEvent('CustomEvent');
-        event.initCustomEvent('digit2Pressed', true, true);
+        event.initCustomEvent('digit2Pressed', true, true, null);
         window.dispatchEvent(event);
         return;
     }
     if (e.keyCode === 51) {  // Digit "3"
         var event = document.createEvent('CustomEvent');
-        event.initCustomEvent('digit3Pressed', true, true);
+        event.initCustomEvent('digit3Pressed', true, true, null);
         window.dispatchEvent(event);
         return;
     }
     if (e.keyCode === 52) {  // Digit "4"
         var event = document.createEvent('CustomEvent');
-        event.initCustomEvent('digit4Pressed', true, true);
+        event.initCustomEvent('digit4Pressed', true, true, null);
         window.dispatchEvent(event);
         return;
     }
