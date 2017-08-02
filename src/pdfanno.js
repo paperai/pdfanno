@@ -270,7 +270,7 @@ window.addEventListener('DOMContentLoaded', e => {
         xhr.ontimeout = function () {
             $('#pdfLoading').addClass('hidden');
             setTimeout(() => {
-                alert('Failed to load the PDF.');
+                annoUI.ui.alertDialog.show({ message : 'Failed to load the PDF.' });
             }, 100);
         };
         xhr.send();

@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 27);
+/******/ 	return __webpack_require__(__webpack_require__.s = 28);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -4555,435 +4555,6 @@ module.exports = {
 /* 20 */,
 /* 21 */,
 /* 22 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["b"] = listenWindowLeaveEvent;
-/* harmony export (immutable) */ __webpack_exports__["c"] = unlistenWindowLeaveEvent;
-/* harmony export (immutable) */ __webpack_exports__["a"] = adjustViewerSize;
-/* unused harmony export resizeHandler */
-/**
- * Utility for window.
- */
-
-/**
- * Set the confirm dialog at leaving the page.
- */
-function listenWindowLeaveEvent() {
-    window.annotationUpdated = true;
-    $(window).off('beforeunload').on('beforeunload', () => {
-        return 'You don\'t save the annotations yet.\nAre you sure to leave ?';
-    });
-}
-
-/**
- * Unset the confirm dialog at leaving the page.
- */
-function unlistenWindowLeaveEvent() {
-    window.annotationUpdated = false;
-    $(window).off('beforeunload');
-}
-
-/**
-    Adjust the height of viewer according to window height.
-*/
-function adjustViewerSize() {
-    window.removeEventListener('resize', resizeHandler);
-    window.addEventListener('resize', resizeHandler);
-    resizeHandler();
-}
-
-/**
- * Resize the height of elements adjusting to the window.
- */
-function resizeHandler() {
-
-    // PDFViewer.
-    let height = $(window).innerHeight() - $('#viewer').offset().top;
-    $('#viewer iframe').css('height', `${height}px`);
-
-    // Dropdown for PDF.
-    let height1 = $(window).innerHeight() - ($('#dropdownPdf ul').offset().top || 120);
-    $('#dropdownPdf ul').css('max-height', `${height1 - 20}px`);
-
-    // Dropdown for Primary Annos.
-    let height2 = $(window).innerHeight() - ($('#dropdownAnnoPrimary ul').offset().top || 120);
-    $('#dropdownAnnoPrimary ul').css('max-height', `${height2 - 20}px`);
-
-    // Dropdown for Anno list.
-    let height3 = $(window).innerHeight() - ($('#dropdownAnnoList ul').offset().top || 120);
-    $('#dropdownAnnoList ul').css('max-height', `${height3 - 20}px`);
-
-    // Dropdown for Reference Annos.
-    let height4 = $(window).innerHeight() - ($('#dropdownAnnoReference ul').offset().top || 120);
-    $('#dropdownAnnoReference ul').css('max-height', `${height4 - 20}px`);
-
-    // Tools.
-    let height5 = $(window).innerHeight() - $('#tools').offset().top;
-    $('#tools').css('height', `${height5}px`);
-}
-
-
-/***/ }),
-/* 23 */,
-/* 24 */,
-/* 25 */,
-/* 26 */,
-/* 27 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_anno_ui__ = __webpack_require__(31);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_anno_ui___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_anno_ui__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__shared_util__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__shared_coords__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__page_util_window__ = __webpack_require__(22);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__page_public__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__page_pdf_PDFAnnoPage__ = __webpack_require__(33);
-__webpack_require__(28);
-__webpack_require__(29);
-
-// UI parts.
-
-
-
-
-
-
-
-
-/**
- * API root point.
- */
-let API_ROOT = 'http://localhost:3000';
-if (true) {
-    console.log('PRODUCTION MODE');
-    API_ROOT = 'https://pdfanno.hshindo.com';
-}
-
-/**
- * Global variable.
- */
-window.pdfanno = {};
-
-/**
- * Expose public APIs.
- */
-window.add = __WEBPACK_IMPORTED_MODULE_4__page_public__["e" /* addAnnotation */];
-window.addAll = __WEBPACK_IMPORTED_MODULE_4__page_public__["d" /* addAllAnnotations */];
-window.delete = __WEBPACK_IMPORTED_MODULE_4__page_public__["g" /* deleteAnnotation */];
-window.RectAnnotation = __WEBPACK_IMPORTED_MODULE_4__page_public__["a" /* PublicRectAnnotation */];
-window.SpanAnnotation = __WEBPACK_IMPORTED_MODULE_4__page_public__["c" /* PublicSpanAnnotation */];
-window.RelationAnnotation = __WEBPACK_IMPORTED_MODULE_4__page_public__["b" /* PublicRelationAnnotation */];
-window.readTOML = __WEBPACK_IMPORTED_MODULE_4__page_public__["h" /* readTOML */];
-window.clear = __WEBPACK_IMPORTED_MODULE_4__page_public__["f" /* clear */];
-
-/**
- * Annotation functions for a page.
- */
-window.annoPage = new __WEBPACK_IMPORTED_MODULE_5__page_pdf_PDFAnnoPage__["a" /* default */]();
-
-
-// Manage ctrlKey (cmdKey on Mac).
-window.addEventListener('manageCtrlKey', e => {
-    window.annoPage.manageCtrlKey(e.detail);
-});
-
-// Manage digitKey.
-window.addEventListener('digitKeyPressed', e => {
-    __WEBPACK_IMPORTED_MODULE_1__shared_util__["b" /* dispatchWindowEvent */](`digit${e.detail}Pressed`);
-});
-
-/**
- * Get the y position in the annotation.
- */
-function _getY(annotation) {
-
-    if (annotation.rectangles) {
-        return annotation.rectangles[0].y;
-
-    } else if (annotation.y1) {
-        return annotation.y1;
-
-    } else {
-        return annotation.y;
-    }
-}
-
-/**
- *  The entry point.
- */
-window.addEventListener('DOMContentLoaded', e => {
-
-    // Delete prev annotations.
-    window.annoPage.clearAllAnnotations();
-
-    // Reset PDFViwer settings.
-    // window.annoPage.resetPDFViewerSettings();
-
-    // resizable.
-    __WEBPACK_IMPORTED_MODULE_0_anno_ui__["util"].setupResizableColumns();
-
-    // Start event listeners.
-    __WEBPACK_IMPORTED_MODULE_0_anno_ui__["event"].setup();
-
-    // Browse button.
-    __WEBPACK_IMPORTED_MODULE_0_anno_ui__["browseButton"].setup({
-        loadFiles : window.annoPage.loadFiles,
-        clearAllAnnotations : window.annoPage.clearAllAnnotations,
-        displayCurrentReferenceAnnotations : () => window.annoPage.displayAnnotation(false, false),
-        displayCurrentPrimaryAnnotations : () => window.annoPage.displayAnnotation(true, false),
-        getContentFiles : () => window.annoPage.contentFiles,
-        getAnnoFiles : () => window.annoPage.annoFiles,
-        closePDFViewer : window.annoPage.closePDFViewer
-    });
-
-    // PDF dropdown.
-    __WEBPACK_IMPORTED_MODULE_0_anno_ui__["contentDropdown"].setup({
-        initialText : 'PDF File',
-        overrideWarningMessage : 'Are you sure to load another PDF ?',
-        contentReloadHandler : fileName => {
-
-            // Get the content.
-            const content = window.annoPage.getContentFile(fileName);
-
-            // Reset annotations displayed.
-            window.annoPage.clearAllAnnotations();
-
-            // Display the PDF on the viewer.
-            window.annoPage.displayViewer(content);
-        }
-    });
-
-    // Primary anno dropdown.
-    __WEBPACK_IMPORTED_MODULE_0_anno_ui__["primaryAnnoDropdown"].setup({
-        clearPrimaryAnnotations : window.annoPage.clearAllAnnotations,
-        displayPrimaryAnnotation : annoName => window.annoPage.displayAnnotation(true)
-    });
-
-    // Reference anno dropdown.
-    __WEBPACK_IMPORTED_MODULE_0_anno_ui__["referenceAnnoDropdown"].setup({
-        displayReferenceAnnotations : annoNames =>window.annoPage.displayAnnotation(false)
-    });
-
-    // Anno list dropdown.
-    __WEBPACK_IMPORTED_MODULE_0_anno_ui__["annoListDropdown"].setup({
-        getAnnotations : () => {
-
-            // Get displayed annotations.
-            let annotations = window.annoPage.getAllAnnotations();
-
-            // Filter only Primary.
-            annotations = annotations.filter(a => {
-                return !a.readOnly;
-            });
-
-            // Sort by offsetY.
-            annotations = annotations.sort((a1, a2) => {
-                return _getY(a1) - _getY(a2);
-            });
-
-            return annotations;
-        },
-        scrollToAnnotation : id => {
-
-            let annotation = window.annoPage.findAnnotationById(id);
-
-            if (annotation) {
-
-                // scroll to.
-                let _y = annotation.y || annotation.y1 || annotation.rectangles[0].y;
-                let { pageNumber, y } = __WEBPACK_IMPORTED_MODULE_2__shared_coords__["b" /* convertToExportY */](_y);
-                let pageHeight = window.annoPage.getViewerViewport().height;
-                let scale = window.annoPage.getViewerViewport().scale;
-                _y = (pageHeight + __WEBPACK_IMPORTED_MODULE_2__shared_coords__["c" /* paddingBetweenPages */]) * (pageNumber - 1) + y * scale;
-                _y -= 100;
-                $('#viewer iframe').contents().find('#viewer').parent()[0].scrollTop = _y;
-
-                // highlight.
-                annotation.highlight();
-                setTimeout(() => {
-                    annotation.dehighlight();
-                }, 1000);
-            }
-        }
-    });
-
-    // Download button.
-    __WEBPACK_IMPORTED_MODULE_0_anno_ui__["downloadButton"].setup({
-        getAnnotationTOMLString : window.annoPage.exportData,
-        getCurrentContentName   : window.annoPage.getCurrentContentName,
-        unlistenWindowLeaveEvent : __WEBPACK_IMPORTED_MODULE_3__page_util_window__["c" /* unlistenWindowLeaveEvent */]
-    });
-
-    // AnnoTool: rect.
-    __WEBPACK_IMPORTED_MODULE_0_anno_ui__["annoRectButton"].setup({
-        enableRect : window.annoPage.enableRect,
-        disableRect : window.annoPage.disableRect,
-    });
-
-    // AnnoTool: span.
-    __WEBPACK_IMPORTED_MODULE_0_anno_ui__["annoSpanButton"].setup({
-        createSpanAnnotation : window.annoPage.createSpan
-    });
-
-    // AnnoTool: relation.
-    __WEBPACK_IMPORTED_MODULE_0_anno_ui__["annoRelButton"].setup({
-        createRelAnnotation : window.annoPage.createRelation
-    });
-
-    // Label input.
-    __WEBPACK_IMPORTED_MODULE_0_anno_ui__["labelInput"].setup({
-        getSelectedAnnotations : window.annoPage.getSelectedAnnotations,
-        saveAnnotationText : (id, text) => {
-            console.log('saveAnnotationText:', id, text);
-            const annotation = window.annoPage.findAnnotationById(id);
-            if (annotation) {
-                annotation.text = text;
-                annotation.save();
-                annotation.enableViewMode();
-            }
-        },
-        createSpanAnnotation : window.annoPage.createSpan,
-        createRelAnnotation : window.annoPage.createRelation
-    });
-
-    // Upload button.
-    __WEBPACK_IMPORTED_MODULE_0_anno_ui__["uploadButton"].setup({
-        getCurrentDisplayContentFile : () => {
-            const pdfFileName = $('#dropdownPdf .js-text').text();
-            if (!pdfFileName || pdfFileName === 'PDF File') {
-                return null;
-            }
-            return window.annoPage.getContentFile(pdfFileName);
-        }
-    });
-
-    // Display a PDF specified via URL query parameter.
-
-    let pdfURL;
-    (location.search || '').replace('?', '').split('&')
-        .filter(a => a)
-        .forEach(fragment => {
-            let [ key, value ] = fragment.split('=');
-            if (key && key.toLowerCase() === 'pdf') {
-                pdfURL = value;
-            }
-    });
-
-    if (pdfURL) {
-
-        console.log('pdfURL=', pdfURL);
-
-        // Show loading.
-        $('#pdfLoading').removeClass('hidden');
-
-        // Load a PDF as ArrayBuffer.
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', API_ROOT + '/load_pdf?url=' + window.encodeURIComponent(pdfURL), true);
-        xhr.responseType = 'arraybuffer';
-        xhr.onload = function () {
-            if (this.status === 200) {
-
-                // Init viewer.
-                window.annoPage.initializeViewer(null);
-                // Start application.
-                window.annoPage.startViewerApplication();
-
-                window.addEventListener('iframeReady', () => {
-                    setTimeout(() => {
-                        window.annoPage.displayViewer({ content : this.response });
-                    }, 500);
-                });
-
-                window.addEventListener('pagerendered', () => {
-                    $('#pdfLoading').addClass('close');
-                    setTimeout(function() {
-                        $('#pdfLoading').addClass('hidden');
-                    }, 1000);
-                });
-            }
-        };
-        xhr.timeout = 120 * 1000; // 120s
-        xhr.ontimeout = function () {
-            $('#pdfLoading').addClass('hidden');
-            setTimeout(() => {
-                alert('Failed to load the PDF.');
-            }, 100);
-        };
-        xhr.send();
-
-    } else {
-
-        // If no PDF is specified, display the blank viewer.
-
-        $('#viewer').css('opacity', '0');
-
-        // Init viewer.
-        window.annoPage.initializeViewer();
-        // Start application.
-        window.annoPage.startViewerApplication();
-
-        const fn = () => {
-            window.annoPage.closePDFViewer();
-            $('#viewer').css('opacity', '1');
-            window.removeEventListener('pagerendered', fn);
-        };
-        window.addEventListener('pagerendered', fn);
-    }
-
-});
-
-
-/***/ }),
-/* 28 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__.p + "dist/index.html";
-
-/***/ }),
-/* 29 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(30);
-if(typeof content === 'string') content = [[module.i, content, '']];
-// add the styles to the DOM
-var update = __webpack_require__(12)(content, {});
-if(content.locals) module.exports = content.locals;
-// Hot Module Replacement
-if(false) {
-	// When the styles change, update the <style> tags
-	if(!content.locals) {
-		module.hot.accept("!!../node_modules/css-loader/index.js!./pdfanno.css", function() {
-			var newContent = require("!!../node_modules/css-loader/index.js!./pdfanno.css");
-			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-			update(newContent);
-		});
-	}
-	// When the module is disposed, remove the <style> tags
-	module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-/* 30 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(11)();
-// imports
-
-
-// module
-exports.push([module.i, "@charset \"utf-8\";\n\n/* Loading */\n.loader-container {\n    position: absolute;\n    top: 100px;\n    left: 50%;\n    width: 200px;\n    height: 200px;\n    margin-left: -150px;\n    /*margin-top: -150px;*/\n    background-color: #333;\n    padding: 16px;\n    box-shadow: 0 0 10px rgba(0,0,0,.5);\n    transition: opacity .3s ease-in-out;\n}\n.loader-container.close {\n    opacity: 0;\n}\n.loader {\n    border: 16px solid #f3f3f3; /* Light grey */\n    border-top: 16px solid #3498db; /* Blue */\n    border-radius: 50%;\n    width: 120px;\n    height: 120px;\n    animation: spin 1.5s ease-in-out infinite;\n    margin-left: auto;\n    margin-right: auto;\n}\n@keyframes spin {\n    0% { transform: rotate(0deg); }\n    100% { transform: rotate(360deg); }\n}\n.loader-container p {\n    margin-top: 16px;\n    font-size: 16px;\n    text-align: center;\n    color: white;\n}\n", ""]);
-
-// exports
-
-
-/***/ }),
-/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -5058,250 +4629,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (immutable) */ __webpack_exports__["setupResizableColumns"] = setupResizableColumns;
-/* harmony export (immutable) */ __webpack_exports__["tomlString"] = tomlString;
-/**
- * Make the UI resizable.
- */
-function setupResizableColumns() {
-
-    // Make resizable.
-    $('#tools').resizable({
-      handles: 'e',
-      alsoResizeReverse: '#viewerWrapper',
-      start : () => {
-        console.log('resize start');
-        $('#viewer iframe').css({
-            'pointer-events' : 'none',
-        });
-
-      },
-      stop : () => {
-        console.log('resize stop');
-        $('#viewer iframe').css({
-            'pointer-events' : 'auto',
-        });
-
-      }
-    });
-
-    // Customize.
-    $.ui.plugin.add("resizable", "alsoResizeReverse", {
-
-        start: function() {
-            var that = $(this).resizable( "instance" ),
-                o = that.options;
-
-            $(o.alsoResizeReverse).each(function() {
-                var el = $(this);
-                el.data("ui-resizable-alsoresizeReverse", {
-                    width: parseInt(el.width(), 10), height: parseInt(el.height(), 10),
-                    left: parseInt(el.css("left"), 10), top: parseInt(el.css("top"), 10)
-                });
-            });
-        },
-
-        resize: function(event, ui) {
-            var that = $(this).resizable( "instance" ),
-                o = that.options,
-                os = that.originalSize,
-                op = that.originalPosition,
-                delta = {
-                    height: (that.size.height - os.height) || 0,
-                    width: (that.size.width - os.width) || 0,
-                    top: (that.position.top - op.top) || 0,
-                    left: (that.position.left - op.left) || 0
-                };
-
-            $(o.alsoResizeReverse).each(function() {
-                var el = $(this), start = $(this).data("ui-resizable-alsoresize-reverse"), style = {},
-                    css = el.parents(ui.originalElement[0]).length ?
-                        [ "width", "height" ] :
-                        [ "width", "height", "top", "left" ];
-
-                $.each(css, function(i, prop) {
-                    var sum = (start[prop] || 0) - (delta[prop] || 0);
-                    if (sum && sum >= 0) {
-                        style[prop] = sum || null;
-                    }
-                });
-
-                el.css(style);
-            });
-        },
-
-        stop: function() {
-            $(this).removeData("resizable-alsoresize-reverse");
-        }
-    });
-}
-
-
-/**
- * Convert object to TOML String.
- */
-function tomlString(obj, root=true) {
-
-    let lines = [];
-
-    // `version` is first.
-    if ('version' in obj) {
-        lines.push(`version = "${obj['version']}"`);
-        lines.push('');
-        delete obj['version'];
-    }
-
-    // #paperanno-ja/issues/38
-    // Make all values in `position` as string.
-    if ('position' in obj) {
-        let position = obj.position;
-        position = position.map(p => {
-            if (typeof p === 'number') {
-                return String(p);
-            } else {
-                return p.map(v => String(v));
-            }
-        });
-        obj.position = position;
-    }
-
-    Object.keys(obj).forEach(prop => {
-
-        let val = obj[prop];
-        if (typeof val === 'string') {
-            lines.push(`${prop} = "${val}"`);
-            root && lines.push('');
-
-        } else if (typeof val === 'number') {
-            lines.push(`${prop} = ${val}`);
-            root && lines.push('');
-
-        } else if (isArray(val)) {
-            lines.push(`${prop} = ${JSON.stringify(val)}`);
-            root && lines.push('');
-
-        } else if (typeof val === 'object') {
-            lines.push(`[${prop}]`);
-            lines.push(tomlString(val, false));
-            root && lines.push('');
-        }
-    });
-
-    return lines.join('\n');
-}
-
-function isArray(val) {
-    return val && 'length' in val;
-}
-
-
-/***/ }),
-/* 1 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_browseButton__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_contentDropdown__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__components_primaryAnnoDropdown__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_referenceAnnoDropdown__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_annoListDropdown__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__components_downloadButton__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__components_annoRectButton__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__components_annoRelButton__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__components_annoSpanButton__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__components_labelInput__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__components_uploadButton__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__events__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__utils__ = __webpack_require__(0);
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "browseButton", function() { return __WEBPACK_IMPORTED_MODULE_0__components_browseButton__; });
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "contentDropdown", function() { return __WEBPACK_IMPORTED_MODULE_1__components_contentDropdown__; });
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "primaryAnnoDropdown", function() { return __WEBPACK_IMPORTED_MODULE_2__components_primaryAnnoDropdown__; });
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "referenceAnnoDropdown", function() { return __WEBPACK_IMPORTED_MODULE_3__components_referenceAnnoDropdown__; });
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "annoListDropdown", function() { return __WEBPACK_IMPORTED_MODULE_4__components_annoListDropdown__; });
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "downloadButton", function() { return __WEBPACK_IMPORTED_MODULE_5__components_downloadButton__; });
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "annoRectButton", function() { return __WEBPACK_IMPORTED_MODULE_6__components_annoRectButton__; });
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "annoRelButton", function() { return __WEBPACK_IMPORTED_MODULE_7__components_annoRelButton__; });
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "annoSpanButton", function() { return __WEBPACK_IMPORTED_MODULE_8__components_annoSpanButton__; });
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "labelInput", function() { return __WEBPACK_IMPORTED_MODULE_9__components_labelInput__; });
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "uploadButton", function() { return __WEBPACK_IMPORTED_MODULE_10__components_uploadButton__; });
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "event", function() { return __WEBPACK_IMPORTED_MODULE_11__events__; });
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "util", function() { return __WEBPACK_IMPORTED_MODULE_12__utils__; });
-__webpack_require__(2);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(3);
-if(typeof content === 'string') content = [[module.i, content, '']];
-// Prepare cssTransformation
-var transform;
-
-var options = {}
-options.transform = transform
-// add the styles to the DOM
-var update = __webpack_require__(5)(content, options);
-if(content.locals) module.exports = content.locals;
-// Hot Module Replacement
-if(false) {
-	// When the styles change, update the <style> tags
-	if(!content.locals) {
-		module.hot.accept("!!../node_modules/css-loader/index.js!./index.css", function() {
-			var newContent = require("!!../node_modules/css-loader/index.js!./index.css");
-			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-			update(newContent);
-		});
-	}
-	// When the module is disposed, remove the <style> tags
-	module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(4)(undefined);
-// imports
-
-
-// module
-exports.push([module.i, "@charset 'utf-8';\n\n/* Reset CSS */\nhtml{color:#000;background:#FFF}body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,textarea,p,blockquote,th,td{margin:0;padding:0}table{border-collapse:collapse;border-spacing:0}fieldset,img{border:0}address,caption,cite,code,dfn,em,strong,th,var{font-style:normal;font-weight:normal}ol,ul{list-style:none}caption,th{text-align:left}h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal}q:before,q:after{content:''}abbr,acronym{border:0;font-variant:normal}sup{vertical-align:text-top}sub{vertical-align:text-bottom}input,textarea,select{font-family:inherit;font-size:inherit;font-weight:inherit;*font-size:100%}legend{color:#000}\n\n/* Super Hack to disable autofill style for Chrome. */\ninput:-webkit-autofill,\ninput:-webkit-autofill:hover,\ninput:-webkit-autofill:focus,\ninput:-webkit-autofill:active {\n    transition: background-color 5000s ease-in-out 0s;\n}\n\n.u-mt-10 {margin-top: 10px;}\n.u-mt-20 {margin-top: 20px;}\n.u-mb-10 {margin-bottom: 10px;}\n.u-ml-15 {margin-left: 15px;}\n.u-disp-iblock {display: inline-block;}\n.no-visible {visibility: hidden;}\n.no-action {pointer-events: none;}\n\n/**\n * Viewer size.\n * This height will be override to fit the browser height (by pdfanno.js).\n */\n.anno-viewer {\n    width: 100%;\n    height: 500px;\n}\n\n/**\n * Annotation Select UI Layout.\n */\n.anno-select-layout {}\n.anno-select-layout .row:first-child {\n    margin-bottom: 10px;\n}\n.anno-select-layout [type=\"radio\"] {\n    margin-right: 5px;\n}\n.anno-select-layout [type=\"file\"] {\n    display: inline-block;\n    margin-left: 5px;\n    line-height: 1em;\n}\n.anno-select-layout .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-select-layout .sp-dd {\n    display: none;\n}\n\n/**\n * Dropdown.\n */\n.dropdown-menu {\n    overflow: scroll;\n}\n\n/**\n * Color picker.\n */\n.anno-ui .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-ui .sp-dd {\n    display: none;\n}\n.anno-ui .sp-preview {\n    margin-right: 0;\n}\n", ""]);
-
-// exports
-
-
-/***/ }),
-/* 4 */
 /***/ (function(module, exports) {
 
 /*
@@ -5383,7 +4715,7 @@ function toComment(sourceMap) {
 
 
 /***/ }),
-/* 5 */
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -5742,6 +5074,248 @@ function updateLink (link, options, obj) {
 
 
 /***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (immutable) */ __webpack_exports__["setupResizableColumns"] = setupResizableColumns;
+/* harmony export (immutable) */ __webpack_exports__["tomlString"] = tomlString;
+/**
+ * Make the UI resizable.
+ */
+function setupResizableColumns() {
+
+    // Make resizable.
+    $('#tools').resizable({
+      handles: 'e',
+      alsoResizeReverse: '#viewerWrapper',
+      start : () => {
+        console.log('resize start');
+        $('#viewer iframe').css({
+            'pointer-events' : 'none',
+        });
+
+      },
+      stop : () => {
+        console.log('resize stop');
+        $('#viewer iframe').css({
+            'pointer-events' : 'auto',
+        });
+
+      }
+    });
+
+    // Customize.
+    $.ui.plugin.add("resizable", "alsoResizeReverse", {
+
+        start: function() {
+            var that = $(this).resizable( "instance" ),
+                o = that.options;
+
+            $(o.alsoResizeReverse).each(function() {
+                var el = $(this);
+                el.data("ui-resizable-alsoresizeReverse", {
+                    width: parseInt(el.width(), 10), height: parseInt(el.height(), 10),
+                    left: parseInt(el.css("left"), 10), top: parseInt(el.css("top"), 10)
+                });
+            });
+        },
+
+        resize: function(event, ui) {
+            var that = $(this).resizable( "instance" ),
+                o = that.options,
+                os = that.originalSize,
+                op = that.originalPosition,
+                delta = {
+                    height: (that.size.height - os.height) || 0,
+                    width: (that.size.width - os.width) || 0,
+                    top: (that.position.top - op.top) || 0,
+                    left: (that.position.left - op.left) || 0
+                };
+
+            $(o.alsoResizeReverse).each(function() {
+                var el = $(this), start = $(this).data("ui-resizable-alsoresize-reverse"), style = {},
+                    css = el.parents(ui.originalElement[0]).length ?
+                        [ "width", "height" ] :
+                        [ "width", "height", "top", "left" ];
+
+                $.each(css, function(i, prop) {
+                    var sum = (start[prop] || 0) - (delta[prop] || 0);
+                    if (sum && sum >= 0) {
+                        style[prop] = sum || null;
+                    }
+                });
+
+                el.css(style);
+            });
+        },
+
+        stop: function() {
+            $(this).removeData("resizable-alsoresize-reverse");
+        }
+    });
+}
+
+
+/**
+ * Convert object to TOML String.
+ */
+function tomlString(obj, root=true) {
+
+    let lines = [];
+
+    // `version` is first.
+    if ('version' in obj) {
+        lines.push(`version = "${obj['version']}"`);
+        lines.push('');
+        delete obj['version'];
+    }
+
+    // #paperanno-ja/issues/38
+    // Make all values in `position` as string.
+    if ('position' in obj) {
+        let position = obj.position;
+        position = position.map(p => {
+            if (typeof p === 'number') {
+                return String(p);
+            } else {
+                return p.map(v => String(v));
+            }
+        });
+        obj.position = position;
+    }
+
+    Object.keys(obj).forEach(prop => {
+
+        let val = obj[prop];
+        if (typeof val === 'string') {
+            lines.push(`${prop} = "${val}"`);
+            root && lines.push('');
+
+        } else if (typeof val === 'number') {
+            lines.push(`${prop} = ${val}`);
+            root && lines.push('');
+
+        } else if (isArray(val)) {
+            lines.push(`${prop} = ${JSON.stringify(val)}`);
+            root && lines.push('');
+
+        } else if (typeof val === 'object') {
+            lines.push(`[${prop}]`);
+            lines.push(tomlString(val, false));
+            root && lines.push('');
+        }
+    });
+
+    return lines.join('\n');
+}
+
+function isArray(val) {
+    return val && 'length' in val;
+}
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_browseButton__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_contentDropdown__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__components_primaryAnnoDropdown__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_referenceAnnoDropdown__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_annoListDropdown__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__components_downloadButton__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__components_annoRectButton__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__components_annoRelButton__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__components_annoSpanButton__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__components_labelInput__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__components_uploadButton__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__uis__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__events__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__utils__ = __webpack_require__(2);
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "browseButton", function() { return __WEBPACK_IMPORTED_MODULE_0__components_browseButton__; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "contentDropdown", function() { return __WEBPACK_IMPORTED_MODULE_1__components_contentDropdown__; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "primaryAnnoDropdown", function() { return __WEBPACK_IMPORTED_MODULE_2__components_primaryAnnoDropdown__; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "referenceAnnoDropdown", function() { return __WEBPACK_IMPORTED_MODULE_3__components_referenceAnnoDropdown__; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "annoListDropdown", function() { return __WEBPACK_IMPORTED_MODULE_4__components_annoListDropdown__; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "downloadButton", function() { return __WEBPACK_IMPORTED_MODULE_5__components_downloadButton__; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "annoRectButton", function() { return __WEBPACK_IMPORTED_MODULE_6__components_annoRectButton__; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "annoRelButton", function() { return __WEBPACK_IMPORTED_MODULE_7__components_annoRelButton__; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "annoSpanButton", function() { return __WEBPACK_IMPORTED_MODULE_8__components_annoSpanButton__; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "labelInput", function() { return __WEBPACK_IMPORTED_MODULE_9__components_labelInput__; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "uploadButton", function() { return __WEBPACK_IMPORTED_MODULE_10__components_uploadButton__; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "ui", function() { return __WEBPACK_IMPORTED_MODULE_11__uis__; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "event", function() { return __WEBPACK_IMPORTED_MODULE_12__events__; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "util", function() { return __WEBPACK_IMPORTED_MODULE_13__utils__; });
+__webpack_require__(4);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(5);
+if(typeof content === 'string') content = [[module.i, content, '']];
+// Prepare cssTransformation
+var transform;
+
+var options = {}
+options.transform = transform
+// add the styles to the DOM
+var update = __webpack_require__(1)(content, options);
+if(content.locals) module.exports = content.locals;
+// Hot Module Replacement
+if(false) {
+	// When the styles change, update the <style> tags
+	if(!content.locals) {
+		module.hot.accept("!!../node_modules/css-loader/index.js!./index.css", function() {
+			var newContent = require("!!../node_modules/css-loader/index.js!./index.css");
+			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+			update(newContent);
+		});
+	}
+	// When the module is disposed, remove the <style> tags
+	module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(0)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, "@charset 'utf-8';\n\n/* Reset CSS */\nhtml{color:#000;background:#FFF}body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,textarea,p,blockquote,th,td{margin:0;padding:0}table{border-collapse:collapse;border-spacing:0}fieldset,img{border:0}address,caption,cite,code,dfn,em,strong,th,var{font-style:normal;font-weight:normal}ol,ul{list-style:none}caption,th{text-align:left}h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal}q:before,q:after{content:''}abbr,acronym{border:0;font-variant:normal}sup{vertical-align:text-top}sub{vertical-align:text-bottom}input,textarea,select{font-family:inherit;font-size:inherit;font-weight:inherit;*font-size:100%}legend{color:#000}\n\n/* Super Hack to disable autofill style for Chrome. */\ninput:-webkit-autofill,\ninput:-webkit-autofill:hover,\ninput:-webkit-autofill:focus,\ninput:-webkit-autofill:active {\n    transition: background-color 5000s ease-in-out 0s;\n}\n\n.u-mt-10 {margin-top: 10px;}\n.u-mt-20 {margin-top: 20px;}\n.u-mb-10 {margin-bottom: 10px;}\n.u-ml-15 {margin-left: 15px;}\n.u-disp-iblock {display: inline-block;}\n.no-visible {visibility: hidden;}\n.no-action {pointer-events: none;}\n\n/**\n * Viewer size.\n * This height will be override to fit the browser height (by pdfanno.js).\n */\n.anno-viewer {\n    width: 100%;\n    height: 500px;\n}\n\n/**\n * Annotation Select UI Layout.\n */\n.anno-select-layout {}\n.anno-select-layout .row:first-child {\n    margin-bottom: 10px;\n}\n.anno-select-layout [type=\"radio\"] {\n    margin-right: 5px;\n}\n.anno-select-layout [type=\"file\"] {\n    display: inline-block;\n    margin-left: 5px;\n    line-height: 1em;\n}\n.anno-select-layout .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-select-layout .sp-dd {\n    display: none;\n}\n\n/**\n * Dropdown.\n */\n.dropdown-menu {\n    overflow: scroll;\n}\n\n/**\n * Color picker.\n */\n.anno-ui .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-ui .sp-dd {\n    display: none;\n}\n.anno-ui .sp-preview {\n    margin-right: 0;\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
 /* 6 */
 /***/ (function(module, exports) {
 
@@ -5844,9 +5418,11 @@ module.exports = function (css) {
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (immutable) */ __webpack_exports__["setupColorPicker"] = setupColorPicker;
 /* harmony export (immutable) */ __webpack_exports__["setup"] = setup;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__uis_alertDialog__ = __webpack_require__(24);
 /**
  * UI parts - Browse button.
  */
+
 
 /**
  * Setup the color pickers.
@@ -5917,7 +5493,8 @@ function setup({
 
         let error = isValidDirectorySelect(files);
         if (error) {
-            return alert(error);
+            __WEBPACK_IMPORTED_MODULE_0__uis_alertDialog__["show"]({ message : error });
+            return;
         }
 
         loadFiles(files).then(() => {
@@ -5949,13 +5526,13 @@ function isValidDirectorySelect(files) {
 
     // Error, if no contents exits.
     if (!files || files.length === 0) {
-        return 'Not files specified';
+        return 'No files specified.';
     }
 
     // Error, if the user select a file - not a directory.
     let relativePath = files[0].webkitRelativePath;
     if (!relativePath) {
-        return 'Please select a directory, NOT a file';
+        return 'Please select a directory, NOT a file.';
     }
 
     // OK.
@@ -6562,17 +6139,20 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (immutable) */ __webpack_exports__["setup"] = setup;
 /* harmony export (immutable) */ __webpack_exports__["enable"] = enable;
 /* harmony export (immutable) */ __webpack_exports__["disable"] = disable;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_toml__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_toml__ = __webpack_require__(19);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_toml___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_toml__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__uis_alertDialog__ = __webpack_require__(24);
 /**
  * UI parts - Input Label.
  */
-__webpack_require__(22);
+__webpack_require__(17);
 
 
 
 // import packageJson from '../../../package.json';
+
+
 
 // LocalStorage key to save label data.
 const LSKEY_LABEL_LIST = 'pdfanno-label-list';
@@ -6829,7 +6409,7 @@ function setupImportExportLink() {
             } catch (e) {
                 console.log('ERROR:', e);
                 console.log('TOML:\n', tomlString);
-                alert('ERROR: cannot load the label file.')
+                __WEBPACK_IMPORTED_MODULE_2__uis_alertDialog__["show"]({ message : 'ERROR: cannot load the label file.' });
                 return;
             }
         }
@@ -7056,8 +6636,53 @@ function listenWindowEvents() {
 /* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var parser = __webpack_require__(18);
-var compiler = __webpack_require__(19);
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(18);
+if(typeof content === 'string') content = [[module.i, content, '']];
+// Prepare cssTransformation
+var transform;
+
+var options = {}
+options.transform = transform
+// add the styles to the DOM
+var update = __webpack_require__(1)(content, options);
+if(content.locals) module.exports = content.locals;
+// Hot Module Replacement
+if(false) {
+	// When the styles change, update the <style> tags
+	if(!content.locals) {
+		module.hot.accept("!!../../../node_modules/css-loader/index.js!./index.css", function() {
+			var newContent = require("!!../../../node_modules/css-loader/index.js!./index.css");
+			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+			update(newContent);
+		});
+	}
+	// When the module is disposed, remove the <style> tags
+	module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(0)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, "\n.inputLabel {\n    font-size: 20px;\n}\n\n/**\n * Label list.\n */\n.label-list {}\n.label-list li {\n    display: flex;\n    align-items: center;\n    padding: 0 10px;\n    border-bottom: 1px solid #eee;\n}\n.label-list li:last-child {\n    padding-top: 5px;\n    padding-bottom: 5px;\n    border-bottom: 0 solid rgba(0,0,0,0);\n}\n.label-list__btn {\n    width: 40px;\n    height: 40px;\n    line-height: 50px;\n    font-size: 16px;\n    text-align: center;\n    cursor: pointer;\n    transition: all 1.5 ease-in-out;\n    border-radius: 3px;\n    background-color: white;\n    margin-right: 20px;\n    flex: 0 0 30px;\n}\n.label-list__btn:hover,\n.label-list__text:hover {\n    box-shadow: 0 1px 3px rgba(0,0,0,.3);\n}\n.label-list__text {\n    flex-grow: 1;\n    cursor: pointer;\n    padding: 2px;\n    font-size: 20px;\n}\n.label-list__input {\n    flex-grow: 1;\n    padding: 2px 5px;\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var parser = __webpack_require__(20);
+var compiler = __webpack_require__(21);
 
 module.exports = {
   parse: function(input) {
@@ -7068,7 +6693,7 @@ module.exports = {
 
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, exports) {
 
 module.exports = (function() {
@@ -10915,7 +10540,7 @@ module.exports = (function() {
 
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11119,15 +10744,17 @@ module.exports = {
 
 
 /***/ }),
-/* 20 */
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (immutable) */ __webpack_exports__["setup"] = setup;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__uis_alertDialog__ = __webpack_require__(24);
 /**
  * UI parts - Upload Button.
  */
+
 
 function setup({
         getCurrentDisplayContentFile,
@@ -11136,7 +10763,7 @@ function setup({
 
         const contentFile = getCurrentDisplayContentFile();
         if (!contentFile) {
-            return alert('Display a content before upload.');
+            return __WEBPACK_IMPORTED_MODULE_0__uis_alertDialog__["show"]({ message : 'Display a content before upload.' });
         }
 
         function arrayBufferToBase64( buffer ) {
@@ -11156,7 +10783,7 @@ function setup({
 
         const url = $('#serverURL').val();
         if (!url) {
-            return alert('Set server URL.');
+            return __WEBPACK_IMPORTED_MODULE_0__uis_alertDialog__["show"]({ message : 'Set server URL.' });
         }
 
         $('#uploadResult').val("Waiting for response...");
@@ -11212,7 +10839,113 @@ function setup({
 
 
 /***/ }),
-/* 21 */
+/* 23 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__alertDialog__ = __webpack_require__(24);
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "alertDialog", function() { return __WEBPACK_IMPORTED_MODULE_0__alertDialog__; });
+
+
+
+
+
+/***/ }),
+/* 24 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (immutable) */ __webpack_exports__["create"] = create;
+/* harmony export (immutable) */ __webpack_exports__["show"] = show;
+/**
+ * UI - Alert dialog.
+ */
+__webpack_require__(25);
+
+function create({ type='alert', message='' }) {
+
+    const id = 'modal-' + (new Date().getTime());
+
+    const styleClass = (type === 'alert' ? 'alertdialog-danger' : '')
+
+    const snipet = `
+        <div id="${id}" class="alertdialog modal fade ${styleClass}" role="dialog">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h4 class="modal-title">Error</h4>
+              </div>
+              <div class="modal-body">
+                <p>${message}</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+    `;
+    $(document.body).append(snipet);
+
+    return $('#' + id)
+}
+
+function show() {
+    const $modal = create(...arguments);
+    $modal.modal('show');
+    return $modal;
+}
+
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(26);
+if(typeof content === 'string') content = [[module.i, content, '']];
+// Prepare cssTransformation
+var transform;
+
+var options = {}
+options.transform = transform
+// add the styles to the DOM
+var update = __webpack_require__(1)(content, options);
+if(content.locals) module.exports = content.locals;
+// Hot Module Replacement
+if(false) {
+	// When the styles change, update the <style> tags
+	if(!content.locals) {
+		module.hot.accept("!!../../../node_modules/css-loader/index.js!./index.css", function() {
+			var newContent = require("!!../../../node_modules/css-loader/index.js!./index.css");
+			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+			update(newContent);
+		});
+	}
+	// When the module is disposed, remove the <style> tags
+	module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(0)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, "/**\n * UI - Alert Dialog.\n */\n\n.alertdialog-danger .modal-header {\n    color: #a94442;\n    background-color: #f2dede;\n    border-color: #ebccd1;\n}\n.alertdialog {\n    margin-top: 200px;\n}\n.alertdialog .modal-dialog {\n    width: 50%;\n}\n.alertdialog .modal-footer {\n    border-top: 0px solid rgba(0,0,0,0);\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 27 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -11263,29 +10996,418 @@ function dispatchWindowEvent(eventName, data) {
 }
 
 
+/***/ })
+/******/ ]);
+});
+//# sourceMappingURL=index.js.map
+
 /***/ }),
-/* 22 */
+/* 23 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["b"] = listenWindowLeaveEvent;
+/* harmony export (immutable) */ __webpack_exports__["c"] = unlistenWindowLeaveEvent;
+/* harmony export (immutable) */ __webpack_exports__["a"] = adjustViewerSize;
+/* unused harmony export resizeHandler */
+/**
+ * Utility for window.
+ */
+
+/**
+ * Set the confirm dialog at leaving the page.
+ */
+function listenWindowLeaveEvent() {
+    window.annotationUpdated = true;
+    $(window).off('beforeunload').on('beforeunload', () => {
+        return 'You don\'t save the annotations yet.\nAre you sure to leave ?';
+    });
+}
+
+/**
+ * Unset the confirm dialog at leaving the page.
+ */
+function unlistenWindowLeaveEvent() {
+    window.annotationUpdated = false;
+    $(window).off('beforeunload');
+}
+
+/**
+    Adjust the height of viewer according to window height.
+*/
+function adjustViewerSize() {
+    window.removeEventListener('resize', resizeHandler);
+    window.addEventListener('resize', resizeHandler);
+    resizeHandler();
+}
+
+/**
+ * Resize the height of elements adjusting to the window.
+ */
+function resizeHandler() {
+
+    // PDFViewer.
+    let height = $(window).innerHeight() - $('#viewer').offset().top;
+    $('#viewer iframe').css('height', `${height}px`);
+
+    // Dropdown for PDF.
+    let height1 = $(window).innerHeight() - ($('#dropdownPdf ul').offset().top || 120);
+    $('#dropdownPdf ul').css('max-height', `${height1 - 20}px`);
+
+    // Dropdown for Primary Annos.
+    let height2 = $(window).innerHeight() - ($('#dropdownAnnoPrimary ul').offset().top || 120);
+    $('#dropdownAnnoPrimary ul').css('max-height', `${height2 - 20}px`);
+
+    // Dropdown for Anno list.
+    let height3 = $(window).innerHeight() - ($('#dropdownAnnoList ul').offset().top || 120);
+    $('#dropdownAnnoList ul').css('max-height', `${height3 - 20}px`);
+
+    // Dropdown for Reference Annos.
+    let height4 = $(window).innerHeight() - ($('#dropdownAnnoReference ul').offset().top || 120);
+    $('#dropdownAnnoReference ul').css('max-height', `${height4 - 20}px`);
+
+    // Tools.
+    let height5 = $(window).innerHeight() - $('#tools').offset().top;
+    $('#tools').css('height', `${height5}px`);
+}
+
+
+/***/ }),
+/* 24 */,
+/* 25 */,
+/* 26 */,
+/* 27 */,
+/* 28 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_anno_ui__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_anno_ui___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_anno_ui__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__shared_util__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__shared_coords__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__page_util_window__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__page_public__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__page_pdf_PDFAnnoPage__ = __webpack_require__(33);
+__webpack_require__(29);
+__webpack_require__(30);
+
+// UI parts.
+
+
+
+
+
+
+
+
+/**
+ * API root point.
+ */
+let API_ROOT = 'http://localhost:3000';
+if (true) {
+    console.log('PRODUCTION MODE');
+    API_ROOT = 'https://pdfanno.hshindo.com';
+}
+
+/**
+ * Global variable.
+ */
+window.pdfanno = {};
+
+/**
+ * Expose public APIs.
+ */
+window.add = __WEBPACK_IMPORTED_MODULE_4__page_public__["e" /* addAnnotation */];
+window.addAll = __WEBPACK_IMPORTED_MODULE_4__page_public__["d" /* addAllAnnotations */];
+window.delete = __WEBPACK_IMPORTED_MODULE_4__page_public__["g" /* deleteAnnotation */];
+window.RectAnnotation = __WEBPACK_IMPORTED_MODULE_4__page_public__["a" /* PublicRectAnnotation */];
+window.SpanAnnotation = __WEBPACK_IMPORTED_MODULE_4__page_public__["c" /* PublicSpanAnnotation */];
+window.RelationAnnotation = __WEBPACK_IMPORTED_MODULE_4__page_public__["b" /* PublicRelationAnnotation */];
+window.readTOML = __WEBPACK_IMPORTED_MODULE_4__page_public__["h" /* readTOML */];
+window.clear = __WEBPACK_IMPORTED_MODULE_4__page_public__["f" /* clear */];
+
+/**
+ * Annotation functions for a page.
+ */
+window.annoPage = new __WEBPACK_IMPORTED_MODULE_5__page_pdf_PDFAnnoPage__["a" /* default */]();
+
+
+// Manage ctrlKey (cmdKey on Mac).
+window.addEventListener('manageCtrlKey', e => {
+    window.annoPage.manageCtrlKey(e.detail);
+});
+
+// Manage digitKey.
+window.addEventListener('digitKeyPressed', e => {
+    __WEBPACK_IMPORTED_MODULE_1__shared_util__["b" /* dispatchWindowEvent */](`digit${e.detail}Pressed`);
+});
+
+/**
+ * Get the y position in the annotation.
+ */
+function _getY(annotation) {
+
+    if (annotation.rectangles) {
+        return annotation.rectangles[0].y;
+
+    } else if (annotation.y1) {
+        return annotation.y1;
+
+    } else {
+        return annotation.y;
+    }
+}
+
+/**
+ *  The entry point.
+ */
+window.addEventListener('DOMContentLoaded', e => {
+
+    // Delete prev annotations.
+    window.annoPage.clearAllAnnotations();
+
+    // Reset PDFViwer settings.
+    // window.annoPage.resetPDFViewerSettings();
+
+    // resizable.
+    __WEBPACK_IMPORTED_MODULE_0_anno_ui__["util"].setupResizableColumns();
+
+    // Start event listeners.
+    __WEBPACK_IMPORTED_MODULE_0_anno_ui__["event"].setup();
+
+    // Browse button.
+    __WEBPACK_IMPORTED_MODULE_0_anno_ui__["browseButton"].setup({
+        loadFiles : window.annoPage.loadFiles,
+        clearAllAnnotations : window.annoPage.clearAllAnnotations,
+        displayCurrentReferenceAnnotations : () => window.annoPage.displayAnnotation(false, false),
+        displayCurrentPrimaryAnnotations : () => window.annoPage.displayAnnotation(true, false),
+        getContentFiles : () => window.annoPage.contentFiles,
+        getAnnoFiles : () => window.annoPage.annoFiles,
+        closePDFViewer : window.annoPage.closePDFViewer
+    });
+
+    // PDF dropdown.
+    __WEBPACK_IMPORTED_MODULE_0_anno_ui__["contentDropdown"].setup({
+        initialText : 'PDF File',
+        overrideWarningMessage : 'Are you sure to load another PDF ?',
+        contentReloadHandler : fileName => {
+
+            // Get the content.
+            const content = window.annoPage.getContentFile(fileName);
+
+            // Reset annotations displayed.
+            window.annoPage.clearAllAnnotations();
+
+            // Display the PDF on the viewer.
+            window.annoPage.displayViewer(content);
+        }
+    });
+
+    // Primary anno dropdown.
+    __WEBPACK_IMPORTED_MODULE_0_anno_ui__["primaryAnnoDropdown"].setup({
+        clearPrimaryAnnotations : window.annoPage.clearAllAnnotations,
+        displayPrimaryAnnotation : annoName => window.annoPage.displayAnnotation(true)
+    });
+
+    // Reference anno dropdown.
+    __WEBPACK_IMPORTED_MODULE_0_anno_ui__["referenceAnnoDropdown"].setup({
+        displayReferenceAnnotations : annoNames =>window.annoPage.displayAnnotation(false)
+    });
+
+    // Anno list dropdown.
+    __WEBPACK_IMPORTED_MODULE_0_anno_ui__["annoListDropdown"].setup({
+        getAnnotations : () => {
+
+            // Get displayed annotations.
+            let annotations = window.annoPage.getAllAnnotations();
+
+            // Filter only Primary.
+            annotations = annotations.filter(a => {
+                return !a.readOnly;
+            });
+
+            // Sort by offsetY.
+            annotations = annotations.sort((a1, a2) => {
+                return _getY(a1) - _getY(a2);
+            });
+
+            return annotations;
+        },
+        scrollToAnnotation : id => {
+
+            let annotation = window.annoPage.findAnnotationById(id);
+
+            if (annotation) {
+
+                // scroll to.
+                let _y = annotation.y || annotation.y1 || annotation.rectangles[0].y;
+                let { pageNumber, y } = __WEBPACK_IMPORTED_MODULE_2__shared_coords__["b" /* convertToExportY */](_y);
+                let pageHeight = window.annoPage.getViewerViewport().height;
+                let scale = window.annoPage.getViewerViewport().scale;
+                _y = (pageHeight + __WEBPACK_IMPORTED_MODULE_2__shared_coords__["c" /* paddingBetweenPages */]) * (pageNumber - 1) + y * scale;
+                _y -= 100;
+                $('#viewer iframe').contents().find('#viewer').parent()[0].scrollTop = _y;
+
+                // highlight.
+                annotation.highlight();
+                setTimeout(() => {
+                    annotation.dehighlight();
+                }, 1000);
+            }
+        }
+    });
+
+    // Download button.
+    __WEBPACK_IMPORTED_MODULE_0_anno_ui__["downloadButton"].setup({
+        getAnnotationTOMLString : window.annoPage.exportData,
+        getCurrentContentName   : window.annoPage.getCurrentContentName,
+        unlistenWindowLeaveEvent : __WEBPACK_IMPORTED_MODULE_3__page_util_window__["c" /* unlistenWindowLeaveEvent */]
+    });
+
+    // AnnoTool: rect.
+    __WEBPACK_IMPORTED_MODULE_0_anno_ui__["annoRectButton"].setup({
+        enableRect : window.annoPage.enableRect,
+        disableRect : window.annoPage.disableRect,
+    });
+
+    // AnnoTool: span.
+    __WEBPACK_IMPORTED_MODULE_0_anno_ui__["annoSpanButton"].setup({
+        createSpanAnnotation : window.annoPage.createSpan
+    });
+
+    // AnnoTool: relation.
+    __WEBPACK_IMPORTED_MODULE_0_anno_ui__["annoRelButton"].setup({
+        createRelAnnotation : window.annoPage.createRelation
+    });
+
+    // Label input.
+    __WEBPACK_IMPORTED_MODULE_0_anno_ui__["labelInput"].setup({
+        getSelectedAnnotations : window.annoPage.getSelectedAnnotations,
+        saveAnnotationText : (id, text) => {
+            console.log('saveAnnotationText:', id, text);
+            const annotation = window.annoPage.findAnnotationById(id);
+            if (annotation) {
+                annotation.text = text;
+                annotation.save();
+                annotation.enableViewMode();
+            }
+        },
+        createSpanAnnotation : window.annoPage.createSpan,
+        createRelAnnotation : window.annoPage.createRelation
+    });
+
+    // Upload button.
+    __WEBPACK_IMPORTED_MODULE_0_anno_ui__["uploadButton"].setup({
+        getCurrentDisplayContentFile : () => {
+            const pdfFileName = $('#dropdownPdf .js-text').text();
+            if (!pdfFileName || pdfFileName === 'PDF File') {
+                return null;
+            }
+            return window.annoPage.getContentFile(pdfFileName);
+        }
+    });
+
+    // Display a PDF specified via URL query parameter.
+
+    let pdfURL;
+    (location.search || '').replace('?', '').split('&')
+        .filter(a => a)
+        .forEach(fragment => {
+            let [ key, value ] = fragment.split('=');
+            if (key && key.toLowerCase() === 'pdf') {
+                pdfURL = value;
+            }
+    });
+
+    if (pdfURL) {
+
+        console.log('pdfURL=', pdfURL);
+
+        // Show loading.
+        $('#pdfLoading').removeClass('hidden');
+
+        // Load a PDF as ArrayBuffer.
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', API_ROOT + '/load_pdf?url=' + window.encodeURIComponent(pdfURL), true);
+        xhr.responseType = 'arraybuffer';
+        xhr.onload = function () {
+            if (this.status === 200) {
+
+                // Init viewer.
+                window.annoPage.initializeViewer(null);
+                // Start application.
+                window.annoPage.startViewerApplication();
+
+                window.addEventListener('iframeReady', () => {
+                    setTimeout(() => {
+                        window.annoPage.displayViewer({ content : this.response });
+                    }, 500);
+                });
+
+                window.addEventListener('pagerendered', () => {
+                    $('#pdfLoading').addClass('close');
+                    setTimeout(function() {
+                        $('#pdfLoading').addClass('hidden');
+                    }, 1000);
+                });
+            }
+        };
+        xhr.timeout = 120 * 1000; // 120s
+        xhr.ontimeout = function () {
+            $('#pdfLoading').addClass('hidden');
+            setTimeout(() => {
+                __WEBPACK_IMPORTED_MODULE_0_anno_ui__["ui"].alertDialog.show({ message : 'Failed to load the PDF.' });
+            }, 100);
+        };
+        xhr.send();
+
+    } else {
+
+        // If no PDF is specified, display the blank viewer.
+
+        $('#viewer').css('opacity', '0');
+
+        // Init viewer.
+        window.annoPage.initializeViewer();
+        // Start application.
+        window.annoPage.startViewerApplication();
+
+        const fn = () => {
+            window.annoPage.closePDFViewer();
+            $('#viewer').css('opacity', '1');
+            window.removeEventListener('pagerendered', fn);
+        };
+        window.addEventListener('pagerendered', fn);
+    }
+
+});
+
+
+/***/ }),
+/* 29 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__.p + "dist/index.html";
+
+/***/ }),
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(23);
+var content = __webpack_require__(31);
 if(typeof content === 'string') content = [[module.i, content, '']];
-// Prepare cssTransformation
-var transform;
-
-var options = {}
-options.transform = transform
 // add the styles to the DOM
-var update = __webpack_require__(5)(content, options);
+var update = __webpack_require__(12)(content, {});
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
 	// When the styles change, update the <style> tags
 	if(!content.locals) {
-		module.hot.accept("!!../../../node_modules/css-loader/index.js!./index.css", function() {
-			var newContent = require("!!../../../node_modules/css-loader/index.js!./index.css");
+		module.hot.accept("!!../node_modules/css-loader/index.js!./pdfanno.css", function() {
+			var newContent = require("!!../node_modules/css-loader/index.js!./pdfanno.css");
 			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 			update(newContent);
 		});
@@ -11295,23 +11417,18 @@ if(false) {
 }
 
 /***/ }),
-/* 23 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(4)(undefined);
+exports = module.exports = __webpack_require__(11)();
 // imports
 
 
 // module
-exports.push([module.i, "\n.inputLabel {\n    font-size: 20px;\n}\n\n/**\n * Label list.\n */\n.label-list {}\n.label-list li {\n    display: flex;\n    align-items: center;\n    padding: 0 10px;\n    border-bottom: 1px solid #eee;\n}\n.label-list li:last-child {\n    padding-top: 5px;\n    padding-bottom: 5px;\n    border-bottom: 0 solid rgba(0,0,0,0);\n}\n.label-list__btn {\n    width: 40px;\n    height: 40px;\n    line-height: 50px;\n    font-size: 16px;\n    text-align: center;\n    cursor: pointer;\n    transition: all 1.5 ease-in-out;\n    border-radius: 3px;\n    background-color: white;\n    margin-right: 20px;\n    flex: 0 0 30px;\n}\n.label-list__btn:hover,\n.label-list__text:hover {\n    box-shadow: 0 1px 3px rgba(0,0,0,.3);\n}\n.label-list__text {\n    flex-grow: 1;\n    cursor: pointer;\n    padding: 2px;\n    font-size: 20px;\n}\n.label-list__input {\n    flex-grow: 1;\n    padding: 2px 5px;\n}\n", ""]);
+exports.push([module.i, "@charset \"utf-8\";\n\n/* Loading */\n.loader-container {\n    position: absolute;\n    top: 100px;\n    left: 50%;\n    width: 200px;\n    height: 200px;\n    margin-left: -150px;\n    /*margin-top: -150px;*/\n    background-color: #333;\n    padding: 16px;\n    box-shadow: 0 0 10px rgba(0,0,0,.5);\n    transition: opacity .3s ease-in-out;\n}\n.loader-container.close {\n    opacity: 0;\n}\n.loader {\n    border: 16px solid #f3f3f3; /* Light grey */\n    border-top: 16px solid #3498db; /* Blue */\n    border-radius: 50%;\n    width: 120px;\n    height: 120px;\n    animation: spin 1.5s ease-in-out infinite;\n    margin-left: auto;\n    margin-right: auto;\n}\n@keyframes spin {\n    0% { transform: rotate(0deg); }\n    100% { transform: rotate(360deg); }\n}\n.loader-container p {\n    margin-top: 16px;\n    font-size: 16px;\n    text-align: center;\n    color: white;\n}\n", ""]);
 
 // exports
 
-
-/***/ })
-/******/ ]);
-});
-//# sourceMappingURL=index.js.map
 
 /***/ }),
 /* 32 */
@@ -11525,9 +11642,13 @@ function clear() {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__loadFiles__ = __webpack_require__(34);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__shared_util__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util_window__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_anno_ui__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_anno_ui___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_anno_ui__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__loadFiles__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__shared_util__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__util_window__ = __webpack_require__(23);
+
+
 
 
 
@@ -11584,16 +11705,16 @@ class PDFAnnoPage {
         iframeWindow.addEventListener('DOMContentLoaded', () => {
 
             // Adjust the height of viewer.
-            __WEBPACK_IMPORTED_MODULE_2__util_window__["a" /* adjustViewerSize */]();
+            __WEBPACK_IMPORTED_MODULE_3__util_window__["a" /* adjustViewerSize */]();
 
             // Reset the confirm dialog at leaving page.
-            __WEBPACK_IMPORTED_MODULE_2__util_window__["c" /* unlistenWindowLeaveEvent */]();
+            __WEBPACK_IMPORTED_MODULE_3__util_window__["c" /* unlistenWindowLeaveEvent */]();
 
-            __WEBPACK_IMPORTED_MODULE_1__shared_util__["b" /* dispatchWindowEvent */]('iframeReady');
+            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('iframeReady');
         });
 
         iframeWindow.addEventListener('pagerendered', () => {
-            __WEBPACK_IMPORTED_MODULE_1__shared_util__["b" /* dispatchWindowEvent */]('pagerendered');
+            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('pagerendered');
         });
 
         iframeWindow.addEventListener('annotationrendered', () => {
@@ -11602,59 +11723,59 @@ class PDFAnnoPage {
             this.disableAnnotateFunctions();
             this.enableAnnotateFunction(window.currentAnnoToolType);
 
-            __WEBPACK_IMPORTED_MODULE_1__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered');
+            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered');
         });
 
         // Set the confirm dialog when leaving a page.
         iframeWindow.addEventListener('annotationUpdated', () => {
-            __WEBPACK_IMPORTED_MODULE_2__util_window__["b" /* listenWindowLeaveEvent */]();
-            __WEBPACK_IMPORTED_MODULE_1__shared_util__["b" /* dispatchWindowEvent */]('annotationUpdated');
+            __WEBPACK_IMPORTED_MODULE_3__util_window__["b" /* listenWindowLeaveEvent */]();
+            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('annotationUpdated');
         });
 
         // enable text input.
         iframeWindow.addEventListener('enableTextInput', (e) => {
-            __WEBPACK_IMPORTED_MODULE_1__shared_util__["b" /* dispatchWindowEvent */]('enableTextInput', e.detail);
+            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('enableTextInput', e.detail);
         });
 
         // disable text input.
         iframeWindow.addEventListener('disappearTextInput', () => {
-            __WEBPACK_IMPORTED_MODULE_1__shared_util__["b" /* dispatchWindowEvent */]('disappearTextInput', e.detail);
+            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('disappearTextInput', e.detail);
         });
 
         iframeWindow.addEventListener('annotationDeleted', e => {
-            __WEBPACK_IMPORTED_MODULE_1__shared_util__["b" /* dispatchWindowEvent */]('annotationDeleted', e.detail);
+            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('annotationDeleted', e.detail);
         });
 
         iframeWindow.addEventListener('annotationHoverIn' , e => {
-            __WEBPACK_IMPORTED_MODULE_1__shared_util__["b" /* dispatchWindowEvent */]('annotationHoverIn', e.detail);
+            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('annotationHoverIn', e.detail);
         });
 
         iframeWindow.addEventListener('annotationHoverOut' , e => {
-            __WEBPACK_IMPORTED_MODULE_1__shared_util__["b" /* dispatchWindowEvent */]('annotationHoverOut', e.detail);
+            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('annotationHoverOut', e.detail);
         });
 
         iframeWindow.addEventListener('annotationSelected' , e => {
-            __WEBPACK_IMPORTED_MODULE_1__shared_util__["b" /* dispatchWindowEvent */]('annotationSelected', e.detail);
+            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('annotationSelected', e.detail);
         });
 
         iframeWindow.addEventListener('annotationDeselected' , () => {
-            __WEBPACK_IMPORTED_MODULE_1__shared_util__["b" /* dispatchWindowEvent */]('annotationDeselected');
+            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('annotationDeselected');
         });
 
         iframeWindow.addEventListener('digit1Pressed' , () => {
-            __WEBPACK_IMPORTED_MODULE_1__shared_util__["b" /* dispatchWindowEvent */]('digit1Pressed');
+            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('digit1Pressed');
         });
 
         iframeWindow.addEventListener('digit2Pressed' , () => {
-            __WEBPACK_IMPORTED_MODULE_1__shared_util__["b" /* dispatchWindowEvent */]('digit2Pressed');
+            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('digit2Pressed');
         });
 
         iframeWindow.addEventListener('digit3Pressed' , () => {
-            __WEBPACK_IMPORTED_MODULE_1__shared_util__["b" /* dispatchWindowEvent */]('digit3Pressed');
+            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('digit3Pressed');
         });
 
         iframeWindow.addEventListener('digit4Pressed' , () => {
-            __WEBPACK_IMPORTED_MODULE_1__shared_util__["b" /* dispatchWindowEvent */]('digit4Pressed');
+            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('digit4Pressed');
         });
     }
 
@@ -11665,7 +11786,7 @@ class PDFAnnoPage {
      * @return {Promise}
      */
     loadFiles(files) {
-        return __WEBPACK_IMPORTED_MODULE_0__loadFiles__["a" /* default */](files).then(result => {
+        return __WEBPACK_IMPORTED_MODULE_1__loadFiles__["a" /* default */](files).then(result => {
             this.contentFiles = result.contents.map(c => {
                 return Object.assign(c, {
                     selected : false
@@ -11762,7 +11883,7 @@ class PDFAnnoPage {
 
         // Check empty.
         if (!rects) {
-            return alert('Please select a text span first.');
+            return __WEBPACK_IMPORTED_MODULE_0_anno_ui__["ui"].alertDialog.show({ message : 'Please select a text span first.' });
         }
 
         // Check duplicated.
@@ -11820,7 +11941,7 @@ class PDFAnnoPage {
         });
 
         if (selectedAnnotations.length < 2) {
-            return alert('Please select two annotations first.');
+            return __WEBPACK_IMPORTED_MODULE_0_anno_ui__["ui"].alertDialog.show({ message : 'Please select two annotations first.' });
         }
 
         const first  = selectedAnnotations[selectedAnnotations.length - 2];
@@ -11832,8 +11953,8 @@ class PDFAnnoPage {
                         .getAllAnnotations()
                         .filter(a => a.type === 'relation')
                         .filter(a => {
-                            return __WEBPACK_IMPORTED_MODULE_1__shared_util__["a" /* anyOf */](a.rel1Annotation.uuid, [first.uuid, second.uuid])
-                                    && __WEBPACK_IMPORTED_MODULE_1__shared_util__["a" /* anyOf */](a.rel2Annotation.uuid, [first.uuid, second.uuid])
+                            return __WEBPACK_IMPORTED_MODULE_2__shared_util__["a" /* anyOf */](a.rel1Annotation.uuid, [first.uuid, second.uuid])
+                                    && __WEBPACK_IMPORTED_MODULE_2__shared_util__["a" /* anyOf */](a.rel2Annotation.uuid, [first.uuid, second.uuid])
                         });
 
         if (arrows.length > 0) {
