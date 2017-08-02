@@ -1,3 +1,5 @@
+import * as annoUI from 'anno-ui';
+
 import loadFiles from './loadFiles';
 import { anyOf, dispatchWindowEvent } from '../../shared/util';
 
@@ -238,7 +240,7 @@ export default class PDFAnnoPage {
 
         // Check empty.
         if (!rects) {
-            return alert('Please select a text span first.');
+            return annoUI.ui.alertDialog.show({ message : 'Please select a text span first.' });
         }
 
         // Check duplicated.
@@ -296,7 +298,7 @@ export default class PDFAnnoPage {
         });
 
         if (selectedAnnotations.length < 2) {
-            return alert('Please select two annotations first.');
+            return annoUI.ui.alertDialog.show({ message : 'Please select two annotations first.' });
         }
 
         const first  = selectedAnnotations[selectedAnnotations.length - 2];
