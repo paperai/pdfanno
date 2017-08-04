@@ -11,27 +11,8 @@ const app = express();
 app.use(bodyParser.json({ limit : '50mb' }));
 app.use(bodyParser.urlencoded({ limit : '50mb', expented : true }));
 
-
-//============ Settings for local development (from) ==================//
-// Routing for static files.
-let STATIC_ROOT = path.join('..', (process.env.NODE_ENV === 'production' ? 'docs' : 'dist'));
-app.use('/dist', express.static(path.resolve(__dirname, STATIC_ROOT, 'dist')));
-app.use('/pages', express.static(path.resolve(__dirname, STATIC_ROOT, 'pages')));
-app.use('/build', express.static(path.resolve(__dirname, STATIC_ROOT, 'build')));
-app.use('/pdfs', express.static(path.resolve(__dirname, STATIC_ROOT, 'pdfs')));
-app.use('/pdfanno.core.bundle.js', express.static(path.resolve(__dirname, STATIC_ROOT, 'pdfanno.core.bundle.js')));
-app.use('/pdfanno.page.bundle.js', express.static(path.resolve(__dirname, STATIC_ROOT, 'pdfanno.page.bundle.js')));
-app.get('/', function(req, res) {
-    res.type('html');
-    res.send(fs.readFileSync(path.resolve(__dirname, STATIC_ROOT, 'index.html')));
-});
-//============ Settings for local development (to) ==================//
-
-
 // Rooting(API) : Uploading a pdf.
 app.post('/api/pdf_upload', (req, res) => {
-
-    console.log('Object.keys(req.body)[0]:', Object.keys(req.body)[0].slice(0,100))
 
     const fileName = 'tmp.pdf';
     const contentBase64 = Object.keys(req.body)[0].replace('data:application/pdf;base64,', '');
