@@ -76,7 +76,7 @@ app.get('/api/test', (req, res) => {
         // TODO パスは仮.
         const pdfPath = path.resolve(__dirname, 'server-data', 'tmp.pdf');
         const jarPath = path.resolve(__dirname, 'pdfreader.jar');
-        const cmd = `java -classpath pdfreader.jar TextDrawImageExtractor ${pdfPath}`;
+        const cmd = `java -classpath ${jarPath} TextDrawImageExtractor ${pdfPath}`;
         console.log('cmd:', cmd);
         return execCommand(cmd);
 
@@ -86,17 +86,17 @@ app.get('/api/test', (req, res) => {
         console.log('stdout:', stdout);
         console.log('stderr:', stderr);
 
-        res.send('OK');
-
+        res.send(stdout);
 
     }).catch((result) => {
 
         console.log('error. result=', result);
-        console.log('err:', result.err);
-        console.log('stdout:', result.stdout);
-        console.log('stderr:', result.stderr);
 
-        res.send('NG. reason=' + err);
+        if (result.err) {
+            res.send('NG. reason=' + result.err);
+        } else {
+            res.send('NG');
+        }
 
     });
 
@@ -142,7 +142,7 @@ app.listen(port, function() {
 
 function execCommand(command) {
     return new Promise((resolve, reject) => {
-        exec(command, (err, stdout, stderr) => {
+        exec(command, { maxBuffer : 1024 * 1024 * 50 }, (err, stdout, stderr) => {
             if (err) {
                 reject({ err, stdout, stderr });
             }
