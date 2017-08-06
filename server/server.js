@@ -1,5 +1,7 @@
 const path = require('path');
 const fs = require('fs');
+const exec = require('child_process').exec;
+
 const request = require('request');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -25,9 +27,81 @@ app.post('/api/pdf_upload', (req, res) => {
     }
     fs.writeFileSync(path.resolve(__dirname, 'server-data', fileName), buf);
 
+
     // Response the result.
     res.json({ status : 'OK' });
 });
+
+app.get('/api/test', (req, res) => {
+
+    // Check java command exists.
+    execCommand('java -version').then(({ stdout, stderr }) => {
+
+
+        return new Promise((resolve, reject) => {
+
+            const exists = fs.existsSync(path.resolve(__dirname, 'pdfreader.jar'));
+            console.log('exists:', exists);
+
+            if (!exists) {
+
+                const reqConfig = {
+                    method   : 'GET',
+                    url      : 'https://cl.naist.jp/~shindo/pdfreader.jar',
+                    encoding : null
+                };
+
+                request(reqConfig, function(err, response, buf) {
+                    console.log('request:err:', err);
+                    console.log('request:response:', response);
+                    console.log('request:buf:', buf);
+
+                    if (err) {
+                        reject(err);
+                    }
+
+                    fs.writeFileSync(path.resolve(__dirname, 'pdfreader.jar'), buf);
+
+                    resolve();
+                });
+
+            } else {
+                resolve();
+            }
+
+        });
+
+    }).then(() => {
+
+        // TODO パスは仮.
+        const pdfPath = path.resolve(__dirname, 'server-data', 'tmp.pdf');
+        const jarPath = path.resolve(__dirname, 'pdfreader.jar');
+        const cmd = `java -classpath pdfreader.jar TextDrawImageExtractor ${pdfPath}`;
+        console.log('cmd:', cmd);
+        return execCommand(cmd);
+
+    }).then(({ stdout, stderr }) => {
+
+
+        console.log('stdout:', stdout);
+        console.log('stderr:', stderr);
+
+        res.send('OK');
+
+
+    }).catch((result) => {
+
+        console.log('error. result=', result);
+        console.log('err:', result.err);
+        console.log('stdout:', result.stdout);
+        console.log('stderr:', result.stderr);
+
+        res.send('NG. reason=' + err);
+
+    });
+
+});
+
 
 // Routing: PDF Loader.
 // example:
@@ -64,3 +138,15 @@ console.log('PORT:', port);
 app.listen(port, function() {
     console.log(`Express app listening on port ${port}.`);
 });
+
+
+function execCommand(command) {
+    return new Promise((resolve, reject) => {
+        exec(command, (err, stdout, stderr) => {
+            if (err) {
+                reject({ err, stdout, stderr });
+            }
+            resolve({ stdout, stderr });
+        });
+    });
+}
