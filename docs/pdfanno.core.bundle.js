@@ -18822,66 +18822,7 @@ let ANNO_VERSION = packageJson.version;
 /* 41 */
 /***/ (function(module, exports) {
 
-module.exports = {
-	"name": "pdfanno",
-	"version": "0.2.0",
-	"description": "",
-	"main": "index.js",
-	"scripts": {
-		"_prepare": "gulp prepare",
-		"dev": "npm run _prepare && webpack-dev-server --inline",
-		"watch": "npm run _prepare && webpack --watch",
-		"publish": "npm run _prepare && cross-env NODE_ENV=production webpack && gulp publish",
-		"server": "cross-env NODE_ENV=production node server/server.js",
-		"server-dev": "cross-env NODE_PORT=3000 ./node_modules/.bin/node-dev server/server.js"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/paperai/pdfanno"
-	},
-	"author": "hshindo, yoheiMune",
-	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/paperai/pdfanno/issues"
-	},
-	"homepage": "https://github.com/paperai/pdfanno#readme",
-	"devDependencies": {
-		"babel-cli": "^6.24.1",
-		"babel-core": "^6.25.0",
-		"babel-loader": "6.2.4",
-		"babel-plugin-add-module-exports": "^0.2.1",
-		"babel-preset-es2015": "^6.24.1",
-		"babel-preset-stage-1": "^6.24.1",
-		"copy": "^0.3.0",
-		"cpr": "^2.2.0",
-		"cross-env": "^5.0.0",
-		"css-loader": "^0.25.0",
-		"deep-assign": "^2.0.0",
-		"file-loader": "^0.9.0",
-		"fs-extra": "^1.0.0",
-		"gulp": "^3.9.1",
-		"gulp-cli": "^1.3.0",
-		"node-dev": "^3.1.3",
-		"style-loader": "^0.13.2",
-		"vinyl-source-stream": "^1.1.0",
-		"webpack": "3.0.0",
-		"webpack-dev-server": "^1.16.5",
-		"webpack-livereload-plugin": "^0.11.0"
-	},
-	"dependencies": {
-		"anno-ui": "^0.2.0",
-		"axios": "^0.15.2",
-		"body-parser": "^1.17.2",
-		"create-stylesheet": "^0.3.0",
-		"express": "^4.15.3",
-		"jquery": "^3.2.1",
-		"json-loader": "^0.5.4",
-		"multer": "^1.3.0",
-		"request": "^2.81.0",
-		"requirejs": "^2.3.3",
-		"toml": "github:yoheiMune/toml-node"
-	}
-};
+module.exports = {"name":"pdfanno","version":"0.2.0","description":"","main":"index.js","scripts":{"_prepare":"gulp prepare","dev":"npm run _prepare && webpack-dev-server --inline","watch":"npm run _prepare && webpack --watch","publish":"npm run _prepare && cross-env NODE_ENV=production webpack && gulp publish","server":"cross-env NODE_ENV=production node server/server.js","server-dev":"cross-env NODE_PORT=3000 ./node_modules/.bin/node-dev server/server.js"},"repository":{"type":"git","url":"git+https://github.com/paperai/pdfanno"},"author":"hshindo, yoheiMune","license":"MIT","bugs":{"url":"https://github.com/paperai/pdfanno/issues"},"homepage":"https://github.com/paperai/pdfanno#readme","devDependencies":{"babel-cli":"^6.24.1","babel-core":"^6.25.0","babel-loader":"6.2.4","babel-plugin-add-module-exports":"^0.2.1","babel-preset-es2015":"^6.24.1","babel-preset-stage-1":"^6.24.1","copy":"^0.3.0","cpr":"^2.2.0","cross-env":"^5.0.0","css-loader":"^0.25.0","deep-assign":"^2.0.0","file-loader":"^0.9.0","fs-extra":"^1.0.0","gulp":"^3.9.1","gulp-cli":"^1.3.0","node-dev":"^3.1.3","style-loader":"^0.13.2","vinyl-source-stream":"^1.1.0","webpack":"3.0.0","webpack-dev-server":"^1.16.5","webpack-livereload-plugin":"^0.11.0"},"dependencies":{"anno-ui":"^0.2.0","axios":"^0.15.2","body-parser":"^1.17.2","create-stylesheet":"^0.3.0","express":"^4.15.3","jquery":"^3.2.1","json-loader":"^0.5.4","multer":"^1.3.0","request":"^2.81.0","requirejs":"^2.3.3","toml":"github:yoheiMune/toml-node"}}
 
 /***/ }),
 /* 42 */
@@ -18943,91 +18884,40 @@ function render(svg, viewport, data) {
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/*
-object-assign
-(c) Sindre Sorhus
-@license MIT
-*/
 
-
-/* eslint-disable no-unused-vars */
-var getOwnPropertySymbols = Object.getOwnPropertySymbols;
-var hasOwnProperty = Object.prototype.hasOwnProperty;
 var propIsEnumerable = Object.prototype.propertyIsEnumerable;
 
-function toObject(val) {
-	if (val === null || val === undefined) {
+function ToObject(val) {
+	if (val == null) {
 		throw new TypeError('Object.assign cannot be called with null or undefined');
 	}
 
 	return Object(val);
 }
 
-function shouldUseNative() {
-	try {
-		if (!Object.assign) {
-			return false;
-		}
+function ownEnumerableKeys(obj) {
+	var keys = Object.getOwnPropertyNames(obj);
 
-		// Detect buggy property enumeration order in older V8 versions.
-
-		// https://bugs.chromium.org/p/v8/issues/detail?id=4118
-		var test1 = new String('abc');  // eslint-disable-line no-new-wrappers
-		test1[5] = 'de';
-		if (Object.getOwnPropertyNames(test1)[0] === '5') {
-			return false;
-		}
-
-		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
-		var test2 = {};
-		for (var i = 0; i < 10; i++) {
-			test2['_' + String.fromCharCode(i)] = i;
-		}
-		var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
-			return test2[n];
-		});
-		if (order2.join('') !== '0123456789') {
-			return false;
-		}
-
-		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
-		var test3 = {};
-		'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
-			test3[letter] = letter;
-		});
-		if (Object.keys(Object.assign({}, test3)).join('') !==
-				'abcdefghijklmnopqrst') {
-			return false;
-		}
-
-		return true;
-	} catch (err) {
-		// We don't expect any of the above to throw, but better to be safe.
-		return false;
+	if (Object.getOwnPropertySymbols) {
+		keys = keys.concat(Object.getOwnPropertySymbols(obj));
 	}
+
+	return keys.filter(function (key) {
+		return propIsEnumerable.call(obj, key);
+	});
 }
 
-module.exports = shouldUseNative() ? Object.assign : function (target, source) {
+module.exports = Object.assign || function (target, source) {
 	var from;
-	var to = toObject(target);
-	var symbols;
+	var keys;
+	var to = ToObject(target);
 
 	for (var s = 1; s < arguments.length; s++) {
-		from = Object(arguments[s]);
+		from = arguments[s];
+		keys = ownEnumerableKeys(Object(from));
 
-		for (var key in from) {
-			if (hasOwnProperty.call(from, key)) {
-				to[key] = from[key];
-			}
-		}
-
-		if (getOwnPropertySymbols) {
-			symbols = getOwnPropertySymbols(from);
-			for (var i = 0; i < symbols.length; i++) {
-				if (propIsEnumerable.call(from, symbols[i])) {
-					to[symbols[i]] = from[symbols[i]];
-				}
-			}
+		for (var i = 0; i < keys.length; i++) {
+			to[keys[i]] = from[keys[i]];
 		}
 	}
 
@@ -19998,7 +19888,7 @@ exports = module.exports = __webpack_require__(11)();
 
 
 // module
-exports.push([module.i, "\n/**\n * Utilities.\n */\n.\\--hide {\n  display: none;\n}\n.no-action {\n    pointer-events: none;\n}\n\n/**\n * SVGLayer.\n */\n.annoLayer {}\n.annoLayer > *.\\--viewMode {\n  opacity: 0.5;\n}\n.annoLayer > *.\\--viewMode.\\--emphasis {\n  opacity: 1;\n}\n\n#tmpLayer {\n    pointer-events: auto;\n}\n\n/**\n    Annotation related.\n*/\n.anno-circle {\n    transition:0.2s;\n    transform-origin: center center;\n}\n.\\--hover .anno-circle {\n  box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;\n  /*transform: scale(2);*/\n  stroke: blue;\n  stroke-width: 5px;\n}\n\n.\\--hover .anno-span {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-span {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n/**\n  Relation.\n*/\n.anno-relation {\n  transition:0.2s;\n}\n.\\--hover .anno-relation {\n  stroke-width: 2px;\n}\n.\\--selected .anno-relation {\n}\n.anno-relation-outline {\n  fill: none;\n  visibility: hidden;\n}\n.\\--selected .anno-relation-outline {\n  visibility: visible;\n  stroke: black;\n  stroke-width: 2.85px;\n  pointer-events: stroke;\n  stroke-dasharray: 3;\n}\n\n/**\n * Span.\n */\n.anno-span {}\n.anno-span rect {\n    /* Enable the hover event on circles and text even if they are overwraped other spans. */\n    pointer-events: none;\n}\n\n/**\n  Rect.\n*/\n.anno-rect {\n}\n.\\--hover .anno-rect {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-rect {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n\n/**\n  Text.\n*/\n.anno-text-group, .anno-text-group.\\--viewMode {\n    transition: 0.2s;\n    opacity: 0.01; /* for enabling a hover event. */\n}\n.anno-text-group.\\--hover,\n.anno-text-group.\\--selected,\n.anno-text-group.\\--visible {\n    opacity: 1;\n}\n.anno-text-group text {\n    /* Disable span action when selecting an anno text. */\n    user-select: none;\n}\n.anno-text {\n}\n.\\--hover .anno-text {\n  fill: rgba(255, 255, 255, 1.0);\n  stroke: black;\n  stroke-width: 0.75px;\n}\n.\\--hover .anno-text ~ text {\n  fill: rgba(255, 0, 0, 1.0);\n}\n.\\--selected .anno-text {\n  stroke: rgba(255, 0, 0, 1.0);\n  stroke-width: 1.5px;\n  fill: rgba(255, 232, 188, 1.0);\n  stroke-dasharray: 3;\n}\n.\\--selected .anno-text ~ text {\n  fill: rgba(0, 0, 0, 1.0);\n}\n\n/**\n Disable text layers.\n*/\nbody.disable-text-layer .textLayer {\n    display: none;\n}\n\n", ""]);
+exports.push([module.i, "\r\n/**\r\n * Utilities.\r\n */\r\n.\\--hide {\r\n  display: none;\r\n}\r\n.no-action {\r\n    pointer-events: none;\r\n}\r\n\r\n/**\r\n * SVGLayer.\r\n */\r\n.annoLayer {}\r\n.annoLayer > *.\\--viewMode {\r\n  opacity: 0.5;\r\n}\r\n.annoLayer > *.\\--viewMode.\\--emphasis {\r\n  opacity: 1;\r\n}\r\n\r\n#tmpLayer {\r\n    pointer-events: auto;\r\n}\r\n\r\n/**\r\n    Annotation related.\r\n*/\r\n.anno-circle {\r\n    transition:0.2s;\r\n    transform-origin: center center;\r\n}\r\n.\\--hover .anno-circle {\r\n  box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;\r\n  /*transform: scale(2);*/\r\n  stroke: blue;\r\n  stroke-width: 5px;\r\n}\r\n\r\n.\\--hover .anno-span {\r\n  /*html*/\r\n  box-shadow: 0 0 0 1px #ccc inset;\r\n  /*svg*/\r\n  stroke: #ccc;\r\n  stroke-width: 0.75px;\r\n}\r\n.\\--selected .anno-span {\r\n  stroke: black;\r\n  stroke-width: 0.5px;\r\n  stroke-dasharray: 3;\r\n}\r\n/**\r\n  Relation.\r\n*/\r\n.anno-relation {\r\n  transition:0.2s;\r\n}\r\n.\\--hover .anno-relation {\r\n  stroke-width: 2px;\r\n}\r\n.\\--selected .anno-relation {\r\n}\r\n.anno-relation-outline {\r\n  fill: none;\r\n  visibility: hidden;\r\n}\r\n.\\--selected .anno-relation-outline {\r\n  visibility: visible;\r\n  stroke: black;\r\n  stroke-width: 2.85px;\r\n  pointer-events: stroke;\r\n  stroke-dasharray: 3;\r\n}\r\n\r\n/**\r\n * Span.\r\n */\r\n.anno-span {}\r\n.anno-span rect {\r\n    /* Enable the hover event on circles and text even if they are overwraped other spans. */\r\n    pointer-events: none;\r\n}\r\n\r\n/**\r\n  Rect.\r\n*/\r\n.anno-rect {\r\n}\r\n.\\--hover .anno-rect {\r\n  /*html*/\r\n  box-shadow: 0 0 0 1px #ccc inset;\r\n  /*svg*/\r\n  stroke: #ccc;\r\n  stroke-width: 0.75px;\r\n}\r\n.\\--selected .anno-rect {\r\n  stroke: black;\r\n  stroke-width: 0.5px;\r\n  stroke-dasharray: 3;\r\n}\r\n\r\n/**\r\n  Text.\r\n*/\r\n.anno-text-group, .anno-text-group.\\--viewMode {\r\n    transition: 0.2s;\r\n    opacity: 0.01; /* for enabling a hover event. */\r\n}\r\n.anno-text-group.\\--hover,\r\n.anno-text-group.\\--selected,\r\n.anno-text-group.\\--visible {\r\n    opacity: 1;\r\n}\r\n.anno-text-group text {\r\n    /* Disable span action when selecting an anno text. */\r\n    user-select: none;\r\n}\r\n.anno-text {\r\n}\r\n.\\--hover .anno-text {\r\n  fill: rgba(255, 255, 255, 1.0);\r\n  stroke: black;\r\n  stroke-width: 0.75px;\r\n}\r\n.\\--hover .anno-text ~ text {\r\n  fill: rgba(255, 0, 0, 1.0);\r\n}\r\n.\\--selected .anno-text {\r\n  stroke: rgba(255, 0, 0, 1.0);\r\n  stroke-width: 1.5px;\r\n  fill: rgba(255, 232, 188, 1.0);\r\n  stroke-dasharray: 3;\r\n}\r\n.\\--selected .anno-text ~ text {\r\n  fill: rgba(0, 0, 0, 1.0);\r\n}\r\n\r\n/**\r\n Disable text layers.\r\n*/\r\nbody.disable-text-layer .textLayer {\r\n    display: none;\r\n}\r\n\r\n", ""]);
 
 // exports
 
