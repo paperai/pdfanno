@@ -2,6 +2,9 @@ const path = require('path');
 const fs = require('fs');
 const exec = require('child_process').exec;
 
+let multer = require('multer');
+let upload = multer();
+
 const request = require('request');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -14,94 +17,35 @@ app.use(bodyParser.json({ limit : '50mb' }));
 app.use(bodyParser.urlencoded({ limit : '50mb', expented : true }));
 
 // Rooting(API) : Uploading a pdf.
-app.post('/api/pdf_upload', (req, res) => {
+app.post('/api/pdf_upload', upload.fields([]), (req, res) => {
 
-    const fileName = 'tmp.pdf';
-    const contentBase64 = Object.keys(req.body)[0].replace('data:application/pdf;base64,', '');
-    const buf = Buffer.from(contentBase64, 'base64');
-    console.log(`${fileName} is uploaded. fileSize=${Math.floor(buf.length / 1024)}KB`);
+    console.log('keys:', Object.keys(req.body));
+
+    const fileName = req.body.filename;
+    console.log('fileName:', fileName);
+    // const contentBase64 = Object.keys(req.body)[0].replace('data:application/pdf;base64,', '');
+    // const contentBase64 = Object.keys(req.body)[0];
+    // console.log('base64.length:', contentBase64.length, contentBase64.slice(0, 100));
+    const buf = Buffer.from(req.body.pdf, 'base64');
+    // const buf = req.body.file;
+    console.log(`${fileName} is uploaded. fileSize=${buf.length}Bytes`);
 
     // Save to dir.
     if (!fs.existsSync('server-data')) {
         fs.mkdirSync('server-data');
     }
-    fs.writeFileSync(path.resolve(__dirname, 'server-data', fileName), buf);
+    const pdfPath = path.resolve(__dirname, 'server-data', fileName);
+    fs.writeFileSync(pdfPath, buf);
 
-
-    // Response the result.
-    res.json({ status : 'OK' });
-});
-
-app.get('/api/test', (req, res) => {
-
-    // Check java command exists.
-    execCommand('java -version').then(({ stdout, stderr }) => {
-
-
-        return new Promise((resolve, reject) => {
-
-            const exists = fs.existsSync(path.resolve(__dirname, 'pdfreader.jar'));
-            console.log('exists:', exists);
-
-            if (!exists) {
-
-                const reqConfig = {
-                    method   : 'GET',
-                    url      : 'https://cl.naist.jp/~shindo/pdfreader.jar',
-                    encoding : null
-                };
-
-                request(reqConfig, function(err, response, buf) {
-                    console.log('request:err:', err);
-                    console.log('request:response:', response);
-                    console.log('request:buf:', buf);
-
-                    if (err) {
-                        reject(err);
-                    }
-
-                    fs.writeFileSync(path.resolve(__dirname, 'pdfreader.jar'), buf);
-
-                    resolve();
-                });
-
-            } else {
-                resolve();
-            }
-
-        });
-
-    }).then(() => {
-
-        // TODO パスは仮.
-        const pdfPath = path.resolve(__dirname, 'server-data', 'tmp.pdf');
-        const jarPath = path.resolve(__dirname, 'pdfreader.jar');
-        const cmd = `java -classpath ${jarPath} TextDrawImageExtractor ${pdfPath}`;
-        console.log('cmd:', cmd);
-        return execCommand(cmd);
-
-    }).then(({ stdout, stderr }) => {
-
-
-        console.log('stdout:', stdout);
-        console.log('stderr:', stderr);
-
-        res.send(stdout);
-
-    }).catch((result) => {
-
-        console.log('error. result=', result);
-
-        if (result.err) {
-            res.send('NG. reason=' + result.err);
-        } else {
-            res.send('NG');
-        }
-
+    // Analyze PDF contents.
+    analyzePDF(pdfPath).then(result => {
+        res.json({ status : 'OK', result });
+    }).catch(err => {
+        console.log('analyze:error:', err);
+        res.json({ status : 'NG' , err });
     });
 
 });
-
 
 // Routing: PDF Loader.
 // example:
@@ -138,6 +82,74 @@ console.log('PORT:', port);
 app.listen(port, function() {
     console.log(`Express app listening on port ${port}.`);
 });
+
+
+// Analize pdf with pdfreader.jar.
+function analyzePDF(pdfPath) {
+
+    return new Promise((resolve, reject) => {
+
+        // Check java command exits.
+        execCommand('java -version')
+            .then(resolve)
+            .catch(() => {
+                reject('java command not found.');
+            });
+
+    }).then(() => {
+
+        // Prepare pdfreader.jar
+
+        const exists = fs.existsSync(path.resolve(__dirname, 'pdfreader.jar'));
+        if (exists) {
+            return;
+        }
+
+        return new Promise((resolve, reject) => {
+
+            const reqConfig = {
+                method   : 'GET',
+                url      : 'https://cl.naist.jp/~shindo/pdfreader.jar',
+                encoding : null
+            };
+
+            request(reqConfig, function(err, response, buf) {
+                console.log('request:err:', err);
+                console.log('request:response:', response);
+                console.log('request:buf:', buf);
+
+                if (err) {
+                    reject(err);
+                }
+
+                fs.writeFileSync(path.resolve(__dirname, 'pdfreader.jar'), buf);
+
+                resolve();
+            });
+        });
+
+    }).then(() => {
+
+        const jarPath = path.resolve(__dirname, 'pdfreader.jar');
+        const cmd = `java -classpath ${jarPath} TextDrawImageExtractor ${pdfPath}`;
+        console.log('cmd:', cmd);
+        return execCommand(cmd);
+
+    }).then(({ stdout, stderr }) => {
+
+        console.log('stdout:', stdout);
+        console.log('stderr:', stderr);
+
+        return stdout;
+    });
+}
+
+
+
+
+
+
+
 
 
 function execCommand(command) {
