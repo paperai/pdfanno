@@ -17,11 +17,12 @@ import PDFAnnoPage from './page/pdf/PDFAnnoPage';
 /**
  * API root point.
  */
-let API_ROOT = 'http://localhost:3000';
+let API_ROOT = 'http://localhost:8080';
 if (process.env.NODE_ENV === 'production') {
     console.log('PRODUCTION MODE');
     API_ROOT = 'https://pdfanno.hshindo.com';
 }
+window.API_ROOT = API_ROOT;
 
 /**
  * Global variable.
