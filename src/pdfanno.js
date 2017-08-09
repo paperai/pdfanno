@@ -22,6 +22,7 @@ if (process.env.NODE_ENV === 'production') {
     console.log('PRODUCTION MODE');
     API_ROOT = 'https://pdfanno.hshindo.com';
 }
+window.API_ROOT = API_ROOT;
 
 /**
  * Global variable.

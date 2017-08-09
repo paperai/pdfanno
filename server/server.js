@@ -39,10 +39,10 @@ app.post('/api/pdf_upload', upload.fields([]), (req, res) => {
 
     // Analyze PDF contents.
     analyzePDF(pdfPath).then(result => {
-        res.json({ status : 'OK', result });
+        res.json({ status : 'success', text : result });
     }).catch(err => {
         console.log('analyze:error:', err);
-        res.json({ status : 'NG' , err });
+        res.json({ status : 'failure' , err });
     });
 
 });
