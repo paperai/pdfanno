@@ -19,22 +19,19 @@ app.use(bodyParser.urlencoded({ limit : '50mb', expented : true }));
 // Rooting(API) : Uploading a pdf.
 app.post('/api/pdf_upload', upload.fields([]), (req, res) => {
 
-    console.log('keys:', Object.keys(req.body));
-
+    // Get an uploaded file.
     const fileName = req.body.filename;
     console.log('fileName:', fileName);
-    // const contentBase64 = Object.keys(req.body)[0].replace('data:application/pdf;base64,', '');
-    // const contentBase64 = Object.keys(req.body)[0];
-    // console.log('base64.length:', contentBase64.length, contentBase64.slice(0, 100));
     const buf = Buffer.from(req.body.pdf, 'base64');
-    // const buf = req.body.file;
     console.log(`${fileName} is uploaded. fileSize=${buf.length}Bytes`);
 
+
     // Save to dir.
-    if (!fs.existsSync('server-data')) {
-        fs.mkdirSync('server-data');
+    const dataPath = path.resolve(__dirname, 'server-data');
+    if (!fs.existsSync(dataPath)) {
+            fs.mkdirSync(dataPath);
     }
-    const pdfPath = path.resolve(__dirname, 'server-data', fileName);
+    const pdfPath = path.resolve(dataPath, fileName);
     fs.writeFileSync(pdfPath, buf);
 
     // Analyze PDF contents.
@@ -114,9 +111,6 @@ function analyzePDF(pdfPath) {
             };
 
             request(reqConfig, function(err, response, buf) {
-                console.log('request:err:', err);
-                console.log('request:response:', response);
-                console.log('request:buf:', buf);
 
                 if (err) {
                     reject(err);
@@ -137,21 +131,11 @@ function analyzePDF(pdfPath) {
 
     }).then(({ stdout, stderr }) => {
 
-        console.log('stdout:', stdout);
-        console.log('stderr:', stderr);
-
         return stdout;
     });
 }
 
-
-
-
-
-
-
-
-
+// Execute an external command.
 function execCommand(command) {
     return new Promise((resolve, reject) => {
         exec(command, { maxBuffer : 1024 * 1024 * 50 }, (err, stdout, stderr) => {
