@@ -67,9 +67,31 @@ app.get('/load_pdf', (req, res) => {
     };
 
     request(reqConfig, function(error, response, body) {
-        res.setHeader('Content-Length', body.length);
-        res.write(body, 'binary');
-        res.end();
+
+        // Save as temporary.
+        const tmpFileName = Date.now() + '.pdf';
+        pdfService.savePDF(tmpFileName, body).then(pdfPath => {
+
+            // Analyze.
+            return pdfService.analyzePDF(pdfPath);
+
+        }).then(analyzeResult => {
+
+            // Response as success.
+            res.json({
+                status : 'success',
+                pdf    : new Buffer(body).toString('base64'),
+                analyzeResult,
+            });
+
+        }).catch(err => {
+
+            // Response as error.
+            res.json({
+                status : 'failure',
+                err    : err
+            });
+        })
     });
 });
 

@@ -2,11 +2,13 @@
  * Service - PDF related.
  */
 const path = require('path');
+const fs = require('fs');
+const exec = require('child_process').exec;
 
 /**
  * Save a PDF file, and return the saved path.
  */
-module.export = function savePDF(fileName, content) {
+module.exports.savePDF = (fileName, content) => {
     return new Promise((resolve, reject) => {
 
         const dataPath = path.resolve(__dirname, 'server-data');
@@ -21,7 +23,7 @@ module.export = function savePDF(fileName, content) {
 }
 
 // Analize pdf with pdfreader.jar.
-module.export = function analyzePDF(pdfPath) {
+module.exports.analyzePDF = (pdfPath) => {
 
     return new Promise((resolve, reject) => {
 

@@ -244,9 +244,14 @@ window.addEventListener('DOMContentLoaded', e => {
         // Load a PDF as ArrayBuffer.
         var xhr = new XMLHttpRequest();
         xhr.open('GET', API_ROOT + '/load_pdf?url=' + window.encodeURIComponent(pdfURL), true);
-        xhr.responseType = 'arraybuffer';
+        // xhr.responseType = 'arraybuffer';
+        xhr.responseType = 'json';
         xhr.onload = function () {
             if (this.status === 200) {
+
+                console.log('this.response=', this.response);
+
+                const pdf = Uint8Array.from(atob(this.response.pdf), c => c.charCodeAt(0));
 
                 // Init viewer.
                 window.annoPage.initializeViewer(null);
@@ -255,7 +260,7 @@ window.addEventListener('DOMContentLoaded', e => {
 
                 window.addEventListener('iframeReady', () => {
                     setTimeout(() => {
-                        window.annoPage.displayViewer({ content : this.response });
+                        window.annoPage.displayViewer({ content : pdf });
                     }, 500);
                 });
 
@@ -265,6 +270,13 @@ window.addEventListener('DOMContentLoaded', e => {
                         $('#pdfLoading').addClass('hidden');
                     }, 1000);
                 });
+
+                // Set the analyzeResult.
+                annoUI.uploadButton.setResult(this.response.analyzeResult);
+
+                // Display upload tab.
+                $('a[href="#tab2"]').click();
+
             }
         };
         xhr.timeout = 120 * 1000; // 120s
@@ -274,6 +286,10 @@ window.addEventListener('DOMContentLoaded', e => {
                 annoUI.ui.alertDialog.show({ message : 'Failed to load the PDF.' });
             }, 100);
         };
+        xhr.onerror = function(err) {
+            console.log('err:', err);
+            alert('Error: ' + err);
+        }
         xhr.send();
 
     } else {
