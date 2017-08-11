@@ -11895,38 +11895,6 @@ class PDFAnnoPage {
             return __WEBPACK_IMPORTED_MODULE_0_anno_ui__["ui"].alertDialog.show({ message : 'Please select a text span first.' });
         }
 
-        // Check duplicated.
-        let annos = window.iframeWindow.annotationContainer
-                        .getAllAnnotations()
-                        .filter(a => a.type === 'span')
-                        .filter(a => {
-                            if (rects.length !== a.rectangles.length) {
-                                return false;
-                            }
-                            for (let i = 0; i < rects.length; i++) {
-                                if (rects[i].x !== a.rectangles[i].x
-                                    || rects[i].y !== a.rectangles[i].y
-                                    || rects[i].width !== a.rectangles[i].width
-                                    || rects[i].height !== a.rectangles[i].height) {
-                                    return false;
-                                }
-                            }
-                            return true;
-                        });
-
-        if (annos.length > 0) {
-            annos[0].text = text;
-            annos[0].save();
-            // Show label input.
-            var event = document.createEvent('CustomEvent');
-            event.initCustomEvent('enableTextInput', true, true, {
-                uuid : annos[0].uuid,
-                text : annos[0].text
-            });
-            window.dispatchEvent(event);
-            return;
-        }
-
         // Create a new rectAnnotation.
         window.iframeWindow.PDFAnnoCore.default.UI.createSpan({ text });
     }
