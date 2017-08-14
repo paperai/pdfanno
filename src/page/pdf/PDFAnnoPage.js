@@ -2,6 +2,7 @@ import * as annoUI from 'anno-ui';
 
 import loadFiles from './loadFiles';
 import { anyOf, dispatchWindowEvent } from '../../shared/util';
+import { convertToExportY, getPageSize, paddingBetweenPages } from '../../shared/coords';
 
 import {
     listenWindowLeaveEvent,
@@ -481,6 +482,32 @@ export default class PDFAnnoPage {
             iframeWindow.removeAnnoLayer();
             iframeWindow.renderAnno();
         });
+    }
+
+    /**
+     * Scroll window to the annotation.
+     */
+    scrollToAnnotation(id) {
+
+        let annotation = window.annoPage.findAnnotationById(id);
+
+        if (annotation) {
+
+            // scroll to.
+            let _y = annotation.y || annotation.y1 || annotation.rectangles[0].y;
+            let { pageNumber, y } = convertToExportY(_y);
+            let pageHeight = window.annoPage.getViewerViewport().height;
+            let scale = window.annoPage.getViewerViewport().scale;
+            _y = (pageHeight + paddingBetweenPages) * (pageNumber - 1) + y * scale;
+            _y -= 100;
+            $('#viewer iframe').contents().find('#viewer').parent()[0].scrollTop = _y;
+
+            // highlight.
+            annotation.highlight();
+            setTimeout(() => {
+                annotation.dehighlight();
+            }, 1000);
+        }
     }
 
     /**

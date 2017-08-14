@@ -1,6 +1,8 @@
 require("file-loader?name=dist/index.html!./index.html");
 require("!style-loader!css-loader!./pdfanno.css");
 
+import axios from 'axios';
+
 // UI parts.
 import * as annoUI from 'anno-ui';
 
@@ -148,28 +150,7 @@ window.addEventListener('DOMContentLoaded', e => {
 
             return annotations;
         },
-        scrollToAnnotation : id => {
-
-            let annotation = window.annoPage.findAnnotationById(id);
-
-            if (annotation) {
-
-                // scroll to.
-                let _y = annotation.y || annotation.y1 || annotation.rectangles[0].y;
-                let { pageNumber, y } = convertToExportY(_y);
-                let pageHeight = window.annoPage.getViewerViewport().height;
-                let scale = window.annoPage.getViewerViewport().scale;
-                _y = (pageHeight + paddingBetweenPages) * (pageNumber - 1) + y * scale;
-                _y -= 100;
-                $('#viewer iframe').contents().find('#viewer').parent()[0].scrollTop = _y;
-
-                // highlight.
-                annotation.highlight();
-                setTimeout(() => {
-                    annotation.dehighlight();
-                }, 1000);
-            }
-        }
+        scrollToAnnotation : window.annoPage.scrollToAnnotation
     });
 
     // Download button.
@@ -225,12 +206,18 @@ window.addEventListener('DOMContentLoaded', e => {
     // Display a PDF specified via URL query parameter.
 
     let pdfURL;
+    let annoURL;
+    let moveTo;
     (location.search || '').replace('?', '').split('&')
         .filter(a => a)
         .forEach(fragment => {
             let [ key, value ] = fragment.split('=');
             if (key && key.toLowerCase() === 'pdf') {
                 pdfURL = value;
+            } else if (key && key.toLowerCase() === 'anno') {
+                annoURL = value;
+            } else if (key && key.toLowerCase() === 'move') {
+                moveTo = value;
             }
     });
 
@@ -264,12 +251,28 @@ window.addEventListener('DOMContentLoaded', e => {
                     }, 500);
                 });
 
-                window.addEventListener('pagerendered', () => {
+                const listenPageRendered = () => {
                     $('#pdfLoading').addClass('close');
                     setTimeout(function() {
                         $('#pdfLoading').addClass('hidden');
                     }, 1000);
-                });
+
+                    // Load and display annotations, if annoURL is set.
+                    if (annoURL) {
+                        loadExternalAnnoFile(annoURL).then(anno => {
+                            publicApi.addAllAnnotations(publicApi.readTOML(anno));
+
+                            // Move to the annotation.
+                            if (moveTo) {
+                                setTimeout(() => {
+                                    window.annoPage.scrollToAnnotation(moveTo);
+                                }, 500);
+                            }
+                        });
+                    }
+                    window.removeEventListener('pagerendered', listenPageRendered);
+                };
+                window.addEventListener('pagerendered', listenPageRendered);
 
                 // Set the analyzeResult.
                 annoUI.uploadButton.setResult(this.response.analyzeResult);
@@ -312,3 +315,13 @@ window.addEventListener('DOMContentLoaded', e => {
     }
 
 });
+
+function loadExternalAnnoFile(url) {
+    return axios.get(`/api/load_anno?url=${url}`).then(res => {
+        if (res.status !== 200) {
+            annoUI.ui.alertDialog.show({ message : 'Failed to load an anno file. url=' + url });
+            return Promise.reject();
+        }
+        return res.data.anno;
+    });
+}
