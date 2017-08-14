@@ -95,6 +95,42 @@ app.get('/load_pdf', (req, res) => {
     });
 });
 
+/**
+ * Load an external anno file.
+ *
+ * Sample: http://localhost:3000/api/load_anno?url=http://www.yoheim.net/tmp/ex1.anno
+ */
+app.get('/api/load_anno', (req, res) => {
+
+    const annoURL = req.query.url;
+    console.log('annoURL=', annoURL);
+
+    const reqConfig = {
+        method : 'GET',
+        url    : annoURL
+    };
+
+    request(reqConfig, function(error, response, body) {
+
+        console.log('response.status:', response)
+
+        if (response.statusCode !== 200) {
+            return res.json({
+                status : 'failure',
+                error  : error
+            });
+        }
+
+        res.json({
+            status : 'success',
+            anno   : body
+        });
+
+    });
+
+
+});
+
 // Port.
 let port = process.env.NODE_PORT || 1000;
 console.log('PORT:', port);
