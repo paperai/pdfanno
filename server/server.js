@@ -115,6 +115,9 @@ app.get('/api/load_anno', (req, res) => {
         console.log('response.status:', response)
 
         if (response.statusCode !== 200) {
+            if (response.statusCode === 404) {
+                error = 'Resource is not found.';
+            }
             return res.json({
                 status : 'failure',
                 error  : error
