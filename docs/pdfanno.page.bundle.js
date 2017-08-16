@@ -12092,7 +12092,7 @@ window.addEventListener('DOMContentLoaded', e => {
 });
 
 function loadExternalAnnoFile(url) {
-    return __WEBPACK_IMPORTED_MODULE_0_axios___default.a.get(`/api/load_anno?url=${url}`).then(res => {
+    return __WEBPACK_IMPORTED_MODULE_0_axios___default.a.get(`${API_ROOT}/api/load_anno?url=${url}`).then(res => {
         if (res.status !== 200) {
             __WEBPACK_IMPORTED_MODULE_1_anno_ui__["ui"].alertDialog.show({ message : 'Failed to load an anno file. url=' + url });
             return Promise.reject();
