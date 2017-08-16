@@ -12010,8 +12010,14 @@ window.addEventListener('DOMContentLoaded', e => {
         xhr.responseType = 'json';
         xhr.onload = function () {
             if (this.status === 200) {
-
                 console.log('this.response=', this.response);
+
+                // Error handling.
+                if (this.response.status === 'failure') {
+                    let error = this.response.err.stderr || this.response.err;
+                    alert('ERROR\n\n' + error);
+                    return;
+                }
 
                 const pdf = Uint8Array.from(atob(this.response.pdf), c => c.charCodeAt(0));
 
@@ -12093,8 +12099,12 @@ window.addEventListener('DOMContentLoaded', e => {
 
 function loadExternalAnnoFile(url) {
     return __WEBPACK_IMPORTED_MODULE_0_axios___default.a.get(`${API_ROOT}/api/load_anno?url=${url}`).then(res => {
-        if (res.status !== 200) {
-            __WEBPACK_IMPORTED_MODULE_1_anno_ui__["ui"].alertDialog.show({ message : 'Failed to load an anno file. url=' + url });
+        if (res.status !== 200 || res.data.status === 'failure') {
+            let reason = '';
+            if (res.data.error) {
+                reason = '<br>Reason: ' + res.data.error;
+            }
+            __WEBPACK_IMPORTED_MODULE_1_anno_ui__["ui"].alertDialog.show({ message : 'Failed to load an anno file. url=' + url + reason});
             return Promise.reject();
         }
         return res.data.anno;
