@@ -317,7 +317,7 @@ window.addEventListener('DOMContentLoaded', e => {
 });
 
 function loadExternalAnnoFile(url) {
-    return axios.get(`/api/load_anno?url=${url}`).then(res => {
+    return axios.get(`${API_ROOT}/api/load_anno?url=${url}`).then(res => {
         if (res.status !== 200) {
             annoUI.ui.alertDialog.show({ message : 'Failed to load an anno file. url=' + url });
             return Promise.reject();
