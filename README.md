@@ -8,15 +8,17 @@ For natural language processing, it is suitable for development of gold-standard
 [Online Demo](https://paperai.github.io/pdfanno/) (version 0.2)  
 **It is highly recommended to use the latest version of Chrome.** (Firefox will also be supported in future.)
 
-You can also install PDFAnno via npm:
+If you install PDFAnno locally,
+```
+git clone https://github.com/paperai/pdfanno.git
+cd pdfanno
+npm install
+```
+or
 ```
 npm install pdfanno
 ```
-
-## Features
-* Simple and easy-to-use interface.
-* No installation is required.
-* Client-only application, i.e., no communication with a server.
+See the developer's guide for more details.
 
 ## Usage
 1. Visit the [online demo](https://paperai.github.io/pdfanno/) with the latest version of Chrome.
