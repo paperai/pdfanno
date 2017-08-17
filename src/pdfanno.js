@@ -303,21 +303,12 @@ window.addEventListener('DOMContentLoaded', e => {
 
     } else {
 
-        // If no PDF is specified, display the blank viewer.
-
-        $('#viewer').css('opacity', '0');
+        // If no PDF is specified, display a default PDF file.
 
         // Init viewer.
         window.annoPage.initializeViewer();
         // Start application.
         window.annoPage.startViewerApplication();
-
-        const fn = () => {
-            window.annoPage.closePDFViewer();
-            $('#viewer').css('opacity', '1');
-            window.removeEventListener('pagerendered', fn);
-        };
-        window.addEventListener('pagerendered', fn);
     }
 
 });
