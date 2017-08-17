@@ -95,89 +95,89 @@ export default class PdfannoStoreAdapter extends StoreAdapter {
                 });
             },
 
-            exportData() {
-              return new Promise((resolve, reject) => {
+            // exportData() {
+            //   return new Promise((resolve, reject) => {
 
-                    let dataExport = {};
+            //         let dataExport = {};
 
-                    // Set version.
-                    dataExport.version = ANNO_VERSION;
+            //         // Set version.
+            //         dataExport.version = ANNO_VERSION;
 
-                    // Every documents.
-                    let container = _getContainer();
+            //         // Every documents.
+            //         let container = _getContainer();
 
-                    // Annotation index.
-                    let index = 1;
+            //         // Annotation index.
+            //         let index = 1;
 
-                    (container.annotations || []).forEach(annotation => {
+            //         (container.annotations || []).forEach(annotation => {
 
-                        // Rect
-                        if (annotation.type === 'area') {
-                            let key = `${index++}`;
-                            dataExport[key] = {
-                                type     : 'rect',
-                                page     : annotation.page,
-                                position : [ annotation.x, annotation.y, annotation.width, annotation.height ],
-                                label    : annotation.text || ''
-                            };
+            //             // Rect
+            //             if (annotation.type === 'area') {
+            //                 let key = `${index++}`;
+            //                 dataExport[key] = {
+            //                     type     : 'rect',
+            //                     page     : annotation.page,
+            //                     position : [ annotation.x, annotation.y, annotation.width, annotation.height ],
+            //                     label    : annotation.text || ''
+            //                 };
 
-                            // save tmporary for relation.
-                            annotation.key = key;
+            //                 // save tmporary for relation.
+            //                 annotation.key = key;
 
-                        // Span.
-                        } else if (annotation.type === 'span') {
-                            // rectangles.
-                            let rectangles = annotation.rectangles.map(rectangle => {
-                                return [
-                                    rectangle.x,
-                                    rectangle.y,
-                                    rectangle.width,
-                                    rectangle.height
-                                ];
-                            });
+            //             // Span.
+            //             } else if (annotation.type === 'span') {
+            //                 // rectangles.
+            //                 let rectangles = annotation.rectangles.map(rectangle => {
+            //                     return [
+            //                         rectangle.x,
+            //                         rectangle.y,
+            //                         rectangle.width,
+            //                         rectangle.height
+            //                     ];
+            //                 });
 
-                            let text = (annotation.selectedText || '')
-                                        .replace(/\r\n/g, ' ')
-                                        .replace(/\r/g, ' ')
-                                        .replace(/\n/g, ' ')
-                                        .replace(/"/g, '')
-                                        .replace(/\\/g, '');
+            //                 let text = (annotation.selectedText || '')
+            //                             .replace(/\r\n/g, ' ')
+            //                             .replace(/\r/g, ' ')
+            //                             .replace(/\n/g, ' ')
+            //                             .replace(/"/g, '')
+            //                             .replace(/\\/g, '');
 
-                            let key = `${index++}`;
-                            dataExport[key] = {
-                                type     : 'span',
-                                page     : annotation.rectangles[0].page,
-                                position : rectangles,
-                                label    : annotation.text || '',
-                                text
-                            };
+            //                 let key = `${index++}`;
+            //                 dataExport[key] = {
+            //                     type     : 'span',
+            //                     page     : annotation.rectangles[0].page,
+            //                     position : rectangles,
+            //                     label    : annotation.text || '',
+            //                     text
+            //                 };
 
-                            // save tmporary for relation.
-                            annotation.key = key;
+            //                 // save tmporary for relation.
+            //                 annotation.key = key;
 
-                        // Relation.
-                        } else if (annotation.type === 'relation') {
+            //             // Relation.
+            //             } else if (annotation.type === 'relation') {
 
-                            let rel1s = container.annotations.filter(a => a.uuid === annotation.rel1);
-                            let rel1 = rel1s[0];
-                            let rel2s = container.annotations.filter(a => a.uuid === annotation.rel2);
-                            let rel2 = rel2s[0];
+            //                 let rel1s = container.annotations.filter(a => a.uuid === annotation.rel1);
+            //                 let rel1 = rel1s[0];
+            //                 let rel2s = container.annotations.filter(a => a.uuid === annotation.rel2);
+            //                 let rel2 = rel2s[0];
 
-                            dataExport[`${index++}`] = {
-                                type  : 'relation',
-                                dir   : annotation.direction,
-                                ids   : [ rel1.key, rel2.key ],
-                                label : annotation.text || ''
-                            };
+            //                 dataExport[`${index++}`] = {
+            //                     type  : 'relation',
+            //                     dir   : annotation.direction,
+            //                     ids   : [ rel1.key, rel2.key ],
+            //                     label : annotation.text || ''
+            //                 };
 
-                        }
+            //             }
 
-                    });
+            //         });
 
 
-                    resolve(tomlString(dataExport));
-                });
-            },
+            //         resolve(tomlString(dataExport));
+            //     });
+            // },
 
             importAnnotations(data, isPrimary) {
                 return new Promise((resolve, reject) => {

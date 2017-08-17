@@ -478,9 +478,10 @@ export default class PDFAnnoPage {
      * Import annotations from UI.
      */
     importAnnotation(paperData, isPrimary) {
-        iframeWindow.PDFAnnoCore.default.getStoreAdapter().importAnnotations(paperData, isPrimary).then(result => {
-            iframeWindow.removeAnnoLayer();
-            iframeWindow.renderAnno();
+        // iframeWindow.PDFAnnoCore.default.getStoreAdapter().importAnnotations(paperData, isPrimary).then(result => {
+        iframeWindow.annotationContainer.importAnnotations(paperData, isPrimary).then(result => {
+            // iframeWindow.removeAnnoLayer();
+            // iframeWindow.renderAnno();
         });
     }
 
@@ -516,7 +517,8 @@ export default class PDFAnnoPage {
      * @return {Promise}
      */
     exportData() {
-        return window.iframeWindow.PDFAnnoCore.default.getStoreAdapter().exportData();
+        // return window.iframeWindow.PDFAnnoCore.default.getStoreAdapter().exportData();
+        return window.iframeWindow.annotationContainer.exportData();
     }
 
     /**

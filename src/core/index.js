@@ -17,7 +17,7 @@ import PDFAnnoCore from './src/PDFAnnoCore';
 export default PDFAnnoCore;
 // module.exports = PDFAnnoCore;
 
-
+// Create an annocation container.
 import AnnotationContainer from './src/annotation/container';
 window.annotationContainer = new AnnotationContainer();
 
@@ -25,10 +25,8 @@ import RectAnnotation from './src/annotation/rect';
 import SpanAnnotation from './src/annotation/span';
 import RelationAnnotation from './src/annotation/relation';
 
-import appendChild from './src/render/appendChild';
-
 // Setup Storage.
-PDFAnnoCore.setStoreAdapter(new PDFAnnoCore.PdfannoStoreAdapter());
+// PDFAnnoCore.setStoreAdapter(new PDFAnnoCore.PdfannoStoreAdapter());
 
 // Enable a view mode.
 PDFAnnoCore.UI.enableViewMode();
@@ -208,42 +206,42 @@ function renderAnnotations(svg) {
         return;
     }
 
-    let documentId = getFileName(PDFView.url);
-    PDFAnnoCore.getAnnotations(documentId).then(function(annotations) {
-        PDFAnnoCore.getStoreAdapter().getSecondaryAnnotations(documentId).then(function(secondaryAnnotations) {
+    // let documentId = getFileName(PDFView.url);
+    // PDFAnnoCore.getAnnotations(documentId).then(function(annotations) {
+    //     PDFAnnoCore.getStoreAdapter().getSecondaryAnnotations(documentId).then(function(secondaryAnnotations) {
 
-            // Primary + Secondary annotations.
-            annotations.annotations = annotations.annotations.concat(secondaryAnnotations.annotations);
+    //         // Primary + Secondary annotations.
+    //         annotations.annotations = annotations.annotations.concat(secondaryAnnotations.annotations);
 
-            // Render annotations.
-            let viewport = PDFView.pdfViewer.getPageView(0).viewport;
+    //         // Render annotations.
+    //         let viewport = PDFView.pdfViewer.getPageView(0).viewport;
 
-            annotations.annotations.forEach(a => {
+    //         annotations.annotations.forEach(a => {
 
-                // TODO move to annotation/index.js
+    //             // TODO move to annotation/index.js
 
-                let anno = null;
+    //             let anno = null;
 
 
-                if (a.type === 'area') {
-                    anno = RectAnnotation.newInstance(a);
-                } else if (a.type === 'span') {
-                    anno = SpanAnnotation.newInstance(a);
-                } else if (a.type === 'relation') {
-                    anno = RelationAnnotation.newInstance(a);
-                }
+    //             if (a.type === 'area') {
+    //                 anno = RectAnnotation.newInstance(a);
+    //             } else if (a.type === 'span') {
+    //                 anno = SpanAnnotation.newInstance(a);
+    //             } else if (a.type === 'relation') {
+    //                 anno = RelationAnnotation.newInstance(a);
+    //             }
 
-                if (anno) {
-                    anno.render();
-                    anno.enableViewMode();
-                    window.annotationContainer.add(anno);
-                }
-            });
+    //             if (anno) {
+    //                 anno.render();
+    //                 anno.enableViewMode();
+    //                 window.annotationContainer.add(anno);
+    //             }
+    //         });
 
-            var event = document.createEvent('CustomEvent');
-            event.initCustomEvent('annotationrendered', true, true, null);
-            window.dispatchEvent(event);
+    //         var event = document.createEvent('CustomEvent');
+    //         event.initCustomEvent('annotationrendered', true, true, null);
+    //         window.dispatchEvent(event);
 
-        });
-    });
+    //     });
+    // });
 }
