@@ -5,7 +5,7 @@ PDFAnno is a browser-based linguistic annotation tool for PDF documents.
 It offers functions for annotating PDF with labels and relations.  
 For natural language processing, it is suitable for development of gold-standard data with named entity spans, dependency relations, and coreference chains.  
 
-[Online Demo](https://paperai.github.io/pdfanno/?pdf=http://www.aclweb.org/anthology/P12-1046) (version 0.2)  
+[Online Demo](https://paperai.github.io/pdfanno/) (version 0.2)  
 **It is highly recommended to use the latest version of Chrome.** (Firefox will also be supported in future.)
 
 You can also install PDFAnno via npm:
@@ -19,10 +19,13 @@ npm install pdfanno
 * Client-only application, i.e., no communication with a server.
 
 ## Usage
-1. Visit the [online demo](https://paperai.github.io/pdfanno/?pdf=http://www.aclweb.org/anthology/P12-1046) with the latest version of Chrome.
-1. Put PDF files and annotation files (if any) in your directory, then specify the directory via `Browse` button.  
-Sample PDFs and annotations are downloadable from [here](https://cl.naist.jp/%7Eshindo/pdfanno_material.zip).  
-1. Load the target PDF. If you have anno file for the PDF, load it as well.
+1. Visit the [online demo](https://paperai.github.io/pdfanno/) with the latest version of Chrome.
+1. Load your PDF and annotation file (if any). Sample PDFs and annotations are downloadable from [here](https://cl.naist.jp/%7Eshindo/pdfanno_material.zip).
+    * For PDFs located on your computer:  
+    Put the PDFs and annotation files (if any) in the same directory, then specify the directory via `Browse` button.
+    * For PDF available on the Web:  
+    Access 'https://paperai.github.io/pdfanno/?pdf=' + `<URL of the PDF>`  
+    For example, https://paperai.github.io/pdfanno/?pdf=http://www.aclweb.org/anthology/P12-1046.pdf.  
 1. Annotate the PDF as you like.
 1. Save your annotations via <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-download.png" width="2%"> button.  
 If you continue the annotation, respecify your directory via `Browse` button to reload the PDF and anno file.
