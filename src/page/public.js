@@ -131,6 +131,7 @@ export class PublicSpanAnnotation {
         });
 
         let span = window.annoPage.createSpanAnnotation({
+            // TODO 既存のものとかぶるのではないか？
             uuid         : id && String(id), // annotationid must be string.
             rectangles   : position,
             text         : label,
@@ -159,6 +160,7 @@ export class PublicRelationAnnotation {
         }
 
         let r = window.annoPage.createRelationAnnotation({
+            // TODO 既存のものとかぶるのではないか？
             uuid      : id && String(id), // annotationid must be string.
             direction : dir,
             rel1      : typeof ids[0] === 'object' ? ids[0].annotation : ids[0],

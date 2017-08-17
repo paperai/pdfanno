@@ -173,6 +173,7 @@ export default class RelationAnnotation extends AbstractAnnotation {
     /**
      * Get the position for text.
      */
+    // TODO No need ?
     getTextPosition() {
         this.setStartEndPosition();
         return getRelationTextPosition(this.x1, this.y1, this.x2, this.y2, this.text, this.uuid);

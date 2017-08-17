@@ -13,5 +13,10 @@ function replacement(c) {
  * @return {String}
  */
 export default function uuid() {
-  return PATTERN.replace(REGEXP, replacement);
+  // return PATTERN.replace(REGEXP, replacement);
+  let uid = 0;
+  window.annotationContainer.getAllAnnotations().forEach(a => {
+    uid = Math.max(uid, parseInt(a.uuid));
+  });
+  return String(uid + 1);
 }
