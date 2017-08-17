@@ -2,6 +2,7 @@ import * as annoUI from 'anno-ui';
 
 import loadFiles from './loadFiles';
 import { anyOf, dispatchWindowEvent } from '../../shared/util';
+import { convertToExportY, getPageSize, paddingBetweenPages } from '../../shared/coords';
 
 import {
     listenWindowLeaveEvent,
@@ -243,38 +244,6 @@ export default class PDFAnnoPage {
             return annoUI.ui.alertDialog.show({ message : 'Text span is not selected.' });
         }
 
-        // Check duplicated.
-        let annos = window.iframeWindow.annotationContainer
-                        .getAllAnnotations()
-                        .filter(a => a.type === 'span')
-                        .filter(a => {
-                            if (rects.length !== a.rectangles.length) {
-                                return false;
-                            }
-                            for (let i = 0; i < rects.length; i++) {
-                                if (rects[i].x !== a.rectangles[i].x
-                                    || rects[i].y !== a.rectangles[i].y
-                                    || rects[i].width !== a.rectangles[i].width
-                                    || rects[i].height !== a.rectangles[i].height) {
-                                    return false;
-                                }
-                            }
-                            return true;
-                        });
-
-        if (annos.length > 0) {
-            annos[0].text = text;
-            annos[0].save();
-            // Show label input.
-            var event = document.createEvent('CustomEvent');
-            event.initCustomEvent('enableTextInput', true, true, {
-                uuid : annos[0].uuid,
-                text : annos[0].text
-            });
-            window.dispatchEvent(event);
-            return;
-        }
-
         // Create a new rectAnnotation.
         window.iframeWindow.PDFAnnoCore.default.UI.createSpan({ text });
     }
@@ -513,6 +482,32 @@ export default class PDFAnnoPage {
             iframeWindow.removeAnnoLayer();
             iframeWindow.renderAnno();
         });
+    }
+
+    /**
+     * Scroll window to the annotation.
+     */
+    scrollToAnnotation(id) {
+
+        let annotation = window.annoPage.findAnnotationById(id);
+
+        if (annotation) {
+
+            // scroll to.
+            let _y = annotation.y || annotation.y1 || annotation.rectangles[0].y;
+            let { pageNumber, y } = convertToExportY(_y);
+            let pageHeight = window.annoPage.getViewerViewport().height;
+            let scale = window.annoPage.getViewerViewport().scale;
+            _y = (pageHeight + paddingBetweenPages) * (pageNumber - 1) + y * scale;
+            _y -= 100;
+            $('#viewer iframe').contents().find('#viewer').parent()[0].scrollTop = _y;
+
+            // highlight.
+            annotation.highlight();
+            setTimeout(() => {
+                annotation.dehighlight();
+            }, 1000);
+        }
     }
 
     /**

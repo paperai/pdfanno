@@ -1,8 +1,15 @@
 const path = require('path');
 const fs = require('fs');
+const exec = require('child_process').exec;
+
+let multer = require('multer');
+let upload = multer();
+
 const request = require('request');
 const express = require('express');
 const bodyParser = require('body-parser');
+
+const pdfService = require('./pdfService');
 
 // create Application.
 const app = express();
@@ -11,41 +18,32 @@ const app = express();
 app.use(bodyParser.json({ limit : '50mb' }));
 app.use(bodyParser.urlencoded({ limit : '50mb', expented : true }));
 
-
-//============ Settings for local development (from) ==================//
-// Routing for static files.
-let STATIC_ROOT = path.join('..', (process.env.NODE_ENV === 'production' ? 'docs' : 'dist'));
-app.use('/dist', express.static(path.resolve(__dirname, STATIC_ROOT, 'dist')));
-app.use('/pages', express.static(path.resolve(__dirname, STATIC_ROOT, 'pages')));
-app.use('/build', express.static(path.resolve(__dirname, STATIC_ROOT, 'build')));
-app.use('/pdfs', express.static(path.resolve(__dirname, STATIC_ROOT, 'pdfs')));
-app.use('/pdfanno.core.bundle.js', express.static(path.resolve(__dirname, STATIC_ROOT, 'pdfanno.core.bundle.js')));
-app.use('/pdfanno.page.bundle.js', express.static(path.resolve(__dirname, STATIC_ROOT, 'pdfanno.page.bundle.js')));
-app.get('/', function(req, res) {
-    res.type('html');
-    res.send(fs.readFileSync(path.resolve(__dirname, STATIC_ROOT, 'index.html')));
-});
-//============ Settings for local development (to) ==================//
-
-
 // Rooting(API) : Uploading a pdf.
-app.post('/api/pdf_upload', (req, res) => {
+app.post('/api/pdf_upload', upload.fields([]), (req, res) => {
 
-    console.log('Object.keys(req.body)[0]:', Object.keys(req.body)[0].slice(0,100))
+    // Get an uploaded file.
+    const fileName = req.body.filename;
+    const buf = Buffer.from(req.body.pdf, 'base64');
+    console.log(`${fileName} is uploaded. fileSize=${buf.length}Bytes`);
 
-    const fileName = 'tmp.pdf';
-    const contentBase64 = Object.keys(req.body)[0].replace('data:application/pdf;base64,', '');
-    const buf = Buffer.from(contentBase64, 'base64');
-    console.log(`${fileName} is uploaded. fileSize=${Math.floor(buf.length / 1024)}KB`);
+    // Save.
+    pdfService.savePDF(fileName, buf).then(pdfPath => {
 
-    // Save to dir.
-    if (!fs.existsSync('server-data')) {
-        fs.mkdirSync('server-data');
-    }
-    fs.writeFileSync(path.resolve(__dirname, 'server-data', fileName), buf);
+        // Analyze.
+        return pdfService.analyzePDF(pdfPath);
 
-    // Response the result.
-    res.json({ status : 'OK' });
+    }).then(result => {
+
+        // Response the analyze result.
+        res.json({ status : 'success', text : result });
+
+    }).catch(err => {
+
+        // Response the error.
+        console.log('analyze:error:', err);
+        res.json({ status : 'failure' , err });
+    });
+
 });
 
 // Routing: PDF Loader.
@@ -69,10 +67,73 @@ app.get('/load_pdf', (req, res) => {
     };
 
     request(reqConfig, function(error, response, body) {
-        res.setHeader('Content-Length', body.length);
-        res.write(body, 'binary');
-        res.end();
+
+        // Save as temporary.
+        const tmpFileName = Date.now() + '.pdf';
+        pdfService.savePDF(tmpFileName, body).then(pdfPath => {
+
+            // Analyze.
+            return pdfService.analyzePDF(pdfPath);
+
+        }).then(analyzeResult => {
+
+            // Response as success.
+            res.json({
+                status : 'success',
+                pdf    : new Buffer(body).toString('base64'),
+                analyzeResult,
+            });
+
+        }).catch(err => {
+
+            console.log('ERROR:', err);
+
+            // Response as error.
+            res.json({
+                status : 'failure',
+                err    : err
+            });
+        })
     });
+});
+
+/**
+ * Load an external anno file.
+ *
+ * Sample: http://localhost:3000/api/load_anno?url=http://www.yoheim.net/tmp/ex1.anno
+ */
+app.get('/api/load_anno', (req, res) => {
+
+    const annoURL = req.query.url;
+    console.log('annoURL=', annoURL);
+
+    const reqConfig = {
+        method : 'GET',
+        url    : annoURL
+    };
+
+    request(reqConfig, function(error, response, body) {
+
+        console.log('response.status:', response)
+
+        if (response.statusCode !== 200) {
+            if (response.statusCode === 404) {
+                error = 'Resource is not found.';
+            }
+            return res.json({
+                status : 'failure',
+                error  : error
+            });
+        }
+
+        res.json({
+            status : 'success',
+            anno   : body
+        });
+
+    });
+
+
 });
 
 // Port.

@@ -1,6 +1,8 @@
 require("file-loader?name=dist/index.html!./index.html");
 require("!style-loader!css-loader!./pdfanno.css");
 
+import axios from 'axios';
+
 // UI parts.
 import * as annoUI from 'anno-ui';
 
@@ -17,11 +19,12 @@ import PDFAnnoPage from './page/pdf/PDFAnnoPage';
 /**
  * API root point.
  */
-let API_ROOT = 'http://localhost:3000';
+let API_ROOT = 'http://localhost:8080';
 if (process.env.NODE_ENV === 'production') {
     console.log('PRODUCTION MODE');
     API_ROOT = 'https://pdfanno.hshindo.com';
 }
+window.API_ROOT = API_ROOT;
 
 /**
  * Global variable.
@@ -147,28 +150,7 @@ window.addEventListener('DOMContentLoaded', e => {
 
             return annotations;
         },
-        scrollToAnnotation : id => {
-
-            let annotation = window.annoPage.findAnnotationById(id);
-
-            if (annotation) {
-
-                // scroll to.
-                let _y = annotation.y || annotation.y1 || annotation.rectangles[0].y;
-                let { pageNumber, y } = convertToExportY(_y);
-                let pageHeight = window.annoPage.getViewerViewport().height;
-                let scale = window.annoPage.getViewerViewport().scale;
-                _y = (pageHeight + paddingBetweenPages) * (pageNumber - 1) + y * scale;
-                _y -= 100;
-                $('#viewer iframe').contents().find('#viewer').parent()[0].scrollTop = _y;
-
-                // highlight.
-                annotation.highlight();
-                setTimeout(() => {
-                    annotation.dehighlight();
-                }, 1000);
-            }
-        }
+        scrollToAnnotation : window.annoPage.scrollToAnnotation
     });
 
     // Download button.
@@ -224,12 +206,18 @@ window.addEventListener('DOMContentLoaded', e => {
     // Display a PDF specified via URL query parameter.
 
     let pdfURL;
+    let annoURL;
+    let moveTo;
     (location.search || '').replace('?', '').split('&')
         .filter(a => a)
         .forEach(fragment => {
             let [ key, value ] = fragment.split('=');
             if (key && key.toLowerCase() === 'pdf') {
                 pdfURL = value;
+            } else if (key && key.toLowerCase() === 'anno') {
+                annoURL = value;
+            } else if (key && key.toLowerCase() === 'move') {
+                moveTo = value;
             }
     });
 
@@ -243,9 +231,20 @@ window.addEventListener('DOMContentLoaded', e => {
         // Load a PDF as ArrayBuffer.
         var xhr = new XMLHttpRequest();
         xhr.open('GET', API_ROOT + '/load_pdf?url=' + window.encodeURIComponent(pdfURL), true);
-        xhr.responseType = 'arraybuffer';
+        // xhr.responseType = 'arraybuffer';
+        xhr.responseType = 'json';
         xhr.onload = function () {
             if (this.status === 200) {
+                console.log('this.response=', this.response);
+
+                // Error handling.
+                if (this.response.status === 'failure') {
+                    let error = this.response.err.stderr || this.response.err;
+                    alert('ERROR\n\n' + error);
+                    return;
+                }
+
+                const pdf = Uint8Array.from(atob(this.response.pdf), c => c.charCodeAt(0));
 
                 // Init viewer.
                 window.annoPage.initializeViewer(null);
@@ -254,16 +253,39 @@ window.addEventListener('DOMContentLoaded', e => {
 
                 window.addEventListener('iframeReady', () => {
                     setTimeout(() => {
-                        window.annoPage.displayViewer({ content : this.response });
+                        window.annoPage.displayViewer({ content : pdf });
                     }, 500);
                 });
 
-                window.addEventListener('pagerendered', () => {
+                const listenPageRendered = () => {
                     $('#pdfLoading').addClass('close');
                     setTimeout(function() {
                         $('#pdfLoading').addClass('hidden');
                     }, 1000);
-                });
+
+                    // Load and display annotations, if annoURL is set.
+                    if (annoURL) {
+                        loadExternalAnnoFile(annoURL).then(anno => {
+                            publicApi.addAllAnnotations(publicApi.readTOML(anno));
+
+                            // Move to the annotation.
+                            if (moveTo) {
+                                setTimeout(() => {
+                                    window.annoPage.scrollToAnnotation(moveTo);
+                                }, 500);
+                            }
+                        });
+                    }
+                    window.removeEventListener('pagerendered', listenPageRendered);
+                };
+                window.addEventListener('pagerendered', listenPageRendered);
+
+                // Set the analyzeResult.
+                annoUI.uploadButton.setResult(this.response.analyzeResult);
+
+                // Display upload tab.
+                $('a[href="#tab2"]').click();
+
             }
         };
         xhr.timeout = 120 * 1000; // 120s
@@ -273,6 +295,10 @@ window.addEventListener('DOMContentLoaded', e => {
                 annoUI.ui.alertDialog.show({ message : 'Failed to load the PDF.' });
             }, 100);
         };
+        xhr.onerror = function(err) {
+            console.log('err:', err);
+            alert('Error: ' + err);
+        }
         xhr.send();
 
     } else {
@@ -295,3 +321,17 @@ window.addEventListener('DOMContentLoaded', e => {
     }
 
 });
+
+function loadExternalAnnoFile(url) {
+    return axios.get(`${API_ROOT}/api/load_anno?url=${url}`).then(res => {
+        if (res.status !== 200 || res.data.status === 'failure') {
+            let reason = '';
+            if (res.data.error) {
+                reason = '<br>Reason: ' + res.data.error;
+            }
+            annoUI.ui.alertDialog.show({ message : 'Failed to load an anno file. url=' + url + reason});
+            return Promise.reject();
+        }
+        return res.data.anno;
+    });
+}

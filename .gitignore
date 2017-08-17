@@ -11,3 +11,6 @@ jsdoc
 
 # Server Data.
 server-data
+
+# Server dependencies.
+server/pdfreader.jar
