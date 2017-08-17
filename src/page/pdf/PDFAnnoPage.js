@@ -241,7 +241,7 @@ export default class PDFAnnoPage {
 
         // Check empty.
         if (!rects) {
-            return annoUI.ui.alertDialog.show({ message : 'Please select a text span first.' });
+            return annoUI.ui.alertDialog.show({ message : 'Text span is not selected.' });
         }
 
         // Create a new rectAnnotation.
@@ -267,7 +267,7 @@ export default class PDFAnnoPage {
         });
 
         if (selectedAnnotations.length < 2) {
-            return annoUI.ui.alertDialog.show({ message : 'Please select two annotations first.' });
+            return annoUI.ui.alertDialog.show({ message : 'Two annotated text spans are not selected.\nTo select multiple annotated spans, click the first annotated span, then Ctrl+Click (Windows) or Cmd+Click (OSX) the second span.' });
         }
 
         const first  = selectedAnnotations[selectedAnnotations.length - 2];

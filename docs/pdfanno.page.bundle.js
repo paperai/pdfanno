@@ -13644,7 +13644,7 @@ class PDFAnnoPage {
 
         // Check empty.
         if (!rects) {
-            return __WEBPACK_IMPORTED_MODULE_0_anno_ui__["ui"].alertDialog.show({ message : 'Please select a text span first.' });
+            return __WEBPACK_IMPORTED_MODULE_0_anno_ui__["ui"].alertDialog.show({ message : 'Text span is not selected.' });
         }
 
         // Create a new rectAnnotation.
@@ -13670,7 +13670,7 @@ class PDFAnnoPage {
         });
 
         if (selectedAnnotations.length < 2) {
-            return __WEBPACK_IMPORTED_MODULE_0_anno_ui__["ui"].alertDialog.show({ message : 'Please select two annotations first.' });
+            return __WEBPACK_IMPORTED_MODULE_0_anno_ui__["ui"].alertDialog.show({ message : 'Two annotated text spans are not selected.\nTo select multiple annotated spans, click the first annotated span, then Ctrl+Click (Windows) or Cmd+Click (OSX) the second span.' });
         }
 
         const first  = selectedAnnotations[selectedAnnotations.length - 2];
