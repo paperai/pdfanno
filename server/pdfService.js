@@ -67,7 +67,6 @@ module.exports.analyzePDF = (pdfPath) => {
 
         const jarPath = path.resolve(__dirname, 'pdfreader.jar');
         const cmd = `java -classpath ${jarPath} TextDrawImageExtractor ${pdfPath}`;
-        console.log('cmd:', cmd);
         return execCommand(cmd);
 
     }).then(({ stdout, stderr }) => {
@@ -78,6 +77,7 @@ module.exports.analyzePDF = (pdfPath) => {
 
 // Execute an external command.
 function execCommand(command) {
+    console.log('execCommand: ' + command);
     return new Promise((resolve, reject) => {
         exec(command, { maxBuffer : 1024 * 1024 * 50 }, (err, stdout, stderr) => {
             if (err) {

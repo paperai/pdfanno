@@ -86,6 +86,8 @@ app.get('/load_pdf', (req, res) => {
 
         }).catch(err => {
 
+            console.log('ERROR:', err);
+
             // Response as error.
             res.json({
                 status : 'failure',
