@@ -246,6 +246,9 @@ export default class PDFAnnoPage {
 
         // Create a new rectAnnotation.
         window.iframeWindow.PDFAnnoCore.default.UI.createSpan({ text });
+
+        // Notify annotation added.
+        dispatchWindowEvent('annotationrendered');
     }
 
 
@@ -309,6 +312,9 @@ export default class PDFAnnoPage {
             anno2 : second,
             text
         });
+
+        // Notify annotation added.
+        dispatchWindowEvent('annotationrendered');
     }
 
     /**
@@ -482,6 +488,9 @@ export default class PDFAnnoPage {
         iframeWindow.annotationContainer.importAnnotations(paperData, isPrimary).then(result => {
             // iframeWindow.removeAnnoLayer();
             // iframeWindow.renderAnno();
+
+            // Notify annotations added.
+            dispatchWindowEvent('annotationrendered');
         });
     }
 
