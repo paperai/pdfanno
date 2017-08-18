@@ -161,17 +161,20 @@ window.addEventListener('DOMContentLoaded', e => {
     });
 
     // AnnoTool: rect.
+    // TODO No need ?
     annoUI.annoRectButton.setup({
         enableRect : window.annoPage.enableRect,
         disableRect : window.annoPage.disableRect,
     });
 
     // AnnoTool: span.
+    // TODO No need ?
     annoUI.annoSpanButton.setup({
         createSpanAnnotation : window.annoPage.createSpan
     });
 
     // AnnoTool: relation.
+    // TODO No need ?
     annoUI.annoRelButton.setup({
         createRelAnnotation : window.annoPage.createRelation
     });
