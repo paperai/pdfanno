@@ -6741,8 +6741,8 @@ function setup({
         $('#dropdownAnnoList .js-count').text(getAnnotations().length);
     }
     $(window)
-        .off('annotationrendered annotationUpdated', watchPrimaryAnno)
-        .on('annotationrendered annotationUpdated', watchPrimaryAnno);
+        .off('annotationrendered annotationUpdated annotationDeleted', watchPrimaryAnno)
+        .on('annotationrendered annotationUpdated annotationDeleted', watchPrimaryAnno);
 }
 
 
@@ -11935,17 +11935,20 @@ window.addEventListener('DOMContentLoaded', e => {
     });
 
     // AnnoTool: rect.
+    // TODO No need ?
     __WEBPACK_IMPORTED_MODULE_1_anno_ui__["annoRectButton"].setup({
         enableRect : window.annoPage.enableRect,
         disableRect : window.annoPage.disableRect,
     });
 
     // AnnoTool: span.
+    // TODO No need ?
     __WEBPACK_IMPORTED_MODULE_1_anno_ui__["annoSpanButton"].setup({
         createSpanAnnotation : window.annoPage.createSpan
     });
 
     // AnnoTool: relation.
+    // TODO No need ?
     __WEBPACK_IMPORTED_MODULE_1_anno_ui__["annoRelButton"].setup({
         createRelAnnotation : window.annoPage.createRelation
     });
@@ -13641,6 +13644,9 @@ class PDFAnnoPage {
 
         // Create a new rectAnnotation.
         window.iframeWindow.PDFAnnoCore.default.UI.createSpan({ text });
+
+        // Notify annotation added.
+        __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered');
     }
 
 
@@ -13704,6 +13710,9 @@ class PDFAnnoPage {
             anno2 : second,
             text
         });
+
+        // Notify annotation added.
+        __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered');
     }
 
     /**
@@ -13877,6 +13886,9 @@ class PDFAnnoPage {
         iframeWindow.annotationContainer.importAnnotations(paperData, isPrimary).then(result => {
             // iframeWindow.removeAnnoLayer();
             // iframeWindow.renderAnno();
+
+            // Notify annotations added.
+            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered');
         });
     }
 
