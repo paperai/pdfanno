@@ -38,7 +38,7 @@ module.exports.analyzePDF = (pdfPath) => {
 
         // Prepare pdfreader.jar
 
-        const exists = fs.existsSync(path.resolve(__dirname, 'pdfreader.jar'));
+        const exists = fs.existsSync(path.resolve(__dirname, 'pdfextract.jar'));
         if (exists) {
             return;
         }
@@ -47,7 +47,7 @@ module.exports.analyzePDF = (pdfPath) => {
 
             const reqConfig = {
                 method   : 'GET',
-                url      : 'https://cl.naist.jp/~shindo/pdfreader.jar',
+                url      : 'https://cl.naist.jp/~shindo/pdfextract.jar',
                 encoding : null
             };
 
@@ -57,7 +57,7 @@ module.exports.analyzePDF = (pdfPath) => {
                     reject(err);
                 }
 
-                fs.writeFileSync(path.resolve(__dirname, 'pdfreader.jar'), buf);
+                fs.writeFileSync(path.resolve(__dirname, 'pdfextract.jar'), buf);
 
                 resolve();
             });
@@ -65,8 +65,8 @@ module.exports.analyzePDF = (pdfPath) => {
 
     }).then(() => {
 
-        const jarPath = path.resolve(__dirname, 'pdfreader.jar');
-        const cmd = `java -classpath ${jarPath} TextDrawImageExtractor ${pdfPath}`;
+        const jarPath = path.resolve(__dirname, 'pdfextract.jar');
+        const cmd = `java -classpath ${jarPath} TextExtractor ${pdfPath}`;
         return execCommand(cmd);
 
     }).then(({ stdout, stderr }) => {
