@@ -11,10 +11,6 @@ module.exports = {
   },
   // https://github.com/feross/standard/blob/master/RULES.md#javascript-standard-style
   extends: 'standard',
-  // required to lint *.vue files
-  // plugins: [
-  //   'html'
-  // ],
   // add your custom rules here
   'rules': {
     // allow paren-less arrow functions
@@ -23,14 +19,11 @@ module.exports = {
     'generator-star-spacing': 0,
     // allow debugger during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
-
-    // TODO use it.
-    // "key-spacing": [1, {
-    //   "align": "colon",
-    //   "beforeColon": true,
-    //   "afterColon": true
-    // }],
-
+    "key-spacing": [1, {
+      "align": "colon",
+      "beforeColon": true,
+      "afterColon": true
+    }],
     "semi" : 1,
     "space-before-function-paren" : 1,
     "padded-blocks" : 1,
@@ -39,8 +32,7 @@ module.exports = {
     "space-infix-ops" : 1,
     "no-unused-vars" : 1,
     "no-multiple-empty-lines" : 1,
-    "indent" : 1,
-    "key-spacing" : 1,
+    "indent" : [1, 4],
     "quotes" : 1,
     "no-duplicate-imports" : 1,
     "eqeqeq" : 1,
