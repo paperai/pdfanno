@@ -38,6 +38,8 @@ export function resizeHandler() {
     let height = $(window).innerHeight() - $('#viewer').offset().top;
     $('#viewer iframe').css('height', `${height}px`);
 
+    // TODO move to anno-ui.
+
     // Dropdown for PDF.
     let height1 = $(window).innerHeight() - ($('#dropdownPdf ul').offset().top || 120);
     $('#dropdownPdf ul').css('max-height', `${height1 - 20}px`);
