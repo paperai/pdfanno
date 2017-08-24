@@ -38,6 +38,7 @@ export default class AnnotationContainer {
      * Remove all annotations.
      */
     destroy() {
+        console.log('AnnotationContainer#destroy');
         this.set.forEach(a => a.destroy());
         this.set = new Set();
     }

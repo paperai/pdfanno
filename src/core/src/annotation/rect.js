@@ -33,6 +33,7 @@ export default class RectAnnotation extends AbstractAnnotation {
         globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
         globalEvent.on('enableViewMode', this.enableViewMode);
 
+        // TODO No need ?
         this.textAnnotation = new TextAnnotation(this.readOnly, this);
         this.textAnnotation.on('selected', this.handleTextSelected);
         this.textAnnotation.on('deselected', this.handleTextDeselected);

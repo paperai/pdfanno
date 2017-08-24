@@ -177,7 +177,7 @@ function renderAnno() {
 
     // Reset.
     // window.annotationContainer.destroy();
-    window.annotationContainer.set = new Set();
+    // window.annotationContainer.set = new Set();
 
     let svg = $annoLayer.get(0);
     let documentId = getFileName(PDFView.url);
@@ -194,11 +194,15 @@ window.renderAnno = renderAnno;
 
 function renderAnnotations(svg) {
 
+    console.log('renderAnnotations:', window.annotationContainer.getAllAnnotations().length);
+
     if (window.annotationContainer.getAllAnnotations().length > 0) {
 
         window.annotationContainer.getAllAnnotations().forEach(a => {
             a.render();
             a.enableViewMode();
+
+            console.log('annotation:', a);
         });
         var event = document.createEvent('CustomEvent');
         event.initCustomEvent('annotationrendered', true, true, null);
