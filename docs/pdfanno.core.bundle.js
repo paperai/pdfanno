@@ -17928,7 +17928,7 @@ function renderAnno() {
 
     // Reset.
     // window.annotationContainer.destroy();
-    window.annotationContainer.set = new Set();
+    // window.annotationContainer.set = new Set();
 
     let svg = $annoLayer.get(0);
     let documentId = getFileName(PDFView.url);
@@ -17945,11 +17945,15 @@ window.renderAnno = renderAnno;
 
 function renderAnnotations(svg) {
 
+    console.log('renderAnnotations:', window.annotationContainer.getAllAnnotations().length);
+
     if (window.annotationContainer.getAllAnnotations().length > 0) {
 
         window.annotationContainer.getAllAnnotations().forEach(a => {
             a.render();
             a.enableViewMode();
+
+            console.log('annotation:', a);
         });
         var event = document.createEvent('CustomEvent');
         event.initCustomEvent('annotationrendered', true, true, null);
@@ -19185,6 +19189,7 @@ class AnnotationContainer {
      * Remove all annotations.
      */
     destroy() {
+        console.log('AnnotationContainer#destroy');
         this.set.forEach(a => a.destroy());
         this.set = new Set();
     }
@@ -19412,7 +19417,7 @@ let ANNO_VERSION = packageJson.version;
 /* 78 */
 /***/ (function(module, exports) {
 
-module.exports = {"name":"pdfanno","version":"0.2.0","description":"","main":"index.js","scripts":{"_prepare":"gulp prepare","dev":"npm run _prepare && webpack-dev-server --inline","watch":"npm run _prepare && webpack --watch","publish":"npm run _prepare && cross-env NODE_ENV=production webpack && gulp publish","server":"cross-env NODE_ENV=production node server/server.js","server-dev":"cross-env NODE_PORT=3000 ./node_modules/.bin/node-dev server/server.js"},"repository":{"type":"git","url":"git+https://github.com/paperai/pdfanno"},"author":"hshindo, yoheiMune","license":"MIT","bugs":{"url":"https://github.com/paperai/pdfanno/issues"},"homepage":"https://github.com/paperai/pdfanno#readme","devDependencies":{"babel-cli":"^6.26.0","babel-core":"^6.26.0","babel-loader":"6.2.4","babel-plugin-add-module-exports":"^0.2.1","babel-preset-es2015":"^6.24.1","babel-preset-stage-1":"^6.24.1","copy":"^0.3.0","cpr":"^2.2.0","cross-env":"^5.0.5","css-loader":"^0.25.0","deep-assign":"^2.0.0","file-loader":"^0.9.0","fs-extra":"^1.0.0","gulp":"^3.9.1","gulp-cli":"^1.4.0","node-dev":"^3.1.3","style-loader":"^0.13.2","vinyl-source-stream":"^1.1.0","webpack":"3.0.0","webpack-dev-server":"^1.16.5","webpack-livereload-plugin":"^0.11.0"},"dependencies":{"anno-ui":"github:paperai/anno-ui#master","axios":"^0.15.2","body-parser":"^1.17.2","create-stylesheet":"^0.3.0","express":"^4.15.4","jquery":"^3.2.1","json-loader":"^0.5.7","multer":"^1.3.0","request":"^2.81.0","requirejs":"^2.3.5","toml":"github:yoheiMune/toml-node"}}
+module.exports = {"name":"pdfanno","version":"0.2.0","description":"","main":"index.js","scripts":{"_prepare":"gulp prepare","dev":"npm run _prepare && webpack-dev-server --inline","watch":"npm run _prepare && webpack --watch","publish":"npm run _prepare && cross-env NODE_ENV=production webpack && gulp publish","server":"cross-env NODE_ENV=production node server/server.js","server-dev":"cross-env NODE_PORT=3000 ./node_modules/.bin/node-dev server/server.js"},"repository":{"type":"git","url":"git+https://github.com/paperai/pdfanno"},"author":"hshindo, yoheiMune","license":"MIT","bugs":{"url":"https://github.com/paperai/pdfanno/issues"},"homepage":"https://github.com/paperai/pdfanno#readme","devDependencies":{"babel-cli":"^6.26.0","babel-core":"^6.26.0","babel-eslint":"^7.2.3","babel-loader":"6.2.4","babel-messages":"^6.23.0","babel-plugin-add-module-exports":"^0.2.1","babel-preset-es2015":"^6.24.1","babel-preset-stage-1":"^6.24.1","copy":"^0.3.0","cpr":"^2.2.0","cross-env":"^5.0.5","css-loader":"^0.25.0","deep-assign":"^2.0.0","eslint":"^3.19.0","eslint-config-standard":"^6.2.1","eslint-friendly-formatter":"^2.0.7","eslint-loader":"^1.7.1","eslint-plugin-html":"^2.0.0","eslint-plugin-promise":"^3.5.0","eslint-plugin-standard":"^2.3.1","file-loader":"^0.9.0","fs-extra":"^1.0.0","gulp":"^3.9.1","gulp-cli":"^1.4.0","node-dev":"^3.1.3","style-loader":"^0.13.2","vinyl-source-stream":"^1.1.0","webpack":"3.0.0","webpack-dev-server":"^1.16.5","webpack-livereload-plugin":"^0.11.0"},"dependencies":{"anno-ui":"github:paperai/anno-ui#master","axios":"^0.15.2","body-parser":"^1.17.2","create-stylesheet":"^0.3.0","express":"^4.15.4","jquery":"^3.2.1","json-loader":"^0.5.7","multer":"^1.3.0","request":"^2.81.0","requirejs":"^2.3.5","toml":"github:yoheiMune/toml-node"}}
 
 /***/ }),
 /* 79 */

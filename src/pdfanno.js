@@ -329,3 +329,5 @@ function loadExternalAnnoFile(url) {
         return res.data.anno;
     });
 }
+
+console.log('aaa');

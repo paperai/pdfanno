@@ -2,6 +2,10 @@ const path = require('path');
 const webpack = require('webpack');
 const LiveReloadPlugin = require('webpack-livereload-plugin');
 
+function resolve (dir) {
+  return path.join(__dirname, dir)
+}
+
 let config = {
     entry : {
         'pdfanno.page' : './src/pdfanno.js',
@@ -11,6 +15,25 @@ let config = {
         filename      : './dist/[name].bundle.js',
         library       : 'PDFAnnoCore',
         libraryTarget : 'umd'
+    },
+    module: {
+        rules: [
+            {
+                test: /\.js$/,
+                loader: 'eslint-loader',
+                enforce: 'pre',
+                include: [resolve('src')],
+                exclude: /node_modules/,
+                options: {
+                    // formatter: require('eslint-friendly-formatter')
+                }
+            },
+            // {
+            //     test: /\.js$/,
+            //     loader: 'babel-loader',
+            //     include: [resolve('src')]
+            // }
+        ]
     },
     plugins : [
         // LiveReload(watchの時のみ有効)
