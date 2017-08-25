@@ -196,6 +196,9 @@ export default class PDFAnnoPage {
         const uint8Array = new Uint8Array(contentFile.content);
         iframeWindow.PDFViewerApplication.open(uint8Array);
 
+        // Set the PDF file name.
+        iframeWindow.PDFView.url = contentFile.name;
+
     }
 
     initializeViewer(initialPDFPath = '../pdfs/P12-1046.pdf') {
