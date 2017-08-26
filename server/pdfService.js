@@ -4,7 +4,7 @@
 const path = require('path');
 const fs = require('fs');
 const exec = require('child_process').exec;
-
+const request = require('request');
 /**
  * Save a PDF file, and return the saved path.
  */
