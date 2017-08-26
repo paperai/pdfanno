@@ -1,70 +1,64 @@
-import $ from 'jquery';
-import assign from 'deep-assign';
-import PDFAnnoCore from '../PDFAnnoCore';
+// TODO Remove jquery, because viewer.html already loaded jQuery.
+import $ from 'jquery'
+import assign from 'deep-assign'
 import {
-  disableUserSelect,
-  enableUserSelect,
-  getMetadata,
-  scaleDown,
-  scaleUp,
-  getXY,
-  getSVGLayer,
-  getTmpLayer,
-  getCurrentPage,
-  disableTextlayer,
-  enableTextlayer
-} from './utils';
-import { addInputField } from './text';
-import RectAnnotation from '../annotation/rect';
-import * as textInput from '../utils/textInput';
+    scaleDown,
+    getXY,
+    getSVGLayer,
+    getTmpLayer,
+    getCurrentPage,
+    disableTextlayer,
+    enableTextlayer
+} from './utils'
+import RectAnnotation from '../annotation/rect'
+import * as textInput from '../utils/textInput'
 
-const _type = 'area';
+const _type = 'area'
 
-let overlay;
-let originY;
-let originX;
+let overlay
+let originY
+let originX
 
 let enableArea = {
-  page : 0,
-  minX : 0,
-  maxX : 0,
-  minY : 0,
-  maxY : 0
-};
+    page : 0,
+    minX : 0,
+    maxX : 0,
+    minY : 0,
+    maxY : 0
+}
 
-let mousedownFired = false;
-let mousemoveFired = false;
+let mousedownFired = false
+let mousemoveFired = false
 
 /**
  * Handle document.mousedown event
  *
  * @param {Event} e The DOM event to handle
  */
-function handleDocumentMousedown(e) {
+function handleDocumentMousedown (e) {
 
-  mousedownFired = true;
+    mousedownFired = true
 
-  let { x, y } = getXY(e);
-  originX = x;
-  originY = y;
+    let { x, y } = getXY(e)
+    originX = x
+    originY = y
 
-  enableArea = getCurrentPage(e);
-  if (!enableArea) {
-    return;
-  }
+    enableArea = getCurrentPage(e)
+    if (!enableArea) {
+        return
+    }
 
-  overlay = document.createElement('div');
-  overlay.style.position = 'absolute';
-  overlay.style.top = `${originY}px`;
-  overlay.style.left = `${originX}px`;
-  overlay.style.width = 0;
-  overlay.style.height = 0;
-  overlay.style.border = `2px solid #00BFFF`; // Blue.
-  overlay.style.boxSizing = 'border-box';
-  overlay.style.visibility = 'visible';
-  overlay.style.pointerEvents = 'none';
-  getTmpLayer().appendChild(overlay);
-
+    overlay = document.createElement('div')
+    overlay.style.position = 'absolute'
+    overlay.style.top = `${originY}px`
+    overlay.style.left = `${originX}px`
+    overlay.style.width = 0
+    overlay.style.height = 0
+    overlay.style.border = `2px solid #00BFFF` // Blue.
+    overlay.style.boxSizing = 'border-box'
+    overlay.style.visibility = 'visible'
+    overlay.style.pointerEvents = 'none'
+    getTmpLayer().appendChild(overlay)
 }
 
 /**
@@ -72,62 +66,62 @@ function handleDocumentMousedown(e) {
  *
  * @param {Event} e The DOM event to handle
  */
-function handleDocumentMousemove(e) {
+function handleDocumentMousemove (e) {
 
     if (!overlay) {
-        return;
+        return
     }
 
     if (mousedownFired) {
-      mousemoveFired = true;
+        mousemoveFired = true
     }
 
-    $(document.body).addClass('no-action');
+    $(document.body).addClass('no-action')
 
-    let { x : curX, y : curY } = getXY(e);
+    let { x : curX, y : curY } = getXY(e)
 
-    let x = Math.min(originX, curX);
-    let y = Math.min(originY, curY);
-    let w = Math.abs(originX - curX);
-    let h = Math.abs(originY - curY);
+    let x = Math.min(originX, curX)
+    let y = Math.min(originY, curY)
+    let w = Math.abs(originX - curX)
+    let h = Math.abs(originY - curY)
 
     // Restrict in page.
-    x = Math.min(enableArea.maxX, Math.max(enableArea.minX, x));
-    y = Math.min(enableArea.maxY, Math.max(enableArea.minY, y));
+    x = Math.min(enableArea.maxX, Math.max(enableArea.minX, x))
+    y = Math.min(enableArea.maxY, Math.max(enableArea.minY, y))
     if (x > enableArea.minX) {
-      w = Math.min(w, enableArea.maxX - x);
+        w = Math.min(w, enableArea.maxX - x)
     } else {
-      w = originX - enableArea.minX;
+        w = originX - enableArea.minX
     }
     if (y > enableArea.minY) {
-      h = Math.min(h, enableArea.maxY - y);
+        h = Math.min(h, enableArea.maxY - y)
     } else {
-      h = originY - enableArea.minY;
+        h = originY - enableArea.minY
     }
 
     // Move and Resize.
-    overlay.style.left   = x + 'px';
-    overlay.style.top    = y + 'px';
-    overlay.style.width  = w + 'px';
-    overlay.style.height = h + 'px';
+    overlay.style.left = x + 'px'
+    overlay.style.top = y + 'px'
+    overlay.style.width = w + 'px'
+    overlay.style.height = h + 'px'
 }
 
-function _findAnnotation(e) {
+function _findAnnotation (e) {
 
-    const { x, y } = scaleDown(getSVGLayer(), getXY(e));
+    const { x, y } = scaleDown(getSVGLayer(), getXY(e))
 
-    let hitAnnotation = null;
+    let hitAnnotation = null
     window.annotationContainer.getAllAnnotations().forEach(a => {
         if (a.isHit(x, y)) {
-            hitAnnotation = a;
+            hitAnnotation = a
         } else if (a.isHitText(x, y)) {
-            hitAnnotation = a.textAnnotation;
+            hitAnnotation = a.textAnnotation
         }
-    });
+    })
 
-    console.log('hit:', hitAnnotation);
+    console.log('hit:', hitAnnotation)
 
-    return hitAnnotation;
+    return hitAnnotation
 }
 
 /**
@@ -135,47 +129,45 @@ function _findAnnotation(e) {
  *
  * @param {Event} e The DOM event to handle
  */
-function handleDocumentMouseup(e) {
+function handleDocumentMouseup (e) {
 
-    $(document.body).removeClass('no-action');
+    $(document.body).removeClass('no-action')
 
-    let clicked = mousedownFired && !mousemoveFired;
-    let dragged = mousedownFired && mousemoveFired;
+    let clicked = mousedownFired && !mousemoveFired
 
     if (clicked) {
 
-        let anno = _findAnnotation(e);
+        let anno = _findAnnotation(e)
         if (anno) {
-            anno.handleClickEvent();
+            anno.handleClickEvent()
         }
 
-        $(overlay).remove();
-        overlay = null;
+        $(overlay).remove()
+        overlay = null
 
-        return;
+        return
     }
 
-    mousedownFired = false;
-    mousemoveFired = false;
+    mousedownFired = false
+    mousemoveFired = false
 
+    if (!overlay) {
+        return
+    }
 
-  if (!overlay) {
-    return;
-  }
+    const rect = {
+        x      : parseInt(overlay.style.left, 10),
+        y      : parseInt(overlay.style.top, 10),
+        width  : parseInt(overlay.style.width, 10),
+        height : parseInt(overlay.style.height, 10)
+    }
 
-  const rect = {
-    x      : parseInt(overlay.style.left, 10),
-    y      : parseInt(overlay.style.top, 10),
-    width  : parseInt(overlay.style.width, 10),
-    height : parseInt(overlay.style.height, 10)
-  };
+    if (rect.width > 0 && rect.height > 0) {
+        saveRect(rect)
+    }
 
-  if (rect.width > 0 && rect.height > 0) {
-    saveRect(rect);
-  }
-
-  $(overlay).remove();
-  overlay = null;
+    $(overlay).remove()
+    overlay = null
 
 }
 
@@ -184,92 +176,84 @@ function handleDocumentMouseup(e) {
  *
  * @param {Object} rect - The rect to use for annotation.
  */
-function saveRect(rect) {
+function saveRect (rect) {
 
-  if (rect.width === 0 || rect.height === 0) {
-    return;
-  }
+    if (rect.width === 0 || rect.height === 0) {
+        return
+    }
 
+    let svg = getSVGLayer()
 
-  let svg = getSVGLayer();
+    let annotation = assign(scaleDown(svg, rect), {
+        type : _type
+    })
 
-  let annotation = assign(scaleDown(svg, rect), {
-    type : _type
-  });
+    // Save.
+    let rectAnnotation = RectAnnotation.newInstance(annotation)
+    rectAnnotation.save()
 
-  // Save.
-  let rectAnnotation = RectAnnotation.newInstance(annotation);
-  rectAnnotation.save();
+    // Render.
+    rectAnnotation.render()
 
-  // Render.
-  rectAnnotation.render();
+    // Enable a drag / click action.
+    // TODO インスタンス生成時にデフォルトで有効にしてもいいかなー.
+    rectAnnotation.enableViewMode()
 
-  // Enable a drag / click action.
-  // TODO インスタンス生成時にデフォルトで有効にしてもいいかなー.
-  rectAnnotation.enableViewMode();
+    // Deselect all annotations.
+    window.annotationContainer
+        .getSelectedAnnotations()
+        .forEach(a => a.deselect())
 
-  // Deselect all annotations.
-  window.annotationContainer
-      .getSelectedAnnotations()
-      .forEach(a => a.deselect());
+    // Select.
+    rectAnnotation.select()
 
-  // Select.
-  rectAnnotation.select();
-
-  // Enable input label.
-  textInput.enable({ uuid : rectAnnotation.uuid, autoFocus : true });
-
+    // Enable input label.
+    textInput.enable({ uuid : rectAnnotation.uuid, autoFocus : true })
 }
 
 /**
  * Cancel rect drawing if an existing rect has got a drag event.
  */
-function cancelRectDrawing() {
+function cancelRectDrawing () {
 
     // After `handleDocumentMousedown`
     setTimeout(() => {
-        console.log('cancelRectDrawing');
-        $(overlay).remove();
-        overlay = null;
-    }, 100);
-
+        console.log('cancelRectDrawing')
+        $(overlay).remove()
+        overlay = null
+    }, 100)
 }
 
 /**
  * Enable rect behavior
  */
-export function enableRect() {
+export function enableRect () {
 
-    disableRect();
+    disableRect()
 
-    window.currentType = 'rect';
+    window.currentType = 'rect'
 
-  document.addEventListener('mouseup', handleDocumentMouseup);
-  document.addEventListener('mousedown', handleDocumentMousedown);
-  document.addEventListener('mousemove', handleDocumentMousemove);
+    document.addEventListener('mouseup', handleDocumentMouseup)
+    document.addEventListener('mousedown', handleDocumentMousedown)
+    document.addEventListener('mousemove', handleDocumentMousemove)
 
-  // disableUserSelect();
-  disableTextlayer();
+    disableTextlayer()
 
-  window.globalEvent.on('rectmovestart', cancelRectDrawing);
+    window.globalEvent.on('rectmovestart', cancelRectDrawing)
 }
 
 /**
  * Disable rect behavior
  */
-export function disableRect() {
+export function disableRect () {
 
-    console.log('disableRect');
+    window.currentType = null
 
-    window.currentType = null;
+    document.removeEventListener('mouseup', handleDocumentMouseup)
+    document.removeEventListener('mousedown', handleDocumentMousedown)
+    document.removeEventListener('mousemove', handleDocumentMousemove)
 
-  document.removeEventListener('mouseup', handleDocumentMouseup);
-  document.removeEventListener('mousedown', handleDocumentMousedown);
-  document.removeEventListener('mousemove', handleDocumentMousemove);
+    enableTextlayer()
 
-  // enableUserSelect();
-  enableTextlayer();
-
-  window.globalEvent.removeListener('rectmovestart', cancelRectDrawing);
-
+    window.globalEvent.removeListener('rectmovestart', cancelRectDrawing)
 }
