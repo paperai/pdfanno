@@ -248,6 +248,7 @@ window.addEventListener('DOMContentLoaded', e => {
                 }
 
                 const pdf = Uint8Array.from(atob(this.response.pdf), c => c.charCodeAt(0));
+                const pdfName = pdfURL.split('/')[pdfURL.split('/').length - 1];
 
                 // Init viewer.
                 window.annoPage.initializeViewer(null);
@@ -256,7 +257,10 @@ window.addEventListener('DOMContentLoaded', e => {
 
                 window.addEventListener('iframeReady', () => {
                     setTimeout(() => {
-                        window.annoPage.displayViewer({ content : pdf });
+                        window.annoPage.displayViewer({
+                            name    : pdfName,
+                            content : pdf
+                        });
                     }, 500);
                 });
 
@@ -329,5 +333,3 @@ function loadExternalAnnoFile(url) {
         return res.data.anno;
     });
 }
-
-console.log('aaa');

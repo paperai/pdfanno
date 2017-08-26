@@ -13,4 +13,4 @@ jsdoc
 server-data
 
 # Server dependencies.
-server/pdfreader.jar
+server/pdfextract.jar
