@@ -8,6 +8,7 @@ module.exports = {
   },
   env: {
     browser: true,
+    jquery: true,
   },
   // https://github.com/feross/standard/blob/master/RULES.md#javascript-standard-style
   extends: 'standard',
@@ -26,7 +27,7 @@ module.exports = {
     }],
     "semi" : 1,
     "space-before-function-paren" : 1,
-    "padded-blocks" : 1,
+    "padded-blocks" : 0,
     "keyword-spacing" : 1,
     "no-multi-spaces" : 1,
     "space-infix-ops" : 1,
@@ -48,6 +49,8 @@ module.exports = {
     "no-throw-literal" : 1,
     "standard/object-curly-even-spacing" : 1,
     "comma-dangle" : 1,
-    "arrow-spacing" : 1
+    "arrow-spacing" : 1,
+    "no-unexpected-multiline" : 1,
+    "no-sequences" : 1
   }
 }
