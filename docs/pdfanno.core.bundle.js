@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 59);
+/******/ 	return __webpack_require__(__webpack_require__.s = 58);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -79,37 +79,34 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (immutable) */ __webpack_exports__["j"] = scaleUp;
-/* harmony export (immutable) */ __webpack_exports__["i"] = scaleDown;
+/* harmony export (immutable) */ __webpack_exports__["i"] = scaleUp;
+/* harmony export (immutable) */ __webpack_exports__["h"] = scaleDown;
 /* unused harmony export disableUserSelect */
 /* unused harmony export enableUserSelect */
 /* harmony export (immutable) */ __webpack_exports__["b"] = disableTextlayer;
 /* harmony export (immutable) */ __webpack_exports__["c"] = enableTextlayer;
-/* harmony export (immutable) */ __webpack_exports__["e"] = getMetadata;
-/* harmony export (immutable) */ __webpack_exports__["h"] = getXY;
-/* harmony export (immutable) */ __webpack_exports__["f"] = getSVGLayer;
-/* harmony export (immutable) */ __webpack_exports__["g"] = getTmpLayer;
+/* unused harmony export getMetadata */
+/* harmony export (immutable) */ __webpack_exports__["g"] = getXY;
+/* harmony export (immutable) */ __webpack_exports__["e"] = getSVGLayer;
+/* harmony export (immutable) */ __webpack_exports__["f"] = getTmpLayer;
 /* harmony export (immutable) */ __webpack_exports__["d"] = getCurrentPage;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_create_stylesheet__ = __webpack_require__(69);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_create_stylesheet___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_create_stylesheet__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_create_stylesheet__ = __webpack_require__(68);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_create_stylesheet___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_create_stylesheet__);
 
 
-
-const BORDER_COLOR = '#00BFFF';
+const BORDER_COLOR = '#00BFFF'
 /* harmony export (immutable) */ __webpack_exports__["a"] = BORDER_COLOR;
 
 
-const userSelectStyleSheet = __WEBPACK_IMPORTED_MODULE_1_create_stylesheet___default.a({
-  body: {
-    '-webkit-user-select': 'none',
-       '-moz-user-select': 'none',
-        '-ms-user-select': 'none',
-            'user-select': 'none'
-  }
-});
-userSelectStyleSheet.setAttribute('data-pdf-annotate-user-select', 'true');
+const userSelectStyleSheet = __WEBPACK_IMPORTED_MODULE_0_create_stylesheet___default.a({
+    body : {
+        '-webkit-user-select' : 'none',
+        '-moz-user-select'    : 'none',
+        '-ms-user-select'     : 'none',
+        'user-select'         : 'none'
+    }
+})
+userSelectStyleSheet.setAttribute('data-pdf-annotate-user-select', 'true')
 
 /**
  * Adjust scale from normalized scale (100%) to rendered scale.
@@ -118,21 +115,21 @@ userSelectStyleSheet.setAttribute('data-pdf-annotate-user-select', 'true');
  * @param {Object} rect A map of numeric values to scale
  * @return {Object} A copy of `rect` with values scaled up
  */
-function scaleUp(svg, rect) {
+function scaleUp (svg, rect) {
 
-  if (arguments.length === 1) {
-    rect = svg;
-    svg = getSVGLayer();
-  }
+    if (arguments.length === 1) {
+        rect = svg
+        svg = getSVGLayer()
+    }
 
-  let result = {};
-  let { viewport } = getMetadata(svg);
+    let result = {}
+    let { viewport } = getMetadata(svg)
 
-  Object.keys(rect).forEach((key) => {
-    result[key] = rect[key] * viewport.scale;
-  });
+    Object.keys(rect).forEach((key) => {
+        result[key] = rect[key] * viewport.scale
+    })
 
-  return result;
+    return result
 }
 
 /**
@@ -142,56 +139,53 @@ function scaleUp(svg, rect) {
  * @param {Object} rect A map of numeric values to scale
  * @return {Object} A copy of `rect` with values scaled down
  */
-function scaleDown(svg, rect) {
+function scaleDown (svg, rect) {
 
-  if (arguments.length === 1) {
-    rect = svg;
-    svg = getSVGLayer();
-  }
+    if (arguments.length === 1) {
+        rect = svg
+        svg = getSVGLayer()
+    }
 
-  let result = {};
-  let { viewport } = getMetadata(svg);
+    let result = {}
+    let { viewport } = getMetadata(svg)
 
-  Object.keys(rect).forEach((key) => {
-    result[key] = rect[key] / viewport.scale;
-  });
+    Object.keys(rect).forEach((key) => {
+        result[key] = rect[key] / viewport.scale
+    })
 
-  return result;
+    return result
 }
 
 /**
  * Disable user ability to select text on page
  */
-function disableUserSelect() {
-  if (!userSelectStyleSheet.parentNode) {
-    document.head.appendChild(userSelectStyleSheet);
-  }
+function disableUserSelect () {
+    if (!userSelectStyleSheet.parentNode) {
+        document.head.appendChild(userSelectStyleSheet)
+    }
 }
-
 
 /**
  * Enable user ability to select text on page
  */
-function enableUserSelect() {
-  if (userSelectStyleSheet.parentNode) {
-    userSelectStyleSheet.parentNode.removeChild(userSelectStyleSheet);
-  }
+function enableUserSelect () {
+    if (userSelectStyleSheet.parentNode) {
+        userSelectStyleSheet.parentNode.removeChild(userSelectStyleSheet)
+    }
 }
 
 /**
  * Disable all text layers.
  */
-function disableTextlayer() {
-    console.log('disableTextlayer');
-  __WEBPACK_IMPORTED_MODULE_0_jquery___default.a('body').addClass('disable-text-layer');
+function disableTextlayer () {
+    $('body').addClass('disable-text-layer')
 }
 
 /**
  * Enable all text layers.
  */
-function enableTextlayer() {
-    console.log('enableTextlayer');
-  __WEBPACK_IMPORTED_MODULE_0_jquery___default.a('body').removeClass('disable-text-layer');
+function enableTextlayer () {
+    $('body').removeClass('disable-text-layer')
 }
 
 /**
@@ -199,68 +193,56 @@ function enableTextlayer() {
  *
  * @param {SVGElement} svg The SVG container to get metadata for
  */
-function getMetadata(svg) {
-  svg = svg || getSVGLayer();
-  return {
-    documentId: svg.getAttribute('data-pdf-annotate-document'),
-    pageNumber: parseInt(svg.getAttribute('data-pdf-annotate-page'), 10),
-    viewport: JSON.parse(svg.getAttribute('data-pdf-annotate-viewport'))
-  };
+// TODO No need ?
+function getMetadata (svg) {
+    svg = svg || getSVGLayer()
+    return {
+        documentId : svg.getAttribute('data-pdf-annotate-document'),
+        pageNumber : parseInt(svg.getAttribute('data-pdf-annotate-page'), 10),
+        viewport   : JSON.parse(svg.getAttribute('data-pdf-annotate-viewport'))
+    }
 }
 
-function getXY(e) {
-
-  let rect1 = __WEBPACK_IMPORTED_MODULE_0_jquery___default.a('#pageContainer1')[0].getBoundingClientRect();
-  let rect2 = __WEBPACK_IMPORTED_MODULE_0_jquery___default.a('#annoLayer')[0].getBoundingClientRect();
-
-  let rectTop = rect2.top - rect1.top;
-  let rectLeft = rect2.left - rect1.left;
-
-  let y = e.clientY + __WEBPACK_IMPORTED_MODULE_0_jquery___default.a('#annoLayer').scrollTop() - rect2.top;
-  let x = e.clientX - rect2.left;
-
-  return { x, y }
+function getXY (e) {
+    let rect2 = $('#annoLayer')[0].getBoundingClientRect()
+    let y = e.clientY + $('#annoLayer').scrollTop() - rect2.top
+    let x = e.clientX - rect2.left
+    return { x, y }
 }
 
-function getSVGLayer() {
-  return document.getElementById('annoLayer');
+function getSVGLayer () {
+    return document.getElementById('annoLayer')
 }
 
-function getTmpLayer() {
-  return document.getElementById('tmpLayer');
+function getTmpLayer () {
+    return document.getElementById('tmpLayer')
 }
 
-function getCurrentPage(e) {
+function getCurrentPage (e) {
 
-  let { x, y } = getXY(e);
+    let { x, y } = getXY(e)
 
-  let scrollTop = __WEBPACK_IMPORTED_MODULE_0_jquery___default.a('#annoLayer')[0].getBoundingClientRect().top;
-  let scrollLeft = __WEBPACK_IMPORTED_MODULE_0_jquery___default.a('#annoLayer')[0].getBoundingClientRect().left;
+    let scrollTop = $('#annoLayer')[0].getBoundingClientRect().top
+    let scrollLeft = $('#annoLayer')[0].getBoundingClientRect().left
 
-  let elements = document.querySelectorAll('.canvasWrapper');
+    let elements = document.querySelectorAll('.canvasWrapper')
 
-  for (let i = 0, l = elements.length; i < l; i++) {
-    let el = elements[i];
-    let rect = el.getBoundingClientRect();
+    for (let i = 0, l = elements.length; i < l; i++) {
+        let el = elements[i]
+        let rect = el.getBoundingClientRect()
+        let minX = rect.left - scrollLeft
+        let maxX = rect.right - scrollLeft
+        let minY = rect.top - scrollTop
+        let maxY = rect.bottom - scrollTop
 
-    let pageNumber = i + 1;
-
-    let minX = rect.left - scrollLeft;
-    let maxX = rect.right - scrollLeft;
-    let minY = rect.top - scrollTop;
-    let maxY = rect.bottom - scrollTop;
-
-    if (minX <= x && x <= maxX && minY <= y && y <= maxY) {
-
-      let page = parseInt(el.parentNode.id.replace('pageContainer', ''));
-
-      return { page, minX, maxX, minY, maxY };
+        if (minX <= x && x <= maxX && minY <= y && y <= maxY) {
+            let page = parseInt(el.parentNode.id.replace('pageContainer', ''))
+            return { page, minX, maxX, minY, maxY }
+        }
     }
 
-  }
-
-  console.log('notfound ><...');
-  return null;
+    console.log('notfound ><...')
+    return null
 }
 
 
@@ -332,6 +314,64 @@ function getPageSize() {
 
 /***/ }),
 /* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = setAttributes;
+const UPPER_REGEX = /[A-Z]/g
+
+// Don't convert these attributes from camelCase to hyphenated-attributes
+const BLACKLIST = [
+    'viewBox'
+]
+
+let keyCase = (key) => {
+    if (BLACKLIST.indexOf(key) === -1) {
+        key = key.replace(UPPER_REGEX, match => '-' + match.toLowerCase())
+    }
+    return key
+}
+
+/**
+ * Set attributes for a node from a map
+ *
+ * @param {Node} node The node to set attributes on
+ * @param {Object} attributes The map of key/value pairs to use for attributes
+ */
+function setAttributes (node, attributes) {
+    Object.keys(attributes).forEach((key) => {
+        node.setAttribute(keyCase(key), attributes[key])
+    })
+}
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = anyOf;
+/* harmony export (immutable) */ __webpack_exports__["b"] = dispatchWindowEvent;
+/**
+ * Utility.
+ */
+
+function anyOf(target, candidates) {
+    return candidates.filter(c => c === target).length > 0;
+}
+
+/**
+ * Dispatch a custom event to `window` object.
+ */
+function dispatchWindowEvent(eventName, data) {
+    var event = document.createEvent('CustomEvent');
+    event.initCustomEvent(eventName, true, true, data);
+    window.dispatchEvent(event);
+}
+
+
+/***/ }),
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -10591,104 +10631,12 @@ return jQuery;
 
 
 /***/ }),
-/* 4 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = setAttributes;
-const UPPER_REGEX = /[A-Z]/g
-
-// Don't convert these attributes from camelCase to hyphenated-attributes
-const BLACKLIST = [
-    'viewBox'
-]
-
-let keyCase = (key) => {
-    if (BLACKLIST.indexOf(key) === -1) {
-        key = key.replace(UPPER_REGEX, match => '-' + match.toLowerCase())
-    }
-    return key
-}
-
-/**
- * Set attributes for a node from a map
- *
- * @param {Node} node The node to set attributes on
- * @param {Object} attributes The map of key/value pairs to use for attributes
- */
-function setAttributes (node, attributes) {
-    Object.keys(attributes).forEach((key) => {
-        node.setAttribute(keyCase(key), attributes[key])
-    })
-}
-
-
-/***/ }),
-/* 5 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = enable;
-/* unused harmony export disable */
-
-
-/**
- * Enable Text input enable.
- */
-function enable({ uuid, text, disable=false, autoFocus=false, blurListener=null }) {
-
-    console.log('textInput.enable:', ...arguments);
-
-    var event = document.createEvent('CustomEvent');
-    event.initCustomEvent('enableTextInput', true, true, ...arguments);
-    window.dispatchEvent(event);
-}
-
-/**
- * Disable the text input.
- */
-function disable() {
-
-    console.log('textInput.disable');
-
-    var event = document.createEvent('CustomEvent');
-    event.initCustomEvent('disappearTextInput', true, true);
-    window.dispatchEvent(event);
-}
-
-
-/***/ }),
 /* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = anyOf;
-/* harmony export (immutable) */ __webpack_exports__["b"] = dispatchWindowEvent;
-/**
- * Utility.
- */
-
-function anyOf(target, candidates) {
-    return candidates.filter(c => c === target).length > 0;
-}
-
-/**
- * Dispatch a custom event to `window` object.
- */
-function dispatchWindowEvent(eventName, data) {
-    var event = document.createEvent('CustomEvent');
-    event.initCustomEvent(eventName, true, true, data);
-    window.dispatchEvent(event);
-}
-
-
-/***/ }),
-/* 7 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
 /* harmony export (immutable) */ __webpack_exports__["b"] = renderCircle;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__ = __webpack_require__(3);
 
 
 const DEFAULT_RADIUS = 3
@@ -10750,7 +10698,7 @@ function adjustPoint (x, y, radius) {
 
 
 /***/ }),
-/* 8 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -10780,17 +10728,15 @@ function uuid() {
 
 
 /***/ }),
-/* 9 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_events__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_events__ = __webpack_require__(27);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_events___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_events__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__render_appendChild__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__render_appendChild__ = __webpack_require__(29);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__UI_utils__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_textInput__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__utils_event__ = __webpack_require__(70);
-
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_event__ = __webpack_require__(69);
 
 
 
@@ -10801,121 +10747,105 @@ function uuid() {
  */
 class AbstractAnnotation extends __WEBPACK_IMPORTED_MODULE_0_events___default.a {
 
-
     /**
      * Check the argument is an annotation.
      */
-    static isAnnotation(obj) {
-        return obj && obj.uuid && obj.type;
+    static isAnnotation (obj) {
+        return obj && obj.uuid && obj.type
     }
 
     /**
      * Constructor.
      */
-    constructor() {
-      super();
-      this.autoBind();
-
-      this.deleted = false;
-      this.selected = false;
-      this.selectedTime = null;
+    constructor () {
+        super()
+        this.autoBind()
+        this.deleted = false
+        this.selected = false
+        this.selectedTime = null
     }
 
     /**
      * Bind the `this` scope of instance methods to `this`.
      */
-    autoBind() {
-      Object.getOwnPropertyNames(this.constructor.prototype)
-        .filter(prop => typeof this[prop] === 'function')
-        .forEach(method => {
-          this[method] = this[method].bind(this);
-        });
+    autoBind () {
+        Object.getOwnPropertyNames(this.constructor.prototype)
+            .filter(prop => typeof this[prop] === 'function')
+            .forEach(method => {
+                this[method] = this[method].bind(this)
+            })
     }
 
     /**
      * Render annotation(s).
      */
-    render() {
+    render () {
 
-        this.$element.remove();
+        this.$element.remove()
 
         if (this.deleted) {
-            return false;
+            return false
         }
 
-        this.$element = $(__WEBPACK_IMPORTED_MODULE_1__render_appendChild__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__UI_utils__["f" /* getSVGLayer */](), this));
-        this.textAnnotation && this.textAnnotation.render();
+        this.$element = $(__WEBPACK_IMPORTED_MODULE_1__render_appendChild__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__UI_utils__["e" /* getSVGLayer */](), this))
+        this.textAnnotation && this.textAnnotation.render()
 
         if (!this.hoverEventDisable && this.setHoverEvent) {
-            this.setHoverEvent();
+            this.setHoverEvent()
         }
 
-        this.$element.addClass('--viewMode');
+        this.$element.addClass('--viewMode')
 
-        this.selected && this.$element.addClass('--selected');
+        this.selected && this.$element.addClass('--selected')
 
-        this.disabled && this.disable();
+        this.disabled && this.disable()
 
-        return true;
+        return true
     }
 
     /**
      * Save the annotation data.
      */
-    save() {
-        // let { documentId } = getMetadata();
-        // window.PDFAnnoCore.default.getStoreAdapter().getAnnotation(documentId, this.uuid).then(a => {
-        //     if (a) {
-        //         // update.
-        //         a = this.createAnnotation(a);
-        //         window.PDFAnnoCore.default.getStoreAdapter().editAnnotation(documentId, this.uuid, a);
-        //     } else {
-        //         // insert.
-        //         a = this.createAnnotation();
-        //         window.PDFAnnoCore.default.getStoreAdapter().addAnnotation(documentId, a);
-        //     }
-        // });
-        window.annotationContainer.add(this);
+    save () {
+        window.annotationContainer.add(this)
     }
 
     /**
      * Delete the annotation from rendering, a container in window, and a container in localStorage.
      */
-    destroy() {
-        this.deleted = true;
-        this.$element.remove();
+    destroy () {
+        this.deleted = true
+        this.$element.remove()
 
-        let promise = Promise.resolve();
+        let promise = Promise.resolve()
 
         if (this.uuid) {
-            window.annotationContainer.remove(this);
-            let { documentId } = __WEBPACK_IMPORTED_MODULE_2__UI_utils__["e" /* getMetadata */](); // TODO Remove this.
-            // promise = window.PDFAnnoCore.default.getStoreAdapter().deleteAnnotation(documentId, this.uuid);
-            this.textAnnotation && this.textAnnotation.destroy();
+            window.annotationContainer.remove(this)
+            this.textAnnotation && this.textAnnotation.destroy()
         }
 
-        return promise;
+        return promise
     }
 
     /**
      * Judge the point within the element.
      */
-    isHit(x, y) {
-        return false;
+    isHit (x, y) {
+        return false
     }
 
     /**
      * Judge the point within the label.
      */
-    isHitText(x, y) {
-        return this.textAnnotation && this.textAnnotation.isHit(x, y);
+    isHitText (x, y) {
+        return this.textAnnotation && this.textAnnotation.isHit(x, y)
     }
 
     /**
      * Handle a click event.
      */
-    handleClickEvent(e) {
-        this.toggleSelect();
+    handleClickEvent (e) {
+        this.toggleSelect()
 
         if (this.type !== 'textbox') {
 
@@ -10926,97 +10856,92 @@ class AbstractAnnotation extends __WEBPACK_IMPORTED_MODULE_0_events___default.a 
                     window.annotationContainer
                         .getSelectedAnnotations()
                         .filter(a => a.uuid !== this.uuid)
-                        .forEach(a => a.deselect());
+                        .forEach(a => a.deselect())
                 }
 
-                // console.log('select:', this.uuid, this.text, this);
-                // textInput.enable({ uuid : this.uuid, text : this.text });
-
-                var event = document.createEvent('CustomEvent');
-                event.initCustomEvent('annotationSelected', true, true, this);
-                window.dispatchEvent(event);
+                // TODO Use common function.
+                let event = document.createEvent('CustomEvent')
+                event.initCustomEvent('annotationSelected', true, true, this)
+                window.dispatchEvent(event)
 
             } else {
 
-                // console.log('deselect:', this.uuid, this);
-                // textInput.disable({ uuid : this.uuid });
-
-                var event = document.createEvent('CustomEvent');
-                event.initCustomEvent('annotationDeselected', true, true, this);
-                window.dispatchEvent(event);
+                // TODO Use common function.
+                let event = document.createEvent('CustomEvent')
+                event.initCustomEvent('annotationDeselected', true, true, this)
+                window.dispatchEvent(event)
 
             }
         }
-
     }
 
     /**
      * Handle a hoverIn event.
      */
-    handleHoverInEvent(e) {
-        console.log('handleHoverInEvent');
-        this.highlight();
-        this.emit('hoverin');
-        __WEBPACK_IMPORTED_MODULE_4__utils_event__["a" /* dispatchWindowEvent */]('annotationHoverIn', this);
+    handleHoverInEvent (e) {
+        console.log('handleHoverInEvent')
+        this.highlight()
+        this.emit('hoverin')
+        __WEBPACK_IMPORTED_MODULE_3__utils_event__["a" /* dispatchWindowEvent */]('annotationHoverIn', this)
     }
 
     /**
      * Handle a hoverOut event.
      */
-    handleHoverOutEvent(e) {
-        console.log('handleHoverOutEvent');
-        this.dehighlight();
-        this.emit('hoverout');
-        __WEBPACK_IMPORTED_MODULE_4__utils_event__["a" /* dispatchWindowEvent */]('annotationHoverOut', this);
+    handleHoverOutEvent (e) {
+        console.log('handleHoverOutEvent')
+        this.dehighlight()
+        this.emit('hoverout')
+        __WEBPACK_IMPORTED_MODULE_3__utils_event__["a" /* dispatchWindowEvent */]('annotationHoverOut', this)
     }
 
     /**
      * Highlight the annotation.
      */
-    highlight() {
-        this.$element.addClass('--hover --emphasis');
-        this.textAnnotation && this.textAnnotation.highlight();
+    highlight () {
+        this.$element.addClass('--hover --emphasis')
+        this.textAnnotation && this.textAnnotation.highlight()
     }
 
     /**
      * Dehighlight the annotation.
      */
-    dehighlight() {
-        this.$element.removeClass('--hover --emphasis');
-        this.textAnnotation && this.textAnnotation.dehighlight();
+    dehighlight () {
+        this.$element.removeClass('--hover --emphasis')
+        this.textAnnotation && this.textAnnotation.dehighlight()
     }
 
     /**
      * Select the annotation.
      */
-    select() {
-        this.selected = true;
-        this.selectedTime = Date.now();
-        this.$element.addClass('--selected');
+    select () {
+        this.selected = true
+        this.selectedTime = Date.now()
+        this.$element.addClass('--selected')
     }
 
     /**
      * Deselect the annotation.
      */
-    deselect() {
-        console.log('deselect');
-        this.selected = false;
-        this.selectedTime = null;
-        this.$element.removeClass('--selected');
+    deselect () {
+        console.log('deselect')
+        this.selected = false
+        this.selectedTime = null
+        this.$element.removeClass('--selected')
     }
 
     /**
      * Toggle the selected state.
      */
-    toggleSelect() {
+    toggleSelect () {
 
         if (this.selected) {
-            this.deselect();
-            this.textAnnotation && this.textAnnotation.deselect();
+            this.deselect()
+            this.textAnnotation && this.textAnnotation.deselect()
 
         } else {
-            this.select();
-            this.textAnnotation && this.textAnnotation.select();
+            this.select()
+            this.textAnnotation && this.textAnnotation.select()
         }
 
     }
@@ -11024,94 +10949,94 @@ class AbstractAnnotation extends __WEBPACK_IMPORTED_MODULE_0_events___default.a 
     /**
      * Delete the annotation if selected.
      */
-    deleteSelectedAnnotation() {
+    deleteSelectedAnnotation () {
 
         if (this.isSelected()) {
             this.destroy().then(() => {
-                __WEBPACK_IMPORTED_MODULE_4__utils_event__["a" /* dispatchWindowEvent */]('annotationDeleted', { uuid : this.uuid });
-            });
-            return true;
+                __WEBPACK_IMPORTED_MODULE_3__utils_event__["a" /* dispatchWindowEvent */]('annotationDeleted', { uuid : this.uuid })
+            })
+            return true
         }
-        return false;
+        return false
     }
 
     /**
      * Check whether a boundingCircle is included.
      */
-    hasBoundingCircle() {
-        return this.$element.find('circle').length > 0;
+    hasBoundingCircle () {
+        return this.$element.find('circle').length > 0
     }
 
     /**
      * Check whether the annotation is selected.
      */
-    isSelected() {
-        return this.$element.hasClass('--selected');
+    isSelected () {
+        return this.$element.hasClass('--selected')
     }
 
     /**
      * Create a dummy DOM element for the timing that a annotation hasn't be specified yet.
      */
-    createDummyElement() {
-        return $('<div class="dummy"/>');
+    createDummyElement () {
+        return $('<div class="dummy"/>')
     }
 
     /**
      * Enable a view mode.
      */
-    enableViewMode() {
-        this.render();
-        this.textAnnotation && this.textAnnotation.enableViewMode();
+    enableViewMode () {
+        this.render()
+        this.textAnnotation && this.textAnnotation.enableViewMode()
     }
 
     /**
      * Disable a view mode.
      */
-    disableViewMode() {
-        this.render();
-        this.textAnnotation && this.textAnnotation.disableViewMode();
+    disableViewMode () {
+        this.render()
+        this.textAnnotation && this.textAnnotation.disableViewMode()
     }
 
     /**
      * Make the text always visible.
      * This state will be reset at entering the view mode.
      */
-    setTextForceDisplay() {
+    setTextForceDisplay () {
         if (this.textAnnotation) {
-            this.textAnnotation.textForceDisplay = true;
+            this.textAnnotation.textForceDisplay = true
         }
     }
 
-    resetTextForceDisplay() {
+    resetTextForceDisplay () {
         if (this.textAnnotation) {
-            this.textAnnotation.textForceDisplay = false;
+            this.textAnnotation.textForceDisplay = false
         }
     }
 
-    setDisableHoverEvent() {
-        this.hoverEventDisable = true;
+    setDisableHoverEvent () {
+        this.hoverEventDisable = true
     }
 
-    setEnableHoverEvent() {
-        this.hoverEventDisable = false;
+    setEnableHoverEvent () {
+        this.hoverEventDisable = false
     }
 
-    enable() {
-        this.disabled = false;
-        this.$element.css('pointer-events', 'auto');
+    enable () {
+        this.disabled = false
+        this.$element.css('pointer-events', 'auto')
     }
 
-    disable() {
-        this.disabled = true;
-        this.$element.css('pointer-events', 'none');
+    disable () {
+        this.disabled = true
+        this.$element.css('pointer-events', 'none')
     }
 
     /**
      * Check the another annotation is equal to `this`.
      */
-    equalTo(anotherAnnotation) {
+    equalTo (anotherAnnotation) {
         // Implement Here.
-        return false;
+        return false
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = AbstractAnnotation;
@@ -11119,14 +11044,40 @@ class AbstractAnnotation extends __WEBPACK_IMPORTED_MODULE_0_events___default.a 
 
 
 /***/ }),
+/* 9 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = enable;
+/* unused harmony export disable */
+/**
+ * Enable Text input enable.
+ */
+function enable ({ uuid, text, disable = false, autoFocus = false, blurListener = null }) {
+    var event = document.createEvent('CustomEvent')
+    event.initCustomEvent('enableTextInput', true, true, ...arguments)
+    window.dispatchEvent(event)
+}
+
+/**
+ * Disable the text input.
+ */
+function disable () {
+    var event = document.createEvent('CustomEvent')
+    event.initCustomEvent('disappearTextInput', true, true)
+    window.dispatchEvent(event)
+}
+
+
+/***/ }),
 /* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_uuid__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__abstract__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__text__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_textInput__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_uuid__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__abstract__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__text__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_textInput__ = __webpack_require__(9);
 
 
 
@@ -11341,11 +11292,11 @@ class SpanAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_uuid__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__abstract__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__text__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_relation_js__ = __webpack_require__(31);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__shared_util__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_uuid__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__abstract__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__text__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_relation_js__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__shared_util__ = __webpack_require__(4);
 
 
 
@@ -16094,189 +16045,9 @@ module.exports = {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__render__ = __webpack_require__(60);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__UI__ = __webpack_require__(66);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__annotation_rect__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__annotation_span__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__annotation_relation__ = __webpack_require__(11);
-// import StoreAdapter from './adapter/StoreAdapter';
-// import PdfannoStoreAdapter from './adapter/PdfannoStoreAdapter';
-
-
-
-
-
-
-__webpack_require__(74);
-
-/* harmony default export */ __webpack_exports__["a"] = ({
-  /**
-   * Abstract class that needs to be defined so PDFAnnoCore
-   * knows how to communicate with your server.
-   */
-  // StoreAdapter,
-
-  /**
-    Implementation of StoreAdapter for PDFAnno.
-  */
-  // PdfannoStoreAdapter,
-
-  /**
-   * Abstract instance of StoreAdapter
-   */
-  // __storeAdapter: new StoreAdapter(),
-
-  /**
-   * Getter for the underlying StoreAdapter property
-   *
-   * @return {StoreAdapter}
-   */
-  // getStoreAdapter() {
-  //   return this.__storeAdapter;
-  // },
-
-  /**
-   * Setter for the underlying StoreAdapter property
-   *
-   * @param {StoreAdapter} adapter The StoreAdapter implementation to be used.
-   */
-  // setStoreAdapter(adapter) {
-  //   // TODO this throws an error when bundled
-  //   // if (!(adapter instanceof StoreAdapter)) {
-  //   //   throw new Error('adapter must be an instance of StoreAdapter');
-  //   // }
-
-  //   this.__storeAdapter = adapter;
-  // },
-
-  /**
-   * UI is a helper for instrumenting UI interactions for creating,
-   * editing, and deleting annotations in the browser.
-   */
-  UI: __WEBPACK_IMPORTED_MODULE_1__UI__["a" /* default */],
-
-  /**
-   * Render the annotations for a page in the PDF Document
-   *
-   * @param {SVGElement} svg The SVG element that annotations should be rendered to
-   * @param {PageViewport} viewport The PDFPage.getViewport data
-   * @param {Object} data The StoreAdapter.getAnnotations data
-   * @return {Promise}
-   */
-  render: __WEBPACK_IMPORTED_MODULE_0__render__["a" /* default */],
-
-  /**
-   * Convenience method for getting annotation data
-   *
-   * @alias StoreAdapter.getAnnotations
-   * @param {String} documentId The ID of the document
-   * @return {Promise}
-   */
-  // getAnnotations(documentId) {
-  //   return this.getStoreAdapter().getAnnotations(...arguments);
-  // },
-
-  /**
-   * RectAnnotation Class.
-   */
-  RectAnnotation: __WEBPACK_IMPORTED_MODULE_2__annotation_rect__["a" /* default */],
-
-  /**
-   * SpanAnnotation Class.
-   */
-  SpanAnnotation: __WEBPACK_IMPORTED_MODULE_3__annotation_span__["a" /* default */],
-
-  /**
-   * RelationAnnotation Class.
-   */
-  RelationAnnotation: __WEBPACK_IMPORTED_MODULE_4__annotation_relation__["a" /* default */]
-
-});
-
-
-/***/ }),
-/* 19 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var isObj = __webpack_require__(68);
-var hasOwnProperty = Object.prototype.hasOwnProperty;
-var propIsEnumerable = Object.prototype.propertyIsEnumerable;
-
-function toObject(val) {
-	if (val === null || val === undefined) {
-		throw new TypeError('Sources cannot be null or undefined');
-	}
-
-	return Object(val);
-}
-
-function assignKey(to, from, key) {
-	var val = from[key];
-
-	if (val === undefined || val === null) {
-		return;
-	}
-
-	if (hasOwnProperty.call(to, key)) {
-		if (to[key] === undefined || to[key] === null) {
-			throw new TypeError('Cannot convert undefined or null to object (' + key + ')');
-		}
-	}
-
-	if (!hasOwnProperty.call(to, key) || !isObj(val)) {
-		to[key] = val;
-	} else {
-		to[key] = assign(Object(to[key]), from[key]);
-	}
-}
-
-function assign(to, from) {
-	if (to === from) {
-		return to;
-	}
-
-	from = Object(from);
-
-	for (var key in from) {
-		if (hasOwnProperty.call(from, key)) {
-			assignKey(to, from, key);
-		}
-	}
-
-	if (Object.getOwnPropertySymbols) {
-		var symbols = Object.getOwnPropertySymbols(from);
-
-		for (var i = 0; i < symbols.length; i++) {
-			if (propIsEnumerable.call(from, symbols[i])) {
-				assignKey(to, from, symbols[i]);
-			}
-		}
-	}
-
-	return to;
-}
-
-module.exports = function deepAssign(target) {
-	target = toObject(target);
-
-	for (var s = 1; s < arguments.length; s++) {
-		assign(target, arguments[s]);
-	}
-
-	return target;
-};
-
-
-/***/ }),
-/* 20 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_uuid__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__abstract__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__text__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_uuid__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__abstract__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__text__ = __webpack_require__(19);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__UI_utils__ = __webpack_require__(1);
 
 
@@ -16509,7 +16280,7 @@ class RectAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
         this.endX = parseInt(e.clientX);
         this.endY = parseInt(e.clientY);
 
-        let diff = __WEBPACK_IMPORTED_MODULE_3__UI_utils__["i" /* scaleDown */]({
+        let diff = __WEBPACK_IMPORTED_MODULE_3__UI_utils__["h" /* scaleDown */]({
             x : this.endX - this.startX,
             y : this.endY - this.startY
         });
@@ -16605,17 +16376,13 @@ class RectAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
 
 
 /***/ }),
-/* 21 */
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_deep_assign__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_deep_assign___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_deep_assign__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__UI_utils__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__UI_text__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__abstract__ = __webpack_require__(9);
-
-
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__UI_utils__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__UI_text__ = __webpack_require__(70);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__abstract__ = __webpack_require__(8);
 
 
 
@@ -16623,196 +16390,179 @@ class RectAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
 /**
  * Text Annotation.
  */
-class TextAnnotation extends __WEBPACK_IMPORTED_MODULE_3__abstract__["a" /* default */] {
+// TODO No need?
+class TextAnnotation extends __WEBPACK_IMPORTED_MODULE_2__abstract__["a" /* default */] {
 
     /**
      * Constructor.
      */
-    constructor(readOnly, parent) {
-        super();
+    constructor (readOnly, parent) {
+        super()
 
-        this.type     = 'textbox';
-        this.parent   = parent;
-        this.x        = 0;
-        this.y        = 0;
-        this.readOnly = readOnly;
-        this.$element = this.createDummyElement();
+        this.type = 'textbox'
+        this.parent = parent
+        this.x = 0
+        this.y = 0
+        this.readOnly = readOnly
+        this.$element = this.createDummyElement()
 
         // Updated by parent via AbstractAnnotation#setTextForceDisplay.
-        this.textForceDisplay = false;
+        // TODO No need?
+        this.textForceDisplay = false
     }
-
 
     /**
      * Render a text.
      */
-     render() {
-
-        // 2Col対応で一旦コメントアウト（PDF上にはテキストを表示しない）
-
-        // let result = false;
-
-        // if (this.parent.text) {
-        //     assign(this, this.parent.getTextPosition());
-        //     this.text = this.parent.text;
-        //     this.color = this.parent.color;
-        //     this.parentId = this.parent.uuid;
-        //     result = super.render();
-        //     if (this.textForceDisplay) {
-        //         this.$element.addClass('--visible');
-        //     }
-        // } else {
-        //     this.$element.remove();
-        // }
-
+    render () {
+        // 何もしない（PDF上にはテキストを表示しない）
     }
 
     /**
      * Set a hover event.
      */
-    setHoverEvent() {
+    setHoverEvent () {
         this.$element.find('text').hover(
             this.handleHoverInEvent,
             this.handleHoverOutEvent
-        );
+        )
     }
 
     /**
      * Delete a text annotation.
      */
-    destroy() {
-        return super.destroy();
+    destroy () {
+        return super.destroy()
     }
 
-    isHit(x, y) {
+    isHit (x, y) {
 
         if (!this.parent.text || this.deleted) {
-            return false;
+            return false
         }
 
-        let $rect = this.$element.find('rect');
-        let x1 = parseInt($rect.attr('x'));
-        let y1 = parseInt($rect.attr('y'));
-        let x2 = x1 + parseInt($rect.attr('width'));
-        let y2 = y1 + parseInt($rect.attr('height'));
+        let $rect = this.$element.find('rect')
+        let x1 = parseInt($rect.attr('x'))
+        let y1 = parseInt($rect.attr('y'))
+        let x2 = x1 + parseInt($rect.attr('width'))
+        let y2 = y1 + parseInt($rect.attr('height'))
 
-        return (x1 <= x && x <= x2) && (y1 <= y && y <= y2);
+        return (x1 <= x && x <= x2) && (y1 <= y && y <= y2)
     }
 
     /**
      * Delete a text annotation if selected.
      */
-    deleteSelectedAnnotation() {
-        super.deleteSelectedAnnotation();
+    deleteSelectedAnnotation () {
+        super.deleteSelectedAnnotation()
     }
 
     /**
      * Handle a hoverin event.
      */
-    handleHoverInEvent() {
-        this.highlight();
-        this.emit('hoverin');
+    handleHoverInEvent () {
+        this.highlight()
+        this.emit('hoverin')
     }
 
     /**
      * Handle a hoverout event.
      */
-    handleHoverOutEvent() {
-        this.dehighlight();
-        this.emit('hoverout');
+    handleHoverOutEvent () {
+        this.dehighlight()
+        this.emit('hoverout')
     }
 
     /**
      * Handle a click event.
      */
-    handleClickEvent() {
+    handleClickEvent () {
 
         // Permit only for editable.
         if (this.parent.readOnly) {
-            return;
+            return
         }
 
-        let next = !this.$element.hasClass('--selected');
+        let next = !this.$element.hasClass('--selected')
 
         if (next) {
-            super.select();
-            this.emit('selected');
+            super.select()
+            this.emit('selected')
 
         } else {
-            super.deselect();
-            this.emit('deselected');
+            super.deselect()
+            this.emit('deselected')
         }
 
         // Check double click.
-        let currentTime = (new Date()).getTime();
+        let currentTime = (new Date()).getTime()
         if (this.prevClickTime && (currentTime - this.prevClickTime) < 400) {
-            this.handleDoubleClickEvent();
+            this.handleDoubleClickEvent()
         }
-        this.prevClickTime = currentTime;
+        this.prevClickTime = currentTime
     }
 
     /**
      * Handle a click event.
      */
-    handleDoubleClickEvent() {
-        console.log('handleDoubleClickEvent:', this.readOnly, this.parent.readOnly);
+    handleDoubleClickEvent () {
+        console.log('handleDoubleClickEvent:', this.readOnly, this.parent.readOnly)
 
-        this.$element.remove();
+        this.$element.remove()
 
-        let svg = __WEBPACK_IMPORTED_MODULE_1__UI_utils__["f" /* getSVGLayer */]();
-        let pos = __WEBPACK_IMPORTED_MODULE_1__UI_utils__["j" /* scaleUp */](svg, {
+        let svg = __WEBPACK_IMPORTED_MODULE_0__UI_utils__["e" /* getSVGLayer */]()
+        let pos = __WEBPACK_IMPORTED_MODULE_0__UI_utils__["i" /* scaleUp */](svg, {
             x : this.x,
             y : this.y
-        });
-        let rect = svg.getBoundingClientRect();
-        pos.x += rect.left;
-        pos.y += rect.top;
+        })
+        let rect = svg.getBoundingClientRect()
+        pos.x += rect.left
+        pos.y += rect.top
 
-        __WEBPACK_IMPORTED_MODULE_2__UI_text__["a" /* addInputField */](pos.x, pos.y, this.uuid, this.text, (text) => {
+        __WEBPACK_IMPORTED_MODULE_1__UI_text__["a" /* addInputField */](pos.x, pos.y, this.uuid, this.text, (text) => {
 
-            console.log('callback:', text);
+            console.log('callback:', text)
 
             if (text || text === '') {
-                this.text = text;
-                this.emit('textchanged', text);
+                this.text = text
+                this.emit('textchanged', text)
             }
 
-            this.render();
+            this.render()
 
             if (!this.readOnly) {
-                this.$element.find('text').off('click').on('click', this.handleClickEvent);
+                this.$element.find('text').off('click').on('click', this.handleClickEvent)
             }
 
-        });
+        })
 
     }
 
-    enableViewMode() {
-        super.enableViewMode();
+    enableViewMode () {
+        super.enableViewMode()
         if (!this.readOnly) {
-            this.$element.find('text').off('click').on('click', this.handleClickEvent);
+            this.$element.find('text').off('click').on('click', this.handleClickEvent)
         }
     }
 
-    disableViewMode() {
-        super.disableViewMode();
-        this.$element.find('text').off('click', this.handleClickEvent);
+    disableViewMode () {
+        super.disableViewMode()
+        this.$element.find('text').off('click', this.handleClickEvent)
     }
-
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = TextAnnotation;
 
 
 
 /***/ }),
+/* 20 */,
+/* 21 */,
 /* 22 */,
 /* 23 */,
 /* 24 */,
 /* 25 */,
 /* 26 */,
-/* 27 */,
-/* 28 */,
-/* 29 */
+/* 27 */
 /***/ (function(module, exports) {
 
 // Copyright Joyent, Inc. and other Node contributors.
@@ -17120,28 +16870,132 @@ function isUndefined(arg) {
 
 
 /***/ }),
-/* 30 */
+/* 28 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__render__ = __webpack_require__(59);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__UI__ = __webpack_require__(65);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__annotation_rect__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__annotation_span__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__annotation_relation__ = __webpack_require__(11);
+// import StoreAdapter from './adapter/StoreAdapter';
+// import PdfannoStoreAdapter from './adapter/PdfannoStoreAdapter';
+
+
+
+
+
+
+__webpack_require__(74);
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+  /**
+   * Abstract class that needs to be defined so PDFAnnoCore
+   * knows how to communicate with your server.
+   */
+  // StoreAdapter,
+
+  /**
+    Implementation of StoreAdapter for PDFAnno.
+  */
+  // PdfannoStoreAdapter,
+
+  /**
+   * Abstract instance of StoreAdapter
+   */
+  // __storeAdapter: new StoreAdapter(),
+
+  /**
+   * Getter for the underlying StoreAdapter property
+   *
+   * @return {StoreAdapter}
+   */
+  // getStoreAdapter() {
+  //   return this.__storeAdapter;
+  // },
+
+  /**
+   * Setter for the underlying StoreAdapter property
+   *
+   * @param {StoreAdapter} adapter The StoreAdapter implementation to be used.
+   */
+  // setStoreAdapter(adapter) {
+  //   // TODO this throws an error when bundled
+  //   // if (!(adapter instanceof StoreAdapter)) {
+  //   //   throw new Error('adapter must be an instance of StoreAdapter');
+  //   // }
+
+  //   this.__storeAdapter = adapter;
+  // },
+
+  /**
+   * UI is a helper for instrumenting UI interactions for creating,
+   * editing, and deleting annotations in the browser.
+   */
+  UI: __WEBPACK_IMPORTED_MODULE_1__UI__["a" /* default */],
+
+  /**
+   * Render the annotations for a page in the PDF Document
+   *
+   * @param {SVGElement} svg The SVG element that annotations should be rendered to
+   * @param {PageViewport} viewport The PDFPage.getViewport data
+   * @param {Object} data The StoreAdapter.getAnnotations data
+   * @return {Promise}
+   */
+  render: __WEBPACK_IMPORTED_MODULE_0__render__["a" /* default */],
+
+  /**
+   * Convenience method for getting annotation data
+   *
+   * @alias StoreAdapter.getAnnotations
+   * @param {String} documentId The ID of the document
+   * @return {Promise}
+   */
+  // getAnnotations(documentId) {
+  //   return this.getStoreAdapter().getAnnotations(...arguments);
+  // },
+
+  /**
+   * RectAnnotation Class.
+   */
+  RectAnnotation: __WEBPACK_IMPORTED_MODULE_2__annotation_rect__["a" /* default */],
+
+  /**
+   * SpanAnnotation Class.
+   */
+  SpanAnnotation: __WEBPACK_IMPORTED_MODULE_3__annotation_span__["a" /* default */],
+
+  /**
+   * RelationAnnotation Class.
+   */
+  RelationAnnotation: __WEBPACK_IMPORTED_MODULE_4__annotation_relation__["a" /* default */]
+
+});
+
+
+/***/ }),
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* unused harmony export transform */
 /* harmony export (immutable) */ __webpack_exports__["a"] = appendChild;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_object_assign__ = __webpack_require__(61);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_object_assign__ = __webpack_require__(60);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_object_assign___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_object_assign__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__renderRect__ = __webpack_require__(62);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__renderSpan__ = __webpack_require__(63);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__renderText__ = __webpack_require__(64);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__renderRelation__ = __webpack_require__(65);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__renderCircle__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__renderRect__ = __webpack_require__(61);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__renderSpan__ = __webpack_require__(62);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__renderText__ = __webpack_require__(63);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__renderRelation__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__renderCircle__ = __webpack_require__(6);
 
 
 
 
-// **extention**
 
 
 
-const isFirefox = /firefox/i.test(navigator.userAgent);
+const isFirefox = /firefox/i.test(navigator.userAgent)
 
 /**
  * Get the x/y translation to be used for transforming the annotations
@@ -17150,31 +17004,31 @@ const isFirefox = /firefox/i.test(navigator.userAgent);
  * @param {Object} viewport The viewport data from the page
  * @return {Object}
  */
-function getTranslation(viewport) {
-  let x;
-  let y;
+function getTranslation (viewport) {
+    let x
+    let y
 
-  // Modulus 360 on the rotation so that we only
-  // have to worry about four possible values.
-  switch(viewport.rotation % 360) {
+    // Modulus 360 on the rotation so that we only
+    // have to worry about four possible values.
+    switch (viewport.rotation % 360) {
     case 0:
-      x = y = 0;
-      break;
+        x = y = 0
+        break
     case 90:
-      x = 0;
-      y = (viewport.width / viewport.scale) * -1;
-      break;
+        x = 0
+        y = (viewport.width / viewport.scale) * -1
+        break
     case 180:
-      x = (viewport.width / viewport.scale) * -1;
-      y = (viewport.height / viewport.scale) * -1;
-      break;
+        x = (viewport.width / viewport.scale) * -1
+        y = (viewport.height / viewport.scale) * -1
+        break
     case 270:
-      x = (viewport.height / viewport.scale) * -1;
-      y = 0;
-      break;
-  }
+        x = (viewport.height / viewport.scale) * -1
+        y = 0
+        break
+    }
 
-  return { x, y };
+    return { x, y }
 }
 
 /**
@@ -17184,55 +17038,56 @@ function getTranslation(viewport) {
  * @param {Object} viewport The page's viewport data
  * @return {Node}
  */
-function transform(node, viewport) {
-  let trans = getTranslation(viewport);
+function transform (node, viewport) {
+    let trans = getTranslation(viewport)
 
-  // Let SVG natively transform the element
-  node.setAttribute('transform', `scale(${viewport.scale}) rotate(${viewport.rotation}) translate(${trans.x}, ${trans.y})`);
+    // Let SVG natively transform the element
+    node.setAttribute('transform', `scale(${viewport.scale}) rotate(${viewport.rotation}) translate(${trans.x}, ${trans.y})`)
 
-  // Manually adjust x/y for nested SVG nodes
-  if (!isFirefox && node.nodeName.toLowerCase() === 'svg') {
-    node.setAttribute('x', parseInt(node.getAttribute('x'), 10) * viewport.scale);
-    node.setAttribute('y', parseInt(node.getAttribute('y'), 10) * viewport.scale);
+    // Manually adjust x/y for nested SVG nodes
+    if (!isFirefox && node.nodeName.toLowerCase() === 'svg') {
+        node.setAttribute('x', parseInt(node.getAttribute('x'), 10) * viewport.scale)
+        node.setAttribute('y', parseInt(node.getAttribute('y'), 10) * viewport.scale)
 
-    let x = parseInt(node.getAttribute('x', 10));
-    let y = parseInt(node.getAttribute('y', 10));
-    let width = parseInt(node.getAttribute('width'), 10);
-    let height = parseInt(node.getAttribute('height'), 10);
-    let path = node.querySelector('path');
-    let svg = path.parentNode;
+        let x = parseInt(node.getAttribute('x', 10))
+        let y = parseInt(node.getAttribute('y', 10))
+        let width = parseInt(node.getAttribute('width'), 10)
+        let height = parseInt(node.getAttribute('height'), 10)
+        let path = node.querySelector('path')
+        let svg = path.parentNode
 
-    // Scale width/height
-    [node, svg, path, node.querySelector('rect')].forEach((n) => {
-      n.setAttribute('width', parseInt(n.getAttribute('width'), 10) * viewport.scale);
-      n.setAttribute('height', parseInt(n.getAttribute('height'), 10) * viewport.scale);
-    });
+        // Scale width/height
+        let targets = [ node, svg, path, node.querySelector('rect') ]
+        targets.forEach(n => {
+            n.setAttribute('width', parseInt(n.getAttribute('width'), 10) * viewport.scale)
+            n.setAttribute('height', parseInt(n.getAttribute('height'), 10) * viewport.scale)
+        })
 
-    // Transform path but keep scale at 100% since it will be handled natively
-    transform(path, __WEBPACK_IMPORTED_MODULE_0_object_assign___default.a({}, viewport, { scale: 1 }));
+        // Transform path but keep scale at 100% since it will be handled natively
+        transform(path, __WEBPACK_IMPORTED_MODULE_0_object_assign___default.a({}, viewport, { scale : 1 }))
 
-    switch(viewport.rotation % 360) {
-      case 90:
-        node.setAttribute('x', viewport.width - y - width);
-        node.setAttribute('y', x);
-        svg.setAttribute('x', 1);
-        svg.setAttribute('y', 0);
-        break;
-      case 180:
-        node.setAttribute('x', viewport.width - x - width);
-        node.setAttribute('y', viewport.height - y - height);
-        svg.setAttribute('y', 2);
-        break;
-      case 270:
-        node.setAttribute('x', y);
-        node.setAttribute('y', viewport.height - x - height);
-        svg.setAttribute('x', -1);
-        svg.setAttribute('y', 0);
-        break;
+        switch (viewport.rotation % 360) {
+        case 90:
+            node.setAttribute('x', viewport.width - y - width)
+            node.setAttribute('y', x)
+            svg.setAttribute('x', 1)
+            svg.setAttribute('y', 0)
+            break
+        case 180:
+            node.setAttribute('x', viewport.width - x - width)
+            node.setAttribute('y', viewport.height - y - height)
+            svg.setAttribute('y', 2)
+            break
+        case 270:
+            node.setAttribute('x', y)
+            node.setAttribute('y', viewport.height - x - height)
+            svg.setAttribute('x', -1)
+            svg.setAttribute('y', 0)
+            break
+        }
     }
-  }
 
-  return node;
+    return node
 }
 
 /**
@@ -17243,58 +17098,57 @@ function transform(node, viewport) {
  * @param {Object} viewport The page's viewport data
  * @return {SVGElement} A node that was created and appended by this function
  */
-function appendChild(svg, annotation, viewport) {
-  if (!viewport) {
-    viewport = JSON.parse(svg.getAttribute('data-pdf-annotate-viewport'));
-  }
-
-  let child, point;
-  switch (annotation.type) {
-    case 'area':
-      child = __WEBPACK_IMPORTED_MODULE_1__renderRect__["a" /* default */](annotation, svg);
-      break;
-    case 'span':
-      child = __WEBPACK_IMPORTED_MODULE_2__renderSpan__["a" /* default */](annotation, svg);
-      break;
-    case 'textbox':
-      child = __WEBPACK_IMPORTED_MODULE_3__renderText__["a" /* default */](annotation, svg);
-      break;
-    case 'relation':
-      child = __WEBPACK_IMPORTED_MODULE_4__renderRelation__["a" /* default */](annotation, svg);
-      break;
-    case 'circle':
-      child = __WEBPACK_IMPORTED_MODULE_5__renderCircle__["b" /* default */](annotation, svg);
-      break;
-  }
-
-
-  // If no type was provided for an annotation it will result in node being null.
-  // Skip appending/transforming if node doesn't exist.
-  if (child) {
-
-    let elm = transform(child, viewport);
-
-    if (annotation.type === 'textbox') {
-        svg.appendChild(elm);
-
-    // `text` show above other type elements.
-    } else {
-        let $text = $('.anno-text-group');
-        if ($text.length > 0) {
-            $(elm).insertBefore($text.get(0));
-        } else {
-            svg.appendChild(elm);
-        }
+function appendChild (svg, annotation, viewport) {
+    if (!viewport) {
+        viewport = JSON.parse(svg.getAttribute('data-pdf-annotate-viewport'))
     }
 
-  }
+    let child
+    switch (annotation.type) {
+    case 'area':
+        child = __WEBPACK_IMPORTED_MODULE_1__renderRect__["a" /* default */](annotation, svg)
+        break
+    case 'span':
+        child = __WEBPACK_IMPORTED_MODULE_2__renderSpan__["a" /* default */](annotation, svg)
+        break
+    case 'textbox':
+        child = __WEBPACK_IMPORTED_MODULE_3__renderText__["a" /* default */](annotation, svg)
+        break
+    case 'relation':
+        child = __WEBPACK_IMPORTED_MODULE_4__renderRelation__["a" /* default */](annotation, svg)
+        break
+    case 'circle':
+        child = __WEBPACK_IMPORTED_MODULE_5__renderCircle__["b" /* default */](annotation, svg)
+        break
+    }
 
-  return child;
+    // If no type was provided for an annotation it will result in node being null.
+    // Skip appending/transforming if node doesn't exist.
+    if (child) {
+
+        let elm = transform(child, viewport)
+
+        if (annotation.type === 'textbox') {
+            svg.appendChild(elm)
+
+        // `text` show above other type elements.
+        } else {
+            let $text = $('.anno-text-group')
+            if ($text.length > 0) {
+                $(elm).insertBefore($text.get(0))
+            } else {
+                svg.appendChild(elm)
+            }
+        }
+
+    }
+
+    return child
 }
 
 
 /***/ }),
-/* 31 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -17313,307 +17167,214 @@ function appendChild(svg, annotation, viewport) {
  * @params y2 : the y of an end position.
  * @return { x, y } the position of bezier control.
  */
-function findBezierControlPoint(x1, y1, x2, y2) {
+function findBezierControlPoint (x1, y1, x2, y2) {
 
-    const DISTANCE = 30;
+    const DISTANCE = 30
 
     // vertical line.
     if (x1 === x2) {
-      return {
-        x: x1,
-        y: (y1 + y2) / 2
-      };
+        return {
+            x : x1,
+            y : (y1 + y2) / 2
+        }
     }
 
     // horizontal line.
     if (y1 === y2) {
-      return {
-        x: (x1 + x2) / 2,
-        y: y1 - DISTANCE
-      };
+        return {
+            x : (x1 + x2) / 2,
+            y : y1 - DISTANCE
+        }
     }
 
     let center = {
-      x: (x1 + x2) / 2,
-      y: (y1 + y2) / 2
-    };
+        x : (x1 + x2) / 2,
+        y : (y1 + y2) / 2
+    }
 
-    let gradient = (y1 - y2) / (x1 - x2);
-    gradient = -1 / gradient;
+    let gradient = (y1 - y2) / (x1 - x2)
+    gradient = -1 / gradient
 
-    let theta = Math.atan(gradient);
-    let deltaX = Math.cos(theta) * DISTANCE;
-    let deltaY = Math.sin(theta) * DISTANCE;
+    let theta = Math.atan(gradient)
+    let deltaX = Math.cos(theta) * DISTANCE
+    let deltaY = Math.sin(theta) * DISTANCE
 
     if (x1 < x2) {
-      // right top quadrant.
-      if (y1 > y2) {
-        return {
-          x: center.x - Math.abs(deltaX),
-          y: center.y - Math.abs(deltaY)
-        };
-      // right bottom quadrant.
-      } else {
-        return {
-          x: center.x + Math.abs(deltaX),
-          y: center.y - Math.abs(deltaY)
-        };
-      }
+        // right top quadrant.
+        if (y1 > y2) {
+            return {
+                x : center.x - Math.abs(deltaX),
+                y : center.y - Math.abs(deltaY)
+            }
+        // right bottom quadrant.
+        } else {
+            return {
+                x : center.x + Math.abs(deltaX),
+                y : center.y - Math.abs(deltaY)
+            }
+        }
     } else {
-      // left top quadrant.
-      if (y1 > y2) {
-        return {
-          x: center.x + Math.abs(deltaX),
-          y: center.y - Math.abs(deltaY)
-        };
-      // left bottom quadrant.
-      } else {
-        return {
-          x: center.x - Math.abs(deltaX),
-          y: center.y - Math.abs(deltaY)
-        };
-      }
+        // left top quadrant.
+        if (y1 > y2) {
+            return {
+                x : center.x + Math.abs(deltaX),
+                y : center.y - Math.abs(deltaY)
+            }
+        // left bottom quadrant.
+        } else {
+            return {
+                x : center.x - Math.abs(deltaX),
+                y : center.y - Math.abs(deltaY)
+            }
+        }
     }
 }
 
-
-function getRelationTextPosition(x1, y1, x2, y2, text='', parentId=null) {
+function getRelationTextPosition (x1, y1, x2, y2, text = '', parentId = null) {
 
     // texts rendered.
-    let rects = [];
-    $('.anno-text').each(function() {
-        let $this = $(this);
+    let rects = []
+    $('.anno-text').each(function () {
+        let $this = $(this)
         // Remove myself.
-        if ($this.parent().data('parent-id') !== parentId)
-        rects.push({
-            x      : parseFloat($this.attr('x')),
-            y      : parseFloat($this.attr('y')),
-            width  : parseFloat($this.attr('width')),
-            height : parseFloat($this.attr('height'))
-        });
-    });
+        if ($this.parent().data('parent-id') !== parentId) {
+            rects.push({
+                x      : parseFloat($this.attr('x')),
+                y      : parseFloat($this.attr('y')),
+                width  : parseFloat($this.attr('width')),
+                height : parseFloat($this.attr('height'))
+            })
+        }
+    })
 
     // Set self size.
-    let myWidth  = 200;
-    let myHeight = 15;
+    let myWidth = 200
+    let myHeight = 15
 
-    let addY = 5;
+    let addY = 5
     if (y1 < y2) {
-        addY *= -1;
+        addY *= -1
     }
 
     // Find the position not overlap.
     while (true) {
 
-        let cp = findBezierControlPoint(x1, y1, x2, y2);
-        let x = x2 + (cp.x - x2) * 0.4;
-        let y = y2 + (cp.y - y2) * 0.4;
+        let cp = findBezierControlPoint(x1, y1, x2, y2)
+        let x = x2 + (cp.x - x2) * 0.4
+        let y = y2 + (cp.y - y2) * 0.4
 
-        let ok = true;
+        let ok = true
         for (let i = 0; i < rects.length; i++) {
-            let r = rects[i];
+            let r = rects[i]
 
             // Check rects overlap.
 
-            let a_x1 = r.x;
-            let a_x2 = r.x + r.width;
-            let a_y1 = r.y;
-            let a_y2 = r.y + r.height;
+            let aX1 = r.x
+            let aX2 = r.x + r.width
+            let aY1 = r.y
+            let aY2 = r.y + r.height
 
-            let b_x1 = x;
-            let b_x2 = x + myWidth;
-            let b_y1 = y;
-            let b_y2 = y + myHeight;
+            let bX1 = x
+            let bX2 = x + myWidth
+            let bY1 = y
+            let bY2 = y + myHeight
 
-            let crossX = a_x1 <= b_x2 && b_x1 <= a_x2;
-            let crossY = a_y1 <= b_y2 && b_y1 <= a_y2;
+            let crossX = aX1 <= bX2 && bX1 <= aX2
+            let crossY = aY1 <= bY2 && bY1 <= aY2
 
             if (crossX && crossY) {
-                ok = false;
-                break;
+                ok = false
+                break
             }
         }
 
         if (ok) {
-            return { x, y };
+            return { x, y }
         }
 
-        y1 += addY;
-        y2 += addY;
+        y1 += addY
+        y2 += addY
     }
-
-
 }
 
 
 /***/ }),
-/* 32 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/* 31 */
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = addInputField;
-/* unused harmony export closeInput */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
-// TODO no need file ?
 
+var isObj = __webpack_require__(67);
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+var propIsEnumerable = Object.prototype.propertyIsEnumerable;
 
+function toObject(val) {
+	if (val === null || val === undefined) {
+		throw new TypeError('Sources cannot be null or undefined');
+	}
 
-/**
- * The text size at editing.
- */
-const TEXT_SIZE = 12
-
-/*
- * The input field for adding/editing a text.
- */
-let input = null
-
-/*
- * The callback called at finishing to add/edit a text.
- */
-let _finishCallback = null
-
-/**
- * Show an input field for adding a text annotation.
- *
- * @param {Number} x - The x-axis position to show.
- * @param {Number} y - The y-axis position to show.
- * @param {String} selfId - The annotation id used for registration.
- * @param {Function} finishCallback - The callback function will be called after registration.
- */
-function addInputField (x, y, selfId = null, text = null, finishCallback = null) {
-    // This is a dummy form for adding autocomplete candidates at finishing adding/editing.
-    // At the time to finish editing, submit via the submit button, then regist an autocomplete content.
-    let $form = __WEBPACK_IMPORTED_MODULE_0_jquery___default.a('<form id="autocompleteform" action="./"/>').css({
-        position : 'absolute',
-        top      : '0',
-        left     : '0'
-    })
-    $form.on('submit', handleSubmit)
-    $form.append('<input type="submit" value="submit"/>') // needs for Firefox emulating submit event.
-    __WEBPACK_IMPORTED_MODULE_0_jquery___default.a(document.body).append($form)
-
-    input = document.createElement('input')
-    input.setAttribute('id', 'pdf-annotate-text-input')
-    input.setAttribute('placeholder', 'Enter text')
-    input.setAttribute('name', 'paperannotext')
-    input.style.border = `3px solid ${__WEBPACK_IMPORTED_MODULE_1__utils__["a" /* BORDER_COLOR */]}`
-    input.style.borderRadius = '3px'
-    input.style.position = 'absolute'
-    input.style.top = `${y}px`
-    input.style.left = `${x}px`
-    input.style.fontSize = `${TEXT_SIZE}px`
-    input.style.width = '150px'
-    input.style.zIndex = 4 // fixme.
-
-    if (selfId) {
-        input.setAttribute('data-self-id', selfId)
-    }
-
-    if (text) {
-        input.value = text
-    }
-
-    _finishCallback = finishCallback
-
-    input.addEventListener('blur', handleInputBlur)
-    input.addEventListener('keyup', handleInputKeyup)
-
-    $form.append(input)
-
-    // for Chrome.
-    setTimeout(() => {
-        input.focus()
-    }, 100)
+	return Object(val);
 }
 
-/*
- * Handle form.submit event.
- * @param {Event} e - Submit event.
- */
-function handleSubmit (e) {
-    e.preventDefault()
-    return false
+function assignKey(to, from, key) {
+	var val = from[key];
+
+	if (val === undefined || val === null) {
+		return;
+	}
+
+	if (hasOwnProperty.call(to, key)) {
+		if (to[key] === undefined || to[key] === null) {
+			throw new TypeError('Cannot convert undefined or null to object (' + key + ')');
+		}
+	}
+
+	if (!hasOwnProperty.call(to, key) || !isObj(val)) {
+		to[key] = val;
+	} else {
+		to[key] = assign(Object(to[key]), from[key]);
+	}
 }
 
-/**
- * Handle input.blur event.
- */
-function handleInputBlur () {
-    saveText()
+function assign(to, from) {
+	if (to === from) {
+		return to;
+	}
+
+	from = Object(from);
+
+	for (var key in from) {
+		if (hasOwnProperty.call(from, key)) {
+			assignKey(to, from, key);
+		}
+	}
+
+	if (Object.getOwnPropertySymbols) {
+		var symbols = Object.getOwnPropertySymbols(from);
+
+		for (var i = 0; i < symbols.length; i++) {
+			if (propIsEnumerable.call(from, symbols[i])) {
+				assignKey(to, from, symbols[i]);
+			}
+		}
+	}
+
+	return to;
 }
 
-/**
- * Handle input.keyup event.
- * @param {Event} e The DOM event to handle
- */
-function handleInputKeyup (e) {
-    if (e.keyCode === 27) {
-        closeInput()
-    }
-}
+module.exports = function deepAssign(target) {
+	target = toObject(target);
 
-/**
- * Save a text annotation from input.
- */
-function saveText () {
-    if (!input) {
-        return
-    }
+	for (var s = 1; s < arguments.length; s++) {
+		assign(target, arguments[s]);
+	}
 
-    let content = input.value.trim()
-    if (!content) {
-        return closeInput('')
-    }
-
-    let clientX = parseInt(input.style.left, 10)
-    let clientY = parseInt(input.style.top, 10)
-    let svg = __WEBPACK_IMPORTED_MODULE_1__utils__["f" /* getSVGLayer */]()
-
-    let rect = svg.getBoundingClientRect()
-    let annotation = Object.assign({
-        type    : 'textbox',
-        content : content
-    }, __WEBPACK_IMPORTED_MODULE_1__utils__["i" /* scaleDown */](svg, {
-        x      : clientX - rect.left,
-        y      : clientY - rect.top,
-        width  : input.offsetWidth,
-        height : input.offsetHeight
-    }))
-
-    // RelationId.
-    let selfId = input.getAttribute('data-self-id')
-    if (selfId) {
-        annotation.uuid = selfId
-    }
-
-    // Add an autocomplete candidate. (Firefox, Chrome)
-    __WEBPACK_IMPORTED_MODULE_0_jquery___default.a('#autocompleteform [type="submit"]').click()
-
-    closeInput(content)
-}
-
-/**
- * Close the input.
- * @param {Object} textAnnotation - the annotation registerd.
- */
-function closeInput (text) {
-    if (input) {
-        __WEBPACK_IMPORTED_MODULE_0_jquery___default.a(input).parents('form').remove()
-        input = null
-
-        if (_finishCallback) {
-            _finishCallback(text)
-        }
-    }
-
-    _finishCallback = null
-}
+	return target;
+};
 
 
 /***/ }),
+/* 32 */,
 /* 33 */,
 /* 34 */,
 /* 35 */,
@@ -17639,19 +17400,18 @@ function closeInput (text) {
 /* 55 */,
 /* 56 */,
 /* 57 */,
-/* 58 */,
-/* 59 */
+/* 58 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_events__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_events__ = __webpack_require__(27);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_events___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_events__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_PDFAnnoCore__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_PDFAnnoCore__ = __webpack_require__(28);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__src_annotation_container__ = __webpack_require__(76);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__src_annotation_rect__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__src_annotation_rect__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__src_annotation_span__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__src_annotation_relation__ = __webpack_require__(11);
 /**
@@ -17908,13 +17668,13 @@ function renderAnnotations(svg) {
 
 
 /***/ }),
-/* 60 */
+/* 59 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = render;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__PDFAnnoCore__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__appendChild__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__PDFAnnoCore__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__appendChild__ = __webpack_require__(29);
 
 
 
@@ -17963,7 +17723,7 @@ function render(svg, viewport, data) {
 
 
 /***/ }),
-/* 61 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18060,13 +17820,13 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 
 
 /***/ }),
-/* 62 */
+/* 61 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = renderRect;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__renderCircle__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__renderCircle__ = __webpack_require__(6);
 
 
 
@@ -18117,13 +17877,13 @@ function createRect (r) {
 
 
 /***/ }),
-/* 63 */
+/* 62 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = renderSpan;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__renderCircle__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__renderCircle__ = __webpack_require__(6);
 
 
 
@@ -18176,12 +17936,12 @@ function createRect (r) {
 
 
 /***/ }),
-/* 64 */
+/* 63 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = renderText;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__ = __webpack_require__(3);
 // TODO no need this file ?
 
 
@@ -18248,15 +18008,15 @@ function renderText (a, svg) {
 
 
 /***/ }),
-/* 65 */
+/* 64 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = renderRelation;
 /* unused harmony export createRelation */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__renderCircle__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_relation_js__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__renderCircle__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_relation_js__ = __webpack_require__(30);
 
 
 
@@ -18374,11 +18134,11 @@ function createRelation (a, id = null) {
 
 
 /***/ }),
-/* 66 */
+/* 65 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__rect__ = __webpack_require__(67);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__rect__ = __webpack_require__(66);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__span__ = __webpack_require__(71);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__relation__ = __webpack_require__(72);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__view__ = __webpack_require__(73);
@@ -18396,76 +18156,72 @@ function createRelation (a, id = null) {
 
 
 /***/ }),
-/* 67 */
+/* 66 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["b"] = enableRect;
 /* harmony export (immutable) */ __webpack_exports__["a"] = disableRect;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_deep_assign__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_deep_assign__ = __webpack_require__(31);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_deep_assign___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_deep_assign__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__PDFAnnoCore__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__text__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__annotation_rect__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__utils_textInput__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__annotation_rect__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__utils_textInput__ = __webpack_require__(9);
+// TODO Remove jquery, because viewer.html already loaded jQuery.
 
 
 
 
 
 
+const _type = 'area'
 
-
-const _type = 'area';
-
-let overlay;
-let originY;
-let originX;
+let overlay
+let originY
+let originX
 
 let enableArea = {
-  page : 0,
-  minX : 0,
-  maxX : 0,
-  minY : 0,
-  maxY : 0
-};
+    page : 0,
+    minX : 0,
+    maxX : 0,
+    minY : 0,
+    maxY : 0
+}
 
-let mousedownFired = false;
-let mousemoveFired = false;
+let mousedownFired = false
+let mousemoveFired = false
 
 /**
  * Handle document.mousedown event
  *
  * @param {Event} e The DOM event to handle
  */
-function handleDocumentMousedown(e) {
+function handleDocumentMousedown (e) {
 
-  mousedownFired = true;
+    mousedownFired = true
 
-  let { x, y } = __WEBPACK_IMPORTED_MODULE_3__utils__["h" /* getXY */](e);
-  originX = x;
-  originY = y;
+    let { x, y } = __WEBPACK_IMPORTED_MODULE_2__utils__["g" /* getXY */](e)
+    originX = x
+    originY = y
 
-  enableArea = __WEBPACK_IMPORTED_MODULE_3__utils__["d" /* getCurrentPage */](e);
-  if (!enableArea) {
-    return;
-  }
+    enableArea = __WEBPACK_IMPORTED_MODULE_2__utils__["d" /* getCurrentPage */](e)
+    if (!enableArea) {
+        return
+    }
 
-  overlay = document.createElement('div');
-  overlay.style.position = 'absolute';
-  overlay.style.top = `${originY}px`;
-  overlay.style.left = `${originX}px`;
-  overlay.style.width = 0;
-  overlay.style.height = 0;
-  overlay.style.border = `2px solid #00BFFF`; // Blue.
-  overlay.style.boxSizing = 'border-box';
-  overlay.style.visibility = 'visible';
-  overlay.style.pointerEvents = 'none';
-  __WEBPACK_IMPORTED_MODULE_3__utils__["g" /* getTmpLayer */]().appendChild(overlay);
-
+    overlay = document.createElement('div')
+    overlay.style.position = 'absolute'
+    overlay.style.top = `${originY}px`
+    overlay.style.left = `${originX}px`
+    overlay.style.width = 0
+    overlay.style.height = 0
+    overlay.style.border = `2px solid #00BFFF` // Blue.
+    overlay.style.boxSizing = 'border-box'
+    overlay.style.visibility = 'visible'
+    overlay.style.pointerEvents = 'none'
+    __WEBPACK_IMPORTED_MODULE_2__utils__["f" /* getTmpLayer */]().appendChild(overlay)
 }
 
 /**
@@ -18473,62 +18229,62 @@ function handleDocumentMousedown(e) {
  *
  * @param {Event} e The DOM event to handle
  */
-function handleDocumentMousemove(e) {
+function handleDocumentMousemove (e) {
 
     if (!overlay) {
-        return;
+        return
     }
 
     if (mousedownFired) {
-      mousemoveFired = true;
+        mousemoveFired = true
     }
 
-    __WEBPACK_IMPORTED_MODULE_0_jquery___default.a(document.body).addClass('no-action');
+    __WEBPACK_IMPORTED_MODULE_0_jquery___default.a(document.body).addClass('no-action')
 
-    let { x : curX, y : curY } = __WEBPACK_IMPORTED_MODULE_3__utils__["h" /* getXY */](e);
+    let { x : curX, y : curY } = __WEBPACK_IMPORTED_MODULE_2__utils__["g" /* getXY */](e)
 
-    let x = Math.min(originX, curX);
-    let y = Math.min(originY, curY);
-    let w = Math.abs(originX - curX);
-    let h = Math.abs(originY - curY);
+    let x = Math.min(originX, curX)
+    let y = Math.min(originY, curY)
+    let w = Math.abs(originX - curX)
+    let h = Math.abs(originY - curY)
 
     // Restrict in page.
-    x = Math.min(enableArea.maxX, Math.max(enableArea.minX, x));
-    y = Math.min(enableArea.maxY, Math.max(enableArea.minY, y));
+    x = Math.min(enableArea.maxX, Math.max(enableArea.minX, x))
+    y = Math.min(enableArea.maxY, Math.max(enableArea.minY, y))
     if (x > enableArea.minX) {
-      w = Math.min(w, enableArea.maxX - x);
+        w = Math.min(w, enableArea.maxX - x)
     } else {
-      w = originX - enableArea.minX;
+        w = originX - enableArea.minX
     }
     if (y > enableArea.minY) {
-      h = Math.min(h, enableArea.maxY - y);
+        h = Math.min(h, enableArea.maxY - y)
     } else {
-      h = originY - enableArea.minY;
+        h = originY - enableArea.minY
     }
 
     // Move and Resize.
-    overlay.style.left   = x + 'px';
-    overlay.style.top    = y + 'px';
-    overlay.style.width  = w + 'px';
-    overlay.style.height = h + 'px';
+    overlay.style.left = x + 'px'
+    overlay.style.top = y + 'px'
+    overlay.style.width = w + 'px'
+    overlay.style.height = h + 'px'
 }
 
-function _findAnnotation(e) {
+function _findAnnotation (e) {
 
-    const { x, y } = __WEBPACK_IMPORTED_MODULE_3__utils__["i" /* scaleDown */](__WEBPACK_IMPORTED_MODULE_3__utils__["f" /* getSVGLayer */](), __WEBPACK_IMPORTED_MODULE_3__utils__["h" /* getXY */](e));
+    const { x, y } = __WEBPACK_IMPORTED_MODULE_2__utils__["h" /* scaleDown */](__WEBPACK_IMPORTED_MODULE_2__utils__["e" /* getSVGLayer */](), __WEBPACK_IMPORTED_MODULE_2__utils__["g" /* getXY */](e))
 
-    let hitAnnotation = null;
+    let hitAnnotation = null
     window.annotationContainer.getAllAnnotations().forEach(a => {
         if (a.isHit(x, y)) {
-            hitAnnotation = a;
+            hitAnnotation = a
         } else if (a.isHitText(x, y)) {
-            hitAnnotation = a.textAnnotation;
+            hitAnnotation = a.textAnnotation
         }
-    });
+    })
 
-    console.log('hit:', hitAnnotation);
+    console.log('hit:', hitAnnotation)
 
-    return hitAnnotation;
+    return hitAnnotation
 }
 
 /**
@@ -18536,47 +18292,45 @@ function _findAnnotation(e) {
  *
  * @param {Event} e The DOM event to handle
  */
-function handleDocumentMouseup(e) {
+function handleDocumentMouseup (e) {
 
-    __WEBPACK_IMPORTED_MODULE_0_jquery___default.a(document.body).removeClass('no-action');
+    __WEBPACK_IMPORTED_MODULE_0_jquery___default.a(document.body).removeClass('no-action')
 
-    let clicked = mousedownFired && !mousemoveFired;
-    let dragged = mousedownFired && mousemoveFired;
+    let clicked = mousedownFired && !mousemoveFired
 
     if (clicked) {
 
-        let anno = _findAnnotation(e);
+        let anno = _findAnnotation(e)
         if (anno) {
-            anno.handleClickEvent();
+            anno.handleClickEvent()
         }
 
-        __WEBPACK_IMPORTED_MODULE_0_jquery___default.a(overlay).remove();
-        overlay = null;
+        __WEBPACK_IMPORTED_MODULE_0_jquery___default.a(overlay).remove()
+        overlay = null
 
-        return;
+        return
     }
 
-    mousedownFired = false;
-    mousemoveFired = false;
+    mousedownFired = false
+    mousemoveFired = false
 
+    if (!overlay) {
+        return
+    }
 
-  if (!overlay) {
-    return;
-  }
+    const rect = {
+        x      : parseInt(overlay.style.left, 10),
+        y      : parseInt(overlay.style.top, 10),
+        width  : parseInt(overlay.style.width, 10),
+        height : parseInt(overlay.style.height, 10)
+    }
 
-  const rect = {
-    x      : parseInt(overlay.style.left, 10),
-    y      : parseInt(overlay.style.top, 10),
-    width  : parseInt(overlay.style.width, 10),
-    height : parseInt(overlay.style.height, 10)
-  };
+    if (rect.width > 0 && rect.height > 0) {
+        saveRect(rect)
+    }
 
-  if (rect.width > 0 && rect.height > 0) {
-    saveRect(rect);
-  }
-
-  __WEBPACK_IMPORTED_MODULE_0_jquery___default.a(overlay).remove();
-  overlay = null;
+    __WEBPACK_IMPORTED_MODULE_0_jquery___default.a(overlay).remove()
+    overlay = null
 
 }
 
@@ -18585,99 +18339,91 @@ function handleDocumentMouseup(e) {
  *
  * @param {Object} rect - The rect to use for annotation.
  */
-function saveRect(rect) {
+function saveRect (rect) {
 
-  if (rect.width === 0 || rect.height === 0) {
-    return;
-  }
+    if (rect.width === 0 || rect.height === 0) {
+        return
+    }
 
+    let svg = __WEBPACK_IMPORTED_MODULE_2__utils__["e" /* getSVGLayer */]()
 
-  let svg = __WEBPACK_IMPORTED_MODULE_3__utils__["f" /* getSVGLayer */]();
+    let annotation = __WEBPACK_IMPORTED_MODULE_1_deep_assign___default.a(__WEBPACK_IMPORTED_MODULE_2__utils__["h" /* scaleDown */](svg, rect), {
+        type : _type
+    })
 
-  let annotation = __WEBPACK_IMPORTED_MODULE_1_deep_assign___default.a(__WEBPACK_IMPORTED_MODULE_3__utils__["i" /* scaleDown */](svg, rect), {
-    type : _type
-  });
+    // Save.
+    let rectAnnotation = __WEBPACK_IMPORTED_MODULE_3__annotation_rect__["a" /* default */].newInstance(annotation)
+    rectAnnotation.save()
 
-  // Save.
-  let rectAnnotation = __WEBPACK_IMPORTED_MODULE_5__annotation_rect__["a" /* default */].newInstance(annotation);
-  rectAnnotation.save();
+    // Render.
+    rectAnnotation.render()
 
-  // Render.
-  rectAnnotation.render();
+    // Enable a drag / click action.
+    // TODO インスタンス生成時にデフォルトで有効にしてもいいかなー.
+    rectAnnotation.enableViewMode()
 
-  // Enable a drag / click action.
-  // TODO インスタンス生成時にデフォルトで有効にしてもいいかなー.
-  rectAnnotation.enableViewMode();
+    // Deselect all annotations.
+    window.annotationContainer
+        .getSelectedAnnotations()
+        .forEach(a => a.deselect())
 
-  // Deselect all annotations.
-  window.annotationContainer
-      .getSelectedAnnotations()
-      .forEach(a => a.deselect());
+    // Select.
+    rectAnnotation.select()
 
-  // Select.
-  rectAnnotation.select();
-
-  // Enable input label.
-  __WEBPACK_IMPORTED_MODULE_6__utils_textInput__["a" /* enable */]({ uuid : rectAnnotation.uuid, autoFocus : true });
-
+    // Enable input label.
+    __WEBPACK_IMPORTED_MODULE_4__utils_textInput__["a" /* enable */]({ uuid : rectAnnotation.uuid, autoFocus : true })
 }
 
 /**
  * Cancel rect drawing if an existing rect has got a drag event.
  */
-function cancelRectDrawing() {
+function cancelRectDrawing () {
 
     // After `handleDocumentMousedown`
     setTimeout(() => {
-        console.log('cancelRectDrawing');
-        __WEBPACK_IMPORTED_MODULE_0_jquery___default.a(overlay).remove();
-        overlay = null;
-    }, 100);
-
+        console.log('cancelRectDrawing')
+        __WEBPACK_IMPORTED_MODULE_0_jquery___default.a(overlay).remove()
+        overlay = null
+    }, 100)
 }
 
 /**
  * Enable rect behavior
  */
-function enableRect() {
+function enableRect () {
 
-    disableRect();
+    disableRect()
 
-    window.currentType = 'rect';
+    window.currentType = 'rect'
 
-  document.addEventListener('mouseup', handleDocumentMouseup);
-  document.addEventListener('mousedown', handleDocumentMousedown);
-  document.addEventListener('mousemove', handleDocumentMousemove);
+    document.addEventListener('mouseup', handleDocumentMouseup)
+    document.addEventListener('mousedown', handleDocumentMousedown)
+    document.addEventListener('mousemove', handleDocumentMousemove)
 
-  // disableUserSelect();
-  __WEBPACK_IMPORTED_MODULE_3__utils__["b" /* disableTextlayer */]();
+    __WEBPACK_IMPORTED_MODULE_2__utils__["b" /* disableTextlayer */]()
 
-  window.globalEvent.on('rectmovestart', cancelRectDrawing);
+    window.globalEvent.on('rectmovestart', cancelRectDrawing)
 }
 
 /**
  * Disable rect behavior
  */
-function disableRect() {
+function disableRect () {
 
-    console.log('disableRect');
+    window.currentType = null
 
-    window.currentType = null;
+    document.removeEventListener('mouseup', handleDocumentMouseup)
+    document.removeEventListener('mousedown', handleDocumentMousedown)
+    document.removeEventListener('mousemove', handleDocumentMousemove)
 
-  document.removeEventListener('mouseup', handleDocumentMouseup);
-  document.removeEventListener('mousedown', handleDocumentMousedown);
-  document.removeEventListener('mousemove', handleDocumentMousemove);
+    __WEBPACK_IMPORTED_MODULE_2__utils__["c" /* enableTextlayer */]()
 
-  // enableUserSelect();
-  __WEBPACK_IMPORTED_MODULE_3__utils__["c" /* enableTextlayer */]();
-
-  window.globalEvent.removeListener('rectmovestart', cancelRectDrawing);
-
+    window.globalEvent.removeListener('rectmovestart', cancelRectDrawing)
 }
 
 
 /***/ }),
-/* 68 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18689,7 +18435,7 @@ module.exports = function (x) {
 
 
 /***/ }),
-/* 69 */
+/* 68 */
 /***/ (function(module, exports) {
 
 module.exports = function createStyleSheet(blocks) {
@@ -18730,7 +18476,7 @@ function hyphenate(prop) {
 
 
 /***/ }),
-/* 70 */
+/* 69 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -18746,6 +18492,173 @@ function dispatchWindowEvent (eventName, data) {
 
 
 /***/ }),
+/* 70 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = addInputField;
+/* unused harmony export closeInput */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
+// TODO no need file ?
+
+
+
+/**
+ * The text size at editing.
+ */
+const TEXT_SIZE = 12
+
+/*
+ * The input field for adding/editing a text.
+ */
+let input = null
+
+/*
+ * The callback called at finishing to add/edit a text.
+ */
+let _finishCallback = null
+
+/**
+ * Show an input field for adding a text annotation.
+ *
+ * @param {Number} x - The x-axis position to show.
+ * @param {Number} y - The y-axis position to show.
+ * @param {String} selfId - The annotation id used for registration.
+ * @param {Function} finishCallback - The callback function will be called after registration.
+ */
+function addInputField (x, y, selfId = null, text = null, finishCallback = null) {
+    // This is a dummy form for adding autocomplete candidates at finishing adding/editing.
+    // At the time to finish editing, submit via the submit button, then regist an autocomplete content.
+    let $form = __WEBPACK_IMPORTED_MODULE_0_jquery___default.a('<form id="autocompleteform" action="./"/>').css({
+        position : 'absolute',
+        top      : '0',
+        left     : '0'
+    })
+    $form.on('submit', handleSubmit)
+    $form.append('<input type="submit" value="submit"/>') // needs for Firefox emulating submit event.
+    __WEBPACK_IMPORTED_MODULE_0_jquery___default.a(document.body).append($form)
+
+    input = document.createElement('input')
+    input.setAttribute('id', 'pdf-annotate-text-input')
+    input.setAttribute('placeholder', 'Enter text')
+    input.setAttribute('name', 'paperannotext')
+    input.style.border = `3px solid ${__WEBPACK_IMPORTED_MODULE_1__utils__["a" /* BORDER_COLOR */]}`
+    input.style.borderRadius = '3px'
+    input.style.position = 'absolute'
+    input.style.top = `${y}px`
+    input.style.left = `${x}px`
+    input.style.fontSize = `${TEXT_SIZE}px`
+    input.style.width = '150px'
+    input.style.zIndex = 4 // fixme.
+
+    if (selfId) {
+        input.setAttribute('data-self-id', selfId)
+    }
+
+    if (text) {
+        input.value = text
+    }
+
+    _finishCallback = finishCallback
+
+    input.addEventListener('blur', handleInputBlur)
+    input.addEventListener('keyup', handleInputKeyup)
+
+    $form.append(input)
+
+    // for Chrome.
+    setTimeout(() => {
+        input.focus()
+    }, 100)
+}
+
+/*
+ * Handle form.submit event.
+ * @param {Event} e - Submit event.
+ */
+function handleSubmit (e) {
+    e.preventDefault()
+    return false
+}
+
+/**
+ * Handle input.blur event.
+ */
+function handleInputBlur () {
+    saveText()
+}
+
+/**
+ * Handle input.keyup event.
+ * @param {Event} e The DOM event to handle
+ */
+function handleInputKeyup (e) {
+    if (e.keyCode === 27) {
+        closeInput()
+    }
+}
+
+/**
+ * Save a text annotation from input.
+ */
+function saveText () {
+    if (!input) {
+        return
+    }
+
+    let content = input.value.trim()
+    if (!content) {
+        return closeInput('')
+    }
+
+    let clientX = parseInt(input.style.left, 10)
+    let clientY = parseInt(input.style.top, 10)
+    let svg = __WEBPACK_IMPORTED_MODULE_1__utils__["e" /* getSVGLayer */]()
+
+    let rect = svg.getBoundingClientRect()
+    let annotation = Object.assign({
+        type    : 'textbox',
+        content : content
+    }, __WEBPACK_IMPORTED_MODULE_1__utils__["h" /* scaleDown */](svg, {
+        x      : clientX - rect.left,
+        y      : clientY - rect.top,
+        width  : input.offsetWidth,
+        height : input.offsetHeight
+    }))
+
+    // RelationId.
+    let selfId = input.getAttribute('data-self-id')
+    if (selfId) {
+        annotation.uuid = selfId
+    }
+
+    // Add an autocomplete candidate. (Firefox, Chrome)
+    __WEBPACK_IMPORTED_MODULE_0_jquery___default.a('#autocompleteform [type="submit"]').click()
+
+    closeInput(content)
+}
+
+/**
+ * Close the input.
+ * @param {Object} textAnnotation - the annotation registerd.
+ */
+function closeInput (text) {
+    if (input) {
+        __WEBPACK_IMPORTED_MODULE_0_jquery___default.a(input).parents('form').remove()
+        input = null
+
+        if (_finishCallback) {
+            _finishCallback(text)
+        }
+    }
+
+    _finishCallback = null
+}
+
+
+/***/ }),
 /* 71 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -18754,7 +18667,7 @@ function dispatchWindowEvent (eventName, data) {
 /* harmony export (immutable) */ __webpack_exports__["a"] = createSpan;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__annotation_span__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_textInput__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_textInput__ = __webpack_require__(9);
 
 
 
@@ -18823,13 +18736,13 @@ function removeSelection () {
  * @param {String} color The color of the rects
  */
 function saveSpan (rects, selectedText, text) {
-    let svg = __WEBPACK_IMPORTED_MODULE_0__utils__["f" /* getSVGLayer */]()
+    let svg = __WEBPACK_IMPORTED_MODULE_0__utils__["e" /* getSVGLayer */]()
     let boundingRect = svg.getBoundingClientRect()
 
     // Initialize the annotation
     let annotation = {
         rectangles : [...rects].map((r) => {
-            return __WEBPACK_IMPORTED_MODULE_0__utils__["i" /* scaleDown */](svg, {
+            return __WEBPACK_IMPORTED_MODULE_0__utils__["h" /* scaleDown */](svg, {
                 x      : r.left - boundingRect.left,
                 y      : r.top - boundingRect.top,
                 width  : r.width,
@@ -18862,11 +18775,11 @@ function getRectangles () {
         return null
     }
 
-    let svg = __WEBPACK_IMPORTED_MODULE_0__utils__["f" /* getSVGLayer */]()
+    let svg = __WEBPACK_IMPORTED_MODULE_0__utils__["e" /* getSVGLayer */]()
     let boundingRect = svg.getBoundingClientRect()
 
     rects = [...rects].map((r) => {
-        return __WEBPACK_IMPORTED_MODULE_0__utils__["i" /* scaleDown */](svg, {
+        return __WEBPACK_IMPORTED_MODULE_0__utils__["h" /* scaleDown */](svg, {
             x      : r.left - boundingRect.left,
             y      : r.top - boundingRect.top,
             width  : r.width,
@@ -18891,7 +18804,7 @@ function createSpan ({ text = null }) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = createRelation;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_textInput__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_textInput__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__annotation_relation__ = __webpack_require__(11);
 
 
@@ -18940,7 +18853,7 @@ function createRelation ({ type, anno1, anno2, text }) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = enableViewMode;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
 
 
@@ -19049,14 +18962,14 @@ exports.push([module.i, "\n/**\n * Utilities.\n */\n.\\--hide {\n  display: none
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_deep_assign__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_deep_assign__ = __webpack_require__(31);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_deep_assign___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_deep_assign__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_toml__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_toml___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_toml__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__version__ = __webpack_require__(77);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_tomlString__ = __webpack_require__(79);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__shared_coords__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__utils_uuid__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__utils_uuid__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__span__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__relation__ = __webpack_require__(11);
 
