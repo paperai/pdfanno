@@ -198,11 +198,12 @@ window.addEventListener('DOMContentLoaded', e => {
     // Upload button.
     annoUI.uploadButton.setup({
         getCurrentDisplayContentFile : () => {
-            const pdfFileName = $('#dropdownPdf .js-text').text();
-            if (!pdfFileName || pdfFileName === 'PDF File') {
-                return null;
-            }
-            return window.annoPage.getContentFile(pdfFileName);
+            return window.annoPage.getCurrentContentFile()
+            // const pdfFileName = $('#dropdownPdf .js-text').text();
+            // if (!pdfFileName || pdfFileName === 'PDF File') {
+            //     return null;
+            // }
+            // return window.annoPage.getContentFile(pdfFileName);
         }
     });
 
@@ -223,6 +224,13 @@ window.addEventListener('DOMContentLoaded', e => {
                 moveTo = value;
             }
     });
+
+    let isDefaultPDF = false
+    if (!pdfURL) {
+        // https://paperai.github.io/pdfanno/pdfs/P12-1046.pdf
+        pdfURL = location.protocol + '//' + location.hostname + ':' + location.port + location.pathname.split('/').slice(0,location.pathname.split('/').length-1).join('/') + '/pdfs/P12-1046.pdf'
+        isDefaultPDF = true
+    }
 
     if (pdfURL) {
 
@@ -291,7 +299,9 @@ window.addEventListener('DOMContentLoaded', e => {
                 annoUI.uploadButton.setResult(this.response.analyzeResult);
 
                 // Display upload tab.
-                $('a[href="#tab2"]').click();
+                if (!isDefaultPDF) {
+                    $('a[href="#tab2"]').click();
+                }
 
             }
         };

@@ -199,6 +199,12 @@ export default class PDFAnnoPage {
         // Set the PDF file name.
         iframeWindow.PDFView.url = contentFile.name;
 
+        // Save the current.
+        this.currentContentFile = contentFile;
+    }
+
+    getCurrentContentFile() {
+        return this.currentContentFile;
     }
 
     initializeViewer(initialPDFPath = '../pdfs/P12-1046.pdf') {
@@ -225,6 +231,7 @@ export default class PDFAnnoPage {
         if (iframeWindow && iframeWindow.PDFViewerApplication) {
             iframeWindow.PDFViewerApplication.close();
             $('#numPages', iframeWindow.document).text('');
+            this.currentContentFile = null;
         }
     }
 
