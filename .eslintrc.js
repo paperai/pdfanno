@@ -29,7 +29,7 @@ module.exports = {
     "space-before-function-paren" : 1,
     "padded-blocks" : 0,
     "keyword-spacing" : 1,
-    "no-multi-spaces" : 1,
+    "no-multi-spaces" : 0,
     "space-infix-ops" : 1,
     "no-unused-vars" : 1,
     "no-multiple-empty-lines" : 1,
