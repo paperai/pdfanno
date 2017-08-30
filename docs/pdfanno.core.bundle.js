@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 58);
+/******/ 	return __webpack_require__(__webpack_require__.s = 57);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -10703,27 +10703,18 @@ function adjustPoint (x, y, radius) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = uuid;
-const REGEXP = /[xy]/g
-const PATTERN = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
-
-function replacement(c) {
-  let r = Math.random()*16|0;
-  let v = c == 'x' ? r : (r&0x3|0x8);
-  return v.toString(16);
-}
-
 /**
  * Generate a univierally unique identifier
  *
  * @return {String}
  */
-function uuid() {
-  // return PATTERN.replace(REGEXP, replacement);
-  let uid = 0;
-  window.annotationContainer.getAllAnnotations().forEach(a => {
-    uid = Math.max(uid, parseInt(a.uuid));
-  });
-  return String(uid + 1);
+function uuid () {
+
+    let uid = 0
+    window.annotationContainer.getAllAnnotations().forEach(a => {
+        uid = Math.max(uid, parseInt(a.uuid))
+    })
+    return String(uid + 1)
 }
 
 
@@ -10734,7 +10725,7 @@ function uuid() {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_events__ = __webpack_require__(27);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_events___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_events__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__render_appendChild__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__render_appendChild__ = __webpack_require__(28);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__UI_utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_event__ = __webpack_require__(69);
 
@@ -11295,7 +11286,7 @@ class SpanAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_uuid__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__abstract__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__text__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_relation_js__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_relation_js__ = __webpack_require__(29);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__shared_util__ = __webpack_require__(4);
 
 
@@ -16874,111 +16865,6 @@ function isUndefined(arg) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__render__ = __webpack_require__(59);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__UI__ = __webpack_require__(65);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__annotation_rect__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__annotation_span__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__annotation_relation__ = __webpack_require__(11);
-// import StoreAdapter from './adapter/StoreAdapter';
-// import PdfannoStoreAdapter from './adapter/PdfannoStoreAdapter';
-
-
-
-
-
-
-__webpack_require__(74);
-
-/* harmony default export */ __webpack_exports__["a"] = ({
-  /**
-   * Abstract class that needs to be defined so PDFAnnoCore
-   * knows how to communicate with your server.
-   */
-  // StoreAdapter,
-
-  /**
-    Implementation of StoreAdapter for PDFAnno.
-  */
-  // PdfannoStoreAdapter,
-
-  /**
-   * Abstract instance of StoreAdapter
-   */
-  // __storeAdapter: new StoreAdapter(),
-
-  /**
-   * Getter for the underlying StoreAdapter property
-   *
-   * @return {StoreAdapter}
-   */
-  // getStoreAdapter() {
-  //   return this.__storeAdapter;
-  // },
-
-  /**
-   * Setter for the underlying StoreAdapter property
-   *
-   * @param {StoreAdapter} adapter The StoreAdapter implementation to be used.
-   */
-  // setStoreAdapter(adapter) {
-  //   // TODO this throws an error when bundled
-  //   // if (!(adapter instanceof StoreAdapter)) {
-  //   //   throw new Error('adapter must be an instance of StoreAdapter');
-  //   // }
-
-  //   this.__storeAdapter = adapter;
-  // },
-
-  /**
-   * UI is a helper for instrumenting UI interactions for creating,
-   * editing, and deleting annotations in the browser.
-   */
-  UI: __WEBPACK_IMPORTED_MODULE_1__UI__["a" /* default */],
-
-  /**
-   * Render the annotations for a page in the PDF Document
-   *
-   * @param {SVGElement} svg The SVG element that annotations should be rendered to
-   * @param {PageViewport} viewport The PDFPage.getViewport data
-   * @param {Object} data The StoreAdapter.getAnnotations data
-   * @return {Promise}
-   */
-  render: __WEBPACK_IMPORTED_MODULE_0__render__["a" /* default */],
-
-  /**
-   * Convenience method for getting annotation data
-   *
-   * @alias StoreAdapter.getAnnotations
-   * @param {String} documentId The ID of the document
-   * @return {Promise}
-   */
-  // getAnnotations(documentId) {
-  //   return this.getStoreAdapter().getAnnotations(...arguments);
-  // },
-
-  /**
-   * RectAnnotation Class.
-   */
-  RectAnnotation: __WEBPACK_IMPORTED_MODULE_2__annotation_rect__["a" /* default */],
-
-  /**
-   * SpanAnnotation Class.
-   */
-  SpanAnnotation: __WEBPACK_IMPORTED_MODULE_3__annotation_span__["a" /* default */],
-
-  /**
-   * RelationAnnotation Class.
-   */
-  RelationAnnotation: __WEBPACK_IMPORTED_MODULE_4__annotation_relation__["a" /* default */]
-
-});
-
-
-/***/ }),
-/* 29 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
 /* unused harmony export transform */
 /* harmony export (immutable) */ __webpack_exports__["a"] = appendChild;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_object_assign__ = __webpack_require__(60);
@@ -17148,7 +17034,7 @@ function appendChild (svg, annotation, viewport) {
 
 
 /***/ }),
-/* 30 */
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -17299,7 +17185,7 @@ function getRelationTextPosition (x1, y1, x2, y2, text = '', parentId = null) {
 
 
 /***/ }),
-/* 31 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17374,6 +17260,7 @@ module.exports = function deepAssign(target) {
 
 
 /***/ }),
+/* 31 */,
 /* 32 */,
 /* 33 */,
 /* 34 */,
@@ -17399,8 +17286,7 @@ module.exports = function deepAssign(target) {
 /* 54 */,
 /* 55 */,
 /* 56 */,
-/* 57 */,
-/* 58 */
+/* 57 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -17409,7 +17295,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_events__ = __webpack_require__(27);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_events___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_events__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_PDFAnnoCore__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_PDFAnnoCore__ = __webpack_require__(58);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__src_annotation_container__ = __webpack_require__(76);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__src_annotation_rect__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__src_annotation_span__ = __webpack_require__(10);
@@ -17668,14 +17554,117 @@ function renderAnnotations(svg) {
 
 
 /***/ }),
+/* 58 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__render__ = __webpack_require__(59);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__UI__ = __webpack_require__(65);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__annotation_rect__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__annotation_span__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__annotation_relation__ = __webpack_require__(11);
+// import StoreAdapter from './adapter/StoreAdapter';
+// import PdfannoStoreAdapter from './adapter/PdfannoStoreAdapter';
+
+
+
+
+
+
+__webpack_require__(74);
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+  /**
+   * Abstract class that needs to be defined so PDFAnnoCore
+   * knows how to communicate with your server.
+   */
+  // StoreAdapter,
+
+  /**
+    Implementation of StoreAdapter for PDFAnno.
+  */
+  // PdfannoStoreAdapter,
+
+  /**
+   * Abstract instance of StoreAdapter
+   */
+  // __storeAdapter: new StoreAdapter(),
+
+  /**
+   * Getter for the underlying StoreAdapter property
+   *
+   * @return {StoreAdapter}
+   */
+  // getStoreAdapter() {
+  //   return this.__storeAdapter;
+  // },
+
+  /**
+   * Setter for the underlying StoreAdapter property
+   *
+   * @param {StoreAdapter} adapter The StoreAdapter implementation to be used.
+   */
+  // setStoreAdapter(adapter) {
+  //   // TODO this throws an error when bundled
+  //   // if (!(adapter instanceof StoreAdapter)) {
+  //   //   throw new Error('adapter must be an instance of StoreAdapter');
+  //   // }
+
+  //   this.__storeAdapter = adapter;
+  // },
+
+  /**
+   * UI is a helper for instrumenting UI interactions for creating,
+   * editing, and deleting annotations in the browser.
+   */
+  UI: __WEBPACK_IMPORTED_MODULE_1__UI__["a" /* default */],
+
+  /**
+   * Render the annotations for a page in the PDF Document
+   *
+   * @param {SVGElement} svg The SVG element that annotations should be rendered to
+   * @param {PageViewport} viewport The PDFPage.getViewport data
+   * @param {Object} data The StoreAdapter.getAnnotations data
+   * @return {Promise}
+   */
+  render: __WEBPACK_IMPORTED_MODULE_0__render__["a" /* default */],
+
+  /**
+   * Convenience method for getting annotation data
+   *
+   * @alias StoreAdapter.getAnnotations
+   * @param {String} documentId The ID of the document
+   * @return {Promise}
+   */
+  // getAnnotations(documentId) {
+  //   return this.getStoreAdapter().getAnnotations(...arguments);
+  // },
+
+  /**
+   * RectAnnotation Class.
+   */
+  RectAnnotation: __WEBPACK_IMPORTED_MODULE_2__annotation_rect__["a" /* default */],
+
+  /**
+   * SpanAnnotation Class.
+   */
+  SpanAnnotation: __WEBPACK_IMPORTED_MODULE_3__annotation_span__["a" /* default */],
+
+  /**
+   * RelationAnnotation Class.
+   */
+  RelationAnnotation: __WEBPACK_IMPORTED_MODULE_4__annotation_relation__["a" /* default */]
+
+});
+
+
+/***/ }),
 /* 59 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = render;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__PDFAnnoCore__ = __webpack_require__(28);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__appendChild__ = __webpack_require__(29);
-
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__appendChild__ = __webpack_require__(28);
 
 
 /**
@@ -17689,36 +17678,36 @@ function renderAnnotations(svg) {
  *    - fulfilled: SVGElement
  *    - rejected: Error
  */
-function render(svg, viewport, data) {
-  return new Promise((resolve, reject) => {
-    // Reset the content of the SVG
-    svg.innerHTML = '';
-    svg.setAttribute('data-pdf-annotate-container', true);
-    svg.setAttribute('data-pdf-annotate-viewport', JSON.stringify(viewport));
-    svg.removeAttribute('data-pdf-annotate-document');
-    svg.removeAttribute('data-pdf-annotate-page');
+function render (svg, viewport, data) {
+    return new Promise((resolve, reject) => {
+        // Reset the content of the SVG
+        svg.innerHTML = ''
+        svg.setAttribute('data-pdf-annotate-container', true)
+        svg.setAttribute('data-pdf-annotate-viewport', JSON.stringify(viewport))
+        svg.removeAttribute('data-pdf-annotate-document')
+        svg.removeAttribute('data-pdf-annotate-page')
 
-    // If there's no data nothing can be done
-    if (!data) {
-      return resolve(svg);
-    }
+        // If there's no data nothing can be done
+        if (!data) {
+            return resolve(svg)
+        }
 
-    svg.setAttribute('data-pdf-annotate-document', data.documentId);
-    svg.setAttribute('data-pdf-annotate-page', data.pageNumber);
+        svg.setAttribute('data-pdf-annotate-document', data.documentId)
+        svg.setAttribute('data-pdf-annotate-page', data.pageNumber)
 
-    // Make sure annotations is an array
-    if (!Array.isArray(data.annotations) || data.annotations.length === 0) {
-      return resolve(svg);
-    }
+        // Make sure annotations is an array
+        if (!Array.isArray(data.annotations) || data.annotations.length === 0) {
+            return resolve(svg)
+        }
 
-    // Append annotation to svg
-    let elements = [];
-    data.annotations.forEach((a) => {
-      elements.push(__WEBPACK_IMPORTED_MODULE_1__appendChild__["a" /* default */](svg, a, viewport));
-    });
+        // Append annotation to svg
+        let elements = []
+        data.annotations.forEach((a) => {
+            elements.push(__WEBPACK_IMPORTED_MODULE_0__appendChild__["a" /* default */](svg, a, viewport))
+        })
 
-    resolve(svg, elements);
-  });
+        resolve(svg, elements)
+  })
 }
 
 
@@ -18016,7 +18005,7 @@ function renderText (a, svg) {
 /* unused harmony export createRelation */
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__renderCircle__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_relation_js__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_relation_js__ = __webpack_require__(29);
 
 
 
@@ -18148,10 +18137,12 @@ function createRelation (a, id = null) {
 
 
 /* harmony default export */ __webpack_exports__["a"] = ({
-  disableRect: __WEBPACK_IMPORTED_MODULE_0__rect__["a" /* disableRect */], enableRect: __WEBPACK_IMPORTED_MODULE_0__rect__["b" /* enableRect */],
-  createSpan: __WEBPACK_IMPORTED_MODULE_1__span__["a" /* createSpan */], getRectangles: __WEBPACK_IMPORTED_MODULE_1__span__["b" /* getRectangles */],
-  createRelation: __WEBPACK_IMPORTED_MODULE_2__relation__["a" /* createRelation */],
-  enableViewMode: __WEBPACK_IMPORTED_MODULE_3__view__["a" /* enableViewMode */]
+    disableRect: __WEBPACK_IMPORTED_MODULE_0__rect__["a" /* disableRect */],
+    enableRect: __WEBPACK_IMPORTED_MODULE_0__rect__["b" /* enableRect */],
+    createSpan: __WEBPACK_IMPORTED_MODULE_1__span__["a" /* createSpan */],
+    getRectangles: __WEBPACK_IMPORTED_MODULE_1__span__["b" /* getRectangles */],
+    createRelation: __WEBPACK_IMPORTED_MODULE_2__relation__["a" /* createRelation */],
+    enableViewMode: __WEBPACK_IMPORTED_MODULE_3__view__["a" /* enableViewMode */]
 });
 
 
@@ -18164,7 +18155,7 @@ function createRelation (a, id = null) {
 /* harmony export (immutable) */ __webpack_exports__["a"] = disableRect;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_deep_assign__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_deep_assign__ = __webpack_require__(30);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_deep_assign___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_deep_assign__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__annotation_rect__ = __webpack_require__(18);
@@ -18962,7 +18953,7 @@ exports.push([module.i, "\n/**\n * Utilities.\n */\n.\\--hide {\n  display: none
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_deep_assign__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_deep_assign__ = __webpack_require__(30);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_deep_assign___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_deep_assign__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_toml__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_toml___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_toml__);
@@ -19228,13 +19219,14 @@ class AnnotationContainer {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-let packageJson = __webpack_require__(78);
+let packageJson = __webpack_require__(78)
 /**
  * Paper Anno Version.
  * This is overwritten at build.
  */
-let ANNO_VERSION = packageJson.version;
+let ANNO_VERSION = packageJson.version
 /* harmony default export */ __webpack_exports__["a"] = (ANNO_VERSION);
+
 
 /***/ }),
 /* 78 */
@@ -19248,59 +19240,64 @@ module.exports = {"name":"pdfanno","version":"0.2.0","description":"","main":"in
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = tomlString;
+/**
+ * Create a TOML String from jsObject.
+ */
+function tomlString (obj, root = true) {
 
-function tomlString(obj, root=true) {
-
-    let lines = [];
+    let lines = []
 
     // `version` is first.
     if ('version' in obj) {
-        lines.push(`version = "${obj['version']}"`);
-        lines.push('');
-        delete obj['version'];
+        lines.push(`version = "${obj['version']}"`)
+        lines.push('')
+        delete obj['version']
     }
 
     // #paperanno-ja/issues/38
     // Make all values in `position` as string.
     if ('position' in obj) {
-        let position = obj.position;
+        let position = obj.position
         position = position.map(p => {
             if (typeof p === 'number') {
-                return String(p);
+                return String(p)
             } else {
-                return p.map(v => String(v));
+                return p.map(v => String(v))
             }
-        });
-        obj.position = position;
+        })
+        obj.position = position
     }
 
     Object.keys(obj).forEach(prop => {
 
-        let val = obj[prop];
+        let val = obj[prop]
         if (typeof val === 'string') {
-            lines.push(`${prop} = "${val}"`);
-            root && lines.push('');
+            lines.push(`${prop} = "${val}"`)
+            root && lines.push('')
 
         } else if (typeof val === 'number') {
-            lines.push(`${prop} = ${val}`);
-            root && lines.push('');
+            lines.push(`${prop} = ${val}`)
+            root && lines.push('')
 
         } else if (isArray(val)) {
-            lines.push(`${prop} = ${JSON.stringify(val)}`);
-            root && lines.push('');
+            lines.push(`${prop} = ${JSON.stringify(val)}`)
+            root && lines.push('')
 
         } else if (typeof val === 'object') {
-            lines.push(`[${prop}]`);
-            lines.push(tomlString(val, false));
-            root && lines.push('');
+            lines.push(`[${prop}]`)
+            lines.push(tomlString(val, false))
+            root && lines.push('')
         }
-    });
+    })
 
-    return lines.join('\n');
+    return lines.join('\n')
 }
 
-function isArray(val) {
-    return val && 'length' in val;
+/**
+ * Check the val is array.
+ */
+function isArray (val) {
+    return val && 'length' in val
 }
 
 
