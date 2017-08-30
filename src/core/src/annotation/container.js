@@ -5,6 +5,7 @@ import { convertToExportY, convertFromExportY } from '../../../shared/coords'
 import uuid from '../utils/uuid'
 
 import SpanAnnotation from './span'
+import RectAnnotation from './rect'
 import RelationAnnotation from './relation'
 
 /**
@@ -191,47 +192,30 @@ export default class AnnotationContainer {
 
                     if (d.type === 'span') {
 
-                        // TODO Define at annotation/span.js
-
-                        // position: String -> Float.
-                        let position = d.position.map(p => p.map(pp => parseFloat(pp)))
-
-                        d.selectedText = d.text
-                        d.text = d.label
-
-                        // Convert.
-                        d.rectangles = position.map(p => {
-                            return {
-                                x      : p[0],
-                                y      : convertFromExportY(d.page, p[1]),
-                                width  : p[2],
-                                height : p[3]
-                            }
-                        })
-
-                        let span = SpanAnnotation.newInstance(d)
+                        let span = SpanAnnotation.newInstanceFromTomlObject(d)
                         span.save()
                         span.render()
                         span.enableViewMode()
 
+                    // Rect.
+                    } else if (d.type === 'rect') {
+
+                        let rect = RectAnnotation.newInstanceFromTomlObject(d)
+                        rect.save()
+                        rect.render()
+                        rect.enableViewMode()
+
                     // Relation.
                     } else if (d.type === 'relation') {
 
-                        // TODO Define at annotation/relation.js
-
-                        d.direction = d.dir
                         d.rel1 = tomlObject[d.ids[0]].uuid
                         d.rel2 = tomlObject[d.ids[1]].uuid
-                        // TODO Annotation側を、labelに合わせてもいいかも。
-                        d.text = d.label
-
-                        let relation = RelationAnnotation.newInstance(d)
+                        let relation = RelationAnnotation.newInstanceFromTomlObject(d)
                         relation.save()
                         relation.render()
                         relation.enableViewMode()
 
                     } else {
-
                         console.log('Unknown: ', key, d)
                     }
                 }

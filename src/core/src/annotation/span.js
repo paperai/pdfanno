@@ -2,6 +2,7 @@ import uuid from '../utils/uuid';
 import AbstractAnnotation from './abstract';
 import TextAnnotation from './text';
 import * as textInput from '../utils/textInput';
+import { convertToExportY, convertFromExportY } from '../../../shared/coords'
 
 /**
  * Span Annotation.
@@ -45,6 +46,28 @@ export default class SpanAnnotation extends AbstractAnnotation {
         a.readOnly     = annotation.readOnly || false;
         a.selectedText = annotation.selectedText;
         return a;
+    }
+
+    /**
+     * Create an instance from a TOML object.
+     */
+    static newInstanceFromTomlObject(tomlObject) {
+        let d = tomlObject
+        // position: String -> Float.
+        let position = d.position.map(p => p.map(parseFloat))
+        d.selectedText = d.text
+        d.text = d.label
+        // Convert.
+        d.rectangles = position.map(p => {
+            return {
+                x      : p[0],
+                y      : convertFromExportY(d.page, p[1]),
+                width  : p[2],
+                height : p[3]
+            }
+        })
+        let span = SpanAnnotation.newInstance(d)
+        return span
     }
 
     /**

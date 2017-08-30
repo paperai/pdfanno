@@ -2,6 +2,7 @@ import uuid from '../utils/uuid';
 import AbstractAnnotation from './abstract';
 import TextAnnotation from './text';
 import { scaleDown } from '../UI/utils';
+import { convertToExportY, convertFromExportY } from '../../../shared/coords'
 
 let globalEvent;
 
@@ -56,6 +57,21 @@ export default class RectAnnotation extends AbstractAnnotation {
         rect.color    = annotation.color;
         rect.readOnly = annotation.readOnly || false;
         return rect;
+    }
+
+    /**
+     * Create an instance from a TOML object.
+     */
+    static newInstanceFromTomlObject(tomlObject) {
+        let d = tomlObject
+        d.position = d.position.map(parseFloat)
+        d.x = d.position[0]
+        d.y = convertFromExportY(d.page, d.position[1])
+        d.width = d.position[2]
+        d.height = d.position[3]
+        d.text = d.label
+        let rect = RectAnnotation.newInstance(d)
+        return rect
     }
 
     /**

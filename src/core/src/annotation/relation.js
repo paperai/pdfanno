@@ -3,6 +3,7 @@ import AbstractAnnotation from './abstract';
 import TextAnnotation from './text';
 import { getRelationTextPosition } from '../utils/relation.js';
 import { anyOf } from '../../../shared/util';
+import { convertToExportY, convertFromExportY } from '../../../shared/coords'
 
 let globalEvent;
 
@@ -60,6 +61,17 @@ export default class RelationAnnotation extends AbstractAnnotation {
         a.color          = annotation.color;
         a.readOnly       = annotation.readOnly || false;
         return a;
+    }
+
+    /**
+     * Create an instance from a TOML object.
+     */
+    static newInstanceFromTomlObject(d) {
+        d.direction = d.dir
+        // TODO Annotation側を、labelに合わせてもいいかも。
+        d.text = d.label
+        let rel = RelationAnnotation.newInstance(d)
+        return rel
     }
 
     /**
