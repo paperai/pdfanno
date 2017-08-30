@@ -1,10 +1,10 @@
-import uuid from '../utils/uuid';
-import AbstractAnnotation from './abstract';
-import TextAnnotation from './text';
-import { scaleDown } from '../UI/utils';
+import uuid from '../utils/uuid'
+import AbstractAnnotation from './abstract'
+import TextAnnotation from './text'
+import { scaleDown } from '../UI/utils'
 import { convertToExportY, convertFromExportY } from '../../../shared/coords'
 
-let globalEvent;
+let globalEvent
 
 /**
  * Rect Annotation.
@@ -14,55 +14,55 @@ export default class RectAnnotation extends AbstractAnnotation {
     /**
      * Constructor.
      */
-    constructor() {
+    constructor () {
 
-        super();
+        super()
 
-        globalEvent = window.globalEvent;
+        globalEvent = window.globalEvent
 
-        this.uuid     = null;
-        this.type     = 'area';
-        this.x        = 0;
-        this.y        = 0;
-        this.width    = 0;
-        this.height   = 0;
-        this.text     = null;
-        this.color    = null;
-        this.readOnly = false;
-        this.$element = this.createDummyElement();
+        this.uuid     = null
+        this.type     = 'area'
+        this.x        = 0
+        this.y        = 0
+        this.width    = 0
+        this.height   = 0
+        this.text     = null
+        this.color    = null
+        this.readOnly = false
+        this.$element = this.createDummyElement()
 
-        globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
-        globalEvent.on('enableViewMode', this.enableViewMode);
+        globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
+        globalEvent.on('enableViewMode', this.enableViewMode)
 
         // TODO No need ?
-        this.textAnnotation = new TextAnnotation(this.readOnly, this);
-        this.textAnnotation.on('selected', this.handleTextSelected);
-        this.textAnnotation.on('deselected', this.handleTextDeselected);
-        this.textAnnotation.on('hoverin', this.handleTextHoverIn);
-        this.textAnnotation.on('hoverout', this.handleTextHoverOut);
-        this.textAnnotation.on('textchanged', this.handleTextChanged);
+        this.textAnnotation = new TextAnnotation(this.readOnly, this)
+        this.textAnnotation.on('selected', this.handleTextSelected)
+        this.textAnnotation.on('deselected', this.handleTextDeselected)
+        this.textAnnotation.on('hoverin', this.handleTextHoverIn)
+        this.textAnnotation.on('hoverout', this.handleTextHoverOut)
+        this.textAnnotation.on('textchanged', this.handleTextChanged)
     }
 
     /**
      * Create an instance from an annotation data.
      */
-    static newInstance(annotation) {
-        let rect      = new RectAnnotation();
-        rect.uuid     = annotation.uuid || uuid();
-        rect.x        = annotation.x;
-        rect.y        = annotation.y;
-        rect.width    = annotation.width;
-        rect.height   = annotation.height;
-        rect.text     = annotation.text;
-        rect.color    = annotation.color;
-        rect.readOnly = annotation.readOnly || false;
-        return rect;
+    static newInstance (annotation) {
+        let rect      = new RectAnnotation()
+        rect.uuid     = annotation.uuid || uuid()
+        rect.x        = annotation.x
+        rect.y        = annotation.y
+        rect.width    = annotation.width
+        rect.height   = annotation.height
+        rect.text     = annotation.text
+        rect.color    = annotation.color
+        rect.readOnly = annotation.readOnly || false
+        return rect
     }
 
     /**
      * Create an instance from a TOML object.
      */
-    static newInstanceFromTomlObject(tomlObject) {
+    static newInstanceFromTomlObject (tomlObject) {
         let d = tomlObject
         d.position = d.position.map(parseFloat)
         d.x = d.position[0]
@@ -77,28 +77,28 @@ export default class RectAnnotation extends AbstractAnnotation {
     /**
      * Set a hover event.
      */
-    setHoverEvent() {
+    setHoverEvent () {
         this.$element.find('rect, circle').hover(
             this.handleHoverInEvent,
             this.handleHoverOutEvent
-        );
+        )
     }
 
     /**
      * Delete the annotation from rendering, a container in window, and a container in localStorage.
      */
-    destroy() {
-        let promise = super.destroy();
-        this.emit('delete');
-        window.globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
-        window.globalEvent.removeListener('enableViewMode', this.enableViewMode);
-        return promise;
+    destroy () {
+        let promise = super.destroy()
+        this.emit('delete')
+        window.globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
+        window.globalEvent.removeListener('enableViewMode', this.enableViewMode)
+        return promise
     }
 
     /**
      * Create an annotation data for save.
      */
-    createAnnotation() {
+    createAnnotation () {
         return {
             uuid      : this.uuid,
             type      : this.type,
@@ -109,230 +109,220 @@ export default class RectAnnotation extends AbstractAnnotation {
             text      : this.text,
             color     : this.color,
             readyOnly : this.readOnly
-        };
+        }
     }
 
     /**
      * Delete the annotation if selected.
      */
-    deleteSelectedAnnotation() {
-        super.deleteSelectedAnnotation();
+    deleteSelectedAnnotation () {
+        super.deleteSelectedAnnotation()
     }
 
     /**
      * Get the position for text.
      */
-    getTextPosition() {
+    getTextPosition () {
         return {
             x : this.x + 7,
             y : this.y - 20
-        };
+        }
     }
 
     /**
      * Get the position of the boundingCircle.
      */
-    getBoundingCirclePosition() {
-        let $circle = this.$element.find('circle');
+    getBoundingCirclePosition () {
+        let $circle = this.$element.find('circle')
         return {
             x : parseFloat($circle.attr('cx')),
             y : parseFloat($circle.attr('cy'))
-        };
+        }
     }
 
     /**
      * Handle a selected event on a text.
      */
-    handleTextSelected() {
-        this.select();
+    handleTextSelected () {
+        this.select()
     }
 
     /**
      * Handle a deselected event on a text.
      */
-    handleTextDeselected() {
-        this.deselect();
+    handleTextDeselected () {
+        this.deselect()
     }
 
     /**
      * Handle a hovein event on a text.
      */
-    handleTextHoverIn() {
-        this.highlight();
-        this.emit('hoverin');
+    handleTextHoverIn () {
+        this.highlight()
+        this.emit('hoverin')
     }
 
     /**
      * Handle a hoveout event on a text.
      */
-    handleTextHoverOut() {
-        this.dehighlight();
-        this.emit('hoverout');
+    handleTextHoverOut () {
+        this.dehighlight()
+        this.emit('hoverout')
     }
 
     /**
      * Save a new text.
      */
-    handleTextChanged(newText) {
-        console.log('rect:handleTextChanged:', newText);
-        this.text = newText;
-        this.save();
+    handleTextChanged (newText) {
+        console.log('rect:handleTextChanged:', newText)
+        this.text = newText
+        this.save()
     }
 
     /**
      * Handle a hoverin event.
      */
-    handleHoverInEvent(e) {
-        super.handleHoverInEvent(e);
-        // this.highlight();
-        // this.emit('hoverin');
+    handleHoverInEvent (e) {
+        super.handleHoverInEvent(e)
 
-        let $elm = $(e.currentTarget);
-        if ($elm.prop("tagName") === 'circle') {
-            this.emit('circlehoverin', this);
+        let $elm = $(e.currentTarget)
+        if ($elm.prop('tagName') === 'circle') {
+            this.emit('circlehoverin', this)
         }
     }
 
     /**
      * Handle a hoverout event.
      */
-    handleHoverOutEvent(e) {
-        super.handleHoverOutEvent(e);
-        // this.dehighlight();
-        // this.emit('hoverout');
+    handleHoverOutEvent (e) {
+        super.handleHoverOutEvent(e)
 
-        let $elm = $(e.currentTarget);
-        if ($elm.prop("tagName") === 'circle') {
-            this.emit('circlehoverout', this);
+        let $elm = $(e.currentTarget)
+        if ($elm.prop('tagName') === 'circle') {
+            this.emit('circlehoverout', this)
         }
     }
 
     /**
      * Handle a click event.
      */
-    handleClickEvent(e) {
-        super.handleClickEvent(e);
+    handleClickEvent (e) {
+        super.handleClickEvent(e)
     }
 
     /**
      * Handle a mousedown event.
      */
-    handleMouseDownOnRect() {
-        console.log('handleMouseDownOnRect');
+    handleMouseDownOnRect () {
+        console.log('handleMouseDownOnRect')
 
-        this.originalX = this.x;
-        this.originalY = this.y;
+        this.originalX = this.x
+        this.originalY = this.y
 
-        document.addEventListener('mousemove', this.handleMouseMoveOnDocument);
-        document.addEventListener('mouseup', this.handleMouseUpOnDocument);
+        document.addEventListener('mousemove', this.handleMouseMoveOnDocument)
+        document.addEventListener('mouseup', this.handleMouseUpOnDocument)
 
-        window.globalEvent.emit('rectmovestart');
+        window.globalEvent.emit('rectmovestart')
 
-        this.disableTextlayer();
+        this.disableTextlayer()
     }
 
     /**
      * Handle a mousemove event.
      */
-    handleMouseMoveOnDocument(e) {
+    handleMouseMoveOnDocument (e) {
 
-        this._dragging = true;
+        this._dragging = true
 
         if (!this.startX) {
-            this.startX = parseInt(e.clientX);
-            this.startY = parseInt(e.clientY);
+            this.startX = parseInt(e.clientX)
+            this.startY = parseInt(e.clientY)
         }
-        this.endX = parseInt(e.clientX);
-        this.endY = parseInt(e.clientY);
+        this.endX = parseInt(e.clientX)
+        this.endY = parseInt(e.clientY)
 
         let diff = scaleDown({
             x : this.endX - this.startX,
             y : this.endY - this.startY
-        });
+        })
 
-        this.x = this.originalX + diff.x;
-        this.y = this.originalY + diff.y;
+        this.x = this.originalX + diff.x
+        this.y = this.originalY + diff.y
 
-        this.render();
+        this.render()
 
-        this.emit('rectmove', this);
+        this.emit('rectmove', this)
     }
 
     /**
      * Handle a mouseup event.
      */
-    handleMouseUpOnDocument() {
+    handleMouseUpOnDocument () {
 
         if (this._dragging) {
-            this._dragging = false;
+            this._dragging = false
 
-            this.originalX = null;
-            this.originalY = null;
-            this.startX = null;
-            this.startY = null;
-            this.endX = null;
-            this.endY = null;
+            this.originalX = null
+            this.originalY = null
+            this.startX = null
+            this.startY = null
+            this.endX = null
+            this.endY = null
 
-            this.save();
-            this.enableViewMode();
-            globalEvent.emit('rectmoveend', this);
+            this.save()
+            this.enableViewMode()
+            globalEvent.emit('rectmoveend', this)
         }
 
-
-        document.removeEventListener('mousemove', this.handleMouseMoveOnDocument);
-        document.removeEventListener('mouseup', this.handleMouseUpOnDocument);
+        document.removeEventListener('mousemove', this.handleMouseMoveOnDocument)
+        document.removeEventListener('mouseup', this.handleMouseUpOnDocument)
 
         if (window.currentType !== 'rect') {
-            this.enableTextlayer();
+            this.enableTextlayer()
         }
     }
 
     // TODO 共通化？
-    disableTextlayer() {
-      // $('.textLayer').hide();
-      $('body').addClass('disable-text-layer');
+    disableTextlayer () {
+        // $('.textLayer').hide()
+        $('body').addClass('disable-text-layer')
     }
 
     // TODO 共通化？
-    enableTextlayer() {
-      // $('.textLayer').show();
-      $('body').removeClass('disable-text-layer');
+    enableTextlayer () {
+        // $('.textLayer').show()
+        $('body').removeClass('disable-text-layer')
     }
 
-
-    enableDragAction() {
+    enableDragAction () {
         this.$element.find('.anno-rect, circle')
             .off('mousedown', this.handleMouseDownOnRect)
-            .on('mousedown', this.handleMouseDownOnRect);
+            .on('mousedown', this.handleMouseDownOnRect)
     }
 
-    disableDragAction() {
+    disableDragAction () {
         this.$element.find('.anno-rect, circle')
-            .off('mousedown', this.handleMouseDownOnRect);
+            .off('mousedown', this.handleMouseDownOnRect)
     }
 
     /**
      * Enable view mode.
      */
-    enableViewMode() {
-
-        console.log('rect:enableViewMode');
-
-        super.enableViewMode();
-
+    enableViewMode () {
+        super.enableViewMode()
         if (!this.readOnly) {
-            this.$element.find('.anno-rect, circle').on('click', this.handleClickEvent);
-            this.enableDragAction();
+            this.$element.find('.anno-rect, circle').on('click', this.handleClickEvent)
+            this.enableDragAction()
         }
     }
 
     /**
      * Disable view mode.
      */
-    disableViewMode() {
-        super.disableViewMode();
-        this.$element.find('.anno-rect, circle').off('click');
-        this.disableDragAction();
+    disableViewMode () {
+        super.disableViewMode()
+        this.$element.find('.anno-rect, circle').off('click')
+        this.disableDragAction()
     }
 
 }
