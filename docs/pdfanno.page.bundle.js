@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 32);
+/******/ 	return __webpack_require__(__webpack_require__.s = 31);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -795,7 +795,7 @@ function updateLink(linkElement, obj) {
 /* WEBPACK VAR INJECTION */(function(process) {
 
 var utils = __webpack_require__(0);
-var normalizeHeaderName = __webpack_require__(40);
+var normalizeHeaderName = __webpack_require__(39);
 
 var PROTECTION_PREFIX = /^\)\]\}',?\n/;
 var DEFAULT_CONTENT_TYPE = {
@@ -886,7 +886,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = defaults;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(39)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(38)))
 
 /***/ }),
 /* 15 */
@@ -4982,12 +4982,12 @@ module.exports = function bind(fn, thisArg) {
 
 
 var utils = __webpack_require__(0);
-var settle = __webpack_require__(41);
-var buildURL = __webpack_require__(43);
-var parseHeaders = __webpack_require__(44);
-var isURLSameOrigin = __webpack_require__(45);
+var settle = __webpack_require__(40);
+var buildURL = __webpack_require__(42);
+var parseHeaders = __webpack_require__(43);
+var isURLSameOrigin = __webpack_require__(44);
 var createError = __webpack_require__(22);
-var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(46);
+var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(45);
 
 module.exports = function xhrAdapter(config) {
   return new Promise(function dispatchXhrRequest(resolve, reject) {
@@ -5083,7 +5083,7 @@ module.exports = function xhrAdapter(config) {
     // This is only done if running in a standard browser environment.
     // Specifically not if we're in a web worker, or react-native.
     if (utils.isStandardBrowserEnv()) {
-      var cookies = __webpack_require__(47);
+      var cookies = __webpack_require__(46);
 
       // Add xsrf header
       var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
@@ -5165,7 +5165,7 @@ module.exports = function xhrAdapter(config) {
 "use strict";
 
 
-var enhanceError = __webpack_require__(42);
+var enhanceError = __webpack_require__(41);
 
 /**
  * Create an Error with the specified message, config, error code, and response.
@@ -6903,12 +6903,6 @@ function setup ({
     _createSpanAnnotation = createSpanAnnotation
     _createRelAnnotation = createRelAnnotation
 
-    // set datalist.
-    setDatalist()
-
-    // set actions.
-    setupActions()
-
     // Start to listen window events.
     listenWindowEvents()
 
@@ -6939,7 +6933,7 @@ function seupTabClick () {
         const labelObject = d[type] || {}
         let labels
         if (labelObject.labels === undefined) {
-            labels = ['&nbsp;']
+            labels = [(type === 'span' ? 'span1' : 'relation1')]
         } else {
             labels = labelObject.labels
         }
@@ -7199,86 +7193,16 @@ function saveText (uuid) {
 }
 
 /**
- * Local storage key for datalist.
+ * Set window event listeners.
  */
-const LSKEY_DATALIST = '_pdfanno_datalist'
-
-function setDatalist () {
-    // set datalist.
-    let datalist = JSON.parse(localStorage.getItem(LSKEY_DATALIST) || '[]')
-    const options = datalist.map(d => {
-        return `<option value="${d}"></option>`
-    })
-    $('#labels').html(options)
-}
-
-function setupActions () {
-    // Setup datalist modal.
-    $('#datalistModal').off().on('show.bs.modal', e => {
-        // datalist.
-        let datalist = JSON.parse(localStorage.getItem(LSKEY_DATALIST) || '[]')
-
-        // input for new.
-        datalist.push('')
-
-        const snipets = datalist.map(d => {
-            return `
-            <li class="list-group-item">
-                <input class="form-control js-input" value="${d}">
-                <span class="glyphicon glyphicon-remove js-delete"></span>
-            </li>
-            `
-        })
-
-        $('#datalistModal .js-datalist').html(snipets.join(''))
-    })
-
-    $('#datalistModal').on('keyup', '.js-input', e => {
-        const $this = $(e.currentTarget)
-        const val = $this.val()
-        const isEnd = $this.parent().is(':last-child')
-
-        if (isEnd && val && val.length > 0) {
-            $('#datalistModal .js-datalist').append(`
-                <li class="list-group-item">
-                    <input class="form-control js-input" value="">
-                    <span class="glyphicon glyphicon-remove js-delete"></span>
-                </li>
-            `)
-        }
-    })
-
-    $('#datalistModal').on('click', '.js-delete', e => {
-        $(e.currentTarget).parent().remove()
-    })
-
-    $('#datalistModal .js-done').on('click', e => {
-        let datalist = []
-        $('#datalistModal .js-datalist .js-input').each(function () {
-            const val = $(this).val()
-            if (val && val.length > 0) {
-                datalist.push(val)
-            }
-        })
-
-        localStorage.setItem(LSKEY_DATALIST, JSON.stringify(datalist))
-
-        setDatalist()
-
-        $('#datalistModal').modal('hide')
-    })
-}
-
 function listenWindowEvents () {
     // enable text input.
     window.addEventListener('enableTextInput', e => {
-        console.log('enableTextInput:', e.detail)
         enable(e.detail)
     })
 
     // disable text input.
     window.addEventListener('disappearTextInput', e => {
-        console.log('disappearTextInput:', e.detail)
         disable(e.detail)
     })
 
@@ -11671,23 +11595,22 @@ function resizeHandler() {
 /* 28 */,
 /* 29 */,
 /* 30 */,
-/* 31 */,
-/* 32 */
+/* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_axios__ = __webpack_require__(36);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_axios__ = __webpack_require__(35);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_axios___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_axios__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_anno_ui__ = __webpack_require__(25);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_anno_ui___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_anno_ui__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__shared_util__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_coords__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__page_util_window__ = __webpack_require__(26);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__page_public__ = __webpack_require__(55);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__page_pdf_PDFAnnoPage__ = __webpack_require__(56);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__page_public__ = __webpack_require__(54);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__page_pdf_PDFAnnoPage__ = __webpack_require__(55);
+__webpack_require__(32);
 __webpack_require__(33);
-__webpack_require__(34);
 
 
 
@@ -12030,19 +11953,19 @@ function loadExternalAnnoFile(url) {
 
 
 /***/ }),
-/* 33 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "dist/index.html";
 
 /***/ }),
-/* 34 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(35);
+var content = __webpack_require__(34);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
 var update = __webpack_require__(13)(content, {});
@@ -12062,7 +11985,7 @@ if(false) {
 }
 
 /***/ }),
-/* 35 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(12)();
@@ -12076,13 +11999,13 @@ exports.push([module.i, "@charset \"utf-8\";\n\n/* Loading */\n.loader-container
 
 
 /***/ }),
-/* 36 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(37);
+module.exports = __webpack_require__(36);
 
 /***/ }),
-/* 37 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12090,7 +12013,7 @@ module.exports = __webpack_require__(37);
 
 var utils = __webpack_require__(0);
 var bind = __webpack_require__(20);
-var Axios = __webpack_require__(38);
+var Axios = __webpack_require__(37);
 var defaults = __webpack_require__(14);
 
 /**
@@ -12125,14 +12048,14 @@ axios.create = function create(instanceConfig) {
 
 // Expose Cancel & CancelToken
 axios.Cancel = __webpack_require__(24);
-axios.CancelToken = __webpack_require__(53);
+axios.CancelToken = __webpack_require__(52);
 axios.isCancel = __webpack_require__(23);
 
 // Expose all/spread
 axios.all = function all(promises) {
   return Promise.all(promises);
 };
-axios.spread = __webpack_require__(54);
+axios.spread = __webpack_require__(53);
 
 module.exports = axios;
 
@@ -12141,7 +12064,7 @@ module.exports.default = axios;
 
 
 /***/ }),
-/* 38 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12149,10 +12072,10 @@ module.exports.default = axios;
 
 var defaults = __webpack_require__(14);
 var utils = __webpack_require__(0);
-var InterceptorManager = __webpack_require__(48);
-var dispatchRequest = __webpack_require__(49);
-var isAbsoluteURL = __webpack_require__(51);
-var combineURLs = __webpack_require__(52);
+var InterceptorManager = __webpack_require__(47);
+var dispatchRequest = __webpack_require__(48);
+var isAbsoluteURL = __webpack_require__(50);
+var combineURLs = __webpack_require__(51);
 
 /**
  * Create a new instance of Axios
@@ -12233,7 +12156,7 @@ module.exports = Axios;
 
 
 /***/ }),
-/* 39 */
+/* 38 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -12423,7 +12346,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 40 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12442,7 +12365,7 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
 
 
 /***/ }),
-/* 41 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12474,7 +12397,7 @@ module.exports = function settle(resolve, reject, response) {
 
 
 /***/ }),
-/* 42 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12500,7 +12423,7 @@ module.exports = function enhanceError(error, config, code, response) {
 
 
 /***/ }),
-/* 43 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12575,7 +12498,7 @@ module.exports = function buildURL(url, params, paramsSerializer) {
 
 
 /***/ }),
-/* 44 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12619,7 +12542,7 @@ module.exports = function parseHeaders(headers) {
 
 
 /***/ }),
-/* 45 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12694,7 +12617,7 @@ module.exports = (
 
 
 /***/ }),
-/* 46 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12737,7 +12660,7 @@ module.exports = btoa;
 
 
 /***/ }),
-/* 47 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12797,7 +12720,7 @@ module.exports = (
 
 
 /***/ }),
-/* 48 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12856,14 +12779,14 @@ module.exports = InterceptorManager;
 
 
 /***/ }),
-/* 49 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var utils = __webpack_require__(0);
-var transformData = __webpack_require__(50);
+var transformData = __webpack_require__(49);
 var isCancel = __webpack_require__(23);
 var defaults = __webpack_require__(14);
 
@@ -12942,7 +12865,7 @@ module.exports = function dispatchRequest(config) {
 
 
 /***/ }),
-/* 50 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12969,7 +12892,7 @@ module.exports = function transformData(data, headers, fns) {
 
 
 /***/ }),
-/* 51 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12990,7 +12913,7 @@ module.exports = function isAbsoluteURL(url) {
 
 
 /***/ }),
-/* 52 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13009,7 +12932,7 @@ module.exports = function combineURLs(baseURL, relativeURL) {
 
 
 /***/ }),
-/* 53 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13073,7 +12996,7 @@ module.exports = CancelToken;
 
 
 /***/ }),
-/* 54 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13107,7 +13030,7 @@ module.exports = function spread(callback) {
 
 
 /***/ }),
-/* 55 */
+/* 54 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -13316,13 +13239,13 @@ function clear() {
 
 
 /***/ }),
-/* 56 */
+/* 55 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_anno_ui__ = __webpack_require__(25);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_anno_ui___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_anno_ui__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__loadFiles__ = __webpack_require__(57);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__loadFiles__ = __webpack_require__(56);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__shared_util__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_coords__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__util_window__ = __webpack_require__(26);
@@ -13895,7 +13818,7 @@ class PDFAnnoPage {
 
 
 /***/ }),
-/* 57 */
+/* 56 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
