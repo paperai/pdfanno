@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 31);
+/******/ 	return __webpack_require__(__webpack_require__.s = 30);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -380,8 +380,7 @@ module.exports = {
 
 
 /***/ }),
-/* 1 */,
-/* 2 */
+/* 1 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -447,6 +446,7 @@ function getPageSize() {
 
 
 /***/ }),
+/* 2 */,
 /* 3 */,
 /* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -795,7 +795,7 @@ function updateLink(linkElement, obj) {
 /* WEBPACK VAR INJECTION */(function(process) {
 
 var utils = __webpack_require__(0);
-var normalizeHeaderName = __webpack_require__(39);
+var normalizeHeaderName = __webpack_require__(38);
 
 var PROTECTION_PREFIX = /^\)\]\}',?\n/;
 var DEFAULT_CONTENT_TYPE = {
@@ -886,7 +886,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = defaults;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(38)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(37)))
 
 /***/ }),
 /* 15 */
@@ -4982,12 +4982,12 @@ module.exports = function bind(fn, thisArg) {
 
 
 var utils = __webpack_require__(0);
-var settle = __webpack_require__(40);
-var buildURL = __webpack_require__(42);
-var parseHeaders = __webpack_require__(43);
-var isURLSameOrigin = __webpack_require__(44);
+var settle = __webpack_require__(39);
+var buildURL = __webpack_require__(41);
+var parseHeaders = __webpack_require__(42);
+var isURLSameOrigin = __webpack_require__(43);
 var createError = __webpack_require__(22);
-var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(45);
+var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(44);
 
 module.exports = function xhrAdapter(config) {
   return new Promise(function dispatchXhrRequest(resolve, reject) {
@@ -5083,7 +5083,7 @@ module.exports = function xhrAdapter(config) {
     // This is only done if running in a standard browser environment.
     // Specifically not if we're in a web worker, or react-native.
     if (utils.isStandardBrowserEnv()) {
-      var cookies = __webpack_require__(46);
+      var cookies = __webpack_require__(45);
 
       // Add xsrf header
       var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
@@ -5165,7 +5165,7 @@ module.exports = function xhrAdapter(config) {
 "use strict";
 
 
-var enhanceError = __webpack_require__(41);
+var enhanceError = __webpack_require__(40);
 
 /**
  * Create an Error with the specified message, config, error code, and response.
@@ -11594,23 +11594,22 @@ function resizeHandler() {
 /* 27 */,
 /* 28 */,
 /* 29 */,
-/* 30 */,
-/* 31 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_axios__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_axios__ = __webpack_require__(34);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_axios___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_axios__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_anno_ui__ = __webpack_require__(25);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_anno_ui___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_anno_ui__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__shared_util__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_coords__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_coords__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__page_util_window__ = __webpack_require__(26);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__page_public__ = __webpack_require__(54);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__page_pdf_PDFAnnoPage__ = __webpack_require__(55);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__page_public__ = __webpack_require__(53);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__page_pdf_PDFAnnoPage__ = __webpack_require__(54);
+__webpack_require__(31);
 __webpack_require__(32);
-__webpack_require__(33);
 
 
 
@@ -11953,19 +11952,19 @@ function loadExternalAnnoFile(url) {
 
 
 /***/ }),
-/* 32 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "dist/index.html";
 
 /***/ }),
-/* 33 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(34);
+var content = __webpack_require__(33);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
 var update = __webpack_require__(13)(content, {});
@@ -11985,7 +11984,7 @@ if(false) {
 }
 
 /***/ }),
-/* 34 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(12)();
@@ -11999,13 +11998,13 @@ exports.push([module.i, "@charset \"utf-8\";\n\n/* Loading */\n.loader-container
 
 
 /***/ }),
-/* 35 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(36);
+module.exports = __webpack_require__(35);
 
 /***/ }),
-/* 36 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12013,7 +12012,7 @@ module.exports = __webpack_require__(36);
 
 var utils = __webpack_require__(0);
 var bind = __webpack_require__(20);
-var Axios = __webpack_require__(37);
+var Axios = __webpack_require__(36);
 var defaults = __webpack_require__(14);
 
 /**
@@ -12048,14 +12047,14 @@ axios.create = function create(instanceConfig) {
 
 // Expose Cancel & CancelToken
 axios.Cancel = __webpack_require__(24);
-axios.CancelToken = __webpack_require__(52);
+axios.CancelToken = __webpack_require__(51);
 axios.isCancel = __webpack_require__(23);
 
 // Expose all/spread
 axios.all = function all(promises) {
   return Promise.all(promises);
 };
-axios.spread = __webpack_require__(53);
+axios.spread = __webpack_require__(52);
 
 module.exports = axios;
 
@@ -12064,7 +12063,7 @@ module.exports.default = axios;
 
 
 /***/ }),
-/* 37 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12072,10 +12071,10 @@ module.exports.default = axios;
 
 var defaults = __webpack_require__(14);
 var utils = __webpack_require__(0);
-var InterceptorManager = __webpack_require__(47);
-var dispatchRequest = __webpack_require__(48);
-var isAbsoluteURL = __webpack_require__(50);
-var combineURLs = __webpack_require__(51);
+var InterceptorManager = __webpack_require__(46);
+var dispatchRequest = __webpack_require__(47);
+var isAbsoluteURL = __webpack_require__(49);
+var combineURLs = __webpack_require__(50);
 
 /**
  * Create a new instance of Axios
@@ -12156,7 +12155,7 @@ module.exports = Axios;
 
 
 /***/ }),
-/* 38 */
+/* 37 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -12346,7 +12345,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 39 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12365,7 +12364,7 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
 
 
 /***/ }),
-/* 40 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12397,7 +12396,7 @@ module.exports = function settle(resolve, reject, response) {
 
 
 /***/ }),
-/* 41 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12423,7 +12422,7 @@ module.exports = function enhanceError(error, config, code, response) {
 
 
 /***/ }),
-/* 42 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12498,7 +12497,7 @@ module.exports = function buildURL(url, params, paramsSerializer) {
 
 
 /***/ }),
-/* 43 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12542,7 +12541,7 @@ module.exports = function parseHeaders(headers) {
 
 
 /***/ }),
-/* 44 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12617,7 +12616,7 @@ module.exports = (
 
 
 /***/ }),
-/* 45 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12660,7 +12659,7 @@ module.exports = btoa;
 
 
 /***/ }),
-/* 46 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12720,7 +12719,7 @@ module.exports = (
 
 
 /***/ }),
-/* 47 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12779,14 +12778,14 @@ module.exports = InterceptorManager;
 
 
 /***/ }),
-/* 48 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var utils = __webpack_require__(0);
-var transformData = __webpack_require__(49);
+var transformData = __webpack_require__(48);
 var isCancel = __webpack_require__(23);
 var defaults = __webpack_require__(14);
 
@@ -12865,7 +12864,7 @@ module.exports = function dispatchRequest(config) {
 
 
 /***/ }),
-/* 49 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12892,7 +12891,7 @@ module.exports = function transformData(data, headers, fns) {
 
 
 /***/ }),
-/* 50 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12913,7 +12912,7 @@ module.exports = function isAbsoluteURL(url) {
 
 
 /***/ }),
-/* 51 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12932,7 +12931,7 @@ module.exports = function combineURLs(baseURL, relativeURL) {
 
 
 /***/ }),
-/* 52 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12996,7 +12995,7 @@ module.exports = CancelToken;
 
 
 /***/ }),
-/* 53 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13030,7 +13029,7 @@ module.exports = function spread(callback) {
 
 
 /***/ }),
-/* 54 */
+/* 53 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -13038,7 +13037,7 @@ module.exports = function spread(callback) {
 /* harmony export (immutable) */ __webpack_exports__["e"] = addAnnotation;
 /* harmony export (immutable) */ __webpack_exports__["g"] = deleteAnnotation;
 /* harmony export (immutable) */ __webpack_exports__["f"] = clear;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shared_coords__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shared_coords__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_toml__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_toml___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_toml__);
 
@@ -13239,15 +13238,15 @@ function clear() {
 
 
 /***/ }),
-/* 55 */
+/* 54 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_anno_ui__ = __webpack_require__(25);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_anno_ui___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_anno_ui__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__loadFiles__ = __webpack_require__(56);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__loadFiles__ = __webpack_require__(55);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__shared_util__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_coords__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_coords__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__util_window__ = __webpack_require__(26);
 
 
@@ -13818,7 +13817,7 @@ class PDFAnnoPage {
 
 
 /***/ }),
-/* 56 */
+/* 55 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

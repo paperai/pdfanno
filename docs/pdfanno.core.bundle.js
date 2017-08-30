@@ -70,12 +70,78 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 57);
+/******/ 	return __webpack_require__(__webpack_require__.s = 56);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */,
 /* 1 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["b"] = convertToExportY;
+/* harmony export (immutable) */ __webpack_exports__["a"] = convertFromExportY;
+/* unused harmony export getPageSize */
+/**
+ * Convert the `y` position from the local coords to exported json.
+ */
+function convertToExportY(y) {
+
+    let meta = getPageSize();
+
+    y -= paddingTop;
+
+    let pageHeight = meta.height + paddingBetweenPages;
+
+    let pageNumber = Math.floor(y / pageHeight) + 1;
+    let yInPage = y - (pageNumber-1) * pageHeight;
+
+    return { pageNumber, y : yInPage };
+}
+
+/**
+ * Convert the `y` position from exported json to local coords.
+ */
+function convertFromExportY(pageNumber, yInPage) {
+
+    let meta = getPageSize();
+
+    let y = yInPage + paddingTop;
+
+    let pagePadding = paddingBetweenPages;
+
+    y += (pageNumber - 1) * (meta.height + pagePadding);
+
+    return y;
+}
+
+/**
+ * The padding of page top.
+ */
+const paddingTop = 9;
+
+/**
+ * The padding between pages.
+ */
+const paddingBetweenPages = 9;
+/* harmony export (immutable) */ __webpack_exports__["c"] = paddingBetweenPages;
+
+
+/**
+ * Get a page size of a single PDF page.
+ */
+function getPageSize() {
+
+    let pdfView = window.PDFView || iframeWindow.PDFView;
+
+    let viewBox = pdfView.pdfViewer.getPageView(0).viewport.viewBox;
+    let size = { width : viewBox[2], height : viewBox[3] };
+    return size;
+}
+
+
+/***/ }),
+/* 2 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -243,72 +309,6 @@ function getCurrentPage (e) {
 
     console.log('notfound ><...')
     return null
-}
-
-
-/***/ }),
-/* 2 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["b"] = convertToExportY;
-/* harmony export (immutable) */ __webpack_exports__["a"] = convertFromExportY;
-/* unused harmony export getPageSize */
-/**
- * Convert the `y` position from the local coords to exported json.
- */
-function convertToExportY(y) {
-
-    let meta = getPageSize();
-
-    y -= paddingTop;
-
-    let pageHeight = meta.height + paddingBetweenPages;
-
-    let pageNumber = Math.floor(y / pageHeight) + 1;
-    let yInPage = y - (pageNumber-1) * pageHeight;
-
-    return { pageNumber, y : yInPage };
-}
-
-/**
- * Convert the `y` position from exported json to local coords.
- */
-function convertFromExportY(pageNumber, yInPage) {
-
-    let meta = getPageSize();
-
-    let y = yInPage + paddingTop;
-
-    let pagePadding = paddingBetweenPages;
-
-    y += (pageNumber - 1) * (meta.height + pagePadding);
-
-    return y;
-}
-
-/**
- * The padding of page top.
- */
-const paddingTop = 9;
-
-/**
- * The padding between pages.
- */
-const paddingBetweenPages = 9;
-/* harmony export (immutable) */ __webpack_exports__["c"] = paddingBetweenPages;
-
-
-/**
- * Get a page size of a single PDF page.
- */
-function getPageSize() {
-
-    let pdfView = window.PDFView || iframeWindow.PDFView;
-
-    let viewBox = pdfView.pdfViewer.getPageView(0).viewport.viewBox;
-    let size = { width : viewBox[2], height : viewBox[3] };
-    return size;
 }
 
 
@@ -10702,6 +10702,348 @@ function adjustPoint (x, y, radius) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_uuid__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__abstract__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__text__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__UI_utils__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__shared_coords__ = __webpack_require__(1);
+
+
+
+
+
+
+let globalEvent
+
+/**
+ * Rect Annotation.
+ */
+class RectAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* default */] {
+
+    /**
+     * Constructor.
+     */
+    constructor () {
+
+        super()
+
+        globalEvent = window.globalEvent
+
+        this.uuid     = null
+        this.type     = 'area'
+        this.x        = 0
+        this.y        = 0
+        this.width    = 0
+        this.height   = 0
+        this.text     = null
+        this.color    = null
+        this.readOnly = false
+        this.$element = this.createDummyElement()
+
+        globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
+        globalEvent.on('enableViewMode', this.enableViewMode)
+
+        // TODO No need ?
+        this.textAnnotation = new __WEBPACK_IMPORTED_MODULE_2__text__["a" /* default */](this.readOnly, this)
+        this.textAnnotation.on('selected', this.handleTextSelected)
+        this.textAnnotation.on('deselected', this.handleTextDeselected)
+        this.textAnnotation.on('hoverin', this.handleTextHoverIn)
+        this.textAnnotation.on('hoverout', this.handleTextHoverOut)
+        this.textAnnotation.on('textchanged', this.handleTextChanged)
+    }
+
+    /**
+     * Create an instance from an annotation data.
+     */
+    static newInstance (annotation) {
+        let rect      = new RectAnnotation()
+        rect.uuid     = annotation.uuid || __WEBPACK_IMPORTED_MODULE_0__utils_uuid__["a" /* default */]()
+        rect.x        = annotation.x
+        rect.y        = annotation.y
+        rect.width    = annotation.width
+        rect.height   = annotation.height
+        rect.text     = annotation.text
+        rect.color    = annotation.color
+        rect.readOnly = annotation.readOnly || false
+        return rect
+    }
+
+    /**
+     * Create an instance from a TOML object.
+     */
+    static newInstanceFromTomlObject (tomlObject) {
+        let d = tomlObject
+        d.position = d.position.map(parseFloat)
+        d.x = d.position[0]
+        d.y = __WEBPACK_IMPORTED_MODULE_4__shared_coords__["a" /* convertFromExportY */](d.page, d.position[1])
+        d.width = d.position[2]
+        d.height = d.position[3]
+        d.text = d.label
+        let rect = RectAnnotation.newInstance(d)
+        return rect
+    }
+
+    /**
+     * Set a hover event.
+     */
+    setHoverEvent () {
+        this.$element.find('rect, circle').hover(
+            this.handleHoverInEvent,
+            this.handleHoverOutEvent
+        )
+    }
+
+    /**
+     * Delete the annotation from rendering, a container in window, and a container in localStorage.
+     */
+    destroy () {
+        let promise = super.destroy()
+        this.emit('delete')
+        window.globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
+        window.globalEvent.removeListener('enableViewMode', this.enableViewMode)
+        return promise
+    }
+
+    /**
+     * Create an annotation data for save.
+     */
+    createAnnotation () {
+        return {
+            uuid      : this.uuid,
+            type      : this.type,
+            x         : this.x,
+            y         : this.y,
+            width     : this.width,
+            height    : this.height,
+            text      : this.text,
+            color     : this.color,
+            readyOnly : this.readOnly
+        }
+    }
+
+    /**
+     * Delete the annotation if selected.
+     */
+    deleteSelectedAnnotation () {
+        super.deleteSelectedAnnotation()
+    }
+
+    /**
+     * Get the position for text.
+     */
+    getTextPosition () {
+        return {
+            x : this.x + 7,
+            y : this.y - 20
+        }
+    }
+
+    /**
+     * Get the position of the boundingCircle.
+     */
+    getBoundingCirclePosition () {
+        let $circle = this.$element.find('circle')
+        return {
+            x : parseFloat($circle.attr('cx')),
+            y : parseFloat($circle.attr('cy'))
+        }
+    }
+
+    /**
+     * Handle a selected event on a text.
+     */
+    handleTextSelected () {
+        this.select()
+    }
+
+    /**
+     * Handle a deselected event on a text.
+     */
+    handleTextDeselected () {
+        this.deselect()
+    }
+
+    /**
+     * Handle a hovein event on a text.
+     */
+    handleTextHoverIn () {
+        this.highlight()
+        this.emit('hoverin')
+    }
+
+    /**
+     * Handle a hoveout event on a text.
+     */
+    handleTextHoverOut () {
+        this.dehighlight()
+        this.emit('hoverout')
+    }
+
+    /**
+     * Save a new text.
+     */
+    handleTextChanged (newText) {
+        console.log('rect:handleTextChanged:', newText)
+        this.text = newText
+        this.save()
+    }
+
+    /**
+     * Handle a hoverin event.
+     */
+    handleHoverInEvent (e) {
+        super.handleHoverInEvent(e)
+
+        let $elm = $(e.currentTarget)
+        if ($elm.prop('tagName') === 'circle') {
+            this.emit('circlehoverin', this)
+        }
+    }
+
+    /**
+     * Handle a hoverout event.
+     */
+    handleHoverOutEvent (e) {
+        super.handleHoverOutEvent(e)
+
+        let $elm = $(e.currentTarget)
+        if ($elm.prop('tagName') === 'circle') {
+            this.emit('circlehoverout', this)
+        }
+    }
+
+    /**
+     * Handle a click event.
+     */
+    handleClickEvent (e) {
+        super.handleClickEvent(e)
+    }
+
+    /**
+     * Handle a mousedown event.
+     */
+    handleMouseDownOnRect () {
+        console.log('handleMouseDownOnRect')
+
+        this.originalX = this.x
+        this.originalY = this.y
+
+        document.addEventListener('mousemove', this.handleMouseMoveOnDocument)
+        document.addEventListener('mouseup', this.handleMouseUpOnDocument)
+
+        window.globalEvent.emit('rectmovestart')
+
+        this.disableTextlayer()
+    }
+
+    /**
+     * Handle a mousemove event.
+     */
+    handleMouseMoveOnDocument (e) {
+
+        this._dragging = true
+
+        if (!this.startX) {
+            this.startX = parseInt(e.clientX)
+            this.startY = parseInt(e.clientY)
+        }
+        this.endX = parseInt(e.clientX)
+        this.endY = parseInt(e.clientY)
+
+        let diff = __WEBPACK_IMPORTED_MODULE_3__UI_utils__["h" /* scaleDown */]({
+            x : this.endX - this.startX,
+            y : this.endY - this.startY
+        })
+
+        this.x = this.originalX + diff.x
+        this.y = this.originalY + diff.y
+
+        this.render()
+
+        this.emit('rectmove', this)
+    }
+
+    /**
+     * Handle a mouseup event.
+     */
+    handleMouseUpOnDocument () {
+
+        if (this._dragging) {
+            this._dragging = false
+
+            this.originalX = null
+            this.originalY = null
+            this.startX = null
+            this.startY = null
+            this.endX = null
+            this.endY = null
+
+            this.save()
+            this.enableViewMode()
+            globalEvent.emit('rectmoveend', this)
+        }
+
+        document.removeEventListener('mousemove', this.handleMouseMoveOnDocument)
+        document.removeEventListener('mouseup', this.handleMouseUpOnDocument)
+
+        if (window.currentType !== 'rect') {
+            this.enableTextlayer()
+        }
+    }
+
+    // TODO 共通化？
+    disableTextlayer () {
+        // $('.textLayer').hide()
+        $('body').addClass('disable-text-layer')
+    }
+
+    // TODO 共通化？
+    enableTextlayer () {
+        // $('.textLayer').show()
+        $('body').removeClass('disable-text-layer')
+    }
+
+    enableDragAction () {
+        this.$element.find('.anno-rect, circle')
+            .off('mousedown', this.handleMouseDownOnRect)
+            .on('mousedown', this.handleMouseDownOnRect)
+    }
+
+    disableDragAction () {
+        this.$element.find('.anno-rect, circle')
+            .off('mousedown', this.handleMouseDownOnRect)
+    }
+
+    /**
+     * Enable view mode.
+     */
+    enableViewMode () {
+        super.enableViewMode()
+        if (!this.readOnly) {
+            this.$element.find('.anno-rect, circle').on('click', this.handleClickEvent)
+            this.enableDragAction()
+        }
+    }
+
+    /**
+     * Disable view mode.
+     */
+    disableViewMode () {
+        super.disableViewMode()
+        this.$element.find('.anno-rect, circle').off('click')
+        this.disableDragAction()
+    }
+
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = RectAnnotation;
+
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = uuid;
 /**
  * Generate a univierally unique identifier
@@ -10719,14 +11061,14 @@ function uuid () {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_events__ = __webpack_require__(27);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_events___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_events__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__render_appendChild__ = __webpack_require__(28);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__UI_utils__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__UI_utils__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_event__ = __webpack_require__(69);
 
 
@@ -11035,40 +11377,14 @@ class AbstractAnnotation extends __WEBPACK_IMPORTED_MODULE_0_events___default.a 
 
 
 /***/ }),
-/* 9 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = enable;
-/* unused harmony export disable */
-/**
- * Enable Text input enable.
- */
-function enable ({ uuid, text, disable = false, autoFocus = false, blurListener = null }) {
-    var event = document.createEvent('CustomEvent')
-    event.initCustomEvent('enableTextInput', true, true, ...arguments)
-    window.dispatchEvent(event)
-}
-
-/**
- * Disable the text input.
- */
-function disable () {
-    var event = document.createEvent('CustomEvent')
-    event.initCustomEvent('disappearTextInput', true, true)
-    window.dispatchEvent(event)
-}
-
-
-/***/ }),
 /* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_uuid__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__abstract__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__text__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_textInput__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_uuid__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__abstract__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__text__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_coords__ = __webpack_require__(1);
 
 
 
@@ -11082,69 +11398,91 @@ class SpanAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
     /**
      * Constructor.
      */
-    constructor() {
-        super();
+    constructor () {
+        super()
 
-        this.uuid       = null;
-        this.type       = 'span';
-        this.rectangles = [];
-        this.text       = null;
-        this.color      = null;
-        this.readOnly   = false;
-        this.$element   = this.createDummyElement();
+        this.uuid       = null
+        this.type       = 'span'
+        this.rectangles = []
+        this.text       = null
+        this.color      = null
+        this.readOnly   = false
+        this.$element   = this.createDummyElement()
 
-        window.globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
-        window.globalEvent.on('enableViewMode', this.enableViewMode);
+        window.globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
+        window.globalEvent.on('enableViewMode', this.enableViewMode)
 
-        this.textAnnotation = new __WEBPACK_IMPORTED_MODULE_2__text__["a" /* default */](this.readOnly, this);
-        this.textAnnotation.on('selected', this.handleTextSelected);
-        this.textAnnotation.on('deselected', this.handleTextDeselected);
-        this.textAnnotation.on('hoverin', this.handleTextHoverIn);
-        this.textAnnotation.on('hoverout', this.handleTextHoverOut);
-        this.textAnnotation.on('textchanged', this.handleTextChanged);
+        this.textAnnotation = new __WEBPACK_IMPORTED_MODULE_2__text__["a" /* default */](this.readOnly, this)
+        this.textAnnotation.on('selected', this.handleTextSelected)
+        this.textAnnotation.on('deselected', this.handleTextDeselected)
+        this.textAnnotation.on('hoverin', this.handleTextHoverIn)
+        this.textAnnotation.on('hoverout', this.handleTextHoverOut)
+        this.textAnnotation.on('textchanged', this.handleTextChanged)
     }
 
     /**
      * Create an instance from an annotation data.
      */
-    static newInstance(annotation) {
-        let a          = new SpanAnnotation();
-        a.uuid         = annotation.uuid || __WEBPACK_IMPORTED_MODULE_0__utils_uuid__["a" /* default */]();
-        a.rectangles   = annotation.rectangles;
-        a.text         = annotation.text;
-        a.color        = annotation.color;
-        a.readOnly     = annotation.readOnly || false;
-        a.selectedText = annotation.selectedText;
-        return a;
+    static newInstance (annotation) {
+        let a          = new SpanAnnotation()
+        a.uuid         = annotation.uuid || __WEBPACK_IMPORTED_MODULE_0__utils_uuid__["a" /* default */]()
+        a.rectangles   = annotation.rectangles
+        a.text         = annotation.text
+        a.color        = annotation.color
+        a.readOnly     = annotation.readOnly || false
+        a.selectedText = annotation.selectedText
+        return a
+    }
+
+    /**
+     * Create an instance from a TOML object.
+     */
+    static newInstanceFromTomlObject (tomlObject) {
+        let d = tomlObject
+        // position: String -> Float.
+        let position = d.position.map(p => p.map(parseFloat))
+        d.selectedText = d.text
+        d.text = d.label
+        // Convert.
+        d.rectangles = position.map(p => {
+            return {
+                x      : p[0],
+                y      : __WEBPACK_IMPORTED_MODULE_3__shared_coords__["a" /* convertFromExportY */](d.page, p[1]),
+                width  : p[2],
+                height : p[3]
+            }
+        })
+        let span = SpanAnnotation.newInstance(d)
+        return span
     }
 
     /**
      * Set a hover event.
      */
-    setHoverEvent() {
+    setHoverEvent () {
         this.$element.find('circle').hover(
             this.handleHoverInEvent,
             this.handleHoverOutEvent
-        );
+        )
     }
 
     /**
      * Delete the annotation from rendering, a container in window, and a container in localStorage.
      */
-    destroy() {
-        let promise = super.destroy();
-        this.emit('delete');
+    destroy () {
+        let promise = super.destroy()
+        this.emit('delete')
 
         // TODO オブジェクトベースで削除できるようにしたい.
-        window.globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
-        window.globalEvent.removeListener('enableViewMode', this.enableViewMode);
-        return promise;
+        window.globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
+        window.globalEvent.removeListener('enableViewMode', this.enableViewMode)
+        return promise
     }
 
     /**
      * Create an annotation data for save.
      */
-    createAnnotation() {
+    createAnnotation () {
         return {
             uuid         : this.uuid,
             type         : this.type,
@@ -11153,125 +11491,125 @@ class SpanAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
             color        : this.color,
             readyOnly    : this.readOnly,
             selectedText : this.selectedText
-        };
+        }
     }
 
     /**
      * Get the position for text.
      */
-    getTextPosition() {
+    getTextPosition () {
 
-        let p = null;
+        let p = null
 
         if (this.rectangles.length > 0) {
             p = {
                 x : this.rectangles[0].x + 7,
                 y : this.rectangles[0].y - 20
-            };
+            }
         }
 
-        return p;
+        return p
     }
 
     /**
      * Delete the annotation if selected.
      */
-    deleteSelectedAnnotation() {
-        super.deleteSelectedAnnotation();
+    deleteSelectedAnnotation () {
+        super.deleteSelectedAnnotation()
     }
 
     /**
      * Get the position of the boundingCircle.
      */
-    getBoundingCirclePosition() {
-        let $circle = this.$element.find('circle');
+    getBoundingCirclePosition () {
+        let $circle = this.$element.find('circle')
         return {
             x : parseFloat($circle.attr('cx')),
             y : parseFloat($circle.attr('cy'))
-        };
+        }
     }
 
     /**
      * Handle a selected event on a text.
      */
-    handleTextSelected() {
-        this.select();
+    handleTextSelected () {
+        this.select()
     }
 
     /**
      * Handle a deselected event on a text.
      */
-    handleTextDeselected() {
-        this.deselect();
+    handleTextDeselected () {
+        this.deselect()
     }
 
     /**
      * Handle a hovein event on a text.
      */
-    handleTextHoverIn() {
-        this.highlight();
-        this.emit('hoverin');
+    handleTextHoverIn () {
+        this.highlight()
+        this.emit('hoverin')
     }
 
     /**
      * Handle a hoveout event on a text.
      */
-    handleTextHoverOut() {
-        this.dehighlight();
-        this.emit('hoverout');
+    handleTextHoverOut () {
+        this.dehighlight()
+        this.emit('hoverout')
     }
 
     /**
      * Save a new text.
      */
-    handleTextChanged(newText) {
-        this.text = newText;
-        this.save();
+    handleTextChanged (newText) {
+        this.text = newText
+        this.save()
     }
 
     /**
      * Handle a hoverin event.
      */
-    handleHoverInEvent(e) {
-        super.handleHoverInEvent(e);
-        this.emit('circlehoverin', this);
+    handleHoverInEvent (e) {
+        super.handleHoverInEvent(e)
+        this.emit('circlehoverin', this)
     }
 
     /**
      * Handle a hoverout event.
      */
-    handleHoverOutEvent(e) {
-        super.handleHoverOutEvent(e);
-        this.emit('circlehoverout', this);
+    handleHoverOutEvent (e) {
+        super.handleHoverOutEvent(e)
+        this.emit('circlehoverout', this)
     }
 
     /**
      * Handle a click event.
      */
-    handleClickEvent(e) {
-        super.handleClickEvent(e);
+    handleClickEvent (e) {
+        super.handleClickEvent(e)
     }
 
     /**
      * Enable view mode.
      */
-    enableViewMode() {
+    enableViewMode () {
 
-        this.disableViewMode();
+        this.disableViewMode()
 
-        super.enableViewMode();
+        super.enableViewMode()
 
         if (!this.readOnly) {
-            this.$element.find('circle').on('click', this.handleClickEvent);
+            this.$element.find('circle').on('click', this.handleClickEvent)
         }
     }
 
     /**
      * Disable view mode.
      */
-    disableViewMode() {
-        super.disableViewMode();
-        this.$element.find('circle').off('click');
+    disableViewMode () {
+        super.disableViewMode()
+        this.$element.find('circle').off('click')
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = SpanAnnotation;
@@ -11283,9 +11621,9 @@ class SpanAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_uuid__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__abstract__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__text__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_uuid__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__abstract__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__text__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_relation_js__ = __webpack_require__(29);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__shared_util__ = __webpack_require__(4);
 
@@ -11294,7 +11632,7 @@ class SpanAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
 
 
 
-let globalEvent;
+let globalEvent
 
 /**
  * Relation Annotation (one-way / two-way / link)
@@ -11304,116 +11642,128 @@ class RelationAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* 
     /**
      * Constructor.
      */
-    constructor() {
-        super();
+    constructor () {
+        super()
 
-        globalEvent = window.globalEvent;
+        globalEvent = window.globalEvent
 
-        this.uuid           = __WEBPACK_IMPORTED_MODULE_0__utils_uuid__["a" /* default */]();
-        this.type           = 'relation';
-        this.direction      = null;
-        this.rel1Annotation = null;
-        this.rel2Annotation = null;
-        this.text           = null;
-        this.color          = null;
-        this.readOnly       = false;
-        this.$element       = this.createDummyElement();
+        this.uuid = __WEBPACK_IMPORTED_MODULE_0__utils_uuid__["a" /* default */]()
+        this.type = 'relation'
+        this.direction = null
+        this.rel1Annotation = null
+        this.rel2Annotation = null
+        this.text = null
+        this.color = null
+        this.readOnly = false
+        this.$element = this.createDummyElement()
 
         // for render.
-        this.x1 = 0;
-        this.y1 = 0;
-        this.x2 = 0;
-        this.y2 = 0;
+        this.x1 = 0
+        this.y1 = 0
+        this.x2 = 0
+        this.y2 = 0
 
-        globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
-        globalEvent.on('enableViewMode', this.enableViewMode);
-        globalEvent.on('rectmoveend', this.handleRelMoveEnd);
+        globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
+        globalEvent.on('enableViewMode', this.enableViewMode)
+        globalEvent.on('rectmoveend', this.handleRelMoveEnd)
 
-        this.textAnnotation = new __WEBPACK_IMPORTED_MODULE_2__text__["a" /* default */](this.readOnly, this);
-        this.textAnnotation.on('selected', this.handleTextSelected);
-        this.textAnnotation.on('deselected', this.handleTextDeselected);
-        this.textAnnotation.on('hoverin', this.handleTextHoverIn);
-        this.textAnnotation.on('hoverout', this.handleTextHoverOut);
-        this.textAnnotation.on('textchanged', this.handleTextChanged);
+        // TODO Maybe no need.
+        this.textAnnotation = new __WEBPACK_IMPORTED_MODULE_2__text__["a" /* default */](this.readOnly, this)
+        this.textAnnotation.on('selected', this.handleTextSelected)
+        this.textAnnotation.on('deselected', this.handleTextDeselected)
+        this.textAnnotation.on('hoverin', this.handleTextHoverIn)
+        this.textAnnotation.on('hoverout', this.handleTextHoverOut)
+        this.textAnnotation.on('textchanged', this.handleTextChanged)
     }
 
     /**
      * Create an instance from an annotation data.
      */
-    static newInstance(annotation) {
-        let a            = new RelationAnnotation();
-        a.uuid           = annotation.uuid || __WEBPACK_IMPORTED_MODULE_0__utils_uuid__["a" /* default */]();
-        a.direction      = annotation.direction;
-        a.rel1Annotation = __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* default */].isAnnotation(annotation.rel1) ? annotation.rel1 : window.annotationContainer.findById(annotation.rel1);
-        a.rel2Annotation = __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* default */].isAnnotation(annotation.rel2) ? annotation.rel2 : window.annotationContainer.findById(annotation.rel2);
-        a.text           = annotation.text;
-        a.color          = annotation.color;
-        a.readOnly       = annotation.readOnly || false;
-        return a;
+    static newInstance (annotation) {
+        let a = new RelationAnnotation()
+        a.uuid = annotation.uuid || __WEBPACK_IMPORTED_MODULE_0__utils_uuid__["a" /* default */]()
+        a.direction = annotation.direction
+        a.rel1Annotation = __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* default */].isAnnotation(annotation.rel1) ? annotation.rel1 : window.annotationContainer.findById(annotation.rel1)
+        a.rel2Annotation = __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* default */].isAnnotation(annotation.rel2) ? annotation.rel2 : window.annotationContainer.findById(annotation.rel2)
+        a.text = annotation.text
+        a.color = annotation.color
+        a.readOnly = annotation.readOnly || false
+        return a
+    }
+
+    /**
+     * Create an instance from a TOML object.
+     */
+    static newInstanceFromTomlObject (d) {
+        d.direction = d.dir
+        // TODO Annotation側を、labelに合わせてもいいかも。
+        d.text = d.label
+        let rel = RelationAnnotation.newInstance(d)
+        return rel
     }
 
     /**
      * Set a hover event.
      */
-    setHoverEvent() {
+    setHoverEvent () {
         this.$element.find('path').hover(
             this.handleHoverInEvent,
             this.handleHoverOutEvent
-        );
+        )
     }
 
     /**
      * Setter - rel1Annotation.
      */
-    set rel1Annotation(a) {
-        this._rel1Annotation = a;
+    set rel1Annotation (a) {
+        this._rel1Annotation = a
         if (this._rel1Annotation) {
-            this._rel1Annotation.on('hoverin', this.handleRelHoverIn);
-            this._rel1Annotation.on('hoverout', this.handleRelHoverOut);
-            this._rel1Annotation.on('rectmove', this.handleRelMove);
-            this._rel1Annotation.on('delete', this.handleRelDelete);
+            this._rel1Annotation.on('hoverin', this.handleRelHoverIn)
+            this._rel1Annotation.on('hoverout', this.handleRelHoverOut)
+            this._rel1Annotation.on('rectmove', this.handleRelMove)
+            this._rel1Annotation.on('delete', this.handleRelDelete)
         }
     }
 
     /**
      * Getter - rel1Annotation.
      */
-    get rel1Annotation() {
-        return this._rel1Annotation;
+    get rel1Annotation () {
+        return this._rel1Annotation
     }
 
     /**
      * Setter - rel2Annotation.
      */
-    set rel2Annotation(a) {
-        this._rel2Annotation = a;
+    set rel2Annotation (a) {
+        this._rel2Annotation = a
         if (this._rel2Annotation) {
-            this._rel2Annotation.on('hoverin', this.handleRelHoverIn);
-            this._rel2Annotation.on('hoverout', this.handleRelHoverOut);
-            this._rel2Annotation.on('rectmove', this.handleRelMove);
-            this._rel2Annotation.on('delete', this.handleRelDelete);
+            this._rel2Annotation.on('hoverin', this.handleRelHoverIn)
+            this._rel2Annotation.on('hoverout', this.handleRelHoverOut)
+            this._rel2Annotation.on('rectmove', this.handleRelMove)
+            this._rel2Annotation.on('delete', this.handleRelDelete)
         }
     }
 
     /**
      * Getter - rel2Annotation.
      */
-    get rel2Annotation() {
-        return this._rel2Annotation;
+    get rel2Annotation () {
+        return this._rel2Annotation
     }
 
     /**
      * Render the annotation.
      */
-    render() {
-        this.setStartEndPosition();
-        super.render();
+    render () {
+        this.setStartEndPosition()
+        super.render()
     }
 
     /**
      * Create an annotation data for save.
      */
-    createAnnotation() {
+    createAnnotation () {
         return {
             uuid      : this.uuid,
             type      : this.type,
@@ -11423,145 +11773,145 @@ class RelationAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* 
             text      : this.text,
             color     : this.color,
             readOnly  : this.readOnly
-        };
+        }
     }
 
     /**
      * Destroy the annotation.
      */
-    destroy() {
-        let promise = super.destroy();
+    destroy () {
+        let promise = super.destroy()
         if (this._rel1Annotation) {
-            this._rel1Annotation.removeListener('hoverin', this.handleRelHoverIn);
-            this._rel1Annotation.removeListener('hoverout', this.handleRelHoverOut);
-            this._rel1Annotation.removeListener('rectmove', this.handleRelMove);
-            this._rel1Annotation.removeListener('delete', this.handleRelDelete);
-            delete this._rel1Annotation;
+            this._rel1Annotation.removeListener('hoverin', this.handleRelHoverIn)
+            this._rel1Annotation.removeListener('hoverout', this.handleRelHoverOut)
+            this._rel1Annotation.removeListener('rectmove', this.handleRelMove)
+            this._rel1Annotation.removeListener('delete', this.handleRelDelete)
+            delete this._rel1Annotation
         }
         if (this._rel2Annotation) {
-            this._rel2Annotation.removeListener('hoverin', this.handleRelHoverIn);
-            this._rel2Annotation.removeListener('hoverout', this.handleRelHoverOut);
-            this._rel2Annotation.removeListener('rectmove', this.handleRelMove);
-            this._rel2Annotation.removeListener('delete', this.handleRelDelete);
-            delete this._rel2Annotation;
+            this._rel2Annotation.removeListener('hoverin', this.handleRelHoverIn)
+            this._rel2Annotation.removeListener('hoverout', this.handleRelHoverOut)
+            this._rel2Annotation.removeListener('rectmove', this.handleRelMove)
+            this._rel2Annotation.removeListener('delete', this.handleRelDelete)
+            delete this._rel2Annotation
         }
 
-        globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
-        globalEvent.removeListener('enableViewMode', this.enableViewMode);
-        globalEvent.removeListener('rectmoveend', this.handleRelMoveEnd);
+        globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
+        globalEvent.removeListener('enableViewMode', this.enableViewMode)
+        globalEvent.removeListener('rectmoveend', this.handleRelMoveEnd)
 
-        return promise;
+        return promise
     }
 
     /**
      * Delete the annotation if selected.
      */
-    deleteSelectedAnnotation() {
-        super.deleteSelectedAnnotation();
+    deleteSelectedAnnotation () {
+        super.deleteSelectedAnnotation()
     }
 
     /**
      * Get the position for text.
      */
     // TODO No need ?
-    getTextPosition() {
-        this.setStartEndPosition();
-        return __WEBPACK_IMPORTED_MODULE_3__utils_relation_js__["b" /* getRelationTextPosition */](this.x1, this.y1, this.x2, this.y2, this.text, this.uuid);
+    getTextPosition () {
+        this.setStartEndPosition()
+        return __WEBPACK_IMPORTED_MODULE_3__utils_relation_js__["b" /* getRelationTextPosition */](this.x1, this.y1, this.x2, this.y2, this.text, this.uuid)
     }
 
     /**
      * Highlight relations.
      */
-    highlightRelAnnotations() {
+    highlightRelAnnotations () {
         if (this._rel1Annotation) {
-            this._rel1Annotation.highlight();
+            this._rel1Annotation.highlight()
         }
         if (this._rel2Annotation) {
-            this._rel2Annotation.highlight();
+            this._rel2Annotation.highlight()
         }
     }
 
     /**
      * Dehighlight relations.
      */
-    dehighlightRelAnnotations() {
+    dehighlightRelAnnotations () {
         if (this._rel1Annotation) {
-            this._rel1Annotation.dehighlight();
+            this._rel1Annotation.dehighlight()
         }
         if (this.rel2Annotation) {
-            this.rel2Annotation.dehighlight();
+            this.rel2Annotation.dehighlight()
         }
     }
 
     /**
      * Handle a selected event on a text.
      */
-    handleTextSelected() {
-        this.select();
+    handleTextSelected () {
+        this.select()
     }
 
     /**
      * Handle a deselected event on a text.
      */
-    handleTextDeselected() {
-        this.deselect();
+    handleTextDeselected () {
+        this.deselect()
     }
 
     /**
      * The callback for the relational text hoverred in.
      */
-    handleTextHoverIn() {
-        this.highlight();
-        this.emit('hoverin');
-        this.highlightRelAnnotations();
+    handleTextHoverIn () {
+        this.highlight()
+        this.emit('hoverin')
+        this.highlightRelAnnotations()
     }
 
     /**
      * The callback for the relational text hoverred out.
      */
-    handleTextHoverOut() {
-        this.dehighlight();
-        this.emit('hoverout');
-        this.dehighlightRelAnnotations();
+    handleTextHoverOut () {
+        this.dehighlight()
+        this.emit('hoverout')
+        this.dehighlightRelAnnotations()
     }
 
     /**
      * The callback for the relationals hoverred in.
      */
-    handleRelHoverIn() {
-        this.highlight();
-        this.highlightRelAnnotations();
+    handleRelHoverIn () {
+        this.highlight()
+        this.highlightRelAnnotations()
     }
 
     /**
      * The callback for the relationals hoverred out.
      */
-    handleRelHoverOut() {
-        this.dehighlight();
-        this.dehighlightRelAnnotations();
+    handleRelHoverOut () {
+        this.dehighlight()
+        this.dehighlightRelAnnotations()
     }
 
     /**
      * The callback that is called relations has benn deleted.
      */
-    handleRelDelete() {
-        this.destroy();
+    handleRelDelete () {
+        this.destroy()
     }
 
     /**
      * The callback that is called relations has been moved.
      */
-    handleRelMove() {
-        this.render();
+    handleRelMove () {
+        this.render()
     }
 
     /**
      * The callback that is called relations has finished to be moved.
      */
-    handleRelMoveEnd(rectAnnotation) {
+    handleRelMoveEnd (rectAnnotation) {
         if (this._rel1Annotation === rectAnnotation || this._rel2Annotation === rectAnnotation) {
-            this.enableViewMode();
-            this.textAnnotation.enableViewMode();
+            this.enableViewMode()
+            this.textAnnotation.enableViewMode()
         }
     }
 
@@ -11570,85 +11920,85 @@ class RelationAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* 
      *
      * @param {String} newText - the content an user changed.
      */
-    handleTextChanged(newText) {
-        this.text = newText;
-        this.save();
+    handleTextChanged (newText) {
+        this.text = newText
+        this.save()
     }
 
     /**
      * The callback that is called at hoverred in.
      */
-    handleHoverInEvent(e) {
-        super.handleHoverInEvent(e);
-        this.highlightRelAnnotations();
+    handleHoverInEvent (e) {
+        super.handleHoverInEvent(e)
+        this.highlightRelAnnotations()
     }
 
     /**
      * The callback that is called at hoverred out.
      */
-    handleHoverOutEvent(e) {
-        super.handleHoverOutEvent(e);
-        this.dehighlightRelAnnotations();
+    handleHoverOutEvent (e) {
+        super.handleHoverOutEvent(e)
+        this.dehighlightRelAnnotations()
     }
 
     /**
      * The callback that is called at clicked.
      */
-    handleClickEvent(e) {
-        super.handleClickEvent(e);
+    handleClickEvent (e) {
+        super.handleClickEvent(e)
     }
 
     /**
      * Enable view mode.
      */
-    enableViewMode() {
+    enableViewMode () {
 
-        this.disableViewMode();
+        this.disableViewMode()
 
-        super.enableViewMode();
+        super.enableViewMode()
 
         if (!this.readOnly) {
-            this.$element.find('path').on('click', this.handleClickEvent);
+            this.$element.find('path').on('click', this.handleClickEvent)
         }
     }
 
     /**
      * Disable view mode.
      */
-    disableViewMode() {
-        super.disableViewMode();
-        this.$element.find('path').off('click');
+    disableViewMode () {
+        super.disableViewMode()
+        this.$element.find('path').off('click')
     }
 
     /**
      * Set the start / end points of the relation.
      */
-    setStartEndPosition() {
+    setStartEndPosition () {
         if (this._rel1Annotation) {
-            let p = this._rel1Annotation.getBoundingCirclePosition();
-            this.x1 = p.x;
-            this.y1 = p.y;
+            let p = this._rel1Annotation.getBoundingCirclePosition()
+            this.x1 = p.x
+            this.y1 = p.y
         }
         if (this._rel2Annotation) {
-            let p = this._rel2Annotation.getBoundingCirclePosition();
-            this.x2 = p.x;
-            this.y2 = p.y;
+            let p = this._rel2Annotation.getBoundingCirclePosition()
+            this.x2 = p.x
+            this.y2 = p.y
         }
     }
 
     /**
      * @{inheritDoc}
      */
-    equalTo(anno) {
+    equalTo (anno) {
 
         if (!anno || this.type !== anno) {
-            return false;
+            return false
         }
 
-        const isSame = __WEBPACK_IMPORTED_MODULE_4__shared_util__["a" /* anyOf */](this.rel1Annotation.uuid, [anno.rel1Annotation.uuid, anno.rel2Annotation.uuid])
-                        && __WEBPACK_IMPORTED_MODULE_4__shared_util__["a" /* anyOf */](this.rel2Annotation.uuid, [anno.rel1Annotation.uuid, anno.rel2Annotation.uuid])
+        const isSame = __WEBPACK_IMPORTED_MODULE_4__shared_util__["a" /* anyOf */](this.rel1Annotation.uuid, [anno.rel1Annotation.uuid, anno.rel2Annotation.uuid]) &&
+                        __WEBPACK_IMPORTED_MODULE_4__shared_util__["a" /* anyOf */](this.rel2Annotation.uuid, [anno.rel1Annotation.uuid, anno.rel2Annotation.uuid])
 
-        return isSame;
+        return isSame
     }
 
 }
@@ -16036,344 +16386,9 @@ module.exports = {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_uuid__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__abstract__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__text__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__UI_utils__ = __webpack_require__(1);
-
-
-
-
-
-let globalEvent;
-
-/**
- * Rect Annotation.
- */
-class RectAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* default */] {
-
-    /**
-     * Constructor.
-     */
-    constructor() {
-
-        super();
-
-        globalEvent = window.globalEvent;
-
-        this.uuid     = null;
-        this.type     = 'area';
-        this.x        = 0;
-        this.y        = 0;
-        this.width    = 0;
-        this.height   = 0;
-        this.text     = null;
-        this.color    = null;
-        this.readOnly = false;
-        this.$element = this.createDummyElement();
-
-        globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
-        globalEvent.on('enableViewMode', this.enableViewMode);
-
-        // TODO No need ?
-        this.textAnnotation = new __WEBPACK_IMPORTED_MODULE_2__text__["a" /* default */](this.readOnly, this);
-        this.textAnnotation.on('selected', this.handleTextSelected);
-        this.textAnnotation.on('deselected', this.handleTextDeselected);
-        this.textAnnotation.on('hoverin', this.handleTextHoverIn);
-        this.textAnnotation.on('hoverout', this.handleTextHoverOut);
-        this.textAnnotation.on('textchanged', this.handleTextChanged);
-    }
-
-    /**
-     * Create an instance from an annotation data.
-     */
-    static newInstance(annotation) {
-        let rect      = new RectAnnotation();
-        rect.uuid     = annotation.uuid || __WEBPACK_IMPORTED_MODULE_0__utils_uuid__["a" /* default */]();
-        rect.x        = annotation.x;
-        rect.y        = annotation.y;
-        rect.width    = annotation.width;
-        rect.height   = annotation.height;
-        rect.text     = annotation.text;
-        rect.color    = annotation.color;
-        rect.readOnly = annotation.readOnly || false;
-        return rect;
-    }
-
-    /**
-     * Set a hover event.
-     */
-    setHoverEvent() {
-        this.$element.find('rect, circle').hover(
-            this.handleHoverInEvent,
-            this.handleHoverOutEvent
-        );
-    }
-
-    /**
-     * Delete the annotation from rendering, a container in window, and a container in localStorage.
-     */
-    destroy() {
-        let promise = super.destroy();
-        this.emit('delete');
-        window.globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation);
-        window.globalEvent.removeListener('enableViewMode', this.enableViewMode);
-        return promise;
-    }
-
-    /**
-     * Create an annotation data for save.
-     */
-    createAnnotation() {
-        return {
-            uuid      : this.uuid,
-            type      : this.type,
-            x         : this.x,
-            y         : this.y,
-            width     : this.width,
-            height    : this.height,
-            text      : this.text,
-            color     : this.color,
-            readyOnly : this.readOnly
-        };
-    }
-
-    /**
-     * Delete the annotation if selected.
-     */
-    deleteSelectedAnnotation() {
-        super.deleteSelectedAnnotation();
-    }
-
-    /**
-     * Get the position for text.
-     */
-    getTextPosition() {
-        return {
-            x : this.x + 7,
-            y : this.y - 20
-        };
-    }
-
-    /**
-     * Get the position of the boundingCircle.
-     */
-    getBoundingCirclePosition() {
-        let $circle = this.$element.find('circle');
-        return {
-            x : parseFloat($circle.attr('cx')),
-            y : parseFloat($circle.attr('cy'))
-        };
-    }
-
-    /**
-     * Handle a selected event on a text.
-     */
-    handleTextSelected() {
-        this.select();
-    }
-
-    /**
-     * Handle a deselected event on a text.
-     */
-    handleTextDeselected() {
-        this.deselect();
-    }
-
-    /**
-     * Handle a hovein event on a text.
-     */
-    handleTextHoverIn() {
-        this.highlight();
-        this.emit('hoverin');
-    }
-
-    /**
-     * Handle a hoveout event on a text.
-     */
-    handleTextHoverOut() {
-        this.dehighlight();
-        this.emit('hoverout');
-    }
-
-    /**
-     * Save a new text.
-     */
-    handleTextChanged(newText) {
-        console.log('rect:handleTextChanged:', newText);
-        this.text = newText;
-        this.save();
-    }
-
-    /**
-     * Handle a hoverin event.
-     */
-    handleHoverInEvent(e) {
-        super.handleHoverInEvent(e);
-        // this.highlight();
-        // this.emit('hoverin');
-
-        let $elm = $(e.currentTarget);
-        if ($elm.prop("tagName") === 'circle') {
-            this.emit('circlehoverin', this);
-        }
-    }
-
-    /**
-     * Handle a hoverout event.
-     */
-    handleHoverOutEvent(e) {
-        super.handleHoverOutEvent(e);
-        // this.dehighlight();
-        // this.emit('hoverout');
-
-        let $elm = $(e.currentTarget);
-        if ($elm.prop("tagName") === 'circle') {
-            this.emit('circlehoverout', this);
-        }
-    }
-
-    /**
-     * Handle a click event.
-     */
-    handleClickEvent(e) {
-        super.handleClickEvent(e);
-    }
-
-    /**
-     * Handle a mousedown event.
-     */
-    handleMouseDownOnRect() {
-        console.log('handleMouseDownOnRect');
-
-        this.originalX = this.x;
-        this.originalY = this.y;
-
-        document.addEventListener('mousemove', this.handleMouseMoveOnDocument);
-        document.addEventListener('mouseup', this.handleMouseUpOnDocument);
-
-        window.globalEvent.emit('rectmovestart');
-
-        this.disableTextlayer();
-    }
-
-    /**
-     * Handle a mousemove event.
-     */
-    handleMouseMoveOnDocument(e) {
-
-        this._dragging = true;
-
-        if (!this.startX) {
-            this.startX = parseInt(e.clientX);
-            this.startY = parseInt(e.clientY);
-        }
-        this.endX = parseInt(e.clientX);
-        this.endY = parseInt(e.clientY);
-
-        let diff = __WEBPACK_IMPORTED_MODULE_3__UI_utils__["h" /* scaleDown */]({
-            x : this.endX - this.startX,
-            y : this.endY - this.startY
-        });
-
-        this.x = this.originalX + diff.x;
-        this.y = this.originalY + diff.y;
-
-        this.render();
-
-        this.emit('rectmove', this);
-    }
-
-    /**
-     * Handle a mouseup event.
-     */
-    handleMouseUpOnDocument() {
-
-        if (this._dragging) {
-            this._dragging = false;
-
-            this.originalX = null;
-            this.originalY = null;
-            this.startX = null;
-            this.startY = null;
-            this.endX = null;
-            this.endY = null;
-
-            this.save();
-            this.enableViewMode();
-            globalEvent.emit('rectmoveend', this);
-        }
-
-
-        document.removeEventListener('mousemove', this.handleMouseMoveOnDocument);
-        document.removeEventListener('mouseup', this.handleMouseUpOnDocument);
-
-        if (window.currentType !== 'rect') {
-            this.enableTextlayer();
-        }
-    }
-
-    // TODO 共通化？
-    disableTextlayer() {
-      // $('.textLayer').hide();
-      $('body').addClass('disable-text-layer');
-    }
-
-    // TODO 共通化？
-    enableTextlayer() {
-      // $('.textLayer').show();
-      $('body').removeClass('disable-text-layer');
-    }
-
-
-    enableDragAction() {
-        this.$element.find('.anno-rect, circle')
-            .off('mousedown', this.handleMouseDownOnRect)
-            .on('mousedown', this.handleMouseDownOnRect);
-    }
-
-    disableDragAction() {
-        this.$element.find('.anno-rect, circle')
-            .off('mousedown', this.handleMouseDownOnRect);
-    }
-
-    /**
-     * Enable view mode.
-     */
-    enableViewMode() {
-
-        console.log('rect:enableViewMode');
-
-        super.enableViewMode();
-
-        if (!this.readOnly) {
-            this.$element.find('.anno-rect, circle').on('click', this.handleClickEvent);
-            this.enableDragAction();
-        }
-    }
-
-    /**
-     * Disable view mode.
-     */
-    disableViewMode() {
-        super.disableViewMode();
-        this.$element.find('.anno-rect, circle').off('click');
-        this.disableDragAction();
-    }
-
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = RectAnnotation;
-
-
-
-/***/ }),
-/* 19 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__UI_utils__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__UI_utils__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__UI_text__ = __webpack_require__(70);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__abstract__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__abstract__ = __webpack_require__(9);
 
 
 
@@ -16543,6 +16558,32 @@ class TextAnnotation extends __WEBPACK_IMPORTED_MODULE_2__abstract__["a" /* defa
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = TextAnnotation;
 
+
+
+/***/ }),
+/* 19 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = enable;
+/* unused harmony export disable */
+/**
+ * Enable Text input enable.
+ */
+function enable ({ uuid, text, disable = false, autoFocus = false, blurListener = null }) {
+    var event = document.createEvent('CustomEvent')
+    event.initCustomEvent('enableTextInput', true, true, ...arguments)
+    window.dispatchEvent(event)
+}
+
+/**
+ * Disable the text input.
+ */
+function disable () {
+    var event = document.createEvent('CustomEvent')
+    event.initCustomEvent('disappearTextInput', true, true)
+    window.dispatchEvent(event)
+}
 
 
 /***/ }),
@@ -16867,12 +16908,12 @@ function isUndefined(arg) {
 "use strict";
 /* unused harmony export transform */
 /* harmony export (immutable) */ __webpack_exports__["a"] = appendChild;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_object_assign__ = __webpack_require__(60);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_object_assign__ = __webpack_require__(59);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_object_assign___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_object_assign__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__renderRect__ = __webpack_require__(61);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__renderSpan__ = __webpack_require__(62);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__renderText__ = __webpack_require__(63);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__renderRelation__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__renderRect__ = __webpack_require__(60);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__renderSpan__ = __webpack_require__(61);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__renderText__ = __webpack_require__(62);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__renderRelation__ = __webpack_require__(63);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__renderCircle__ = __webpack_require__(6);
 
 
@@ -17185,81 +17226,7 @@ function getRelationTextPosition (x1, y1, x2, y2, text = '', parentId = null) {
 
 
 /***/ }),
-/* 30 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var isObj = __webpack_require__(67);
-var hasOwnProperty = Object.prototype.hasOwnProperty;
-var propIsEnumerable = Object.prototype.propertyIsEnumerable;
-
-function toObject(val) {
-	if (val === null || val === undefined) {
-		throw new TypeError('Sources cannot be null or undefined');
-	}
-
-	return Object(val);
-}
-
-function assignKey(to, from, key) {
-	var val = from[key];
-
-	if (val === undefined || val === null) {
-		return;
-	}
-
-	if (hasOwnProperty.call(to, key)) {
-		if (to[key] === undefined || to[key] === null) {
-			throw new TypeError('Cannot convert undefined or null to object (' + key + ')');
-		}
-	}
-
-	if (!hasOwnProperty.call(to, key) || !isObj(val)) {
-		to[key] = val;
-	} else {
-		to[key] = assign(Object(to[key]), from[key]);
-	}
-}
-
-function assign(to, from) {
-	if (to === from) {
-		return to;
-	}
-
-	from = Object(from);
-
-	for (var key in from) {
-		if (hasOwnProperty.call(from, key)) {
-			assignKey(to, from, key);
-		}
-	}
-
-	if (Object.getOwnPropertySymbols) {
-		var symbols = Object.getOwnPropertySymbols(from);
-
-		for (var i = 0; i < symbols.length; i++) {
-			if (propIsEnumerable.call(from, symbols[i])) {
-				assignKey(to, from, symbols[i]);
-			}
-		}
-	}
-
-	return to;
-}
-
-module.exports = function deepAssign(target) {
-	target = toObject(target);
-
-	for (var s = 1; s < arguments.length; s++) {
-		assign(target, arguments[s]);
-	}
-
-	return target;
-};
-
-
-/***/ }),
+/* 30 */,
 /* 31 */,
 /* 32 */,
 /* 33 */,
@@ -17285,8 +17252,7 @@ module.exports = function deepAssign(target) {
 /* 53 */,
 /* 54 */,
 /* 55 */,
-/* 56 */,
-/* 57 */
+/* 56 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -17295,9 +17261,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_events__ = __webpack_require__(27);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_events___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_events__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_PDFAnnoCore__ = __webpack_require__(58);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_PDFAnnoCore__ = __webpack_require__(57);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__src_annotation_container__ = __webpack_require__(76);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__src_annotation_rect__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__src_annotation_rect__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__src_annotation_span__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__src_annotation_relation__ = __webpack_require__(11);
 /**
@@ -17554,13 +17520,13 @@ function renderAnnotations(svg) {
 
 
 /***/ }),
-/* 58 */
+/* 57 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__render__ = __webpack_require__(59);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__UI__ = __webpack_require__(65);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__annotation_rect__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__render__ = __webpack_require__(58);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__UI__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__annotation_rect__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__annotation_span__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__annotation_relation__ = __webpack_require__(11);
 // import StoreAdapter from './adapter/StoreAdapter';
@@ -17659,7 +17625,7 @@ __webpack_require__(74);
 
 
 /***/ }),
-/* 59 */
+/* 58 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -17712,7 +17678,7 @@ function render (svg, viewport, data) {
 
 
 /***/ }),
-/* 60 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17809,7 +17775,7 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 
 
 /***/ }),
-/* 61 */
+/* 60 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -17866,7 +17832,7 @@ function createRect (r) {
 
 
 /***/ }),
-/* 62 */
+/* 61 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -17925,7 +17891,7 @@ function createRect (r) {
 
 
 /***/ }),
-/* 63 */
+/* 62 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -17997,7 +17963,7 @@ function renderText (a, svg) {
 
 
 /***/ }),
-/* 64 */
+/* 63 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -18123,11 +18089,11 @@ function createRelation (a, id = null) {
 
 
 /***/ }),
-/* 65 */
+/* 64 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__rect__ = __webpack_require__(66);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__rect__ = __webpack_require__(65);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__span__ = __webpack_require__(71);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__relation__ = __webpack_require__(72);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__view__ = __webpack_require__(73);
@@ -18147,7 +18113,7 @@ function createRelation (a, id = null) {
 
 
 /***/ }),
-/* 66 */
+/* 65 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -18155,11 +18121,11 @@ function createRelation (a, id = null) {
 /* harmony export (immutable) */ __webpack_exports__["a"] = disableRect;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_deep_assign__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_deep_assign__ = __webpack_require__(66);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_deep_assign___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_deep_assign__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__annotation_rect__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__utils_textInput__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__annotation_rect__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__utils_textInput__ = __webpack_require__(19);
 // TODO Remove jquery, because viewer.html already loaded jQuery.
 
 
@@ -18414,6 +18380,81 @@ function disableRect () {
 
 
 /***/ }),
+/* 66 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var isObj = __webpack_require__(67);
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+
+function toObject(val) {
+	if (val === null || val === undefined) {
+		throw new TypeError('Sources cannot be null or undefined');
+	}
+
+	return Object(val);
+}
+
+function assignKey(to, from, key) {
+	var val = from[key];
+
+	if (val === undefined || val === null) {
+		return;
+	}
+
+	if (hasOwnProperty.call(to, key)) {
+		if (to[key] === undefined || to[key] === null) {
+			throw new TypeError('Cannot convert undefined or null to object (' + key + ')');
+		}
+	}
+
+	if (!hasOwnProperty.call(to, key) || !isObj(val)) {
+		to[key] = val;
+	} else {
+		to[key] = assign(Object(to[key]), from[key]);
+	}
+}
+
+function assign(to, from) {
+	if (to === from) {
+		return to;
+	}
+
+	from = Object(from);
+
+	for (var key in from) {
+		if (hasOwnProperty.call(from, key)) {
+			assignKey(to, from, key);
+		}
+	}
+
+	if (Object.getOwnPropertySymbols) {
+		var symbols = Object.getOwnPropertySymbols(from);
+
+		for (var i = 0; i < symbols.length; i++) {
+			if (propIsEnumerable.call(from, symbols[i])) {
+				assignKey(to, from, symbols[i]);
+			}
+		}
+	}
+
+	return to;
+}
+
+module.exports = function deepAssign(target) {
+	target = toObject(target);
+
+	for (var s = 1; s < arguments.length; s++) {
+		assign(target, arguments[s]);
+	}
+
+	return target;
+};
+
+
+/***/ }),
 /* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18491,7 +18532,7 @@ function dispatchWindowEvent (eventName, data) {
 /* unused harmony export closeInput */
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(2);
 // TODO no need file ?
 
 
@@ -18656,9 +18697,9 @@ function closeInput (text) {
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["b"] = getRectangles;
 /* harmony export (immutable) */ __webpack_exports__["a"] = createSpan;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__annotation_span__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_textInput__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_textInput__ = __webpack_require__(19);
 
 
 
@@ -18795,7 +18836,7 @@ function createSpan ({ text = null }) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = createRelation;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_textInput__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_textInput__ = __webpack_require__(19);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__annotation_relation__ = __webpack_require__(11);
 
 
@@ -18953,15 +18994,14 @@ exports.push([module.i, "\n/**\n * Utilities.\n */\n.\\--hide {\n  display: none
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_deep_assign__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_deep_assign___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_deep_assign__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_toml__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_toml___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_toml__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__version__ = __webpack_require__(77);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_tomlString__ = __webpack_require__(79);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__shared_coords__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__utils_uuid__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__span__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_toml__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_toml___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_toml__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__version__ = __webpack_require__(77);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_tomlString__ = __webpack_require__(79);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_coords__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__utils_uuid__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__span__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__rect__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__relation__ = __webpack_require__(11);
 
 
@@ -18981,79 +19021,79 @@ class AnnotationContainer {
     /**
      * Constructor.
      */
-    constructor() {
-        this.set = new Set();
+    constructor () {
+        this.set = new Set()
     }
 
     /**
      * Add an annotation to the container.
      */
-    add(annotation) {
-        this.set.add(annotation);
+    add (annotation) {
+        this.set.add(annotation)
     }
 
     /**
      * Remove the annotation from the container.
      */
-    remove(annotation) {
-        this.set.delete(annotation);
+    remove (annotation) {
+        this.set.delete(annotation)
     }
 
     /**
      * Remove all annotations.
      */
-    destroy() {
-        console.log('AnnotationContainer#destroy');
-        this.set.forEach(a => a.destroy());
-        this.set = new Set();
+    destroy () {
+        console.log('AnnotationContainer#destroy')
+        this.set.forEach(a => a.destroy())
+        this.set = new Set()
     }
 
     /**
      * Get all annotations from the container.
      */
-    getAllAnnotations() {
-        let list = [];
-        this.set.forEach(a => list.push(a));
-        return list;
+    getAllAnnotations () {
+        let list = []
+        this.set.forEach(a => list.push(a))
+        return list
     }
 
     /**
      * Get annotations which user select.
      */
-    getSelectedAnnotations() {
-        return this.getAllAnnotations().filter(a => a.selected);
+    getSelectedAnnotations () {
+        return this.getAllAnnotations().filter(a => a.selected)
     }
 
     /**
      * Find an annotation by the id which an annotation has.
      */
-    findById(uuid) {
-        uuid = String(uuid); // `uuid` must be string.
-        let annotation = null;
+    findById (uuid) {
+        uuid = String(uuid) // `uuid` must be string.
+        let annotation = null
         this.set.forEach(a => {
             if (a.uuid === uuid) {
-                annotation = a;
+                annotation = a
             }
-        });
-        return annotation;
+        })
+        return annotation
     }
 
     /**
      * Export annotations as a TOML string.
      */
-    exportData() {
+    exportData () {
 
-      return new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
 
-            let dataExport = {};
+            let dataExport = {}
 
             // Set version.
-            dataExport.version = __WEBPACK_IMPORTED_MODULE_2__version__["a" /* default */];
+            dataExport.version = __WEBPACK_IMPORTED_MODULE_1__version__["a" /* default */]
 
             // Create export data.
             this.getAllAnnotations().filter(a => {
                 // Just only primary annos.
-                return !a.readOnly;
+                return !a.readOnly
 
             }).forEach(annotation => {
 
@@ -19063,25 +19103,25 @@ class AnnotationContainer {
                     // TODO Define at annotation/span.js
 
                     // page.
-                    let { pageNumber } = __WEBPACK_IMPORTED_MODULE_4__shared_coords__["b" /* convertToExportY */](annotation.rectangles[0].y);
+                    let { pageNumber } = __WEBPACK_IMPORTED_MODULE_3__shared_coords__["b" /* convertToExportY */](annotation.rectangles[0].y)
 
                     // rectangles.
                     let rectangles = annotation.rectangles.map(rectangle => {
-                        const { y, pageNumber } = __WEBPACK_IMPORTED_MODULE_4__shared_coords__["b" /* convertToExportY */](rectangle.y);
+                        const { y } = __WEBPACK_IMPORTED_MODULE_3__shared_coords__["b" /* convertToExportY */](rectangle.y)
                         return [
                             rectangle.x,
                             y,
                             rectangle.width,
                             rectangle.height
-                        ];
-                    });
+                        ]
+                    })
 
                     let text = (annotation.selectedText || '')
                                 .replace(/\r\n/g, ' ')
                                 .replace(/\r/g, ' ')
                                 .replace(/\n/g, ' ')
                                 .replace(/"/g, '')
-                                .replace(/\\/g, '');
+                                .replace(/\\/g, '')
 
                     dataExport[annotation.uuid] = {
                         type     : annotation.type,
@@ -19089,7 +19129,7 @@ class AnnotationContainer {
                         position : rectangles,
                         label    : annotation.text || '',
                         text
-                    };
+                    }
 
                 // Relation.
                 } else if (annotation.type === 'relation') {
@@ -19101,113 +19141,94 @@ class AnnotationContainer {
                         dir   : annotation.direction,
                         ids   : [ annotation.rel1Annotation.uuid, annotation.rel2Annotation.uuid ],
                         label : annotation.text || ''
-                    };
+                    }
                 }
-            });
+            })
 
-            resolve(__WEBPACK_IMPORTED_MODULE_3__utils_tomlString__["a" /* default */](dataExport));
-        });
+            resolve(__WEBPACK_IMPORTED_MODULE_2__utils_tomlString__["a" /* default */](dataExport))
+        })
     }
 
     /**
      * Import annotations.
      */
-    importAnnotations(data, isPrimary) {
+    importAnnotations (data, isPrimary) {
 
-        const readOnly = !isPrimary;
+        const readOnly = !isPrimary
 
         return new Promise((resolve, reject) => {
 
             // Delete old ones.
             this.getAllAnnotations()
                     .filter(a => a.readOnly === readOnly)
-                    .forEach(a => a.destroy());
+                    .forEach(a => a.destroy())
 
             // Add annotations.
             data.annotations.forEach((tomlString, i) => {
 
                 // TOML to JavascriptObject.
                 // TODO Define as a function.
-                let tomlObject;
+                let tomlObject
                 try {
                     if (tomlString) {
-                        tomlObject = __WEBPACK_IMPORTED_MODULE_1_toml___default.a.parse(tomlString);
+                        tomlObject = __WEBPACK_IMPORTED_MODULE_0_toml___default.a.parse(tomlString)
                     } else {
-                        tomlObject = {};
+                        tomlObject = {}
                     }
                 } catch (e) {
-                    console.log('ERROR:', e);
-                    console.log('TOML:\n', tomlString);
+                    console.log('ERROR:', e)
+                    console.log('TOML:\n', tomlString)
                 }
 
-                let color = data.colors[i];
-
+                let color = data.colors[i]
 
                 for (const key in tomlObject) {
 
-                    let d = tomlObject[key];
+                    let d = tomlObject[key]
 
                     // Skip if the content is not object, like version string.
                     if (typeof d !== 'object') {
-                        continue;
+                        continue
                     }
 
-                    d.uuid = __WEBPACK_IMPORTED_MODULE_5__utils_uuid__["a" /* default */]();
-                    d.readOnly = !isPrimary;
-                    d.color = color;
+                    d.uuid = __WEBPACK_IMPORTED_MODULE_4__utils_uuid__["a" /* default */]()
+                    d.readOnly = !isPrimary
+                    d.color = color
 
-                    let a;
                     if (d.type === 'span') {
 
-                        // TODO Define at annotation/span.js
+                        let span = __WEBPACK_IMPORTED_MODULE_5__span__["a" /* default */].newInstanceFromTomlObject(d)
+                        span.save()
+                        span.render()
+                        span.enableViewMode()
 
-                        // position: String -> Float.
-                        let position = d.position.map(p => p.map(pp => parseFloat(pp)));
+                    // Rect.
+                    } else if (d.type === 'rect') {
 
-                        d.selectedText = d.text;
-                        d.text = d.label;
-
-                        // Convert.
-                        d.rectangles = position.map(p => {
-                            return {
-                                x      : p[0],
-                                y      : __WEBPACK_IMPORTED_MODULE_4__shared_coords__["a" /* convertFromExportY */](d.page, p[1]),
-                                width  : p[2],
-                                height : p[3]
-                            }
-                        });
-
-                        let span = __WEBPACK_IMPORTED_MODULE_6__span__["a" /* default */].newInstance(d);
-                        span.save();
-                        span.render();
-                        span.enableViewMode();
+                        let rect = __WEBPACK_IMPORTED_MODULE_6__rect__["a" /* default */].newInstanceFromTomlObject(d)
+                        rect.save()
+                        rect.render()
+                        rect.enableViewMode()
 
                     // Relation.
                     } else if (d.type === 'relation') {
 
-                        // TODO Define at annotation/relation.js
-
-                        d.direction = d.dir;
-                        d.rel1 = tomlObject[d.ids[0]].uuid;
-                        d.rel2 = tomlObject[d.ids[1]].uuid;
-                        // TODO Annotation側を、labelに合わせてもいいかも。
-                        d.text = d.label;
-
-                        let relation = __WEBPACK_IMPORTED_MODULE_7__relation__["a" /* default */].newInstance(d);
-                        relation.save();
-                        relation.render();
-                        relation.enableViewMode();
+                        d.rel1 = tomlObject[d.ids[0]].uuid
+                        d.rel2 = tomlObject[d.ids[1]].uuid
+                        let relation = __WEBPACK_IMPORTED_MODULE_7__relation__["a" /* default */].newInstanceFromTomlObject(d)
+                        relation.save()
+                        relation.render()
+                        relation.enableViewMode()
 
                     } else {
-
-                        console.log('Unknown: ', key, d);
+                        console.log('Unknown: ', key, d)
                     }
                 }
-            });
+            })
 
             // Done.
-            resolve(true);
-        });
+            resolve(true)
+        })
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = AnnotationContainer;
