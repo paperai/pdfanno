@@ -11694,9 +11694,6 @@ window.addEventListener('DOMContentLoaded', e => {
     // Delete prev annotations.
     window.annoPage.clearAllAnnotations()
 
-    // Reset PDFViwer settings.
-    // window.annoPage.resetPDFViewerSettings()
-
     // resizable.
     __WEBPACK_IMPORTED_MODULE_1_anno_ui__["util"].setupResizableColumns()
 
@@ -11771,25 +11768,6 @@ window.addEventListener('DOMContentLoaded', e => {
         unlistenWindowLeaveEvent : __WEBPACK_IMPORTED_MODULE_4__page_util_window__["c" /* unlistenWindowLeaveEvent */]
     })
 
-    // AnnoTool: rect.
-    // TODO No need ?
-    __WEBPACK_IMPORTED_MODULE_1_anno_ui__["annoRectButton"].setup({
-        enableRect : window.annoPage.enableRect,
-        disableRect : window.annoPage.disableRect,
-    })
-
-    // AnnoTool: span.
-    // TODO No need ?
-    __WEBPACK_IMPORTED_MODULE_1_anno_ui__["annoSpanButton"].setup({
-        createSpanAnnotation : window.annoPage.createSpan
-    })
-
-    // AnnoTool: relation.
-    // TODO No need ?
-    __WEBPACK_IMPORTED_MODULE_1_anno_ui__["annoRelButton"].setup({
-        createRelAnnotation : window.annoPage.createRelation
-    })
-
     // Label input.
     __WEBPACK_IMPORTED_MODULE_1_anno_ui__["labelInput"].setup({
         getSelectedAnnotations : window.annoPage.getSelectedAnnotations,
@@ -11810,11 +11788,6 @@ window.addEventListener('DOMContentLoaded', e => {
     __WEBPACK_IMPORTED_MODULE_1_anno_ui__["uploadButton"].setup({
         getCurrentDisplayContentFile : () => {
             return window.annoPage.getCurrentContentFile()
-            // const pdfFileName = $('#dropdownPdf .js-text').text()
-            // if (!pdfFileName || pdfFileName === 'PDF File') {
-            //     return null
-            // }
-            // return window.annoPage.getContentFile(pdfFileName)
         }
     })
 
@@ -11835,8 +11808,6 @@ window.addEventListener('DOMContentLoaded', e => {
                 moveTo = value
             }
     })
-
-    let isDefaultPDF = false
 
     if (pdfURL) {
 
@@ -11891,9 +11862,7 @@ window.addEventListener('DOMContentLoaded', e => {
             __WEBPACK_IMPORTED_MODULE_1_anno_ui__["uploadButton"].setResult(analyzeResult)
 
             // Display upload tab.
-            if (!isDefaultPDF) {
-                $('a[href="#tab2"]').click()
-            }
+            $('a[href="#tab2"]').click()
 
         }).catch(err => {
             // Hide a loading, and show the error message.
@@ -11911,14 +11880,12 @@ window.addEventListener('DOMContentLoaded', e => {
         window.annoPage.startViewerApplication()
 
         // Load the default PDF, and save it.
-        loadPDF(getDefaultPDFURL()).then(({ pdf, analyzeResult }) => {
+        loadPDF(getDefaultPDFURL()).then(({ pdf }) => {
             // Set as current.
             window.annoPage.setCurrentContentFile({
                 name    : DEFAULT_PDF_NAME,
                 content : pdf
             })
-            // Set the analyzeResult.
-            __WEBPACK_IMPORTED_MODULE_1_anno_ui__["uploadButton"].setResult(analyzeResult)
         })
     }
 
@@ -11960,6 +11927,9 @@ function loadPDF (url) {
     })
 }
 
+/**
+ * Load an annotation file from the server.
+ */
 function loadExternalAnnoFile (url) {
     return __WEBPACK_IMPORTED_MODULE_0_axios___default.a.get(`${API_ROOT}/api/load_anno?url=${url}`).then(res => {
         if (res.status !== 200 || res.data.status === 'failure') {
@@ -11974,12 +11944,13 @@ function loadExternalAnnoFile (url) {
     })
 }
 
+/**
+ * Get the URL of the default PDF.
+ */
 function getDefaultPDFURL () {
-
-    // https://paperai.github.io/pdfanno/pdfs/P12-1046.pdf
+    // e.g. https://paperai.github.io/pdfanno/pdfs/P12-1046.pdf
     const pathnames = location.pathname.split('/')
     const pdfURL = location.protocol + '//' + location.hostname + ':' + location.port + pathnames.slice(0, pathnames.length-1).join('/') + '/pdfs/' + DEFAULT_PDF_NAME
-
     return pdfURL
 }
 
