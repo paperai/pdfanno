@@ -367,8 +367,8 @@ export default class RelationAnnotation extends AbstractAnnotation {
             return false
         }
 
-        const isSame = anyOf(this.rel1Annotation.uuid, [anno.rel1Annotation.uuid, anno.rel2Annotation.uuid]) &&
-                        anyOf(this.rel2Annotation.uuid, [anno.rel1Annotation.uuid, anno.rel2Annotation.uuid])
+        const isSame = anyOf(this.rel1Annotation.uuid, [anno.rel1Annotation.uuid, anno.rel2Annotation.uuid])
+                        && anyOf(this.rel2Annotation.uuid, [anno.rel1Annotation.uuid, anno.rel2Annotation.uuid])
 
         return isSame
     }

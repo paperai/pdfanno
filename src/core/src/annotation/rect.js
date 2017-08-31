@@ -2,7 +2,7 @@ import uuid from '../utils/uuid'
 import AbstractAnnotation from './abstract'
 import TextAnnotation from './text'
 import { scaleDown } from '../UI/utils'
-import { convertToExportY, convertFromExportY } from '../../../shared/coords'
+import { convertFromExportY } from '../../../shared/coords'
 
 let globalEvent
 

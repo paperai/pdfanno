@@ -1,140 +1,138 @@
-import * as annoUI from 'anno-ui';
+import * as annoUI from 'anno-ui'
 
-import loadFiles from './loadFiles';
-import { anyOf, dispatchWindowEvent } from '../../shared/util';
-import { convertToExportY, getPageSize, paddingBetweenPages } from '../../shared/coords';
+import loadFiles from './loadFiles'
+import { anyOf, dispatchWindowEvent } from '../../shared/util'
+import { convertToExportY, paddingBetweenPages } from '../../shared/coords'
 
 import {
     listenWindowLeaveEvent,
     unlistenWindowLeaveEvent,
-    adjustViewerSize,
-    resizeHandler,
-    setupResizableColumns
-} from '../util/window';
+    adjustViewerSize
+} from '../util/window'
 
 /**
  * PDFAnno's Annotation functions for Page produced by .
  */
 export default class PDFAnnoPage {
 
-    constructor() {
-        this.autoBind();
-        this.setup();
+    constructor () {
+        this.autoBind()
+        this.setup()
     }
 
-    autoBind() {
-      Object.getOwnPropertyNames(this.constructor.prototype)
-        .filter(prop => typeof this[prop] === 'function')
-        .forEach(method => {
-          this[method] = this[method].bind(this);
-        });
+    autoBind () {
+        Object.getOwnPropertyNames(this.constructor.prototype)
+            .filter(prop => typeof this[prop] === 'function')
+            .forEach(method => {
+                this[method] = this[method].bind(this)
+            })
     }
 
-    setup() {
-        this.listenWindowEvents();
+    setup () {
+        this.listenWindowEvents()
     }
 
-    listenWindowEvents() {
+    listenWindowEvents () {
 
         // Disable shortcut temporary.
 
         // window.addEventListener('digit1Pressed' , () => {
-        //     this.createSpan();
-        // });
+        //     this.createSpan()
+        // })
         // window.addEventListener('digit2Pressed' , () => {
-        //     this.createRelation('one-way');
-        // });
+        //     this.createRelation('one-way')
+        // })
         // window.addEventListener('digit3Pressed' , () => {
-        //     this.createRelation('two-way');
-        // });
+        //     this.createRelation('two-way')
+        // })
         // window.addEventListener('digit4Pressed' , () => {
-        //     this.createRelation('link');
-        // });
+        //     this.createRelation('link')
+        // })
     }
 
     /**
      * Start PDFAnno Application.
      */
-    startViewerApplication() {
+    startViewerApplication () {
 
         // Alias for convenience.
-        window.iframeWindow = $('#viewer iframe').get(0).contentWindow;
+        window.iframeWindow = $('#viewer iframe').get(0).contentWindow
 
-        iframeWindow.addEventListener('DOMContentLoaded', () => {
+        window.iframeWindow.addEventListener('DOMContentLoaded', () => {
 
             // Adjust the height of viewer.
-            adjustViewerSize();
+            adjustViewerSize()
 
             // Reset the confirm dialog at leaving page.
-            unlistenWindowLeaveEvent();
+            unlistenWindowLeaveEvent()
 
-            dispatchWindowEvent('iframeReady');
-        });
+            dispatchWindowEvent('iframeReady')
+        })
 
-        iframeWindow.addEventListener('pagerendered', () => {
-            dispatchWindowEvent('pagerendered');
-        });
+        window.iframeWindow.addEventListener('pagerendered', () => {
+            dispatchWindowEvent('pagerendered')
+        })
 
-        iframeWindow.addEventListener('annotationrendered', () => {
+        window.iframeWindow.addEventListener('annotationrendered', () => {
 
             // Restore the status of AnnoTools.
-            this.disableAnnotateFunctions();
-            this.enableAnnotateFunction(window.currentAnnoToolType);
+            this.disableAnnotateFunctions()
+            this.enableAnnotateFunction(window.currentAnnoToolType)
 
-            dispatchWindowEvent('annotationrendered');
-        });
+            dispatchWindowEvent('annotationrendered')
+        })
 
         // Set the confirm dialog when leaving a page.
-        iframeWindow.addEventListener('annotationUpdated', () => {
-            listenWindowLeaveEvent();
-            dispatchWindowEvent('annotationUpdated');
-        });
+        window.iframeWindow.addEventListener('annotationUpdated', () => {
+            listenWindowLeaveEvent()
+            dispatchWindowEvent('annotationUpdated')
+        })
 
         // enable text input.
-        iframeWindow.addEventListener('enableTextInput', (e) => {
-            dispatchWindowEvent('enableTextInput', e.detail);
-        });
+        window.iframeWindow.addEventListener('enableTextInput', e => {
+            dispatchWindowEvent('enableTextInput', e.detail)
+        })
 
         // disable text input.
-        iframeWindow.addEventListener('disappearTextInput', () => {
-            dispatchWindowEvent('disappearTextInput', e.detail);
-        });
+        window.iframeWindow.addEventListener('disappearTextInput', e => {
+            dispatchWindowEvent('disappearTextInput', e.detail)
+        })
 
-        iframeWindow.addEventListener('annotationDeleted', e => {
-            dispatchWindowEvent('annotationDeleted', e.detail);
-        });
+        window.iframeWindow.addEventListener('annotationDeleted', e => {
+            dispatchWindowEvent('annotationDeleted', e.detail)
+        })
 
-        iframeWindow.addEventListener('annotationHoverIn' , e => {
-            dispatchWindowEvent('annotationHoverIn', e.detail);
-        });
+        window.iframeWindow.addEventListener('annotationHoverIn', e => {
+            dispatchWindowEvent('annotationHoverIn', e.detail)
+        })
 
-        iframeWindow.addEventListener('annotationHoverOut' , e => {
-            dispatchWindowEvent('annotationHoverOut', e.detail);
-        });
+        window.iframeWindow.addEventListener('annotationHoverOut', e => {
+            dispatchWindowEvent('annotationHoverOut', e.detail)
+        })
 
-        iframeWindow.addEventListener('annotationSelected' , e => {
-            dispatchWindowEvent('annotationSelected', e.detail);
-        });
+        window.iframeWindow.addEventListener('annotationSelected', e => {
+            dispatchWindowEvent('annotationSelected', e.detail)
+        })
 
-        iframeWindow.addEventListener('annotationDeselected' , () => {
-            dispatchWindowEvent('annotationDeselected');
-        });
+        window.iframeWindow.addEventListener('annotationDeselected', () => {
+            dispatchWindowEvent('annotationDeselected')
+        })
 
-        iframeWindow.addEventListener('digit1Pressed' , () => {
-            dispatchWindowEvent('digit1Pressed');
-        });
+        window.iframeWindow.addEventListener('digit1Pressed', () => {
+            dispatchWindowEvent('digit1Pressed')
+        })
 
-        iframeWindow.addEventListener('digit2Pressed' , () => {
-            dispatchWindowEvent('digit2Pressed');
-        });
+        window.iframeWindow.addEventListener('digit2Pressed', () => {
+            dispatchWindowEvent('digit2Pressed')
+        })
 
-        iframeWindow.addEventListener('digit3Pressed' , () => {
-            dispatchWindowEvent('digit3Pressed');
-        });
+        window.iframeWindow.addEventListener('digit3Pressed', () => {
+            dispatchWindowEvent('digit3Pressed')
+        })
 
-        iframeWindow.addEventListener('digit4Pressed' , () => {
-            dispatchWindowEvent('digit4Pressed');
-        });
+        window.iframeWindow.addEventListener('digit4Pressed', () => {
+            dispatchWindowEvent('digit4Pressed')
+        })
     }
 
     /**
@@ -143,153 +141,151 @@ export default class PDFAnnoPage {
      * @param {Array<File>} files - files user selected in a file dialog.
      * @return {Promise}
      */
-    loadFiles(files) {
+    loadFiles (files) {
         return loadFiles(files).then(result => {
             this.contentFiles = result.contents.map(c => {
                 return Object.assign(c, {
                     selected : false
-                });
-            });
+                })
+            })
             this.annoFiles = result.annos.map(a => {
                 return Object.assign(a, {
                     primary   : false,
                     reference : false
-                });
-            });
-        });
+                })
+            })
+        })
     }
 
-    getContentFile(name) {
-        const items = this.contentFiles.filter(c => c.name === name);
+    getContentFile (name) {
+        const items = this.contentFiles.filter(c => c.name === name)
         if (items.length > 0) {
-            return items[0];
+            return items[0]
         }
-        return null;
+        return null
     }
 
-    getAnnoFile(name) {
-        const items = this.annoFiles.filter(c => c.name === name);
+    getAnnoFile (name) {
+        const items = this.annoFiles.filter(c => c.name === name)
         if (items.length > 0) {
-            return items[0];
+            return items[0]
         }
-        return null;
+        return null
     }
 
-    displayContent(contentName) {
+    displayContent (contentName) {
 
-        let contentFile = this.contentFiles.filter(c => c.name === contentName);
+        let contentFile = this.contentFiles.filter(c => c.name === contentName)
         if (contentFile.length === 0) {
-            console.log('displayContent: NOT FOUND FILE. file=', contentName);
-            return;
+            console.log('displayContent: NOT FOUND FILE. file=', contentName)
+            return
         }
 
-        displayViewer(contentFile[0]);
+        this.displayViewer(contentFile[0])
     }
 
-
-    displayViewer(contentFile) {
+    displayViewer (contentFile) {
 
         // Reset settings.
-        this.resetPDFViewerSettings();
+        this.resetPDFViewerSettings()
 
         // Load PDF.
-        const uint8Array = new Uint8Array(contentFile.content);
-        iframeWindow.PDFViewerApplication.open(uint8Array);
+        const uint8Array = new Uint8Array(contentFile.content)
+        window.iframeWindow.PDFViewerApplication.open(uint8Array)
 
         // Set the PDF file name.
-        iframeWindow.PDFView.url = contentFile.name;
+        window.iframeWindow.PDFView.url = contentFile.name
 
         // Save the current.
-        this.currentContentFile = contentFile;
+        this.currentContentFile = contentFile
     }
 
     setCurrentContentFile (contentFile) {
         this.currentContentFile = contentFile
     }
 
-    getCurrentContentFile() {
+    getCurrentContentFile () {
         return this.currentContentFile
     }
 
-    initializeViewer(initialPDFPath = '../pdfs/P12-1046.pdf') {
+    initializeViewer (initialPDFPath = '../pdfs/P12-1046.pdf') {
 
-        window.pdf = null;
-        window.pdfName = null;
+        window.pdf = null
+        window.pdfName = null
 
         // Reset setting.
-        this.resetPDFViewerSettings();
+        this.resetPDFViewerSettings()
 
-        let url = './pages/viewer.html';
+        let url = './pages/viewer.html'
         if (initialPDFPath) {
-            url += '?file=' + initialPDFPath;
+            url += '?file=' + initialPDFPath
         }
 
         // Reload pdf.js.
-        $('#viewer iframe').remove();
-        $('#viewer').html('<iframe src="' + url + '" class="anno-viewer" frameborder="0"></iframe>');
+        $('#viewer iframe').remove()
+        $('#viewer').html('<iframe src="' + url + '" class="anno-viewer" frameborder="0"></iframe>')
 
     }
 
-    closePDFViewer() {
-        console.log('closePDFViewer');
-        if (iframeWindow && iframeWindow.PDFViewerApplication) {
-            iframeWindow.PDFViewerApplication.close();
-            $('#numPages', iframeWindow.document).text('');
-            this.currentContentFile = null;
+    closePDFViewer () {
+        console.log('closePDFViewer')
+        if (window.iframeWindow && window.iframeWindow.PDFViewerApplication) {
+            window.iframeWindow.PDFViewerApplication.close()
+            $('#numPages', window.iframeWindow.document).text('')
+            this.currentContentFile = null
         }
     }
 
     /**
      * Reset the setting of PDFViewer.
      */
-    resetPDFViewerSettings() {
-        localStorage.removeItem('database');
+    resetPDFViewerSettings () {
+        localStorage.removeItem('database')
     }
 
     /**
      * Create a Span annotation.
      */
-    createSpan({ text = null } = {}) {
+    createSpan ({ text = null } = {}) {
 
-        const rects = window.iframeWindow.PDFAnnoCore.default.UI.getRectangles();
+        const rects = window.iframeWindow.PDFAnnoCore.default.UI.getRectangles()
 
         // Check empty.
         if (!rects) {
-            return annoUI.ui.alertDialog.show({ message : 'Text span is not selected.' });
+            return annoUI.ui.alertDialog.show({ message : 'Text span is not selected.' })
         }
 
         // Create a new rectAnnotation.
-        window.iframeWindow.PDFAnnoCore.default.UI.createSpan({ text });
+        window.iframeWindow.PDFAnnoCore.default.UI.createSpan({ text })
 
         // Notify annotation added.
-        dispatchWindowEvent('annotationrendered');
+        dispatchWindowEvent('annotationrendered')
     }
-
 
     /**
      * Create a Relation annotation.
      */
-    createRelation({ type, text = null } = {}) {
+    createRelation ({ type, text = null } = {}) {
 
         // for old style.
         if (arguments.length === 1 && typeof arguments[0] === 'string') {
-            type = arguments[0];
+            type = arguments[0]
         }
 
-        let selectedAnnotations = window.iframeWindow.annotationContainer.getSelectedAnnotations();
+        let selectedAnnotations = window.iframeWindow.annotationContainer.getSelectedAnnotations()
         selectedAnnotations = selectedAnnotations.filter(a => {
-            return a.type === 'area' || a.type === 'span';
+            return a.type === 'area' || a.type === 'span'
         }).sort((a1, a2) => {
-            return (a1.selectedTime - a2.selectedTime); // asc
-        });
+            return (a1.selectedTime - a2.selectedTime) // asc
+        })
 
         if (selectedAnnotations.length < 2) {
-            return annoUI.ui.alertDialog.show({ message : 'Two annotated text spans are not selected.\nTo select multiple annotated spans, click the first annotated span, then Ctrl+Click (Windows) or Cmd+Click (OSX) the second span.' });
+            return annoUI.ui.alertDialog.show({ message : 'Two annotated text spans are not selected.\nTo select multiple annotated spans, click the first annotated span, then Ctrl+Click (Windows) or Cmd+Click (OSX) the second span.' })
         }
 
-        const first  = selectedAnnotations[selectedAnnotations.length - 2];
-        const second = selectedAnnotations[selectedAnnotations.length - 1];
-        console.log('first:second,', first, second);
+        const first  = selectedAnnotations[selectedAnnotations.length - 2]
+        const second = selectedAnnotations[selectedAnnotations.length - 1]
+        console.log('first:second,', first, second)
 
         // Check duplicated.
         const arrows = window.iframeWindow.annotationContainer
@@ -298,26 +294,26 @@ export default class PDFAnnoPage {
                         .filter(a => {
                             return anyOf(a.rel1Annotation.uuid, [first.uuid, second.uuid])
                                     && anyOf(a.rel2Annotation.uuid, [first.uuid, second.uuid])
-                        });
+                        })
 
         if (arrows.length > 0) {
-            console.log('same found!!!');
+            console.log('same found!!!')
             // Update!!
-            arrows[0].direction = type;
-            arrows[0].rel1Annotation = first;
-            arrows[0].rel2Annotation = second;
-            arrows[0].text = text;
-            arrows[0].save();
-            arrows[0].render();
-            arrows[0].enableViewMode();
+            arrows[0].direction = type
+            arrows[0].rel1Annotation = first
+            arrows[0].rel2Annotation = second
+            arrows[0].text = text
+            arrows[0].save()
+            arrows[0].render()
+            arrows[0].enableViewMode()
             // Show label input.
-            var event = document.createEvent('CustomEvent');
+            var event = document.createEvent('CustomEvent')
             event.initCustomEvent('enableTextInput', true, true, {
                 uuid : arrows[0].uuid,
                 text : arrows[0].text
-            });
-            window.dispatchEvent(event);
-            return;
+            })
+            window.dispatchEvent(event)
+            return
         }
 
         window.iframeWindow.PDFAnnoCore.default.UI.createRelation({
@@ -325,212 +321,207 @@ export default class PDFAnnoPage {
             anno1 : first,
             anno2 : second,
             text
-        });
+        })
 
         // Notify annotation added.
-        dispatchWindowEvent('annotationrendered');
+        dispatchWindowEvent('annotationrendered')
     }
 
     /**
         Disable annotation tool buttons.
     */
-    disableRect() {
-        window.iframeWindow.PDFAnnoCore.default.UI.disableRect();
+    disableRect () {
+        window.iframeWindow.PDFAnnoCore.default.UI.disableRect()
     }
 
     /**
      * Enable an annotation tool.
      */
-    enableRect() {
-        window.iframeWindow.PDFAnnoCore.default.UI.enableRect();
+    enableRect () {
+        window.iframeWindow.PDFAnnoCore.default.UI.enableRect()
     }
 
     /**
      * Display annotations an user selected.
      */
-    displayAnnotation(isPrimary) {
+    displayAnnotation (isPrimary) {
 
         // Check the viewer not clised.
-        if ($('#numPages', iframeWindow.document).text() === '') {
-            return;
+        if ($('#numPages', window.iframeWindow.document).text() === '') {
+            return
         }
 
-
-        let annotations = [];
-        let colors = [];
-        let primaryIndex = -1;
+        let annotations = []
+        let colors = []
+        let primaryIndex = -1
 
         // Primary annotation.
         if (isPrimary) {
             $('#dropdownAnnoPrimary a').each((index, element) => {
-                let $elm = $(element);
+                let $elm = $(element)
                 if ($elm.find('.fa-check').hasClass('no-visible') === false) {
-                    let annoPath = $elm.find('.js-annoname').text();
+                    let annoPath = $elm.find('.js-annoname').text()
 
-                    const annoFile = window.annoPage.getAnnoFile(annoPath);
+                    const annoFile = window.annoPage.getAnnoFile(annoPath)
                     if (!annoFile) {
-                        console.log('ERROR');
-                        return;
+                        console.log('ERROR')
+                        return
                     }
-                    primaryIndex = 0;
-                    annotations.push(annoFile.content);
-                    let color = null; // Use the default color used for edit.
-                    colors.push(color);
+                    primaryIndex = 0
+                    annotations.push(annoFile.content)
+                    let color = null // Use the default color used for edit.
+                    colors.push(color)
 
-                    let filename = annoFile.name;
-                    localStorage.setItem('_pdfanno_primary_annoname', filename);
-                    console.log('filename:', filename);
+                    let filename = annoFile.name
+                    localStorage.setItem('_pdfanno_primary_annoname', filename)
+                    console.log('filename:', filename)
                 }
-            });
+            })
         }
 
         // Reference annotations.
         if (!isPrimary) {
             $('#dropdownAnnoReference a').each((index, element) => {
-                let $elm = $(element);
+                let $elm = $(element)
                 if ($elm.find('.fa-check').hasClass('no-visible') === false) {
-                    let annoPath = $elm.find('.js-annoname').text();
+                    let annoPath = $elm.find('.js-annoname').text()
 
-                    const annoFile = window.annoPage.getAnnoFile(annoPath);
+                    const annoFile = window.annoPage.getAnnoFile(annoPath)
 
                     if (!annoFile) {
-                        console.log('ERROR');
-                        return;
+                        console.log('ERROR')
+                        return
                     }
-                    annotations.push(annoFile.content);
-                    let color = $elm.find('.js-anno-palette').spectrum('get').toHexString();
-                    console.log(color);
-                    colors.push(color);
+                    annotations.push(annoFile.content)
+                    let color = $elm.find('.js-anno-palette').spectrum('get').toHexString()
+                    console.log(color)
+                    colors.push(color)
                 }
-            });
+            })
         }
 
-        console.log('colors:', colors);
+        console.log('colors:', colors)
 
         // Create import data.
         let paperData = {
             primary : primaryIndex,
             colors,
             annotations
-        };
+        }
 
         // Import annotations to Viewer.
-        window.annoPage.importAnnotation(paperData, isPrimary);
+        window.annoPage.importAnnotation(paperData, isPrimary)
     }
 
     /**
      *  Disable annotation tool buttons.
      */
-    disableAnnotateFunctions() {
-        window.iframeWindow.PDFAnnoCore.default.UI.disableRect();
+    disableAnnotateFunctions () {
+        window.iframeWindow.PDFAnnoCore.default.UI.disableRect()
     }
 
     /**
      * Enable an annotation tool.
      */
-    enableAnnotateFunction(type) {
+    enableAnnotateFunction (type) {
         if (type === 'rect') {
-            window.iframeWindow.PDFAnnoCore.default.UI.enableRect();
+            window.iframeWindow.PDFAnnoCore.default.UI.enableRect()
         }
     }
 
     /**
      * Get all annotations.
      */
-    getAllAnnotations() {
-        return iframeWindow.annotationContainer.getAllAnnotations();
+    getAllAnnotations () {
+        return window.iframeWindow.annotationContainer.getAllAnnotations()
     }
 
     /**
      * Get selected annotations.
      */
-    getSelectedAnnotations() {
-        return iframeWindow.annotationContainer.getSelectedAnnotations();
+    getSelectedAnnotations () {
+        return window.iframeWindow.annotationContainer.getSelectedAnnotations()
     }
 
     /**
      * Find an annotation by id.
      */
-    findAnnotationById(id) {
-        return iframeWindow.annotationContainer.findById(id);
+    findAnnotationById (id) {
+        return window.iframeWindow.annotationContainer.findById(id)
     }
 
     /**
      * Clear the all annotations from the view and storage.
      */
-    clearAllAnnotations() {
+    clearAllAnnotations () {
         if (window.iframeWindow) {
-            window.iframeWindow.annotationContainer.getAllAnnotations().forEach(a => a.destroy());
+            window.iframeWindow.annotationContainer.getAllAnnotations().forEach(a => a.destroy())
         }
-        localStorage.removeItem('_pdfanno_containers');
-        localStorage.removeItem('_pdfanno_primary_annoname');
+        localStorage.removeItem('_pdfanno_containers')
+        localStorage.removeItem('_pdfanno_primary_annoname')
     }
 
     /**
      * Add an annotation to the container.
      */
-    addAnnotation(annotation) {
-        window.iframeWindow.annotationContainer.add(annotation);
+    addAnnotation  (annotation) {
+        window.iframeWindow.annotationContainer.add(annotation)
     }
 
     /**
      * Create a new rect annotation.
      */
-    createRectAnnotation(options) {
-        return iframeWindow.PDFAnnoCore.default.RectAnnotation.newInstance(options);
+    createRectAnnotation (options) {
+        return window.iframeWindow.PDFAnnoCore.default.RectAnnotation.newInstance(options)
     }
 
     /**
      * Create a new span annotation.
      */
-    createSpanAnnotation(options) {
-        return iframeWindow.PDFAnnoCore.default.SpanAnnotation.newInstance(options);
+    createSpanAnnotation (options) {
+        return window.iframeWindow.PDFAnnoCore.default.SpanAnnotation.newInstance(options)
     }
 
     /**
      * Create a new relation annotation.
      */
-    createRelationAnnotation(options) {
-        return iframeWindow.PDFAnnoCore.default.RelationAnnotation.newInstance(options);
+    createRelationAnnotation (options) {
+        return window.iframeWindow.PDFAnnoCore.default.RelationAnnotation.newInstance(options)
     }
 
     /**
      * Import annotations from UI.
      */
-    importAnnotation(paperData, isPrimary) {
-        // iframeWindow.PDFAnnoCore.default.getStoreAdapter().importAnnotations(paperData, isPrimary).then(result => {
-        iframeWindow.annotationContainer.importAnnotations(paperData, isPrimary).then(result => {
-            // iframeWindow.removeAnnoLayer();
-            // iframeWindow.renderAnno();
-
+    importAnnotation (paperData, isPrimary) {
+        window.iframeWindow.annotationContainer.importAnnotations(paperData, isPrimary).then(result => {
             // Notify annotations added.
-            dispatchWindowEvent('annotationrendered');
-        });
+            dispatchWindowEvent('annotationrendered')
+        })
     }
 
     /**
      * Scroll window to the annotation.
      */
-    scrollToAnnotation(id) {
+    scrollToAnnotation (id) {
 
-        let annotation = window.annoPage.findAnnotationById(id);
+        let annotation = window.annoPage.findAnnotationById(id)
 
         if (annotation) {
 
             // scroll to.
-            let _y = annotation.y || annotation.y1 || annotation.rectangles[0].y;
-            let { pageNumber, y } = convertToExportY(_y);
-            let pageHeight = window.annoPage.getViewerViewport().height;
-            let scale = window.annoPage.getViewerViewport().scale;
-            _y = (pageHeight + paddingBetweenPages) * (pageNumber - 1) + y * scale;
-            _y -= 100;
-            $('#viewer iframe').contents().find('#viewer').parent()[0].scrollTop = _y;
+            let _y = annotation.y || annotation.y1 || annotation.rectangles[0].y
+            let { pageNumber, y } = convertToExportY(_y)
+            let pageHeight = window.annoPage.getViewerViewport().height
+            let scale = window.annoPage.getViewerViewport().scale
+            _y = (pageHeight + paddingBetweenPages) * (pageNumber - 1) + y * scale
+            _y -= 100
+            $('#viewer iframe').contents().find('#viewer').parent()[0].scrollTop = _y
 
             // highlight.
-            annotation.highlight();
+            annotation.highlight()
             setTimeout(() => {
-                annotation.dehighlight();
-            }, 1000);
+                annotation.dehighlight()
+            }, 1000)
         }
     }
 
@@ -539,35 +530,34 @@ export default class PDFAnnoPage {
      *
      * @return {Promise}
      */
-    exportData() {
-        // return window.iframeWindow.PDFAnnoCore.default.getStoreAdapter().exportData();
-        return window.iframeWindow.annotationContainer.exportData();
+    exportData () {
+        return window.iframeWindow.annotationContainer.exportData()
     }
 
     /**
      * Get the viewport of the viewer.
      */
-    getViewerViewport() {
-        return iframeWindow.PDFView.pdfViewer.getPageView(0).viewport;
+    getViewerViewport () {
+        return window.iframeWindow.PDFView.pdfViewer.getPageView(0).viewport
     }
 
     /**
      * Get the content's name displayed now.
      */
-    getCurrentContentName() {
-        return iframeWindow.getFileName(iframeWindow.PDFView.url);
+    getCurrentContentName () {
+        return window.iframeWindow.getFileName(window.iframeWindow.PDFView.url)
     }
 
     /**
      * Manage the ctrl button is enable/disable.
      */
-    manageCtrlKey(type) {
+    manageCtrlKey (type) {
 
         if (type === 'on') {
-            window.iframeWindow.ctrlPressed = true;
+            window.iframeWindow.ctrlPressed = true
 
         } else if (type === 'off') {
-            window.iframeWindow.ctrlPressed = false;
+            window.iframeWindow.ctrlPressed = false
         }
     }
 
