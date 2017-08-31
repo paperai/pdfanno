@@ -17,6 +17,11 @@ import * as publicApi from './page/public';
 import PDFAnnoPage from './page/pdf/PDFAnnoPage';
 
 /**
+ * Default PDF Name.
+ */
+const DEFAULT_PDF_NAME = 'P12-1046.pdf'
+
+/**
  * API root point.
  */
 let API_ROOT = 'http://localhost:8080';
@@ -226,97 +231,69 @@ window.addEventListener('DOMContentLoaded', e => {
     });
 
     let isDefaultPDF = false
-    if (!pdfURL) {
-        // https://paperai.github.io/pdfanno/pdfs/P12-1046.pdf
-        pdfURL = location.protocol + '//' + location.hostname + ':' + location.port + location.pathname.split('/').slice(0,location.pathname.split('/').length-1).join('/') + '/pdfs/P12-1046.pdf'
-        isDefaultPDF = true
-    }
 
     if (pdfURL) {
 
-        console.log('pdfURL=', pdfURL);
+        console.log('pdfURL=', pdfURL)
 
         // Show loading.
-        $('#pdfLoading').removeClass('hidden');
+        $('#pdfLoading').removeClass('hidden')
 
-        // Load a PDF as ArrayBuffer.
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', API_ROOT + '/load_pdf?url=' + window.encodeURIComponent(pdfURL), true);
-        // xhr.responseType = 'arraybuffer';
-        xhr.responseType = 'json';
-        xhr.onload = function () {
-            if (this.status === 200) {
-                console.log('this.response=', this.response);
+        // Load a PDF file.
+        loadPDF(pdfURL).then(({ pdf, analyzeResult }) => {
 
-                // Error handling.
-                if (this.response.status === 'failure') {
-                    let error = this.response.err.stderr || this.response.err;
-                    alert('ERROR\n\n' + error);
-                    return;
+            const pdfName = pdfURL.split('/')[pdfURL.split('/').length - 1]
+
+            // Init viewer.
+            window.annoPage.initializeViewer(null);
+            // Start application.
+            window.annoPage.startViewerApplication();
+
+            window.addEventListener('iframeReady', () => {
+                setTimeout(() => {
+                    window.annoPage.displayViewer({
+                        name    : pdfName,
+                        content : pdf
+                    });
+                }, 500);
+            });
+
+            const listenPageRendered = () => {
+                $('#pdfLoading').addClass('close');
+                setTimeout(function() {
+                    $('#pdfLoading').addClass('hidden');
+                }, 1000);
+
+                // Load and display annotations, if annoURL is set.
+                if (annoURL) {
+                    loadExternalAnnoFile(annoURL).then(anno => {
+                        publicApi.addAllAnnotations(publicApi.readTOML(anno));
+
+                        // Move to the annotation.
+                        if (moveTo) {
+                            setTimeout(() => {
+                                window.annoPage.scrollToAnnotation(moveTo);
+                            }, 500);
+                        }
+                    });
                 }
+                window.removeEventListener('pagerendered', listenPageRendered);
+            };
+            window.addEventListener('pagerendered', listenPageRendered);
 
-                const pdf = Uint8Array.from(atob(this.response.pdf), c => c.charCodeAt(0));
-                const pdfName = pdfURL.split('/')[pdfURL.split('/').length - 1];
+            // Set the analyzeResult.
+            annoUI.uploadButton.setResult(analyzeResult);
 
-                // Init viewer.
-                window.annoPage.initializeViewer(null);
-                // Start application.
-                window.annoPage.startViewerApplication();
-
-                window.addEventListener('iframeReady', () => {
-                    setTimeout(() => {
-                        window.annoPage.displayViewer({
-                            name    : pdfName,
-                            content : pdf
-                        });
-                    }, 500);
-                });
-
-                const listenPageRendered = () => {
-                    $('#pdfLoading').addClass('close');
-                    setTimeout(function() {
-                        $('#pdfLoading').addClass('hidden');
-                    }, 1000);
-
-                    // Load and display annotations, if annoURL is set.
-                    if (annoURL) {
-                        loadExternalAnnoFile(annoURL).then(anno => {
-                            publicApi.addAllAnnotations(publicApi.readTOML(anno));
-
-                            // Move to the annotation.
-                            if (moveTo) {
-                                setTimeout(() => {
-                                    window.annoPage.scrollToAnnotation(moveTo);
-                                }, 500);
-                            }
-                        });
-                    }
-                    window.removeEventListener('pagerendered', listenPageRendered);
-                };
-                window.addEventListener('pagerendered', listenPageRendered);
-
-                // Set the analyzeResult.
-                annoUI.uploadButton.setResult(this.response.analyzeResult);
-
-                // Display upload tab.
-                if (!isDefaultPDF) {
-                    $('a[href="#tab2"]').click();
-                }
-
+            // Display upload tab.
+            if (!isDefaultPDF) {
+                $('a[href="#tab2"]').click();
             }
-        };
-        xhr.timeout = 120 * 1000; // 120s
-        xhr.ontimeout = function () {
-            $('#pdfLoading').addClass('hidden');
-            setTimeout(() => {
-                annoUI.ui.alertDialog.show({ message : 'Failed to load the PDF.' });
-            }, 100);
-        };
-        xhr.onerror = function(err) {
-            console.log('err:', err);
-            alert('Error: ' + err);
-        }
-        xhr.send();
+
+        }).catch(err => {
+            // Hide a loading, and show the error message.
+            $('#pdfLoading').addClass('hidden')
+            annoUI.ui.alertDialog.show({ message : err })
+        })
 
     } else {
 
@@ -326,11 +303,58 @@ window.addEventListener('DOMContentLoaded', e => {
         window.annoPage.initializeViewer();
         // Start application.
         window.annoPage.startViewerApplication();
+
+        // Load the default PDF, and save it.
+        loadPDF(getDefaultPDFURL()).then(({ pdf, analyzeResult }) => {
+            // Set as current.
+            window.annoPage.setCurrentContentFile({
+                name    : DEFAULT_PDF_NAME,
+                content : pdf
+            })
+            // Set the analyzeResult.
+            annoUI.uploadButton.setResult(analyzeResult);
+        })
     }
 
 });
 
-function loadExternalAnnoFile(url) {
+/**
+ * Load a PDF data from the server.
+ */
+function loadPDF (url) {
+    return new Promise((resolve, reject) => {
+
+        // Load a PDF as ArrayBuffer.
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', API_ROOT + '/load_pdf?url=' + window.encodeURIComponent(url), true);
+        xhr.responseType = 'json';
+        xhr.onload = function () {
+            if (this.status === 200) {
+
+                // Error handling.
+                if (this.response.status === 'failure') {
+                    let error = this.response.err.stderr || this.response.err;
+                    return reject(error)
+                }
+
+                // Get a PDF as arrayBuffer.
+                const pdf = Uint8Array.from(atob(this.response.pdf), c => c.charCodeAt(0));
+                const analyzeResult = this.response.analyzeResult
+                resolve({ pdf, analyzeResult })
+            }
+        };
+        xhr.timeout = 120 * 1000; // 120s
+        xhr.ontimeout = function () {
+            reject('Failed to load the PDF.')
+        };
+        xhr.onerror = function(err) {
+            reject(err)
+        }
+        xhr.send();
+    })
+}
+
+function loadExternalAnnoFile (url) {
     return axios.get(`${API_ROOT}/api/load_anno?url=${url}`).then(res => {
         if (res.status !== 200 || res.data.status === 'failure') {
             let reason = '';
@@ -342,4 +366,13 @@ function loadExternalAnnoFile(url) {
         }
         return res.data.anno;
     });
+}
+
+function getDefaultPDFURL () {
+
+    // https://paperai.github.io/pdfanno/pdfs/P12-1046.pdf
+    const pathnames = location.pathname.split('/')
+    const pdfURL = location.protocol + '//' + location.hostname + ':' + location.port + pathnames.slice(0, pathnames.length-1).join('/') + '/pdfs/' + DEFAULT_PDF_NAME
+
+    return pdfURL
 }

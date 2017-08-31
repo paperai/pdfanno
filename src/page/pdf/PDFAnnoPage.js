@@ -203,8 +203,12 @@ export default class PDFAnnoPage {
         this.currentContentFile = contentFile;
     }
 
+    setCurrentContentFile (contentFile) {
+        this.currentContentFile = contentFile
+    }
+
     getCurrentContentFile() {
-        return this.currentContentFile;
+        return this.currentContentFile
     }
 
     initializeViewer(initialPDFPath = '../pdfs/P12-1046.pdf') {
