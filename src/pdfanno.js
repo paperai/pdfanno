@@ -305,14 +305,12 @@ window.addEventListener('DOMContentLoaded', e => {
         window.annoPage.startViewerApplication()
 
         // Load the default PDF, and save it.
-        loadPDF(getDefaultPDFURL()).then(({ pdf, analyzeResult }) => {
+        loadPDF(getDefaultPDFURL()).then(({ pdf }) => {
             // Set as current.
             window.annoPage.setCurrentContentFile({
                 name    : DEFAULT_PDF_NAME,
                 content : pdf
             })
-            // Set the analyzeResult.
-            annoUI.uploadButton.setResult(analyzeResult)
         })
     }
 
