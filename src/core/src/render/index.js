@@ -40,5 +40,5 @@ export default function render (svg, viewport, data) {
         })
 
         resolve(svg, elements)
-  })
+    })
 }

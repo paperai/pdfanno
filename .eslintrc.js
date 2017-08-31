@@ -44,7 +44,7 @@ module.exports = {
     "no-irregular-whitespace" : 1,
     "eol-last" : 1,
     "no-redeclare" : 1,
-    "operator-linebreak" : 1,
+    "operator-linebreak" : [1, "before"],
     "comma-spacing" : 1,
     "no-throw-literal" : 1,
     "standard/object-curly-even-spacing" : 1,

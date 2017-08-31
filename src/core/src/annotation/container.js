@@ -1,7 +1,7 @@
 import toml from 'toml'
 import ANNO_VERSION from '../version'
 import tomlString from '../utils/tomlString'
-import { convertToExportY, convertFromExportY } from '../../../shared/coords'
+import { convertToExportY } from '../../../shared/coords'
 import uuid from '../utils/uuid'
 
 import SpanAnnotation from './span'

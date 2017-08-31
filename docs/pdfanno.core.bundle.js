@@ -11995,8 +11995,8 @@ class RelationAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* 
             return false
         }
 
-        const isSame = __WEBPACK_IMPORTED_MODULE_4__shared_util__["a" /* anyOf */](this.rel1Annotation.uuid, [anno.rel1Annotation.uuid, anno.rel2Annotation.uuid]) &&
-                        __WEBPACK_IMPORTED_MODULE_4__shared_util__["a" /* anyOf */](this.rel2Annotation.uuid, [anno.rel1Annotation.uuid, anno.rel2Annotation.uuid])
+        const isSame = __WEBPACK_IMPORTED_MODULE_4__shared_util__["a" /* anyOf */](this.rel1Annotation.uuid, [anno.rel1Annotation.uuid, anno.rel2Annotation.uuid])
+                        && __WEBPACK_IMPORTED_MODULE_4__shared_util__["a" /* anyOf */](this.rel2Annotation.uuid, [anno.rel1Annotation.uuid, anno.rel2Annotation.uuid])
 
         return isSame
     }
@@ -17529,98 +17529,46 @@ function renderAnnotations(svg) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__annotation_rect__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__annotation_span__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__annotation_relation__ = __webpack_require__(11);
-// import StoreAdapter from './adapter/StoreAdapter';
-// import PdfannoStoreAdapter from './adapter/PdfannoStoreAdapter';
 
 
 
 
 
 
-__webpack_require__(74);
+__webpack_require__(74)
 
 /* harmony default export */ __webpack_exports__["a"] = ({
-  /**
-   * Abstract class that needs to be defined so PDFAnnoCore
-   * knows how to communicate with your server.
-   */
-  // StoreAdapter,
 
-  /**
-    Implementation of StoreAdapter for PDFAnno.
-  */
-  // PdfannoStoreAdapter,
+    /**
+     * UI is a helper for instrumenting UI interactions for creating,
+     * editing, and deleting annotations in the browser.
+     */
+    UI: __WEBPACK_IMPORTED_MODULE_1__UI__["a" /* default */],
 
-  /**
-   * Abstract instance of StoreAdapter
-   */
-  // __storeAdapter: new StoreAdapter(),
+    /**
+     * Render the annotations for a page in the PDF Document
+     *
+     * @param {SVGElement} svg The SVG element that annotations should be rendered to
+     * @param {PageViewport} viewport The PDFPage.getViewport data
+     * @param {Object} data The StoreAdapter.getAnnotations data
+     * @return {Promise}
+     */
+    render: __WEBPACK_IMPORTED_MODULE_0__render__["a" /* default */],
 
-  /**
-   * Getter for the underlying StoreAdapter property
-   *
-   * @return {StoreAdapter}
-   */
-  // getStoreAdapter() {
-  //   return this.__storeAdapter;
-  // },
+    /**
+     * RectAnnotation Class.
+     */
+    RectAnnotation: __WEBPACK_IMPORTED_MODULE_2__annotation_rect__["a" /* default */],
 
-  /**
-   * Setter for the underlying StoreAdapter property
-   *
-   * @param {StoreAdapter} adapter The StoreAdapter implementation to be used.
-   */
-  // setStoreAdapter(adapter) {
-  //   // TODO this throws an error when bundled
-  //   // if (!(adapter instanceof StoreAdapter)) {
-  //   //   throw new Error('adapter must be an instance of StoreAdapter');
-  //   // }
+    /**
+     * SpanAnnotation Class.
+     */
+    SpanAnnotation: __WEBPACK_IMPORTED_MODULE_3__annotation_span__["a" /* default */],
 
-  //   this.__storeAdapter = adapter;
-  // },
-
-  /**
-   * UI is a helper for instrumenting UI interactions for creating,
-   * editing, and deleting annotations in the browser.
-   */
-  UI: __WEBPACK_IMPORTED_MODULE_1__UI__["a" /* default */],
-
-  /**
-   * Render the annotations for a page in the PDF Document
-   *
-   * @param {SVGElement} svg The SVG element that annotations should be rendered to
-   * @param {PageViewport} viewport The PDFPage.getViewport data
-   * @param {Object} data The StoreAdapter.getAnnotations data
-   * @return {Promise}
-   */
-  render: __WEBPACK_IMPORTED_MODULE_0__render__["a" /* default */],
-
-  /**
-   * Convenience method for getting annotation data
-   *
-   * @alias StoreAdapter.getAnnotations
-   * @param {String} documentId The ID of the document
-   * @return {Promise}
-   */
-  // getAnnotations(documentId) {
-  //   return this.getStoreAdapter().getAnnotations(...arguments);
-  // },
-
-  /**
-   * RectAnnotation Class.
-   */
-  RectAnnotation: __WEBPACK_IMPORTED_MODULE_2__annotation_rect__["a" /* default */],
-
-  /**
-   * SpanAnnotation Class.
-   */
-  SpanAnnotation: __WEBPACK_IMPORTED_MODULE_3__annotation_span__["a" /* default */],
-
-  /**
-   * RelationAnnotation Class.
-   */
-  RelationAnnotation: __WEBPACK_IMPORTED_MODULE_4__annotation_relation__["a" /* default */]
-
+    /**
+     * RelationAnnotation Class.
+     */
+    RelationAnnotation: __WEBPACK_IMPORTED_MODULE_4__annotation_relation__["a" /* default */]
 });
 
 
@@ -17673,7 +17621,7 @@ function render (svg, viewport, data) {
         })
 
         resolve(svg, elements)
-  })
+    })
 }
 
 
