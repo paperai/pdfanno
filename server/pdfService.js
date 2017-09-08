@@ -66,7 +66,7 @@ module.exports.analyzePDF = (pdfPath) => {
     }).then(() => {
 
         const jarPath = path.resolve(__dirname, 'pdfextract.jar');
-        const cmd = `java -classpath ${jarPath} TextExtractor ${pdfPath}`;
+        const cmd = `java -classpath ${jarPath} PDFExtractor ${pdfPath}`;
         return execCommand(cmd);
 
     }).then(({ stdout, stderr }) => {
