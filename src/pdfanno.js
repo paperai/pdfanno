@@ -182,6 +182,9 @@ window.addEventListener('DOMContentLoaded', e => {
     annoUI.uploadButton.setup({
         getCurrentDisplayContentFile : () => {
             return window.annoPage.getCurrentContentFile()
+        },
+        uploadFinishCallback : (resultText) => {
+            console.log('resultText:\n', resultText)
         }
     })
 
