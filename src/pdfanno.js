@@ -2,6 +2,7 @@ require("file-loader?name=dist/index.html!./index.html")
 require("!style-loader!css-loader!./pdfanno.css")
 
 import axios from 'axios'
+import Fuse from 'fuse.js'
 
 // UI parts.
 import * as annoUI from 'anno-ui'
@@ -350,3 +351,32 @@ function getDefaultPDFURL () {
     const pdfURL = location.protocol + '//' + location.hostname + ':' + location.port + pathnames.slice(0, pathnames.length-1).join('/') + '/pdfs/' + DEFAULT_PDF_NAME
     return pdfURL
 }
+
+
+/*
+    fuse.js sample.
+
+    http://fusejs.io/
+*/
+var books = [{
+  'title': "Old Man's War",
+  'author': 'John Scalzi',
+  'tags': ['fiction']
+}, {
+  'title': 'The Lock Artist',
+  'author': 'Steve',
+  'tags': ['thriller']
+}]
+var options = {
+  keys: ['author', 'tags']
+}
+var fuse = new Fuse(books, options)
+
+var result = fuse.search('tion')
+console.log('fuse result:', result)
+
+
+
+
+
+
