@@ -464,6 +464,9 @@ function search({ hay, needle, isCaseSensitive = false }) {
 
 window.addEventListener('DOMContentLoaded', () => {
 
+    const DELAY = 500
+    let timerId
+
     $('#searchWord').on('keyup', e => {
         const text = $(e.currentTarget).val()
 
@@ -485,51 +488,67 @@ window.addEventListener('DOMContentLoaded', () => {
         // const result = fuse.search(text)
         // console.log(`text=${text}, fuse result:`, result)
 
-        // Remove search result highlights.
-        $('.pdfanno-search-result', iframeWindow.document).remove()
+        if (timerId) {
+            clearTimeout(timerId)
+            timerId = null
+        }
 
-        pages.forEach(page => {
-            const positions = search({ hay : page.body, needle : text, isCaseSensitive : true })
-            // console.log('positions:', positions)
-
-            // 表示する
-            if (positions.length > 0) {
-                positions.forEach(position => {
-                    const { start, end } = position
-                    const $textLayer = $(`.page[data-page-number="${page.page}"] .textLayer`, iframeWindow.document)
-                    const infos = page.meta.slice(start, end)
-                    // console.log('infos:', infos)
-                    let fromX, toX, fromY, toY
-                    infos.forEach(info => {
-                        if (!info) {
-                            return
-                        }
-                        const [ x, y, w, h ] = info.split('\t').slice(3, 7).map(parseFloat)
-                        // console.log(x, y, w, h)
-                        fromX = (fromX === undefined ? x : Math.min(x, fromX))
-                        toX = (toX === undefined ? (x + w) : Math.max((x + w), toX))
-                        fromY = (fromY === undefined ? y : Math.min(y, fromY))
-                        toY = (toY === undefined ? (y + h) : Math.max((y + h), toY))
-                    })
-                    // console.log('from:to', fromX, toX, fromY, toY)
-                    const scale = iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale
-                    let $div = $('<div class="pdfanno-search-result"/>')
-                    $div.css({
-                        position   : 'absolute',
-                        top        : fromY * scale + 'px',
-                        left       : fromX * scale+ 'px',
-                        width      : (toX - fromX) * scale + 'px',
-                        height     : (toY - fromY) * scale + 'px',
-                        background : 'rgba(255,0,0,.7)'
-                    })
-                    $textLayer.append($div)
-                })
-            }
-        })
-
+        timerId = setTimeout(() => {
+            doSearch(text)
+        }, DELAY)
     })
-
 })
+
+function doSearch(text) {
+
+    const MIN_LEN = 2
+
+    // Remove search result highlights.
+    $('.pdfanno-search-result', iframeWindow.document).remove()
+
+    if (text.length <= MIN_LEN) {
+        return
+    }
+
+    pages.forEach(page => {
+        const positions = search({ hay : page.body, needle : text, isCaseSensitive : true })
+        // console.log('positions:', positions)
+
+        // 表示する
+        if (positions.length > 0) {
+            positions.forEach(position => {
+                const { start, end } = position
+                const $textLayer = $(`.page[data-page-number="${page.page}"] .textLayer`, iframeWindow.document)
+                const infos = page.meta.slice(start, end)
+                // console.log('infos:', infos)
+                let fromX, toX, fromY, toY
+                infos.forEach(info => {
+                    if (!info) {
+                        return
+                    }
+                    const [ x, y, w, h ] = info.split('\t').slice(3, 7).map(parseFloat)
+                    // console.log(x, y, w, h)
+                    fromX = (fromX === undefined ? x : Math.min(x, fromX))
+                    toX = (toX === undefined ? (x + w) : Math.max((x + w), toX))
+                    fromY = (fromY === undefined ? y : Math.min(y, fromY))
+                    toY = (toY === undefined ? (y + h) : Math.max((y + h), toY))
+                })
+                // console.log('from:to', fromX, toX, fromY, toY)
+                const scale = iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale
+                let $div = $('<div class="pdfanno-search-result"/>')
+                $div.css({
+                    position   : 'absolute',
+                    top        : fromY * scale + 'px',
+                    left       : fromX * scale+ 'px',
+                    width      : (toX - fromX) * scale + 'px',
+                    height     : (toY - fromY) * scale + 'px',
+                    background : 'rgba(255,0,0,.7)'
+                })
+                $textLayer.append($div)
+            })
+        }
+    })
+}
 
 
 
