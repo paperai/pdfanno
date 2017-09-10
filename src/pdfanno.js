@@ -501,6 +501,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
 function doSearch(text) {
 
+    // TODO 件数表示とか
+    // TODO 検索条件指定とか（caseSensitiveなど）
+
     const MIN_LEN = 2
 
     // Remove search result highlights.
