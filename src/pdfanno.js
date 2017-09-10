@@ -471,22 +471,35 @@ window.addEventListener('DOMContentLoaded', () => {
         console.log('positions:', positions)
 
         // 表示する
+        $('.pdfanno-search-result', iframeWindow.document).remove()
         if (positions.length > 0) {
-            // TODO とりあえず1個だけ（後で全部にする）.
-            const { start, end } = positions[0]
-            const $textLayer = $('.page[data-page-number="1"] .textLayer', iframeWindow.document)
-            const infos = pages[0].meta.slice(start, end)
-            console.log('infos:', infos)
-            let fromX, toX, fromY, toY
-            infos.forEach(info => {
-                const [ x, y, w, h ] = info.split('\t').slice(3, 7).map(parseFloat)
-                console.log(x, y, w, h)
-                fromX = (fromX === undefined ? x : Math.min(x, fromX))
-                toX = (toX === undefined ? (x + w) : Math.max((x + w), toX))
-                fromY = (fromY === undefined ? y : Math.min(y, fromY))
-                toY = (toY === undefined ? (y + h) : Math.max((y + h), toY))
+            positions.forEach(position => {
+                const { start, end } = position
+                const $textLayer = $('.page[data-page-number="1"] .textLayer', iframeWindow.document)
+                const infos = pages[0].meta.slice(start, end)
+                console.log('infos:', infos)
+                let fromX, toX, fromY, toY
+                infos.forEach(info => {
+                    const [ x, y, w, h ] = info.split('\t').slice(3, 7).map(parseFloat)
+                    console.log(x, y, w, h)
+                    fromX = (fromX === undefined ? x : Math.min(x, fromX))
+                    toX = (toX === undefined ? (x + w) : Math.max((x + w), toX))
+                    fromY = (fromY === undefined ? y : Math.min(y, fromY))
+                    toY = (toY === undefined ? (y + h) : Math.max((y + h), toY))
+                })
+                console.log('from:to', fromX, toX, fromY, toY)
+                const scale = iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale
+                let $div = $('<div class="pdfanno-search-result"/>')
+                $div.css({
+                    position   : 'absolute',
+                    top        : fromY * scale + 'px',
+                    left       : fromX * scale+ 'px',
+                    width      : (toX - fromX) * scale + 'px',
+                    height     : (toY - fromY) * scale + 'px',
+                    background : 'rgba(255,0,0,.7)'
+                })
+                $textLayer.append($div)
             })
-            console.log('from:to', fromX, toX, fromY, toY)
         }
 
     })
