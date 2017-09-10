@@ -186,6 +186,7 @@ window.addEventListener('DOMContentLoaded', e => {
         },
         uploadFinishCallback : (resultText) => {
             console.log('resultText:\n', resultText)
+            prepareSearch(resultText)
         }
     })
 
@@ -259,6 +260,8 @@ window.addEventListener('DOMContentLoaded', e => {
             // Set the analyzeResult.
             annoUI.uploadButton.setResult(analyzeResult)
 
+            prepareSearch(analyzeResult)
+
             // Display upload tab.
             $('a[href="#tab2"]').click()
 
@@ -278,12 +281,14 @@ window.addEventListener('DOMContentLoaded', e => {
         window.annoPage.startViewerApplication()
 
         // Load the default PDF, and save it.
-        loadPDF(getDefaultPDFURL()).then(({ pdf }) => {
+        loadPDF(getDefaultPDFURL()).then(({ pdf, analyzeResult }) => {
             // Set as current.
             window.annoPage.setCurrentContentFile({
                 name    : DEFAULT_PDF_NAME,
                 content : pdf
             })
+
+            prepareSearch(analyzeResult)
         })
     }
 
@@ -377,6 +382,116 @@ console.log('fuse result:', result)
 
 
 
+let pages = []
+
+function prepareSearch(pdfResult) {
+    console.log('prepareSearch!!!', pdfResult.length)
+
+    pages = []
+
+    let body = ''
+    let meta = []
+    pdfResult.split('\n').forEach(line => {
+        if (!line) {
+            body += ' '
+            meta.push(line)
+        } else {
+            const [
+                pageNumber,
+                type,
+                char,
+                ...others
+            ] = line.split('\t')
+            if (pageNumber === '1' && type === 'TEXT') {
+                body += char
+                meta.push(line)
+            }
+        }
+    })
+    console.log('body:', body)
+
+    pages.push({
+        body,
+        meta
+    })
+}
+
+/*
+var re = /bar/g,
+    str = "foobarfoobar";
+while ((match = re.exec(str)) != null) {
+    console.log("match found at " + match.index, (match.index + match[0].length), match);
+}
+*/
+function search({ hay, needle, isCaseSensitive = false }) {
+    console.log('search:', hay, needle)
+    if (!needle) {
+        return []
+    }
+    const SPECIAL_CHARS_REGEX = /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g
+    const flags = 'g' + (isCaseSensitive ? 'i' : '')
+    let re = new RegExp(needle.replace(SPECIAL_CHARS_REGEX, '\\$&'), flags)
+    let positions = []
+    let match
+    while ((match = re.exec(hay)) != null) {
+        positions.push({
+            start : match.index,
+            end   : match.index + match[0].length
+        })
+    }
+    return positions
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+
+    $('#searchWord').on('keyup', e => {
+        const text = $(e.currentTarget).val()
+
+        // TODO ここから.
+        const options = {
+            // includeMatches: true,
+            tokenize: true,
+            findAllMatches: true,
+            includeMatches: true,
+            threshold: 0.0,
+            location: 0,
+            distance: 0,
+            maxPatternLength: 32,
+            minMatchCharLength: 1,
+            keys: ['body']
+        }
+
+        // const fuse = new Fuse(pages, options)
+        // const result = fuse.search(text)
+        // console.log(`text=${text}, fuse result:`, result)
+
+        // TODO 複数ページ対応.
+        const body = pages[0].body
+        const positions = search({ hay : body, needle : text, isCaseSensitive : true })
+        console.log('positions:', positions)
+
+        // 表示する
+        if (positions.length > 0) {
+            // TODO とりあえず1個だけ（後で全部にする）.
+            const { start, end } = positions[0]
+            const $textLayer = $('.page[data-page-number="1"] .textLayer', iframeWindow.document)
+            const infos = pages[0].meta.slice(start, end)
+            console.log('infos:', infos)
+            let fromX, toX, fromY, toY
+            infos.forEach(info => {
+                const [ x, y, w, h ] = info.split('\t').slice(3, 7).map(parseFloat)
+                console.log(x, y, w, h)
+                fromX = (fromX === undefined ? x : Math.min(x, fromX))
+                toX = (toX === undefined ? (x + w) : Math.max((x + w), toX))
+                fromY = (fromY === undefined ? y : Math.min(y, fromY))
+                toY = (toY === undefined ? (y + h) : Math.max((y + h), toY))
+            })
+            console.log('from:to', fromX, toX, fromY, toY)
+        }
+
+    })
+
+})
 
 
 

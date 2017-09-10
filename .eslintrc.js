@@ -51,6 +51,7 @@ module.exports = {
     "comma-dangle" : 1,
     "arrow-spacing" : 1,
     "no-unexpected-multiline" : 1,
-    "no-sequences" : 1
+    "no-sequences" : 1,
+    "no-useless-escape" : 1
   }
 }
