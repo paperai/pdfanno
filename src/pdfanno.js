@@ -458,7 +458,6 @@ function search({ hay, needle, isCaseSensitive = false }) {
             end   : match.index + match[0].length
         })
     }
-    // console.log('search:', needle, positions.length)
     return positions
 }
 
@@ -468,21 +467,21 @@ window.addEventListener('DOMContentLoaded', () => {
     let timerId
 
     $('#searchWord').on('keyup', e => {
-        const text = $(e.currentTarget).val()
+        // const text = $(e.currentTarget).val()
 
         // TODO ここから.
-        const options = {
-            // includeMatches: true,
-            tokenize: true,
-            findAllMatches: true,
-            includeMatches: true,
-            threshold: 0.0,
-            location: 0,
-            distance: 0,
-            maxPatternLength: 32,
-            minMatchCharLength: 1,
-            keys: ['body']
-        }
+        // const options = {
+        //     // includeMatches: true,
+        //     tokenize: true,
+        //     findAllMatches: true,
+        //     includeMatches: true,
+        //     threshold: 0.0,
+        //     location: 0,
+        //     distance: 0,
+        //     maxPatternLength: 32,
+        //     minMatchCharLength: 1,
+        //     keys: ['body']
+        // }
 
         // const fuse = new Fuse(pages, options)
         // const result = fuse.search(text)
@@ -494,12 +493,20 @@ window.addEventListener('DOMContentLoaded', () => {
         }
 
         timerId = setTimeout(() => {
-            doSearch(text)
+            doSearch()
         }, DELAY)
     })
 })
 
-function doSearch(text) {
+function doSearch() {
+
+    // Text
+    const text = $('#searchWord').val()
+    // Case Sensitive
+    const isCaseSensitive = $('.js-search-case-sensitive')[0].checked
+    // TODO ここから実装する.
+
+
 
     // TODO 件数表示とか
     // TODO 検索条件指定とか（caseSensitiveなど）
