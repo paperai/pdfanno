@@ -89,11 +89,12 @@
                 <div style="padding-left: 15px; padding-right: 15px;">
 
                     <ul class="nav nav-tabs">
-                        <li class="active"><a  href="#tab1" data-toggle="tab">Annotation</a></li>
+                        <li><a  href="#tab1" data-toggle="tab">Annotation</a></li>
                         <li><a href="#tab2" data-toggle="tab">Server (Experimental)</a></li>
+                        <li class="active"><a href="#tab3" data-toggle="tab">Search</a></li>
                     </ul>
                     <div class="tab-content">
-                        <div id="tab1" class="tab-pane active">
+                        <div id="tab1" class="tab-pane">
                             <div class="u-mt-20">
                                 <input list=labels class="form-control inputLabel" id="inputLabel" disabled>
                                 <ul class="nav nav-tabs u-mt-10">
@@ -112,16 +113,6 @@
                             </div>
                             <br>
                             <br>
-
-                            <!-- Search -->
-                            <h3 style="font-size: 16px; font-weight: bold;">Search</h3>
-                            <br>
-                            <input type="text" id="searchWord" class="form-control" placeholder="search..." disabled>
-                            <!-- <br> -->
-                            <!-- <textarea id="searchResult" class="form-control" cols="30" rows="10"></textarea> -->
-
-
-
                         </div> <!-- /#tab1 -->
                         <div class="tab-pane" id="tab2">
 							<div class="input-group u-mt-20">
@@ -139,6 +130,20 @@
                                 <textarea id="uploadResult" class="form-control" rows="30" wrap="off"></textarea>
                             </div>
                         </div> <!-- /#tab2 -->
+                        <div class="tab-pane active" id="tab3">
+                            <!-- Search -->
+                            <div class="u-mt-20 search-control">
+                                <input type="text" id="searchWord" class="form-control search-control__input" placeholder="Text to match" disabled>
+                                <button class="btn btn-default search-control__btn">▲</button>
+                                <button class="btn btn-default search-control__btn">▼</button>
+                            </div>
+                            <div class="checkbox">
+                                <label><input type="checkbox" value="">Case sensitive</label>
+                            </div>
+                            <div class="checkbox">
+                                <label><input type="checkbox" value="">Regular expression</label>
+                            </div>
+                        </div> <!-- /#tab3 -->
                     </div>
                 </div>
             </div>
