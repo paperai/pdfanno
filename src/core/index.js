@@ -1,6 +1,8 @@
 /**
     Functions for annotations rendered over a PDF file.
 */
+require("!style-loader!css-loader!./index.css")
+
 import $ from 'jquery';
 import EventEmitter from 'events';
 

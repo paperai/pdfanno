@@ -457,8 +457,55 @@ window.addEventListener('DOMContentLoaded', () => {
     })
 
     // Re-render the search results.
-    window.addEventListener('pagerendered', doSearch)
+    window.addEventListener('pagerendered', rerenderSearchResults)
+
+
+    $('.js-search-prev, .js-search-next').on('click', e => {
+
+        // No action for no results.
+        if (searchHighlights.length === 0) {
+            return
+        }
+
+        // go to next or prev.
+        let num = 1
+        if ($(e.currentTarget).hasClass('js-search-prev')) {
+            num = -1
+        }
+        searchPosition += num
+        if (searchPosition < 0) {
+            searchPosition = searchHighlights.length - 1
+        } else if (searchPosition >= searchHighlights.length) {
+            searchPosition = 0
+        }
+
+        $('.pdfanno-search-result', iframeWindow.document).removeClass('pdfanno-search-result--highlight')
+
+        const highlight = searchHighlights[searchPosition]
+        highlight.$elm.addClass('pdfanno-search-result--highlight')
+
+        console.log(`highlight: index=${searchPosition}, page=${highlight.page}`)
+
+        // TODO その位置までスクロール.
+    })
 })
+
+function rerenderSearchResults() {
+
+    // No action for no results.
+    if (searchHighlights.length === 0) {
+        return
+    }
+
+    // Remove.
+    $('.pdfanno-search-result', iframeWindow.document).remove()
+
+    // Display.
+    searchHighlights.forEach((highlight, index) => {
+        const $textLayer = $(`.page[data-page-number="${highlight.page}"] .textLayer`, iframeWindow.document)
+        $textLayer.append(highlight.$elm)
+    })
+}
 
 function search({ hay, needle, isCaseSensitive = false, useRegexp = false }) {
     if (!needle) {
@@ -480,6 +527,9 @@ function search({ hay, needle, isCaseSensitive = false, useRegexp = false }) {
     }
     return positions
 }
+
+let searchPosition = 0
+let searchHighlights = []
 
 function doSearch () {
 
@@ -509,7 +559,13 @@ function doSearch () {
         return
     }
 
+    // Reset.
+    searchPosition = 0
+    searchHighlights = []
+
     pages.forEach(page => {
+
+        // Search.
         const positions = search({ hay : page.body, needle : text, isCaseSensitive, useRegexp })
 
         // Display highlights.
@@ -537,12 +593,19 @@ function doSearch () {
                     left       : fromX * scale+ 'px',
                     width      : (toX - fromX) * scale + 'px',
                     height     : (toY - fromY) * scale + 'px',
-                    background : 'rgba(255,0,0,.7)'
+                    // background : 'rgba(255,0,0,.7)'
                 })
                 $textLayer.append($div)
+                searchHighlights.push({ page : page.page, $elm : $div})
             })
         }
     })
+
+    // TODO 本当なら、現在のページの1つ目を指定できるように.
+    if (searchHighlights.length > 0) {
+        searchHighlights[0].$elm.addClass('pdfanno-search-result--highlight')
+    }
+
 }
 
 
