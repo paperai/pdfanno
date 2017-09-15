@@ -133,7 +133,12 @@
                         <div class="tab-pane active" id="tab3">
                             <!-- Search -->
                             <div class="u-mt-20 search-control">
-                                <input type="text" id="searchWord" class="form-control search-control__input" placeholder="Text to match" disabled>
+                                <div class="search-input-container">
+                                    <input type="text" id="searchWord" class="form-control search-control__input" placeholder="Text to match" disabled>
+                                    <p class="search-hit hidden">
+                                        <span class="search-current-position">0</span>/<span class="search-hit-count">0</span>
+                                    </p>
+                                </div>
                                 <button class="btn btn-default search-control__btn js-search-prev">▲</button>
                                 <button class="btn btn-default search-control__btn js-search-next">▼</button>
                             </div>

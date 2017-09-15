@@ -4,6 +4,7 @@
     Search UI.
 */
 .pdfanno-search-result {
+    position: absolute;
     background-color: rgba(0, 255, 0, 0.7)
 }
 .pdfanno-search-result--highlight {

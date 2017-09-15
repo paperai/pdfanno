@@ -358,30 +358,6 @@ function getDefaultPDFURL () {
 }
 
 
-/*
-    fuse.js sample.
-
-    http://fusejs.io/
-*/
-var books = [{
-  'title': "Old Man's War",
-  'author': 'John Scalzi',
-  'tags': ['fiction']
-}, {
-  'title': 'The Lock Artist',
-  'author': 'Steve',
-  'tags': ['thriller']
-}]
-var options = {
-  keys: ['author', 'tags']
-}
-var fuse = new Fuse(books, options)
-
-var result = fuse.search('tion')
-console.log('fuse result:', result)
-
-
-
 let pages = []
 
 function prepareSearch(pdfResult) {
@@ -485,6 +461,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
 function highlightSearchResult() {
 
+    $('.search-current-position').text(searchPosition + 1)
+
     $('.pdfanno-search-result', iframeWindow.document).removeClass('pdfanno-search-result--highlight')
 
     const highlight = searchHighlights[searchPosition]
@@ -554,6 +532,7 @@ function doSearch () {
 
     // Remove highlights for search results.
     $('.pdfanno-search-result', iframeWindow.document).remove()
+    $('.search-hit').addClass('hidden')
 
     // Text
     const text = $('#searchWord').val()
@@ -599,18 +578,17 @@ function doSearch () {
                 const scale = iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale
                 let $div = $('<div class="pdfanno-search-result"/>')
                 $div.css({
-                    position   : 'absolute',
-                    top        : fromY * scale + 'px',
-                    left       : fromX * scale+ 'px',
-                    width      : (toX - fromX) * scale + 'px',
-                    height     : (toY - fromY) * scale + 'px',
-                    // background : 'rgba(255,0,0,.7)'
+                    top    : fromY * scale + 'px',
+                    left   : fromX * scale + 'px',
+                    width  : (toX - fromX) * scale + 'px',
+                    height : (toY - fromY) * scale + 'px'
                 })
                 $textLayer.append($div)
                 searchHighlights.push({ page : page.page, originalY : fromY, $elm : $div})
             })
         }
     })
+
 
     if (searchHighlights.length > 0) {
         // Init highlight at the current page.
@@ -624,7 +602,7 @@ function doSearch () {
         highlightSearchResult()
     }
 
+    $('.search-hit').removeClass('hidden')
+    $('.search-current-position').text(searchPosition + 1)
+    $('.search-hit-count').text(searchHighlights.length)
 }
-
-
-
