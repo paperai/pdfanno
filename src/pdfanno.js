@@ -435,20 +435,37 @@ function prepareSearch(pdfResult) {
     $('#searchWord').removeAttr('disabled')
 }
 
-/*
-var re = /bar/g,
-    str = "foobarfoobar";
-while ((match = re.exec(str)) != null) {
-    console.log("match found at " + match.index, (match.index + match[0].length), match);
-}
-*/
+window.addEventListener('DOMContentLoaded', () => {
+
+    const DELAY = 500
+    let timerId
+
+    $('#searchWord').on('keyup', e => {
+
+        if (timerId) {
+            clearTimeout(timerId)
+            timerId = null
+        }
+
+        timerId = setTimeout(() => {
+            doSearch()
+        }, DELAY)
+    })
+
+    $('.js-search-case-sensitive, .js-search-regexp').on('change', () => {
+        doSearch();
+    })
+
+    // Re-render the search results.
+    window.addEventListener('pagerendered', doSearch)
+})
+
 function search({ hay, needle, isCaseSensitive = false }) {
-    // console.log('search:', hay, needle)
     if (!needle) {
         return []
     }
     const SPECIAL_CHARS_REGEX = /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g
-    const flags = 'g' + (isCaseSensitive ? 'i' : '')
+    const flags = 'g' + (isCaseSensitive === false ? 'i' : '')
     let re = new RegExp(needle.replace(SPECIAL_CHARS_REGEX, '\\$&'), flags)
     let positions = []
     let match
@@ -461,75 +478,42 @@ function search({ hay, needle, isCaseSensitive = false }) {
     return positions
 }
 
-window.addEventListener('DOMContentLoaded', () => {
+function doSearch () {
 
-    const DELAY = 500
-    let timerId
+    // TODO Display hit counts?
 
-    $('#searchWord').on('keyup', e => {
-        // const text = $(e.currentTarget).val()
+    // Check enable.
+    if ($('#searchWord').is('[disabled]')) {
+        console.log('Search function is not enabled yet.')
+        return
+    }
 
-        // TODO ここから.
-        // const options = {
-        //     // includeMatches: true,
-        //     tokenize: true,
-        //     findAllMatches: true,
-        //     includeMatches: true,
-        //     threshold: 0.0,
-        //     location: 0,
-        //     distance: 0,
-        //     maxPatternLength: 32,
-        //     minMatchCharLength: 1,
-        //     keys: ['body']
-        // }
-
-        // const fuse = new Fuse(pages, options)
-        // const result = fuse.search(text)
-        // console.log(`text=${text}, fuse result:`, result)
-
-        if (timerId) {
-            clearTimeout(timerId)
-            timerId = null
-        }
-
-        timerId = setTimeout(() => {
-            doSearch()
-        }, DELAY)
-    })
-})
-
-function doSearch() {
+    // Remove highlights for search results.
+    $('.pdfanno-search-result', iframeWindow.document).remove()
 
     // Text
     const text = $('#searchWord').val()
     // Case Sensitive
     const isCaseSensitive = $('.js-search-case-sensitive')[0].checked
-    // TODO ここから実装する.
+    // Use Regexp.
+    const useRegexp = $('.js-search-regexp')[0].checked
 
+    console.log(`doSearch: text="${text}", caseSensitive=${isCaseSensitive}, regexp=${useRegexp}`)
 
-
-    // TODO 件数表示とか
-    // TODO 検索条件指定とか（caseSensitiveなど）
-
+    // The min length of text for searching.
     const MIN_LEN = 2
-
-    // Remove search result highlights.
-    $('.pdfanno-search-result', iframeWindow.document).remove()
-
-    if (text.length <= MIN_LEN) {
+    if (text.length < MIN_LEN) {
         return
     }
 
     pages.forEach(page => {
-        const positions = search({ hay : page.body, needle : text, isCaseSensitive : true })
-        // console.log('positions:', positions)
+        const positions = search({ hay : page.body, needle : text, isCaseSensitive })
 
-        // 表示する
+        // Display highlights.
         if (positions.length > 0) {
             positions.forEach(position => {
-                const { start, end } = position
                 const $textLayer = $(`.page[data-page-number="${page.page}"] .textLayer`, iframeWindow.document)
-                const infos = page.meta.slice(start, end)
+                const infos = page.meta.slice(position.start, position.end)
                 // console.log('infos:', infos)
                 let fromX, toX, fromY, toY
                 infos.forEach(info => {
