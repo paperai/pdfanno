@@ -612,9 +612,15 @@ function doSearch () {
         }
     })
 
-    // TODO 本当なら、現在のページの1つ目を指定できるように.
     if (searchHighlights.length > 0) {
-        // searchHighlights[0].$elm.addClass('pdfanno-search-result--highlight')
+        // Init highlight at the current page.
+        const currentPage = iframeWindow.PDFViewerApplication.page
+        for (let i = 0; i < searchHighlights.length; i++) {
+            if (currentPage === searchHighlights[i].page) {
+                searchPosition = i
+                break
+            }
+        }
         highlightSearchResult()
     }
 
