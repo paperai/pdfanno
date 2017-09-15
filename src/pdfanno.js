@@ -479,16 +479,27 @@ window.addEventListener('DOMContentLoaded', () => {
             searchPosition = 0
         }
 
-        $('.pdfanno-search-result', iframeWindow.document).removeClass('pdfanno-search-result--highlight')
-
-        const highlight = searchHighlights[searchPosition]
-        highlight.$elm.addClass('pdfanno-search-result--highlight')
-
-        console.log(`highlight: index=${searchPosition}, page=${highlight.page}`)
-
-        // TODO その位置までスクロール.
+        highlightSearchResult()
     })
 })
+
+function highlightSearchResult() {
+
+    $('.pdfanno-search-result', iframeWindow.document).removeClass('pdfanno-search-result--highlight')
+
+    const highlight = searchHighlights[searchPosition]
+    highlight.$elm.addClass('pdfanno-search-result--highlight')
+
+    console.log(`highlight: index=${searchPosition}, page=${highlight.page}`)
+
+    // Scroll to.
+    let pageHeight = window.annoPage.getViewerViewport().height
+    let scale = window.annoPage.getViewerViewport().scale
+    let _y = (pageHeight + paddingBetweenPages) * (highlight.page - 1) + highlight.originalY * scale
+    _y -= 100
+    $('#viewer iframe').contents().find('#viewer').parent()[0].scrollTop = _y
+
+}
 
 function rerenderSearchResults() {
 
@@ -596,14 +607,15 @@ function doSearch () {
                     // background : 'rgba(255,0,0,.7)'
                 })
                 $textLayer.append($div)
-                searchHighlights.push({ page : page.page, $elm : $div})
+                searchHighlights.push({ page : page.page, originalY : fromY, $elm : $div})
             })
         }
     })
 
     // TODO 本当なら、現在のページの1つ目を指定できるように.
     if (searchHighlights.length > 0) {
-        searchHighlights[0].$elm.addClass('pdfanno-search-result--highlight')
+        // searchHighlights[0].$elm.addClass('pdfanno-search-result--highlight')
+        highlightSearchResult()
     }
 
 }
