@@ -460,13 +460,16 @@ window.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('pagerendered', doSearch)
 })
 
-function search({ hay, needle, isCaseSensitive = false }) {
+function search({ hay, needle, isCaseSensitive = false, useRegexp = false }) {
     if (!needle) {
         return []
     }
     const SPECIAL_CHARS_REGEX = /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g
     const flags = 'g' + (isCaseSensitive === false ? 'i' : '')
-    let re = new RegExp(needle.replace(SPECIAL_CHARS_REGEX, '\\$&'), flags)
+    if (useRegexp === false) {
+        needle = needle.replace(SPECIAL_CHARS_REGEX, '\\$&')
+    }
+    let re = new RegExp(needle, flags)
     let positions = []
     let match
     while ((match = re.exec(hay)) != null) {
@@ -507,7 +510,7 @@ function doSearch () {
     }
 
     pages.forEach(page => {
-        const positions = search({ hay : page.body, needle : text, isCaseSensitive })
+        const positions = search({ hay : page.body, needle : text, isCaseSensitive, useRegexp })
 
         // Display highlights.
         if (positions.length > 0) {
@@ -521,13 +524,11 @@ function doSearch () {
                         return
                     }
                     const [ x, y, w, h ] = info.split('\t').slice(3, 7).map(parseFloat)
-                    // console.log(x, y, w, h)
                     fromX = (fromX === undefined ? x : Math.min(x, fromX))
                     toX = (toX === undefined ? (x + w) : Math.max((x + w), toX))
                     fromY = (fromY === undefined ? y : Math.min(y, fromY))
                     toY = (toY === undefined ? (y + h) : Math.max((y + h), toY))
                 })
-                // console.log('from:to', fromX, toX, fromY, toY)
                 const scale = iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale
                 let $div = $('<div class="pdfanno-search-result"/>')
                 $div.css({
