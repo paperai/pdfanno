@@ -8,7 +8,7 @@ import Fuse from 'fuse.js'
 import * as annoUI from 'anno-ui'
 
 import { dispatchWindowEvent } from './shared/util'
-import { convertToExportY, getPageSize, paddingBetweenPages } from './shared/coords'
+import { convertToExportY, convertFromExportY, getPageSize, paddingBetweenPages } from './shared/coords'
 import {
     listenWindowLeaveEvent,
     unlistenWindowLeaveEvent,
@@ -473,7 +473,7 @@ function highlightSearchResult() {
     // Scroll to.
     let pageHeight = window.annoPage.getViewerViewport().height
     let scale = window.annoPage.getViewerViewport().scale
-    let _y = (pageHeight + paddingBetweenPages) * (highlight.page - 1) + highlight.originalY * scale
+    let _y = (pageHeight + paddingBetweenPages) * (highlight.page - 1) + highlight.top * scale
     _y -= 100
     $('#viewer iframe').contents().find('#viewer').parent()[0].scrollTop = _y
 
@@ -517,8 +517,8 @@ function search({ hay, needle, isCaseSensitive = false, useRegexp = false }) {
     return positions
 }
 
-let searchPosition = 0
-let searchHighlights = []
+window.searchPosition = -1
+window.searchHighlights = []
 
 function doSearch () {
 
@@ -550,7 +550,7 @@ function doSearch () {
     }
 
     // Reset.
-    searchPosition = 0
+    searchPosition = -1
     searchHighlights = []
 
     pages.forEach(page => {
@@ -584,7 +584,15 @@ function doSearch () {
                     height : (toY - fromY) * scale + 'px'
                 })
                 $textLayer.append($div)
-                searchHighlights.push({ page : page.page, originalY : fromY, $elm : $div})
+                // TODO 後で、改行されたものとかにも対応できるようにする（その場合は、rectsが複数）
+                const aPosition = [[ fromX, fromY, (toX - fromX), (toY - fromY) ]]
+                searchHighlights.push({
+                    page           : page.page,
+                    top            : fromY,
+                    position       : aPosition,
+                    $elm           : $div,
+                    text
+                })
             })
         }
     })

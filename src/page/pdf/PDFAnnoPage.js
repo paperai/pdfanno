@@ -247,16 +247,54 @@ export default class PDFAnnoPage {
      * Create a Span annotation.
      */
     createSpan ({ text = null } = {}) {
+        // TODO Refactoring: a little too long.
 
+        // Get user selection.
         const rects = window.iframeWindow.PDFAnnoCore.default.UI.getRectangles()
 
+        // Use a search result.
+        let highlight;
+        if (window.searchPosition > -1) {
+            highlight = window.searchHighlights[window.searchPosition]
+        }
+
         // Check empty.
-        if (!rects) {
+        if (!rects && !highlight) {
             return annoUI.ui.alertDialog.show({ message : 'Text span is not selected.' })
         }
 
         // Create a new rectAnnotation.
-        window.iframeWindow.PDFAnnoCore.default.UI.createSpan({ text })
+        if (rects) {
+            window.iframeWindow.PDFAnnoCore.default.UI.createSpan({ text })
+
+        } else if (highlight) {
+
+            const s = new SpanAnnotation({
+                page : highlight.page,
+                position: highlight.position,
+                label : text,
+                text : highlight.text
+                // id : 1
+            });
+            window.add(s);
+
+            // TODO Refactoring.
+            var event = document.createEvent('CustomEvent')
+            event.initCustomEvent('enableTextInput', true, true, {
+                uuid : s.annotation.uuid,
+                text : text,
+                autoFocus : true
+            })
+            window.dispatchEvent(event)
+
+
+            // window.iframeWindow.PDFAnnoCore.default.UI.createSpan({
+            //     text,
+            //     selectedText : highlight.text,
+            //     rects        : highlight.rects
+            // })
+        }
+
 
         // Notify annotation added.
         dispatchWindowEvent('annotationrendered')
