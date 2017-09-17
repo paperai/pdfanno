@@ -429,7 +429,18 @@ window.addEventListener('DOMContentLoaded', () => {
     })
 
     $('.js-search-case-sensitive, .js-search-regexp').on('change', () => {
-        doSearch();
+        doSearch()
+    })
+
+    $('.js-search-case-sensitive, .js-search-regexp').on('click', e => {
+        $(e.currentTarget).blur()
+    })
+
+    $('.js-search-clear').on('click', e => {
+        // Clear search.
+        $('#searchWord').val('')
+        doSearch()
+        $(e.currentTarget).blur()
     })
 
     // Re-render the search results.
@@ -543,15 +554,15 @@ function doSearch () {
 
     console.log(`doSearch: text="${text}", caseSensitive=${isCaseSensitive}, regexp=${useRegexp}`)
 
+    // Reset.
+    searchPosition = -1
+    searchHighlights = []
+
     // The min length of text for searching.
     const MIN_LEN = 2
     if (text.length < MIN_LEN) {
         return
     }
-
-    // Reset.
-    searchPosition = -1
-    searchHighlights = []
 
     pages.forEach(page => {
 
