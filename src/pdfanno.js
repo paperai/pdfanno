@@ -2,12 +2,13 @@ require("file-loader?name=dist/index.html!./index.html")
 require("!style-loader!css-loader!./pdfanno.css")
 
 import axios from 'axios'
+import Fuse from 'fuse.js'
 
 // UI parts.
 import * as annoUI from 'anno-ui'
 
 import { dispatchWindowEvent } from './shared/util'
-import { convertToExportY, getPageSize, paddingBetweenPages } from './shared/coords'
+import { convertToExportY, convertFromExportY, getPageSize, paddingBetweenPages } from './shared/coords'
 import {
     listenWindowLeaveEvent,
     unlistenWindowLeaveEvent,
@@ -182,6 +183,10 @@ window.addEventListener('DOMContentLoaded', e => {
     annoUI.uploadButton.setup({
         getCurrentDisplayContentFile : () => {
             return window.annoPage.getCurrentContentFile()
+        },
+        uploadFinishCallback : (resultText) => {
+            console.log('resultText:\n', resultText)
+            prepareSearch(resultText)
         }
     })
 
@@ -255,6 +260,8 @@ window.addEventListener('DOMContentLoaded', e => {
             // Set the analyzeResult.
             annoUI.uploadButton.setResult(analyzeResult)
 
+            prepareSearch(analyzeResult)
+
             // Display upload tab.
             $('a[href="#tab2"]').click()
 
@@ -274,12 +281,14 @@ window.addEventListener('DOMContentLoaded', e => {
         window.annoPage.startViewerApplication()
 
         // Load the default PDF, and save it.
-        loadPDF(getDefaultPDFURL()).then(({ pdf }) => {
+        loadPDF(getDefaultPDFURL()).then(({ pdf, analyzeResult }) => {
             // Set as current.
             window.annoPage.setCurrentContentFile({
                 name    : DEFAULT_PDF_NAME,
                 content : pdf
             })
+
+            prepareSearch(analyzeResult)
         })
     }
 
@@ -346,4 +355,273 @@ function getDefaultPDFURL () {
     const pathnames = location.pathname.split('/')
     const pdfURL = location.protocol + '//' + location.hostname + ':' + location.port + pathnames.slice(0, pathnames.length-1).join('/') + '/pdfs/' + DEFAULT_PDF_NAME
     return pdfURL
+}
+
+
+let pages = []
+
+function prepareSearch(pdfResult) {
+    console.log('prepareSearch!!!', pdfResult.length)
+
+    pages = []
+
+    let page
+    let body
+    let meta
+    pdfResult.split('\n').forEach(line => {
+        if (page && !line) {
+            body += ' '
+            meta.push(line)
+        } else {
+            let [
+                pageNumber,
+                type,
+                char,
+                ...others
+            ] = line.split('\t')
+            pageNumber = parseInt(pageNumber, 10)
+            if (!page) {
+                page = pageNumber
+                body = ''
+                meta = []
+            } else if (page !== pageNumber) {
+                pages.push({
+                    body,
+                    meta,
+                    page
+                })
+                body = ''
+                meta = []
+                page = pageNumber
+            }
+            if (type === 'TEXT') {
+                body += char
+                meta.push(line)
+            }
+        }
+    })
+    pages.push({
+        body,
+        meta,
+        page
+    })
+    console.log('pages:', pages)
+
+    // Enable search input field.
+    $('#searchWord').removeAttr('disabled')
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+
+    const DELAY = 500
+    let timerId
+
+    $('#searchWord').on('keyup', e => {
+
+        if (timerId) {
+            clearTimeout(timerId)
+            timerId = null
+        }
+
+        timerId = setTimeout(() => {
+            doSearch()
+        }, DELAY)
+    })
+
+    $('.js-search-case-sensitive, .js-search-regexp').on('change', () => {
+        doSearch()
+    })
+
+    $('.js-search-case-sensitive, .js-search-regexp').on('click', e => {
+        $(e.currentTarget).blur()
+    })
+
+    $('.js-search-clear').on('click', e => {
+        // Clear search.
+        $('#searchWord').val('')
+        doSearch()
+        $(e.currentTarget).blur()
+    })
+
+    // Re-render the search results.
+    window.addEventListener('pagerendered', rerenderSearchResults)
+
+
+    $('.js-search-prev, .js-search-next').on('click', e => {
+
+        // No action for no results.
+        if (searchHighlights.length === 0) {
+            return
+        }
+
+        // go to next or prev.
+        let num = 1
+        if ($(e.currentTarget).hasClass('js-search-prev')) {
+            num = -1
+        }
+        searchPosition += num
+        if (searchPosition < 0) {
+            searchPosition = searchHighlights.length - 1
+        } else if (searchPosition >= searchHighlights.length) {
+            searchPosition = 0
+        }
+
+        highlightSearchResult()
+    })
+})
+
+function highlightSearchResult() {
+
+    $('.search-current-position').text(searchPosition + 1)
+
+    $('.pdfanno-search-result', iframeWindow.document).removeClass('pdfanno-search-result--highlight')
+
+    const highlight = searchHighlights[searchPosition]
+    highlight.$elm.addClass('pdfanno-search-result--highlight')
+
+    console.log(`highlight: index=${searchPosition}, page=${highlight.page}`)
+
+    // Scroll to.
+    let pageHeight = window.annoPage.getViewerViewport().height
+    let scale = window.annoPage.getViewerViewport().scale
+    let _y = (pageHeight + paddingBetweenPages) * (highlight.page - 1) + highlight.top * scale
+    _y -= 100
+    $('#viewer iframe').contents().find('#viewer').parent()[0].scrollTop = _y
+
+}
+
+function rerenderSearchResults() {
+
+    // No action for no results.
+    if (searchHighlights.length === 0) {
+        return
+    }
+
+    // Remove.
+    $('.pdfanno-search-result', iframeWindow.document).remove()
+
+    // Display.
+    searchHighlights.forEach((highlight, index) => {
+        const $textLayer = $(`.page[data-page-number="${highlight.page}"] .textLayer`, iframeWindow.document)
+        $textLayer.append(highlight.$elm)
+    })
+}
+
+function search({ hay, needle, isCaseSensitive = false, useRegexp = false }) {
+    if (!needle) {
+        return []
+    }
+    const SPECIAL_CHARS_REGEX = /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g
+    const flags = 'g' + (isCaseSensitive === false ? 'i' : '')
+    if (useRegexp === false) {
+        needle = needle.replace(SPECIAL_CHARS_REGEX, '\\$&')
+    }
+    let re = new RegExp(needle, flags)
+    let positions = []
+    let match
+    while ((match = re.exec(hay)) != null) {
+        positions.push({
+            start : match.index,
+            end   : match.index + match[0].length
+        })
+    }
+    return positions
+}
+
+window.searchPosition = -1
+window.searchHighlights = []
+
+function doSearch () {
+
+    // TODO Display hit counts?
+
+    // Check enable.
+    if ($('#searchWord').is('[disabled]')) {
+        console.log('Search function is not enabled yet.')
+        return
+    }
+
+    // Remove highlights for search results.
+    $('.pdfanno-search-result', iframeWindow.document).remove()
+    $('.search-hit').addClass('hidden')
+
+    // Text
+    const text = $('#searchWord').val()
+    // Case Sensitive
+    const isCaseSensitive = $('.js-search-case-sensitive')[0].checked
+    // Use Regexp.
+    const useRegexp = $('.js-search-regexp')[0].checked
+
+    console.log(`doSearch: text="${text}", caseSensitive=${isCaseSensitive}, regexp=${useRegexp}`)
+
+    // Reset.
+    searchPosition = -1
+    searchHighlights = []
+
+    // The min length of text for searching.
+    const MIN_LEN = 2
+    if (text.length < MIN_LEN) {
+        return
+    }
+
+    pages.forEach(page => {
+
+        // Search.
+        const positions = search({ hay : page.body, needle : text, isCaseSensitive, useRegexp })
+
+        // Display highlights.
+        if (positions.length > 0) {
+            positions.forEach(position => {
+                const $textLayer = $(`.page[data-page-number="${page.page}"] .textLayer`, iframeWindow.document)
+                const infos = page.meta.slice(position.start, position.end)
+                // console.log('infos:', infos)
+                let fromX, toX, fromY, toY
+                infos.forEach(info => {
+                    if (!info) {
+                        return
+                    }
+                    const [ x, y, w, h ] = info.split('\t').slice(3, 7).map(parseFloat)
+                    fromX = (fromX === undefined ? x : Math.min(x, fromX))
+                    toX = (toX === undefined ? (x + w) : Math.max((x + w), toX))
+                    fromY = (fromY === undefined ? y : Math.min(y, fromY))
+                    toY = (toY === undefined ? (y + h) : Math.max((y + h), toY))
+                })
+                const scale = iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale
+                let $div = $('<div class="pdfanno-search-result"/>')
+                $div.css({
+                    top    : fromY * scale + 'px',
+                    left   : fromX * scale + 'px',
+                    width  : (toX - fromX) * scale + 'px',
+                    height : (toY - fromY) * scale + 'px'
+                })
+                $textLayer.append($div)
+                // TODO 後で、改行されたものとかにも対応できるようにする（その場合は、rectsが複数）
+                const aPosition = [[ fromX, fromY, (toX - fromX), (toY - fromY) ]]
+                searchHighlights.push({
+                    page           : page.page,
+                    top            : fromY,
+                    position       : aPosition,
+                    $elm           : $div,
+                    text
+                })
+            })
+        }
+    })
+
+
+    if (searchHighlights.length > 0) {
+        // Init highlight at the current page.
+        const currentPage = iframeWindow.PDFViewerApplication.page
+        for (let i = 0; i < searchHighlights.length; i++) {
+            if (currentPage === searchHighlights[i].page) {
+                searchPosition = i
+                break
+            }
+        }
+        highlightSearchResult()
+    }
+
+    $('.search-hit').removeClass('hidden')
+    $('.search-current-position').text(searchPosition + 1)
+    $('.search-hit-count').text(searchHighlights.length)
 }

@@ -34,8 +34,11 @@ function getSelectionRects () {
 /**
  * Handle document.mouseup event.
  */
-function handleDocumentMouseup (text) {
-    let { rects, selectedText } = getSelectionRects()
+function handleDocumentMouseup (text, selectedText = null, rects = null, useOriginalCoords = false) {
+    if (!selectedText && !rects) {
+        var { rects, selectedText } = getSelectionRects()
+    }
+    console.log('rects=', rects)
     let annotation
     if (rects) {
         annotation = saveSpan([...rects].map((r) => {
@@ -45,7 +48,7 @@ function handleDocumentMouseup (text) {
                 width  : r.width,
                 height : r.height
             }
-        }), selectedText, text)
+        }), selectedText, text, useOriginalCoords)
     }
 
     removeSelection()
@@ -68,23 +71,36 @@ function removeSelection () {
  * @param {Array} rects The rects to use for annotation
  * @param {String} color The color of the rects
  */
-function saveSpan (rects, selectedText, text) {
+function saveSpan (rects, selectedText, text, useOriginalCoords) {
     let svg = getSVGLayer()
     let boundingRect = svg.getBoundingClientRect()
+
+    let br2 = scaleDown(svg, boundingRect)
 
     // Initialize the annotation
     let annotation = {
         rectangles : [...rects].map((r) => {
-            return scaleDown(svg, {
-                x      : r.left - boundingRect.left,
-                y      : r.top - boundingRect.top,
-                width  : r.width,
-                height : r.height
-            })
+            if (useOriginalCoords) {
+                return {
+                    x      : r.left - br2.left,
+                    y      : r.top - br2.top,
+                    width  : r.width,
+                    height : r.height
+                }
+            } else {
+                return scaleDown(svg, {
+                    x      : r.left - boundingRect.left,
+                    y      : r.top - boundingRect.top,
+                    width  : r.width,
+                    height : r.height
+                })
+            }
         }).filter((r) => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1),
         selectedText,
         text
     }
+
+    console.log('rects2:', annotation.rectangles)
 
     // Save.
     let spanAnnotation = SpanAnnotation.newInstance(annotation)
@@ -126,6 +142,6 @@ export function getRectangles () {
 /**
  * Create a span by current texts selection.
  */
-export function createSpan ({ text = null }) {
-    return handleDocumentMouseup(text)
+export function createSpan ({ text = null, selectedText = null, rects = null, useOriginalCoords = false }) {
+    return handleDocumentMouseup(text, selectedText, rects, useOriginalCoords)
 }
