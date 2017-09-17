@@ -89,11 +89,12 @@
                 <div style="padding-left: 15px; padding-right: 15px;">
 
                     <ul class="nav nav-tabs">
-                        <li class="active"><a  href="#tab1" data-toggle="tab">Annotation</a></li>
+                        <li><a  href="#tab1" data-toggle="tab">Annotation</a></li>
                         <li><a href="#tab2" data-toggle="tab">Server (Experimental)</a></li>
+                        <li class="active"><a href="#tab3" data-toggle="tab">Search</a></li>
                     </ul>
                     <div class="tab-content">
-                        <div id="tab1" class="tab-pane active">
+                        <div id="tab1" class="tab-pane">
                             <div class="u-mt-20">
                                 <input list=labels class="form-control inputLabel" id="inputLabel" disabled>
                                 <ul class="nav nav-tabs u-mt-10">
@@ -110,6 +111,8 @@
                                     <input type="file" class="hidden js-import-file" accept=".conf">
                                 </div>
                             </div>
+                            <br>
+                            <br>
                         </div> <!-- /#tab1 -->
                         <div class="tab-pane" id="tab2">
 							<div class="input-group u-mt-20">
@@ -127,6 +130,26 @@
                                 <textarea id="uploadResult" class="form-control" rows="30" wrap="off"></textarea>
                             </div>
                         </div> <!-- /#tab2 -->
+                        <div class="tab-pane active" id="tab3">
+                            <!-- Search -->
+                            <div class="u-mt-20 search-control">
+                                <div class="search-input-container">
+                                    <input type="text" id="searchWord" class="form-control search-control__input" placeholder="Text to match" disabled>
+                                    <p class="search-hit hidden">
+                                        <span class="search-current-position">0</span>/<span class="search-hit-count">0</span>
+                                    </p>
+                                </div>
+                                <button class="btn btn-default search-control__btn js-search-prev">▲</button>
+                                <button class="btn btn-default search-control__btn js-search-next">▼</button>
+                                <button class="btn search-control__btn js-search-clear">×</button>
+                            </div>
+                            <div class="checkbox">
+                                <label><input type="checkbox" value="on" class="js-search-case-sensitive">Case sensitive</label>
+                            </div>
+                            <div class="checkbox">
+                                <label><input type="checkbox" value="on" class="js-search-regexp">Regular expression</label>
+                            </div>
+                        </div> <!-- /#tab3 -->
                     </div>
                 </div>
             </div>
