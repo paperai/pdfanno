@@ -195,6 +195,7 @@ window.addEventListener('DOMContentLoaded', e => {
     let pdfURL
     let annoURL
     let moveTo
+    let tabIndex
     (location.search || '').replace('?', '').split('&')
         .filter(a => a)
         .forEach(fragment => {
@@ -205,6 +206,8 @@ window.addEventListener('DOMContentLoaded', e => {
                 annoURL = value
             } else if (key && key.toLowerCase() === 'move') {
                 moveTo = value
+            } else if (key && key.toLowerCase() === 'tab') {
+                tabIndex = parseInt(value, 10)
             }
     })
 
@@ -290,6 +293,11 @@ window.addEventListener('DOMContentLoaded', e => {
 
             prepareSearch(analyzeResult)
         })
+    }
+
+    // initial tab.
+    if (tabIndex) {
+        $(`.nav-tabs a[href="#tab${tabIndex}"]`).click()
     }
 
 })
