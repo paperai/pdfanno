@@ -1,5 +1,5 @@
-require("file-loader?name=dist/index.html!./index.html")
-require("!style-loader!css-loader!./pdfanno.css")
+require('file-loader?name=dist/index.html!./index.html')
+require('!style-loader!css-loader!./pdfanno.css')
 
 import axios from 'axios'
 import Fuse from 'fuse.js'
@@ -359,7 +359,7 @@ function loadExternalAnnoFile (url) {
  * Get the URL of the default PDF.
  */
 function getDefaultPDFURL () {
-    // e.g. https://paperai.github.io/pdfanno/pdfs/P12-1046.pdf
+    // e.g. https://paperai.github.io:80/pdfanno/pdfs/P12-1046.pdf
     const pathnames = location.pathname.split('/')
     const pdfURL = location.protocol + '//' + location.hostname + ':' + location.port + pathnames.slice(0, pathnames.length-1).join('/') + '/pdfs/' + DEFAULT_PDF_NAME
     return pdfURL
