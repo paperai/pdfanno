@@ -432,11 +432,13 @@ window.addEventListener('DOMContentLoaded', () => {
         }
 
         timerId = setTimeout(() => {
+            window.searchType = 'text'
             doSearch()
         }, DELAY)
     })
 
     $('.js-search-case-sensitive, .js-search-regexp').on('change', () => {
+        window.searchType = 'text'
         doSearch()
     })
 
@@ -447,6 +449,7 @@ window.addEventListener('DOMContentLoaded', () => {
     $('.js-search-clear').on('click', e => {
         // Clear search.
         $('#searchWord').val('')
+        window.searchType = null
         doSearch()
         $(e.currentTarget).blur()
     })
@@ -456,6 +459,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
     $('.js-search-prev, .js-search-next').on('click', e => {
+
+        if (window.searchType !== 'text') {
+            return
+        }
 
         // No action for no results.
         if (searchHighlights.length === 0) {
@@ -536,12 +543,11 @@ function search({ hay, needle, isCaseSensitive = false, useRegexp = false }) {
     return positions
 }
 
+window.searchType = null
 window.searchPosition = -1
 window.searchHighlights = []
 
-function doSearch () {
-
-    // TODO Display hit counts?
+function doSearch ({ query = null } = {}) {
 
     // Check enable.
     if ($('#searchWord').is('[disabled]')) {
@@ -552,15 +558,22 @@ function doSearch () {
     // Remove highlights for search results.
     $('.pdfanno-search-result', iframeWindow.document).remove()
     $('.search-hit').addClass('hidden')
+    $('.js-dict-match-cur-pos, .js-dict-match-hit-counts').text('000')
 
-    // Text
-    const text = $('#searchWord').val()
-    // Case Sensitive
-    const isCaseSensitive = $('.js-search-case-sensitive')[0].checked
-    // Use Regexp.
-    const useRegexp = $('.js-search-regexp')[0].checked
+    let text
+    let isCaseSensitive
+    let useRegexp
+    if (window.searchType === 'text') {
+        text = $('#searchWord').val()
+        isCaseSensitive = $('.js-search-case-sensitive')[0].checked
+        useRegexp = $('.js-search-regexp')[0].checked
+    } else {
+        text = query
+        isCaseSensitive = $('.js-dict-match-case-sensitive')[0].checked
+        useRegexp = true
+    }
 
-    console.log(`doSearch: text="${text}", caseSensitive=${isCaseSensitive}, regexp=${useRegexp}`)
+    console.log(`doSearch: searchType=${window.searchType} text="${text}", caseSensitive=${isCaseSensitive}, regexp=${useRegexp}`)
 
     // Reset.
     searchPosition = -1
@@ -568,7 +581,7 @@ function doSearch () {
 
     // The min length of text for searching.
     const MIN_LEN = 2
-    if (text.length < MIN_LEN) {
+    if (!text || text.length < MIN_LEN) {
         return
     }
 
@@ -629,7 +642,101 @@ function doSearch () {
         highlightSearchResult()
     }
 
-    $('.search-hit').removeClass('hidden')
-    $('.search-current-position').text(searchPosition + 1)
-    $('.search-hit-count').text(searchHighlights.length)
+    if (window.searchType === 'text') {
+        $('.search-hit').removeClass('hidden')
+        $('.search-current-position').text(searchPosition + 1)
+        $('.search-hit-count').text(searchHighlights.length)
+    } else {
+        // Dict matching.
+        $('.js-dict-match-cur-pos').text(window.searchPosition + 1)
+        $('.js-dict-match-hit-counts').text(searchHighlights.length)
+    }
+}
+
+let dictonaryTexts;
+
+/**
+ * Dictonary Matching.
+ */
+window.addEventListener('DOMContentLoaded', () => {
+
+    // Clear prev cache.
+    $('.js-dict-match-file :file').on('click', e => {
+        $(e.currentTarget).val(null)
+    })
+
+    // Load a dictionary for matching.
+    $('.js-dict-match-file :file').on('change', e => {
+
+        const files = e.target.files
+        if (files.length === 0) {
+            annoUI.ui.alertDialog.show({ message : 'Select a file.' })
+            return
+        }
+
+        const fname = files[0].name
+        $('.js-dict-match-file-name').text(fname)
+
+        let fileReader = new FileReader()
+        fileReader.onload = ev => {
+            const texts = ev.target.result.split('\n').map(t => {
+                return t.trim()
+            }).filter(t => {
+                return t
+            })
+            if (texts.length === 0) {
+                annoUI.ui.alertDialog.show({ message : 'No text is found in the dictionary file.' })
+                return
+            }
+            dictonaryTexts = texts
+            searchByDictionary(texts)
+        }
+        fileReader.readAsText(files[0])
+    })
+
+    // Clear search results.
+    $('.js-dict-match-clear').on('click', e => {
+        window.searchType = null
+        doSearch()
+        $(e.currentTarget).blur()
+    })
+
+    // Go to the prev/next result.
+    $('.js-dict-match-prev, .js-dict-match-next').on('click', e => {
+
+        if (window.searchType !== 'dictionary') {
+            return
+        }
+
+        // No action for no results.
+        if (searchHighlights.length === 0) {
+            return
+        }
+
+        // go to next or prev.
+        let num = 1
+        if ($(e.currentTarget).hasClass('js-dict-match-prev')) {
+            num = -1
+        }
+        searchPosition += num
+        if (searchPosition < 0) {
+            searchPosition = searchHighlights.length - 1
+        } else if (searchPosition >= searchHighlights.length) {
+            searchPosition = 0
+        }
+
+        highlightSearchResult()
+    })
+
+    // Set the search behavior.
+    $('.js-dict-match-case-sensitive').on('change', () => {
+        searchByDictionary(dictonaryTexts)
+    })
+})
+
+function searchByDictionary(texts = []) {
+    console.log('searchByDictionary:', texts)
+    window.searchType = 'dictionary'
+    const query = texts.join('|')
+    doSearch({ query })
 }
