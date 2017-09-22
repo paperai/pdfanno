@@ -1,68 +1,68 @@
-import { convertFromExportY } from '../shared/coords';
-import toml from 'toml';
+import { convertFromExportY } from '../shared/coords'
+import toml from 'toml'
 
 /**
  * Add all annotations.
  *
  * This method expect to get argument made from a TOML file parsed by `window.readTOML`.
  */
-export function addAllAnnotations(tomlObject) {
+export function addAllAnnotations (tomlObject) {
 
-    let result = {};
+    let result = {}
 
     for (const key in tomlObject) {
 
-        let data = tomlObject[key];
+        let data = tomlObject[key]
 
         if (typeof data !== 'object') {
-            continue;
+            continue
         }
 
-        data.id = key;
+        data.id = key
 
-        let a;
+        let a
         if (data.type === 'span') {
-            a = new PublicSpanAnnotation(data);
+            a = new PublicSpanAnnotation(data)
         } else if (data.type === 'rect') {
-            a = new PublicRectAnnotation(data);
+            a = new PublicRectAnnotation(data)
         } else if (data.type === 'relation') {
-            a = new PublicRelationAnnotation(data);
+            a = new PublicRelationAnnotation(data)
         } else {
-            console.log('Unknown: ', key, data);
+            console.log('Unknown: ', key, data)
         }
 
         if (a) {
-            addAnnotation(a);
-            result[key] = a;
+            addAnnotation(a)
+            result[key] = a
         }
     }
 
-    return result;
+    return result
 
 }
 
 /**
  * Add an annotation, and render it.
  */
-export function addAnnotation(publicAnnotation) {
+export function addAnnotation (publicAnnotation) {
 
-    let a = publicAnnotation.annotation;
-    window.annoPage.addAnnotation(a);
-    a.render();
-    a.enableViewMode();
-    a.save();
+    let a = publicAnnotation.annotation
+    window.annoPage.addAnnotation(a)
+    a.render()
+    a.enableViewMode()
+    a.save()
 
     // Restore the status of AnnoTools.
-    window.annoPage.disableAnnotateFunctions();
-    window.annoPage.enableAnnotateFunction(window.currentAnnoToolType);
+    window.annoPage.disableAnnotateFunctions()
+    window.annoPage.enableAnnotateFunction(window.currentAnnoToolType)
 }
 
 /**
  * Delete an annotation, and also detach it from view.
  */
-export function deleteAnnotation(publicAnnotation) {
+export function deleteAnnotation (publicAnnotation) {
 
-    publicAnnotation.annotation.destroy();
+    publicAnnotation.annotation.destroy()
 }
 
 /**
@@ -73,18 +73,18 @@ export class PublicRectAnnotation {
     /**
      * Create a rect annotation from a TOML data.
      */
-    constructor({ page, position, label='', id=0 }) {
+    constructor ({ page, position, label = '', id = 0 }) {
 
         // Check inputs.
         if (!page || typeof page !== 'number') {
-            throw 'Set the page as number.';
+            throw new Error('Set the page as number.')
         }
         if (!position || position.length !== 4) {
-            throw 'Set the position which includes `x`, `y`, `width` and `height`.';
+            throw new Error('Set the position which includes `x`, `y`, `width` and `height`.')
         }
 
         // position: String -> Float.
-        position = position.map(p => parseFloat(p));
+        position = position.map(p => parseFloat(p))
 
         let rect = window.annoPage.createRectAnnotation({
             uuid     : id && String(id), // annotationid must be string.
@@ -93,11 +93,11 @@ export class PublicRectAnnotation {
             width    : position[2],
             height   : position[3],
             text     : label,
-            color    : "#FF0000",
+            color    : '#FF0000',
             readOnly : false
-        });
+        })
 
-        this.annotation = rect;
+        this.annotation = rect
     }
 }
 
@@ -106,18 +106,18 @@ export class PublicRectAnnotation {
  */
 export class PublicSpanAnnotation {
 
-    constructor({ page, position, label='', text='', id=0 }) {
+    constructor ({ page, position, label = '', text = '', id = 0 }) {
 
         // Check inputs.
         if (!page || typeof page !== 'number') {
-            throw 'Set the page as number.';
+            throw new Error('Set the page as number.')
         }
         if (!position) {
-            throw 'Set the position.';
+            throw new Error('Set the position.')
         }
 
         // position: String -> Float.
-        position = position.map(p => p.map(pp => parseFloat(pp)));
+        position = position.map(p => p.map(pp => parseFloat(pp)))
 
         // Convert.
         position = position.map(p => {
@@ -128,7 +128,7 @@ export class PublicSpanAnnotation {
                 width  : p[2],
                 height : p[3]
             }
-        });
+        })
 
         let span = window.annoPage.createSpanAnnotation({
             // TODO 既存のものとかぶるのではないか？
@@ -138,9 +138,9 @@ export class PublicSpanAnnotation {
             color        : '#FFFF00',
             readOnly     : false,
             selectedText : text
-        });
+        })
 
-        this.annotation = span;
+        this.annotation = span
     }
 }
 
@@ -149,14 +149,14 @@ export class PublicSpanAnnotation {
  */
 export class PublicRelationAnnotation {
 
-    constructor({ dir, ids, label='', id=0 }) {
+    constructor ({ dir, ids, label = '', id = 0 }) {
 
         // Check inputs.
         if (!dir) {
-            throw 'Set the dir.';
+            throw new Error('Set the dir.')
         }
         if (!ids || ids.length !== 2) {
-            throw 'Set the ids.';
+            throw new Error('Set the ids.')
         }
 
         let r = window.annoPage.createRelationAnnotation({
@@ -166,22 +166,22 @@ export class PublicRelationAnnotation {
             rel1      : typeof ids[0] === 'object' ? ids[0].annotation : ids[0],
             rel2      : typeof ids[1] === 'object' ? ids[1].annotation : ids[1],
             text      : label,
-            color     : "#FF0000",
+            color     : '#FF0000',
             readOnly  : false
-        });
+        })
 
-        this.annotation = r;
+        this.annotation = r
     }
 }
 
 /**
  * TOML parser.
  */
-export const readTOML = toml.parse;
+export const readTOML = toml.parse
 
 /**
  * Delete all annotations.
  */
-export function clear() {
-    window.annoPage.clearAllAnnotations();
+export function clear () {
+    window.annoPage.clearAllAnnotations()
 }

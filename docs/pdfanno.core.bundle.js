@@ -85,58 +85,58 @@ return /******/ (function(modules) { // webpackBootstrap
 /**
  * Convert the `y` position from the local coords to exported json.
  */
-function convertToExportY(y) {
+function convertToExportY (y) {
 
-    let meta = getPageSize();
+    let meta = getPageSize()
 
-    y -= paddingTop;
+    y -= paddingTop
 
-    let pageHeight = meta.height + paddingBetweenPages;
+    let pageHeight = meta.height + paddingBetweenPages
 
-    let pageNumber = Math.floor(y / pageHeight) + 1;
-    let yInPage = y - (pageNumber-1) * pageHeight;
+    let pageNumber = Math.floor(y / pageHeight) + 1
+    let yInPage = y - (pageNumber - 1) * pageHeight
 
-    return { pageNumber, y : yInPage };
+    return { pageNumber, y : yInPage }
 }
 
 /**
  * Convert the `y` position from exported json to local coords.
  */
-function convertFromExportY(pageNumber, yInPage) {
+function convertFromExportY (pageNumber, yInPage) {
 
-    let meta = getPageSize();
+    let meta = getPageSize()
 
-    let y = yInPage + paddingTop;
+    let y = yInPage + paddingTop
 
-    let pagePadding = paddingBetweenPages;
+    let pagePadding = paddingBetweenPages
 
-    y += (pageNumber - 1) * (meta.height + pagePadding);
+    y += (pageNumber - 1) * (meta.height + pagePadding)
 
-    return y;
+    return y
 }
 
 /**
  * The padding of page top.
  */
-const paddingTop = 9;
+const paddingTop = 9
 
 /**
  * The padding between pages.
  */
-const paddingBetweenPages = 9;
+const paddingBetweenPages = 9
 /* harmony export (immutable) */ __webpack_exports__["c"] = paddingBetweenPages;
 
 
 /**
  * Get a page size of a single PDF page.
  */
-function getPageSize() {
+function getPageSize () {
 
-    let pdfView = window.PDFView || iframeWindow.PDFView;
+    let pdfView = window.PDFView || window.iframeWindow.PDFView
 
-    let viewBox = pdfView.pdfViewer.getPageView(0).viewport.viewBox;
-    let size = { width : viewBox[2], height : viewBox[3] };
-    return size;
+    let viewBox = pdfView.pdfViewer.getPageView(0).viewport.viewBox
+    let size = { width : viewBox[2], height : viewBox[3] }
+    return size
 }
 
 
@@ -664,17 +664,17 @@ function updateLink(linkElement, obj) {
  * Utility.
  */
 
-function anyOf(target, candidates) {
-    return candidates.filter(c => c === target).length > 0;
+function anyOf (target, candidates) {
+    return candidates.filter(c => c === target).length > 0
 }
 
 /**
  * Dispatch a custom event to `window` object.
  */
-function dispatchWindowEvent(eventName, data) {
-    var event = document.createEvent('CustomEvent');
-    event.initCustomEvent(eventName, true, true, data);
-    window.dispatchEvent(event);
+function dispatchWindowEvent (eventName, data) {
+    var event = document.createEvent('CustomEvent')
+    event.initCustomEvent(eventName, true, true, data)
+    window.dispatchEvent(event)
 }
 
 
@@ -11010,348 +11010,6 @@ function adjustPoint (x, y, radius) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_uuid__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__abstract__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__text__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__UI_utils__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__shared_coords__ = __webpack_require__(1);
-
-
-
-
-
-
-let globalEvent
-
-/**
- * Rect Annotation.
- */
-class RectAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* default */] {
-
-    /**
-     * Constructor.
-     */
-    constructor () {
-
-        super()
-
-        globalEvent = window.globalEvent
-
-        this.uuid     = null
-        this.type     = 'area'
-        this.x        = 0
-        this.y        = 0
-        this.width    = 0
-        this.height   = 0
-        this.text     = null
-        this.color    = null
-        this.readOnly = false
-        this.$element = this.createDummyElement()
-
-        globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
-        globalEvent.on('enableViewMode', this.enableViewMode)
-
-        // TODO No need ?
-        this.textAnnotation = new __WEBPACK_IMPORTED_MODULE_2__text__["a" /* default */](this.readOnly, this)
-        this.textAnnotation.on('selected', this.handleTextSelected)
-        this.textAnnotation.on('deselected', this.handleTextDeselected)
-        this.textAnnotation.on('hoverin', this.handleTextHoverIn)
-        this.textAnnotation.on('hoverout', this.handleTextHoverOut)
-        this.textAnnotation.on('textchanged', this.handleTextChanged)
-    }
-
-    /**
-     * Create an instance from an annotation data.
-     */
-    static newInstance (annotation) {
-        let rect      = new RectAnnotation()
-        rect.uuid     = annotation.uuid || __WEBPACK_IMPORTED_MODULE_0__utils_uuid__["a" /* default */]()
-        rect.x        = annotation.x
-        rect.y        = annotation.y
-        rect.width    = annotation.width
-        rect.height   = annotation.height
-        rect.text     = annotation.text
-        rect.color    = annotation.color
-        rect.readOnly = annotation.readOnly || false
-        return rect
-    }
-
-    /**
-     * Create an instance from a TOML object.
-     */
-    static newInstanceFromTomlObject (tomlObject) {
-        let d = tomlObject
-        d.position = d.position.map(parseFloat)
-        d.x = d.position[0]
-        d.y = __WEBPACK_IMPORTED_MODULE_4__shared_coords__["a" /* convertFromExportY */](d.page, d.position[1])
-        d.width = d.position[2]
-        d.height = d.position[3]
-        d.text = d.label
-        let rect = RectAnnotation.newInstance(d)
-        return rect
-    }
-
-    /**
-     * Set a hover event.
-     */
-    setHoverEvent () {
-        this.$element.find('rect, circle').hover(
-            this.handleHoverInEvent,
-            this.handleHoverOutEvent
-        )
-    }
-
-    /**
-     * Delete the annotation from rendering, a container in window, and a container in localStorage.
-     */
-    destroy () {
-        let promise = super.destroy()
-        this.emit('delete')
-        window.globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
-        window.globalEvent.removeListener('enableViewMode', this.enableViewMode)
-        return promise
-    }
-
-    /**
-     * Create an annotation data for save.
-     */
-    createAnnotation () {
-        return {
-            uuid      : this.uuid,
-            type      : this.type,
-            x         : this.x,
-            y         : this.y,
-            width     : this.width,
-            height    : this.height,
-            text      : this.text,
-            color     : this.color,
-            readyOnly : this.readOnly
-        }
-    }
-
-    /**
-     * Delete the annotation if selected.
-     */
-    deleteSelectedAnnotation () {
-        super.deleteSelectedAnnotation()
-    }
-
-    /**
-     * Get the position for text.
-     */
-    getTextPosition () {
-        return {
-            x : this.x + 7,
-            y : this.y - 20
-        }
-    }
-
-    /**
-     * Get the position of the boundingCircle.
-     */
-    getBoundingCirclePosition () {
-        let $circle = this.$element.find('circle')
-        return {
-            x : parseFloat($circle.attr('cx')),
-            y : parseFloat($circle.attr('cy'))
-        }
-    }
-
-    /**
-     * Handle a selected event on a text.
-     */
-    handleTextSelected () {
-        this.select()
-    }
-
-    /**
-     * Handle a deselected event on a text.
-     */
-    handleTextDeselected () {
-        this.deselect()
-    }
-
-    /**
-     * Handle a hovein event on a text.
-     */
-    handleTextHoverIn () {
-        this.highlight()
-        this.emit('hoverin')
-    }
-
-    /**
-     * Handle a hoveout event on a text.
-     */
-    handleTextHoverOut () {
-        this.dehighlight()
-        this.emit('hoverout')
-    }
-
-    /**
-     * Save a new text.
-     */
-    handleTextChanged (newText) {
-        console.log('rect:handleTextChanged:', newText)
-        this.text = newText
-        this.save()
-    }
-
-    /**
-     * Handle a hoverin event.
-     */
-    handleHoverInEvent (e) {
-        super.handleHoverInEvent(e)
-
-        let $elm = $(e.currentTarget)
-        if ($elm.prop('tagName') === 'circle') {
-            this.emit('circlehoverin', this)
-        }
-    }
-
-    /**
-     * Handle a hoverout event.
-     */
-    handleHoverOutEvent (e) {
-        super.handleHoverOutEvent(e)
-
-        let $elm = $(e.currentTarget)
-        if ($elm.prop('tagName') === 'circle') {
-            this.emit('circlehoverout', this)
-        }
-    }
-
-    /**
-     * Handle a click event.
-     */
-    handleClickEvent (e) {
-        super.handleClickEvent(e)
-    }
-
-    /**
-     * Handle a mousedown event.
-     */
-    handleMouseDownOnRect () {
-        console.log('handleMouseDownOnRect')
-
-        this.originalX = this.x
-        this.originalY = this.y
-
-        document.addEventListener('mousemove', this.handleMouseMoveOnDocument)
-        document.addEventListener('mouseup', this.handleMouseUpOnDocument)
-
-        window.globalEvent.emit('rectmovestart')
-
-        this.disableTextlayer()
-    }
-
-    /**
-     * Handle a mousemove event.
-     */
-    handleMouseMoveOnDocument (e) {
-
-        this._dragging = true
-
-        if (!this.startX) {
-            this.startX = parseInt(e.clientX)
-            this.startY = parseInt(e.clientY)
-        }
-        this.endX = parseInt(e.clientX)
-        this.endY = parseInt(e.clientY)
-
-        let diff = __WEBPACK_IMPORTED_MODULE_3__UI_utils__["h" /* scaleDown */]({
-            x : this.endX - this.startX,
-            y : this.endY - this.startY
-        })
-
-        this.x = this.originalX + diff.x
-        this.y = this.originalY + diff.y
-
-        this.render()
-
-        this.emit('rectmove', this)
-    }
-
-    /**
-     * Handle a mouseup event.
-     */
-    handleMouseUpOnDocument () {
-
-        if (this._dragging) {
-            this._dragging = false
-
-            this.originalX = null
-            this.originalY = null
-            this.startX = null
-            this.startY = null
-            this.endX = null
-            this.endY = null
-
-            this.save()
-            this.enableViewMode()
-            globalEvent.emit('rectmoveend', this)
-        }
-
-        document.removeEventListener('mousemove', this.handleMouseMoveOnDocument)
-        document.removeEventListener('mouseup', this.handleMouseUpOnDocument)
-
-        if (window.currentType !== 'rect') {
-            this.enableTextlayer()
-        }
-    }
-
-    // TODO 共通化？
-    disableTextlayer () {
-        // $('.textLayer').hide()
-        $('body').addClass('disable-text-layer')
-    }
-
-    // TODO 共通化？
-    enableTextlayer () {
-        // $('.textLayer').show()
-        $('body').removeClass('disable-text-layer')
-    }
-
-    enableDragAction () {
-        this.$element.find('.anno-rect, circle')
-            .off('mousedown', this.handleMouseDownOnRect)
-            .on('mousedown', this.handleMouseDownOnRect)
-    }
-
-    disableDragAction () {
-        this.$element.find('.anno-rect, circle')
-            .off('mousedown', this.handleMouseDownOnRect)
-    }
-
-    /**
-     * Enable view mode.
-     */
-    enableViewMode () {
-        super.enableViewMode()
-        if (!this.readOnly) {
-            this.$element.find('.anno-rect, circle').on('click', this.handleClickEvent)
-            this.enableDragAction()
-        }
-    }
-
-    /**
-     * Disable view mode.
-     */
-    disableViewMode () {
-        super.disableViewMode()
-        this.$element.find('.anno-rect, circle').off('click')
-        this.disableDragAction()
-    }
-
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = RectAnnotation;
-
-
-
-/***/ }),
-/* 10 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = uuid;
 /**
  * Generate a univierally unique identifier
@@ -11369,7 +11027,7 @@ function uuid () {
 
 
 /***/ }),
-/* 11 */
+/* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -11685,642 +11343,12 @@ class AbstractAnnotation extends __WEBPACK_IMPORTED_MODULE_0_events___default.a 
 
 
 /***/ }),
+/* 11 */,
 /* 12 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_uuid__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__abstract__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__text__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_coords__ = __webpack_require__(1);
-
-
-
-
-
-/**
- * Span Annotation.
- */
-class SpanAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* default */] {
-
-    /**
-     * Constructor.
-     */
-    constructor () {
-        super()
-
-        this.uuid       = null
-        this.type       = 'span'
-        this.rectangles = []
-        this.text       = null
-        this.color      = null
-        this.readOnly   = false
-        this.$element   = this.createDummyElement()
-
-        window.globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
-        window.globalEvent.on('enableViewMode', this.enableViewMode)
-
-        this.textAnnotation = new __WEBPACK_IMPORTED_MODULE_2__text__["a" /* default */](this.readOnly, this)
-        this.textAnnotation.on('selected', this.handleTextSelected)
-        this.textAnnotation.on('deselected', this.handleTextDeselected)
-        this.textAnnotation.on('hoverin', this.handleTextHoverIn)
-        this.textAnnotation.on('hoverout', this.handleTextHoverOut)
-        this.textAnnotation.on('textchanged', this.handleTextChanged)
-    }
-
-    /**
-     * Create an instance from an annotation data.
-     */
-    static newInstance (annotation) {
-        let a          = new SpanAnnotation()
-        a.uuid         = annotation.uuid || __WEBPACK_IMPORTED_MODULE_0__utils_uuid__["a" /* default */]()
-        a.rectangles   = annotation.rectangles
-        a.text         = annotation.text
-        a.color        = annotation.color
-        a.readOnly     = annotation.readOnly || false
-        a.selectedText = annotation.selectedText
-        return a
-    }
-
-    /**
-     * Create an instance from a TOML object.
-     */
-    static newInstanceFromTomlObject (tomlObject) {
-        let d = tomlObject
-        // position: String -> Float.
-        let position = d.position.map(p => p.map(parseFloat))
-        d.selectedText = d.text
-        d.text = d.label
-        // Convert.
-        d.rectangles = position.map(p => {
-            return {
-                x      : p[0],
-                y      : __WEBPACK_IMPORTED_MODULE_3__shared_coords__["a" /* convertFromExportY */](d.page, p[1]),
-                width  : p[2],
-                height : p[3]
-            }
-        })
-        let span = SpanAnnotation.newInstance(d)
-        return span
-    }
-
-    /**
-     * Set a hover event.
-     */
-    setHoverEvent () {
-        this.$element.find('circle').hover(
-            this.handleHoverInEvent,
-            this.handleHoverOutEvent
-        )
-    }
-
-    /**
-     * Delete the annotation from rendering, a container in window, and a container in localStorage.
-     */
-    destroy () {
-        let promise = super.destroy()
-        this.emit('delete')
-
-        // TODO オブジェクトベースで削除できるようにしたい.
-        window.globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
-        window.globalEvent.removeListener('enableViewMode', this.enableViewMode)
-        return promise
-    }
-
-    /**
-     * Create an annotation data for save.
-     */
-    createAnnotation () {
-        return {
-            uuid         : this.uuid,
-            type         : this.type,
-            rectangles   : this.rectangles,
-            text         : this.text,
-            color        : this.color,
-            readyOnly    : this.readOnly,
-            selectedText : this.selectedText
-        }
-    }
-
-    /**
-     * Get the position for text.
-     */
-    getTextPosition () {
-
-        let p = null
-
-        if (this.rectangles.length > 0) {
-            p = {
-                x : this.rectangles[0].x + 7,
-                y : this.rectangles[0].y - 20
-            }
-        }
-
-        return p
-    }
-
-    /**
-     * Delete the annotation if selected.
-     */
-    deleteSelectedAnnotation () {
-        super.deleteSelectedAnnotation()
-    }
-
-    /**
-     * Get the position of the boundingCircle.
-     */
-    getBoundingCirclePosition () {
-        let $circle = this.$element.find('circle')
-        return {
-            x : parseFloat($circle.attr('cx')),
-            y : parseFloat($circle.attr('cy'))
-        }
-    }
-
-    /**
-     * Handle a selected event on a text.
-     */
-    handleTextSelected () {
-        this.select()
-    }
-
-    /**
-     * Handle a deselected event on a text.
-     */
-    handleTextDeselected () {
-        this.deselect()
-    }
-
-    /**
-     * Handle a hovein event on a text.
-     */
-    handleTextHoverIn () {
-        this.highlight()
-        this.emit('hoverin')
-    }
-
-    /**
-     * Handle a hoveout event on a text.
-     */
-    handleTextHoverOut () {
-        this.dehighlight()
-        this.emit('hoverout')
-    }
-
-    /**
-     * Save a new text.
-     */
-    handleTextChanged (newText) {
-        this.text = newText
-        this.save()
-    }
-
-    /**
-     * Handle a hoverin event.
-     */
-    handleHoverInEvent (e) {
-        super.handleHoverInEvent(e)
-        this.emit('circlehoverin', this)
-    }
-
-    /**
-     * Handle a hoverout event.
-     */
-    handleHoverOutEvent (e) {
-        super.handleHoverOutEvent(e)
-        this.emit('circlehoverout', this)
-    }
-
-    /**
-     * Handle a click event.
-     */
-    handleClickEvent (e) {
-        super.handleClickEvent(e)
-    }
-
-    /**
-     * Enable view mode.
-     */
-    enableViewMode () {
-
-        this.disableViewMode()
-
-        super.enableViewMode()
-
-        if (!this.readOnly) {
-            this.$element.find('circle').on('click', this.handleClickEvent)
-        }
-    }
-
-    /**
-     * Disable view mode.
-     */
-    disableViewMode () {
-        super.disableViewMode()
-        this.$element.find('circle').off('click')
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = SpanAnnotation;
-
-
-
-/***/ }),
-/* 13 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_uuid__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__abstract__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__text__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_relation_js__ = __webpack_require__(29);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__shared_util__ = __webpack_require__(6);
-
-
-
-
-
-
-let globalEvent
-
-/**
- * Relation Annotation (one-way / two-way / link)
- */
-class RelationAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* default */] {
-
-    /**
-     * Constructor.
-     */
-    constructor () {
-        super()
-
-        globalEvent = window.globalEvent
-
-        this.uuid = __WEBPACK_IMPORTED_MODULE_0__utils_uuid__["a" /* default */]()
-        this.type = 'relation'
-        this.direction = null
-        this.rel1Annotation = null
-        this.rel2Annotation = null
-        this.text = null
-        this.color = null
-        this.readOnly = false
-        this.$element = this.createDummyElement()
-
-        // for render.
-        this.x1 = 0
-        this.y1 = 0
-        this.x2 = 0
-        this.y2 = 0
-
-        globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
-        globalEvent.on('enableViewMode', this.enableViewMode)
-        globalEvent.on('rectmoveend', this.handleRelMoveEnd)
-
-        // TODO Maybe no need.
-        this.textAnnotation = new __WEBPACK_IMPORTED_MODULE_2__text__["a" /* default */](this.readOnly, this)
-        this.textAnnotation.on('selected', this.handleTextSelected)
-        this.textAnnotation.on('deselected', this.handleTextDeselected)
-        this.textAnnotation.on('hoverin', this.handleTextHoverIn)
-        this.textAnnotation.on('hoverout', this.handleTextHoverOut)
-        this.textAnnotation.on('textchanged', this.handleTextChanged)
-    }
-
-    /**
-     * Create an instance from an annotation data.
-     */
-    static newInstance (annotation) {
-        let a = new RelationAnnotation()
-        a.uuid = annotation.uuid || __WEBPACK_IMPORTED_MODULE_0__utils_uuid__["a" /* default */]()
-        a.direction = annotation.direction
-        a.rel1Annotation = __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* default */].isAnnotation(annotation.rel1) ? annotation.rel1 : window.annotationContainer.findById(annotation.rel1)
-        a.rel2Annotation = __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* default */].isAnnotation(annotation.rel2) ? annotation.rel2 : window.annotationContainer.findById(annotation.rel2)
-        a.text = annotation.text
-        a.color = annotation.color
-        a.readOnly = annotation.readOnly || false
-        return a
-    }
-
-    /**
-     * Create an instance from a TOML object.
-     */
-    static newInstanceFromTomlObject (d) {
-        d.direction = d.dir
-        // TODO Annotation側を、labelに合わせてもいいかも。
-        d.text = d.label
-        let rel = RelationAnnotation.newInstance(d)
-        return rel
-    }
-
-    /**
-     * Set a hover event.
-     */
-    setHoverEvent () {
-        this.$element.find('path').hover(
-            this.handleHoverInEvent,
-            this.handleHoverOutEvent
-        )
-    }
-
-    /**
-     * Setter - rel1Annotation.
-     */
-    set rel1Annotation (a) {
-        this._rel1Annotation = a
-        if (this._rel1Annotation) {
-            this._rel1Annotation.on('hoverin', this.handleRelHoverIn)
-            this._rel1Annotation.on('hoverout', this.handleRelHoverOut)
-            this._rel1Annotation.on('rectmove', this.handleRelMove)
-            this._rel1Annotation.on('delete', this.handleRelDelete)
-        }
-    }
-
-    /**
-     * Getter - rel1Annotation.
-     */
-    get rel1Annotation () {
-        return this._rel1Annotation
-    }
-
-    /**
-     * Setter - rel2Annotation.
-     */
-    set rel2Annotation (a) {
-        this._rel2Annotation = a
-        if (this._rel2Annotation) {
-            this._rel2Annotation.on('hoverin', this.handleRelHoverIn)
-            this._rel2Annotation.on('hoverout', this.handleRelHoverOut)
-            this._rel2Annotation.on('rectmove', this.handleRelMove)
-            this._rel2Annotation.on('delete', this.handleRelDelete)
-        }
-    }
-
-    /**
-     * Getter - rel2Annotation.
-     */
-    get rel2Annotation () {
-        return this._rel2Annotation
-    }
-
-    /**
-     * Render the annotation.
-     */
-    render () {
-        this.setStartEndPosition()
-        super.render()
-    }
-
-    /**
-     * Create an annotation data for save.
-     */
-    createAnnotation () {
-        return {
-            uuid      : this.uuid,
-            type      : this.type,
-            direction : this.direction,
-            rel1      : this._rel1Annotation.uuid,
-            rel2      : this._rel2Annotation.uuid,
-            text      : this.text,
-            color     : this.color,
-            readOnly  : this.readOnly
-        }
-    }
-
-    /**
-     * Destroy the annotation.
-     */
-    destroy () {
-        let promise = super.destroy()
-        if (this._rel1Annotation) {
-            this._rel1Annotation.removeListener('hoverin', this.handleRelHoverIn)
-            this._rel1Annotation.removeListener('hoverout', this.handleRelHoverOut)
-            this._rel1Annotation.removeListener('rectmove', this.handleRelMove)
-            this._rel1Annotation.removeListener('delete', this.handleRelDelete)
-            delete this._rel1Annotation
-        }
-        if (this._rel2Annotation) {
-            this._rel2Annotation.removeListener('hoverin', this.handleRelHoverIn)
-            this._rel2Annotation.removeListener('hoverout', this.handleRelHoverOut)
-            this._rel2Annotation.removeListener('rectmove', this.handleRelMove)
-            this._rel2Annotation.removeListener('delete', this.handleRelDelete)
-            delete this._rel2Annotation
-        }
-
-        globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
-        globalEvent.removeListener('enableViewMode', this.enableViewMode)
-        globalEvent.removeListener('rectmoveend', this.handleRelMoveEnd)
-
-        return promise
-    }
-
-    /**
-     * Delete the annotation if selected.
-     */
-    deleteSelectedAnnotation () {
-        super.deleteSelectedAnnotation()
-    }
-
-    /**
-     * Get the position for text.
-     */
-    // TODO No need ?
-    getTextPosition () {
-        this.setStartEndPosition()
-        return __WEBPACK_IMPORTED_MODULE_3__utils_relation_js__["b" /* getRelationTextPosition */](this.x1, this.y1, this.x2, this.y2, this.text, this.uuid)
-    }
-
-    /**
-     * Highlight relations.
-     */
-    highlightRelAnnotations () {
-        if (this._rel1Annotation) {
-            this._rel1Annotation.highlight()
-        }
-        if (this._rel2Annotation) {
-            this._rel2Annotation.highlight()
-        }
-    }
-
-    /**
-     * Dehighlight relations.
-     */
-    dehighlightRelAnnotations () {
-        if (this._rel1Annotation) {
-            this._rel1Annotation.dehighlight()
-        }
-        if (this.rel2Annotation) {
-            this.rel2Annotation.dehighlight()
-        }
-    }
-
-    /**
-     * Handle a selected event on a text.
-     */
-    handleTextSelected () {
-        this.select()
-    }
-
-    /**
-     * Handle a deselected event on a text.
-     */
-    handleTextDeselected () {
-        this.deselect()
-    }
-
-    /**
-     * The callback for the relational text hoverred in.
-     */
-    handleTextHoverIn () {
-        this.highlight()
-        this.emit('hoverin')
-        this.highlightRelAnnotations()
-    }
-
-    /**
-     * The callback for the relational text hoverred out.
-     */
-    handleTextHoverOut () {
-        this.dehighlight()
-        this.emit('hoverout')
-        this.dehighlightRelAnnotations()
-    }
-
-    /**
-     * The callback for the relationals hoverred in.
-     */
-    handleRelHoverIn () {
-        this.highlight()
-        this.highlightRelAnnotations()
-    }
-
-    /**
-     * The callback for the relationals hoverred out.
-     */
-    handleRelHoverOut () {
-        this.dehighlight()
-        this.dehighlightRelAnnotations()
-    }
-
-    /**
-     * The callback that is called relations has benn deleted.
-     */
-    handleRelDelete () {
-        this.destroy()
-    }
-
-    /**
-     * The callback that is called relations has been moved.
-     */
-    handleRelMove () {
-        this.render()
-    }
-
-    /**
-     * The callback that is called relations has finished to be moved.
-     */
-    handleRelMoveEnd (rectAnnotation) {
-        if (this._rel1Annotation === rectAnnotation || this._rel2Annotation === rectAnnotation) {
-            this.enableViewMode()
-            this.textAnnotation.enableViewMode()
-        }
-    }
-
-    /**
-     * The callback that is called the text content is changed.
-     *
-     * @param {String} newText - the content an user changed.
-     */
-    handleTextChanged (newText) {
-        this.text = newText
-        this.save()
-    }
-
-    /**
-     * The callback that is called at hoverred in.
-     */
-    handleHoverInEvent (e) {
-        super.handleHoverInEvent(e)
-        this.highlightRelAnnotations()
-    }
-
-    /**
-     * The callback that is called at hoverred out.
-     */
-    handleHoverOutEvent (e) {
-        super.handleHoverOutEvent(e)
-        this.dehighlightRelAnnotations()
-    }
-
-    /**
-     * The callback that is called at clicked.
-     */
-    handleClickEvent (e) {
-        super.handleClickEvent(e)
-    }
-
-    /**
-     * Enable view mode.
-     */
-    enableViewMode () {
-
-        this.disableViewMode()
-
-        super.enableViewMode()
-
-        if (!this.readOnly) {
-            this.$element.find('path').on('click', this.handleClickEvent)
-        }
-    }
-
-    /**
-     * Disable view mode.
-     */
-    disableViewMode () {
-        super.disableViewMode()
-        this.$element.find('path').off('click')
-    }
-
-    /**
-     * Set the start / end points of the relation.
-     */
-    setStartEndPosition () {
-        if (this._rel1Annotation) {
-            let p = this._rel1Annotation.getBoundingCirclePosition()
-            this.x1 = p.x
-            this.y1 = p.y
-        }
-        if (this._rel2Annotation) {
-            let p = this._rel2Annotation.getBoundingCirclePosition()
-            this.x2 = p.x
-            this.y2 = p.y
-        }
-    }
-
-    /**
-     * @{inheritDoc}
-     */
-    equalTo (anno) {
-
-        if (!anno || this.type !== anno) {
-            return false
-        }
-
-        const isSame = __WEBPACK_IMPORTED_MODULE_4__shared_util__["a" /* anyOf */](this.rel1Annotation.uuid, [anno.rel1Annotation.uuid, anno.rel2Annotation.uuid])
-                        && __WEBPACK_IMPORTED_MODULE_4__shared_util__["a" /* anyOf */](this.rel2Annotation.uuid, [anno.rel1Annotation.uuid, anno.rel2Annotation.uuid])
-
-        return isSame
-    }
-
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = RelationAnnotation;
-
-
-
-/***/ }),
-/* 14 */,
-/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var parser = __webpack_require__(16);
-var compiler = __webpack_require__(17);
+var parser = __webpack_require__(13);
+var compiler = __webpack_require__(14);
 
 module.exports = {
   parse: function(input) {
@@ -12331,7 +11359,7 @@ module.exports = {
 
 
 /***/ }),
-/* 16 */
+/* 13 */
 /***/ (function(module, exports) {
 
 module.exports = (function() {
@@ -16178,7 +15206,7 @@ module.exports = (function() {
 
 
 /***/ }),
-/* 17 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16382,13 +15410,355 @@ module.exports = {
 
 
 /***/ }),
-/* 18 */
+/* 15 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_uuid__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__abstract__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__text__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__UI_utils__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__shared_coords__ = __webpack_require__(1);
+
+
+
+
+
+
+let globalEvent
+
+/**
+ * Rect Annotation.
+ */
+class RectAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* default */] {
+
+    /**
+     * Constructor.
+     */
+    constructor () {
+
+        super()
+
+        globalEvent = window.globalEvent
+
+        this.uuid     = null
+        this.type     = 'area'
+        this.x        = 0
+        this.y        = 0
+        this.width    = 0
+        this.height   = 0
+        this.text     = null
+        this.color    = null
+        this.readOnly = false
+        this.$element = this.createDummyElement()
+
+        globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
+        globalEvent.on('enableViewMode', this.enableViewMode)
+
+        // TODO No need ?
+        this.textAnnotation = new __WEBPACK_IMPORTED_MODULE_2__text__["a" /* default */](this.readOnly, this)
+        this.textAnnotation.on('selected', this.handleTextSelected)
+        this.textAnnotation.on('deselected', this.handleTextDeselected)
+        this.textAnnotation.on('hoverin', this.handleTextHoverIn)
+        this.textAnnotation.on('hoverout', this.handleTextHoverOut)
+        this.textAnnotation.on('textchanged', this.handleTextChanged)
+    }
+
+    /**
+     * Create an instance from an annotation data.
+     */
+    static newInstance (annotation) {
+        let rect      = new RectAnnotation()
+        rect.uuid     = annotation.uuid || __WEBPACK_IMPORTED_MODULE_0__utils_uuid__["a" /* default */]()
+        rect.x        = annotation.x
+        rect.y        = annotation.y
+        rect.width    = annotation.width
+        rect.height   = annotation.height
+        rect.text     = annotation.text
+        rect.color    = annotation.color
+        rect.readOnly = annotation.readOnly || false
+        return rect
+    }
+
+    /**
+     * Create an instance from a TOML object.
+     */
+    static newInstanceFromTomlObject (tomlObject) {
+        let d = tomlObject
+        d.position = d.position.map(parseFloat)
+        d.x = d.position[0]
+        d.y = __WEBPACK_IMPORTED_MODULE_4__shared_coords__["a" /* convertFromExportY */](d.page, d.position[1])
+        d.width = d.position[2]
+        d.height = d.position[3]
+        d.text = d.label
+        let rect = RectAnnotation.newInstance(d)
+        return rect
+    }
+
+    /**
+     * Set a hover event.
+     */
+    setHoverEvent () {
+        this.$element.find('rect, circle').hover(
+            this.handleHoverInEvent,
+            this.handleHoverOutEvent
+        )
+    }
+
+    /**
+     * Delete the annotation from rendering, a container in window, and a container in localStorage.
+     */
+    destroy () {
+        let promise = super.destroy()
+        this.emit('delete')
+        window.globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
+        window.globalEvent.removeListener('enableViewMode', this.enableViewMode)
+        return promise
+    }
+
+    /**
+     * Create an annotation data for save.
+     */
+    createAnnotation () {
+        return {
+            uuid      : this.uuid,
+            type      : this.type,
+            x         : this.x,
+            y         : this.y,
+            width     : this.width,
+            height    : this.height,
+            text      : this.text,
+            color     : this.color,
+            readyOnly : this.readOnly
+        }
+    }
+
+    /**
+     * Delete the annotation if selected.
+     */
+    deleteSelectedAnnotation () {
+        super.deleteSelectedAnnotation()
+    }
+
+    /**
+     * Get the position for text.
+     */
+    getTextPosition () {
+        return {
+            x : this.x + 7,
+            y : this.y - 20
+        }
+    }
+
+    /**
+     * Get the position of the boundingCircle.
+     */
+    getBoundingCirclePosition () {
+        let $circle = this.$element.find('circle')
+        return {
+            x : parseFloat($circle.attr('cx')),
+            y : parseFloat($circle.attr('cy'))
+        }
+    }
+
+    /**
+     * Handle a selected event on a text.
+     */
+    handleTextSelected () {
+        this.select()
+    }
+
+    /**
+     * Handle a deselected event on a text.
+     */
+    handleTextDeselected () {
+        this.deselect()
+    }
+
+    /**
+     * Handle a hovein event on a text.
+     */
+    handleTextHoverIn () {
+        this.highlight()
+        this.emit('hoverin')
+    }
+
+    /**
+     * Handle a hoveout event on a text.
+     */
+    handleTextHoverOut () {
+        this.dehighlight()
+        this.emit('hoverout')
+    }
+
+    /**
+     * Save a new text.
+     */
+    handleTextChanged (newText) {
+        console.log('rect:handleTextChanged:', newText)
+        this.text = newText
+        this.save()
+    }
+
+    /**
+     * Handle a hoverin event.
+     */
+    handleHoverInEvent (e) {
+        super.handleHoverInEvent(e)
+
+        let $elm = $(e.currentTarget)
+        if ($elm.prop('tagName') === 'circle') {
+            this.emit('circlehoverin', this)
+        }
+    }
+
+    /**
+     * Handle a hoverout event.
+     */
+    handleHoverOutEvent (e) {
+        super.handleHoverOutEvent(e)
+
+        let $elm = $(e.currentTarget)
+        if ($elm.prop('tagName') === 'circle') {
+            this.emit('circlehoverout', this)
+        }
+    }
+
+    /**
+     * Handle a click event.
+     */
+    handleClickEvent (e) {
+        super.handleClickEvent(e)
+    }
+
+    /**
+     * Handle a mousedown event.
+     */
+    handleMouseDownOnRect () {
+        console.log('handleMouseDownOnRect')
+
+        this.originalX = this.x
+        this.originalY = this.y
+
+        document.addEventListener('mousemove', this.handleMouseMoveOnDocument)
+        document.addEventListener('mouseup', this.handleMouseUpOnDocument)
+
+        window.globalEvent.emit('rectmovestart')
+
+        this.disableTextlayer()
+    }
+
+    /**
+     * Handle a mousemove event.
+     */
+    handleMouseMoveOnDocument (e) {
+
+        this._dragging = true
+
+        if (!this.startX) {
+            this.startX = parseInt(e.clientX)
+            this.startY = parseInt(e.clientY)
+        }
+        this.endX = parseInt(e.clientX)
+        this.endY = parseInt(e.clientY)
+
+        let diff = __WEBPACK_IMPORTED_MODULE_3__UI_utils__["h" /* scaleDown */]({
+            x : this.endX - this.startX,
+            y : this.endY - this.startY
+        })
+
+        this.x = this.originalX + diff.x
+        this.y = this.originalY + diff.y
+
+        this.render()
+
+        this.emit('rectmove', this)
+    }
+
+    /**
+     * Handle a mouseup event.
+     */
+    handleMouseUpOnDocument () {
+
+        if (this._dragging) {
+            this._dragging = false
+
+            this.originalX = null
+            this.originalY = null
+            this.startX = null
+            this.startY = null
+            this.endX = null
+            this.endY = null
+
+            this.save()
+            this.enableViewMode()
+            globalEvent.emit('rectmoveend', this)
+        }
+
+        document.removeEventListener('mousemove', this.handleMouseMoveOnDocument)
+        document.removeEventListener('mouseup', this.handleMouseUpOnDocument)
+
+        if (window.currentType !== 'rect') {
+            this.enableTextlayer()
+        }
+    }
+
+    // TODO 共通化？
+    disableTextlayer () {
+        // $('.textLayer').hide()
+        $('body').addClass('disable-text-layer')
+    }
+
+    // TODO 共通化？
+    enableTextlayer () {
+        // $('.textLayer').show()
+        $('body').removeClass('disable-text-layer')
+    }
+
+    enableDragAction () {
+        this.$element.find('.anno-rect, circle')
+            .off('mousedown', this.handleMouseDownOnRect)
+            .on('mousedown', this.handleMouseDownOnRect)
+    }
+
+    disableDragAction () {
+        this.$element.find('.anno-rect, circle')
+            .off('mousedown', this.handleMouseDownOnRect)
+    }
+
+    /**
+     * Enable view mode.
+     */
+    enableViewMode () {
+        super.enableViewMode()
+        if (!this.readOnly) {
+            this.$element.find('.anno-rect, circle').on('click', this.handleClickEvent)
+            this.enableDragAction()
+        }
+    }
+
+    /**
+     * Disable view mode.
+     */
+    disableViewMode () {
+        super.disableViewMode()
+        this.$element.find('.anno-rect, circle').off('click')
+        this.disableDragAction()
+    }
+
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = RectAnnotation;
+
+
+
+/***/ }),
+/* 16 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__UI_utils__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__UI_text__ = __webpack_require__(73);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__abstract__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__abstract__ = __webpack_require__(10);
 
 
 
@@ -16561,7 +15931,7 @@ class TextAnnotation extends __WEBPACK_IMPORTED_MODULE_2__abstract__["a" /* defa
 
 
 /***/ }),
-/* 19 */
+/* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16584,6 +15954,636 @@ function disable () {
     event.initCustomEvent('disappearTextInput', true, true)
     window.dispatchEvent(event)
 }
+
+
+/***/ }),
+/* 18 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_uuid__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__abstract__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__text__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_coords__ = __webpack_require__(1);
+
+
+
+
+
+/**
+ * Span Annotation.
+ */
+class SpanAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* default */] {
+
+    /**
+     * Constructor.
+     */
+    constructor () {
+        super()
+
+        this.uuid       = null
+        this.type       = 'span'
+        this.rectangles = []
+        this.text       = null
+        this.color      = null
+        this.readOnly   = false
+        this.$element   = this.createDummyElement()
+
+        window.globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
+        window.globalEvent.on('enableViewMode', this.enableViewMode)
+
+        this.textAnnotation = new __WEBPACK_IMPORTED_MODULE_2__text__["a" /* default */](this.readOnly, this)
+        this.textAnnotation.on('selected', this.handleTextSelected)
+        this.textAnnotation.on('deselected', this.handleTextDeselected)
+        this.textAnnotation.on('hoverin', this.handleTextHoverIn)
+        this.textAnnotation.on('hoverout', this.handleTextHoverOut)
+        this.textAnnotation.on('textchanged', this.handleTextChanged)
+    }
+
+    /**
+     * Create an instance from an annotation data.
+     */
+    static newInstance (annotation) {
+        let a          = new SpanAnnotation()
+        a.uuid         = annotation.uuid || __WEBPACK_IMPORTED_MODULE_0__utils_uuid__["a" /* default */]()
+        a.rectangles   = annotation.rectangles
+        a.text         = annotation.text
+        a.color        = annotation.color
+        a.readOnly     = annotation.readOnly || false
+        a.selectedText = annotation.selectedText
+        return a
+    }
+
+    /**
+     * Create an instance from a TOML object.
+     */
+    static newInstanceFromTomlObject (tomlObject) {
+        let d = tomlObject
+        // position: String -> Float.
+        let position = d.position.map(p => p.map(parseFloat))
+        d.selectedText = d.text
+        d.text = d.label
+        // Convert.
+        d.rectangles = position.map(p => {
+            return {
+                x      : p[0],
+                y      : __WEBPACK_IMPORTED_MODULE_3__shared_coords__["a" /* convertFromExportY */](d.page, p[1]),
+                width  : p[2],
+                height : p[3]
+            }
+        })
+        let span = SpanAnnotation.newInstance(d)
+        return span
+    }
+
+    /**
+     * Set a hover event.
+     */
+    setHoverEvent () {
+        this.$element.find('circle').hover(
+            this.handleHoverInEvent,
+            this.handleHoverOutEvent
+        )
+    }
+
+    /**
+     * Delete the annotation from rendering, a container in window, and a container in localStorage.
+     */
+    destroy () {
+        let promise = super.destroy()
+        this.emit('delete')
+
+        // TODO オブジェクトベースで削除できるようにしたい.
+        window.globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
+        window.globalEvent.removeListener('enableViewMode', this.enableViewMode)
+        return promise
+    }
+
+    /**
+     * Create an annotation data for save.
+     */
+    createAnnotation () {
+        return {
+            uuid         : this.uuid,
+            type         : this.type,
+            rectangles   : this.rectangles,
+            text         : this.text,
+            color        : this.color,
+            readyOnly    : this.readOnly,
+            selectedText : this.selectedText
+        }
+    }
+
+    /**
+     * Get the position for text.
+     */
+    getTextPosition () {
+
+        let p = null
+
+        if (this.rectangles.length > 0) {
+            p = {
+                x : this.rectangles[0].x + 7,
+                y : this.rectangles[0].y - 20
+            }
+        }
+
+        return p
+    }
+
+    /**
+     * Delete the annotation if selected.
+     */
+    deleteSelectedAnnotation () {
+        super.deleteSelectedAnnotation()
+    }
+
+    /**
+     * Get the position of the boundingCircle.
+     */
+    getBoundingCirclePosition () {
+        let $circle = this.$element.find('circle')
+        return {
+            x : parseFloat($circle.attr('cx')),
+            y : parseFloat($circle.attr('cy'))
+        }
+    }
+
+    /**
+     * Handle a selected event on a text.
+     */
+    handleTextSelected () {
+        this.select()
+    }
+
+    /**
+     * Handle a deselected event on a text.
+     */
+    handleTextDeselected () {
+        this.deselect()
+    }
+
+    /**
+     * Handle a hovein event on a text.
+     */
+    handleTextHoverIn () {
+        this.highlight()
+        this.emit('hoverin')
+    }
+
+    /**
+     * Handle a hoveout event on a text.
+     */
+    handleTextHoverOut () {
+        this.dehighlight()
+        this.emit('hoverout')
+    }
+
+    /**
+     * Save a new text.
+     */
+    handleTextChanged (newText) {
+        this.text = newText
+        this.save()
+    }
+
+    /**
+     * Handle a hoverin event.
+     */
+    handleHoverInEvent (e) {
+        super.handleHoverInEvent(e)
+        this.emit('circlehoverin', this)
+    }
+
+    /**
+     * Handle a hoverout event.
+     */
+    handleHoverOutEvent (e) {
+        super.handleHoverOutEvent(e)
+        this.emit('circlehoverout', this)
+    }
+
+    /**
+     * Handle a click event.
+     */
+    handleClickEvent (e) {
+        super.handleClickEvent(e)
+    }
+
+    /**
+     * Enable view mode.
+     */
+    enableViewMode () {
+
+        this.disableViewMode()
+
+        super.enableViewMode()
+
+        if (!this.readOnly) {
+            this.$element.find('circle').on('click', this.handleClickEvent)
+        }
+    }
+
+    /**
+     * Disable view mode.
+     */
+    disableViewMode () {
+        super.disableViewMode()
+        this.$element.find('circle').off('click')
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = SpanAnnotation;
+
+
+
+/***/ }),
+/* 19 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_uuid__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__abstract__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__text__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_relation_js__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__shared_util__ = __webpack_require__(6);
+
+
+
+
+
+
+let globalEvent
+
+/**
+ * Relation Annotation (one-way / two-way / link)
+ */
+class RelationAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* default */] {
+
+    /**
+     * Constructor.
+     */
+    constructor () {
+        super()
+
+        globalEvent = window.globalEvent
+
+        this.uuid = __WEBPACK_IMPORTED_MODULE_0__utils_uuid__["a" /* default */]()
+        this.type = 'relation'
+        this.direction = null
+        this.rel1Annotation = null
+        this.rel2Annotation = null
+        this.text = null
+        this.color = null
+        this.readOnly = false
+        this.$element = this.createDummyElement()
+
+        // for render.
+        this.x1 = 0
+        this.y1 = 0
+        this.x2 = 0
+        this.y2 = 0
+
+        globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
+        globalEvent.on('enableViewMode', this.enableViewMode)
+        globalEvent.on('rectmoveend', this.handleRelMoveEnd)
+
+        // TODO Maybe no need.
+        this.textAnnotation = new __WEBPACK_IMPORTED_MODULE_2__text__["a" /* default */](this.readOnly, this)
+        this.textAnnotation.on('selected', this.handleTextSelected)
+        this.textAnnotation.on('deselected', this.handleTextDeselected)
+        this.textAnnotation.on('hoverin', this.handleTextHoverIn)
+        this.textAnnotation.on('hoverout', this.handleTextHoverOut)
+        this.textAnnotation.on('textchanged', this.handleTextChanged)
+    }
+
+    /**
+     * Create an instance from an annotation data.
+     */
+    static newInstance (annotation) {
+        let a = new RelationAnnotation()
+        a.uuid = annotation.uuid || __WEBPACK_IMPORTED_MODULE_0__utils_uuid__["a" /* default */]()
+        a.direction = annotation.direction
+        a.rel1Annotation = __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* default */].isAnnotation(annotation.rel1) ? annotation.rel1 : window.annotationContainer.findById(annotation.rel1)
+        a.rel2Annotation = __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* default */].isAnnotation(annotation.rel2) ? annotation.rel2 : window.annotationContainer.findById(annotation.rel2)
+        a.text = annotation.text
+        a.color = annotation.color
+        a.readOnly = annotation.readOnly || false
+        return a
+    }
+
+    /**
+     * Create an instance from a TOML object.
+     */
+    static newInstanceFromTomlObject (d) {
+        d.direction = d.dir
+        // TODO Annotation側を、labelに合わせてもいいかも。
+        d.text = d.label
+        let rel = RelationAnnotation.newInstance(d)
+        return rel
+    }
+
+    /**
+     * Set a hover event.
+     */
+    setHoverEvent () {
+        this.$element.find('path').hover(
+            this.handleHoverInEvent,
+            this.handleHoverOutEvent
+        )
+    }
+
+    /**
+     * Setter - rel1Annotation.
+     */
+    set rel1Annotation (a) {
+        this._rel1Annotation = a
+        if (this._rel1Annotation) {
+            this._rel1Annotation.on('hoverin', this.handleRelHoverIn)
+            this._rel1Annotation.on('hoverout', this.handleRelHoverOut)
+            this._rel1Annotation.on('rectmove', this.handleRelMove)
+            this._rel1Annotation.on('delete', this.handleRelDelete)
+        }
+    }
+
+    /**
+     * Getter - rel1Annotation.
+     */
+    get rel1Annotation () {
+        return this._rel1Annotation
+    }
+
+    /**
+     * Setter - rel2Annotation.
+     */
+    set rel2Annotation (a) {
+        this._rel2Annotation = a
+        if (this._rel2Annotation) {
+            this._rel2Annotation.on('hoverin', this.handleRelHoverIn)
+            this._rel2Annotation.on('hoverout', this.handleRelHoverOut)
+            this._rel2Annotation.on('rectmove', this.handleRelMove)
+            this._rel2Annotation.on('delete', this.handleRelDelete)
+        }
+    }
+
+    /**
+     * Getter - rel2Annotation.
+     */
+    get rel2Annotation () {
+        return this._rel2Annotation
+    }
+
+    /**
+     * Render the annotation.
+     */
+    render () {
+        this.setStartEndPosition()
+        super.render()
+    }
+
+    /**
+     * Create an annotation data for save.
+     */
+    createAnnotation () {
+        return {
+            uuid      : this.uuid,
+            type      : this.type,
+            direction : this.direction,
+            rel1      : this._rel1Annotation.uuid,
+            rel2      : this._rel2Annotation.uuid,
+            text      : this.text,
+            color     : this.color,
+            readOnly  : this.readOnly
+        }
+    }
+
+    /**
+     * Destroy the annotation.
+     */
+    destroy () {
+        let promise = super.destroy()
+        if (this._rel1Annotation) {
+            this._rel1Annotation.removeListener('hoverin', this.handleRelHoverIn)
+            this._rel1Annotation.removeListener('hoverout', this.handleRelHoverOut)
+            this._rel1Annotation.removeListener('rectmove', this.handleRelMove)
+            this._rel1Annotation.removeListener('delete', this.handleRelDelete)
+            delete this._rel1Annotation
+        }
+        if (this._rel2Annotation) {
+            this._rel2Annotation.removeListener('hoverin', this.handleRelHoverIn)
+            this._rel2Annotation.removeListener('hoverout', this.handleRelHoverOut)
+            this._rel2Annotation.removeListener('rectmove', this.handleRelMove)
+            this._rel2Annotation.removeListener('delete', this.handleRelDelete)
+            delete this._rel2Annotation
+        }
+
+        globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
+        globalEvent.removeListener('enableViewMode', this.enableViewMode)
+        globalEvent.removeListener('rectmoveend', this.handleRelMoveEnd)
+
+        return promise
+    }
+
+    /**
+     * Delete the annotation if selected.
+     */
+    deleteSelectedAnnotation () {
+        super.deleteSelectedAnnotation()
+    }
+
+    /**
+     * Get the position for text.
+     */
+    // TODO No need ?
+    getTextPosition () {
+        this.setStartEndPosition()
+        return __WEBPACK_IMPORTED_MODULE_3__utils_relation_js__["b" /* getRelationTextPosition */](this.x1, this.y1, this.x2, this.y2, this.text, this.uuid)
+    }
+
+    /**
+     * Highlight relations.
+     */
+    highlightRelAnnotations () {
+        if (this._rel1Annotation) {
+            this._rel1Annotation.highlight()
+        }
+        if (this._rel2Annotation) {
+            this._rel2Annotation.highlight()
+        }
+    }
+
+    /**
+     * Dehighlight relations.
+     */
+    dehighlightRelAnnotations () {
+        if (this._rel1Annotation) {
+            this._rel1Annotation.dehighlight()
+        }
+        if (this.rel2Annotation) {
+            this.rel2Annotation.dehighlight()
+        }
+    }
+
+    /**
+     * Handle a selected event on a text.
+     */
+    handleTextSelected () {
+        this.select()
+    }
+
+    /**
+     * Handle a deselected event on a text.
+     */
+    handleTextDeselected () {
+        this.deselect()
+    }
+
+    /**
+     * The callback for the relational text hoverred in.
+     */
+    handleTextHoverIn () {
+        this.highlight()
+        this.emit('hoverin')
+        this.highlightRelAnnotations()
+    }
+
+    /**
+     * The callback for the relational text hoverred out.
+     */
+    handleTextHoverOut () {
+        this.dehighlight()
+        this.emit('hoverout')
+        this.dehighlightRelAnnotations()
+    }
+
+    /**
+     * The callback for the relationals hoverred in.
+     */
+    handleRelHoverIn () {
+        this.highlight()
+        this.highlightRelAnnotations()
+    }
+
+    /**
+     * The callback for the relationals hoverred out.
+     */
+    handleRelHoverOut () {
+        this.dehighlight()
+        this.dehighlightRelAnnotations()
+    }
+
+    /**
+     * The callback that is called relations has benn deleted.
+     */
+    handleRelDelete () {
+        this.destroy()
+    }
+
+    /**
+     * The callback that is called relations has been moved.
+     */
+    handleRelMove () {
+        this.render()
+    }
+
+    /**
+     * The callback that is called relations has finished to be moved.
+     */
+    handleRelMoveEnd (rectAnnotation) {
+        if (this._rel1Annotation === rectAnnotation || this._rel2Annotation === rectAnnotation) {
+            this.enableViewMode()
+            this.textAnnotation.enableViewMode()
+        }
+    }
+
+    /**
+     * The callback that is called the text content is changed.
+     *
+     * @param {String} newText - the content an user changed.
+     */
+    handleTextChanged (newText) {
+        this.text = newText
+        this.save()
+    }
+
+    /**
+     * The callback that is called at hoverred in.
+     */
+    handleHoverInEvent (e) {
+        super.handleHoverInEvent(e)
+        this.highlightRelAnnotations()
+    }
+
+    /**
+     * The callback that is called at hoverred out.
+     */
+    handleHoverOutEvent (e) {
+        super.handleHoverOutEvent(e)
+        this.dehighlightRelAnnotations()
+    }
+
+    /**
+     * The callback that is called at clicked.
+     */
+    handleClickEvent (e) {
+        super.handleClickEvent(e)
+    }
+
+    /**
+     * Enable view mode.
+     */
+    enableViewMode () {
+
+        this.disableViewMode()
+
+        super.enableViewMode()
+
+        if (!this.readOnly) {
+            this.$element.find('path').on('click', this.handleClickEvent)
+        }
+    }
+
+    /**
+     * Disable view mode.
+     */
+    disableViewMode () {
+        super.disableViewMode()
+        this.$element.find('path').off('click')
+    }
+
+    /**
+     * Set the start / end points of the relation.
+     */
+    setStartEndPosition () {
+        if (this._rel1Annotation) {
+            let p = this._rel1Annotation.getBoundingCirclePosition()
+            this.x1 = p.x
+            this.y1 = p.y
+        }
+        if (this._rel2Annotation) {
+            let p = this._rel2Annotation.getBoundingCirclePosition()
+            this.x2 = p.x
+            this.y2 = p.y
+        }
+    }
+
+    /**
+     * @{inheritDoc}
+     */
+    equalTo (anno) {
+
+        if (!anno || this.type !== anno) {
+            return false
+        }
+
+        const isSame = __WEBPACK_IMPORTED_MODULE_4__shared_util__["a" /* anyOf */](this.rel1Annotation.uuid, [anno.rel1Annotation.uuid, anno.rel2Annotation.uuid])
+                        && __WEBPACK_IMPORTED_MODULE_4__shared_util__["a" /* anyOf */](this.rel2Annotation.uuid, [anno.rel1Annotation.uuid, anno.rel2Annotation.uuid])
+
+        return isSame
+    }
+
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = RelationAnnotation;
+
 
 
 /***/ }),
@@ -17264,9 +17264,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_events___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_events__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_PDFAnnoCore__ = __webpack_require__(60);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__src_annotation_container__ = __webpack_require__(79);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__src_annotation_rect__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__src_annotation_span__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__src_annotation_relation__ = __webpack_require__(13);
 /**
     Functions for annotations rendered over a PDF file.
 */
@@ -17275,151 +17272,141 @@ __webpack_require__(58)
 
 
 
-
 // for Convinience.
-window.$ = window.jQuery = __WEBPACK_IMPORTED_MODULE_0_jquery___default.a;
+window.$ = window.jQuery = __WEBPACK_IMPORTED_MODULE_0_jquery___default.a
 
-window.globalEvent = new __WEBPACK_IMPORTED_MODULE_1_events___default.a();
-
+window.globalEvent = new __WEBPACK_IMPORTED_MODULE_1_events___default.a()
 
 // This is the entry point of window.xxx.
 // (setting from webpack.config.js)
 
 /* harmony default export */ __webpack_exports__["default"] = (__WEBPACK_IMPORTED_MODULE_2__src_PDFAnnoCore__["a" /* default */]);
-// module.exports = PDFAnnoCore;
 
 // Create an annocation container.
 
-window.annotationContainer = new __WEBPACK_IMPORTED_MODULE_3__src_annotation_container__["a" /* default */]();
-
-
-
-
-
-// Setup Storage.
-// PDFAnnoCore.setStoreAdapter(new PDFAnnoCore.PdfannoStoreAdapter());
+window.annotationContainer = new __WEBPACK_IMPORTED_MODULE_3__src_annotation_container__["a" /* default */]()
 
 // Enable a view mode.
-__WEBPACK_IMPORTED_MODULE_2__src_PDFAnnoCore__["a" /* default */].UI.enableViewMode();
+__WEBPACK_IMPORTED_MODULE_2__src_PDFAnnoCore__["a" /* default */].UI.enableViewMode()
 
 // Check Ctrl or Cmd button clicked.
 // ** ATTENTION!! ALSO UPDATED by pdfanno.js **
-window.ctrlPressed = false;
+window.ctrlPressed = false
 __WEBPACK_IMPORTED_MODULE_0_jquery___default.a(document).on('keydown', e => {
 
     // Allow any keyboard events for <input/>.
     if (e.target.tagName.toLowerCase() === 'input') {
-        return;
+        return
     }
 
     if (e.keyCode === 17 || e.keyCode === 91) { // 17:ctrlKey, 91:cmdKey
-        window.ctrlPressed = true;
-        console.log('ctrl press!!');
+        window.ctrlPressed = true
+        console.log('ctrl press!!')
     }
 }).on('keyup', e => {
 
     // Allow any keyboard events for <input/>.
     if (e.target.tagName.toLowerCase() === 'input') {
-        return;
+        return
     }
 
-    if (e.keyCode === 49) {  // Digit "1"
-        var event = document.createEvent('CustomEvent');
-        event.initCustomEvent('digit1Pressed', true, true, null);
-        window.dispatchEvent(event);
-        return;
-    }
-    if (e.keyCode === 50) {  // Digit "2"
-        var event = document.createEvent('CustomEvent');
-        event.initCustomEvent('digit2Pressed', true, true, null);
-        window.dispatchEvent(event);
-        return;
-    }
-    if (e.keyCode === 51) {  // Digit "3"
-        var event = document.createEvent('CustomEvent');
-        event.initCustomEvent('digit3Pressed', true, true, null);
-        window.dispatchEvent(event);
-        return;
-    }
-    if (e.keyCode === 52) {  // Digit "4"
-        var event = document.createEvent('CustomEvent');
-        event.initCustomEvent('digit4Pressed', true, true, null);
-        window.dispatchEvent(event);
-        return;
-    }
+    // if (e.keyCode === 49) {  // Digit "1"
+    //     var event = document.createEvent('CustomEvent')
+    //     event.initCustomEvent('digit1Pressed', true, true, null)
+    //     window.dispatchEvent(event)
+    //     return
+    // }
+    // if (e.keyCode === 50) {  // Digit "2"
+    //     var event = document.createEvent('CustomEvent')
+    //     event.initCustomEvent('digit2Pressed', true, true, null)
+    //     window.dispatchEvent(event)
+    //     return
+    // }
+    // if (e.keyCode === 51) {  // Digit "3"
+    //     var event = document.createEvent('CustomEvent')
+    //     event.initCustomEvent('digit3Pressed', true, true, null)
+    //     window.dispatchEvent(event)
+    //     return
+    // }
+    // if (e.keyCode === 52) {  // Digit "4"
+    //     var event = document.createEvent('CustomEvent')
+    //     event.initCustomEvent('digit4Pressed', true, true, null)
+    //     window.dispatchEvent(event)
+    //     return
+    // }
 
-    window.ctrlPressed = false;
-});
+    window.ctrlPressed = false
+})
 
 // The event called at page rendered by pdfjs.
-window.addEventListener('pagerendered', function(ev) {
-    console.log('pagerendered:', ev.detail.pageNumber);
+window.addEventListener('pagerendered', function (ev) {
+    console.log('pagerendered:', ev.detail.pageNumber)
 
     // No action, if the viewer is closed.
-    if (!PDFView.pdfViewer.getPageView(0)) {
-        return;
+    if (!window.PDFView.pdfViewer.getPageView(0)) {
+        return
     }
 
-    renderAnno();
+    renderAnno()
 
     // Issue Fix.
     // Correctly rendering when changing scaling.
     // The margin between pages is fixed(9px), and never be scaled in default,
     // then manually have to change the margin.
-    let scale = PDFView.pdfViewer.getPageView(0).viewport.scale;
-    let borderWidth = `${9 * scale}px`;
-    let marginBottom = `${-9 * scale}px`;
+    let scale = window.PDFView.pdfViewer.getPageView(0).viewport.scale
+    let borderWidth = `${9 * scale}px`
+    let marginBottom = `${-9 * scale}px`
     __WEBPACK_IMPORTED_MODULE_0_jquery___default.a('.page').css({
         'border-top-width'    : borderWidth,
         'border-bottom-width' : borderWidth,
         'margin-bottom'       : marginBottom
-    });
-});
+    })
+})
 
 // Adapt to scale change.
 window.addEventListener('scalechange', () => {
-    console.log('scalechange');
-    removeAnnoLayer();
-    renderAnno();
-});
+    console.log('scalechange')
+    removeAnnoLayer()
+    renderAnno()
+})
 
 /*
  * Remove the annotation layer and the temporary rendering layer.
  */
-function removeAnnoLayer() {
-    __WEBPACK_IMPORTED_MODULE_0_jquery___default.a('#annoLayer, #tmpLayer').remove();
+function removeAnnoLayer () {
+    __WEBPACK_IMPORTED_MODULE_0_jquery___default.a('#annoLayer, #tmpLayer').remove()
 }
 // TODO Refactoring: tricky.
-window.removeAnnoLayer = removeAnnoLayer;
+window.removeAnnoLayer = removeAnnoLayer
 
 /*
  * Render annotations saved in the storage.
  */
-function renderAnno() {
+function renderAnno () {
 
     // No action, if the viewer is closed.
-    if (!PDFView.pdfViewer.getPageView(0)) {
-        return;
+    if (!window.PDFView.pdfViewer.getPageView(0)) {
+        return
     }
 
     // TODO make it a global const.
-    const svgLayerId = 'annoLayer';
+    const svgLayerId = 'annoLayer'
 
     // Check already exists.
     if (__WEBPACK_IMPORTED_MODULE_0_jquery___default.a('#' + svgLayerId).length > 0) {
-        return;
+        return
     }
 
-    let leftMargin = (__WEBPACK_IMPORTED_MODULE_0_jquery___default.a('#viewer').width() - __WEBPACK_IMPORTED_MODULE_0_jquery___default.a('.page').width()) / 2;
+    let leftMargin = (__WEBPACK_IMPORTED_MODULE_0_jquery___default.a('#viewer').width() - __WEBPACK_IMPORTED_MODULE_0_jquery___default.a('.page').width()) / 2
 
     // At window.width < page.width.
     if (leftMargin < 0) {
-        leftMargin = 9;
+        leftMargin = 9
     }
 
-    let height = __WEBPACK_IMPORTED_MODULE_0_jquery___default.a('#viewer').height();
+    let height = __WEBPACK_IMPORTED_MODULE_0_jquery___default.a('#viewer').height()
 
-    let width = __WEBPACK_IMPORTED_MODULE_0_jquery___default.a('.page').width();
+    let width = __WEBPACK_IMPORTED_MODULE_0_jquery___default.a('.page').width()
 
     // Add an annotation layer.
     let $annoLayer = __WEBPACK_IMPORTED_MODULE_0_jquery___default.a(`<svg id="${svgLayerId}" class="${svgLayerId}"/>`).css({   // TODO CSSClass.
@@ -17430,95 +17417,57 @@ function renderAnno() {
         height     : `${height}px`,
         visibility : 'hidden',
         'z-index'  : 2
-    });
+    })
     // Add a tmp layer.
     let $tmpLayer = __WEBPACK_IMPORTED_MODULE_0_jquery___default.a(`<div id="tmpLayer"/>`).css({   // TODO CSSClass.
-        position : 'absolute',
-        top      : '0px',
-        left     : `${leftMargin}px`,
-        width    : `${width}px`,
-        height   : `${height}px`,
+        position   : 'absolute',
+        top        : '0px',
+        left       : `${leftMargin}px`,
+        width      : `${width}px`,
+        height     : `${height}px`,
         visibility : 'hidden',
         'z-index'  : 2
-    });
+    })
 
     __WEBPACK_IMPORTED_MODULE_0_jquery___default.a('#viewer').css({
         position : 'relative'
-    }).append($annoLayer).append($tmpLayer);
+    }).append($annoLayer).append($tmpLayer)
 
     // Reset.
-    // window.annotationContainer.destroy();
-    // window.annotationContainer.set = new Set();
+    // window.annotationContainer.destroy()
+    // window.annotationContainer.set = new Set()
 
-    let svg = $annoLayer.get(0);
-    let documentId = getFileName(PDFView.url);
-    let viewport = PDFView.pdfViewer.getPageView(0).viewport;
-    svg.setAttribute('data-pdf-annotate-viewport', JSON.stringify(viewport));
-    svg.setAttribute('data-pdf-annotate-document', documentId);
-    svg.setAttribute('data-pdf-annotate-page', 1);
+    let svg = $annoLayer.get(0)
+    let documentId = window.getFileName(window.PDFView.url)
+    let viewport = window.PDFView.pdfViewer.getPageView(0).viewport
+    svg.setAttribute('data-pdf-annotate-viewport', JSON.stringify(viewport))
+    svg.setAttribute('data-pdf-annotate-document', documentId)
+    svg.setAttribute('data-pdf-annotate-page', 1)
 
-    renderAnnotations(svg);
+    renderAnnotations(svg)
 }
 
 // TODO Refactoring: tricky.
-window.renderAnno = renderAnno;
+window.renderAnno = renderAnno
 
-function renderAnnotations(svg) {
+function renderAnnotations (svg) {
 
-    console.log('renderAnnotations:', window.annotationContainer.getAllAnnotations().length);
+    console.log('renderAnnotations:', window.annotationContainer.getAllAnnotations().length)
 
     if (window.annotationContainer.getAllAnnotations().length > 0) {
 
         window.annotationContainer.getAllAnnotations().forEach(a => {
-            a.render();
-            a.enableViewMode();
+            a.render()
+            a.enableViewMode()
 
-            console.log('annotation:', a);
-        });
-        var event = document.createEvent('CustomEvent');
-        event.initCustomEvent('annotationrendered', true, true, null);
-        window.dispatchEvent(event);
-        return;
+            console.log('annotation:', a)
+        })
+        var event = document.createEvent('CustomEvent')
+        event.initCustomEvent('annotationrendered', true, true, null)
+        window.dispatchEvent(event)
+        return
     }
 
-    // let documentId = getFileName(PDFView.url);
-    // PDFAnnoCore.getAnnotations(documentId).then(function(annotations) {
-    //     PDFAnnoCore.getStoreAdapter().getSecondaryAnnotations(documentId).then(function(secondaryAnnotations) {
-
-    //         // Primary + Secondary annotations.
-    //         annotations.annotations = annotations.annotations.concat(secondaryAnnotations.annotations);
-
-    //         // Render annotations.
-    //         let viewport = PDFView.pdfViewer.getPageView(0).viewport;
-
-    //         annotations.annotations.forEach(a => {
-
-    //             // TODO move to annotation/index.js
-
-    //             let anno = null;
-
-
-    //             if (a.type === 'area') {
-    //                 anno = RectAnnotation.newInstance(a);
-    //             } else if (a.type === 'span') {
-    //                 anno = SpanAnnotation.newInstance(a);
-    //             } else if (a.type === 'relation') {
-    //                 anno = RelationAnnotation.newInstance(a);
-    //             }
-
-    //             if (anno) {
-    //                 anno.render();
-    //                 anno.enableViewMode();
-    //                 window.annotationContainer.add(anno);
-    //             }
-    //         });
-
-    //         var event = document.createEvent('CustomEvent');
-    //         event.initCustomEvent('annotationrendered', true, true, null);
-    //         window.dispatchEvent(event);
-
-    //     });
-    // });
 }
 
 
@@ -17569,9 +17518,9 @@ exports.push([module.i, "@charset \"utf-8\";\n\n/*\n    Search UI.\n*/\n.pdfanno
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__render__ = __webpack_require__(61);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__UI__ = __webpack_require__(67);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__annotation_rect__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__annotation_span__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__annotation_relation__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__annotation_rect__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__annotation_span__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__annotation_relation__ = __webpack_require__(19);
 
 
 
@@ -18115,8 +18064,8 @@ function createRelation (a, id = null) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_deep_assign__ = __webpack_require__(69);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_deep_assign___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_deep_assign__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__annotation_rect__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__utils_textInput__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__annotation_rect__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__utils_textInput__ = __webpack_require__(17);
 // TODO Remove jquery, because viewer.html already loaded jQuery.
 
 
@@ -18689,8 +18638,8 @@ function closeInput (text) {
 /* harmony export (immutable) */ __webpack_exports__["b"] = getRectangles;
 /* harmony export (immutable) */ __webpack_exports__["a"] = createSpan;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__annotation_span__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_textInput__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__annotation_span__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_textInput__ = __webpack_require__(17);
 
 
 
@@ -18724,10 +18673,9 @@ function getSelectionRects () {
 /**
  * Handle document.mouseup event.
  */
-function handleDocumentMouseup (text, selectedText = null, rects = null, useOriginalCoords = false) {
-    if (!selectedText && !rects) {
-        var { rects, selectedText } = getSelectionRects()
-    }
+function handleDocumentMouseup (text) {
+
+    let { rects, selectedText } = getSelectionRects()
     console.log('rects=', rects)
     let annotation
     if (rects) {
@@ -18738,7 +18686,7 @@ function handleDocumentMouseup (text, selectedText = null, rects = null, useOrig
                 width  : r.width,
                 height : r.height
             }
-        }), selectedText, text, useOriginalCoords)
+        }), selectedText, text)
     }
 
     removeSelection()
@@ -18761,30 +18709,19 @@ function removeSelection () {
  * @param {Array} rects The rects to use for annotation
  * @param {String} color The color of the rects
  */
-function saveSpan (rects, selectedText, text, useOriginalCoords) {
+function saveSpan (rects, selectedText, text) {
     let svg = __WEBPACK_IMPORTED_MODULE_0__utils__["e" /* getSVGLayer */]()
     let boundingRect = svg.getBoundingClientRect()
-
-    let br2 = __WEBPACK_IMPORTED_MODULE_0__utils__["h" /* scaleDown */](svg, boundingRect)
 
     // Initialize the annotation
     let annotation = {
         rectangles : [...rects].map((r) => {
-            if (useOriginalCoords) {
-                return {
-                    x      : r.left - br2.left,
-                    y      : r.top - br2.top,
-                    width  : r.width,
-                    height : r.height
-                }
-            } else {
-                return __WEBPACK_IMPORTED_MODULE_0__utils__["h" /* scaleDown */](svg, {
-                    x      : r.left - boundingRect.left,
-                    y      : r.top - boundingRect.top,
-                    width  : r.width,
-                    height : r.height
-                })
-            }
+            return __WEBPACK_IMPORTED_MODULE_0__utils__["h" /* scaleDown */](svg, {
+                x      : r.left - boundingRect.left,
+                y      : r.top - boundingRect.top,
+                width  : r.width,
+                height : r.height
+            })
         }).filter((r) => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1),
         selectedText,
         text
@@ -18832,8 +18769,8 @@ function getRectangles () {
 /**
  * Create a span by current texts selection.
  */
-function createSpan ({ text = null, selectedText = null, rects = null, useOriginalCoords = false }) {
-    return handleDocumentMouseup(text, selectedText, rects, useOriginalCoords)
+function createSpan ({ text = null }) {
+    return handleDocumentMouseup(text)
 }
 
 
@@ -18843,8 +18780,8 @@ function createSpan ({ text = null, selectedText = null, rects = null, useOrigin
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = createRelation;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_textInput__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__annotation_relation__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_textInput__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__annotation_relation__ = __webpack_require__(19);
 
 
 
@@ -19001,15 +18938,15 @@ exports.push([module.i, "\n/**\n * Utilities.\n */\n.\\--hide {\n  display: none
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_toml__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_toml__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_toml___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_toml__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__version__ = __webpack_require__(80);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_tomlString__ = __webpack_require__(82);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_coords__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__utils_uuid__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__span__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__rect__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__relation__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__utils_uuid__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__span__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__rect__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__relation__ = __webpack_require__(19);
 
 
 

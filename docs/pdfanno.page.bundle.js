@@ -390,58 +390,58 @@ module.exports = {
 /**
  * Convert the `y` position from the local coords to exported json.
  */
-function convertToExportY(y) {
+function convertToExportY (y) {
 
-    let meta = getPageSize();
+    let meta = getPageSize()
 
-    y -= paddingTop;
+    y -= paddingTop
 
-    let pageHeight = meta.height + paddingBetweenPages;
+    let pageHeight = meta.height + paddingBetweenPages
 
-    let pageNumber = Math.floor(y / pageHeight) + 1;
-    let yInPage = y - (pageNumber-1) * pageHeight;
+    let pageNumber = Math.floor(y / pageHeight) + 1
+    let yInPage = y - (pageNumber - 1) * pageHeight
 
-    return { pageNumber, y : yInPage };
+    return { pageNumber, y : yInPage }
 }
 
 /**
  * Convert the `y` position from exported json to local coords.
  */
-function convertFromExportY(pageNumber, yInPage) {
+function convertFromExportY (pageNumber, yInPage) {
 
-    let meta = getPageSize();
+    let meta = getPageSize()
 
-    let y = yInPage + paddingTop;
+    let y = yInPage + paddingTop
 
-    let pagePadding = paddingBetweenPages;
+    let pagePadding = paddingBetweenPages
 
-    y += (pageNumber - 1) * (meta.height + pagePadding);
+    y += (pageNumber - 1) * (meta.height + pagePadding)
 
-    return y;
+    return y
 }
 
 /**
  * The padding of page top.
  */
-const paddingTop = 9;
+const paddingTop = 9
 
 /**
  * The padding between pages.
  */
-const paddingBetweenPages = 9;
+const paddingBetweenPages = 9
 /* harmony export (immutable) */ __webpack_exports__["c"] = paddingBetweenPages;
 
 
 /**
  * Get a page size of a single PDF page.
  */
-function getPageSize() {
+function getPageSize () {
 
-    let pdfView = window.PDFView || iframeWindow.PDFView;
+    let pdfView = window.PDFView || window.iframeWindow.PDFView
 
-    let viewBox = pdfView.pdfViewer.getPageView(0).viewport.viewBox;
-    let size = { width : viewBox[2], height : viewBox[3] };
-    return size;
+    let viewBox = pdfView.pdfViewer.getPageView(0).viewport.viewBox
+    let size = { width : viewBox[2], height : viewBox[3] }
+    return size
 }
 
 
@@ -766,17 +766,17 @@ function updateLink(linkElement, obj) {
  * Utility.
  */
 
-function anyOf(target, candidates) {
-    return candidates.filter(c => c === target).length > 0;
+function anyOf (target, candidates) {
+    return candidates.filter(c => c === target).length > 0
 }
 
 /**
  * Dispatch a custom event to `window` object.
  */
-function dispatchWindowEvent(eventName, data) {
-    var event = document.createEvent('CustomEvent');
-    event.initCustomEvent(eventName, true, true, data);
-    window.dispatchEvent(event);
+function dispatchWindowEvent (eventName, data) {
+    var event = document.createEvent('CustomEvent')
+    event.initCustomEvent(eventName, true, true, data)
+    window.dispatchEvent(event)
 }
 
 
@@ -785,10 +785,7 @@ function dispatchWindowEvent(eventName, data) {
 /* 8 */,
 /* 9 */,
 /* 10 */,
-/* 11 */,
-/* 12 */,
-/* 13 */,
-/* 14 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -889,11 +886,11 @@ module.exports = defaults;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(37)))
 
 /***/ }),
-/* 15 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var parser = __webpack_require__(16);
-var compiler = __webpack_require__(17);
+var parser = __webpack_require__(13);
+var compiler = __webpack_require__(14);
 
 module.exports = {
   parse: function(input) {
@@ -904,7 +901,7 @@ module.exports = {
 
 
 /***/ }),
-/* 16 */
+/* 13 */
 /***/ (function(module, exports) {
 
 module.exports = (function() {
@@ -4751,7 +4748,7 @@ module.exports = (function() {
 
 
 /***/ }),
-/* 17 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4955,6 +4952,9 @@ module.exports = {
 
 
 /***/ }),
+/* 15 */,
+/* 16 */,
+/* 17 */,
 /* 18 */,
 /* 19 */,
 /* 20 */
@@ -11535,60 +11535,60 @@ function dispatchWindowEvent (eventName, data) {
 /**
  * Set the confirm dialog at leaving the page.
  */
-function listenWindowLeaveEvent() {
-    window.annotationUpdated = true;
+function listenWindowLeaveEvent () {
+    window.annotationUpdated = true
     $(window).off('beforeunload').on('beforeunload', () => {
-        return 'You don\'t save the annotations yet.\nAre you sure to leave ?';
-    });
+        return 'You don\'t save the annotations yet.\nAre you sure to leave ?'
+    })
 }
 
 /**
  * Unset the confirm dialog at leaving the page.
  */
-function unlistenWindowLeaveEvent() {
-    window.annotationUpdated = false;
-    $(window).off('beforeunload');
+function unlistenWindowLeaveEvent () {
+    window.annotationUpdated = false
+    $(window).off('beforeunload')
 }
 
 /**
     Adjust the height of viewer according to window height.
 */
-function adjustViewerSize() {
-    window.removeEventListener('resize', resizeHandler);
-    window.addEventListener('resize', resizeHandler);
-    resizeHandler();
+function adjustViewerSize () {
+    window.removeEventListener('resize', resizeHandler)
+    window.addEventListener('resize', resizeHandler)
+    resizeHandler()
 }
 
 /**
  * Resize the height of elements adjusting to the window.
  */
-function resizeHandler() {
+function resizeHandler () {
 
     // PDFViewer.
-    let height = $(window).innerHeight() - $('#viewer').offset().top;
-    $('#viewer iframe').css('height', `${height}px`);
+    let height = $(window).innerHeight() - $('#viewer').offset().top
+    $('#viewer iframe').css('height', `${height}px`)
 
     // TODO move to anno-ui.
 
     // Dropdown for PDF.
-    let height1 = $(window).innerHeight() - ($('#dropdownPdf ul').offset().top || 120);
-    $('#dropdownPdf ul').css('max-height', `${height1 - 20}px`);
+    let height1 = $(window).innerHeight() - ($('#dropdownPdf ul').offset().top || 120)
+    $('#dropdownPdf ul').css('max-height', `${height1 - 20}px`)
 
     // Dropdown for Primary Annos.
-    let height2 = $(window).innerHeight() - ($('#dropdownAnnoPrimary ul').offset().top || 120);
-    $('#dropdownAnnoPrimary ul').css('max-height', `${height2 - 20}px`);
+    let height2 = $(window).innerHeight() - ($('#dropdownAnnoPrimary ul').offset().top || 120)
+    $('#dropdownAnnoPrimary ul').css('max-height', `${height2 - 20}px`)
 
     // Dropdown for Anno list.
-    let height3 = $(window).innerHeight() - ($('#dropdownAnnoList ul').offset().top || 120);
-    $('#dropdownAnnoList ul').css('max-height', `${height3 - 20}px`);
+    let height3 = $(window).innerHeight() - ($('#dropdownAnnoList ul').offset().top || 120)
+    $('#dropdownAnnoList ul').css('max-height', `${height3 - 20}px`)
 
     // Dropdown for Reference Annos.
-    let height4 = $(window).innerHeight() - ($('#dropdownAnnoReference ul').offset().top || 120);
-    $('#dropdownAnnoReference ul').css('max-height', `${height4 - 20}px`);
+    let height4 = $(window).innerHeight() - ($('#dropdownAnnoReference ul').offset().top || 120)
+    $('#dropdownAnnoReference ul').css('max-height', `${height4 - 20}px`)
 
     // Tools.
-    let height5 = $(window).innerHeight() - $('#tools').offset().top;
-    $('#tools').css('height', `${height5}px`);
+    let height5 = $(window).innerHeight() - $('#tools').offset().top
+    $('#tools').css('height', `${height5}px`)
 }
 
 
@@ -11805,6 +11805,7 @@ window.addEventListener('DOMContentLoaded', e => {
     let pdfURL
     let annoURL
     let moveTo
+    let tabIndex
     (location.search || '').replace('?', '').split('&')
         .filter(a => a)
         .forEach(fragment => {
@@ -11815,6 +11816,8 @@ window.addEventListener('DOMContentLoaded', e => {
                 annoURL = value
             } else if (key && key.toLowerCase() === 'move') {
                 moveTo = value
+            } else if (key && key.toLowerCase() === 'tab') {
+                tabIndex = parseInt(value, 10)
             }
     })
 
@@ -11902,6 +11905,11 @@ window.addEventListener('DOMContentLoaded', e => {
         })
     }
 
+    // initial tab.
+    if (tabIndex) {
+        $(`.nav-tabs a[href="#tab${tabIndex}"]`).click()
+    }
+
 })
 
 /**
@@ -11961,7 +11969,7 @@ function loadExternalAnnoFile (url) {
  * Get the URL of the default PDF.
  */
 function getDefaultPDFURL () {
-    // e.g. https://paperai.github.io/pdfanno/pdfs/P12-1046.pdf
+    // e.g. https://paperai.github.io:80/pdfanno/pdfs/P12-1046.pdf
     const pathnames = location.pathname.split('/')
     const pdfURL = location.protocol + '//' + location.hostname + ':' + location.port + pathnames.slice(0, pathnames.length-1).join('/') + '/pdfs/' + DEFAULT_PDF_NAME
     return pdfURL
@@ -12018,7 +12026,7 @@ function prepareSearch(pdfResult) {
     console.log('pages:', pages)
 
     // Enable search input field.
-    $('#searchWord').removeAttr('disabled')
+    $('#searchWord, .js-dict-match-file').removeAttr('disabled')
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -12034,11 +12042,13 @@ window.addEventListener('DOMContentLoaded', () => {
         }
 
         timerId = setTimeout(() => {
+            window.searchType = 'text'
             doSearch()
         }, DELAY)
     })
 
     $('.js-search-case-sensitive, .js-search-regexp').on('change', () => {
+        window.searchType = 'text'
         doSearch()
     })
 
@@ -12049,6 +12059,7 @@ window.addEventListener('DOMContentLoaded', () => {
     $('.js-search-clear').on('click', e => {
         // Clear search.
         $('#searchWord').val('')
+        window.searchType = null
         doSearch()
         $(e.currentTarget).blur()
     })
@@ -12058,6 +12069,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
     $('.js-search-prev, .js-search-next').on('click', e => {
+
+        if (window.searchType !== 'text') {
+            return
+        }
 
         // No action for no results.
         if (searchHighlights.length === 0) {
@@ -12138,12 +12153,11 @@ function search({ hay, needle, isCaseSensitive = false, useRegexp = false }) {
     return positions
 }
 
+window.searchType = null
 window.searchPosition = -1
 window.searchHighlights = []
 
-function doSearch () {
-
-    // TODO Display hit counts?
+function doSearch ({ query = null } = {}) {
 
     // Check enable.
     if ($('#searchWord').is('[disabled]')) {
@@ -12154,15 +12168,22 @@ function doSearch () {
     // Remove highlights for search results.
     $('.pdfanno-search-result', iframeWindow.document).remove()
     $('.search-hit').addClass('hidden')
+    $('.js-dict-match-cur-pos, .js-dict-match-hit-counts').text('000')
 
-    // Text
-    const text = $('#searchWord').val()
-    // Case Sensitive
-    const isCaseSensitive = $('.js-search-case-sensitive')[0].checked
-    // Use Regexp.
-    const useRegexp = $('.js-search-regexp')[0].checked
+    let text
+    let isCaseSensitive
+    let useRegexp
+    if (window.searchType === 'text') {
+        text = $('#searchWord').val()
+        isCaseSensitive = $('.js-search-case-sensitive')[0].checked
+        useRegexp = $('.js-search-regexp')[0].checked
+    } else {
+        text = query
+        isCaseSensitive = $('.js-dict-match-case-sensitive')[0].checked
+        useRegexp = true
+    }
 
-    console.log(`doSearch: text="${text}", caseSensitive=${isCaseSensitive}, regexp=${useRegexp}`)
+    console.log(`doSearch: searchType=${window.searchType} text="${text}", caseSensitive=${isCaseSensitive}, regexp=${useRegexp}`)
 
     // Reset.
     searchPosition = -1
@@ -12170,7 +12191,7 @@ function doSearch () {
 
     // The min length of text for searching.
     const MIN_LEN = 2
-    if (text.length < MIN_LEN) {
+    if (!text || text.length < MIN_LEN) {
         return
     }
 
@@ -12231,9 +12252,103 @@ function doSearch () {
         highlightSearchResult()
     }
 
-    $('.search-hit').removeClass('hidden')
-    $('.search-current-position').text(searchPosition + 1)
-    $('.search-hit-count').text(searchHighlights.length)
+    if (window.searchType === 'text') {
+        $('.search-hit').removeClass('hidden')
+        $('.search-current-position').text(searchPosition + 1)
+        $('.search-hit-count').text(searchHighlights.length)
+    } else {
+        // Dict matching.
+        $('.js-dict-match-cur-pos').text(window.searchPosition + 1)
+        $('.js-dict-match-hit-counts').text(searchHighlights.length)
+    }
+}
+
+let dictonaryTexts;
+
+/**
+ * Dictonary Matching.
+ */
+window.addEventListener('DOMContentLoaded', () => {
+
+    // Clear prev cache.
+    $('.js-dict-match-file :file').on('click', e => {
+        $(e.currentTarget).val(null)
+    })
+
+    // Load a dictionary for matching.
+    $('.js-dict-match-file :file').on('change', e => {
+
+        const files = e.target.files
+        if (files.length === 0) {
+            __WEBPACK_IMPORTED_MODULE_2_anno_ui__["ui"].alertDialog.show({ message : 'Select a file.' })
+            return
+        }
+
+        const fname = files[0].name
+        $('.js-dict-match-file-name').text(fname)
+
+        let fileReader = new FileReader()
+        fileReader.onload = ev => {
+            const texts = ev.target.result.split('\n').map(t => {
+                return t.trim()
+            }).filter(t => {
+                return t
+            })
+            if (texts.length === 0) {
+                __WEBPACK_IMPORTED_MODULE_2_anno_ui__["ui"].alertDialog.show({ message : 'No text is found in the dictionary file.' })
+                return
+            }
+            dictonaryTexts = texts
+            searchByDictionary(texts)
+        }
+        fileReader.readAsText(files[0])
+    })
+
+    // Clear search results.
+    $('.js-dict-match-clear').on('click', e => {
+        window.searchType = null
+        doSearch()
+        $(e.currentTarget).blur()
+    })
+
+    // Go to the prev/next result.
+    $('.js-dict-match-prev, .js-dict-match-next').on('click', e => {
+
+        if (window.searchType !== 'dictionary') {
+            return
+        }
+
+        // No action for no results.
+        if (searchHighlights.length === 0) {
+            return
+        }
+
+        // go to next or prev.
+        let num = 1
+        if ($(e.currentTarget).hasClass('js-dict-match-prev')) {
+            num = -1
+        }
+        searchPosition += num
+        if (searchPosition < 0) {
+            searchPosition = searchHighlights.length - 1
+        } else if (searchPosition >= searchHighlights.length) {
+            searchPosition = 0
+        }
+
+        highlightSearchResult()
+    })
+
+    // Set the search behavior.
+    $('.js-dict-match-case-sensitive').on('change', () => {
+        searchByDictionary(dictonaryTexts)
+    })
+})
+
+function searchByDictionary(texts = []) {
+    console.log('searchByDictionary:', texts)
+    window.searchType = 'dictionary'
+    const query = texts.join('|')
+    doSearch({ query })
 }
 
 
@@ -12299,7 +12414,7 @@ module.exports = __webpack_require__(35);
 var utils = __webpack_require__(0);
 var bind = __webpack_require__(20);
 var Axios = __webpack_require__(36);
-var defaults = __webpack_require__(14);
+var defaults = __webpack_require__(11);
 
 /**
  * Create an instance of Axios
@@ -12355,7 +12470,7 @@ module.exports.default = axios;
 "use strict";
 
 
-var defaults = __webpack_require__(14);
+var defaults = __webpack_require__(11);
 var utils = __webpack_require__(0);
 var InterceptorManager = __webpack_require__(46);
 var dispatchRequest = __webpack_require__(47);
@@ -13073,7 +13188,7 @@ module.exports = InterceptorManager;
 var utils = __webpack_require__(0);
 var transformData = __webpack_require__(48);
 var isCancel = __webpack_require__(23);
-var defaults = __webpack_require__(14);
+var defaults = __webpack_require__(11);
 
 /**
  * Throws a `Cancel` if cancellation has been requested.
@@ -14325,7 +14440,7 @@ module.exports = Fuse;
 /* harmony export (immutable) */ __webpack_exports__["g"] = deleteAnnotation;
 /* harmony export (immutable) */ __webpack_exports__["f"] = clear;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shared_coords__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_toml__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_toml__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_toml___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_toml__);
 
 
@@ -14335,63 +14450,63 @@ module.exports = Fuse;
  *
  * This method expect to get argument made from a TOML file parsed by `window.readTOML`.
  */
-function addAllAnnotations(tomlObject) {
+function addAllAnnotations (tomlObject) {
 
-    let result = {};
+    let result = {}
 
     for (const key in tomlObject) {
 
-        let data = tomlObject[key];
+        let data = tomlObject[key]
 
         if (typeof data !== 'object') {
-            continue;
+            continue
         }
 
-        data.id = key;
+        data.id = key
 
-        let a;
+        let a
         if (data.type === 'span') {
-            a = new PublicSpanAnnotation(data);
+            a = new PublicSpanAnnotation(data)
         } else if (data.type === 'rect') {
-            a = new PublicRectAnnotation(data);
+            a = new PublicRectAnnotation(data)
         } else if (data.type === 'relation') {
-            a = new PublicRelationAnnotation(data);
+            a = new PublicRelationAnnotation(data)
         } else {
-            console.log('Unknown: ', key, data);
+            console.log('Unknown: ', key, data)
         }
 
         if (a) {
-            addAnnotation(a);
-            result[key] = a;
+            addAnnotation(a)
+            result[key] = a
         }
     }
 
-    return result;
+    return result
 
 }
 
 /**
  * Add an annotation, and render it.
  */
-function addAnnotation(publicAnnotation) {
+function addAnnotation (publicAnnotation) {
 
-    let a = publicAnnotation.annotation;
-    window.annoPage.addAnnotation(a);
-    a.render();
-    a.enableViewMode();
-    a.save();
+    let a = publicAnnotation.annotation
+    window.annoPage.addAnnotation(a)
+    a.render()
+    a.enableViewMode()
+    a.save()
 
     // Restore the status of AnnoTools.
-    window.annoPage.disableAnnotateFunctions();
-    window.annoPage.enableAnnotateFunction(window.currentAnnoToolType);
+    window.annoPage.disableAnnotateFunctions()
+    window.annoPage.enableAnnotateFunction(window.currentAnnoToolType)
 }
 
 /**
  * Delete an annotation, and also detach it from view.
  */
-function deleteAnnotation(publicAnnotation) {
+function deleteAnnotation (publicAnnotation) {
 
-    publicAnnotation.annotation.destroy();
+    publicAnnotation.annotation.destroy()
 }
 
 /**
@@ -14402,18 +14517,18 @@ class PublicRectAnnotation {
     /**
      * Create a rect annotation from a TOML data.
      */
-    constructor({ page, position, label='', id=0 }) {
+    constructor ({ page, position, label = '', id = 0 }) {
 
         // Check inputs.
         if (!page || typeof page !== 'number') {
-            throw 'Set the page as number.';
+            throw new Error('Set the page as number.')
         }
         if (!position || position.length !== 4) {
-            throw 'Set the position which includes `x`, `y`, `width` and `height`.';
+            throw new Error('Set the position which includes `x`, `y`, `width` and `height`.')
         }
 
         // position: String -> Float.
-        position = position.map(p => parseFloat(p));
+        position = position.map(p => parseFloat(p))
 
         let rect = window.annoPage.createRectAnnotation({
             uuid     : id && String(id), // annotationid must be string.
@@ -14422,11 +14537,11 @@ class PublicRectAnnotation {
             width    : position[2],
             height   : position[3],
             text     : label,
-            color    : "#FF0000",
+            color    : '#FF0000',
             readOnly : false
-        });
+        })
 
-        this.annotation = rect;
+        this.annotation = rect
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = PublicRectAnnotation;
@@ -14437,18 +14552,18 @@ class PublicRectAnnotation {
  */
 class PublicSpanAnnotation {
 
-    constructor({ page, position, label='', text='', id=0 }) {
+    constructor ({ page, position, label = '', text = '', id = 0 }) {
 
         // Check inputs.
         if (!page || typeof page !== 'number') {
-            throw 'Set the page as number.';
+            throw new Error('Set the page as number.')
         }
         if (!position) {
-            throw 'Set the position.';
+            throw new Error('Set the position.')
         }
 
         // position: String -> Float.
-        position = position.map(p => p.map(pp => parseFloat(pp)));
+        position = position.map(p => p.map(pp => parseFloat(pp)))
 
         // Convert.
         position = position.map(p => {
@@ -14459,7 +14574,7 @@ class PublicSpanAnnotation {
                 width  : p[2],
                 height : p[3]
             }
-        });
+        })
 
         let span = window.annoPage.createSpanAnnotation({
             // TODO 既存のものとかぶるのではないか？
@@ -14469,9 +14584,9 @@ class PublicSpanAnnotation {
             color        : '#FFFF00',
             readOnly     : false,
             selectedText : text
-        });
+        })
 
-        this.annotation = span;
+        this.annotation = span
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["c"] = PublicSpanAnnotation;
@@ -14482,14 +14597,14 @@ class PublicSpanAnnotation {
  */
 class PublicRelationAnnotation {
 
-    constructor({ dir, ids, label='', id=0 }) {
+    constructor ({ dir, ids, label = '', id = 0 }) {
 
         // Check inputs.
         if (!dir) {
-            throw 'Set the dir.';
+            throw new Error('Set the dir.')
         }
         if (!ids || ids.length !== 2) {
-            throw 'Set the ids.';
+            throw new Error('Set the ids.')
         }
 
         let r = window.annoPage.createRelationAnnotation({
@@ -14499,11 +14614,11 @@ class PublicRelationAnnotation {
             rel1      : typeof ids[0] === 'object' ? ids[0].annotation : ids[0],
             rel2      : typeof ids[1] === 'object' ? ids[1].annotation : ids[1],
             text      : label,
-            color     : "#FF0000",
+            color     : '#FF0000',
             readOnly  : false
-        });
+        })
 
-        this.annotation = r;
+        this.annotation = r
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["b"] = PublicRelationAnnotation;
@@ -14512,15 +14627,15 @@ class PublicRelationAnnotation {
 /**
  * TOML parser.
  */
-const readTOML = __WEBPACK_IMPORTED_MODULE_1_toml___default.a.parse;
+const readTOML = __WEBPACK_IMPORTED_MODULE_1_toml___default.a.parse
 /* harmony export (immutable) */ __webpack_exports__["h"] = readTOML;
 
 
 /**
  * Delete all annotations.
  */
-function clear() {
-    window.annoPage.clearAllAnnotations();
+function clear () {
+    window.annoPage.clearAllAnnotations()
 }
 
 
@@ -14786,7 +14901,7 @@ class PDFAnnoPage {
         const rects = window.iframeWindow.PDFAnnoCore.default.UI.getRectangles()
 
         // Use a search result.
-        let highlight;
+        let highlight
         if (window.searchPosition > -1) {
             highlight = window.searchHighlights[window.searchPosition]
         }
@@ -14802,32 +14917,23 @@ class PDFAnnoPage {
 
         } else if (highlight) {
 
-            const s = new SpanAnnotation({
-                page : highlight.page,
-                position: highlight.position,
-                label : text,
-                text : highlight.text
-                // id : 1
-            });
-            window.add(s);
+            const s = new window.SpanAnnotation({
+                page     : highlight.page,
+                position : highlight.position,
+                label    : text,
+                text     : highlight.text
+            })
+            window.add(s)
 
             // TODO Refactoring.
             var event = document.createEvent('CustomEvent')
             event.initCustomEvent('enableTextInput', true, true, {
-                uuid : s.annotation.uuid,
-                text : text,
+                uuid      : s.annotation.uuid,
+                text      : text,
                 autoFocus : true
             })
             window.dispatchEvent(event)
-
-
-            // window.iframeWindow.PDFAnnoCore.default.UI.createSpan({
-            //     text,
-            //     selectedText : highlight.text,
-            //     rects        : highlight.rects
-            // })
         }
-
 
         // Notify annotation added.
         __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered')

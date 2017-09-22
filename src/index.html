@@ -131,8 +131,9 @@
                             </div>
                         </div> <!-- /#tab2 -->
                         <div class="tab-pane" id="tab3">
-                            <!-- Search -->
-                            <div class="u-mt-20 search-control">
+                            <!-- Text Search -->
+                            <h3 class="h4 u-mt-20">Text Search</h3>
+                            <div class="search-control u-mt-20">
                                 <div class="search-input-container">
                                     <input type="text" id="searchWord" class="form-control search-control__input" placeholder="Text to match" disabled>
                                     <p class="search-hit hidden">
@@ -148,6 +149,24 @@
                             </div>
                             <div class="checkbox">
                                 <label><input type="checkbox" value="on" class="js-search-regexp">Regular expression</label>
+                            </div>
+                            <hr>
+                            <!-- Dictionary Matching -->
+                            <h3 class="h4 u-mt-20">Dictionary Matching</h3>
+                            <div>
+                                <label class="btn btn-primary btn-file js-dict-match-file" disabled>
+                                    Browse <input type="file" style="display: none;">
+                                </label>
+                                <span class="js-dict-match-file-name">Select a file.</span>
+                            </div>
+                            <div class="u-mt-10">
+                                <span><span class="js-dict-match-cur-pos">000</span>/<span class="js-dict-match-hit-counts">000</span> hits</span>
+                                <button class="btn btn-default search-control__btn js-dict-match-prev">▲</button>
+                                <button class="btn btn-default search-control__btn js-dict-match-next">▼</button>
+                                <button class="btn search-control__btn js-dict-match-clear">×</button>
+                            </div>
+                            <div class="checkbox">
+                                <label><input type="checkbox" value="on" class="js-dict-match-case-sensitive">Case sensitive</label>
                             </div>
                         </div> <!-- /#tab3 -->
                     </div>

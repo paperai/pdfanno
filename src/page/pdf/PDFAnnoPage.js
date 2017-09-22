@@ -253,7 +253,7 @@ export default class PDFAnnoPage {
         const rects = window.iframeWindow.PDFAnnoCore.default.UI.getRectangles()
 
         // Use a search result.
-        let highlight;
+        let highlight
         if (window.searchPosition > -1) {
             highlight = window.searchHighlights[window.searchPosition]
         }
@@ -269,32 +269,23 @@ export default class PDFAnnoPage {
 
         } else if (highlight) {
 
-            const s = new SpanAnnotation({
-                page : highlight.page,
-                position: highlight.position,
-                label : text,
-                text : highlight.text
-                // id : 1
-            });
-            window.add(s);
+            const s = new window.SpanAnnotation({
+                page     : highlight.page,
+                position : highlight.position,
+                label    : text,
+                text     : highlight.text
+            })
+            window.add(s)
 
             // TODO Refactoring.
             var event = document.createEvent('CustomEvent')
             event.initCustomEvent('enableTextInput', true, true, {
-                uuid : s.annotation.uuid,
-                text : text,
+                uuid      : s.annotation.uuid,
+                text      : text,
                 autoFocus : true
             })
             window.dispatchEvent(event)
-
-
-            // window.iframeWindow.PDFAnnoCore.default.UI.createSpan({
-            //     text,
-            //     selectedText : highlight.text,
-            //     rects        : highlight.rects
-            // })
         }
-
 
         // Notify annotation added.
         dispatchWindowEvent('annotationrendered')
