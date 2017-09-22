@@ -416,7 +416,7 @@ function prepareSearch(pdfResult) {
     console.log('pages:', pages)
 
     // Enable search input field.
-    $('#searchWord').removeAttr('disabled')
+    $('#searchWord, .js-dict-match-file').removeAttr('disabled')
 }
 
 window.addEventListener('DOMContentLoaded', () => {
