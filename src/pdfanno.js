@@ -426,12 +426,19 @@ window.addEventListener('DOMContentLoaded', () => {
 
     $('#searchWord').on('keyup', e => {
 
+        // Enter key.
+        if (e.keyCode === 13) {
+            nextSearchResult()
+            return
+        }
+
         if (timerId) {
             clearTimeout(timerId)
             timerId = null
         }
 
         timerId = setTimeout(() => {
+            timerId = null
             window.searchType = 'text'
             doSearch()
         }, DELAY)
@@ -469,21 +476,29 @@ window.addEventListener('DOMContentLoaded', () => {
             return
         }
 
-        // go to next or prev.
-        let num = 1
         if ($(e.currentTarget).hasClass('js-search-prev')) {
-            num = -1
+            prevSearchResult()
+        } else {
+            nextSearchResult()
         }
-        searchPosition += num
-        if (searchPosition < 0) {
-            searchPosition = searchHighlights.length - 1
-        } else if (searchPosition >= searchHighlights.length) {
-            searchPosition = 0
-        }
-
-        highlightSearchResult()
     })
 })
+
+function prevSearchResult () {
+        searchPosition--
+        if (searchPosition < 0) {
+            searchPosition = searchHighlights.length - 1
+        }
+        highlightSearchResult()
+}
+
+function nextSearchResult () {
+        searchPosition++
+        if (searchPosition >= searchHighlights.length) {
+            searchPosition = 0
+        }
+        highlightSearchResult()
+}
 
 function highlightSearchResult() {
 
