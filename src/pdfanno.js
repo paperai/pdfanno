@@ -2,18 +2,13 @@ require('file-loader?name=dist/index.html!./index.html')
 require('!style-loader!css-loader!./pdfanno.css')
 
 import axios from 'axios'
-import Fuse from 'fuse.js'
 
 // UI parts.
 import * as annoUI from 'anno-ui'
 
 import { dispatchWindowEvent } from './shared/util'
-import { convertToExportY, convertFromExportY, getPageSize, paddingBetweenPages } from './shared/coords'
-import {
-    listenWindowLeaveEvent,
-    unlistenWindowLeaveEvent,
-    resizeHandler
-} from './page/util/window'
+import { paddingBetweenPages } from './shared/coords'
+import { unlistenWindowLeaveEvent } from './page/util/window'
 import * as publicApi from './page/public'
 import PDFAnnoPage from './page/pdf/PDFAnnoPage'
 
@@ -54,7 +49,6 @@ window.clear = publicApi.clear
  */
 window.annoPage = new PDFAnnoPage()
 
-
 // Manage ctrlKey (cmdKey on Mac).
 window.addEventListener('manageCtrlKey', e => {
     window.annoPage.manageCtrlKey(e.detail)
@@ -68,7 +62,7 @@ window.addEventListener('digitKeyPressed', e => {
 /**
  * Get the y position in the annotation.
  */
-function _getY(annotation) {
+function _getY (annotation) {
 
     if (annotation.rectangles) {
         return annotation.rectangles[0].y
@@ -97,20 +91,23 @@ window.addEventListener('DOMContentLoaded', e => {
 
     // Browse button.
     annoUI.browseButton.setup({
-        loadFiles : window.annoPage.loadFiles,
-        clearAllAnnotations : window.annoPage.clearAllAnnotations,
+        loadFiles                          : window.annoPage.loadFiles,
+        clearAllAnnotations                : window.annoPage.clearAllAnnotations,
         displayCurrentReferenceAnnotations : () => window.annoPage.displayAnnotation(false, false),
-        displayCurrentPrimaryAnnotations : () => window.annoPage.displayAnnotation(true, false),
-        getContentFiles : () => window.annoPage.contentFiles,
-        getAnnoFiles : () => window.annoPage.annoFiles,
-        closePDFViewer : window.annoPage.closePDFViewer
+        displayCurrentPrimaryAnnotations   : () => window.annoPage.displayAnnotation(true, false),
+        getContentFiles                    : () => window.annoPage.contentFiles,
+        getAnnoFiles                       : () => window.annoPage.annoFiles,
+        closePDFViewer                     : window.annoPage.closePDFViewer
     })
 
     // PDF dropdown.
     annoUI.contentDropdown.setup({
-        initialText : 'PDF File',
+        initialText            : 'PDF File',
         overrideWarningMessage : 'Are you sure to load another PDF ?',
-        contentReloadHandler : fileName => {
+        contentReloadHandler   : fileName => {
+
+            // Disable search UI.
+            $('#searchWord, .js-dict-match-file').attr('disabled', 'disabled')
 
             // Get the content.
             const content = window.annoPage.getContentFile(fileName)
@@ -120,18 +117,26 @@ window.addEventListener('DOMContentLoaded', e => {
 
             // Display the PDF on the viewer.
             window.annoPage.displayViewer(content)
+
+            // Upload and analyze the PDF for search.
+            annoUI.uploadButton.uploadPDF({
+                contentFile : content,
+                successCallback : text => {
+                    prepareSearch(text)
+                }
+            })
         }
     })
 
     // Primary anno dropdown.
     annoUI.primaryAnnoDropdown.setup({
-        clearPrimaryAnnotations : window.annoPage.clearAllAnnotations,
+        clearPrimaryAnnotations  : window.annoPage.clearAllAnnotations,
         displayPrimaryAnnotation : annoName => window.annoPage.displayAnnotation(true)
     })
 
     // Reference anno dropdown.
     annoUI.referenceAnnoDropdown.setup({
-        displayReferenceAnnotations : annoNames =>window.annoPage.displayAnnotation(false)
+        displayReferenceAnnotations : annoNames => window.annoPage.displayAnnotation(false)
     })
 
     // Anno list dropdown.
@@ -158,15 +163,15 @@ window.addEventListener('DOMContentLoaded', e => {
 
     // Download button.
     annoUI.downloadButton.setup({
-        getAnnotationTOMLString : window.annoPage.exportData,
-        getCurrentContentName   : window.annoPage.getCurrentContentName,
+        getAnnotationTOMLString  : window.annoPage.exportData,
+        getCurrentContentName    : window.annoPage.getCurrentContentName,
         unlistenWindowLeaveEvent : unlistenWindowLeaveEvent
     })
 
     // Label input.
     annoUI.labelInput.setup({
         getSelectedAnnotations : window.annoPage.getSelectedAnnotations,
-        saveAnnotationText : (id, text) => {
+        saveAnnotationText     : (id, text) => {
             console.log('saveAnnotationText:', id, text)
             const annotation = window.annoPage.findAnnotationById(id)
             if (annotation) {
@@ -176,7 +181,7 @@ window.addEventListener('DOMContentLoaded', e => {
             }
         },
         createSpanAnnotation : window.annoPage.createSpan,
-        createRelAnnotation : window.annoPage.createRelation
+        createRelAnnotation  : window.annoPage.createRelation
     })
 
     // Upload button.
@@ -185,7 +190,6 @@ window.addEventListener('DOMContentLoaded', e => {
             return window.annoPage.getCurrentContentFile()
         },
         uploadFinishCallback : (resultText) => {
-            console.log('resultText:\n', resultText)
             prepareSearch(resultText)
         }
     })
@@ -209,7 +213,7 @@ window.addEventListener('DOMContentLoaded', e => {
             } else if (key && key.toLowerCase() === 'tab') {
                 tabIndex = parseInt(value, 10)
             }
-    })
+        })
 
     if (pdfURL) {
 
@@ -239,7 +243,7 @@ window.addEventListener('DOMContentLoaded', e => {
 
             const listenPageRendered = () => {
                 $('#pdfLoading').addClass('close')
-                setTimeout(function() {
+                setTimeout(function () {
                     $('#pdfLoading').addClass('hidden')
                 }, 1000)
 
@@ -271,7 +275,8 @@ window.addEventListener('DOMContentLoaded', e => {
         }).catch(err => {
             // Hide a loading, and show the error message.
             $('#pdfLoading').addClass('hidden')
-            annoUI.ui.alertDialog.show({ message : err })
+            const message = 'Failed to analyze the PDF.<br>Reason: ' + err
+            annoUI.ui.alertDialog.show({ message })
         })
 
     } else {
@@ -292,6 +297,12 @@ window.addEventListener('DOMContentLoaded', e => {
             })
 
             prepareSearch(analyzeResult)
+
+        }).catch(err => {
+            // Hide a loading, and show the error message.
+            $('#pdfLoading').addClass('hidden')
+            const message = 'Failed to analyze the PDF.<br>Reason: ' + err
+            annoUI.ui.alertDialog.show({ message })
         })
     }
 
@@ -331,7 +342,7 @@ function loadPDF (url) {
         xhr.ontimeout = function () {
             reject('Failed to load the PDF.')
         }
-        xhr.onerror = function(err) {
+        xhr.onerror = function (err) {
             reject(err)
         }
         xhr.send()
@@ -348,7 +359,7 @@ function loadExternalAnnoFile (url) {
             if (res.data.error) {
                 reason = '<br>Reason: ' + res.data.error
             }
-            annoUI.ui.alertDialog.show({ message : 'Failed to load an anno file. url=' + url + reason})
+            annoUI.ui.alertDialog.show({ message : 'Failed to load an anno file. url=' + url + reason })
             return Promise.reject()
         }
         return res.data.anno
@@ -361,14 +372,13 @@ function loadExternalAnnoFile (url) {
 function getDefaultPDFURL () {
     // e.g. https://paperai.github.io:80/pdfanno/pdfs/P12-1046.pdf
     const pathnames = location.pathname.split('/')
-    const pdfURL = location.protocol + '//' + location.hostname + ':' + location.port + pathnames.slice(0, pathnames.length-1).join('/') + '/pdfs/' + DEFAULT_PDF_NAME
+    const pdfURL = location.protocol + '//' + location.hostname + ':' + location.port + pathnames.slice(0, pathnames.length - 1).join('/') + '/pdfs/' + DEFAULT_PDF_NAME
     return pdfURL
 }
 
-
 let pages = []
 
-function prepareSearch(pdfResult) {
+function prepareSearch (pdfResult) {
     console.log('prepareSearch!!!', pdfResult.length)
 
     pages = []
@@ -384,8 +394,7 @@ function prepareSearch(pdfResult) {
             let [
                 pageNumber,
                 type,
-                char,
-                ...others
+                char
             ] = line.split('\t')
             pageNumber = parseInt(pageNumber, 10)
             if (!page) {
@@ -426,12 +435,19 @@ window.addEventListener('DOMContentLoaded', () => {
 
     $('#searchWord').on('keyup', e => {
 
+        // Enter key.
+        if (e.keyCode === 13) {
+            nextSearchResult()
+            return
+        }
+
         if (timerId) {
             clearTimeout(timerId)
             timerId = null
         }
 
         timerId = setTimeout(() => {
+            timerId = null
             window.searchType = 'text'
             doSearch()
         }, DELAY)
@@ -457,7 +473,6 @@ window.addEventListener('DOMContentLoaded', () => {
     // Re-render the search results.
     window.addEventListener('pagerendered', rerenderSearchResults)
 
-
     $('.js-search-prev, .js-search-next').on('click', e => {
 
         if (window.searchType !== 'text') {
@@ -465,36 +480,44 @@ window.addEventListener('DOMContentLoaded', () => {
         }
 
         // No action for no results.
-        if (searchHighlights.length === 0) {
+        if (window.searchHighlights.length === 0) {
             return
         }
 
-        // go to next or prev.
-        let num = 1
         if ($(e.currentTarget).hasClass('js-search-prev')) {
-            num = -1
+            prevSearchResult()
+        } else {
+            nextSearchResult()
         }
-        searchPosition += num
-        if (searchPosition < 0) {
-            searchPosition = searchHighlights.length - 1
-        } else if (searchPosition >= searchHighlights.length) {
-            searchPosition = 0
-        }
-
-        highlightSearchResult()
     })
 })
 
-function highlightSearchResult() {
+function prevSearchResult () {
+    window.searchPosition--
+    if (window.searchPosition < 0) {
+        window.searchPosition = window.searchHighlights.length - 1
+    }
+    highlightSearchResult()
+}
 
-    $('.search-current-position').text(searchPosition + 1)
+function nextSearchResult () {
+    window.searchPosition++
+    if (window.searchPosition >= window.searchHighlights.length) {
+        window.searchPosition = 0
+    }
+    highlightSearchResult()
+}
 
-    $('.pdfanno-search-result', iframeWindow.document).removeClass('pdfanno-search-result--highlight')
+function highlightSearchResult () {
 
-    const highlight = searchHighlights[searchPosition]
+    $('.search-current-position').text(window.searchPosition + 1)
+
+    $('.pdfanno-search-result', window.iframeWindow.document).removeClass('pdfanno-search-result--highlight')
+
+    const highlight = window.searchHighlights[window.searchPosition]
     highlight.$elm.addClass('pdfanno-search-result--highlight')
 
-    console.log(`highlight: index=${searchPosition}, page=${highlight.page}`)
+    console.log(`highlight: index=${window.searchPosition}, page=${highlight.page}`)
 
     // Scroll to.
     let pageHeight = window.annoPage.getViewerViewport().height
@@ -505,24 +528,24 @@ function highlightSearchResult() {
 
 }
 
-function rerenderSearchResults() {
+function rerenderSearchResults () {
 
     // No action for no results.
-    if (searchHighlights.length === 0) {
+    if (window.searchHighlights.length === 0) {
         return
     }
 
     // Remove.
-    $('.pdfanno-search-result', iframeWindow.document).remove()
+    $('.pdfanno-search-result', window.iframeWindow.document).remove()
 
     // Display.
-    searchHighlights.forEach((highlight, index) => {
-        const $textLayer = $(`.page[data-page-number="${highlight.page}"] .textLayer`, iframeWindow.document)
+    window.searchHighlights.forEach((highlight, index) => {
+        const $textLayer = $(`.page[data-page-number="${highlight.page}"] .textLayer`, window.iframeWindow.document)
         $textLayer.append(highlight.$elm)
     })
 }
 
-function search({ hay, needle, isCaseSensitive = false, useRegexp = false }) {
+function search ({ hay, needle, isCaseSensitive = false, useRegexp = false }) {
     if (!needle) {
         return []
     }
@@ -556,7 +579,7 @@ function doSearch ({ query = null } = {}) {
     }
 
     // Remove highlights for search results.
-    $('.pdfanno-search-result', iframeWindow.document).remove()
+    $('.pdfanno-search-result', window.iframeWindow.document).remove()
     $('.search-hit').addClass('hidden')
     $('.js-dict-match-cur-pos, .js-dict-match-hit-counts').text('000')
 
@@ -576,8 +599,8 @@ function doSearch ({ query = null } = {}) {
     console.log(`doSearch: searchType=${window.searchType} text="${text}", caseSensitive=${isCaseSensitive}, regexp=${useRegexp}`)
 
     // Reset.
-    searchPosition = -1
-    searchHighlights = []
+    window.searchPosition = -1
+    window.searchHighlights = []
 
     // The min length of text for searching.
     const MIN_LEN = 2
@@ -593,7 +616,7 @@ function doSearch ({ query = null } = {}) {
         // Display highlights.
         if (positions.length > 0) {
             positions.forEach(position => {
-                const $textLayer = $(`.page[data-page-number="${page.page}"] .textLayer`, iframeWindow.document)
+                const $textLayer = $(`.page[data-page-number="${page.page}"] .textLayer`, window.iframeWindow.document)
                 const infos = page.meta.slice(position.start, position.end)
                 // console.log('infos:', infos)
                 let fromX, toX, fromY, toY
@@ -607,7 +630,7 @@ function doSearch ({ query = null } = {}) {
                     fromY = (fromY === undefined ? y : Math.min(y, fromY))
                     toY = (toY === undefined ? (y + h) : Math.max((y + h), toY))
                 })
-                const scale = iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale
+                const scale = window.iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale
                 let $div = $('<div class="pdfanno-search-result"/>')
                 $div.css({
                     top    : fromY * scale + 'px',
@@ -618,24 +641,23 @@ function doSearch ({ query = null } = {}) {
                 $textLayer.append($div)
                 // TODO 後で、改行されたものとかにも対応できるようにする（その場合は、rectsが複数）
                 const aPosition = [[ fromX, fromY, (toX - fromX), (toY - fromY) ]]
-                searchHighlights.push({
-                    page           : page.page,
-                    top            : fromY,
-                    position       : aPosition,
-                    $elm           : $div,
+                window.searchHighlights.push({
+                    page     : page.page,
+                    top      : fromY,
+                    position : aPosition,
+                    $elm     : $div,
                     text
                 })
             })
         }
     })
 
-
-    if (searchHighlights.length > 0) {
+    if (window.searchHighlights.length > 0) {
         // Init highlight at the current page.
-        const currentPage = iframeWindow.PDFViewerApplication.page
-        for (let i = 0; i < searchHighlights.length; i++) {
-            if (currentPage === searchHighlights[i].page) {
-                searchPosition = i
+        const currentPage = window.iframeWindow.PDFViewerApplication.page
+        for (let i = 0; i < window.searchHighlights.length; i++) {
+            if (currentPage === window.searchHighlights[i].page) {
+                window.searchPosition = i
                 break
             }
         }
@@ -644,16 +666,16 @@ function doSearch ({ query = null } = {}) {
 
     if (window.searchType === 'text') {
         $('.search-hit').removeClass('hidden')
-        $('.search-current-position').text(searchPosition + 1)
-        $('.search-hit-count').text(searchHighlights.length)
+        $('.search-current-position').text(window.searchPosition + 1)
+        $('.search-hit-count').text(window.searchHighlights.length)
     } else {
         // Dict matching.
         $('.js-dict-match-cur-pos').text(window.searchPosition + 1)
-        $('.js-dict-match-hit-counts').text(searchHighlights.length)
+        $('.js-dict-match-hit-counts').text(window.searchHighlights.length)
     }
 }
 
-let dictonaryTexts;
+let dictonaryTexts
 
 /**
  * Dictonary Matching.
@@ -709,7 +731,7 @@ window.addEventListener('DOMContentLoaded', () => {
         }
 
         // No action for no results.
-        if (searchHighlights.length === 0) {
+        if (window.searchHighlights.length === 0) {
             return
         }
 
@@ -718,11 +740,11 @@ window.addEventListener('DOMContentLoaded', () => {
         if ($(e.currentTarget).hasClass('js-dict-match-prev')) {
             num = -1
         }
-        searchPosition += num
-        if (searchPosition < 0) {
-            searchPosition = searchHighlights.length - 1
-        } else if (searchPosition >= searchHighlights.length) {
-            searchPosition = 0
+        window.searchPosition += num
+        if (window.searchPosition < 0) {
+            window.searchPosition = window.searchHighlights.length - 1
+        } else if (window.searchPosition >= window.searchHighlights.length) {
+            window.searchPosition = 0
         }
 
         highlightSearchResult()
@@ -734,7 +756,7 @@ window.addEventListener('DOMContentLoaded', () => {
     })
 })
 
-function searchByDictionary(texts = []) {
+function searchByDictionary (texts = []) {
     console.log('searchByDictionary:', texts)
     window.searchType = 'dictionary'
     const query = texts.join('|')
