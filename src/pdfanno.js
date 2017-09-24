@@ -114,6 +114,14 @@ window.addEventListener('DOMContentLoaded', e => {
 
             // Display the PDF on the viewer.
             window.annoPage.displayViewer(content)
+
+            // Upload and analyze the PDF for search.
+            annoUI.uploadButton.uploadPDF({
+                contentFile : content,
+                successCallback : text => {
+                    prepareSearch(text)
+                }
+            })
         }
     })
 
@@ -179,7 +187,6 @@ window.addEventListener('DOMContentLoaded', e => {
             return window.annoPage.getCurrentContentFile()
         },
         uploadFinishCallback : (resultText) => {
-            console.log('resultText:\n', resultText)
             prepareSearch(resultText)
         }
     })
