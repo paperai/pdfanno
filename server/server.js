@@ -22,6 +22,10 @@ app.use(bodyParser.urlencoded({ limit : '50mb', expented : true }));
 // Rooting(API) : Uploading a pdf.
 app.post('/api/pdf_upload', upload.fields([]), (req, res) => {
 
+    // Test for error.
+    // res.json({ status : 'failure', err : 'Test Error.' })
+    // return
+
     // Get an uploaded file.
     const fileName = req.body.filename;
     const buf = Buffer.from(req.body.pdf, 'base64');
@@ -52,6 +56,10 @@ app.post('/api/pdf_upload', upload.fields([]), (req, res) => {
 //      http://localhost:8000/?pdf=http://www.yoheim.net/tmp/pdf-sample.pdf
 //      http://localhost:8000/?pdf=https://arxiv.org/pdf/1707.03141
 app.get('/load_pdf', (req, res) => {
+
+    // Test for error.
+    // res.json({ status : 'failure', err : 'Test Error.' })
+    // return
 
     const pdfURL = req.query.url;
     console.log('pdfURL=', pdfURL);

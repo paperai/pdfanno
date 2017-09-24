@@ -106,6 +106,9 @@ window.addEventListener('DOMContentLoaded', e => {
         overrideWarningMessage : 'Are you sure to load another PDF ?',
         contentReloadHandler   : fileName => {
 
+            // Disable search UI.
+            $('#searchWord, .js-dict-match-file').attr('disabled', 'disabled')
+
             // Get the content.
             const content = window.annoPage.getContentFile(fileName)
 
@@ -272,7 +275,8 @@ window.addEventListener('DOMContentLoaded', e => {
         }).catch(err => {
             // Hide a loading, and show the error message.
             $('#pdfLoading').addClass('hidden')
-            annoUI.ui.alertDialog.show({ message : err })
+            const message = 'Failed to analyze the PDF.<br>Reason: ' + err
+            annoUI.ui.alertDialog.show({ message })
         })
 
     } else {
@@ -293,6 +297,12 @@ window.addEventListener('DOMContentLoaded', e => {
             })
 
             prepareSearch(analyzeResult)
+
+        }).catch(err => {
+            // Hide a loading, and show the error message.
+            $('#pdfLoading').addClass('hidden')
+            const message = 'Failed to analyze the PDF.<br>Reason: ' + err
+            annoUI.ui.alertDialog.show({ message })
         })
     }
 
