@@ -1,6 +1,7 @@
 import toml from 'toml'
 import ANNO_VERSION from '../version'
 import tomlString from '../utils/tomlString'
+import { dispatchWindowEvent } from '../utils/event'
 import { convertToExportY } from '../../../shared/coords'
 import uuid from '../utils/uuid'
 
@@ -25,6 +26,7 @@ export default class AnnotationContainer {
      */
     add (annotation) {
         this.set.add(annotation)
+        dispatchWindowEvent('annotationUpdated')
     }
 
     /**
@@ -32,6 +34,7 @@ export default class AnnotationContainer {
      */
     remove (annotation) {
         this.set.delete(annotation)
+        dispatchWindowEvent('annotationUpdated')
     }
 
     /**
