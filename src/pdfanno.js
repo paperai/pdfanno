@@ -120,7 +120,7 @@ window.addEventListener('DOMContentLoaded', e => {
 
             // Upload and analyze the PDF for search.
             annoUI.uploadButton.uploadPDF({
-                contentFile : content,
+                contentFile     : content,
                 successCallback : text => {
                     prepareSearch(text)
                 }
@@ -163,9 +163,9 @@ window.addEventListener('DOMContentLoaded', e => {
 
     // Download button.
     annoUI.downloadButton.setup({
-        getAnnotationTOMLString  : window.annoPage.exportData,
-        getCurrentContentName    : window.annoPage.getCurrentContentName,
-        unlistenWindowLeaveEvent : unlistenWindowLeaveEvent
+        getAnnotationTOMLString : window.annoPage.exportData,
+        getCurrentContentName   : window.annoPage.getCurrentContentName,
+        didDownloadCallback     : unlistenWindowLeaveEvent
     })
 
     // Label input.
@@ -178,6 +178,8 @@ window.addEventListener('DOMContentLoaded', e => {
                 annotation.text = text
                 annotation.save()
                 annotation.enableViewMode()
+
+                dispatchWindowEvent('annotationUpdated')
             }
         },
         createSpanAnnotation : window.annoPage.createSpan,
