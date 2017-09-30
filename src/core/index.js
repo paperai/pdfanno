@@ -108,7 +108,7 @@ window.addEventListener('scalechange', () => {
  * Remove the annotation layer and the temporary rendering layer.
  */
 function removeAnnoLayer () {
-    $('#annoLayer, #tmpLayer').remove()
+    $('#annoLayer, #annoLayer2, #tmpLayer').remove()
 }
 // TODO Refactoring: tricky.
 window.removeAnnoLayer = removeAnnoLayer
@@ -125,9 +125,13 @@ function renderAnno () {
 
     // TODO make it a global const.
     const svgLayerId = 'annoLayer'
+    const annoLayer2Id = 'annoLayer2'
 
     // Check already exists.
     if ($('#' + svgLayerId).length > 0) {
+        return
+    }
+    if ($('#' + annoLayer2Id).length > 0) {
         return
     }
 
@@ -152,6 +156,16 @@ function renderAnno () {
         visibility : 'hidden',
         'z-index'  : 2
     })
+    // Add an annotation layer.
+    let $annoLayer2 = $(`<div id="${annoLayer2Id}"/>`).css({   // TODO CSSClass.
+        position   : 'absolute',
+        top        : '0px',
+        left       : `${leftMargin}px`,
+        width      : `${width}px`,
+        height     : `${height}px`,
+        visibility : 'hidden',
+        'z-index'  : 2
+    })
     // Add a tmp layer.
     let $tmpLayer = $(`<div id="tmpLayer"/>`).css({   // TODO CSSClass.
         position   : 'absolute',
@@ -165,26 +179,15 @@ function renderAnno () {
 
     $('#viewer').css({
         position : 'relative'
-    }).append($annoLayer).append($tmpLayer)
+    }).append($annoLayer).append($annoLayer2).append($tmpLayer)
 
-    // Reset.
-    // window.annotationContainer.destroy()
-    // window.annotationContainer.set = new Set()
-
-    let svg = $annoLayer.get(0)
-    let documentId = window.getFileName(window.PDFView.url)
-    let viewport = window.PDFView.pdfViewer.getPageView(0).viewport
-    svg.setAttribute('data-pdf-annotate-viewport', JSON.stringify(viewport))
-    svg.setAttribute('data-pdf-annotate-document', documentId)
-    svg.setAttribute('data-pdf-annotate-page', 1)
-
-    renderAnnotations(svg)
+    renderAnnotations()
 }
 
 // TODO Refactoring: tricky.
 window.renderAnno = renderAnno
 
-function renderAnnotations (svg) {
+function renderAnnotations () {
 
     console.log('renderAnnotations:', window.annotationContainer.getAllAnnotations().length)
 

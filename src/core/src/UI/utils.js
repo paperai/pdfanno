@@ -27,7 +27,7 @@ export function scaleUp (svg, rect) {
     }
 
     let result = {}
-    let { viewport } = getMetadata(svg)
+    const viewport = window.PDFView.pdfViewer.getPageView(0).viewport
 
     Object.keys(rect).forEach((key) => {
         result[key] = rect[key] * viewport.scale
@@ -51,7 +51,7 @@ export function scaleDown (svg, rect) {
     }
 
     let result = {}
-    let { viewport } = getMetadata(svg)
+    const viewport = window.PDFView.pdfViewer.getPageView(0).viewport
 
     Object.keys(rect).forEach((key) => {
         result[key] = rect[key] / viewport.scale
@@ -90,21 +90,6 @@ export function disableTextlayer () {
  */
 export function enableTextlayer () {
     $('body').removeClass('disable-text-layer')
-}
-
-/**
- * Get the metadata for a SVG container
- *
- * @param {SVGElement} svg The SVG container to get metadata for
- */
-// TODO No need ?
-export function getMetadata (svg) {
-    svg = svg || getSVGLayer()
-    return {
-        documentId : svg.getAttribute('data-pdf-annotate-document'),
-        pageNumber : parseInt(svg.getAttribute('data-pdf-annotate-page'), 10),
-        viewport   : JSON.parse(svg.getAttribute('data-pdf-annotate-viewport'))
-    }
 }
 
 export function getXY (e) {

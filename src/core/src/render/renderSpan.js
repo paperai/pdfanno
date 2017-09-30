@@ -12,10 +12,10 @@ export default function renderSpan (a, svg) {
     let color = a.color || '#FF0'
 
     let group = document.createElementNS('http://www.w3.org/2000/svg', 'g')
-    group.setAttribute('read-only', a.readOnly === true)
-    group.setAttribute('data-text', a.text)
+    // group.setAttribute('read-only', a.readOnly === true)
+    // group.setAttribute('data-text', a.text)
     group.classList.add('anno-span')
-    group.style.zIndex = a.zIndex
+    // group.style.zIndex = a.zIndex
 
     a.rectangles.forEach((r) => {
         let rect = createRect(r)

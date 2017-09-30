@@ -110,7 +110,8 @@ export function transform (node, viewport) {
  */
 export default function appendChild (svg, annotation, viewport) {
     if (!viewport) {
-        viewport = JSON.parse(svg.getAttribute('data-pdf-annotate-viewport'))
+        viewport = window.PDFView.pdfViewer.getPageView(0).viewport
+        // viewport = JSON.parse(svg.getAttribute('data-pdf-annotate-viewport'))
     }
 
     let child
