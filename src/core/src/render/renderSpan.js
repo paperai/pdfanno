@@ -15,6 +15,7 @@ export default function renderSpan (a, svg) {
     group.setAttribute('read-only', a.readOnly === true)
     group.setAttribute('data-text', a.text)
     group.classList.add('anno-span')
+    group.style.zIndex = a.zIndex
 
     a.rectangles.forEach((r) => {
         let rect = createRect(r)

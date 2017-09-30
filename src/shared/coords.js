@@ -52,3 +52,17 @@ export function getPageSize () {
     let size = { width : viewBox[2], height : viewBox[3] }
     return size
 }
+
+/**
+ * Get the next z-index.
+ */
+export function nextZIndex () {
+
+    let w = (window.iframeWindow ? window.iframeWindow : window)
+
+    if (!w.nextZIndex) {
+        w.nextZIndex = 10
+    }
+
+    return w.nextZIndex++
+}

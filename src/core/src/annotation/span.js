@@ -44,6 +44,7 @@ export default class SpanAnnotation extends AbstractAnnotation {
         a.color        = annotation.color
         a.readOnly     = annotation.readOnly || false
         a.selectedText = annotation.selectedText
+        a.zIndex       = annotation.zIndex || 10
         return a
     }
 
