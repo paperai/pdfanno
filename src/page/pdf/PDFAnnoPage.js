@@ -90,6 +90,7 @@ export default class PDFAnnoPage {
 
         // enable text input.
         window.iframeWindow.addEventListener('enableTextInput', e => {
+            console.log('aaaaaaaaaaaaaaaaaaa')
             dispatchWindowEvent('enableTextInput', e.detail)
         })
 

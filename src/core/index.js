@@ -157,7 +157,7 @@ function renderAnno () {
         'z-index'  : 2
     })
     // Add an annotation layer.
-    let $annoLayer2 = $(`<div id="${annoLayer2Id}"/>`).css({   // TODO CSSClass.
+    let $annoLayer2 = $(`<div id="${annoLayer2Id}"/>`).addClass('annoLayer').css({   // TODO CSSClass.
         position   : 'absolute',
         top        : '0px',
         left       : `${leftMargin}px`,

@@ -38,17 +38,26 @@
   stroke-width: 5px;
 }
 
+.anno-span.--hover .anno-circle {
+  box-shadow: rgba(113,135,164,.2) 1px 1px 1px;
+  transform: scale(2);
+/*  stroke: blue;
+  stroke-width: 5px;*/
+}
+
 .--hover .anno-span {
   /*html*/
   box-shadow: 0 0 0 1px #ccc inset;
   /*svg*/
-  stroke: #ccc;
-  stroke-width: 0.75px;
+/*  stroke: #ccc;
+  stroke-width: 0.75px;*/
+  border: 1px dashed #ccc;
 }
-.--selected .anno-span {
-  stroke: black;
+.--selected .anno-span .anno-span__area {
+/*  stroke: black;
   stroke-width: 0.5px;
-  stroke-dasharray: 3;
+  stroke-dasharray: 3;*/
+  border: 2px dashed black;
 }
 /**
   Relation.

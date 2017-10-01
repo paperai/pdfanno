@@ -48,7 +48,12 @@ export default class AbstractAnnotation extends EventEmitter {
             return false
         }
 
-        this.$element = $(appendChild(getSVGLayer(), this))
+        let base = getSVGLayer()
+        if (this.type === 'span') {
+            base = $('#annoLayer2')[0]
+        }
+
+        this.$element = $(appendChild(base, this))
         this.textAnnotation && this.textAnnotation.render()
 
         if (!this.hoverEventDisable && this.setHoverEvent) {

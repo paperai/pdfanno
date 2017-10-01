@@ -29,6 +29,48 @@ export default function renderCircle (a) {
     return circle
 }
 
+export function renderCircle2 (a) {
+
+    // const radius = a.r || DEFAULT_RADIUS
+    const radius = a.r || 7
+
+    // TODO 復活させる.
+    // let {x, y} = adjustPoint(a.x, a.y, a.r || DEFAULT_RADIUS)
+
+
+
+    const circle = $('<div/>').css({
+        position        : 'absolute',
+        top             : `${a.y - (radius + 2)}px`,
+        left            : a.x + 'px',
+        backgroundColor : 'blue',
+        width           : radius + 'px',
+        height          : radius + 'px',
+        borderRadius    : '50%'
+    }).attr('type', a.type).addClass('anno-circle')
+    // TODO attrは必要なの？
+
+    return circle
+
+
+
+    // // <circle cx="100" cy="100" r="100"/>
+    // let circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
+    // setAttributes(circle, {
+    //     cx   : x,
+    //     cy   : y,
+    //     r    : a.r || DEFAULT_RADIUS,
+    //     fill : 'blue'
+    // })
+    // if (a.type) {
+    //     circle.setAttribute('type', a.type)
+    // }
+
+    // circle.classList.add('anno-circle')
+
+    // return circle
+}
+
 function adjustPoint (x, y, radius) {
     // Avoid overlapping.
     let circles = document.querySelectorAll('svg [type="boundingCircle"]')

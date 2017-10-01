@@ -1,6 +1,6 @@
 import objectAssign from 'object-assign'
-import renderRect from './renderRect'
-import renderSpan from './renderSpan'
+import { renderRect, renderRect2 } from './renderRect'
+import renderSpan, { renderSpan2 } from './renderSpan'
 import renderText from './renderText'
 import renderRelation from './renderRelation'
 import renderCircle from './renderCircle'
@@ -48,11 +48,15 @@ function getTranslation (viewport) {
  * @param {Object} viewport The page's viewport data
  * @return {Node}
  */
-export function transform (node, viewport) {
+export function transform (node, viewport, type) {
     let trans = getTranslation(viewport)
 
     // Let SVG natively transform the element
-    node.setAttribute('transform', `scale(${viewport.scale}) rotate(${viewport.rotation}) translate(${trans.x}, ${trans.y})`)
+    if (type === 'span') {
+        $(node).css('transform', `scale(${viewport.scale}) rotate(${viewport.rotation}) translate(${trans.x}, ${trans.y})`)
+    } else {
+        node.setAttribute('transform', `scale(${viewport.scale}) rotate(${viewport.rotation}) translate(${trans.x}, ${trans.y})`)
+    }
 
     // Manually adjust x/y for nested SVG nodes
     if (!isFirefox && node.nodeName.toLowerCase() === 'svg') {
@@ -111,7 +115,6 @@ export function transform (node, viewport) {
 export default function appendChild (svg, annotation, viewport) {
     if (!viewport) {
         viewport = window.PDFView.pdfViewer.getPageView(0).viewport
-        // viewport = JSON.parse(svg.getAttribute('data-pdf-annotate-viewport'))
     }
 
     let child
@@ -119,8 +122,11 @@ export default function appendChild (svg, annotation, viewport) {
     case 'area':
         child = renderRect(annotation, svg)
         break
+    // case 'span':
+    //     child = renderSpan(annotation, svg)
+    //     break
     case 'span':
-        child = renderSpan(annotation, svg)
+        child = renderSpan2(annotation, svg)
         break
     case 'textbox':
         child = renderText(annotation, svg)
@@ -137,19 +143,29 @@ export default function appendChild (svg, annotation, viewport) {
     // Skip appending/transforming if node doesn't exist.
     if (child) {
 
-        let elm = transform(child, viewport)
+        let elm = transform(child, viewport, annotation.type)
 
         if (annotation.type === 'textbox') {
             svg.appendChild(elm)
 
         // `text` show above other type elements.
         } else {
-            let $text = $('.anno-text-group')
-            if ($text.length > 0) {
-                $(elm).insertBefore($text.get(0))
+
+            console.log('type:', annotation.type)
+
+            if (annotation.type === 'span') {
+                svg.append(elm)
+
             } else {
-                svg.appendChild(elm)
+
+                let $text = $('.anno-text-group')
+                if ($text.length > 0) {
+                    $(elm).insertBefore($text.get(0))
+                } else {
+                    svg.appendChild(elm)
+                }
             }
+
         }
 
     }
