@@ -52,14 +52,14 @@ export function transform (node, viewport, type) {
     let trans = getTranslation(viewport)
 
     // Let SVG natively transform the element
-    if (type === 'span') {
+    if (type === 'span' || type === 'relation') {
         $(node).css('transform', `scale(${viewport.scale}) rotate(${viewport.rotation}) translate(${trans.x}, ${trans.y})`)
     } else {
         node.setAttribute('transform', `scale(${viewport.scale}) rotate(${viewport.rotation}) translate(${trans.x}, ${trans.y})`)
     }
 
     // Manually adjust x/y for nested SVG nodes
-    if (!isFirefox && node.nodeName.toLowerCase() === 'svg') {
+    if (!isFirefox && node.nodeName.toLowerCase() === 'svg' && type !== 'relation') {
         node.setAttribute('x', parseInt(node.getAttribute('x'), 10) * viewport.scale)
         node.setAttribute('y', parseInt(node.getAttribute('y'), 10) * viewport.scale)
 
@@ -153,7 +153,7 @@ export default function appendChild (svg, annotation, viewport) {
 
             console.log('type:', annotation.type)
 
-            if (annotation.type === 'span') {
+            if (annotation.type === 'span' || annotation.type === 'relation') {
                 svg.append(elm)
 
             } else {
