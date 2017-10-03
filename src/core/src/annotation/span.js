@@ -140,10 +140,15 @@ export default class SpanAnnotation extends AbstractAnnotation {
      * Get the position of the boundingCircle.
      */
     getBoundingCirclePosition () {
-        let $circle = this.$element.find('circle')
+        // let $circle = this.$element.find('circle')
+        // return {
+        //     x : parseFloat($circle.attr('cx')),
+        //     y : parseFloat($circle.attr('cy'))
+        // }
+        const $circle = this.$element.find('.anno-circle')
         return {
-            x : parseFloat($circle.attr('cx')),
-            y : parseFloat($circle.attr('cy'))
+            x : parseFloat($circle.css('left')),
+            y : parseFloat($circle.css('top'))
         }
     }
 

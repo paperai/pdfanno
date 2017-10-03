@@ -26,6 +26,8 @@ export function createRelation (a, id = null) {
         }
     }
 
+    console.log('createRelation:', a.x1, a.x2, a.y1, a.y2)
+
     // Adjust the start/end points.
     let theta = Math.atan((a.y1 - a.y2) / (a.x1 - a.x2))
     let sign = (a.x1 < a.x2 ? 1 : -1)
