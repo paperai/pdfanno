@@ -41,7 +41,6 @@ export function createRelation2 (a, id = null) {
     let width  = Math.abs(a.x1 - a.x2)
     let height = Math.abs(a.y1 - a.y2)
 
-    // TODO 大きすぎる?
     const $svg = createSVGElement(top, left, width, height)
 
     // Transform coords.
@@ -128,8 +127,18 @@ export function createRelation2 (a, id = null) {
 
     group.appendChild(relation)
 
+
+    const $base = $('<div/>').css({
+        position   : 'absolute',
+        top        : 0,
+        left       : 0,
+        visibility : 'visible'
+    }).addClass('anno-relation')
+    $base.append($svg)
+
     // return group
-    return $svg[0]
+    // return $svg[0]
+    return $base[0]
 }
 
 function createSVGElement (top, left, width, height) {
