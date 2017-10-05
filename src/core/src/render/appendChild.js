@@ -1,5 +1,7 @@
 import objectAssign from 'object-assign'
+// TODO fix the import.
 import { renderRect, renderRect2 } from './renderRect'
+// TODO fix the import.
 import renderSpan, { renderSpan2 } from './renderSpan'
 import renderText from './renderText'
 import renderRelation from './renderRelation'
@@ -14,6 +16,7 @@ const isFirefox = /firefox/i.test(navigator.userAgent)
  * @param {Object} viewport The viewport data from the page
  * @return {Object}
  */
+// TODO no need?
 function getTranslation (viewport) {
     let x
     let y
@@ -52,7 +55,7 @@ export function transform (node, viewport, type) {
     let trans = getTranslation(viewport)
 
     // Let SVG natively transform the element
-    if (type === 'span' || type === 'relation') {
+    if (type === 'span' || type === 'relation' || type === 'area') { // TODO this is all.
         $(node).css('transform', `scale(${viewport.scale}) rotate(${viewport.rotation}) translate(${trans.x}, ${trans.y})`)
     } else {
         node.setAttribute('transform', `scale(${viewport.scale}) rotate(${viewport.rotation}) translate(${trans.x}, ${trans.y})`)
@@ -113,28 +116,35 @@ export function transform (node, viewport, type) {
  * @return {SVGElement} A node that was created and appended by this function
  */
 export default function appendChild (svg, annotation, viewport) {
+    // TODO no need third argument(viewport) ?
     if (!viewport) {
         viewport = window.PDFView.pdfViewer.getPageView(0).viewport
     }
 
     let child
     switch (annotation.type) {
+    // TODO no need?
+    // case 'area':
+    //     child = renderRect(annotation, svg)
+    //     break
     case 'area':
-        child = renderRect(annotation, svg)
+        child = renderRect2(annotation, svg)
         break
+    // TODO no need?
     // case 'span':
     //     child = renderSpan(annotation, svg)
     //     break
     case 'span':
         child = renderSpan2(annotation, svg)
         break
-    case 'textbox':
+    case 'textbox': // TODO no need?
         child = renderText(annotation, svg)
         break
     case 'relation':
+        console.log('rel:', annotation)
         child = renderRelation(annotation, svg)
         break
-    case 'circle':
+    case 'circle':  // TODO no need?
         child = renderCircle(annotation, svg)
         break
     }
@@ -153,7 +163,8 @@ export default function appendChild (svg, annotation, viewport) {
 
             console.log('type:', annotation.type)
 
-            if (annotation.type === 'span' || annotation.type === 'relation') {
+            // TODO
+            if (annotation.type === 'span' || annotation.type === 'relation' || annotation.type === 'area') {
                 svg.append(elm)
 
             } else {

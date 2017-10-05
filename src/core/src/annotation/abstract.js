@@ -49,7 +49,8 @@ export default class AbstractAnnotation extends EventEmitter {
         }
 
         let base = getSVGLayer()
-        if (this.type === 'span' || this.type === 'relation') {
+        // TODO getSVGLayer() will be no longer needed.
+        if (this.type === 'span' || this.type === 'relation' || this.type === 'area') {
             base = $('#annoLayer2')[0]
         }
 

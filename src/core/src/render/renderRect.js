@@ -34,55 +34,50 @@ export function renderRect (a, svg) {
     return group
 }
 
+// TODO fix the name.
 export function renderRect2 (a) {
     let color = a.color || '#f00'
 
-    const $base = $('<div/>').css({  // TODO CSS.
-        position        : 'absolute',
-        top             : a.y,
-        left            : a.y,
-        width           : a.width,
-        height          : a.height,
-        visibility      : 'visible'
-    }).addClass('anno-rect')
-
-    $base.append($('<div/>').css({  // TODO CSS.
-        width    : '100%',
-        height   : '100%',
-        opacity         : 0.2,
-        border          : '1px solid yellow',
-        backgroundColor : color
-    }).addClass('anno-rect__area'))
-
-    $base.append(renderCircle2())
-
-
-    // TODO ここから実装する.
-
-
-
-
-    let group = document.createElementNS('http://www.w3.org/2000/svg', 'g')
-    group.setAttribute('read-only', a.readOnly === true)
-    group.style.visibility = 'visible'
-
-    let rect = createRect(a)
-    setAttributes(rect, {
-        stroke      : color,
-        strokeWidth : 1,
-        fill        : 'none',
-        class       : 'anno-rect'
+    const $base = $('<div/>').css({
+        position   : 'absolute',
+        top        : 0,
+        left       : 0,
+        visibility : 'visible'
     })
-    group.appendChild(rect)
 
-    let circle = renderCircle({
+
+    $base.append(createRect2(a))
+
+    $base.append(renderCircle2({
         x    : a.x,
-        y    : a.y - DEFAULT_RADIUS - 2,
+        y    : a.y,
         type : 'boundingCircle'
-    })
-    group.appendChild(circle)
+    }))
 
-    return group
+    return $base[0]
+
+
+    // let group = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+    // group.setAttribute('read-only', a.readOnly === true)
+    // group.style.visibility = 'visible'
+
+    // let rect = createRect(a)
+    // setAttributes(rect, {
+    //     stroke      : color,
+    //     strokeWidth : 1,
+    //     fill        : 'none',
+    //     class       : 'anno-rect'
+    // })
+    // group.appendChild(rect)
+
+    // let circle = renderCircle({
+    //     x    : a.x,
+    //     y    : a.y - DEFAULT_RADIUS - 2,
+    //     type : 'boundingCircle'
+    // })
+    // group.appendChild(circle)
+
+    // return group
 }
 
 function createRect (r) {
@@ -93,6 +88,29 @@ function createRect (r) {
         width  : r.width,
         height : r.height
     })
+
+    return rect
+}
+
+
+function createRect2 (r) {
+
+    const rect = $('<div/>').css({
+        position : 'absolute',
+        top      : `${r.y}px`,
+        left     : `${r.x}px`,
+        width    : `${r.width}px`,
+        height   : `${r.height}px`,
+        border   : '1px solid red'
+    }).addClass('anno-rect')
+
+    // let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
+    // setAttributes(rect, {
+    //     x      : r.x,
+    //     y      : r.y,
+    //     width  : r.width,
+    //     height : r.height
+    // })
 
     return rect
 }

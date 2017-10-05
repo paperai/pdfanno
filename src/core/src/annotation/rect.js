@@ -21,6 +21,7 @@ export default class RectAnnotation extends AbstractAnnotation {
         globalEvent = window.globalEvent
 
         this.uuid     = null
+        // TODO fix the name to "rect".
         this.type     = 'area'
         this.x        = 0
         this.y        = 0
@@ -78,7 +79,8 @@ export default class RectAnnotation extends AbstractAnnotation {
      * Set a hover event.
      */
     setHoverEvent () {
-        this.$element.find('rect, circle').hover(
+        // this.$element.find('rect, circle').hover(
+        this.$element.find('.anno-rect, .anno-circle').hover(
             this.handleHoverInEvent,
             this.handleHoverOutEvent
         )
@@ -132,11 +134,17 @@ export default class RectAnnotation extends AbstractAnnotation {
     /**
      * Get the position of the boundingCircle.
      */
+    // TODO make as common?
     getBoundingCirclePosition () {
-        let $circle = this.$element.find('circle')
+        // let $circle = this.$element.find('circle')
+        // return {
+        //     x : parseFloat($circle.attr('cx')),
+        //     y : parseFloat($circle.attr('cy'))
+        // }
+        const $circle = this.$element.find('.anno-circle')
         return {
-            x : parseFloat($circle.attr('cx')),
-            y : parseFloat($circle.attr('cy'))
+            x : parseFloat($circle.css('left')),
+            y : parseFloat($circle.css('top'))
         }
     }
 
@@ -311,7 +319,8 @@ export default class RectAnnotation extends AbstractAnnotation {
     enableViewMode () {
         super.enableViewMode()
         if (!this.readOnly) {
-            this.$element.find('.anno-rect, circle').on('click', this.handleClickEvent)
+            // this.$element.find('.anno-rect, circle').on('click', this.handleClickEvent)
+            this.$element.find('.anno-rect, .anno-circle').on('click', this.handleClickEvent)
             this.enableDragAction()
         }
     }
@@ -321,7 +330,8 @@ export default class RectAnnotation extends AbstractAnnotation {
      */
     disableViewMode () {
         super.disableViewMode()
-        this.$element.find('.anno-rect, circle').off('click')
+        // this.$element.find('.anno-rect, circle').off('click')
+        this.$element.find('.anno-rect, .anno-circle').off('click')
         this.disableDragAction()
     }
 
