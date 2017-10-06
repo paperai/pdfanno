@@ -140,7 +140,28 @@ export default class AnnotationContainer {
                         ids   : [ annotation.rel1Annotation.uuid, annotation.rel2Annotation.uuid ],
                         label : annotation.text || ''
                     }
+
+                // Rect.
+                } else if (annotation.type === 'area') {
+
+                    /*
+                        [2]
+                        type = "rect"
+                        page = 1
+                        position = ["9.24324324324326","435.94054054054055","235.7027027027027","44.65945945945946"]
+                        label = "aaaa"
+                    */
+                    let { pageNumber, y } = convertToExportY(annotation.y)
+
+                    dataExport[annotation.uuid] = {
+                        type     : 'rect',
+                        page     : pageNumber,
+                        position : [ annotation.x, y, annotation.width, annotation.height ],
+                        label    : annotation.text || ''
+                    }
+
                 }
+
             })
 
             resolve(tomlString(dataExport))
