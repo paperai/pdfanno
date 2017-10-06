@@ -41,13 +41,13 @@ export function createRelation2 (a, id = null) {
     let width  = Math.abs(a.x1 - a.x2)
     let height = Math.abs(a.y1 - a.y2)
 
-    const $svg = createSVGElement(top, left, width, height)
+    const [ $svg, margin ] = createSVGElement(top, left, width, height)
 
     // Transform coords.
-    a.x1 -= left
-    a.x2 -= left
-    a.y1 -= top
-    a.y2 -= top
+    a.x1 = a.x1 - left + margin
+    a.x2 = a.x2 - left + margin
+    a.y1 = a.y1 - top + margin
+    a.y2 = a.y2 - top + margin
 
     // <svg viewBox="0 0 200 200">
     //     <marker id="m_ar" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="strokeWidth" preserveAspectRatio="none" markerWidth="2" markerHeight="3" orient="auto-start-reverse">
@@ -154,13 +154,23 @@ function createSVGElement (top, left, width, height) {
 
     // let width = $('.page').width()
 
+    const margin = 50
+
+
     // Add an annotation layer.
     let $annoLayer = $(`<svg class="annoLayer"/>`).css({   // TODO CSSClass.
         position   : 'absolute',
-        top        : `${top}px`,
-        left       : `${left}px`,
-        width      : `${width}px`,
-        height     : `${height}px`,
+
+        top        : `${top - margin}px`,
+        left       : `${left - margin}px`,
+        width      : `${width + margin * 2}px`,
+        height     : `${height + margin * 2}px`,
+
+        // top        : `${top}px`,
+        // left       : `${left}px`,
+        // width      : `${width + margin}px`,
+        // height     : `${height + margin}px`,
+
         // top        : '0px',
         // left       : `${leftMargin}px`,
         // width      : `${width}px`,
@@ -172,7 +182,7 @@ function createSVGElement (top, left, width, height) {
         y : 0
     })
 
-    return $annoLayer
+    return [ $annoLayer, margin ]
 }
 
 
