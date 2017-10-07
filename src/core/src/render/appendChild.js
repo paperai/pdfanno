@@ -1,13 +1,7 @@
-import objectAssign from 'object-assign'
-// TODO fix the import.
 import { renderRect } from './renderRect'
-// TODO fix the import.
 import { renderSpan } from './renderSpan'
 import renderText from './renderText'
 import renderRelation from './renderRelation'
-import renderCircle from './renderCircle'
-
-const isFirefox = /firefox/i.test(navigator.userAgent)
 
 /**
  * Transform the rotation and scale of a node using SVG's native transform attribute.

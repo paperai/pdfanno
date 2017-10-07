@@ -255,8 +255,8 @@ export default class AbstractAnnotation extends EventEmitter {
         const $circle = this.$element.find('.anno-circle')
         if ($circle.length > 0) {
             return {
-                x : parseFloat($circle.css('left')) + parseFloat($circle.css("width")) / 2,
-                y : parseFloat($circle.css('top')) + parseFloat($circle.css("height")) / 2
+                x : parseFloat($circle.css('left')) + parseFloat($circle.css('width')) / 2,
+                y : parseFloat($circle.css('top')) + parseFloat($circle.css('height')) / 2
             }
         }
         return null
