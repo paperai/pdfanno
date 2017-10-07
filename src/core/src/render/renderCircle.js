@@ -1,43 +1,17 @@
 import setAttributes from '../utils/setAttributes'
 
-export const DEFAULT_RADIUS = 3
+export const DEFAULT_RADIUS = 7
 
 /**
- * Create SVGLineElements from an annotation definition.
- * This is used for anntations of type `circle`.
- *
- * @param {Object} a The annotation definition
- * @return {SVGGElement} A group of all lines to be rendered
+ * Create a bounding circle.
+ * @param {Object} a - the position for rendering.
  */
-export default function renderCircle (a) {
-    let {x, y} = adjustPoint(a.x, a.y, a.r || DEFAULT_RADIUS)
+export function renderCircle (a) {
 
-    // <circle cx="100" cy="100" r="100"/>
-    let circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
-    setAttributes(circle, {
-        cx   : x,
-        cy   : y,
-        r    : a.r || DEFAULT_RADIUS,
-        fill : 'blue'
-    })
-    if (a.type) {
-        circle.setAttribute('type', a.type)
-    }
+    const radius = a.r || DEFAULT_RADIUS
 
-    circle.classList.add('anno-circle')
-
-    return circle
-}
-
-export function renderCircle2 (a) {
-
-    // const radius = a.r || DEFAULT_RADIUS
-    const radius = a.r || 7
-
-    // TODO 復活させる.
+    // TODO Use this.
     // let {x, y} = adjustPoint(a.x, a.y, a.r || DEFAULT_RADIUS)
-
-
 
     const circle = $('<div/>').css({
         position        : 'absolute',
@@ -47,30 +21,12 @@ export function renderCircle2 (a) {
         width           : radius + 'px',
         height          : radius + 'px',
         borderRadius    : '50%'
-    }).attr('type', a.type).addClass('anno-circle')
-    // TODO attrは必要なの？
+    }).attr('type', a.type).addClass('anno-circle') // need to add type ?
 
     return circle
-
-
-
-    // // <circle cx="100" cy="100" r="100"/>
-    // let circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
-    // setAttributes(circle, {
-    //     cx   : x,
-    //     cy   : y,
-    //     r    : a.r || DEFAULT_RADIUS,
-    //     fill : 'blue'
-    // })
-    // if (a.type) {
-    //     circle.setAttribute('type', a.type)
-    // }
-
-    // circle.classList.add('anno-circle')
-
-    // return circle
 }
 
+// TODO Use this.
 function adjustPoint (x, y, radius) {
     // Avoid overlapping.
     let circles = document.querySelectorAll('svg [type="boundingCircle"]')
