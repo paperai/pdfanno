@@ -60,6 +60,7 @@
   stroke-width: 0.5px;
   stroke-dasharray: 3;*/
   border: 2px dashed black !important;
+  transform: translate(-2px, -2px);
 }
 /**
   Relation.
