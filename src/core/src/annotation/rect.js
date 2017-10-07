@@ -143,8 +143,8 @@ export default class RectAnnotation extends AbstractAnnotation {
         // }
         const $circle = this.$element.find('.anno-circle')
         return {
-            x : parseFloat($circle.css('left')),
-            y : parseFloat($circle.css('top'))
+            x : parseFloat($circle.css('left')) + parseFloat($circle.css("width")) / 2,
+            y : parseFloat($circle.css('top')) + parseFloat($circle.css("height")) / 2
         }
     }
 
