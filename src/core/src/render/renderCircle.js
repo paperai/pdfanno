@@ -3,53 +3,49 @@ export const DEFAULT_RADIUS = 7
 
 /**
  * Create a bounding circle.
- * @param {Object} a - the position for rendering.
+ * @param {Object} the position for rendering.
  */
-export function renderCircle (a) {
+export function renderCircle ({ x, y }) {
 
-    const radius = a.r || DEFAULT_RADIUS
+    // Adjust the position.
+    [x, y] = adjustPoint(x, (y - (DEFAULT_RADIUS + 2)), DEFAULT_RADIUS)
 
-    // TODO Use this.
-    // let {x, y} = adjustPoint(a.x, a.y, a.r || DEFAULT_RADIUS)
-    adjustPoint(a.x, a.y, a.r || DEFAULT_RADIUS)
-
-    const circle = $('<div/>').css({
+    const circle = $('<div class="anno-circle"/>').css({
         position        : 'absolute',
-        top             : `${a.y - (radius + 2)}px`,
-        left            : a.x + 'px',
+        top             : `${y}px`,
+        left            : `${x}px`,
         backgroundColor : 'blue',
-        width           : radius + 'px',
-        height          : radius + 'px',
+        width           : DEFAULT_RADIUS + 'px',
+        height          : DEFAULT_RADIUS + 'px',
         borderRadius    : '50%'
-    }).attr('type', a.type).addClass('anno-circle') // need to add type ?
+    })
 
     return circle
 }
 
-// TODO Use this.
+/**
+ * Adjust the circle position not overlay anothers.
+ */
 function adjustPoint (x, y, radius) {
 
-    // // Avoid overlapping.
-    // let circles = document.querySelectorAll('svg [type="boundingCircle"]')
+    const $circles = $('.anno-circle')
 
-    // while (true) {
-    //     let good = true
-    //     Array.prototype.forEach.call(circles, circle => {
-    //         let x1 = parseFloat(circle.getAttribute('cx'))
-    //         let y1 = parseFloat(circle.getAttribute('cy'))
-    //         let r1 = parseFloat(circle.getAttribute('r'))
-    //         let distance1 = Math.pow(x - x1, 2) + Math.pow(y - y1, 2)
-    //         let distance2 = Math.pow(radius + r1, 2)
-    //         if (distance1 < distance2) {
-    //             good = false
-    //         }
-    //     })
-
-    //     if (good) {
-    //         break
-    //     }
-    //     y -= 1
-    // }
-
-    return {x, y}
+    while (true) {
+        let good = true
+        $circles.each(function () {
+            const $this = $(this)
+            const x1 = parseInt($this.css('left'))
+            const y1 = parseInt($this.css('top'))
+            const distance1 = Math.pow(x - x1, 2) + Math.pow(y - y1, 2)
+            const distance2 = Math.pow(radius, 2)
+            if (distance1 < distance2) {
+                good = false
+            }
+        })
+        if (good) {
+            break
+        }
+        y -= 1
+    }
+    return [x, y]
 }

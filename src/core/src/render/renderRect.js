@@ -26,8 +26,7 @@ export function renderRect (a) {
 
     $base.append(renderCircle({
         x    : a.x,
-        y    : a.y,
-        type : 'boundingCircle'
+        y    : a.y
     }))
 
     return $base[0]

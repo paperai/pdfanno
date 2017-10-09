@@ -22,8 +22,7 @@ export function renderSpan (a) {
 
     $base.append(renderCircle({
         x    : a.rectangles[0].x,
-        y    : a.rectangles[0].y,
-        type : 'boundingCircle'
+        y    : a.rectangles[0].y
     }))
 
     return $base[0]
