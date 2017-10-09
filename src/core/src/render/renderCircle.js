@@ -1,4 +1,7 @@
 
+/**
+ * Circle radius.
+ */
 export const DEFAULT_RADIUS = 7
 
 /**
