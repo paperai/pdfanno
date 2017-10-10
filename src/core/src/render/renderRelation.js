@@ -11,12 +11,7 @@ let secondaryColor = ['green', 'blue', 'purple']
  * @param {Object} a The annotation definition
  * @return {SVGGElement} A group of a relation to be rendered
  */
-export default function renderRelation (a) {
-    let relation = createRelation2(a)
-    return relation
-}
-
-export function createRelation2 (a, id = null) {
+export function createRelation (a) {
     let color = a.color
     if (!color) {
         if (a.readOnly) {
@@ -25,8 +20,6 @@ export function createRelation2 (a, id = null) {
             color = '#F00'
         }
     }
-
-    console.log('createRelation2:', a.x1, a.x2, a.y1, a.y2)
 
     // Adjust the start/end points.
     let theta = Math.atan((a.y1 - a.y2) / (a.x1 - a.x2))
