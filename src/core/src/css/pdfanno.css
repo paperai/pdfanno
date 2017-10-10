@@ -10,6 +10,10 @@
     pointer-events: none;
 }
 
+.textLayer {
+    /*z-index: 1000;*/
+}
+
 /**
  * SVGLayer.
  */

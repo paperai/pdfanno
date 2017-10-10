@@ -57,6 +57,7 @@ export default class RectAnnotation extends AbstractAnnotation {
         rect.text     = annotation.text
         rect.color    = annotation.color
         rect.readOnly = annotation.readOnly || false
+        rect.zIndex   = annotation.zIndex || 10
         return rect
     }
 

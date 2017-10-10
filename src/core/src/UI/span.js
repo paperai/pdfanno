@@ -34,7 +34,7 @@ function getSelectionRects () {
 /**
  * Handle document.mouseup event.
  */
-function handleDocumentMouseup (text) {
+function handleDocumentMouseup (text, zIndex) {
 
     let { rects, selectedText } = getSelectionRects()
     console.log('rects=', rects)
@@ -47,7 +47,7 @@ function handleDocumentMouseup (text) {
                 width  : r.width,
                 height : r.height
             }
-        }), selectedText, text)
+        }), selectedText, text, zIndex)
     }
 
     removeSelection()
@@ -70,7 +70,7 @@ function removeSelection () {
  * @param {Array} rects The rects to use for annotation
  * @param {String} color The color of the rects
  */
-function saveSpan (rects, selectedText, text) {
+function saveSpan (rects, selectedText, text, zIndex) {
     let svg = getSVGLayer()
     let boundingRect = svg.getBoundingClientRect()
 
@@ -85,7 +85,8 @@ function saveSpan (rects, selectedText, text) {
             })
         }).filter((r) => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1),
         selectedText,
-        text
+        text,
+        zIndex
     }
 
     console.log('rects2:', annotation.rectangles)
@@ -130,6 +131,6 @@ export function getRectangles () {
 /**
  * Create a span by current texts selection.
  */
-export function createSpan ({ text = null }) {
-    return handleDocumentMouseup(text)
+export function createSpan ({ text = null, zIndex = 10 }) {
+    return handleDocumentMouseup(text, zIndex)
 }

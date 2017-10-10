@@ -13,7 +13,8 @@ export function renderSpan (a) {
         position   : 'absolute',
         top        : 0,
         left       : 0,
-        visibility : 'visible'
+        visibility : 'visible',
+        zIndex     : a.zIndex || 10
     }).addClass('anno-span')
 
     a.rectangles.forEach(r => {
