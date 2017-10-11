@@ -13651,7 +13651,9 @@ class PublicRectAnnotation {
  */
 class PublicSpanAnnotation {
 
-    constructor ({ page, position, label = '', text = '', id = 0 }) {
+    constructor ({ page, position, label = '', text = '', id = 0, zIndex = 10 }) {
+
+        console.log('PublicSpanAnnotation:', zIndex)
 
         // Check inputs.
         if (!page || typeof page !== 'number') {
@@ -13683,7 +13685,7 @@ class PublicSpanAnnotation {
             color        : '#FFFF00',
             readOnly     : false,
             selectedText : text,
-            zIndex       : 10
+            zIndex
         })
 
         this.annotation = span
@@ -14014,7 +14016,7 @@ class PDFAnnoPage {
 
         // Create a new rectAnnotation.
         if (rects) {
-            window.iframeWindow.PDFAnnoCore.default.UI.createSpan({ text })
+            window.iframeWindow.PDFAnnoCore.default.UI.createSpan({ text, zIndex : __WEBPACK_IMPORTED_MODULE_3__shared_coords__["c" /* nextZIndex */]() })
 
         } else if (highlight) {
 
@@ -14022,7 +14024,8 @@ class PDFAnnoPage {
                 page     : highlight.page,
                 position : highlight.position,
                 label    : text,
-                text     : highlight.text
+                text     : highlight.text,
+                zIndex   : __WEBPACK_IMPORTED_MODULE_3__shared_coords__["c" /* nextZIndex */]()
             })
             window.add(s)
 
