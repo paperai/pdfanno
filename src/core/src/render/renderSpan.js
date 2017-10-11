@@ -22,8 +22,8 @@ export function renderSpan (a) {
     })
 
     $base.append(renderCircle({
-        x    : a.rectangles[0].x,
-        y    : a.rectangles[0].y
+        x : a.rectangles[0].x,
+        y : a.rectangles[0].y
     }))
 
     return $base[0]
@@ -45,6 +45,9 @@ function createRect (r, color) {
     })
 }
 
+/**
+ * Change color definition style from hex to rgba.
+ */
 function hex2rgba (hex, alpha = 1) {
 
     // long version
