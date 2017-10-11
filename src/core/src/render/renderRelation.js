@@ -11,7 +11,7 @@ let secondaryColor = ['green', 'blue', 'purple']
  * @param {Object} a The annotation definition
  * @return {SVGGElement} A group of a relation to be rendered
  */
-export function createRelation (a) {
+export function renderRelation (a) {
     let color = a.color
     if (!color) {
         if (a.readOnly) {
@@ -115,9 +115,9 @@ export function createRelation (a) {
         relation.setAttribute('marker-start', 'url(#relationhead)')
     }
 
-    if (id) {
-        setAttributes(relation, { id : id })
-    }
+    // if (id) {
+    //     setAttributes(relation, { id : id })
+    // }
 
     group.appendChild(relation)
 

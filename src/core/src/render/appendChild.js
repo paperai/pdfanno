@@ -1,7 +1,7 @@
 import { renderRect } from './renderRect'
 import { renderSpan } from './renderSpan'
 import renderText from './renderText'
-import renderRelation from './renderRelation'
+import { renderRelation } from './renderRelation'
 
 /**
  * Transform the rotation and scale of a node using SVG's native transform attribute.
