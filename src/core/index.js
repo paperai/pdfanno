@@ -2,6 +2,7 @@
     Functions for annotations rendered over a PDF file.
 */
 require('!style-loader!css-loader!./index.css')
+import { dispatchWindowEvent } from '../shared/util'
 
 // import $ from 'jquery'
 import EventEmitter from 'events'
@@ -27,48 +28,18 @@ PDFAnnoCore.UI.enableViewMode()
 // ** ATTENTION!! ALSO UPDATED by pdfanno.js **
 window.ctrlPressed = false
 $(document).on('keydown', e => {
-
     // Allow any keyboard events for <input/>.
     if (e.target.tagName.toLowerCase() === 'input') {
         return
     }
-
     if (e.keyCode === 17 || e.keyCode === 91) { // 17:ctrlKey, 91:cmdKey
         window.ctrlPressed = true
-        console.log('ctrl press!!')
     }
 }).on('keyup', e => {
-
     // Allow any keyboard events for <input/>.
     if (e.target.tagName.toLowerCase() === 'input') {
         return
     }
-
-    // if (e.keyCode === 49) {  // Digit "1"
-    //     var event = document.createEvent('CustomEvent')
-    //     event.initCustomEvent('digit1Pressed', true, true, null)
-    //     window.dispatchEvent(event)
-    //     return
-    // }
-    // if (e.keyCode === 50) {  // Digit "2"
-    //     var event = document.createEvent('CustomEvent')
-    //     event.initCustomEvent('digit2Pressed', true, true, null)
-    //     window.dispatchEvent(event)
-    //     return
-    // }
-    // if (e.keyCode === 51) {  // Digit "3"
-    //     var event = document.createEvent('CustomEvent')
-    //     event.initCustomEvent('digit3Pressed', true, true, null)
-    //     window.dispatchEvent(event)
-    //     return
-    // }
-    // if (e.keyCode === 52) {  // Digit "4"
-    //     var event = document.createEvent('CustomEvent')
-    //     event.initCustomEvent('digit4Pressed', true, true, null)
-    //     window.dispatchEvent(event)
-    //     return
-    // }
-
     window.ctrlPressed = false
 })
 
@@ -108,6 +79,7 @@ window.addEventListener('scalechange', () => {
  * Remove the annotation layer and the temporary rendering layer.
  */
 function removeAnnoLayer () {
+    // TODO Remove #annoLayer.
     $('#annoLayer, #annoLayer2, #tmpLayer').remove()
 }
 // TODO Refactoring: tricky.
@@ -146,6 +118,7 @@ function renderAnno () {
 
     let width = $('.page').width()
 
+    // TODO no need ?
     // Add an annotation layer.
     let $annoLayer = $(`<svg id="${svgLayerId}" class="${svgLayerId}"/>`).css({   // TODO CSSClass.
         position   : 'absolute',
@@ -166,6 +139,7 @@ function renderAnno () {
         visibility : 'hidden',
         'z-index'  : 2
     })
+    // TODO no need ? can use annoLayer2 instead of this ?
     // Add a tmp layer.
     let $tmpLayer = $(`<div id="tmpLayer"/>`).css({   // TODO CSSClass.
         position   : 'absolute',
@@ -187,22 +161,17 @@ function renderAnno () {
 // TODO Refactoring: tricky.
 window.renderAnno = renderAnno
 
+/**
+ * Render all annotations.
+ */
 function renderAnnotations () {
-
-    console.log('renderAnnotations:', window.annotationContainer.getAllAnnotations().length)
-
-    if (window.annotationContainer.getAllAnnotations().length > 0) {
-
-        window.annotationContainer.getAllAnnotations().forEach(a => {
-            a.render()
-            a.enableViewMode()
-
-            console.log('annotation:', a)
-        })
-        var event = document.createEvent('CustomEvent')
-        event.initCustomEvent('annotationrendered', true, true, null)
-        window.dispatchEvent(event)
+    const annotations = window.annotationContainer.getAllAnnotations()
+    if (annotations.length === 0) {
         return
     }
-
+    annotations.forEach(a => {
+        a.render()
+        a.enableViewMode()
+    })
+    dispatchWindowEvent('annotationrendered')
 }
