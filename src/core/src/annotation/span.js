@@ -44,6 +44,7 @@ export default class SpanAnnotation extends AbstractAnnotation {
         a.color        = annotation.color
         a.readOnly     = annotation.readOnly || false
         a.selectedText = annotation.selectedText
+        a.zIndex       = annotation.zIndex || 10
         return a
     }
 
@@ -73,7 +74,11 @@ export default class SpanAnnotation extends AbstractAnnotation {
      * Set a hover event.
      */
     setHoverEvent () {
-        this.$element.find('circle').hover(
+        // this.$element.find('circle').hover(
+        //     this.handleHoverInEvent,
+        //     this.handleHoverOutEvent
+        // )
+        this.$element.find('.anno-circle').hover(
             this.handleHoverInEvent,
             this.handleHoverOutEvent
         )
@@ -129,17 +134,6 @@ export default class SpanAnnotation extends AbstractAnnotation {
      */
     deleteSelectedAnnotation () {
         super.deleteSelectedAnnotation()
-    }
-
-    /**
-     * Get the position of the boundingCircle.
-     */
-    getBoundingCirclePosition () {
-        let $circle = this.$element.find('circle')
-        return {
-            x : parseFloat($circle.attr('cx')),
-            y : parseFloat($circle.attr('cy'))
-        }
     }
 
     /**
@@ -213,7 +207,8 @@ export default class SpanAnnotation extends AbstractAnnotation {
         super.enableViewMode()
 
         if (!this.readOnly) {
-            this.$element.find('circle').on('click', this.handleClickEvent)
+            // this.$element.find('circle').on('click', this.handleClickEvent)
+            this.$element.find('.anno-circle').on('click', this.handleClickEvent)
         }
     }
 
@@ -222,6 +217,7 @@ export default class SpanAnnotation extends AbstractAnnotation {
      */
     disableViewMode () {
         super.disableViewMode()
-        this.$element.find('circle').off('click')
+        // this.$element.find('circle').off('click')
+        this.$element.find('.anno-circle').off('click')
     }
 }

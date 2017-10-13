@@ -137,7 +137,8 @@ export class PublicSpanAnnotation {
             text         : label,
             color        : '#FFFF00',
             readOnly     : false,
-            selectedText : text
+            selectedText : text,
+            zIndex       : 10
         })
 
         this.annotation = span

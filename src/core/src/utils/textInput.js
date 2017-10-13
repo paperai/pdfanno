@@ -5,6 +5,7 @@ export function enable ({ uuid, text, disable = false, autoFocus = false, blurLi
     var event = document.createEvent('CustomEvent')
     event.initCustomEvent('enableTextInput', true, true, ...arguments)
     window.dispatchEvent(event)
+    console.log('dispatchEvent:', event, arguments[0])
 }
 
 /**

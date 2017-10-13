@@ -1,49 +1,45 @@
-import setAttributes from '../utils/setAttributes'
-import renderCircle, { DEFAULT_RADIUS } from './renderCircle'
+import { renderCircle } from './renderCircle'
 
 /**
- * Create SVGRectElements from an annotation definition.
- * This is used for anntations of type `span`.
- *
- * @param {Object} a The annotation definition
- * @return {SVGGElement|SVGRectElement} A group of all rects to be rendered
+ * Create a Span element.
+ * @param {SpanAnnotation} a - span annotation.
+ * @return {HTMLElement} a html element describing a span annotation.
  */
-export default function renderSpan (a, svg) {
-    let color = a.color || '#FF0'
+export function renderSpan (a) {
 
-    let group = document.createElementNS('http://www.w3.org/2000/svg', 'g')
-    group.setAttribute('read-only', a.readOnly === true)
-    group.setAttribute('data-text', a.text)
-    group.classList.add('anno-span')
+    const color = a.color || '#FF0'
 
-    a.rectangles.forEach((r) => {
-        let rect = createRect(r)
-        rect.setAttribute('fill-opacity', 0.2)
-        rect.setAttribute('fill', color)
-        rect.classList.add('anno-span')
-        group.appendChild(rect)
+    const $base = $('<div/>').css({
+        position   : 'absolute',
+        top        : 0,
+        left       : 0,
+        visibility : 'visible'
+    }).addClass('anno-span')
+
+    a.rectangles.forEach(r => {
+        $base.append(createRect(r, color))
     })
 
-    let rect = a.rectangles[0]
-    let circle = renderCircle({
-        x    : rect.x,
-        y    : rect.y - DEFAULT_RADIUS,
-        type : 'boundingCircle'
-    })
-    group.style.visibility = 'visible'
-    group.appendChild(circle)
+    $base.append(renderCircle({
+        x    : a.rectangles[0].x,
+        y    : a.rectangles[0].y
+    }))
 
-    return group
+    return $base[0]
 }
 
-function createRect (r) {
-    let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
-    setAttributes(rect, {
-        x      : r.x,
-        y      : r.y,
-        width  : r.width,
-        height : r.height
-    })
+function createRect (r, color) {
 
-    return rect
+    return $('<div/>').addClass('anno-span__area').css({
+        position        : 'absolute',
+        top             : r.y + 'px',
+        left            : r.x + 'px',
+        width           : r.width + 'px',
+        height          : r.height + 'px',
+        // TODO 背景色に透過を設定して、全体でopacityにはしないようにする
+        // そのために、HEXからrgbaに変換する実装が必要.
+        backgroundColor : color,
+        opacity         : 0.2,
+        border          : '1px dashed gray'
+    })
 }

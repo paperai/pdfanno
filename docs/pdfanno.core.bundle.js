@@ -82,6 +82,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* harmony export (immutable) */ __webpack_exports__["b"] = convertToExportY;
 /* harmony export (immutable) */ __webpack_exports__["a"] = convertFromExportY;
 /* unused harmony export getPageSize */
+/* harmony export (immutable) */ __webpack_exports__["c"] = nextZIndex;
 /**
  * Convert the `y` position from the local coords to exported json.
  */
@@ -124,7 +125,7 @@ const paddingTop = 9
  * The padding between pages.
  */
 const paddingBetweenPages = 9
-/* harmony export (immutable) */ __webpack_exports__["c"] = paddingBetweenPages;
+/* harmony export (immutable) */ __webpack_exports__["d"] = paddingBetweenPages;
 
 
 /**
@@ -139,6 +140,20 @@ function getPageSize () {
     return size
 }
 
+/**
+ * Get the next z-index.
+ */
+function nextZIndex () {
+
+    let w = (window.iframeWindow ? window.iframeWindow : window)
+
+    if (!w.nextZIndex) {
+        w.nextZIndex = 10
+    }
+
+    return w.nextZIndex++
+}
+
 
 /***/ }),
 /* 2 */
@@ -151,12 +166,11 @@ function getPageSize () {
 /* unused harmony export enableUserSelect */
 /* harmony export (immutable) */ __webpack_exports__["b"] = disableTextlayer;
 /* harmony export (immutable) */ __webpack_exports__["c"] = enableTextlayer;
-/* unused harmony export getMetadata */
 /* harmony export (immutable) */ __webpack_exports__["g"] = getXY;
 /* harmony export (immutable) */ __webpack_exports__["e"] = getSVGLayer;
 /* harmony export (immutable) */ __webpack_exports__["f"] = getTmpLayer;
 /* harmony export (immutable) */ __webpack_exports__["d"] = getCurrentPage;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_create_stylesheet__ = __webpack_require__(71);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_create_stylesheet__ = __webpack_require__(70);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_create_stylesheet___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_create_stylesheet__);
 
 
@@ -189,7 +203,7 @@ function scaleUp (svg, rect) {
     }
 
     let result = {}
-    let { viewport } = getMetadata(svg)
+    const viewport = window.PDFView.pdfViewer.getPageView(0).viewport
 
     Object.keys(rect).forEach((key) => {
         result[key] = rect[key] * viewport.scale
@@ -213,7 +227,7 @@ function scaleDown (svg, rect) {
     }
 
     let result = {}
-    let { viewport } = getMetadata(svg)
+    const viewport = window.PDFView.pdfViewer.getPageView(0).viewport
 
     Object.keys(rect).forEach((key) => {
         result[key] = rect[key] / viewport.scale
@@ -252,21 +266,6 @@ function disableTextlayer () {
  */
 function enableTextlayer () {
     $('body').removeClass('disable-text-layer')
-}
-
-/**
- * Get the metadata for a SVG container
- *
- * @param {SVGElement} svg The SVG container to get metadata for
- */
-// TODO No need ?
-function getMetadata (svg) {
-    svg = svg || getSVGLayer()
-    return {
-        documentId : svg.getAttribute('data-pdf-annotate-document'),
-        pageNumber : parseInt(svg.getAttribute('data-pdf-annotate-page'), 10),
-        viewport   : JSON.parse(svg.getAttribute('data-pdf-annotate-viewport'))
-    }
 }
 
 function getXY (e) {
@@ -314,39 +313,6 @@ function getCurrentPage (e) {
 
 /***/ }),
 /* 3 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = setAttributes;
-const UPPER_REGEX = /[A-Z]/g
-
-// Don't convert these attributes from camelCase to hyphenated-attributes
-const BLACKLIST = [
-    'viewBox'
-]
-
-let keyCase = (key) => {
-    if (BLACKLIST.indexOf(key) === -1) {
-        key = key.replace(UPPER_REGEX, match => '-' + match.toLowerCase())
-    }
-    return key
-}
-
-/**
- * Set attributes for a node from a map
- *
- * @param {Node} node The node to set attributes on
- * @param {Object} attributes The map of key/value pairs to use for attributes
- */
-function setAttributes (node, attributes) {
-    Object.keys(attributes).forEach((key) => {
-        node.setAttribute(keyCase(key), attributes[key])
-    })
-}
-
-
-/***/ }),
-/* 4 */
 /***/ (function(module, exports) {
 
 /*
@@ -402,7 +368,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 5 */
+/* 4 */
 /***/ (function(module, exports) {
 
 /*
@@ -654,7 +620,7 @@ function updateLink(linkElement, obj) {
 
 
 /***/ }),
-/* 6 */
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -679,7 +645,7 @@ function dispatchWindowEvent (eventName, data) {
 
 
 /***/ }),
-/* 7 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -10939,74 +10905,7 @@ return jQuery;
 
 
 /***/ }),
-/* 8 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["b"] = renderCircle;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__ = __webpack_require__(3);
-
-
-const DEFAULT_RADIUS = 3
-/* harmony export (immutable) */ __webpack_exports__["a"] = DEFAULT_RADIUS;
-
-
-/**
- * Create SVGLineElements from an annotation definition.
- * This is used for anntations of type `circle`.
- *
- * @param {Object} a The annotation definition
- * @return {SVGGElement} A group of all lines to be rendered
- */
-function renderCircle (a) {
-    let {x, y} = adjustPoint(a.x, a.y, a.r || DEFAULT_RADIUS)
-
-    // <circle cx="100" cy="100" r="100"/>
-    let circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
-    __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__["a" /* default */](circle, {
-        cx   : x,
-        cy   : y,
-        r    : a.r || DEFAULT_RADIUS,
-        fill : 'blue'
-    })
-    if (a.type) {
-        circle.setAttribute('type', a.type)
-    }
-
-    circle.classList.add('anno-circle')
-
-    return circle
-}
-
-function adjustPoint (x, y, radius) {
-    // Avoid overlapping.
-    let circles = document.querySelectorAll('svg [type="boundingCircle"]')
-
-    while (true) {
-        let good = true
-        Array.prototype.forEach.call(circles, circle => {
-            let x1 = parseFloat(circle.getAttribute('cx'))
-            let y1 = parseFloat(circle.getAttribute('cy'))
-            let r1 = parseFloat(circle.getAttribute('r'))
-            let distance1 = Math.pow(x - x1, 2) + Math.pow(y - y1, 2)
-            let distance2 = Math.pow(radius + r1, 2)
-            if (distance1 < distance2) {
-                good = false
-            }
-        })
-
-        if (good) {
-            break
-        }
-        y -= 1
-    }
-
-    return {x, y}
-}
-
-
-/***/ }),
-/* 9 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -11027,13 +10926,13 @@ function uuid () {
 
 
 /***/ }),
-/* 10 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_events__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_events__ = __webpack_require__(26);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_events___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_events__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__render_appendChild__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__render_appendChild__ = __webpack_require__(27);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__UI_utils__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_event__ = __webpack_require__(30);
 
@@ -11086,7 +10985,13 @@ class AbstractAnnotation extends __WEBPACK_IMPORTED_MODULE_0_events___default.a 
             return false
         }
 
-        this.$element = $(__WEBPACK_IMPORTED_MODULE_1__render_appendChild__["a" /* default */](__WEBPACK_IMPORTED_MODULE_2__UI_utils__["e" /* getSVGLayer */](), this))
+        let base = __WEBPACK_IMPORTED_MODULE_2__UI_utils__["e" /* getSVGLayer */]()
+        // TODO getSVGLayer() will be no longer needed.
+        if (this.type === 'span' || this.type === 'relation' || this.type === 'area') {
+            base = $('#annoLayer2')[0]
+        }
+
+        this.$element = $(__WEBPACK_IMPORTED_MODULE_1__render_appendChild__["a" /* default */](base, this))
         this.textAnnotation && this.textAnnotation.render()
 
         if (!this.hoverEventDisable && this.setHoverEvent) {
@@ -11281,6 +11186,20 @@ class AbstractAnnotation extends __WEBPACK_IMPORTED_MODULE_0_events___default.a 
     }
 
     /**
+     * Get the central position of the boundingCircle.
+     */
+    getBoundingCirclePosition () {
+        const $circle = this.$element.find('.anno-circle')
+        if ($circle.length > 0) {
+            return {
+                x : parseFloat($circle.css('left')) + parseFloat($circle.css('width')) / 2,
+                y : parseFloat($circle.css('top')) + parseFloat($circle.css('height')) / 2
+            }
+        }
+        return null
+    }
+
+    /**
      * Enable a view mode.
      */
     enableViewMode () {
@@ -11343,12 +11262,12 @@ class AbstractAnnotation extends __WEBPACK_IMPORTED_MODULE_0_events___default.a 
 
 
 /***/ }),
-/* 11 */,
-/* 12 */
+/* 9 */,
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var parser = __webpack_require__(13);
-var compiler = __webpack_require__(14);
+var parser = __webpack_require__(11);
+var compiler = __webpack_require__(12);
 
 module.exports = {
   parse: function(input) {
@@ -11359,7 +11278,7 @@ module.exports = {
 
 
 /***/ }),
-/* 13 */
+/* 11 */
 /***/ (function(module, exports) {
 
 module.exports = (function() {
@@ -15206,7 +15125,7 @@ module.exports = (function() {
 
 
 /***/ }),
-/* 14 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15410,13 +15329,77 @@ module.exports = {
 
 
 /***/ }),
-/* 15 */
+/* 13 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_uuid__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__abstract__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__text__ = __webpack_require__(16);
+/* harmony export (immutable) */ __webpack_exports__["b"] = renderCircle;
+
+/**
+ * Circle radius.
+ */
+const DEFAULT_RADIUS = 7
+/* harmony export (immutable) */ __webpack_exports__["a"] = DEFAULT_RADIUS;
+
+
+/**
+ * Create a bounding circle.
+ * @param {Object} the position for rendering.
+ */
+function renderCircle ({ x, y }) {
+
+    // Adjust the position.
+    [x, y] = adjustPoint(x, (y - (DEFAULT_RADIUS + 2)), DEFAULT_RADIUS)
+
+    const circle = $('<div class="anno-circle"/>').css({
+        position        : 'absolute',
+        top             : `${y}px`,
+        left            : `${x}px`,
+        backgroundColor : 'blue',
+        width           : DEFAULT_RADIUS + 'px',
+        height          : DEFAULT_RADIUS + 'px',
+        borderRadius    : '50%'
+    })
+
+    return circle
+}
+
+/**
+ * Adjust the circle position not overlay anothers.
+ */
+function adjustPoint (x, y, radius) {
+
+    const $circles = $('.anno-circle')
+
+    while (true) {
+        let good = true
+        $circles.each(function () {
+            const $this = $(this)
+            const x1 = parseInt($this.css('left'))
+            const y1 = parseInt($this.css('top'))
+            const distance1 = Math.pow(x - x1, 2) + Math.pow(y - y1, 2)
+            const distance2 = Math.pow(radius, 2)
+            if (distance1 < distance2) {
+                good = false
+            }
+        })
+        if (good) {
+            break
+        }
+        y -= 1
+    }
+    return [x, y]
+}
+
+
+/***/ }),
+/* 14 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_uuid__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__abstract__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__text__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__UI_utils__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__shared_coords__ = __webpack_require__(1);
 
@@ -15442,6 +15425,7 @@ class RectAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
         globalEvent = window.globalEvent
 
         this.uuid     = null
+        // TODO fix the name to "rect".
         this.type     = 'area'
         this.x        = 0
         this.y        = 0
@@ -15499,7 +15483,8 @@ class RectAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
      * Set a hover event.
      */
     setHoverEvent () {
-        this.$element.find('rect, circle').hover(
+        // this.$element.find('rect, circle').hover(
+        this.$element.find('.anno-rect, .anno-circle').hover(
             this.handleHoverInEvent,
             this.handleHoverOutEvent
         )
@@ -15547,17 +15532,6 @@ class RectAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
         return {
             x : this.x + 7,
             y : this.y - 20
-        }
-    }
-
-    /**
-     * Get the position of the boundingCircle.
-     */
-    getBoundingCirclePosition () {
-        let $circle = this.$element.find('circle')
-        return {
-            x : parseFloat($circle.attr('cx')),
-            y : parseFloat($circle.attr('cy'))
         }
     }
 
@@ -15732,7 +15706,8 @@ class RectAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
     enableViewMode () {
         super.enableViewMode()
         if (!this.readOnly) {
-            this.$element.find('.anno-rect, circle').on('click', this.handleClickEvent)
+            // this.$element.find('.anno-rect, circle').on('click', this.handleClickEvent)
+            this.$element.find('.anno-rect, .anno-circle').on('click', this.handleClickEvent)
             this.enableDragAction()
         }
     }
@@ -15742,7 +15717,8 @@ class RectAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
      */
     disableViewMode () {
         super.disableViewMode()
-        this.$element.find('.anno-rect, circle').off('click')
+        // this.$element.find('.anno-rect, circle').off('click')
+        this.$element.find('.anno-rect, .anno-circle').off('click')
         this.disableDragAction()
     }
 
@@ -15752,13 +15728,13 @@ class RectAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
 
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__UI_utils__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__UI_text__ = __webpack_require__(72);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__abstract__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__UI_text__ = __webpack_require__(71);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__abstract__ = __webpack_require__(8);
 
 
 
@@ -15931,7 +15907,7 @@ class TextAnnotation extends __WEBPACK_IMPORTED_MODULE_2__abstract__["a" /* defa
 
 
 /***/ }),
-/* 17 */
+/* 16 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -15944,6 +15920,7 @@ function enable ({ uuid, text, disable = false, autoFocus = false, blurListener 
     var event = document.createEvent('CustomEvent')
     event.initCustomEvent('enableTextInput', true, true, ...arguments)
     window.dispatchEvent(event)
+    console.log('dispatchEvent:', event, arguments[0])
 }
 
 /**
@@ -15957,13 +15934,13 @@ function disable () {
 
 
 /***/ }),
-/* 18 */
+/* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_uuid__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__abstract__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__text__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_uuid__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__abstract__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__text__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_coords__ = __webpack_require__(1);
 
 
@@ -16011,6 +15988,7 @@ class SpanAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
         a.color        = annotation.color
         a.readOnly     = annotation.readOnly || false
         a.selectedText = annotation.selectedText
+        a.zIndex       = annotation.zIndex || 10
         return a
     }
 
@@ -16040,7 +16018,11 @@ class SpanAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
      * Set a hover event.
      */
     setHoverEvent () {
-        this.$element.find('circle').hover(
+        // this.$element.find('circle').hover(
+        //     this.handleHoverInEvent,
+        //     this.handleHoverOutEvent
+        // )
+        this.$element.find('.anno-circle').hover(
             this.handleHoverInEvent,
             this.handleHoverOutEvent
         )
@@ -16096,17 +16078,6 @@ class SpanAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
      */
     deleteSelectedAnnotation () {
         super.deleteSelectedAnnotation()
-    }
-
-    /**
-     * Get the position of the boundingCircle.
-     */
-    getBoundingCirclePosition () {
-        let $circle = this.$element.find('circle')
-        return {
-            x : parseFloat($circle.attr('cx')),
-            y : parseFloat($circle.attr('cy'))
-        }
     }
 
     /**
@@ -16180,7 +16151,8 @@ class SpanAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
         super.enableViewMode()
 
         if (!this.readOnly) {
-            this.$element.find('circle').on('click', this.handleClickEvent)
+            // this.$element.find('circle').on('click', this.handleClickEvent)
+            this.$element.find('.anno-circle').on('click', this.handleClickEvent)
         }
     }
 
@@ -16189,7 +16161,8 @@ class SpanAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
      */
     disableViewMode () {
         super.disableViewMode()
-        this.$element.find('circle').off('click')
+        // this.$element.find('circle').off('click')
+        this.$element.find('.anno-circle').off('click')
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = SpanAnnotation;
@@ -16197,15 +16170,15 @@ class SpanAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
 
 
 /***/ }),
-/* 19 */
+/* 18 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_uuid__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__abstract__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__text__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_uuid__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__abstract__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__text__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_relation_js__ = __webpack_require__(29);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__shared_util__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__shared_util__ = __webpack_require__(5);
 
 
 
@@ -16587,14 +16560,14 @@ class RelationAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* 
 
 
 /***/ }),
+/* 19 */,
 /* 20 */,
 /* 21 */,
 /* 22 */,
 /* 23 */,
 /* 24 */,
 /* 25 */,
-/* 26 */,
-/* 27 */
+/* 26 */
 /***/ (function(module, exports) {
 
 // Copyright Joyent, Inc. and other Node contributors.
@@ -16902,61 +16875,19 @@ function isUndefined(arg) {
 
 
 /***/ }),
-/* 28 */
+/* 27 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* unused harmony export transform */
 /* harmony export (immutable) */ __webpack_exports__["a"] = appendChild;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_object_assign__ = __webpack_require__(62);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_object_assign___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_object_assign__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__renderRect__ = __webpack_require__(63);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__renderSpan__ = __webpack_require__(64);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__renderText__ = __webpack_require__(65);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__renderRelation__ = __webpack_require__(66);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__renderCircle__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderRect__ = __webpack_require__(62);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__renderSpan__ = __webpack_require__(63);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__renderText__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__renderRelation__ = __webpack_require__(65);
 
 
 
 
-
-
-
-const isFirefox = /firefox/i.test(navigator.userAgent)
-
-/**
- * Get the x/y translation to be used for transforming the annotations
- * based on the rotation of the viewport.
- *
- * @param {Object} viewport The viewport data from the page
- * @return {Object}
- */
-function getTranslation (viewport) {
-    let x
-    let y
-
-    // Modulus 360 on the rotation so that we only
-    // have to worry about four possible values.
-    switch (viewport.rotation % 360) {
-    case 0:
-        x = y = 0
-        break
-    case 90:
-        x = 0
-        y = (viewport.width / viewport.scale) * -1
-        break
-    case 180:
-        x = (viewport.width / viewport.scale) * -1
-        y = (viewport.height / viewport.scale) * -1
-        break
-    case 270:
-        x = (viewport.height / viewport.scale) * -1
-        y = 0
-        break
-    }
-
-    return { x, y }
-}
 
 /**
  * Transform the rotation and scale of a node using SVG's native transform attribute.
@@ -16966,54 +16897,7 @@ function getTranslation (viewport) {
  * @return {Node}
  */
 function transform (node, viewport) {
-    let trans = getTranslation(viewport)
-
-    // Let SVG natively transform the element
-    node.setAttribute('transform', `scale(${viewport.scale}) rotate(${viewport.rotation}) translate(${trans.x}, ${trans.y})`)
-
-    // Manually adjust x/y for nested SVG nodes
-    if (!isFirefox && node.nodeName.toLowerCase() === 'svg') {
-        node.setAttribute('x', parseInt(node.getAttribute('x'), 10) * viewport.scale)
-        node.setAttribute('y', parseInt(node.getAttribute('y'), 10) * viewport.scale)
-
-        let x = parseInt(node.getAttribute('x', 10))
-        let y = parseInt(node.getAttribute('y', 10))
-        let width = parseInt(node.getAttribute('width'), 10)
-        let height = parseInt(node.getAttribute('height'), 10)
-        let path = node.querySelector('path')
-        let svg = path.parentNode
-
-        // Scale width/height
-        let targets = [ node, svg, path, node.querySelector('rect') ]
-        targets.forEach(n => {
-            n.setAttribute('width', parseInt(n.getAttribute('width'), 10) * viewport.scale)
-            n.setAttribute('height', parseInt(n.getAttribute('height'), 10) * viewport.scale)
-        })
-
-        // Transform path but keep scale at 100% since it will be handled natively
-        transform(path, __WEBPACK_IMPORTED_MODULE_0_object_assign___default.a({}, viewport, { scale : 1 }))
-
-        switch (viewport.rotation % 360) {
-        case 90:
-            node.setAttribute('x', viewport.width - y - width)
-            node.setAttribute('y', x)
-            svg.setAttribute('x', 1)
-            svg.setAttribute('y', 0)
-            break
-        case 180:
-            node.setAttribute('x', viewport.width - x - width)
-            node.setAttribute('y', viewport.height - y - height)
-            svg.setAttribute('y', 2)
-            break
-        case 270:
-            node.setAttribute('x', y)
-            node.setAttribute('y', viewport.height - x - height)
-            svg.setAttribute('x', -1)
-            svg.setAttribute('y', 0)
-            break
-        }
-    }
-
+    node.style.transform = `scale(${viewport.scale})`
     return node
 }
 
@@ -17026,26 +16910,24 @@ function transform (node, viewport) {
  * @return {SVGElement} A node that was created and appended by this function
  */
 function appendChild (svg, annotation, viewport) {
+    // TODO no need third argument(viewport) ?
     if (!viewport) {
-        viewport = JSON.parse(svg.getAttribute('data-pdf-annotate-viewport'))
+        viewport = window.PDFView.pdfViewer.getPageView(0).viewport
     }
 
     let child
     switch (annotation.type) {
     case 'area':
-        child = __WEBPACK_IMPORTED_MODULE_1__renderRect__["a" /* default */](annotation, svg)
+        child = __WEBPACK_IMPORTED_MODULE_0__renderRect__["a" /* renderRect */](annotation, svg)
         break
     case 'span':
-        child = __WEBPACK_IMPORTED_MODULE_2__renderSpan__["a" /* default */](annotation, svg)
+        child = __WEBPACK_IMPORTED_MODULE_1__renderSpan__["a" /* renderSpan */](annotation, svg)
         break
     case 'textbox':
-        child = __WEBPACK_IMPORTED_MODULE_3__renderText__["a" /* default */](annotation, svg)
+        child = __WEBPACK_IMPORTED_MODULE_2__renderText__["a" /* default */](annotation, svg)
         break
     case 'relation':
-        child = __WEBPACK_IMPORTED_MODULE_4__renderRelation__["a" /* default */](annotation, svg)
-        break
-    case 'circle':
-        child = __WEBPACK_IMPORTED_MODULE_5__renderCircle__["b" /* default */](annotation, svg)
+        child = __WEBPACK_IMPORTED_MODULE_3__renderRelation__["a" /* default */](annotation, svg)
         break
     }
 
@@ -17060,17 +16942,43 @@ function appendChild (svg, annotation, viewport) {
 
         // `text` show above other type elements.
         } else {
-            let $text = $('.anno-text-group')
-            if ($text.length > 0) {
-                $(elm).insertBefore($text.get(0))
-            } else {
-                svg.appendChild(elm)
-            }
+            svg.append(elm)
         }
-
     }
-
     return child
+}
+
+
+/***/ }),
+/* 28 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = setAttributes;
+const UPPER_REGEX = /[A-Z]/g
+
+// Don't convert these attributes from camelCase to hyphenated-attributes
+const BLACKLIST = [
+    'viewBox'
+]
+
+let keyCase = (key) => {
+    if (BLACKLIST.indexOf(key) === -1) {
+        key = key.replace(UPPER_REGEX, match => '-' + match.toLowerCase())
+    }
+    return key
+}
+
+/**
+ * Set attributes for a node from a map
+ *
+ * @param {Node} node The node to set attributes on
+ * @param {Object} attributes The map of key/value pairs to use for attributes
+ */
+function setAttributes (node, attributes) {
+    Object.keys(attributes).forEach((key) => {
+        node.setAttribute(keyCase(key), attributes[key])
+    })
 }
 
 
@@ -17273,12 +17181,12 @@ function dispatchWindowEvent (eventName, data) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_events__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_events__ = __webpack_require__(26);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_events___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_events__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_PDFAnnoCore__ = __webpack_require__(60);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__src_annotation_container__ = __webpack_require__(78);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__src_annotation_container__ = __webpack_require__(77);
 /**
     Functions for annotations rendered over a PDF file.
 */
@@ -17389,7 +17297,7 @@ window.addEventListener('scalechange', () => {
  * Remove the annotation layer and the temporary rendering layer.
  */
 function removeAnnoLayer () {
-    __WEBPACK_IMPORTED_MODULE_0_jquery___default.a('#annoLayer, #tmpLayer').remove()
+    __WEBPACK_IMPORTED_MODULE_0_jquery___default.a('#annoLayer, #annoLayer2, #tmpLayer').remove()
 }
 // TODO Refactoring: tricky.
 window.removeAnnoLayer = removeAnnoLayer
@@ -17406,9 +17314,13 @@ function renderAnno () {
 
     // TODO make it a global const.
     const svgLayerId = 'annoLayer'
+    const annoLayer2Id = 'annoLayer2'
 
     // Check already exists.
     if (__WEBPACK_IMPORTED_MODULE_0_jquery___default.a('#' + svgLayerId).length > 0) {
+        return
+    }
+    if (__WEBPACK_IMPORTED_MODULE_0_jquery___default.a('#' + annoLayer2Id).length > 0) {
         return
     }
 
@@ -17433,6 +17345,16 @@ function renderAnno () {
         visibility : 'hidden',
         'z-index'  : 2
     })
+    // Add an annotation layer.
+    let $annoLayer2 = __WEBPACK_IMPORTED_MODULE_0_jquery___default.a(`<div id="${annoLayer2Id}"/>`).addClass('annoLayer').css({   // TODO CSSClass.
+        position   : 'absolute',
+        top        : '0px',
+        left       : `${leftMargin}px`,
+        width      : `${width}px`,
+        height     : `${height}px`,
+        visibility : 'hidden',
+        'z-index'  : 2
+    })
     // Add a tmp layer.
     let $tmpLayer = __WEBPACK_IMPORTED_MODULE_0_jquery___default.a(`<div id="tmpLayer"/>`).css({   // TODO CSSClass.
         position   : 'absolute',
@@ -17446,26 +17368,15 @@ function renderAnno () {
 
     __WEBPACK_IMPORTED_MODULE_0_jquery___default.a('#viewer').css({
         position : 'relative'
-    }).append($annoLayer).append($tmpLayer)
+    }).append($annoLayer).append($annoLayer2).append($tmpLayer)
 
-    // Reset.
-    // window.annotationContainer.destroy()
-    // window.annotationContainer.set = new Set()
-
-    let svg = $annoLayer.get(0)
-    let documentId = window.getFileName(window.PDFView.url)
-    let viewport = window.PDFView.pdfViewer.getPageView(0).viewport
-    svg.setAttribute('data-pdf-annotate-viewport', JSON.stringify(viewport))
-    svg.setAttribute('data-pdf-annotate-document', documentId)
-    svg.setAttribute('data-pdf-annotate-page', 1)
-
-    renderAnnotations(svg)
+    renderAnnotations()
 }
 
 // TODO Refactoring: tricky.
 window.renderAnno = renderAnno
 
-function renderAnnotations (svg) {
+function renderAnnotations () {
 
     console.log('renderAnnotations:', window.annotationContainer.getAllAnnotations().length)
 
@@ -17496,7 +17407,7 @@ function renderAnnotations (svg) {
 var content = __webpack_require__(59);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
-var update = __webpack_require__(5)(content, {});
+var update = __webpack_require__(4)(content, {});
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
@@ -17516,7 +17427,7 @@ if(false) {
 /* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(4)();
+exports = module.exports = __webpack_require__(3)();
 // imports
 
 
@@ -17532,17 +17443,17 @@ exports.push([module.i, "@charset \"utf-8\";\n\n/*\n    Search UI.\n*/\n.pdfanno
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__render__ = __webpack_require__(61);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__UI__ = __webpack_require__(67);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__annotation_rect__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__annotation_span__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__annotation_relation__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__UI__ = __webpack_require__(66);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__annotation_rect__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__annotation_span__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__annotation_relation__ = __webpack_require__(18);
 
 
 
 
 
 
-__webpack_require__(76)
+__webpack_require__(75)
 
 /* harmony default export */ __webpack_exports__["a"] = ({
 
@@ -17585,7 +17496,7 @@ __webpack_require__(76)
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = render;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__appendChild__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__appendChild__ = __webpack_require__(27);
 
 
 /**
@@ -17603,18 +17514,11 @@ function render (svg, viewport, data) {
     return new Promise((resolve, reject) => {
         // Reset the content of the SVG
         svg.innerHTML = ''
-        svg.setAttribute('data-pdf-annotate-container', true)
-        svg.setAttribute('data-pdf-annotate-viewport', JSON.stringify(viewport))
-        svg.removeAttribute('data-pdf-annotate-document')
-        svg.removeAttribute('data-pdf-annotate-page')
 
         // If there's no data nothing can be done
         if (!data) {
             return resolve(svg)
         }
-
-        svg.setAttribute('data-pdf-annotate-document', data.documentId)
-        svg.setAttribute('data-pdf-annotate-page', data.pageNumber)
 
         // Make sure annotations is an array
         if (!Array.isArray(data.annotations) || data.annotations.length === 0) {
@@ -17634,99 +17538,44 @@ function render (svg, viewport, data) {
 
 /***/ }),
 /* 62 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/*
-object-assign
-(c) Sindre Sorhus
-@license MIT
-*/
+/* harmony export (immutable) */ __webpack_exports__["a"] = renderRect;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderCircle__ = __webpack_require__(13);
 
 
-/* eslint-disable no-unused-vars */
-var getOwnPropertySymbols = Object.getOwnPropertySymbols;
-var hasOwnProperty = Object.prototype.hasOwnProperty;
-var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+/**
+ * Create a Rect element.
+ * @param {RectAnnotation} a - rect annotation.
+ */
+function renderRect (a) {
 
-function toObject(val) {
-	if (val === null || val === undefined) {
-		throw new TypeError('Object.assign cannot be called with null or undefined');
-	}
+    let color = a.color || '#f00'
 
-	return Object(val);
+    const $base = $('<div/>').css({
+        position   : 'absolute',
+        top        : 0,
+        left       : 0,
+        visibility : 'visible'
+    })
+
+    $base.append($('<div/>').css({
+        position : 'absolute',
+        top      : `${a.y}px`,
+        left     : `${a.x}px`,
+        width    : `${a.width}px`,
+        height   : `${a.height}px`,
+        border   : `1px solid ${color}`
+    }).addClass('anno-rect'))
+
+    $base.append(__WEBPACK_IMPORTED_MODULE_0__renderCircle__["b" /* renderCircle */]({
+        x    : a.x,
+        y    : a.y
+    }))
+
+    return $base[0]
 }
-
-function shouldUseNative() {
-	try {
-		if (!Object.assign) {
-			return false;
-		}
-
-		// Detect buggy property enumeration order in older V8 versions.
-
-		// https://bugs.chromium.org/p/v8/issues/detail?id=4118
-		var test1 = new String('abc');  // eslint-disable-line no-new-wrappers
-		test1[5] = 'de';
-		if (Object.getOwnPropertyNames(test1)[0] === '5') {
-			return false;
-		}
-
-		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
-		var test2 = {};
-		for (var i = 0; i < 10; i++) {
-			test2['_' + String.fromCharCode(i)] = i;
-		}
-		var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
-			return test2[n];
-		});
-		if (order2.join('') !== '0123456789') {
-			return false;
-		}
-
-		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
-		var test3 = {};
-		'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
-			test3[letter] = letter;
-		});
-		if (Object.keys(Object.assign({}, test3)).join('') !==
-				'abcdefghijklmnopqrst') {
-			return false;
-		}
-
-		return true;
-	} catch (err) {
-		// We don't expect any of the above to throw, but better to be safe.
-		return false;
-	}
-}
-
-module.exports = shouldUseNative() ? Object.assign : function (target, source) {
-	var from;
-	var to = toObject(target);
-	var symbols;
-
-	for (var s = 1; s < arguments.length; s++) {
-		from = Object(arguments[s]);
-
-		for (var key in from) {
-			if (hasOwnProperty.call(from, key)) {
-				to[key] = from[key];
-			}
-		}
-
-		if (getOwnPropertySymbols) {
-			symbols = getOwnPropertySymbols(from);
-			for (var i = 0; i < symbols.length; i++) {
-				if (propIsEnumerable.call(from, symbols[i])) {
-					to[symbols[i]] = from[symbols[i]];
-				}
-			}
-		}
-	}
-
-	return to;
-};
 
 
 /***/ }),
@@ -17734,55 +17583,52 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = renderRect;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__renderCircle__ = __webpack_require__(8);
-
+/* harmony export (immutable) */ __webpack_exports__["a"] = renderSpan;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderCircle__ = __webpack_require__(13);
 
 
 /**
- * Create SVGRectElements from an annotation definition.
- * This is used for anntations of type `area`.
- *
- * @param {Object} a The annotation definition
- * @return {SVGGElement|SVGRectElement} A group of all rects to be rendered
+ * Create a Span element.
+ * @param {SpanAnnotation} a - span annotation.
+ * @return {HTMLElement} a html element describing a span annotation.
  */
-function renderRect (a, svg) {
-    let color = a.color || '#f00'
+function renderSpan (a) {
 
-    let group = document.createElementNS('http://www.w3.org/2000/svg', 'g')
-    group.setAttribute('read-only', a.readOnly === true)
-    group.style.visibility = 'visible'
+    const color = a.color || '#FF0'
 
-    let rect = createRect(a)
-    __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__["a" /* default */](rect, {
-        stroke      : color,
-        strokeWidth : 1,
-        fill        : 'none',
-        class       : 'anno-rect'
+    const $base = $('<div/>').css({
+        position   : 'absolute',
+        top        : 0,
+        left       : 0,
+        visibility : 'visible'
+    }).addClass('anno-span')
+
+    a.rectangles.forEach(r => {
+        $base.append(createRect(r, color))
     })
-    group.appendChild(rect)
 
-    let circle = __WEBPACK_IMPORTED_MODULE_1__renderCircle__["b" /* default */]({
-        x    : a.x,
-        y    : a.y - __WEBPACK_IMPORTED_MODULE_1__renderCircle__["a" /* DEFAULT_RADIUS */] - 2,
-        type : 'boundingCircle'
-    })
-    group.appendChild(circle)
+    $base.append(__WEBPACK_IMPORTED_MODULE_0__renderCircle__["b" /* renderCircle */]({
+        x    : a.rectangles[0].x,
+        y    : a.rectangles[0].y
+    }))
 
-    return group
+    return $base[0]
 }
 
-function createRect (r) {
-    let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
-    __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__["a" /* default */](rect, {
-        x      : r.x,
-        y      : r.y,
-        width  : r.width,
-        height : r.height
-    })
+function createRect (r, color) {
 
-    return rect
+    return $('<div/>').addClass('anno-span__area').css({
+        position        : 'absolute',
+        top             : r.y + 'px',
+        left            : r.x + 'px',
+        width           : r.width + 'px',
+        height          : r.height + 'px',
+        // TODO 背景色に透過を設定して、全体でopacityにはしないようにする
+        // そのために、HEXからrgbaに変換する実装が必要.
+        backgroundColor : color,
+        opacity         : 0.2,
+        border          : '1px dashed gray'
+    })
 }
 
 
@@ -17791,67 +17637,8 @@ function createRect (r) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = renderSpan;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__renderCircle__ = __webpack_require__(8);
-
-
-
-/**
- * Create SVGRectElements from an annotation definition.
- * This is used for anntations of type `span`.
- *
- * @param {Object} a The annotation definition
- * @return {SVGGElement|SVGRectElement} A group of all rects to be rendered
- */
-function renderSpan (a, svg) {
-    let color = a.color || '#FF0'
-
-    let group = document.createElementNS('http://www.w3.org/2000/svg', 'g')
-    group.setAttribute('read-only', a.readOnly === true)
-    group.setAttribute('data-text', a.text)
-    group.classList.add('anno-span')
-
-    a.rectangles.forEach((r) => {
-        let rect = createRect(r)
-        rect.setAttribute('fill-opacity', 0.2)
-        rect.setAttribute('fill', color)
-        rect.classList.add('anno-span')
-        group.appendChild(rect)
-    })
-
-    let rect = a.rectangles[0]
-    let circle = __WEBPACK_IMPORTED_MODULE_1__renderCircle__["b" /* default */]({
-        x    : rect.x,
-        y    : rect.y - __WEBPACK_IMPORTED_MODULE_1__renderCircle__["a" /* DEFAULT_RADIUS */],
-        type : 'boundingCircle'
-    })
-    group.style.visibility = 'visible'
-    group.appendChild(circle)
-
-    return group
-}
-
-function createRect (r) {
-    let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
-    __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__["a" /* default */](rect, {
-        x      : r.x,
-        y      : r.y,
-        width  : r.width,
-        height : r.height
-    })
-
-    return rect
-}
-
-
-/***/ }),
-/* 65 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = renderText;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__ = __webpack_require__(28);
 // TODO no need this file ?
 
 
@@ -17918,14 +17705,14 @@ function renderText (a, svg) {
 
 
 /***/ }),
-/* 66 */
+/* 65 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = renderRelation;
-/* unused harmony export createRelation */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__renderCircle__ = __webpack_require__(8);
+/* unused harmony export createRelation2 */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__renderCircle__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_relation_js__ = __webpack_require__(29);
 
 
@@ -17941,11 +17728,11 @@ let secondaryColor = ['green', 'blue', 'purple']
  * @return {SVGGElement} A group of a relation to be rendered
  */
 function renderRelation (a) {
-    let relation = createRelation(a)
+    let relation = createRelation2(a)
     return relation
 }
 
-function createRelation (a, id = null) {
+function createRelation2 (a, id = null) {
     let color = a.color
     if (!color) {
         if (a.readOnly) {
@@ -17955,6 +17742,8 @@ function createRelation (a, id = null) {
         }
     }
 
+    console.log('createRelation2:', a.x1, a.x2, a.y1, a.y2)
+
     // Adjust the start/end points.
     let theta = Math.atan((a.y1 - a.y2) / (a.x1 - a.x2))
     let sign = (a.x1 < a.x2 ? 1 : -1)
@@ -17962,6 +17751,19 @@ function createRelation (a, id = null) {
     a.x2 -= __WEBPACK_IMPORTED_MODULE_1__renderCircle__["a" /* DEFAULT_RADIUS */] * Math.cos(theta) * sign
     a.y1 += __WEBPACK_IMPORTED_MODULE_1__renderCircle__["a" /* DEFAULT_RADIUS */] * Math.sin(theta) * sign
     a.y2 -= __WEBPACK_IMPORTED_MODULE_1__renderCircle__["a" /* DEFAULT_RADIUS */] * Math.sin(theta) * sign
+
+    let top    = Math.min(a.y1, a.y2)
+    let left   = Math.min(a.x1, a.x2)
+    let width  = Math.abs(a.x1 - a.x2)
+    let height = Math.abs(a.y1 - a.y2)
+
+    const [ $svg, margin ] = createSVGElement(top, left, width, height)
+
+    // Transform coords.
+    a.x1 = a.x1 - left + margin
+    a.x2 = a.x2 - left + margin
+    a.y1 = a.y1 - top + margin
+    a.y2 = a.y2 - top + margin
 
     // <svg viewBox="0 0 200 200">
     //     <marker id="m_ar" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="strokeWidth" preserveAspectRatio="none" markerWidth="2" markerHeight="3" orient="auto-start-reverse">
@@ -17974,12 +17776,15 @@ function createRelation (a, id = null) {
     __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__["a" /* default */](group, {
         fill        : color,
         stroke      : color,
+        // TODO no need?
         'data-rel1' : a.rel1,
         'data-rel2' : a.rel2,
         'data-text' : a.text
     })
     group.style.visibility = 'visible'
     group.setAttribute('read-only', a.readOnly === true)
+
+    $svg[0].appendChild(group)
 
     let marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker')
     __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__["a" /* default */](marker, {
@@ -18039,19 +17844,49 @@ function createRelation (a, id = null) {
 
     group.appendChild(relation)
 
-    return group
+    const $base = $('<div/>').css({
+        position   : 'absolute',
+        top        : 0,
+        left       : 0,
+        visibility : 'visible'
+    }).addClass('anno-relation')
+    $base.append($svg)
+
+    return $base[0]
+}
+
+function createSVGElement (top, left, width, height) {
+
+    // the margin for rendering an arrow curve.
+    const margin = 50
+
+    // Add an annotation layer.
+    let $svg = $(`<svg class="annoLayer"/>`).css({ // TODO why need .annoLayer
+        position   : 'absolute',
+        top        : `${top - margin}px`,
+        left       : `${left - margin}px`,
+        width      : `${width + margin * 2}px`,
+        height     : `${height + margin * 2}px`,
+        visibility : 'hidden',
+        'z-index'  : 2
+    }).attr({
+        x : 0,
+        y : 0
+    })
+
+    return [ $svg, margin ]
 }
 
 
 /***/ }),
-/* 67 */
+/* 66 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__rect__ = __webpack_require__(68);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__span__ = __webpack_require__(73);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__relation__ = __webpack_require__(74);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__view__ = __webpack_require__(75);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__rect__ = __webpack_require__(67);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__span__ = __webpack_require__(72);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__relation__ = __webpack_require__(73);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__view__ = __webpack_require__(74);
 
 
 
@@ -18068,19 +17903,19 @@ function createRelation (a, id = null) {
 
 
 /***/ }),
-/* 68 */
+/* 67 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["b"] = enableRect;
 /* harmony export (immutable) */ __webpack_exports__["a"] = disableRect;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_deep_assign__ = __webpack_require__(69);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_deep_assign__ = __webpack_require__(68);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_deep_assign___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_deep_assign__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__annotation_rect__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__utils_textInput__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__annotation_rect__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__utils_textInput__ = __webpack_require__(16);
 // TODO Remove jquery, because viewer.html already loaded jQuery.
 
 
@@ -18335,12 +18170,12 @@ function disableRect () {
 
 
 /***/ }),
-/* 69 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var isObj = __webpack_require__(70);
+var isObj = __webpack_require__(69);
 var hasOwnProperty = Object.prototype.hasOwnProperty;
 var propIsEnumerable = Object.prototype.propertyIsEnumerable;
 
@@ -18410,7 +18245,7 @@ module.exports = function deepAssign(target) {
 
 
 /***/ }),
-/* 70 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18422,7 +18257,7 @@ module.exports = function (x) {
 
 
 /***/ }),
-/* 71 */
+/* 70 */
 /***/ (function(module, exports) {
 
 module.exports = function createStyleSheet(blocks) {
@@ -18463,13 +18298,13 @@ function hyphenate(prop) {
 
 
 /***/ }),
-/* 72 */
+/* 71 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = addInputField;
 /* unused harmony export closeInput */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(2);
 // TODO no need file ?
@@ -18630,15 +18465,15 @@ function closeInput (text) {
 
 
 /***/ }),
-/* 73 */
+/* 72 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["b"] = getRectangles;
 /* harmony export (immutable) */ __webpack_exports__["a"] = createSpan;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__annotation_span__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_textInput__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__annotation_span__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_textInput__ = __webpack_require__(16);
 
 
 
@@ -18774,13 +18609,13 @@ function createSpan ({ text = null }) {
 
 
 /***/ }),
-/* 74 */
+/* 73 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = createRelation;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_textInput__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__annotation_relation__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_textInput__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__annotation_relation__ = __webpack_require__(18);
 
 
 
@@ -18823,12 +18658,12 @@ function createRelation ({ type, anno1, anno2, text }) {
 
 
 /***/ }),
-/* 75 */
+/* 74 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = enableViewMode;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
 
 
@@ -18893,16 +18728,16 @@ function enableViewMode () {
 
 
 /***/ }),
-/* 76 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(77);
+var content = __webpack_require__(76);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
-var update = __webpack_require__(5)(content, {});
+var update = __webpack_require__(4)(content, {});
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
@@ -18919,34 +18754,34 @@ if(false) {
 }
 
 /***/ }),
-/* 77 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(4)();
+exports = module.exports = __webpack_require__(3)();
 // imports
 
 
 // module
-exports.push([module.i, "\n/**\n * Utilities.\n */\n.\\--hide {\n  display: none;\n}\n.no-action {\n    pointer-events: none;\n}\n\n/**\n * SVGLayer.\n */\n.annoLayer {}\n.annoLayer > *.\\--viewMode {\n  opacity: 0.5;\n}\n.annoLayer > *.\\--viewMode.\\--emphasis {\n  opacity: 1;\n}\n\n#tmpLayer {\n    pointer-events: auto;\n}\n\n/**\n    Annotation related.\n*/\n.anno-circle {\n    transition:0.2s;\n    transform-origin: center center;\n}\n.\\--hover .anno-circle {\n  box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;\n  /*transform: scale(2);*/\n  stroke: blue;\n  stroke-width: 5px;\n}\n\n.\\--hover .anno-span {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-span {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n/**\n  Relation.\n*/\n.anno-relation {\n  transition:0.2s;\n}\n.\\--hover .anno-relation {\n  stroke-width: 2px;\n}\n.\\--selected .anno-relation {\n}\n.anno-relation-outline {\n  fill: none;\n  visibility: hidden;\n}\n.\\--selected .anno-relation-outline {\n  visibility: visible;\n  stroke: black;\n  stroke-width: 2.85px;\n  pointer-events: stroke;\n  stroke-dasharray: 3;\n}\n\n/**\n * Span.\n */\n.anno-span {}\n.anno-span rect {\n    /* Enable the hover event on circles and text even if they are overwraped other spans. */\n    pointer-events: none;\n}\n\n/**\n  Rect.\n*/\n.anno-rect {\n}\n.\\--hover .anno-rect {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-rect {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n\n/**\n  Text.\n*/\n.anno-text-group, .anno-text-group.\\--viewMode {\n    transition: 0.2s;\n    opacity: 0.01; /* for enabling a hover event. */\n}\n.anno-text-group.\\--hover,\n.anno-text-group.\\--selected,\n.anno-text-group.\\--visible {\n    opacity: 1;\n}\n.anno-text-group text {\n    /* Disable span action when selecting an anno text. */\n    user-select: none;\n}\n.anno-text {\n}\n.\\--hover .anno-text {\n  fill: rgba(255, 255, 255, 1.0);\n  stroke: black;\n  stroke-width: 0.75px;\n}\n.\\--hover .anno-text ~ text {\n  fill: rgba(255, 0, 0, 1.0);\n}\n.\\--selected .anno-text {\n  stroke: rgba(255, 0, 0, 1.0);\n  stroke-width: 1.5px;\n  fill: rgba(255, 232, 188, 1.0);\n  stroke-dasharray: 3;\n}\n.\\--selected .anno-text ~ text {\n  fill: rgba(0, 0, 0, 1.0);\n}\n\n/**\n Disable text layers.\n*/\nbody.disable-text-layer .textLayer {\n    display: none;\n}\n\n", ""]);
+exports.push([module.i, "/** TODO refactoring. */\n\n/**\n * Utilities.\n */\n.\\--hide {\n  display: none;\n}\n.no-action {\n    pointer-events: none;\n}\n\n/**\n * SVGLayer.\n */\n.annoLayer {}\n.annoLayer > *.\\--viewMode {\n  opacity: 0.5;\n}\n.annoLayer > *.\\--viewMode.\\--emphasis,\n.annoLayer > *.\\--viewMode.\\--selected {\n  opacity: 1;\n}\n\n#tmpLayer {\n    pointer-events: auto;\n}\n\n/**\n    Annotation related.\n*/\n.anno-circle {\n    transition:0.2s;\n    transform-origin: center center;\n}\n.\\--hover .anno-circle {\n  box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;\n  /*transform: scale(2);*/\n  stroke: blue;\n  stroke-width: 5px;\n}\n\n.anno-span.\\--hover .anno-circle {\n  box-shadow: rgba(113,135,164,.2) 1px 1px 1px;\n  transform: scale(2);\n/*  stroke: blue;\n  stroke-width: 5px;*/\n}\n\n.\\--hover .anno-span {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n/*  stroke: #ccc;\n  stroke-width: 0.75px;*/\n  border: 1px dashed #ccc;\n}\n.anno-span.\\--selected .anno-span__area {\n/*  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;*/\n  border: 2px dashed black !important;\n  transform: translate(-2px, -2px);\n}\n/**\n  Relation.\n*/\n.anno-relation {\n  transition:0.2s;\n}\n.\\--hover .anno-relation {\n  stroke-width: 2px;\n}\n.\\--selected .anno-relation {\n}\n.anno-relation-outline {\n  fill: none;\n  visibility: hidden;\n}\n.\\--selected .anno-relation-outline {\n  visibility: visible;\n  stroke: black;\n  stroke-width: 2.85px;\n  pointer-events: stroke;\n  stroke-dasharray: 3;\n}\n\n/**\n * Span.\n */\n.anno-span {}\n.anno-span rect {\n    /* Enable the hover event on circles and text even if they are overwraped other spans. */\n    pointer-events: none;\n}\n\n/**\n  Rect.\n*/\n.anno-rect {\n}\n.\\--hover .anno-rect {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-rect {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n\n/**\n  Text.\n*/\n.anno-text-group, .anno-text-group.\\--viewMode {\n    transition: 0.2s;\n    opacity: 0.01; /* for enabling a hover event. */\n}\n.anno-text-group.\\--hover,\n.anno-text-group.\\--selected,\n.anno-text-group.\\--visible {\n    opacity: 1;\n}\n.anno-text-group text {\n    /* Disable span action when selecting an anno text. */\n    user-select: none;\n}\n.anno-text {\n}\n.\\--hover .anno-text {\n  fill: rgba(255, 255, 255, 1.0);\n  stroke: black;\n  stroke-width: 0.75px;\n}\n.\\--hover .anno-text ~ text {\n  fill: rgba(255, 0, 0, 1.0);\n}\n.\\--selected .anno-text {\n  stroke: rgba(255, 0, 0, 1.0);\n  stroke-width: 1.5px;\n  fill: rgba(255, 232, 188, 1.0);\n  stroke-dasharray: 3;\n}\n.\\--selected .anno-text ~ text {\n  fill: rgba(0, 0, 0, 1.0);\n}\n\n/**\n Disable text layers.\n*/\nbody.disable-text-layer .textLayer {\n    display: none;\n}\n\n", ""]);
 
 // exports
 
 
 /***/ }),
-/* 78 */
+/* 77 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_toml__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_toml__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_toml___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_toml__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__version__ = __webpack_require__(79);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_tomlString__ = __webpack_require__(81);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__version__ = __webpack_require__(78);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_tomlString__ = __webpack_require__(80);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_event__ = __webpack_require__(30);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__shared_coords__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__utils_uuid__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__span__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__rect__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__relation__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__utils_uuid__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__span__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__rect__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__relation__ = __webpack_require__(18);
 
 
 
@@ -19089,7 +18924,28 @@ class AnnotationContainer {
                         ids   : [ annotation.rel1Annotation.uuid, annotation.rel2Annotation.uuid ],
                         label : annotation.text || ''
                     }
+
+                // Rect.
+                } else if (annotation.type === 'area') {
+
+                    /*
+                        [2]
+                        type = "rect"
+                        page = 1
+                        position = ["9.24324324324326","435.94054054054055","235.7027027027027","44.65945945945946"]
+                        label = "aaaa"
+                    */
+                    let { pageNumber, y } = __WEBPACK_IMPORTED_MODULE_4__shared_coords__["b" /* convertToExportY */](annotation.y)
+
+                    dataExport[annotation.uuid] = {
+                        type     : 'rect',
+                        page     : pageNumber,
+                        position : [ annotation.x, y, annotation.width, annotation.height ],
+                        label    : annotation.text || ''
+                    }
+
                 }
+
             })
 
             resolve(__WEBPACK_IMPORTED_MODULE_2__utils_tomlString__["a" /* default */](dataExport))
@@ -19183,11 +19039,11 @@ class AnnotationContainer {
 
 
 /***/ }),
-/* 79 */
+/* 78 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-let packageJson = __webpack_require__(80)
+let packageJson = __webpack_require__(79)
 /**
  * Paper Anno Version.
  * This is overwritten at build.
@@ -19197,13 +19053,13 @@ let ANNO_VERSION = packageJson.version
 
 
 /***/ }),
-/* 80 */
+/* 79 */
 /***/ (function(module, exports) {
 
 module.exports = {"name":"pdfanno","version":"0.2.0","description":"","main":"index.js","scripts":{"_prepare":"gulp prepare","dev":"npm run _prepare && webpack-dev-server --inline","watch":"npm run _prepare && webpack --watch","publish":"npm run _prepare && cross-env NODE_ENV=production webpack && gulp publish","server":"cross-env NODE_ENV=production node server/server.js","server-dev":"cross-env NODE_PORT=3000 ./node_modules/.bin/node-dev server/server.js"},"repository":{"type":"git","url":"git+https://github.com/paperai/pdfanno"},"author":"hshindo, yoheiMune","license":"MIT","bugs":{"url":"https://github.com/paperai/pdfanno/issues"},"homepage":"https://github.com/paperai/pdfanno#readme","devDependencies":{"babel-cli":"^6.26.0","babel-core":"^6.26.0","babel-eslint":"^7.2.3","babel-loader":"6.2.4","babel-messages":"^6.23.0","babel-plugin-add-module-exports":"^0.2.1","babel-preset-es2015":"^6.24.1","babel-preset-stage-1":"^6.24.1","copy":"^0.3.0","cpr":"^2.2.0","cross-env":"^5.0.5","css-loader":"^0.25.0","deep-assign":"^2.0.0","eslint":"^3.19.0","eslint-config-standard":"^6.2.1","eslint-friendly-formatter":"^2.0.7","eslint-loader":"^1.7.1","eslint-plugin-html":"^2.0.0","eslint-plugin-promise":"^3.5.0","eslint-plugin-standard":"^2.3.1","file-loader":"^0.9.0","fs-extra":"^1.0.0","fuse.js":"^3.1.0","gulp":"^3.9.1","gulp-cli":"^1.4.0","node-dev":"^3.1.3","style-loader":"^0.13.2","vinyl-source-stream":"^1.1.0","webpack":"3.0.0","webpack-dev-server":"^1.16.5","webpack-livereload-plugin":"^0.11.0"},"dependencies":{"anno-ui":"github:paperai/anno-ui#master","axios":"^0.15.2","body-parser":"^1.17.2","create-stylesheet":"^0.3.0","express":"^4.15.4","jquery":"^3.2.1","json-loader":"^0.5.7","multer":"^1.3.0","request":"^2.81.0","requirejs":"^2.3.5","toml":"github:yoheiMune/toml-node"}}
 
 /***/ }),
-/* 81 */
+/* 80 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

@@ -48,7 +48,13 @@ export default class AbstractAnnotation extends EventEmitter {
             return false
         }
 
-        this.$element = $(appendChild(getSVGLayer(), this))
+        let base = getSVGLayer()
+        // TODO getSVGLayer() will be no longer needed.
+        if (this.type === 'span' || this.type === 'relation' || this.type === 'area') {
+            base = $('#annoLayer2')[0]
+        }
+
+        this.$element = $(appendChild(base, this))
         this.textAnnotation && this.textAnnotation.render()
 
         if (!this.hoverEventDisable && this.setHoverEvent) {
@@ -240,6 +246,20 @@ export default class AbstractAnnotation extends EventEmitter {
      */
     createDummyElement () {
         return $('<div class="dummy"/>')
+    }
+
+    /**
+     * Get the central position of the boundingCircle.
+     */
+    getBoundingCirclePosition () {
+        const $circle = this.$element.find('.anno-circle')
+        if ($circle.length > 0) {
+            return {
+                x : parseFloat($circle.css('left')) + parseFloat($circle.css('width')) / 2,
+                y : parseFloat($circle.css('top')) + parseFloat($circle.css('height')) / 2
+            }
+        }
+        return null
     }
 
     /**

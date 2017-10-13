@@ -7,7 +7,7 @@ import axios from 'axios'
 import * as annoUI from 'anno-ui'
 
 import { dispatchWindowEvent } from './shared/util'
-import { paddingBetweenPages } from './shared/coords'
+import { paddingBetweenPages, nextZIndex } from './shared/coords'
 import { unlistenWindowLeaveEvent } from './page/util/window'
 import * as publicApi from './page/public'
 import PDFAnnoPage from './page/pdf/PDFAnnoPage'
@@ -543,6 +543,8 @@ function rerenderSearchResults () {
     // Display.
     window.searchHighlights.forEach((highlight, index) => {
         const $textLayer = $(`.page[data-page-number="${highlight.page}"] .textLayer`, window.iframeWindow.document)
+        // set the depth.
+        highlight.$elm.css('z-index', nextZIndex())
         $textLayer.append(highlight.$elm)
     })
 }
@@ -638,7 +640,8 @@ function doSearch ({ query = null } = {}) {
                     top    : fromY * scale + 'px',
                     left   : fromX * scale + 'px',
                     width  : (toX - fromX) * scale + 'px',
-                    height : (toY - fromY) * scale + 'px'
+                    height : (toY - fromY) * scale + 'px',
+                    zIndex : nextZIndex()
                 })
                 $textLayer.append($div)
                 // TODO 後で、改行されたものとかにも対応できるようにする（その場合は、rectsが複数）
