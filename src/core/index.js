@@ -82,8 +82,6 @@ function removeAnnoLayer () {
     // TODO Remove #annoLayer.
     $('#annoLayer, #annoLayer2, #tmpLayer').remove()
 }
-// TODO Refactoring: tricky.
-window.removeAnnoLayer = removeAnnoLayer
 
 /*
  * Render annotations saved in the storage.
@@ -152,14 +150,11 @@ function renderAnno () {
     })
 
     $('#viewer').css({
-        position : 'relative'
+        position : 'relative'  // TODO css.
     }).append($annoLayer).append($annoLayer2).append($tmpLayer)
 
     renderAnnotations()
 }
-
-// TODO Refactoring: tricky.
-window.renderAnno = renderAnno
 
 /**
  * Render all annotations.

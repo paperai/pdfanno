@@ -1,6 +1,5 @@
 import EventEmitter from 'events'
 import appendChild from '../render/appendChild'
-import { getSVGLayer } from '../UI/utils'
 import { dispatchWindowEvent } from '../utils/event'
 
 /**
@@ -48,12 +47,7 @@ export default class AbstractAnnotation extends EventEmitter {
             return false
         }
 
-        let base = getSVGLayer()
-        // TODO getSVGLayer() will be no longer needed.
-        if (this.type === 'span' || this.type === 'relation' || this.type === 'area') {
-            base = $('#annoLayer2')[0]
-        }
-
+        const base = $('#annoLayer2')[0]
         this.$element = $(appendChild(base, this))
         this.textAnnotation && this.textAnnotation.render()
 

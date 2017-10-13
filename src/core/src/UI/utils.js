@@ -93,8 +93,8 @@ export function enableTextlayer () {
 }
 
 export function getXY (e) {
-    let rect2 = $('#annoLayer')[0].getBoundingClientRect()
-    let y = e.clientY + $('#annoLayer').scrollTop() - rect2.top
+    let rect2 = $('#annoLayer2')[0].getBoundingClientRect()
+    let y = e.clientY + $('#annoLayer2').scrollTop() - rect2.top
     let x = e.clientX - rect2.left
     return { x, y }
 }
@@ -111,8 +111,8 @@ export function getCurrentPage (e) {
 
     let { x, y } = getXY(e)
 
-    let scrollTop = $('#annoLayer')[0].getBoundingClientRect().top
-    let scrollLeft = $('#annoLayer')[0].getBoundingClientRect().left
+    let scrollTop = $('#annoLayer2')[0].getBoundingClientRect().top
+    let scrollLeft = $('#annoLayer2')[0].getBoundingClientRect().left
 
     let elements = document.querySelectorAll('.canvasWrapper')
 
