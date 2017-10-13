@@ -1,5 +1,5 @@
 // TODO no need file ?
-import $ from 'jquery'
+// import $ from 'jquery'
 import {
     BORDER_COLOR,
     scaleDown,

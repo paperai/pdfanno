@@ -3,11 +3,11 @@
 */
 require('!style-loader!css-loader!./index.css')
 
-import $ from 'jquery'
+// import $ from 'jquery'
 import EventEmitter from 'events'
 
 // for Convinience.
-window.$ = window.jQuery = $
+// window.$ = window.jQuery = $
 
 window.globalEvent = new EventEmitter()
 

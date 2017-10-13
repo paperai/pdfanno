@@ -1,5 +1,5 @@
 // TODO Remove jquery, because viewer.html already loaded jQuery.
-import $ from 'jquery'
+// import $ from 'jquery'
 import assign from 'deep-assign'
 import {
     scaleDown,

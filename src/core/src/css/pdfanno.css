@@ -1,4 +1,4 @@
-/** TODO refactoring. */
+/** TODO refactoring. Merge to index.css ? */
 
 /**
  * Utilities.
@@ -11,7 +11,7 @@
 }
 
 .textLayer {
-    /*z-index: 1000;*/
+    /*display: none;*/
 }
 
 /**
