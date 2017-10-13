@@ -106,7 +106,9 @@ export class PublicRectAnnotation {
  */
 export class PublicSpanAnnotation {
 
-    constructor ({ page, position, label = '', text = '', id = 0 }) {
+    constructor ({ page, position, label = '', text = '', id = 0, zIndex = 10 }) {
+
+        console.log('PublicSpanAnnotation:', zIndex)
 
         // Check inputs.
         if (!page || typeof page !== 'number') {
@@ -138,7 +140,7 @@ export class PublicSpanAnnotation {
             color        : '#FFFF00',
             readOnly     : false,
             selectedText : text,
-            zIndex       : 10
+            zIndex
         })
 
         this.annotation = span

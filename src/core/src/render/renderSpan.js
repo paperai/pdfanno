@@ -13,7 +13,8 @@ export function renderSpan (a) {
         position   : 'absolute',
         top        : 0,
         left       : 0,
-        visibility : 'visible'
+        visibility : 'visible',
+        zIndex     : a.zIndex || 10
     }).addClass('anno-span')
 
     a.rectangles.forEach(r => {
@@ -21,8 +22,8 @@ export function renderSpan (a) {
     })
 
     $base.append(renderCircle({
-        x    : a.rectangles[0].x,
-        y    : a.rectangles[0].y
+        x : a.rectangles[0].x,
+        y : a.rectangles[0].y
     }))
 
     return $base[0]
@@ -30,16 +31,38 @@ export function renderSpan (a) {
 
 function createRect (r, color) {
 
+    const rgba = hex2rgba(color, 0.4)
+    console.log('hex2rgba:', color, rgba)
+
     return $('<div/>').addClass('anno-span__area').css({
         position        : 'absolute',
         top             : r.y + 'px',
         left            : r.x + 'px',
         width           : r.width + 'px',
         height          : r.height + 'px',
-        // TODO 背景色に透過を設定して、全体でopacityにはしないようにする
-        // そのために、HEXからrgbaに変換する実装が必要.
-        backgroundColor : color,
-        opacity         : 0.2,
+        backgroundColor : rgba,
         border          : '1px dashed gray'
     })
+}
+
+/**
+ * Change color definition style from hex to rgba.
+ */
+function hex2rgba (hex, alpha = 1) {
+
+    // long version
+    let r = hex.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i)
+    let c = null
+    if (r) {
+            c = r.slice(1,4).map(function(x) { return parseInt(x, 16) })
+    }
+    // short version
+    r = hex.match(/^#([0-9a-f])([0-9a-f])([0-9a-f])$/i)
+    if (r) {
+            c = r.slice(1,4).map(function(x) { return 0x11 * parseInt(x, 16) })
+    }
+    if (!c) {
+        return hex
+    }
+    return `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${alpha})`
 }

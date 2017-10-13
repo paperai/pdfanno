@@ -2,7 +2,7 @@ import * as annoUI from 'anno-ui'
 
 import loadFiles from './loadFiles'
 import { anyOf, dispatchWindowEvent } from '../../shared/util'
-import { convertToExportY, paddingBetweenPages } from '../../shared/coords'
+import { convertToExportY, paddingBetweenPages, nextZIndex } from '../../shared/coords'
 
 import {
     listenWindowLeaveEvent,
@@ -266,7 +266,7 @@ export default class PDFAnnoPage {
 
         // Create a new rectAnnotation.
         if (rects) {
-            window.iframeWindow.PDFAnnoCore.default.UI.createSpan({ text })
+            window.iframeWindow.PDFAnnoCore.default.UI.createSpan({ text, zIndex : nextZIndex() })
 
         } else if (highlight) {
 
@@ -274,7 +274,8 @@ export default class PDFAnnoPage {
                 page     : highlight.page,
                 position : highlight.position,
                 label    : text,
-                text     : highlight.text
+                text     : highlight.text,
+                zIndex   : nextZIndex()
             })
             window.add(s)
 

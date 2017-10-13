@@ -15461,6 +15461,7 @@ class RectAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
         rect.text     = annotation.text
         rect.color    = annotation.color
         rect.readOnly = annotation.readOnly || false
+        rect.zIndex   = annotation.zIndex || 10
         return rect
     }
 
@@ -16233,14 +16234,15 @@ class RelationAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* 
      * Create an instance from an annotation data.
      */
     static newInstance (annotation) {
-        let a = new RelationAnnotation()
-        a.uuid = annotation.uuid || __WEBPACK_IMPORTED_MODULE_0__utils_uuid__["a" /* default */]()
-        a.direction = annotation.direction
+        let a            = new RelationAnnotation()
+        a.uuid           = annotation.uuid || __WEBPACK_IMPORTED_MODULE_0__utils_uuid__["a" /* default */]()
+        a.direction      = annotation.direction
         a.rel1Annotation = __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* default */].isAnnotation(annotation.rel1) ? annotation.rel1 : window.annotationContainer.findById(annotation.rel1)
         a.rel2Annotation = __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* default */].isAnnotation(annotation.rel2) ? annotation.rel2 : window.annotationContainer.findById(annotation.rel2)
-        a.text = annotation.text
-        a.color = annotation.color
-        a.readOnly = annotation.readOnly || false
+        a.text           = annotation.text
+        a.color          = annotation.color
+        a.readOnly       = annotation.readOnly || false
+        a.zIndex         = annotation.zIndex || 10
         return a
     }
 
@@ -16927,7 +16929,7 @@ function appendChild (svg, annotation, viewport) {
         child = __WEBPACK_IMPORTED_MODULE_2__renderText__["a" /* default */](annotation, svg)
         break
     case 'relation':
-        child = __WEBPACK_IMPORTED_MODULE_3__renderRelation__["a" /* default */](annotation, svg)
+        child = __WEBPACK_IMPORTED_MODULE_3__renderRelation__["a" /* renderRelation */](annotation, svg)
         break
     }
 
@@ -17600,7 +17602,8 @@ function renderSpan (a) {
         position   : 'absolute',
         top        : 0,
         left       : 0,
-        visibility : 'visible'
+        visibility : 'visible',
+        zIndex     : a.zIndex || 10
     }).addClass('anno-span')
 
     a.rectangles.forEach(r => {
@@ -17608,8 +17611,8 @@ function renderSpan (a) {
     })
 
     $base.append(__WEBPACK_IMPORTED_MODULE_0__renderCircle__["b" /* renderCircle */]({
-        x    : a.rectangles[0].x,
-        y    : a.rectangles[0].y
+        x : a.rectangles[0].x,
+        y : a.rectangles[0].y
     }))
 
     return $base[0]
@@ -17617,18 +17620,40 @@ function renderSpan (a) {
 
 function createRect (r, color) {
 
+    const rgba = hex2rgba(color, 0.4)
+    console.log('hex2rgba:', color, rgba)
+
     return $('<div/>').addClass('anno-span__area').css({
         position        : 'absolute',
         top             : r.y + 'px',
         left            : r.x + 'px',
         width           : r.width + 'px',
         height          : r.height + 'px',
-        // TODO 背景色に透過を設定して、全体でopacityにはしないようにする
-        // そのために、HEXからrgbaに変換する実装が必要.
-        backgroundColor : color,
-        opacity         : 0.2,
+        backgroundColor : rgba,
         border          : '1px dashed gray'
     })
+}
+
+/**
+ * Change color definition style from hex to rgba.
+ */
+function hex2rgba (hex, alpha = 1) {
+
+    // long version
+    let r = hex.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i)
+    let c = null
+    if (r) {
+            c = r.slice(1,4).map(function(x) { return parseInt(x, 16) })
+    }
+    // short version
+    r = hex.match(/^#([0-9a-f])([0-9a-f])([0-9a-f])$/i)
+    if (r) {
+            c = r.slice(1,4).map(function(x) { return 0x11 * parseInt(x, 16) })
+    }
+    if (!c) {
+        return hex
+    }
+    return `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${alpha})`
 }
 
 
@@ -17710,7 +17735,6 @@ function renderText (a, svg) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = renderRelation;
-/* unused harmony export createRelation2 */
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__ = __webpack_require__(28);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__renderCircle__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_relation_js__ = __webpack_require__(29);
@@ -17728,11 +17752,6 @@ let secondaryColor = ['green', 'blue', 'purple']
  * @return {SVGGElement} A group of a relation to be rendered
  */
 function renderRelation (a) {
-    let relation = createRelation2(a)
-    return relation
-}
-
-function createRelation2 (a, id = null) {
     let color = a.color
     if (!color) {
         if (a.readOnly) {
@@ -17741,8 +17760,6 @@ function createRelation2 (a, id = null) {
             color = '#F00'
         }
     }
-
-    console.log('createRelation2:', a.x1, a.x2, a.y1, a.y2)
 
     // Adjust the start/end points.
     let theta = Math.atan((a.y1 - a.y2) / (a.x1 - a.x2))
@@ -17838,9 +17855,9 @@ function createRelation2 (a, id = null) {
         relation.setAttribute('marker-start', 'url(#relationhead)')
     }
 
-    if (id) {
-        __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__["a" /* default */](relation, { id : id })
-    }
+    // if (id) {
+    //     setAttributes(relation, { id : id })
+    // }
 
     group.appendChild(relation)
 
@@ -18507,7 +18524,7 @@ function getSelectionRects () {
 /**
  * Handle document.mouseup event.
  */
-function handleDocumentMouseup (text) {
+function handleDocumentMouseup (text, zIndex) {
 
     let { rects, selectedText } = getSelectionRects()
     console.log('rects=', rects)
@@ -18520,7 +18537,7 @@ function handleDocumentMouseup (text) {
                 width  : r.width,
                 height : r.height
             }
-        }), selectedText, text)
+        }), selectedText, text, zIndex)
     }
 
     removeSelection()
@@ -18543,7 +18560,7 @@ function removeSelection () {
  * @param {Array} rects The rects to use for annotation
  * @param {String} color The color of the rects
  */
-function saveSpan (rects, selectedText, text) {
+function saveSpan (rects, selectedText, text, zIndex) {
     let svg = __WEBPACK_IMPORTED_MODULE_0__utils__["e" /* getSVGLayer */]()
     let boundingRect = svg.getBoundingClientRect()
 
@@ -18558,7 +18575,8 @@ function saveSpan (rects, selectedText, text) {
             })
         }).filter((r) => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1),
         selectedText,
-        text
+        text,
+        zIndex
     }
 
     console.log('rects2:', annotation.rectangles)
@@ -18603,8 +18621,8 @@ function getRectangles () {
 /**
  * Create a span by current texts selection.
  */
-function createSpan ({ text = null }) {
-    return handleDocumentMouseup(text)
+function createSpan ({ text = null, zIndex = 10 }) {
+    return handleDocumentMouseup(text, zIndex)
 }
 
 
@@ -18762,7 +18780,7 @@ exports = module.exports = __webpack_require__(3)();
 
 
 // module
-exports.push([module.i, "/** TODO refactoring. */\n\n/**\n * Utilities.\n */\n.\\--hide {\n  display: none;\n}\n.no-action {\n    pointer-events: none;\n}\n\n/**\n * SVGLayer.\n */\n.annoLayer {}\n.annoLayer > *.\\--viewMode {\n  opacity: 0.5;\n}\n.annoLayer > *.\\--viewMode.\\--emphasis,\n.annoLayer > *.\\--viewMode.\\--selected {\n  opacity: 1;\n}\n\n#tmpLayer {\n    pointer-events: auto;\n}\n\n/**\n    Annotation related.\n*/\n.anno-circle {\n    transition:0.2s;\n    transform-origin: center center;\n}\n.\\--hover .anno-circle {\n  box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;\n  /*transform: scale(2);*/\n  stroke: blue;\n  stroke-width: 5px;\n}\n\n.anno-span.\\--hover .anno-circle {\n  box-shadow: rgba(113,135,164,.2) 1px 1px 1px;\n  transform: scale(2);\n/*  stroke: blue;\n  stroke-width: 5px;*/\n}\n\n.\\--hover .anno-span {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n/*  stroke: #ccc;\n  stroke-width: 0.75px;*/\n  border: 1px dashed #ccc;\n}\n.anno-span.\\--selected .anno-span__area {\n/*  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;*/\n  border: 2px dashed black !important;\n  transform: translate(-2px, -2px);\n}\n/**\n  Relation.\n*/\n.anno-relation {\n  transition:0.2s;\n}\n.\\--hover .anno-relation {\n  stroke-width: 2px;\n}\n.\\--selected .anno-relation {\n}\n.anno-relation-outline {\n  fill: none;\n  visibility: hidden;\n}\n.\\--selected .anno-relation-outline {\n  visibility: visible;\n  stroke: black;\n  stroke-width: 2.85px;\n  pointer-events: stroke;\n  stroke-dasharray: 3;\n}\n\n/**\n * Span.\n */\n.anno-span {}\n.anno-span rect {\n    /* Enable the hover event on circles and text even if they are overwraped other spans. */\n    pointer-events: none;\n}\n\n/**\n  Rect.\n*/\n.anno-rect {\n}\n.\\--hover .anno-rect {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-rect {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n\n/**\n  Text.\n*/\n.anno-text-group, .anno-text-group.\\--viewMode {\n    transition: 0.2s;\n    opacity: 0.01; /* for enabling a hover event. */\n}\n.anno-text-group.\\--hover,\n.anno-text-group.\\--selected,\n.anno-text-group.\\--visible {\n    opacity: 1;\n}\n.anno-text-group text {\n    /* Disable span action when selecting an anno text. */\n    user-select: none;\n}\n.anno-text {\n}\n.\\--hover .anno-text {\n  fill: rgba(255, 255, 255, 1.0);\n  stroke: black;\n  stroke-width: 0.75px;\n}\n.\\--hover .anno-text ~ text {\n  fill: rgba(255, 0, 0, 1.0);\n}\n.\\--selected .anno-text {\n  stroke: rgba(255, 0, 0, 1.0);\n  stroke-width: 1.5px;\n  fill: rgba(255, 232, 188, 1.0);\n  stroke-dasharray: 3;\n}\n.\\--selected .anno-text ~ text {\n  fill: rgba(0, 0, 0, 1.0);\n}\n\n/**\n Disable text layers.\n*/\nbody.disable-text-layer .textLayer {\n    display: none;\n}\n\n", ""]);
+exports.push([module.i, "/** TODO refactoring. */\n\n/**\n * Utilities.\n */\n.\\--hide {\n  display: none;\n}\n.no-action {\n    pointer-events: none;\n}\n\n.textLayer {\n    /*z-index: 1000;*/\n}\n\n/**\n * SVGLayer.\n */\n.annoLayer {}\n.annoLayer > *.\\--viewMode {\n  opacity: 0.5;\n}\n.annoLayer > *.\\--viewMode.\\--emphasis,\n.annoLayer > *.\\--viewMode.\\--selected {\n  opacity: 1;\n}\n\n#tmpLayer {\n    pointer-events: auto;\n}\n\n/**\n    Annotation related.\n*/\n.anno-circle {\n    transition:0.2s;\n    transform-origin: center center;\n}\n.\\--hover .anno-circle {\n  box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;\n  /*transform: scale(2);*/\n  stroke: blue;\n  stroke-width: 5px;\n}\n\n.anno-span.\\--hover .anno-circle {\n  box-shadow: rgba(113,135,164,.2) 1px 1px 1px;\n  transform: scale(2);\n/*  stroke: blue;\n  stroke-width: 5px;*/\n}\n\n.\\--hover .anno-span {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n/*  stroke: #ccc;\n  stroke-width: 0.75px;*/\n  border: 1px dashed #ccc;\n}\n.anno-span.\\--selected .anno-span__area {\n/*  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;*/\n  border: 2px dashed black !important;\n  transform: translate(-2px, -2px);\n}\n/**\n  Relation.\n*/\n.anno-relation {\n  transition:0.2s;\n}\n.\\--hover .anno-relation {\n  stroke-width: 2px;\n}\n.\\--selected .anno-relation {\n}\n.anno-relation-outline {\n  fill: none;\n  visibility: hidden;\n}\n.\\--selected .anno-relation-outline {\n  visibility: visible;\n  stroke: black;\n  stroke-width: 2.85px;\n  pointer-events: stroke;\n  stroke-dasharray: 3;\n}\n\n/**\n * Span.\n */\n.anno-span {}\n.anno-span rect {\n    /* Enable the hover event on circles and text even if they are overwraped other spans. */\n    pointer-events: none;\n}\n\n/**\n  Rect.\n*/\n.anno-rect {\n}\n.\\--hover .anno-rect {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-rect {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n\n/**\n  Text.\n*/\n.anno-text-group, .anno-text-group.\\--viewMode {\n    transition: 0.2s;\n    opacity: 0.01; /* for enabling a hover event. */\n}\n.anno-text-group.\\--hover,\n.anno-text-group.\\--selected,\n.anno-text-group.\\--visible {\n    opacity: 1;\n}\n.anno-text-group text {\n    /* Disable span action when selecting an anno text. */\n    user-select: none;\n}\n.anno-text {\n}\n.\\--hover .anno-text {\n  fill: rgba(255, 255, 255, 1.0);\n  stroke: black;\n  stroke-width: 0.75px;\n}\n.\\--hover .anno-text ~ text {\n  fill: rgba(255, 0, 0, 1.0);\n}\n.\\--selected .anno-text {\n  stroke: rgba(255, 0, 0, 1.0);\n  stroke-width: 1.5px;\n  fill: rgba(255, 232, 188, 1.0);\n  stroke-dasharray: 3;\n}\n.\\--selected .anno-text ~ text {\n  fill: rgba(0, 0, 0, 1.0);\n}\n\n/**\n Disable text layers.\n*/\nbody.disable-text-layer .textLayer {\n    display: none;\n}\n\n", ""]);
 
 // exports
 
