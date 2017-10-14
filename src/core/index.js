@@ -4,11 +4,7 @@
 require('!style-loader!css-loader!./index.css')
 import { dispatchWindowEvent } from '../shared/util'
 
-// import $ from 'jquery'
 import EventEmitter from 'events'
-
-// for Convinience.
-// window.$ = window.jQuery = $
 
 window.globalEvent = new EventEmitter()
 

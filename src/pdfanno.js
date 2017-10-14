@@ -1,19 +1,16 @@
 require('file-loader?name=dist/index.html!./index.html')
 require('!style-loader!css-loader!./pdfanno.css')
 
-import axios from 'axios'
 import URI from 'urijs'
 
 // UI parts.
 import * as annoUI from 'anno-ui'
 
 import { dispatchWindowEvent } from './shared/util'
-import { paddingBetweenPages, nextZIndex } from './shared/coords'
 import { unlistenWindowLeaveEvent } from './page/util/window'
 import * as publicApi from './page/public'
 import * as searchUI from './page/search'
 import PDFAnnoPage from './page/pdf/PDFAnnoPage'
-
 
 /**
  * Default PDF Name.
@@ -125,7 +122,6 @@ window.addEventListener('DOMContentLoaded', e => {
             annoUI.uploadButton.uploadPDF({
                 contentFile     : content,
                 successCallback : text => {
-                    // prepareSearch(text)
                     searchUI.setup(text)
                 }
             })
@@ -196,7 +192,6 @@ window.addEventListener('DOMContentLoaded', e => {
             return window.annoPage.getCurrentContentFile()
         },
         uploadFinishCallback : (resultText) => {
-            // prepareSearch(resultText)
             searchUI.setup(resultText)
         }
     })
@@ -260,10 +255,8 @@ window.addEventListener('DOMContentLoaded', e => {
             // Set the analyzeResult.
             annoUI.uploadButton.setResult(analyzeResult)
 
-            // prepareSearch(analyzeResult)
             // Init search function.
             searchUI.setup(analyzeResult)
-
 
             // Display upload tab.
             $('a[href="#tab2"]').click()
@@ -292,7 +285,6 @@ window.addEventListener('DOMContentLoaded', e => {
                 content : pdf
             })
 
-            // prepareSearch(analyzeResult)
             searchUI.setup(analyzeResult)
 
         }).catch(err => {

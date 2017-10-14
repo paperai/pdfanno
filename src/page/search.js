@@ -55,7 +55,6 @@ export function setup (analyzeData) {
     $('#searchWord, .js-dict-match-file').removeAttr('disabled')
 }
 
-
 window.addEventListener('DOMContentLoaded', () => {
 
     const DELAY = 500
