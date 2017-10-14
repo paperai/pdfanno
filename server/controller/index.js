@@ -54,7 +54,7 @@ module.exports.loadPDF = function (req, res) {
         const tmpFileName = Date.now() + '.pdf';
         service .savePDF(tmpFileName, body).then(pdfPath => {
             // Analyze.
-            return service .analyzePDF(pdfPath);
+            return service.analyzePDF(pdfPath);
         }).then(analyzeResult => {
             // Response as success.
             res.json({

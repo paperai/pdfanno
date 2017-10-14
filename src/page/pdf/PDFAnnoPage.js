@@ -1,9 +1,8 @@
+import axios from 'axios'
 import * as annoUI from 'anno-ui'
-
 import loadFiles from './loadFiles'
 import { anyOf, dispatchWindowEvent } from '../../shared/util'
 import { convertToExportY, paddingBetweenPages, nextZIndex } from '../../shared/coords'
-
 import {
     listenWindowLeaveEvent,
     unlistenWindowLeaveEvent,
@@ -589,6 +588,56 @@ export default class PDFAnnoPage {
         } else if (type === 'off') {
             window.iframeWindow.ctrlPressed = false
         }
+    }
+
+    /**
+     * Load a PDF data from the server.
+     */
+    loadPDFFromServer (url) {
+        return new Promise((resolve, reject) => {
+            // Load a PDF as ArrayBuffer.
+            var xhr = new XMLHttpRequest()
+            xhr.open('GET', window.API_ROOT + '/load_pdf?url=' + window.encodeURIComponent(url), true)
+            xhr.responseType = 'json'
+            xhr.onload = function () {
+                if (this.status === 200) {
+                    // Error handling.
+                    if (this.response.status === 'failure') {
+                        let error = this.response.err.stderr || this.response.err
+                        return reject(error)
+                    }
+                    // Get a PDF as arrayBuffer.
+                    const pdf = Uint8Array.from(atob(this.response.pdf), c => c.charCodeAt(0))
+                    const analyzeResult = this.response.analyzeResult
+                    resolve({ pdf, analyzeResult })
+                }
+            }
+            xhr.timeout = 120 * 1000 // 120s
+            xhr.ontimeout = function () {
+                reject('Failed to load the PDF.')
+            }
+            xhr.onerror = function (err) {
+                reject(err)
+            }
+            xhr.send()
+        })
+    }
+
+    /**
+     * Load an annotation file from the server.
+     */
+    loadAnnoFileFromServer (url) {
+        return axios.get(`${window.API_ROOT}/api/load_anno?url=${url}`).then(res => {
+            if (res.status !== 200 || res.data.status === 'failure') {
+                let reason = ''
+                if (res.data.error) {
+                    reason = '<br>Reason: ' + res.data.error
+                }
+                annoUI.ui.alertDialog.show({ message : 'Failed to load an anno file. url=' + url + reason })
+                return Promise.reject()
+            }
+            return res.data.anno
+        })
     }
 
 }
