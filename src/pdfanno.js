@@ -22,7 +22,6 @@ const DEFAULT_PDF_NAME = 'P12-1046.pdf'
  */
 let API_ROOT = 'http://localhost:8080'
 if (process.env.NODE_ENV === 'production') {
-    console.log('PRODUCTION MODE')
     API_ROOT = 'https://pdfanno.hshindo.com'
 }
 window.API_ROOT = API_ROOT
@@ -35,14 +34,7 @@ window.pdfanno = {}
 /**
  * Expose public APIs.
  */
-window.add = publicApi.addAnnotation
-window.addAll = publicApi.addAllAnnotations
-window.delete = publicApi.deleteAnnotation
-window.RectAnnotation = publicApi.PublicRectAnnotation
-window.SpanAnnotation = publicApi.PublicSpanAnnotation
-window.RelationAnnotation = publicApi.PublicRelationAnnotation
-window.readTOML = publicApi.readTOML
-window.clear = publicApi.clear
+publicApi.expose()
 
 /**
  * Annotation functions for a page.
@@ -52,11 +44,6 @@ window.annoPage = new PDFAnnoPage()
 // Manage ctrlKey (cmdKey on Mac).
 window.addEventListener('manageCtrlKey', e => {
     window.annoPage.manageCtrlKey(e.detail)
-})
-
-// Manage digitKey.
-window.addEventListener('digitKeyPressed', e => {
-    dispatchWindowEvent(`digit${e.detail}Pressed`)
 })
 
 /**
@@ -79,9 +66,6 @@ function _getY (annotation) {
  *  The entry point.
  */
 window.addEventListener('DOMContentLoaded', e => {
-
-    // Delete prev annotations.
-    window.annoPage.clearAllAnnotations()
 
     // resizable.
     annoUI.util.setupResizableColumns()
@@ -198,102 +182,65 @@ window.addEventListener('DOMContentLoaded', e => {
 
     // Display a PDF specified via URL query parameter.
     const q        = URI(document.URL).query(true)
-    const pdfURL   = q.pdf
+    const pdfURL   = q.pdf || getDefaultPDFURL()
     const annoURL  = q.anno
     const moveTo   = q.move
     const tabIndex = q.tab && parseInt(q.tab, 10)
 
-    if (pdfURL) {
+    console.log('target PDF :', pdfURL)
 
-        console.log('pdfURL=', pdfURL)
+    // Show loading.
+    showLoader(true)
 
-        // Show loading.
-        $('#pdfLoading').removeClass('hidden')
-
-        // Load a PDF file.
-        window.annoPage.loadPDFFromServer(pdfURL).then(({ pdf, analyzeResult }) => {
-
-            const pdfName = pdfURL.split('/')[pdfURL.split('/').length - 1]
-
-            // Init viewer.
-            window.annoPage.initializeViewer(null)
-            // Start application.
-            window.annoPage.startViewerApplication()
-
-            window.addEventListener('iframeReady', () => {
-                setTimeout(() => {
-                    window.annoPage.displayViewer({
-                        name    : pdfName,
-                        content : pdf
-                    })
-                }, 500)
-            })
-
-            const listenPageRendered = () => {
-                $('#pdfLoading').addClass('close')
-                setTimeout(function () {
-                    $('#pdfLoading').addClass('hidden')
-                }, 1000)
-
-                // Load and display annotations, if annoURL is set.
-                if (annoURL) {
-                    window.annoPage.loadAnnoFileFromServer(annoURL).then(anno => {
-                        publicApi.addAllAnnotations(publicApi.readTOML(anno))
-
-                        // Move to the annotation.
-                        if (moveTo) {
-                            setTimeout(() => {
-                                window.annoPage.scrollToAnnotation(moveTo)
-                            }, 500)
-                        }
-                    })
-                }
-                window.removeEventListener('pagerendered', listenPageRendered)
-            }
-            window.addEventListener('pagerendered', listenPageRendered)
-
-            // Set the analyzeResult.
-            annoUI.uploadButton.setResult(analyzeResult)
-
-            // Init search function.
-            searchUI.setup(analyzeResult)
-
-            // Display upload tab.
-            $('a[href="#tab2"]').click()
-
-        }).catch(err => {
-            // Hide a loading, and show the error message.
-            $('#pdfLoading').addClass('hidden')
-            const message = 'Failed to analyze the PDF.<br>Reason: ' + err
-            annoUI.ui.alertDialog.show({ message })
-        })
-
-    } else {
-
-        // If no PDF is specified, display a default PDF file.
+    // Load a PDF file.
+    window.annoPage.loadPDFFromServer(pdfURL).then(({ pdf, analyzeResult }) => {
 
         // Init viewer.
-        window.annoPage.initializeViewer()
+        window.annoPage.initializeViewer(null)
         // Start application.
         window.annoPage.startViewerApplication()
 
-        // Load the default PDF, and save it.
-        window.annoPage.loadPDFFromServer(getDefaultPDFURL()).then(({ pdf, analyzeResult }) => {
-            // Set as current.
-            window.annoPage.setCurrentContentFile({
-                name    : DEFAULT_PDF_NAME,
-                content : pdf
-            })
-
-            searchUI.setup(analyzeResult)
-
-        }).catch(err => {
-            // Hide a loading, and show the error message.
-            $('#pdfLoading').addClass('hidden')
-            const message = 'Failed to analyze the PDF.<br>Reason: ' + err
-            annoUI.ui.alertDialog.show({ message })
+        window.addEventListener('iframeReady', () => {
+            setTimeout(() => {
+                window.annoPage.displayViewer({
+                    name    : getPDFName(pdfURL),
+                    content : pdf
+                })
+            }, 500)
         })
-    }
+
+        const listenPageRendered = () => {
+            showLoader(false)
+
+            // Load and display annotations, if annoURL is set.
+            if (annoURL) {
+                window.annoPage.loadAnnoFileFromServer(annoURL).then(anno => {
+                    publicApi.addAllAnnotations(publicApi.readTOML(anno))
+
+                    // Move to the annotation.
+                    if (moveTo) {
+                        setTimeout(() => {
+                            window.annoPage.scrollToAnnotation(moveTo)
+                        }, 500)
+                    }
+                })
+            }
+            window.removeEventListener('pagerendered', listenPageRendered)
+        }
+        window.addEventListener('pagerendered', listenPageRendered)
+
+        // Set the analyzeResult.
+        annoUI.uploadButton.setResult(analyzeResult)
+
+        // Init search function.
+        searchUI.setup(analyzeResult)
+
+    }).catch(err => {
+        // Hide a loading, and show the error message.
+        showLoader(false)
+        const message = 'Failed to analyze the PDF.<br>Reason: ' + err
+        annoUI.ui.alertDialog.show({ message })
+    })
 
     // initial tab.
     if (tabIndex) {
@@ -310,4 +257,26 @@ function getDefaultPDFURL () {
     const pathnames = location.pathname.split('/')
     const pdfURL = location.protocol + '//' + location.hostname + ':' + location.port + pathnames.slice(0, pathnames.length - 1).join('/') + '/pdfs/' + DEFAULT_PDF_NAME
     return pdfURL
+}
+
+/**
+ * Get a PDF name from URL.
+ */
+function getPDFName (url) {
+    const a = url.split('/')
+    return a[a.length - 1]
+}
+
+/**
+ * Show or hide a loding.
+ */
+function showLoader (display) {
+    if (display) {
+        $('#pdfLoading').removeClass('close hidden')
+    } else {
+        $('#pdfLoading').addClass('close')
+        setTimeout(function () {
+            $('#pdfLoading').addClass('hidden')
+        }, 1000)
+    }
 }

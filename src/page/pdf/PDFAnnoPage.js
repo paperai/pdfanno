@@ -207,6 +207,9 @@ export default class PDFAnnoPage {
         return this.currentContentFile
     }
 
+    /**
+     * Start the viewer.
+     */
     initializeViewer (initialPDFPath = '../pdfs/P12-1046.pdf') {
 
         window.pdf = null
@@ -223,11 +226,12 @@ export default class PDFAnnoPage {
         // Reload pdf.js.
         $('#viewer iframe').remove()
         $('#viewer').html('<iframe src="' + url + '" class="anno-viewer" frameborder="0"></iframe>')
-
     }
 
+    /**
+     * Close the viewer.
+     */
     closePDFViewer () {
-        console.log('closePDFViewer')
         if (window.iframeWindow && window.iframeWindow.PDFViewerApplication) {
             window.iframeWindow.PDFViewerApplication.close()
             $('#numPages', window.iframeWindow.document).text('')
@@ -486,8 +490,6 @@ export default class PDFAnnoPage {
         if (window.iframeWindow) {
             window.iframeWindow.annotationContainer.getAllAnnotations().forEach(a => a.destroy())
         }
-        localStorage.removeItem('_pdfanno_containers')
-        localStorage.removeItem('_pdfanno_primary_annoname')
     }
 
     /**
