@@ -1,3 +1,4 @@
+import { customizeAnalyzeResult } from './util/analyzer'
 
 let pages
 
@@ -7,48 +8,7 @@ let pages
 export function setup (analyzeData) {
     console.log('textLayer:setup')
 
-    // TODO Refactoring: same at page/search.js
-    pages = []
-    let page
-    let body
-    let meta
-    analyzeData.split('\n').forEach(line => {
-        if (page && !line) {
-            body += ' '
-            meta.push(line)
-        } else {
-            let [
-                pageNumber,
-                type,
-                char
-            ] = line.split('\t')
-            pageNumber = parseInt(pageNumber, 10)
-            if (!page) {
-                page = pageNumber
-                body = ''
-                meta = []
-            } else if (page !== pageNumber) {
-                pages.push({
-                    body,
-                    meta,
-                    page
-                })
-                body = ''
-                meta = []
-                page = pageNumber
-            }
-            if (type === 'TEXT') {
-                body += char
-                meta.push(line)
-            }
-        }
-    })
-    pages.push({
-        body,
-        meta,
-        page
-    })
-    console.log('textLayer:pages:', pages)
+    pages = customizeAnalyzeResult(analyzeData)
 
     // Renew text layers.
     $('.textLayer', window.iframeWindow.document).each(function () {
