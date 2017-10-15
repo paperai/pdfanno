@@ -68,8 +68,8 @@ export default class PDFAnnoPage {
             dispatchWindowEvent('iframeReady')
         })
 
-        window.iframeWindow.addEventListener('pagerendered', () => {
-            dispatchWindowEvent('pagerendered')
+        window.iframeWindow.addEventListener('pagerendered', ev => {
+            dispatchWindowEvent('pagerendered', ev.detail)
         })
 
         window.iframeWindow.addEventListener('annotationrendered', () => {

@@ -10,6 +10,7 @@ import { dispatchWindowEvent } from './shared/util'
 import { unlistenWindowLeaveEvent } from './page/util/window'
 import * as publicApi from './page/public'
 import * as searchUI from './page/search'
+import * as textLayer from './page/textLayer'
 import PDFAnnoPage from './page/pdf/PDFAnnoPage'
 
 /**
@@ -107,6 +108,7 @@ window.addEventListener('DOMContentLoaded', e => {
                 contentFile     : content,
                 successCallback : text => {
                     searchUI.setup(text)
+                    textLayer.setup(text)
                 }
             })
         }
@@ -177,6 +179,7 @@ window.addEventListener('DOMContentLoaded', e => {
         },
         uploadFinishCallback : (resultText) => {
             searchUI.setup(resultText)
+            textLayer.setup(resultText)
         }
     })
 
@@ -234,6 +237,9 @@ window.addEventListener('DOMContentLoaded', e => {
 
         // Init search function.
         searchUI.setup(analyzeResult)
+
+        // Init textLayers.
+        textLayer.setup(analyzeResult)
 
     }).catch(err => {
         // Hide a loading, and show the error message.
