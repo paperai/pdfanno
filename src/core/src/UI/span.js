@@ -1,14 +1,9 @@
-import {
-    scaleDown,
-    getSVGLayer
-} from './utils'
+import { scaleDown, getSVGLayer } from './utils'
 import SpanAnnotation from '../annotation/span'
 import * as textInput from '../utils/textInput'
 
 /**
- * Get the current window selection as rects
- *
- * @return {Array} An Array of rects
+ * Get the current window selections and texts.
  */
 function getSelectionRects () {
     try {
@@ -24,7 +19,8 @@ function getSelectionRects () {
         }
 
         if (rects.length > 0 && rects[0].width > 0 && rects[0].height > 0) {
-            return {rects, selectedText}
+            rects = mergeRects(rects)
+            return { rects, selectedText }
         }
     } catch (e) {}
 
@@ -32,29 +28,65 @@ function getSelectionRects () {
 }
 
 /**
- * Handle document.mouseup event.
+ * Merge user selections.
  */
-function handleDocumentMouseup (text, zIndex) {
+function mergeRects (rects) {
 
-    let { rects, selectedText } = getSelectionRects()
-    console.log('rects=', rects)
-    let annotation
-    if (rects) {
-        annotation = saveSpan([...rects].map((r) => {
-            return {
-                top    : r.top,
-                left   : r.left,
-                width  : r.width,
-                height : r.height
-            }
-        }), selectedText, text, zIndex)
+    // a margin of error.
+    const error = 5
+
+    let newRects = []
+    let tmp = convertToObject(rects[0])
+    newRects.push(tmp)
+    for (let i = 1; i < rects.length; i++) {
+
+        // Merge rects.
+        if (withinMargin(rects[i].top, tmp.top, error)) {
+            tmp.top    = Math.min(tmp.top, rects[i].top)
+            tmp.left   = Math.min(tmp.left, rects[i].left)
+            tmp.right  = Math.max(tmp.right, rects[i].right)
+            tmp.bottom = Math.max(tmp.bottom, rects[i].bottom)
+            tmp.x      = tmp.left
+            tmp.y      = tmp.top
+            tmp.width  = tmp.right - tmp.left
+            tmp.height = tmp.bottom - tmp.top
+
+        // New one.
+        } else {
+            tmp = convertToObject(rects[i])
+            newRects.push(tmp)
+        }
     }
 
-    removeSelection()
-
-    return annotation
+    return newRects
 }
 
+/**
+ * Convert a DOMList to a javascript plan object.
+ */
+function convertToObject (rect) {
+    return {
+        top    : rect.top,
+        left   : rect.left,
+        right  : rect.right,
+        bottom : rect.bottom,
+        x      : rect.x,
+        y      : rect.y,
+        width  : rect.width,
+        height : rect.height
+    }
+}
+
+/**
+ * Check the value(x) within the range.
+ */
+function withinMargin (x, base, margin) {
+    return (base - margin) <= x && x <= (base + margin)
+}
+
+/**
+ * Remove user selections.
+ */
 function removeSelection () {
     let selection = window.getSelection()
     // Firefox
@@ -64,13 +96,20 @@ function removeSelection () {
 }
 
 /**
- * Save a rect annotation
- *
- * @param {String} type The type of rect (span)
- * @param {Array} rects The rects to use for annotation
- * @param {String} color The color of the rects
+ * Save a rect annotation.
  */
-function saveSpan (rects, selectedText, text, zIndex) {
+function saveSpan (text, zIndex) {
+
+    // Get the rect area which User selected.
+    let { rects, selectedText } = getSelectionRects()
+
+    // Remove the user selection.
+    removeSelection()
+
+    if (!rects) {
+        return
+    }
+
     let svg = getSVGLayer()
     let boundingRect = svg.getBoundingClientRect()
 
@@ -89,8 +128,6 @@ function saveSpan (rects, selectedText, text, zIndex) {
         zIndex
     }
 
-    console.log('rects2:', annotation.rectangles)
-
     // Save.
     let spanAnnotation = SpanAnnotation.newInstance(annotation)
     spanAnnotation.save()
@@ -107,6 +144,9 @@ function saveSpan (rects, selectedText, text, zIndex) {
     return spanAnnotation
 }
 
+/**
+ * Get the rect area of User selected.
+ */
 export function getRectangles () {
     let { rects } = getSelectionRects()
     if (!rects) {
@@ -132,5 +172,5 @@ export function getRectangles () {
  * Create a span by current texts selection.
  */
 export function createSpan ({ text = null, zIndex = 10 }) {
-    return handleDocumentMouseup(text, zIndex)
+    return saveSpan(text, zIndex)
 }
