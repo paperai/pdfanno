@@ -1,4 +1,4 @@
-import { scaleDown, getSVGLayer } from './utils'
+import { scaleDown, getAnnoLayerBoundingRect } from './utils'
 import SpanAnnotation from '../annotation/span'
 import * as textInput from '../utils/textInput'
 
@@ -110,19 +110,18 @@ function saveSpan (text, zIndex) {
         return
     }
 
-    let svg = getSVGLayer()
-    let boundingRect = svg.getBoundingClientRect()
+    let boundingRect = getAnnoLayerBoundingRect()
 
     // Initialize the annotation
     let annotation = {
-        rectangles : [...rects].map((r) => {
-            return scaleDown(svg, {
+        rectangles : rects.map((r) => {
+            return scaleDown({
                 x      : r.left - boundingRect.left,
                 y      : r.top - boundingRect.top,
                 width  : r.width,
                 height : r.height
             })
-        }).filter((r) => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1),
+        }).filter(r => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1),
         selectedText,
         text,
         zIndex
@@ -153,17 +152,16 @@ export function getRectangles () {
         return null
     }
 
-    let svg = getSVGLayer()
-    let boundingRect = svg.getBoundingClientRect()
+    const boundingRect = getAnnoLayerBoundingRect()
 
-    rects = [...rects].map((r) => {
-        return scaleDown(svg, {
+    rects = [...rects].map(r => {
+        return scaleDown({
             x      : r.left - boundingRect.left,
             y      : r.top - boundingRect.top,
             width  : r.width,
             height : r.height
         })
-    }).filter((r) => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1)
+    }).filter(r => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1)
 
     return rects
 }

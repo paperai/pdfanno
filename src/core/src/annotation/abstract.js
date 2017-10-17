@@ -272,22 +272,6 @@ export default class AbstractAnnotation extends EventEmitter {
         this.textAnnotation && this.textAnnotation.disableViewMode()
     }
 
-    /**
-     * Make the text always visible.
-     * This state will be reset at entering the view mode.
-     */
-    setTextForceDisplay () {
-        if (this.textAnnotation) {
-            this.textAnnotation.textForceDisplay = true
-        }
-    }
-
-    resetTextForceDisplay () {
-        if (this.textAnnotation) {
-            this.textAnnotation.textForceDisplay = false
-        }
-    }
-
     setDisableHoverEvent () {
         this.hoverEventDisable = true
     }

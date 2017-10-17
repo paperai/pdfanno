@@ -2,7 +2,6 @@ import assign from 'deep-assign'
 import {
     scaleDown,
     getXY,
-    getSVGLayer,
     getTmpLayer,
     getCurrentPage,
     disableTextlayer,
@@ -106,7 +105,7 @@ function handleDocumentMousemove (e) {
 
 function _findAnnotation (e) {
 
-    const { x, y } = scaleDown(getSVGLayer(), getXY(e))
+    const { x, y } = scaleDown(getXY(e))
 
     let hitAnnotation = null
     window.annotationContainer.getAllAnnotations().forEach(a => {
@@ -180,9 +179,7 @@ function saveRect (rect) {
         return
     }
 
-    let svg = getSVGLayer()
-
-    let annotation = assign(scaleDown(svg, rect), {
+    let annotation = assign(scaleDown(rect), {
         type : _type
     })
 
