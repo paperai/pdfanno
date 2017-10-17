@@ -222,13 +222,6 @@ export default class AbstractAnnotation extends EventEmitter {
     }
 
     /**
-     * Check whether a boundingCircle is included.
-     */
-    hasBoundingCircle () {
-        return this.$element.find('circle').length > 0
-    }
-
-    /**
      * Check whether the annotation is selected.
      */
     isSelected () {
