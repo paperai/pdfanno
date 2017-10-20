@@ -2,6 +2,10 @@ import { scaleDown, getAnnoLayerBoundingRect } from './utils'
 import SpanAnnotation from '../annotation/span'
 import * as textInput from '../utils/textInput'
 
+function scale () {
+    return window.PDFView.pdfViewer.getPageView(0).viewport.scale
+}
+
 /**
  * Get the current window selections and texts.
  */
@@ -11,6 +15,18 @@ function getSelectionRects () {
         let range = selection.getRangeAt(0)
         let rects = range.getClientRects()
         let selectedText = selection.toString()
+
+        console.log('start:', selection.anchorNode.parentNode)
+        console.log('end:', selection.focusNode.parentNode)
+
+        const pageNumber = parseInt(selection.anchorNode.parentNode.getAttribute('data-page'), 10)
+        const startIndex = parseInt(selection.anchorNode.parentNode.getAttribute('data-index'), 10)
+        const endIndex = parseInt(selection.focusNode.parentNode.getAttribute('data-index'), 10)
+        console.log('t:', pageNumber, startIndex, endIndex)
+
+        // TODO a little tricky.
+        selectedText = window.parent.getText(pageNumber, startIndex, endIndex)
+        console.log('text:', selectedText)
 
         // Bug detect.
         // This selects loadingIcon and/or loadingSpacer.
@@ -33,13 +49,15 @@ function getSelectionRects () {
 function mergeRects (rects, selectedText) {
 
     // Trim a rect which is almost same to other.
+    const l = rects.length
     rects = trimRects(rects)
+    console.log('length:', l, rects.length, selectedText.length)
 
     // a virtical margin of error.
-    const error = 5
+    const error = 5 * scale()
 
     // a space margin.
-    const space = 3
+    const space = 3 * scale()
 
     // new text.
     let texts = []
@@ -48,6 +66,8 @@ function mergeRects (rects, selectedText) {
     let newRects = [tmp]
     texts.push(selectedText[0])
     for (let i = 1; i < rects.length; i++) {
+
+        console.log('space:', /* rects[i - 1].right, rects[i].left, */(rects[i].left - rects[i - 1].right), texts.join(''), selectedText[i])
 
         // Same line -> Merge rects.
         if (withinMargin(rects[i].top, tmp.top, error)) {
@@ -63,6 +83,7 @@ function mergeRects (rects, selectedText) {
             // check has space.
             const prev = rects[i - 1]
             if (rects[i].left - prev.right >= space) {
+                console.log('aaa')
                 texts.push(' ')
             }
 
@@ -83,7 +104,8 @@ function mergeRects (rects, selectedText) {
         texts.push(selectedText[i])
     }
 
-    return { rects : newRects, selectedText : texts.join('') }
+    // return { rects : newRects, selectedText : texts.join('') }
+    return { rects : newRects, selectedText }
 }
 
 /**
@@ -91,10 +113,13 @@ function mergeRects (rects, selectedText) {
  */
 function trimRects (rects) {
 
+    const error = 1.5 * scale()
+    console.log('error raito:', error)
+
     let newRects = [rects[0]]
 
     for (let i = 1; i < rects.length; i++) {
-        if (Math.abs(rects[i].left - rects[i - 1].left) < 1) {
+        if (Math.abs(rects[i].left - rects[i - 1].left) < error) {
             // Almost same.
             continue
         }
