@@ -19,8 +19,8 @@ function getSelectionRects () {
         }
 
         if (rects.length > 0 && rects[0].width > 0 && rects[0].height > 0) {
-            rects = mergeRects(rects)
-            return { rects, selectedText }
+            return mergeRects(rects, selectedText)
+            // return { rects, selectedText }
         }
     } catch (e) {}
 
@@ -30,17 +30,26 @@ function getSelectionRects () {
 /**
  * Merge user selections.
  */
-function mergeRects (rects) {
+function mergeRects (rects, selectedText) {
 
-    // a margin of error.
+    // Trim a rect which is almost same to other.
+    rects = trimRects(rects)
+
+    // a virtical margin of error.
     const error = 5
 
-    let newRects = []
+    // a space margin.
+    const space = 3
+
+    // new text.
+    let texts = []
+
     let tmp = convertToObject(rects[0])
-    newRects.push(tmp)
+    let newRects = [tmp]
+    texts.push(selectedText[0])
     for (let i = 1; i < rects.length; i++) {
 
-        // Merge rects.
+        // Same line -> Merge rects.
         if (withinMargin(rects[i].top, tmp.top, error)) {
             tmp.top    = Math.min(tmp.top, rects[i].top)
             tmp.left   = Math.min(tmp.left, rects[i].left)
@@ -51,15 +60,50 @@ function mergeRects (rects) {
             tmp.width  = tmp.right - tmp.left
             tmp.height = tmp.bottom - tmp.top
 
-        // New one.
+            // check has space.
+            const prev = rects[i - 1]
+            if (rects[i].left - prev.right >= space) {
+                texts.push(' ')
+            }
+
+        // New line -> Create a new rect.
         } else {
             tmp = convertToObject(rects[i])
             newRects.push(tmp)
+            // Add space.
+            if (i >= 2 && selectedText[i - 1] === '-' && selectedText[i - 2] !== ' ') {
+                // Remove "-"
+                texts.pop()
+            } else {
+                texts.push(' ')
+            }
         }
+
+        // Add text.
+        texts.push(selectedText[i])
+    }
+
+    return { rects : newRects, selectedText : texts.join('') }
+}
+
+/**
+ * Trim rects which is almost same other.
+ */
+function trimRects (rects) {
+
+    let newRects = [rects[0]]
+
+    for (let i = 1; i < rects.length; i++) {
+        if (Math.abs(rects[i].left - rects[i - 1].left) < 1) {
+            // Almost same.
+            continue
+        }
+        newRects.push(rects[i])
     }
 
     return newRects
 }
+
 
 /**
  * Convert a DOMList to a javascript plan object.

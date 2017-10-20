@@ -16,4 +16,5 @@
  */
 .pdfanno-text-layer {
     position: absolute;
+    text-align: center;
 }

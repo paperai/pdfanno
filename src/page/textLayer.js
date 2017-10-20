@@ -39,13 +39,13 @@ function createTextLayer (page) {
         console.log('createTextLayer:', page)
 
         const $textLayer = $(`.page[data-page-number="${page}"] .textLayer`, window.iframeWindow.document)
-        console.log('$textLayer:', $textLayer)
 
         // Remove all children.
         $textLayer.html('')
 
         // Create text div elements.
-        const snipets = pages[page - 1].meta.map(info => {
+        const snipets = pages[page - 1].meta.map((info, index) => {
+            // console.log(index, info)
             if (!info) {
                 return
             }
@@ -58,7 +58,7 @@ function createTextLayer (page) {
                 left     : x * scale + 'px',
                 width    : w * scale + 'px',
                 height   : h * scale + 'px',
-                fontSize : `${h * 0.9}px`
+                fontSize : `${h * 0.85}px`
             }).text(text)
             return $div[0].outerHTML
         })
