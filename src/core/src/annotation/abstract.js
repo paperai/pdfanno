@@ -1,6 +1,5 @@
 import EventEmitter from 'events'
 import appendChild from '../render/appendChild'
-import { getSVGLayer } from '../UI/utils'
 import { dispatchWindowEvent } from '../utils/event'
 
 /**
@@ -48,12 +47,7 @@ export default class AbstractAnnotation extends EventEmitter {
             return false
         }
 
-        let base = getSVGLayer()
-        // TODO getSVGLayer() will be no longer needed.
-        if (this.type === 'span' || this.type === 'relation' || this.type === 'area') {
-            base = $('#annoLayer2')[0]
-        }
-
+        const base = $('#annoLayer2')[0]
         this.$element = $(appendChild(base, this))
         this.textAnnotation && this.textAnnotation.render()
 
@@ -228,13 +222,6 @@ export default class AbstractAnnotation extends EventEmitter {
     }
 
     /**
-     * Check whether a boundingCircle is included.
-     */
-    hasBoundingCircle () {
-        return this.$element.find('circle').length > 0
-    }
-
-    /**
      * Check whether the annotation is selected.
      */
     isSelected () {
@@ -276,22 +263,6 @@ export default class AbstractAnnotation extends EventEmitter {
     disableViewMode () {
         this.render()
         this.textAnnotation && this.textAnnotation.disableViewMode()
-    }
-
-    /**
-     * Make the text always visible.
-     * This state will be reset at entering the view mode.
-     */
-    setTextForceDisplay () {
-        if (this.textAnnotation) {
-            this.textAnnotation.textForceDisplay = true
-        }
-    }
-
-    resetTextForceDisplay () {
-        if (this.textAnnotation) {
-            this.textAnnotation.textForceDisplay = false
-        }
     }
 
     setDisableHoverEvent () {

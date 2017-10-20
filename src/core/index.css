@@ -1,12 +1,20 @@
 @charset "utf-8";
 
 /*
-    Search UI.
-*/
+ *  Search UI.
+ */
 .pdfanno-search-result {
     position: absolute;
     background-color: rgba(0, 255, 0, 0.7)
 }
 .pdfanno-search-result--highlight {
     background-color: rgba(255, 0, 0, 0.7)
+}
+
+/*
+ * Text Layer.
+ */
+.pdfanno-text-layer {
+    position: absolute;
+    text-align: center;
 }

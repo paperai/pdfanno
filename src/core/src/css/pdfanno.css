@@ -1,4 +1,4 @@
-/** TODO refactoring. */
+/** TODO refactoring. Merge to index.css ? */
 
 /**
  * Utilities.
@@ -11,7 +11,7 @@
 }
 
 .textLayer {
-    /*z-index: 1000;*/
+    /*display: none;*/
 }
 
 /**
@@ -64,7 +64,8 @@
   stroke-width: 0.5px;
   stroke-dasharray: 3;*/
   border: 2px dashed black !important;
-  transform: translate(-2px, -2px);
+  /*transform: translate(-2px, -2px);*/
+  box-sizing: border-box;
 }
 /**
   Relation.

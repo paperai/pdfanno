@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 31);
+/******/ 	return __webpack_require__(__webpack_require__.s = 34);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -80,7 +80,7 @@ return /******/ (function(modules) { // webpackBootstrap
 "use strict";
 
 
-var bind = __webpack_require__(19);
+var bind = __webpack_require__(24);
 
 /*global toString:true*/
 
@@ -461,7 +461,31 @@ function nextZIndex () {
 
 
 /***/ }),
-/* 2 */,
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = anyOf;
+/* harmony export (immutable) */ __webpack_exports__["b"] = dispatchWindowEvent;
+/**
+ * Utility.
+ */
+
+function anyOf (target, candidates) {
+    return candidates.filter(c => c === target).length > 0
+}
+
+/**
+ * Dispatch a custom event to `window` object.
+ */
+function dispatchWindowEvent (eventName, data) {
+    var event = document.createEvent('CustomEvent')
+    event.initCustomEvent(eventName, true, true, data)
+    window.dispatchEvent(event)
+}
+
+
+/***/ }),
 /* 3 */
 /***/ (function(module, exports) {
 
@@ -770,140 +794,13 @@ function updateLink(linkElement, obj) {
 
 
 /***/ }),
-/* 5 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = anyOf;
-/* harmony export (immutable) */ __webpack_exports__["b"] = dispatchWindowEvent;
-/**
- * Utility.
- */
-
-function anyOf (target, candidates) {
-    return candidates.filter(c => c === target).length > 0
-}
-
-/**
- * Dispatch a custom event to `window` object.
- */
-function dispatchWindowEvent (eventName, data) {
-    var event = document.createEvent('CustomEvent')
-    event.initCustomEvent(eventName, true, true, data)
-    window.dispatchEvent(event)
-}
-
-
-/***/ }),
+/* 5 */,
 /* 6 */,
-/* 7 */,
-/* 8 */,
-/* 9 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-/* WEBPACK VAR INJECTION */(function(process) {
-
-var utils = __webpack_require__(0);
-var normalizeHeaderName = __webpack_require__(39);
-
-var PROTECTION_PREFIX = /^\)\]\}',?\n/;
-var DEFAULT_CONTENT_TYPE = {
-  'Content-Type': 'application/x-www-form-urlencoded'
-};
-
-function setContentTypeIfUnset(headers, value) {
-  if (!utils.isUndefined(headers) && utils.isUndefined(headers['Content-Type'])) {
-    headers['Content-Type'] = value;
-  }
-}
-
-function getDefaultAdapter() {
-  var adapter;
-  if (typeof XMLHttpRequest !== 'undefined') {
-    // For browsers use XHR adapter
-    adapter = __webpack_require__(20);
-  } else if (typeof process !== 'undefined') {
-    // For node use HTTP adapter
-    adapter = __webpack_require__(20);
-  }
-  return adapter;
-}
-
-var defaults = {
-  adapter: getDefaultAdapter(),
-
-  transformRequest: [function transformRequest(data, headers) {
-    normalizeHeaderName(headers, 'Content-Type');
-    if (utils.isFormData(data) ||
-      utils.isArrayBuffer(data) ||
-      utils.isStream(data) ||
-      utils.isFile(data) ||
-      utils.isBlob(data)
-    ) {
-      return data;
-    }
-    if (utils.isArrayBufferView(data)) {
-      return data.buffer;
-    }
-    if (utils.isURLSearchParams(data)) {
-      setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
-      return data.toString();
-    }
-    if (utils.isObject(data)) {
-      setContentTypeIfUnset(headers, 'application/json;charset=utf-8');
-      return JSON.stringify(data);
-    }
-    return data;
-  }],
-
-  transformResponse: [function transformResponse(data) {
-    /*eslint no-param-reassign:0*/
-    if (typeof data === 'string') {
-      data = data.replace(PROTECTION_PREFIX, '');
-      try {
-        data = JSON.parse(data);
-      } catch (e) { /* Ignore */ }
-    }
-    return data;
-  }],
-
-  timeout: 0,
-
-  xsrfCookieName: 'XSRF-TOKEN',
-  xsrfHeaderName: 'X-XSRF-TOKEN',
-
-  maxContentLength: -1,
-
-  validateStatus: function validateStatus(status) {
-    return status >= 200 && status < 300;
-  }
-};
-
-defaults.headers = {
-  common: {
-    'Accept': 'application/json, text/plain, */*'
-  }
-};
-
-utils.forEach(['delete', 'get', 'head'], function forEachMehtodNoData(method) {
-  defaults.headers[method] = {};
-});
-
-utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
-  defaults.headers[method] = utils.merge(DEFAULT_CONTENT_TYPE);
-});
-
-module.exports = defaults;
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(38)))
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var parser = __webpack_require__(11);
-var compiler = __webpack_require__(12);
+var parser = __webpack_require__(8);
+var compiler = __webpack_require__(9);
 
 module.exports = {
   parse: function(input) {
@@ -914,7 +811,7 @@ module.exports = {
 
 
 /***/ }),
-/* 11 */
+/* 8 */
 /***/ (function(module, exports) {
 
 module.exports = (function() {
@@ -4761,7 +4658,7 @@ module.exports = (function() {
 
 
 /***/ }),
-/* 12 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4965,277 +4862,1104 @@ module.exports = {
 
 
 /***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+var utils = __webpack_require__(0);
+var normalizeHeaderName = __webpack_require__(49);
+
+var PROTECTION_PREFIX = /^\)\]\}',?\n/;
+var DEFAULT_CONTENT_TYPE = {
+  'Content-Type': 'application/x-www-form-urlencoded'
+};
+
+function setContentTypeIfUnset(headers, value) {
+  if (!utils.isUndefined(headers) && utils.isUndefined(headers['Content-Type'])) {
+    headers['Content-Type'] = value;
+  }
+}
+
+function getDefaultAdapter() {
+  var adapter;
+  if (typeof XMLHttpRequest !== 'undefined') {
+    // For browsers use XHR adapter
+    adapter = __webpack_require__(25);
+  } else if (typeof process !== 'undefined') {
+    // For node use HTTP adapter
+    adapter = __webpack_require__(25);
+  }
+  return adapter;
+}
+
+var defaults = {
+  adapter: getDefaultAdapter(),
+
+  transformRequest: [function transformRequest(data, headers) {
+    normalizeHeaderName(headers, 'Content-Type');
+    if (utils.isFormData(data) ||
+      utils.isArrayBuffer(data) ||
+      utils.isStream(data) ||
+      utils.isFile(data) ||
+      utils.isBlob(data)
+    ) {
+      return data;
+    }
+    if (utils.isArrayBufferView(data)) {
+      return data.buffer;
+    }
+    if (utils.isURLSearchParams(data)) {
+      setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
+      return data.toString();
+    }
+    if (utils.isObject(data)) {
+      setContentTypeIfUnset(headers, 'application/json;charset=utf-8');
+      return JSON.stringify(data);
+    }
+    return data;
+  }],
+
+  transformResponse: [function transformResponse(data) {
+    /*eslint no-param-reassign:0*/
+    if (typeof data === 'string') {
+      data = data.replace(PROTECTION_PREFIX, '');
+      try {
+        data = JSON.parse(data);
+      } catch (e) { /* Ignore */ }
+    }
+    return data;
+  }],
+
+  timeout: 0,
+
+  xsrfCookieName: 'XSRF-TOKEN',
+  xsrfHeaderName: 'X-XSRF-TOKEN',
+
+  maxContentLength: -1,
+
+  validateStatus: function validateStatus(status) {
+    return status >= 200 && status < 300;
+  }
+};
+
+defaults.headers = {
+  common: {
+    'Accept': 'application/json, text/plain, */*'
+  }
+};
+
+utils.forEach(['delete', 'get', 'head'], function forEachMehtodNoData(method) {
+  defaults.headers[method] = {};
+});
+
+utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+  defaults.headers[method] = utils.merge(DEFAULT_CONTENT_TYPE);
+});
+
+module.exports = defaults;
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(48)))
+
+/***/ }),
+/* 11 */,
+/* 12 */,
 /* 13 */,
 /* 14 */,
 /* 15 */,
 /* 16 */,
 /* 17 */,
-/* 18 */,
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(module, global) {var __WEBPACK_AMD_DEFINE_RESULT__;/*! https://mths.be/punycode v1.4.0 by @mathias */
+;(function(root) {
+
+	/** Detect free variables */
+	var freeExports = typeof exports == 'object' && exports &&
+		!exports.nodeType && exports;
+	var freeModule = typeof module == 'object' && module &&
+		!module.nodeType && module;
+	var freeGlobal = typeof global == 'object' && global;
+	if (
+		freeGlobal.global === freeGlobal ||
+		freeGlobal.window === freeGlobal ||
+		freeGlobal.self === freeGlobal
+	) {
+		root = freeGlobal;
+	}
+
+	/**
+	 * The `punycode` object.
+	 * @name punycode
+	 * @type Object
+	 */
+	var punycode,
+
+	/** Highest positive signed 32-bit float value */
+	maxInt = 2147483647, // aka. 0x7FFFFFFF or 2^31-1
+
+	/** Bootstring parameters */
+	base = 36,
+	tMin = 1,
+	tMax = 26,
+	skew = 38,
+	damp = 700,
+	initialBias = 72,
+	initialN = 128, // 0x80
+	delimiter = '-', // '\x2D'
+
+	/** Regular expressions */
+	regexPunycode = /^xn--/,
+	regexNonASCII = /[^\x20-\x7E]/, // unprintable ASCII chars + non-ASCII chars
+	regexSeparators = /[\x2E\u3002\uFF0E\uFF61]/g, // RFC 3490 separators
+
+	/** Error messages */
+	errors = {
+		'overflow': 'Overflow: input needs wider integers to process',
+		'not-basic': 'Illegal input >= 0x80 (not a basic code point)',
+		'invalid-input': 'Invalid input'
+	},
+
+	/** Convenience shortcuts */
+	baseMinusTMin = base - tMin,
+	floor = Math.floor,
+	stringFromCharCode = String.fromCharCode,
+
+	/** Temporary variable */
+	key;
+
+	/*--------------------------------------------------------------------------*/
+
+	/**
+	 * A generic error utility function.
+	 * @private
+	 * @param {String} type The error type.
+	 * @returns {Error} Throws a `RangeError` with the applicable error message.
+	 */
+	function error(type) {
+		throw new RangeError(errors[type]);
+	}
+
+	/**
+	 * A generic `Array#map` utility function.
+	 * @private
+	 * @param {Array} array The array to iterate over.
+	 * @param {Function} callback The function that gets called for every array
+	 * item.
+	 * @returns {Array} A new array of values returned by the callback function.
+	 */
+	function map(array, fn) {
+		var length = array.length;
+		var result = [];
+		while (length--) {
+			result[length] = fn(array[length]);
+		}
+		return result;
+	}
+
+	/**
+	 * A simple `Array#map`-like wrapper to work with domain name strings or email
+	 * addresses.
+	 * @private
+	 * @param {String} domain The domain name or email address.
+	 * @param {Function} callback The function that gets called for every
+	 * character.
+	 * @returns {Array} A new string of characters returned by the callback
+	 * function.
+	 */
+	function mapDomain(string, fn) {
+		var parts = string.split('@');
+		var result = '';
+		if (parts.length > 1) {
+			// In email addresses, only the domain name should be punycoded. Leave
+			// the local part (i.e. everything up to `@`) intact.
+			result = parts[0] + '@';
+			string = parts[1];
+		}
+		// Avoid `split(regex)` for IE8 compatibility. See #17.
+		string = string.replace(regexSeparators, '\x2E');
+		var labels = string.split('.');
+		var encoded = map(labels, fn).join('.');
+		return result + encoded;
+	}
+
+	/**
+	 * Creates an array containing the numeric code points of each Unicode
+	 * character in the string. While JavaScript uses UCS-2 internally,
+	 * this function will convert a pair of surrogate halves (each of which
+	 * UCS-2 exposes as separate characters) into a single code point,
+	 * matching UTF-16.
+	 * @see `punycode.ucs2.encode`
+	 * @see <https://mathiasbynens.be/notes/javascript-encoding>
+	 * @memberOf punycode.ucs2
+	 * @name decode
+	 * @param {String} string The Unicode input string (UCS-2).
+	 * @returns {Array} The new array of code points.
+	 */
+	function ucs2decode(string) {
+		var output = [],
+		    counter = 0,
+		    length = string.length,
+		    value,
+		    extra;
+		while (counter < length) {
+			value = string.charCodeAt(counter++);
+			if (value >= 0xD800 && value <= 0xDBFF && counter < length) {
+				// high surrogate, and there is a next character
+				extra = string.charCodeAt(counter++);
+				if ((extra & 0xFC00) == 0xDC00) { // low surrogate
+					output.push(((value & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000);
+				} else {
+					// unmatched surrogate; only append this code unit, in case the next
+					// code unit is the high surrogate of a surrogate pair
+					output.push(value);
+					counter--;
+				}
+			} else {
+				output.push(value);
+			}
+		}
+		return output;
+	}
+
+	/**
+	 * Creates a string based on an array of numeric code points.
+	 * @see `punycode.ucs2.decode`
+	 * @memberOf punycode.ucs2
+	 * @name encode
+	 * @param {Array} codePoints The array of numeric code points.
+	 * @returns {String} The new Unicode string (UCS-2).
+	 */
+	function ucs2encode(array) {
+		return map(array, function(value) {
+			var output = '';
+			if (value > 0xFFFF) {
+				value -= 0x10000;
+				output += stringFromCharCode(value >>> 10 & 0x3FF | 0xD800);
+				value = 0xDC00 | value & 0x3FF;
+			}
+			output += stringFromCharCode(value);
+			return output;
+		}).join('');
+	}
+
+	/**
+	 * Converts a basic code point into a digit/integer.
+	 * @see `digitToBasic()`
+	 * @private
+	 * @param {Number} codePoint The basic numeric code point value.
+	 * @returns {Number} The numeric value of a basic code point (for use in
+	 * representing integers) in the range `0` to `base - 1`, or `base` if
+	 * the code point does not represent a value.
+	 */
+	function basicToDigit(codePoint) {
+		if (codePoint - 48 < 10) {
+			return codePoint - 22;
+		}
+		if (codePoint - 65 < 26) {
+			return codePoint - 65;
+		}
+		if (codePoint - 97 < 26) {
+			return codePoint - 97;
+		}
+		return base;
+	}
+
+	/**
+	 * Converts a digit/integer into a basic code point.
+	 * @see `basicToDigit()`
+	 * @private
+	 * @param {Number} digit The numeric value of a basic code point.
+	 * @returns {Number} The basic code point whose value (when used for
+	 * representing integers) is `digit`, which needs to be in the range
+	 * `0` to `base - 1`. If `flag` is non-zero, the uppercase form is
+	 * used; else, the lowercase form is used. The behavior is undefined
+	 * if `flag` is non-zero and `digit` has no uppercase form.
+	 */
+	function digitToBasic(digit, flag) {
+		//  0..25 map to ASCII a..z or A..Z
+		// 26..35 map to ASCII 0..9
+		return digit + 22 + 75 * (digit < 26) - ((flag != 0) << 5);
+	}
+
+	/**
+	 * Bias adaptation function as per section 3.4 of RFC 3492.
+	 * https://tools.ietf.org/html/rfc3492#section-3.4
+	 * @private
+	 */
+	function adapt(delta, numPoints, firstTime) {
+		var k = 0;
+		delta = firstTime ? floor(delta / damp) : delta >> 1;
+		delta += floor(delta / numPoints);
+		for (/* no initialization */; delta > baseMinusTMin * tMax >> 1; k += base) {
+			delta = floor(delta / baseMinusTMin);
+		}
+		return floor(k + (baseMinusTMin + 1) * delta / (delta + skew));
+	}
+
+	/**
+	 * Converts a Punycode string of ASCII-only symbols to a string of Unicode
+	 * symbols.
+	 * @memberOf punycode
+	 * @param {String} input The Punycode string of ASCII-only symbols.
+	 * @returns {String} The resulting string of Unicode symbols.
+	 */
+	function decode(input) {
+		// Don't use UCS-2
+		var output = [],
+		    inputLength = input.length,
+		    out,
+		    i = 0,
+		    n = initialN,
+		    bias = initialBias,
+		    basic,
+		    j,
+		    index,
+		    oldi,
+		    w,
+		    k,
+		    digit,
+		    t,
+		    /** Cached calculation results */
+		    baseMinusT;
+
+		// Handle the basic code points: let `basic` be the number of input code
+		// points before the last delimiter, or `0` if there is none, then copy
+		// the first basic code points to the output.
+
+		basic = input.lastIndexOf(delimiter);
+		if (basic < 0) {
+			basic = 0;
+		}
+
+		for (j = 0; j < basic; ++j) {
+			// if it's not a basic code point
+			if (input.charCodeAt(j) >= 0x80) {
+				error('not-basic');
+			}
+			output.push(input.charCodeAt(j));
+		}
+
+		// Main decoding loop: start just after the last delimiter if any basic code
+		// points were copied; start at the beginning otherwise.
+
+		for (index = basic > 0 ? basic + 1 : 0; index < inputLength; /* no final expression */) {
+
+			// `index` is the index of the next character to be consumed.
+			// Decode a generalized variable-length integer into `delta`,
+			// which gets added to `i`. The overflow checking is easier
+			// if we increase `i` as we go, then subtract off its starting
+			// value at the end to obtain `delta`.
+			for (oldi = i, w = 1, k = base; /* no condition */; k += base) {
+
+				if (index >= inputLength) {
+					error('invalid-input');
+				}
+
+				digit = basicToDigit(input.charCodeAt(index++));
+
+				if (digit >= base || digit > floor((maxInt - i) / w)) {
+					error('overflow');
+				}
+
+				i += digit * w;
+				t = k <= bias ? tMin : (k >= bias + tMax ? tMax : k - bias);
+
+				if (digit < t) {
+					break;
+				}
+
+				baseMinusT = base - t;
+				if (w > floor(maxInt / baseMinusT)) {
+					error('overflow');
+				}
+
+				w *= baseMinusT;
+
+			}
+
+			out = output.length + 1;
+			bias = adapt(i - oldi, out, oldi == 0);
+
+			// `i` was supposed to wrap around from `out` to `0`,
+			// incrementing `n` each time, so we'll fix that now:
+			if (floor(i / out) > maxInt - n) {
+				error('overflow');
+			}
+
+			n += floor(i / out);
+			i %= out;
+
+			// Insert `n` at position `i` of the output
+			output.splice(i++, 0, n);
+
+		}
+
+		return ucs2encode(output);
+	}
+
+	/**
+	 * Converts a string of Unicode symbols (e.g. a domain name label) to a
+	 * Punycode string of ASCII-only symbols.
+	 * @memberOf punycode
+	 * @param {String} input The string of Unicode symbols.
+	 * @returns {String} The resulting Punycode string of ASCII-only symbols.
+	 */
+	function encode(input) {
+		var n,
+		    delta,
+		    handledCPCount,
+		    basicLength,
+		    bias,
+		    j,
+		    m,
+		    q,
+		    k,
+		    t,
+		    currentValue,
+		    output = [],
+		    /** `inputLength` will hold the number of code points in `input`. */
+		    inputLength,
+		    /** Cached calculation results */
+		    handledCPCountPlusOne,
+		    baseMinusT,
+		    qMinusT;
+
+		// Convert the input in UCS-2 to Unicode
+		input = ucs2decode(input);
+
+		// Cache the length
+		inputLength = input.length;
+
+		// Initialize the state
+		n = initialN;
+		delta = 0;
+		bias = initialBias;
+
+		// Handle the basic code points
+		for (j = 0; j < inputLength; ++j) {
+			currentValue = input[j];
+			if (currentValue < 0x80) {
+				output.push(stringFromCharCode(currentValue));
+			}
+		}
+
+		handledCPCount = basicLength = output.length;
+
+		// `handledCPCount` is the number of code points that have been handled;
+		// `basicLength` is the number of basic code points.
+
+		// Finish the basic string - if it is not empty - with a delimiter
+		if (basicLength) {
+			output.push(delimiter);
+		}
+
+		// Main encoding loop:
+		while (handledCPCount < inputLength) {
+
+			// All non-basic code points < n have been handled already. Find the next
+			// larger one:
+			for (m = maxInt, j = 0; j < inputLength; ++j) {
+				currentValue = input[j];
+				if (currentValue >= n && currentValue < m) {
+					m = currentValue;
+				}
+			}
+
+			// Increase `delta` enough to advance the decoder's <n,i> state to <m,0>,
+			// but guard against overflow
+			handledCPCountPlusOne = handledCPCount + 1;
+			if (m - n > floor((maxInt - delta) / handledCPCountPlusOne)) {
+				error('overflow');
+			}
+
+			delta += (m - n) * handledCPCountPlusOne;
+			n = m;
+
+			for (j = 0; j < inputLength; ++j) {
+				currentValue = input[j];
+
+				if (currentValue < n && ++delta > maxInt) {
+					error('overflow');
+				}
+
+				if (currentValue == n) {
+					// Represent delta as a generalized variable-length integer
+					for (q = delta, k = base; /* no condition */; k += base) {
+						t = k <= bias ? tMin : (k >= bias + tMax ? tMax : k - bias);
+						if (q < t) {
+							break;
+						}
+						qMinusT = q - t;
+						baseMinusT = base - t;
+						output.push(
+							stringFromCharCode(digitToBasic(t + qMinusT % baseMinusT, 0))
+						);
+						q = floor(qMinusT / baseMinusT);
+					}
+
+					output.push(stringFromCharCode(digitToBasic(q, 0)));
+					bias = adapt(delta, handledCPCountPlusOne, handledCPCount == basicLength);
+					delta = 0;
+					++handledCPCount;
+				}
+			}
+
+			++delta;
+			++n;
+
+		}
+		return output.join('');
+	}
+
+	/**
+	 * Converts a Punycode string representing a domain name or an email address
+	 * to Unicode. Only the Punycoded parts of the input will be converted, i.e.
+	 * it doesn't matter if you call it on a string that has already been
+	 * converted to Unicode.
+	 * @memberOf punycode
+	 * @param {String} input The Punycoded domain name or email address to
+	 * convert to Unicode.
+	 * @returns {String} The Unicode representation of the given Punycode
+	 * string.
+	 */
+	function toUnicode(input) {
+		return mapDomain(input, function(string) {
+			return regexPunycode.test(string)
+				? decode(string.slice(4).toLowerCase())
+				: string;
+		});
+	}
+
+	/**
+	 * Converts a Unicode string representing a domain name or an email address to
+	 * Punycode. Only the non-ASCII parts of the domain name will be converted,
+	 * i.e. it doesn't matter if you call it with a domain that's already in
+	 * ASCII.
+	 * @memberOf punycode
+	 * @param {String} input The domain name or email address to convert, as a
+	 * Unicode string.
+	 * @returns {String} The Punycode representation of the given domain name or
+	 * email address.
+	 */
+	function toASCII(input) {
+		return mapDomain(input, function(string) {
+			return regexNonASCII.test(string)
+				? 'xn--' + encode(string)
+				: string;
+		});
+	}
+
+	/*--------------------------------------------------------------------------*/
+
+	/** Define the public API */
+	punycode = {
+		/**
+		 * A string representing the current Punycode.js version number.
+		 * @memberOf punycode
+		 * @type String
+		 */
+		'version': '1.3.2',
+		/**
+		 * An object of methods to convert from JavaScript's internal character
+		 * representation (UCS-2) to Unicode code points, and back.
+		 * @see <https://mathiasbynens.be/notes/javascript-encoding>
+		 * @memberOf punycode
+		 * @type Object
+		 */
+		'ucs2': {
+			'decode': ucs2decode,
+			'encode': ucs2encode
+		},
+		'decode': decode,
+		'encode': encode,
+		'toASCII': toASCII,
+		'toUnicode': toUnicode
+	};
+
+	/** Expose `punycode` */
+	// Some AMD build optimizers, like r.js, check for specific condition patterns
+	// like the following:
+	if (
+		true
+	) {
+		!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
+			return punycode;
+		}.call(exports, __webpack_require__, exports, module),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	} else if (freeExports && freeModule) {
+		if (module.exports == freeExports) {
+			// in Node.js, io.js, or RingoJS v0.8.0+
+			freeModule.exports = punycode;
+		} else {
+			// in Narwhal or RingoJS v0.7.0-
+			for (key in punycode) {
+				punycode.hasOwnProperty(key) && (freeExports[key] = punycode[key]);
+			}
+		}
+	} else {
+		// in Rhino or a web browser
+		root.punycode = punycode;
+	}
+
+}(this));
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(39)(module), __webpack_require__(40)))
+
+/***/ }),
 /* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+ * URI.js - Mutating URLs
+ * IPv6 Support
+ *
+ * Version: 1.19.0
+ *
+ * Author: Rodney Rehm
+ * Web: http://medialize.github.io/URI.js/
+ *
+ * Licensed under
+ *   MIT License http://www.opensource.org/licenses/mit-license
+ *
+ */
 
+(function (root, factory) {
+  'use strict';
+  // https://github.com/umdjs/umd/blob/master/returnExports.js
+  if (typeof module === 'object' && module.exports) {
+    // Node
+    module.exports = factory();
+  } else if (true) {
+    // AMD. Register as an anonymous module.
+    !(__WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) :
+				__WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+  } else {
+    // Browser globals (root is window)
+    root.IPv6 = factory(root);
+  }
+}(this, function (root) {
+  'use strict';
 
-module.exports = function bind(fn, thisArg) {
-  return function wrap() {
-    var args = new Array(arguments.length);
-    for (var i = 0; i < args.length; i++) {
-      args[i] = arguments[i];
+  /*
+  var _in = "fe80:0000:0000:0000:0204:61ff:fe9d:f156";
+  var _out = IPv6.best(_in);
+  var _expected = "fe80::204:61ff:fe9d:f156";
+
+  console.log(_in, _out, _expected, _out === _expected);
+  */
+
+  // save current IPv6 variable, if any
+  var _IPv6 = root && root.IPv6;
+
+  function bestPresentation(address) {
+    // based on:
+    // Javascript to test an IPv6 address for proper format, and to
+    // present the "best text representation" according to IETF Draft RFC at
+    // http://tools.ietf.org/html/draft-ietf-6man-text-addr-representation-04
+    // 8 Feb 2010 Rich Brown, Dartware, LLC
+    // Please feel free to use this code as long as you provide a link to
+    // http://www.intermapper.com
+    // http://intermapper.com/support/tools/IPV6-Validator.aspx
+    // http://download.dartware.com/thirdparty/ipv6validator.js
+
+    var _address = address.toLowerCase();
+    var segments = _address.split(':');
+    var length = segments.length;
+    var total = 8;
+
+    // trim colons (:: or ::a:b:c… or …a:b:c::)
+    if (segments[0] === '' && segments[1] === '' && segments[2] === '') {
+      // must have been ::
+      // remove first two items
+      segments.shift();
+      segments.shift();
+    } else if (segments[0] === '' && segments[1] === '') {
+      // must have been ::xxxx
+      // remove the first item
+      segments.shift();
+    } else if (segments[length - 1] === '' && segments[length - 2] === '') {
+      // must have been xxxx::
+      segments.pop();
     }
-    return fn.apply(thisArg, args);
+
+    length = segments.length;
+
+    // adjust total segments for IPv4 trailer
+    if (segments[length - 1].indexOf('.') !== -1) {
+      // found a "." which means IPv4
+      total = 7;
+    }
+
+    // fill empty segments them with "0000"
+    var pos;
+    for (pos = 0; pos < length; pos++) {
+      if (segments[pos] === '') {
+        break;
+      }
+    }
+
+    if (pos < total) {
+      segments.splice(pos, 1, '0000');
+      while (segments.length < total) {
+        segments.splice(pos, 0, '0000');
+      }
+    }
+
+    // strip leading zeros
+    var _segments;
+    for (var i = 0; i < total; i++) {
+      _segments = segments[i].split('');
+      for (var j = 0; j < 3 ; j++) {
+        if (_segments[0] === '0' && _segments.length > 1) {
+          _segments.splice(0,1);
+        } else {
+          break;
+        }
+      }
+
+      segments[i] = _segments.join('');
+    }
+
+    // find longest sequence of zeroes and coalesce them into one segment
+    var best = -1;
+    var _best = 0;
+    var _current = 0;
+    var current = -1;
+    var inzeroes = false;
+    // i; already declared
+
+    for (i = 0; i < total; i++) {
+      if (inzeroes) {
+        if (segments[i] === '0') {
+          _current += 1;
+        } else {
+          inzeroes = false;
+          if (_current > _best) {
+            best = current;
+            _best = _current;
+          }
+        }
+      } else {
+        if (segments[i] === '0') {
+          inzeroes = true;
+          current = i;
+          _current = 1;
+        }
+      }
+    }
+
+    if (_current > _best) {
+      best = current;
+      _best = _current;
+    }
+
+    if (_best > 1) {
+      segments.splice(best, _best, '');
+    }
+
+    length = segments.length;
+
+    // assemble remaining segments
+    var result = '';
+    if (segments[0] === '')  {
+      result = ':';
+    }
+
+    for (i = 0; i < length; i++) {
+      result += segments[i];
+      if (i === length - 1) {
+        break;
+      }
+
+      result += ':';
+    }
+
+    if (segments[length - 1] === '') {
+      result += ':';
+    }
+
+    return result;
+  }
+
+  function noConflict() {
+    /*jshint validthis: true */
+    if (root.IPv6 === this) {
+      root.IPv6 = _IPv6;
+    }
+
+    return this;
+  }
+
+  return {
+    best: bestPresentation,
+    noConflict: noConflict
   };
-};
+}));
 
 
 /***/ }),
 /* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+ * URI.js - Mutating URLs
+ * Second Level Domain (SLD) Support
+ *
+ * Version: 1.19.0
+ *
+ * Author: Rodney Rehm
+ * Web: http://medialize.github.io/URI.js/
+ *
+ * Licensed under
+ *   MIT License http://www.opensource.org/licenses/mit-license
+ *
+ */
 
+(function (root, factory) {
+  'use strict';
+  // https://github.com/umdjs/umd/blob/master/returnExports.js
+  if (typeof module === 'object' && module.exports) {
+    // Node
+    module.exports = factory();
+  } else if (true) {
+    // AMD. Register as an anonymous module.
+    !(__WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) :
+				__WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+  } else {
+    // Browser globals (root is window)
+    root.SecondLevelDomains = factory(root);
+  }
+}(this, function (root) {
+  'use strict';
 
-var utils = __webpack_require__(0);
-var settle = __webpack_require__(40);
-var buildURL = __webpack_require__(42);
-var parseHeaders = __webpack_require__(43);
-var isURLSameOrigin = __webpack_require__(44);
-var createError = __webpack_require__(21);
-var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(45);
+  // save current SecondLevelDomains variable, if any
+  var _SecondLevelDomains = root && root.SecondLevelDomains;
 
-module.exports = function xhrAdapter(config) {
-  return new Promise(function dispatchXhrRequest(resolve, reject) {
-    var requestData = config.data;
-    var requestHeaders = config.headers;
-
-    if (utils.isFormData(requestData)) {
-      delete requestHeaders['Content-Type']; // Let the browser set it
-    }
-
-    var request = new XMLHttpRequest();
-    var loadEvent = 'onreadystatechange';
-    var xDomain = false;
-
-    // For IE 8/9 CORS support
-    // Only supports POST and GET calls and doesn't returns the response headers.
-    // DON'T do this for testing b/c XMLHttpRequest is mocked, not XDomainRequest.
-    if ("production" !== 'test' &&
-        typeof window !== 'undefined' &&
-        window.XDomainRequest && !('withCredentials' in request) &&
-        !isURLSameOrigin(config.url)) {
-      request = new window.XDomainRequest();
-      loadEvent = 'onload';
-      xDomain = true;
-      request.onprogress = function handleProgress() {};
-      request.ontimeout = function handleTimeout() {};
-    }
-
-    // HTTP basic authentication
-    if (config.auth) {
-      var username = config.auth.username || '';
-      var password = config.auth.password || '';
-      requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
-    }
-
-    request.open(config.method.toUpperCase(), buildURL(config.url, config.params, config.paramsSerializer), true);
-
-    // Set the request timeout in MS
-    request.timeout = config.timeout;
-
-    // Listen for ready state
-    request[loadEvent] = function handleLoad() {
-      if (!request || (request.readyState !== 4 && !xDomain)) {
-        return;
+  var SLD = {
+    // list of known Second Level Domains
+    // converted list of SLDs from https://github.com/gavingmiller/second-level-domains
+    // ----
+    // publicsuffix.org is more current and actually used by a couple of browsers internally.
+    // downside is it also contains domains like "dyndns.org" - which is fine for the security
+    // issues browser have to deal with (SOP for cookies, etc) - but is way overboard for URI.js
+    // ----
+    list: {
+      'ac':' com gov mil net org ',
+      'ae':' ac co gov mil name net org pro sch ',
+      'af':' com edu gov net org ',
+      'al':' com edu gov mil net org ',
+      'ao':' co ed gv it og pb ',
+      'ar':' com edu gob gov int mil net org tur ',
+      'at':' ac co gv or ',
+      'au':' asn com csiro edu gov id net org ',
+      'ba':' co com edu gov mil net org rs unbi unmo unsa untz unze ',
+      'bb':' biz co com edu gov info net org store tv ',
+      'bh':' biz cc com edu gov info net org ',
+      'bn':' com edu gov net org ',
+      'bo':' com edu gob gov int mil net org tv ',
+      'br':' adm adv agr am arq art ato b bio blog bmd cim cng cnt com coop ecn edu eng esp etc eti far flog fm fnd fot fst g12 ggf gov imb ind inf jor jus lel mat med mil mus net nom not ntr odo org ppg pro psc psi qsl rec slg srv tmp trd tur tv vet vlog wiki zlg ',
+      'bs':' com edu gov net org ',
+      'bz':' du et om ov rg ',
+      'ca':' ab bc mb nb nf nl ns nt nu on pe qc sk yk ',
+      'ck':' biz co edu gen gov info net org ',
+      'cn':' ac ah bj com cq edu fj gd gov gs gx gz ha hb he hi hl hn jl js jx ln mil net nm nx org qh sc sd sh sn sx tj tw xj xz yn zj ',
+      'co':' com edu gov mil net nom org ',
+      'cr':' ac c co ed fi go or sa ',
+      'cy':' ac biz com ekloges gov ltd name net org parliament press pro tm ',
+      'do':' art com edu gob gov mil net org sld web ',
+      'dz':' art asso com edu gov net org pol ',
+      'ec':' com edu fin gov info med mil net org pro ',
+      'eg':' com edu eun gov mil name net org sci ',
+      'er':' com edu gov ind mil net org rochest w ',
+      'es':' com edu gob nom org ',
+      'et':' biz com edu gov info name net org ',
+      'fj':' ac biz com info mil name net org pro ',
+      'fk':' ac co gov net nom org ',
+      'fr':' asso com f gouv nom prd presse tm ',
+      'gg':' co net org ',
+      'gh':' com edu gov mil org ',
+      'gn':' ac com gov net org ',
+      'gr':' com edu gov mil net org ',
+      'gt':' com edu gob ind mil net org ',
+      'gu':' com edu gov net org ',
+      'hk':' com edu gov idv net org ',
+      'hu':' 2000 agrar bolt casino city co erotica erotika film forum games hotel info ingatlan jogasz konyvelo lakas media news org priv reklam sex shop sport suli szex tm tozsde utazas video ',
+      'id':' ac co go mil net or sch web ',
+      'il':' ac co gov idf k12 muni net org ',
+      'in':' ac co edu ernet firm gen gov i ind mil net nic org res ',
+      'iq':' com edu gov i mil net org ',
+      'ir':' ac co dnssec gov i id net org sch ',
+      'it':' edu gov ',
+      'je':' co net org ',
+      'jo':' com edu gov mil name net org sch ',
+      'jp':' ac ad co ed go gr lg ne or ',
+      'ke':' ac co go info me mobi ne or sc ',
+      'kh':' com edu gov mil net org per ',
+      'ki':' biz com de edu gov info mob net org tel ',
+      'km':' asso com coop edu gouv k medecin mil nom notaires pharmaciens presse tm veterinaire ',
+      'kn':' edu gov net org ',
+      'kr':' ac busan chungbuk chungnam co daegu daejeon es gangwon go gwangju gyeongbuk gyeonggi gyeongnam hs incheon jeju jeonbuk jeonnam k kg mil ms ne or pe re sc seoul ulsan ',
+      'kw':' com edu gov net org ',
+      'ky':' com edu gov net org ',
+      'kz':' com edu gov mil net org ',
+      'lb':' com edu gov net org ',
+      'lk':' assn com edu gov grp hotel int ltd net ngo org sch soc web ',
+      'lr':' com edu gov net org ',
+      'lv':' asn com conf edu gov id mil net org ',
+      'ly':' com edu gov id med net org plc sch ',
+      'ma':' ac co gov m net org press ',
+      'mc':' asso tm ',
+      'me':' ac co edu gov its net org priv ',
+      'mg':' com edu gov mil nom org prd tm ',
+      'mk':' com edu gov inf name net org pro ',
+      'ml':' com edu gov net org presse ',
+      'mn':' edu gov org ',
+      'mo':' com edu gov net org ',
+      'mt':' com edu gov net org ',
+      'mv':' aero biz com coop edu gov info int mil museum name net org pro ',
+      'mw':' ac co com coop edu gov int museum net org ',
+      'mx':' com edu gob net org ',
+      'my':' com edu gov mil name net org sch ',
+      'nf':' arts com firm info net other per rec store web ',
+      'ng':' biz com edu gov mil mobi name net org sch ',
+      'ni':' ac co com edu gob mil net nom org ',
+      'np':' com edu gov mil net org ',
+      'nr':' biz com edu gov info net org ',
+      'om':' ac biz co com edu gov med mil museum net org pro sch ',
+      'pe':' com edu gob mil net nom org sld ',
+      'ph':' com edu gov i mil net ngo org ',
+      'pk':' biz com edu fam gob gok gon gop gos gov net org web ',
+      'pl':' art bialystok biz com edu gda gdansk gorzow gov info katowice krakow lodz lublin mil net ngo olsztyn org poznan pwr radom slupsk szczecin torun warszawa waw wroc wroclaw zgora ',
+      'pr':' ac biz com edu est gov info isla name net org pro prof ',
+      'ps':' com edu gov net org plo sec ',
+      'pw':' belau co ed go ne or ',
+      'ro':' arts com firm info nom nt org rec store tm www ',
+      'rs':' ac co edu gov in org ',
+      'sb':' com edu gov net org ',
+      'sc':' com edu gov net org ',
+      'sh':' co com edu gov net nom org ',
+      'sl':' com edu gov net org ',
+      'st':' co com consulado edu embaixada gov mil net org principe saotome store ',
+      'sv':' com edu gob org red ',
+      'sz':' ac co org ',
+      'tr':' av bbs bel biz com dr edu gen gov info k12 name net org pol tel tsk tv web ',
+      'tt':' aero biz cat co com coop edu gov info int jobs mil mobi museum name net org pro tel travel ',
+      'tw':' club com ebiz edu game gov idv mil net org ',
+      'mu':' ac co com gov net or org ',
+      'mz':' ac co edu gov org ',
+      'na':' co com ',
+      'nz':' ac co cri geek gen govt health iwi maori mil net org parliament school ',
+      'pa':' abo ac com edu gob ing med net nom org sld ',
+      'pt':' com edu gov int net nome org publ ',
+      'py':' com edu gov mil net org ',
+      'qa':' com edu gov mil net org ',
+      're':' asso com nom ',
+      'ru':' ac adygeya altai amur arkhangelsk astrakhan bashkiria belgorod bir bryansk buryatia cbg chel chelyabinsk chita chukotka chuvashia com dagestan e-burg edu gov grozny int irkutsk ivanovo izhevsk jar joshkar-ola kalmykia kaluga kamchatka karelia kazan kchr kemerovo khabarovsk khakassia khv kirov koenig komi kostroma kranoyarsk kuban kurgan kursk lipetsk magadan mari mari-el marine mil mordovia mosreg msk murmansk nalchik net nnov nov novosibirsk nsk omsk orenburg org oryol penza perm pp pskov ptz rnd ryazan sakhalin samara saratov simbirsk smolensk spb stavropol stv surgut tambov tatarstan tom tomsk tsaritsyn tsk tula tuva tver tyumen udm udmurtia ulan-ude vladikavkaz vladimir vladivostok volgograd vologda voronezh vrn vyatka yakutia yamal yekaterinburg yuzhno-sakhalinsk ',
+      'rw':' ac co com edu gouv gov int mil net ',
+      'sa':' com edu gov med net org pub sch ',
+      'sd':' com edu gov info med net org tv ',
+      'se':' a ac b bd c d e f g h i k l m n o org p parti pp press r s t tm u w x y z ',
+      'sg':' com edu gov idn net org per ',
+      'sn':' art com edu gouv org perso univ ',
+      'sy':' com edu gov mil net news org ',
+      'th':' ac co go in mi net or ',
+      'tj':' ac biz co com edu go gov info int mil name net nic org test web ',
+      'tn':' agrinet com defense edunet ens fin gov ind info intl mincom nat net org perso rnrt rns rnu tourism ',
+      'tz':' ac co go ne or ',
+      'ua':' biz cherkassy chernigov chernovtsy ck cn co com crimea cv dn dnepropetrovsk donetsk dp edu gov if in ivano-frankivsk kh kharkov kherson khmelnitskiy kiev kirovograd km kr ks kv lg lugansk lutsk lviv me mk net nikolaev od odessa org pl poltava pp rovno rv sebastopol sumy te ternopil uzhgorod vinnica vn zaporizhzhe zhitomir zp zt ',
+      'ug':' ac co go ne or org sc ',
+      'uk':' ac bl british-library co cym gov govt icnet jet lea ltd me mil mod national-library-scotland nel net nhs nic nls org orgn parliament plc police sch scot soc ',
+      'us':' dni fed isa kids nsn ',
+      'uy':' com edu gub mil net org ',
+      've':' co com edu gob info mil net org web ',
+      'vi':' co com k12 net org ',
+      'vn':' ac biz com edu gov health info int name net org pro ',
+      'ye':' co com gov ltd me net org plc ',
+      'yu':' ac co edu gov org ',
+      'za':' ac agric alt bourse city co cybernet db edu gov grondar iaccess imt inca landesign law mil net ngo nis nom olivetti org pix school tm web ',
+      'zm':' ac co com edu gov net org sch ',
+      // https://en.wikipedia.org/wiki/CentralNic#Second-level_domains
+      'com': 'ar br cn de eu gb gr hu jpn kr no qc ru sa se uk us uy za ',
+      'net': 'gb jp se uk ',
+      'org': 'ae',
+      'de': 'com '
+    },
+    // gorhill 2013-10-25: Using indexOf() instead Regexp(). Significant boost
+    // in both performance and memory footprint. No initialization required.
+    // http://jsperf.com/uri-js-sld-regex-vs-binary-search/4
+    // Following methods use lastIndexOf() rather than array.split() in order
+    // to avoid any memory allocations.
+    has: function(domain) {
+      var tldOffset = domain.lastIndexOf('.');
+      if (tldOffset <= 0 || tldOffset >= (domain.length-1)) {
+        return false;
       }
-
-      // The request errored out and we didn't get a response, this will be
-      // handled by onerror instead
-      // With one exception: request that using file: protocol, most browsers
-      // will return status as 0 even though it's a successful request
-      if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
-        return;
+      var sldOffset = domain.lastIndexOf('.', tldOffset-1);
+      if (sldOffset <= 0 || sldOffset >= (tldOffset-1)) {
+        return false;
       }
-
-      // Prepare the response
-      var responseHeaders = 'getAllResponseHeaders' in request ? parseHeaders(request.getAllResponseHeaders()) : null;
-      var responseData = !config.responseType || config.responseType === 'text' ? request.responseText : request.response;
-      var response = {
-        data: responseData,
-        // IE sends 1223 instead of 204 (https://github.com/mzabriskie/axios/issues/201)
-        status: request.status === 1223 ? 204 : request.status,
-        statusText: request.status === 1223 ? 'No Content' : request.statusText,
-        headers: responseHeaders,
-        config: config,
-        request: request
-      };
-
-      settle(resolve, reject, response);
-
-      // Clean up request
-      request = null;
-    };
-
-    // Handle low level network errors
-    request.onerror = function handleError() {
-      // Real errors are hidden from us by the browser
-      // onerror should only fire if it's a network error
-      reject(createError('Network Error', config));
-
-      // Clean up request
-      request = null;
-    };
-
-    // Handle timeout
-    request.ontimeout = function handleTimeout() {
-      reject(createError('timeout of ' + config.timeout + 'ms exceeded', config, 'ECONNABORTED'));
-
-      // Clean up request
-      request = null;
-    };
-
-    // Add xsrf header
-    // This is only done if running in a standard browser environment.
-    // Specifically not if we're in a web worker, or react-native.
-    if (utils.isStandardBrowserEnv()) {
-      var cookies = __webpack_require__(46);
-
-      // Add xsrf header
-      var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
-          cookies.read(config.xsrfCookieName) :
-          undefined;
-
-      if (xsrfValue) {
-        requestHeaders[config.xsrfHeaderName] = xsrfValue;
+      var sldList = SLD.list[domain.slice(tldOffset+1)];
+      if (!sldList) {
+        return false;
       }
-    }
-
-    // Add headers to the request
-    if ('setRequestHeader' in request) {
-      utils.forEach(requestHeaders, function setRequestHeader(val, key) {
-        if (typeof requestData === 'undefined' && key.toLowerCase() === 'content-type') {
-          // Remove Content-Type if data is undefined
-          delete requestHeaders[key];
-        } else {
-          // Otherwise add header to the request
-          request.setRequestHeader(key, val);
-        }
-      });
-    }
-
-    // Add withCredentials to request if needed
-    if (config.withCredentials) {
-      request.withCredentials = true;
-    }
-
-    // Add responseType to request if needed
-    if (config.responseType) {
-      try {
-        request.responseType = config.responseType;
-      } catch (e) {
-        if (request.responseType !== 'json') {
-          throw e;
-        }
+      return sldList.indexOf(' ' + domain.slice(sldOffset+1, tldOffset) + ' ') >= 0;
+    },
+    is: function(domain) {
+      var tldOffset = domain.lastIndexOf('.');
+      if (tldOffset <= 0 || tldOffset >= (domain.length-1)) {
+        return false;
       }
+      var sldOffset = domain.lastIndexOf('.', tldOffset-1);
+      if (sldOffset >= 0) {
+        return false;
+      }
+      var sldList = SLD.list[domain.slice(tldOffset+1)];
+      if (!sldList) {
+        return false;
+      }
+      return sldList.indexOf(' ' + domain.slice(0, tldOffset) + ' ') >= 0;
+    },
+    get: function(domain) {
+      var tldOffset = domain.lastIndexOf('.');
+      if (tldOffset <= 0 || tldOffset >= (domain.length-1)) {
+        return null;
+      }
+      var sldOffset = domain.lastIndexOf('.', tldOffset-1);
+      if (sldOffset <= 0 || sldOffset >= (tldOffset-1)) {
+        return null;
+      }
+      var sldList = SLD.list[domain.slice(tldOffset+1)];
+      if (!sldList) {
+        return null;
+      }
+      if (sldList.indexOf(' ' + domain.slice(sldOffset+1, tldOffset) + ' ') < 0) {
+        return null;
+      }
+      return domain.slice(sldOffset+1);
+    },
+    noConflict: function(){
+      if (root.SecondLevelDomains === this) {
+        root.SecondLevelDomains = _SecondLevelDomains;
+      }
+      return this;
     }
+  };
 
-    // Handle progress if needed
-    if (typeof config.onDownloadProgress === 'function') {
-      request.addEventListener('progress', config.onDownloadProgress);
-    }
-
-    // Not all browsers support upload events
-    if (typeof config.onUploadProgress === 'function' && request.upload) {
-      request.upload.addEventListener('progress', config.onUploadProgress);
-    }
-
-    if (config.cancelToken) {
-      // Handle cancellation
-      config.cancelToken.promise.then(function onCanceled(cancel) {
-        if (!request) {
-          return;
-        }
-
-        request.abort();
-        reject(cancel);
-        // Clean up request
-        request = null;
-      });
-    }
-
-    if (requestData === undefined) {
-      requestData = null;
-    }
-
-    // Send the request
-    request.send(requestData);
-  });
-};
+  return SLD;
+}));
 
 
 /***/ }),
 /* 21 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var enhanceError = __webpack_require__(41);
-
-/**
- * Create an Error with the specified message, config, error code, and response.
- *
- * @param {string} message The error message.
- * @param {Object} config The config.
- * @param {string} [code] The error code (for example, 'ECONNABORTED').
- @ @param {Object} [response] The response.
- * @returns {Error} The created error.
- */
-module.exports = function createError(message, config, code, response) {
-  var error = new Error(message);
-  return enhanceError(error, config, code, response);
-};
-
-
-/***/ }),
-/* 22 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = function isCancel(value) {
-  return !!(value && value.__CANCEL__);
-};
-
-
-/***/ }),
-/* 23 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * A `Cancel` is an object that is thrown when an operation is canceled.
- *
- * @class
- * @param {string=} message The message.
- */
-function Cancel(message) {
-  this.message = message;
-}
-
-Cancel.prototype.toString = function toString() {
-  return 'Cancel' + (this.message ? ': ' + this.message : '');
-};
-
-Cancel.prototype.__CANCEL__ = true;
-
-module.exports = Cancel;
-
-
-/***/ }),
-/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -11589,7 +12313,7 @@ function dispatchWindowEvent (eventName, data) {
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 25 */
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -11662,31 +12386,354 @@ function resizeHandler () {
 
 
 /***/ }),
-/* 26 */,
-/* 27 */,
-/* 28 */,
+/* 23 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = customizeAnalyzeResult;
+
+/**
+ * Convert analyze results as page-based.
+ */
+function customizeAnalyzeResult (analyzeData) {
+
+    let pages = []
+    let page
+    let body
+    let meta
+    analyzeData.split('\n').forEach(line => {
+        if (page && !line) {
+            body += ' '
+            meta.push(line)
+        } else {
+            let [
+                pageNumber,
+                type,
+                char
+            ] = line.split('\t')
+            pageNumber = parseInt(pageNumber, 10)
+            if (!page) {
+                page = pageNumber
+                body = ''
+                meta = []
+            } else if (page !== pageNumber) {
+                pages.push({
+                    body,
+                    meta,
+                    page
+                })
+                body = ''
+                meta = []
+                page = pageNumber
+            }
+            if (type === 'TEXT') {
+                body += char
+                meta.push(line)
+            }
+        }
+    })
+    pages.push({
+        body,
+        meta,
+        page
+    })
+
+    return pages
+}
+
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = function bind(fn, thisArg) {
+  return function wrap() {
+    var args = new Array(arguments.length);
+    for (var i = 0; i < args.length; i++) {
+      args[i] = arguments[i];
+    }
+    return fn.apply(thisArg, args);
+  };
+};
+
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(0);
+var settle = __webpack_require__(50);
+var buildURL = __webpack_require__(52);
+var parseHeaders = __webpack_require__(53);
+var isURLSameOrigin = __webpack_require__(54);
+var createError = __webpack_require__(26);
+var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(55);
+
+module.exports = function xhrAdapter(config) {
+  return new Promise(function dispatchXhrRequest(resolve, reject) {
+    var requestData = config.data;
+    var requestHeaders = config.headers;
+
+    if (utils.isFormData(requestData)) {
+      delete requestHeaders['Content-Type']; // Let the browser set it
+    }
+
+    var request = new XMLHttpRequest();
+    var loadEvent = 'onreadystatechange';
+    var xDomain = false;
+
+    // For IE 8/9 CORS support
+    // Only supports POST and GET calls and doesn't returns the response headers.
+    // DON'T do this for testing b/c XMLHttpRequest is mocked, not XDomainRequest.
+    if ("production" !== 'test' &&
+        typeof window !== 'undefined' &&
+        window.XDomainRequest && !('withCredentials' in request) &&
+        !isURLSameOrigin(config.url)) {
+      request = new window.XDomainRequest();
+      loadEvent = 'onload';
+      xDomain = true;
+      request.onprogress = function handleProgress() {};
+      request.ontimeout = function handleTimeout() {};
+    }
+
+    // HTTP basic authentication
+    if (config.auth) {
+      var username = config.auth.username || '';
+      var password = config.auth.password || '';
+      requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
+    }
+
+    request.open(config.method.toUpperCase(), buildURL(config.url, config.params, config.paramsSerializer), true);
+
+    // Set the request timeout in MS
+    request.timeout = config.timeout;
+
+    // Listen for ready state
+    request[loadEvent] = function handleLoad() {
+      if (!request || (request.readyState !== 4 && !xDomain)) {
+        return;
+      }
+
+      // The request errored out and we didn't get a response, this will be
+      // handled by onerror instead
+      // With one exception: request that using file: protocol, most browsers
+      // will return status as 0 even though it's a successful request
+      if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
+        return;
+      }
+
+      // Prepare the response
+      var responseHeaders = 'getAllResponseHeaders' in request ? parseHeaders(request.getAllResponseHeaders()) : null;
+      var responseData = !config.responseType || config.responseType === 'text' ? request.responseText : request.response;
+      var response = {
+        data: responseData,
+        // IE sends 1223 instead of 204 (https://github.com/mzabriskie/axios/issues/201)
+        status: request.status === 1223 ? 204 : request.status,
+        statusText: request.status === 1223 ? 'No Content' : request.statusText,
+        headers: responseHeaders,
+        config: config,
+        request: request
+      };
+
+      settle(resolve, reject, response);
+
+      // Clean up request
+      request = null;
+    };
+
+    // Handle low level network errors
+    request.onerror = function handleError() {
+      // Real errors are hidden from us by the browser
+      // onerror should only fire if it's a network error
+      reject(createError('Network Error', config));
+
+      // Clean up request
+      request = null;
+    };
+
+    // Handle timeout
+    request.ontimeout = function handleTimeout() {
+      reject(createError('timeout of ' + config.timeout + 'ms exceeded', config, 'ECONNABORTED'));
+
+      // Clean up request
+      request = null;
+    };
+
+    // Add xsrf header
+    // This is only done if running in a standard browser environment.
+    // Specifically not if we're in a web worker, or react-native.
+    if (utils.isStandardBrowserEnv()) {
+      var cookies = __webpack_require__(56);
+
+      // Add xsrf header
+      var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
+          cookies.read(config.xsrfCookieName) :
+          undefined;
+
+      if (xsrfValue) {
+        requestHeaders[config.xsrfHeaderName] = xsrfValue;
+      }
+    }
+
+    // Add headers to the request
+    if ('setRequestHeader' in request) {
+      utils.forEach(requestHeaders, function setRequestHeader(val, key) {
+        if (typeof requestData === 'undefined' && key.toLowerCase() === 'content-type') {
+          // Remove Content-Type if data is undefined
+          delete requestHeaders[key];
+        } else {
+          // Otherwise add header to the request
+          request.setRequestHeader(key, val);
+        }
+      });
+    }
+
+    // Add withCredentials to request if needed
+    if (config.withCredentials) {
+      request.withCredentials = true;
+    }
+
+    // Add responseType to request if needed
+    if (config.responseType) {
+      try {
+        request.responseType = config.responseType;
+      } catch (e) {
+        if (request.responseType !== 'json') {
+          throw e;
+        }
+      }
+    }
+
+    // Handle progress if needed
+    if (typeof config.onDownloadProgress === 'function') {
+      request.addEventListener('progress', config.onDownloadProgress);
+    }
+
+    // Not all browsers support upload events
+    if (typeof config.onUploadProgress === 'function' && request.upload) {
+      request.upload.addEventListener('progress', config.onUploadProgress);
+    }
+
+    if (config.cancelToken) {
+      // Handle cancellation
+      config.cancelToken.promise.then(function onCanceled(cancel) {
+        if (!request) {
+          return;
+        }
+
+        request.abort();
+        reject(cancel);
+        // Clean up request
+        request = null;
+      });
+    }
+
+    if (requestData === undefined) {
+      requestData = null;
+    }
+
+    // Send the request
+    request.send(requestData);
+  });
+};
+
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var enhanceError = __webpack_require__(51);
+
+/**
+ * Create an Error with the specified message, config, error code, and response.
+ *
+ * @param {string} message The error message.
+ * @param {Object} config The config.
+ * @param {string} [code] The error code (for example, 'ECONNABORTED').
+ @ @param {Object} [response] The response.
+ * @returns {Error} The created error.
+ */
+module.exports = function createError(message, config, code, response) {
+  var error = new Error(message);
+  return enhanceError(error, config, code, response);
+};
+
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = function isCancel(value) {
+  return !!(value && value.__CANCEL__);
+};
+
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * A `Cancel` is an object that is thrown when an operation is canceled.
+ *
+ * @class
+ * @param {string=} message The message.
+ */
+function Cancel(message) {
+  this.message = message;
+}
+
+Cancel.prototype.toString = function toString() {
+  return 'Cancel' + (this.message ? ': ' + this.message : '');
+};
+
+Cancel.prototype.__CANCEL__ = true;
+
+module.exports = Cancel;
+
+
+/***/ }),
 /* 29 */,
 /* 30 */,
-/* 31 */
+/* 31 */,
+/* 32 */,
+/* 33 */,
+/* 34 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_axios__ = __webpack_require__(35);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_axios___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_axios__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_anno_ui__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_urijs__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_urijs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_urijs__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_anno_ui__ = __webpack_require__(21);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_anno_ui___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_anno_ui__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__shared_util__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_coords__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__page_util_window__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__page_public__ = __webpack_require__(54);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__page_pdf_PDFAnnoPage__ = __webpack_require__(55);
-__webpack_require__(32)
-__webpack_require__(33)
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__shared_util__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__page_util_window__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__page_public__ = __webpack_require__(41);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__page_search__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__page_textLayer__ = __webpack_require__(43);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__page_pdf_PDFAnnoPage__ = __webpack_require__(44);
+__webpack_require__(35)
+__webpack_require__(36)
 
 
 
 // UI parts.
+
 
 
 
@@ -11705,7 +12752,6 @@ const DEFAULT_PDF_NAME = 'P12-1046.pdf'
  */
 let API_ROOT = 'http://localhost:8080'
 if (true) {
-    console.log('PRODUCTION MODE')
     API_ROOT = 'https://pdfanno.hshindo.com'
 }
 window.API_ROOT = API_ROOT
@@ -11718,28 +12764,16 @@ window.pdfanno = {}
 /**
  * Expose public APIs.
  */
-window.add = __WEBPACK_IMPORTED_MODULE_5__page_public__["e" /* addAnnotation */]
-window.addAll = __WEBPACK_IMPORTED_MODULE_5__page_public__["d" /* addAllAnnotations */]
-window.delete = __WEBPACK_IMPORTED_MODULE_5__page_public__["g" /* deleteAnnotation */]
-window.RectAnnotation = __WEBPACK_IMPORTED_MODULE_5__page_public__["a" /* PublicRectAnnotation */]
-window.SpanAnnotation = __WEBPACK_IMPORTED_MODULE_5__page_public__["c" /* PublicSpanAnnotation */]
-window.RelationAnnotation = __WEBPACK_IMPORTED_MODULE_5__page_public__["b" /* PublicRelationAnnotation */]
-window.readTOML = __WEBPACK_IMPORTED_MODULE_5__page_public__["h" /* readTOML */]
-window.clear = __WEBPACK_IMPORTED_MODULE_5__page_public__["f" /* clear */]
+__WEBPACK_IMPORTED_MODULE_4__page_public__["b" /* expose */]()
 
 /**
  * Annotation functions for a page.
  */
-window.annoPage = new __WEBPACK_IMPORTED_MODULE_6__page_pdf_PDFAnnoPage__["a" /* default */]()
+window.annoPage = new __WEBPACK_IMPORTED_MODULE_7__page_pdf_PDFAnnoPage__["a" /* default */]()
 
 // Manage ctrlKey (cmdKey on Mac).
 window.addEventListener('manageCtrlKey', e => {
     window.annoPage.manageCtrlKey(e.detail)
-})
-
-// Manage digitKey.
-window.addEventListener('digitKeyPressed', e => {
-    __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */](`digit${e.detail}Pressed`)
 })
 
 /**
@@ -11762,9 +12796,6 @@ function _getY (annotation) {
  *  The entry point.
  */
 window.addEventListener('DOMContentLoaded', e => {
-
-    // Delete prev annotations.
-    window.annoPage.clearAllAnnotations()
 
     // resizable.
     __WEBPACK_IMPORTED_MODULE_1_anno_ui__["util"].setupResizableColumns()
@@ -11805,7 +12836,8 @@ window.addEventListener('DOMContentLoaded', e => {
             __WEBPACK_IMPORTED_MODULE_1_anno_ui__["uploadButton"].uploadPDF({
                 contentFile     : content,
                 successCallback : text => {
-                    prepareSearch(text)
+                    __WEBPACK_IMPORTED_MODULE_5__page_search__["a" /* setup */](text)
+                    __WEBPACK_IMPORTED_MODULE_6__page_textLayer__["a" /* setup */](text)
                 }
             })
         }
@@ -11848,7 +12880,7 @@ window.addEventListener('DOMContentLoaded', e => {
     __WEBPACK_IMPORTED_MODULE_1_anno_ui__["downloadButton"].setup({
         getAnnotationTOMLString : window.annoPage.exportData,
         getCurrentContentName   : window.annoPage.getCurrentContentName,
-        didDownloadCallback     : __WEBPACK_IMPORTED_MODULE_4__page_util_window__["c" /* unlistenWindowLeaveEvent */]
+        didDownloadCallback     : __WEBPACK_IMPORTED_MODULE_3__page_util_window__["c" /* unlistenWindowLeaveEvent */]
     })
 
     // Label input.
@@ -11875,121 +12907,75 @@ window.addEventListener('DOMContentLoaded', e => {
             return window.annoPage.getCurrentContentFile()
         },
         uploadFinishCallback : (resultText) => {
-            prepareSearch(resultText)
+            __WEBPACK_IMPORTED_MODULE_5__page_search__["a" /* setup */](resultText)
+            __WEBPACK_IMPORTED_MODULE_6__page_textLayer__["a" /* setup */](resultText)
         }
     })
 
     // Display a PDF specified via URL query parameter.
+    const q        = __WEBPACK_IMPORTED_MODULE_0_urijs___default.a(document.URL).query(true)
+    const pdfURL   = q.pdf || getDefaultPDFURL()
+    const annoURL  = q.anno
+    const moveTo   = q.move
+    const tabIndex = q.tab && parseInt(q.tab, 10)
 
-    let pdfURL
-    let annoURL
-    let moveTo
-    let tabIndex
-    (location.search || '').replace('?', '').split('&')
-        .filter(a => a)
-        .forEach(fragment => {
-            let [ key, value ] = fragment.split('=')
-            if (key && key.toLowerCase() === 'pdf') {
-                pdfURL = value
-            } else if (key && key.toLowerCase() === 'anno') {
-                annoURL = value
-            } else if (key && key.toLowerCase() === 'move') {
-                moveTo = value
-            } else if (key && key.toLowerCase() === 'tab') {
-                tabIndex = parseInt(value, 10)
-            }
-        })
+    console.log('target PDF :', pdfURL)
 
-    if (pdfURL) {
+    // Show loading.
+    showLoader(true)
 
-        console.log('pdfURL=', pdfURL)
-
-        // Show loading.
-        $('#pdfLoading').removeClass('hidden')
-
-        // Load a PDF file.
-        loadPDF(pdfURL).then(({ pdf, analyzeResult }) => {
-
-            const pdfName = pdfURL.split('/')[pdfURL.split('/').length - 1]
-
-            // Init viewer.
-            window.annoPage.initializeViewer(null)
-            // Start application.
-            window.annoPage.startViewerApplication()
-
-            window.addEventListener('iframeReady', () => {
-                setTimeout(() => {
-                    window.annoPage.displayViewer({
-                        name    : pdfName,
-                        content : pdf
-                    })
-                }, 500)
-            })
-
-            const listenPageRendered = () => {
-                $('#pdfLoading').addClass('close')
-                setTimeout(function () {
-                    $('#pdfLoading').addClass('hidden')
-                }, 1000)
-
-                // Load and display annotations, if annoURL is set.
-                if (annoURL) {
-                    loadExternalAnnoFile(annoURL).then(anno => {
-                        __WEBPACK_IMPORTED_MODULE_5__page_public__["d" /* addAllAnnotations */](__WEBPACK_IMPORTED_MODULE_5__page_public__["h" /* readTOML */](anno))
-
-                        // Move to the annotation.
-                        if (moveTo) {
-                            setTimeout(() => {
-                                window.annoPage.scrollToAnnotation(moveTo)
-                            }, 500)
-                        }
-                    })
-                }
-                window.removeEventListener('pagerendered', listenPageRendered)
-            }
-            window.addEventListener('pagerendered', listenPageRendered)
-
-            // Set the analyzeResult.
-            __WEBPACK_IMPORTED_MODULE_1_anno_ui__["uploadButton"].setResult(analyzeResult)
-
-            prepareSearch(analyzeResult)
-
-            // Display upload tab.
-            $('a[href="#tab2"]').click()
-
-        }).catch(err => {
-            // Hide a loading, and show the error message.
-            $('#pdfLoading').addClass('hidden')
-            const message = 'Failed to analyze the PDF.<br>Reason: ' + err
-            __WEBPACK_IMPORTED_MODULE_1_anno_ui__["ui"].alertDialog.show({ message })
-        })
-
-    } else {
-
-        // If no PDF is specified, display a default PDF file.
+    // Load a PDF file.
+    window.annoPage.loadPDFFromServer(pdfURL).then(({ pdf, analyzeResult }) => {
 
         // Init viewer.
-        window.annoPage.initializeViewer()
+        window.annoPage.initializeViewer(null)
         // Start application.
         window.annoPage.startViewerApplication()
 
-        // Load the default PDF, and save it.
-        loadPDF(getDefaultPDFURL()).then(({ pdf, analyzeResult }) => {
-            // Set as current.
-            window.annoPage.setCurrentContentFile({
-                name    : DEFAULT_PDF_NAME,
-                content : pdf
-            })
-
-            prepareSearch(analyzeResult)
-
-        }).catch(err => {
-            // Hide a loading, and show the error message.
-            $('#pdfLoading').addClass('hidden')
-            const message = 'Failed to analyze the PDF.<br>Reason: ' + err
-            __WEBPACK_IMPORTED_MODULE_1_anno_ui__["ui"].alertDialog.show({ message })
+        window.addEventListener('iframeReady', () => {
+            setTimeout(() => {
+                window.annoPage.displayViewer({
+                    name    : getPDFName(pdfURL),
+                    content : pdf
+                })
+            }, 500)
         })
-    }
+
+        const listenPageRendered = () => {
+            showLoader(false)
+
+            // Load and display annotations, if annoURL is set.
+            if (annoURL) {
+                window.annoPage.loadAnnoFileFromServer(annoURL).then(anno => {
+                    __WEBPACK_IMPORTED_MODULE_4__page_public__["a" /* addAllAnnotations */](__WEBPACK_IMPORTED_MODULE_4__page_public__["c" /* readTOML */](anno))
+
+                    // Move to the annotation.
+                    if (moveTo) {
+                        setTimeout(() => {
+                            window.annoPage.scrollToAnnotation(moveTo)
+                        }, 500)
+                    }
+                })
+            }
+            window.removeEventListener('pagerendered', listenPageRendered)
+        }
+        window.addEventListener('pagerendered', listenPageRendered)
+
+        // Set the analyzeResult.
+        __WEBPACK_IMPORTED_MODULE_1_anno_ui__["uploadButton"].setResult(analyzeResult)
+
+        // Init search function.
+        __WEBPACK_IMPORTED_MODULE_5__page_search__["a" /* setup */](analyzeResult)
+
+        // Init textLayers.
+        __WEBPACK_IMPORTED_MODULE_6__page_textLayer__["a" /* setup */](analyzeResult)
+
+    }).catch(err => {
+        // Hide a loading, and show the error message.
+        showLoader(false)
+        const message = 'Failed to analyze the PDF.<br>Reason: ' + err
+        __WEBPACK_IMPORTED_MODULE_1_anno_ui__["ui"].alertDialog.show({ message })
+    })
 
     // initial tab.
     if (tabIndex) {
@@ -11997,59 +12983,6 @@ window.addEventListener('DOMContentLoaded', e => {
     }
 
 })
-
-/**
- * Load a PDF data from the server.
- */
-function loadPDF (url) {
-    return new Promise((resolve, reject) => {
-
-        // Load a PDF as ArrayBuffer.
-        var xhr = new XMLHttpRequest()
-        xhr.open('GET', API_ROOT + '/load_pdf?url=' + window.encodeURIComponent(url), true)
-        xhr.responseType = 'json'
-        xhr.onload = function () {
-            if (this.status === 200) {
-
-                // Error handling.
-                if (this.response.status === 'failure') {
-                    let error = this.response.err.stderr || this.response.err
-                    return reject(error)
-                }
-
-                // Get a PDF as arrayBuffer.
-                const pdf = Uint8Array.from(atob(this.response.pdf), c => c.charCodeAt(0))
-                const analyzeResult = this.response.analyzeResult
-                resolve({ pdf, analyzeResult })
-            }
-        }
-        xhr.timeout = 120 * 1000 // 120s
-        xhr.ontimeout = function () {
-            reject('Failed to load the PDF.')
-        }
-        xhr.onerror = function (err) {
-            reject(err)
-        }
-        xhr.send()
-    })
-}
-
-/**
- * Load an annotation file from the server.
- */
-function loadExternalAnnoFile (url) {
-    return __WEBPACK_IMPORTED_MODULE_0_axios___default.a.get(`${API_ROOT}/api/load_anno?url=${url}`).then(res => {
-        if (res.status !== 200 || res.data.status === 'failure') {
-            let reason = ''
-            if (res.data.error) {
-                reason = '<br>Reason: ' + res.data.error
-            }
-            __WEBPACK_IMPORTED_MODULE_1_anno_ui__["ui"].alertDialog.show({ message : 'Failed to load an anno file. url=' + url + reason })
-            return Promise.reject()
-        }
-        return res.data.anno
-    })
-}
 
 /**
  * Get the URL of the default PDF.
@@ -12061,53 +12994,2720 @@ function getDefaultPDFURL () {
     return pdfURL
 }
 
+/**
+ * Get a PDF name from URL.
+ */
+function getPDFName (url) {
+    const a = url.split('/')
+    return a[a.length - 1]
+}
+
+/**
+ * Show or hide a loding.
+ */
+function showLoader (display) {
+    if (display) {
+        $('#pdfLoading').removeClass('close hidden')
+    } else {
+        $('#pdfLoading').addClass('close')
+        setTimeout(function () {
+            $('#pdfLoading').addClass('hidden')
+        }, 1000)
+    }
+}
+
+
+/***/ }),
+/* 35 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__.p + "dist/index.html";
+
+/***/ }),
+/* 36 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(37);
+if(typeof content === 'string') content = [[module.i, content, '']];
+// add the styles to the DOM
+var update = __webpack_require__(4)(content, {});
+if(content.locals) module.exports = content.locals;
+// Hot Module Replacement
+if(false) {
+	// When the styles change, update the <style> tags
+	if(!content.locals) {
+		module.hot.accept("!!../node_modules/css-loader/index.js!./pdfanno.css", function() {
+			var newContent = require("!!../node_modules/css-loader/index.js!./pdfanno.css");
+			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+			update(newContent);
+		});
+	}
+	// When the module is disposed, remove the <style> tags
+	module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 37 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(3)();
+// imports
+
+
+// module
+exports.push([module.i, "@charset \"utf-8\";\n\n/* Loading */\n.loader-container {\n    position: absolute;\n    top: 100px;\n    left: 50%;\n    width: 200px;\n    height: 200px;\n    margin-left: -150px;\n    /*margin-top: -150px;*/\n    background-color: #333;\n    padding: 16px;\n    box-shadow: 0 0 10px rgba(0,0,0,.5);\n    transition: opacity .3s ease-in-out;\n}\n.loader-container.close {\n    opacity: 0;\n}\n.loader {\n    border: 16px solid #f3f3f3; /* Light grey */\n    border-top: 16px solid #3498db; /* Blue */\n    border-radius: 50%;\n    width: 120px;\n    height: 120px;\n    animation: spin 1.5s ease-in-out infinite;\n    margin-left: auto;\n    margin-right: auto;\n}\n@keyframes spin {\n    0% { transform: rotate(0deg); }\n    100% { transform: rotate(360deg); }\n}\n.loader-container p {\n    margin-top: 16px;\n    font-size: 16px;\n    text-align: center;\n    color: white;\n}\n\n/*\n    Search UI.\n*/\n.search-control {\n    display: flex;\n}\n.search-input-container {\n    flex-grow: 1;\n    position: relative;\n}\n.search-control__input {\n    width: 100%;\n}\n.search-control__btn {\n    flex-grow: 0;\n    flex-shrink: 0;\n    flex-basis: 32px;\n}\n.search-hit {\n    position: absolute;\n    top: 50%;\n    right: 5px;\n    opacity: .5;\n    font-size: 12px;\n    line-height: 12px;\n    margin-top: -6px;\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 38 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+ * URI.js - Mutating URLs
+ *
+ * Version: 1.19.0
+ *
+ * Author: Rodney Rehm
+ * Web: http://medialize.github.io/URI.js/
+ *
+ * Licensed under
+ *   MIT License http://www.opensource.org/licenses/mit-license
+ *
+ */
+(function (root, factory) {
+  'use strict';
+  // https://github.com/umdjs/umd/blob/master/returnExports.js
+  if (typeof module === 'object' && module.exports) {
+    // Node
+    module.exports = factory(__webpack_require__(18), __webpack_require__(19), __webpack_require__(20));
+  } else if (true) {
+    // AMD. Register as an anonymous module.
+    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(18), __webpack_require__(19), __webpack_require__(20)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+  } else {
+    // Browser globals (root is window)
+    root.URI = factory(root.punycode, root.IPv6, root.SecondLevelDomains, root);
+  }
+}(this, function (punycode, IPv6, SLD, root) {
+  'use strict';
+  /*global location, escape, unescape */
+  // FIXME: v2.0.0 renamce non-camelCase properties to uppercase
+  /*jshint camelcase: false */
+
+  // save current URI variable, if any
+  var _URI = root && root.URI;
+
+  function URI(url, base) {
+    var _urlSupplied = arguments.length >= 1;
+    var _baseSupplied = arguments.length >= 2;
+
+    // Allow instantiation without the 'new' keyword
+    if (!(this instanceof URI)) {
+      if (_urlSupplied) {
+        if (_baseSupplied) {
+          return new URI(url, base);
+        }
+
+        return new URI(url);
+      }
+
+      return new URI();
+    }
+
+    if (url === undefined) {
+      if (_urlSupplied) {
+        throw new TypeError('undefined is not a valid argument for URI');
+      }
+
+      if (typeof location !== 'undefined') {
+        url = location.href + '';
+      } else {
+        url = '';
+      }
+    }
+
+    if (url === null) {
+      if (_urlSupplied) {
+        throw new TypeError('null is not a valid argument for URI');
+      }
+    }
+
+    this.href(url);
+
+    // resolve to base according to http://dvcs.w3.org/hg/url/raw-file/tip/Overview.html#constructor
+    if (base !== undefined) {
+      return this.absoluteTo(base);
+    }
+
+    return this;
+  }
+
+  function isInteger(value) {
+    return /^[0-9]+$/.test(value);
+  }
+
+  URI.version = '1.19.0';
+
+  var p = URI.prototype;
+  var hasOwn = Object.prototype.hasOwnProperty;
+
+  function escapeRegEx(string) {
+    // https://github.com/medialize/URI.js/commit/85ac21783c11f8ccab06106dba9735a31a86924d#commitcomment-821963
+    return string.replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1');
+  }
+
+  function getType(value) {
+    // IE8 doesn't return [Object Undefined] but [Object Object] for undefined value
+    if (value === undefined) {
+      return 'Undefined';
+    }
+
+    return String(Object.prototype.toString.call(value)).slice(8, -1);
+  }
+
+  function isArray(obj) {
+    return getType(obj) === 'Array';
+  }
+
+  function filterArrayValues(data, value) {
+    var lookup = {};
+    var i, length;
+
+    if (getType(value) === 'RegExp') {
+      lookup = null;
+    } else if (isArray(value)) {
+      for (i = 0, length = value.length; i < length; i++) {
+        lookup[value[i]] = true;
+      }
+    } else {
+      lookup[value] = true;
+    }
+
+    for (i = 0, length = data.length; i < length; i++) {
+      /*jshint laxbreak: true */
+      var _match = lookup && lookup[data[i]] !== undefined
+        || !lookup && value.test(data[i]);
+      /*jshint laxbreak: false */
+      if (_match) {
+        data.splice(i, 1);
+        length--;
+        i--;
+      }
+    }
+
+    return data;
+  }
+
+  function arrayContains(list, value) {
+    var i, length;
+
+    // value may be string, number, array, regexp
+    if (isArray(value)) {
+      // Note: this can be optimized to O(n) (instead of current O(m * n))
+      for (i = 0, length = value.length; i < length; i++) {
+        if (!arrayContains(list, value[i])) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    var _type = getType(value);
+    for (i = 0, length = list.length; i < length; i++) {
+      if (_type === 'RegExp') {
+        if (typeof list[i] === 'string' && list[i].match(value)) {
+          return true;
+        }
+      } else if (list[i] === value) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  function arraysEqual(one, two) {
+    if (!isArray(one) || !isArray(two)) {
+      return false;
+    }
+
+    // arrays can't be equal if they have different amount of content
+    if (one.length !== two.length) {
+      return false;
+    }
+
+    one.sort();
+    two.sort();
+
+    for (var i = 0, l = one.length; i < l; i++) {
+      if (one[i] !== two[i]) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  function trimSlashes(text) {
+    var trim_expression = /^\/+|\/+$/g;
+    return text.replace(trim_expression, '');
+  }
+
+  URI._parts = function() {
+    return {
+      protocol: null,
+      username: null,
+      password: null,
+      hostname: null,
+      urn: null,
+      port: null,
+      path: null,
+      query: null,
+      fragment: null,
+      // state
+      preventInvalidHostname: URI.preventInvalidHostname,
+      duplicateQueryParameters: URI.duplicateQueryParameters,
+      escapeQuerySpace: URI.escapeQuerySpace
+    };
+  };
+  // state: throw on invalid hostname
+  // see https://github.com/medialize/URI.js/pull/345
+  // and https://github.com/medialize/URI.js/issues/354
+  URI.preventInvalidHostname = false;
+  // state: allow duplicate query parameters (a=1&a=1)
+  URI.duplicateQueryParameters = false;
+  // state: replaces + with %20 (space in query strings)
+  URI.escapeQuerySpace = true;
+  // static properties
+  URI.protocol_expression = /^[a-z][a-z0-9.+-]*$/i;
+  URI.idn_expression = /[^a-z0-9\._-]/i;
+  URI.punycode_expression = /(xn--)/i;
+  // well, 333.444.555.666 matches, but it sure ain't no IPv4 - do we care?
+  URI.ip4_expression = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/;
+  // credits to Rich Brown
+  // source: http://forums.intermapper.com/viewtopic.php?p=1096#1096
+  // specification: http://www.ietf.org/rfc/rfc4291.txt
+  URI.ip6_expression = /^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?\s*$/;
+  // expression used is "gruber revised" (@gruber v2) determined to be the
+  // best solution in a regex-golf we did a couple of ages ago at
+  // * http://mathiasbynens.be/demo/url-regex
+  // * http://rodneyrehm.de/t/url-regex.html
+  URI.find_uri_expression = /\b((?:[a-z][\w-]+:(?:\/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/ig;
+  URI.findUri = {
+    // valid "scheme://" or "www."
+    start: /\b(?:([a-z][a-z0-9.+-]*:\/\/)|www\.)/gi,
+    // everything up to the next whitespace
+    end: /[\s\r\n]|$/,
+    // trim trailing punctuation captured by end RegExp
+    trim: /[`!()\[\]{};:'".,<>?«»“”„‘’]+$/,
+    // balanced parens inclusion (), [], {}, <>
+    parens: /(\([^\)]*\)|\[[^\]]*\]|\{[^}]*\}|<[^>]*>)/g,
+  };
+  // http://www.iana.org/assignments/uri-schemes.html
+  // http://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers#Well-known_ports
+  URI.defaultPorts = {
+    http: '80',
+    https: '443',
+    ftp: '21',
+    gopher: '70',
+    ws: '80',
+    wss: '443'
+  };
+  // list of protocols which always require a hostname
+  URI.hostProtocols = [
+    'http',
+    'https'
+  ];
+
+  // allowed hostname characters according to RFC 3986
+  // ALPHA DIGIT "-" "." "_" "~" "!" "$" "&" "'" "(" ")" "*" "+" "," ";" "=" %encoded
+  // I've never seen a (non-IDN) hostname other than: ALPHA DIGIT . - _
+  URI.invalid_hostname_characters = /[^a-zA-Z0-9\.\-:_]/;
+  // map DOM Elements to their URI attribute
+  URI.domAttributes = {
+    'a': 'href',
+    'blockquote': 'cite',
+    'link': 'href',
+    'base': 'href',
+    'script': 'src',
+    'form': 'action',
+    'img': 'src',
+    'area': 'href',
+    'iframe': 'src',
+    'embed': 'src',
+    'source': 'src',
+    'track': 'src',
+    'input': 'src', // but only if type="image"
+    'audio': 'src',
+    'video': 'src'
+  };
+  URI.getDomAttribute = function(node) {
+    if (!node || !node.nodeName) {
+      return undefined;
+    }
+
+    var nodeName = node.nodeName.toLowerCase();
+    // <input> should only expose src for type="image"
+    if (nodeName === 'input' && node.type !== 'image') {
+      return undefined;
+    }
+
+    return URI.domAttributes[nodeName];
+  };
+
+  function escapeForDumbFirefox36(value) {
+    // https://github.com/medialize/URI.js/issues/91
+    return escape(value);
+  }
+
+  // encoding / decoding according to RFC3986
+  function strictEncodeURIComponent(string) {
+    // see https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/encodeURIComponent
+    return encodeURIComponent(string)
+      .replace(/[!'()*]/g, escapeForDumbFirefox36)
+      .replace(/\*/g, '%2A');
+  }
+  URI.encode = strictEncodeURIComponent;
+  URI.decode = decodeURIComponent;
+  URI.iso8859 = function() {
+    URI.encode = escape;
+    URI.decode = unescape;
+  };
+  URI.unicode = function() {
+    URI.encode = strictEncodeURIComponent;
+    URI.decode = decodeURIComponent;
+  };
+  URI.characters = {
+    pathname: {
+      encode: {
+        // RFC3986 2.1: For consistency, URI producers and normalizers should
+        // use uppercase hexadecimal digits for all percent-encodings.
+        expression: /%(24|26|2B|2C|3B|3D|3A|40)/ig,
+        map: {
+          // -._~!'()*
+          '%24': '$',
+          '%26': '&',
+          '%2B': '+',
+          '%2C': ',',
+          '%3B': ';',
+          '%3D': '=',
+          '%3A': ':',
+          '%40': '@'
+        }
+      },
+      decode: {
+        expression: /[\/\?#]/g,
+        map: {
+          '/': '%2F',
+          '?': '%3F',
+          '#': '%23'
+        }
+      }
+    },
+    reserved: {
+      encode: {
+        // RFC3986 2.1: For consistency, URI producers and normalizers should
+        // use uppercase hexadecimal digits for all percent-encodings.
+        expression: /%(21|23|24|26|27|28|29|2A|2B|2C|2F|3A|3B|3D|3F|40|5B|5D)/ig,
+        map: {
+          // gen-delims
+          '%3A': ':',
+          '%2F': '/',
+          '%3F': '?',
+          '%23': '#',
+          '%5B': '[',
+          '%5D': ']',
+          '%40': '@',
+          // sub-delims
+          '%21': '!',
+          '%24': '$',
+          '%26': '&',
+          '%27': '\'',
+          '%28': '(',
+          '%29': ')',
+          '%2A': '*',
+          '%2B': '+',
+          '%2C': ',',
+          '%3B': ';',
+          '%3D': '='
+        }
+      }
+    },
+    urnpath: {
+      // The characters under `encode` are the characters called out by RFC 2141 as being acceptable
+      // for usage in a URN. RFC2141 also calls out "-", ".", and "_" as acceptable characters, but
+      // these aren't encoded by encodeURIComponent, so we don't have to call them out here. Also
+      // note that the colon character is not featured in the encoding map; this is because URI.js
+      // gives the colons in URNs semantic meaning as the delimiters of path segements, and so it
+      // should not appear unencoded in a segment itself.
+      // See also the note above about RFC3986 and capitalalized hex digits.
+      encode: {
+        expression: /%(21|24|27|28|29|2A|2B|2C|3B|3D|40)/ig,
+        map: {
+          '%21': '!',
+          '%24': '$',
+          '%27': '\'',
+          '%28': '(',
+          '%29': ')',
+          '%2A': '*',
+          '%2B': '+',
+          '%2C': ',',
+          '%3B': ';',
+          '%3D': '=',
+          '%40': '@'
+        }
+      },
+      // These characters are the characters called out by RFC2141 as "reserved" characters that
+      // should never appear in a URN, plus the colon character (see note above).
+      decode: {
+        expression: /[\/\?#:]/g,
+        map: {
+          '/': '%2F',
+          '?': '%3F',
+          '#': '%23',
+          ':': '%3A'
+        }
+      }
+    }
+  };
+  URI.encodeQuery = function(string, escapeQuerySpace) {
+    var escaped = URI.encode(string + '');
+    if (escapeQuerySpace === undefined) {
+      escapeQuerySpace = URI.escapeQuerySpace;
+    }
+
+    return escapeQuerySpace ? escaped.replace(/%20/g, '+') : escaped;
+  };
+  URI.decodeQuery = function(string, escapeQuerySpace) {
+    string += '';
+    if (escapeQuerySpace === undefined) {
+      escapeQuerySpace = URI.escapeQuerySpace;
+    }
+
+    try {
+      return URI.decode(escapeQuerySpace ? string.replace(/\+/g, '%20') : string);
+    } catch(e) {
+      // we're not going to mess with weird encodings,
+      // give up and return the undecoded original string
+      // see https://github.com/medialize/URI.js/issues/87
+      // see https://github.com/medialize/URI.js/issues/92
+      return string;
+    }
+  };
+  // generate encode/decode path functions
+  var _parts = {'encode':'encode', 'decode':'decode'};
+  var _part;
+  var generateAccessor = function(_group, _part) {
+    return function(string) {
+      try {
+        return URI[_part](string + '').replace(URI.characters[_group][_part].expression, function(c) {
+          return URI.characters[_group][_part].map[c];
+        });
+      } catch (e) {
+        // we're not going to mess with weird encodings,
+        // give up and return the undecoded original string
+        // see https://github.com/medialize/URI.js/issues/87
+        // see https://github.com/medialize/URI.js/issues/92
+        return string;
+      }
+    };
+  };
+
+  for (_part in _parts) {
+    URI[_part + 'PathSegment'] = generateAccessor('pathname', _parts[_part]);
+    URI[_part + 'UrnPathSegment'] = generateAccessor('urnpath', _parts[_part]);
+  }
+
+  var generateSegmentedPathFunction = function(_sep, _codingFuncName, _innerCodingFuncName) {
+    return function(string) {
+      // Why pass in names of functions, rather than the function objects themselves? The
+      // definitions of some functions (but in particular, URI.decode) will occasionally change due
+      // to URI.js having ISO8859 and Unicode modes. Passing in the name and getting it will ensure
+      // that the functions we use here are "fresh".
+      var actualCodingFunc;
+      if (!_innerCodingFuncName) {
+        actualCodingFunc = URI[_codingFuncName];
+      } else {
+        actualCodingFunc = function(string) {
+          return URI[_codingFuncName](URI[_innerCodingFuncName](string));
+        };
+      }
+
+      var segments = (string + '').split(_sep);
+
+      for (var i = 0, length = segments.length; i < length; i++) {
+        segments[i] = actualCodingFunc(segments[i]);
+      }
+
+      return segments.join(_sep);
+    };
+  };
+
+  // This takes place outside the above loop because we don't want, e.g., encodeUrnPath functions.
+  URI.decodePath = generateSegmentedPathFunction('/', 'decodePathSegment');
+  URI.decodeUrnPath = generateSegmentedPathFunction(':', 'decodeUrnPathSegment');
+  URI.recodePath = generateSegmentedPathFunction('/', 'encodePathSegment', 'decode');
+  URI.recodeUrnPath = generateSegmentedPathFunction(':', 'encodeUrnPathSegment', 'decode');
+
+  URI.encodeReserved = generateAccessor('reserved', 'encode');
+
+  URI.parse = function(string, parts) {
+    var pos;
+    if (!parts) {
+      parts = {
+        preventInvalidHostname: URI.preventInvalidHostname
+      };
+    }
+    // [protocol"://"[username[":"password]"@"]hostname[":"port]"/"?][path]["?"querystring]["#"fragment]
+
+    // extract fragment
+    pos = string.indexOf('#');
+    if (pos > -1) {
+      // escaping?
+      parts.fragment = string.substring(pos + 1) || null;
+      string = string.substring(0, pos);
+    }
+
+    // extract query
+    pos = string.indexOf('?');
+    if (pos > -1) {
+      // escaping?
+      parts.query = string.substring(pos + 1) || null;
+      string = string.substring(0, pos);
+    }
+
+    // extract protocol
+    if (string.substring(0, 2) === '//') {
+      // relative-scheme
+      parts.protocol = null;
+      string = string.substring(2);
+      // extract "user:pass@host:port"
+      string = URI.parseAuthority(string, parts);
+    } else {
+      pos = string.indexOf(':');
+      if (pos > -1) {
+        parts.protocol = string.substring(0, pos) || null;
+        if (parts.protocol && !parts.protocol.match(URI.protocol_expression)) {
+          // : may be within the path
+          parts.protocol = undefined;
+        } else if (string.substring(pos + 1, pos + 3) === '//') {
+          string = string.substring(pos + 3);
+
+          // extract "user:pass@host:port"
+          string = URI.parseAuthority(string, parts);
+        } else {
+          string = string.substring(pos + 1);
+          parts.urn = true;
+        }
+      }
+    }
+
+    // what's left must be the path
+    parts.path = string;
+
+    // and we're done
+    return parts;
+  };
+  URI.parseHost = function(string, parts) {
+    if (!string) {
+      string = '';
+    }
+
+    // Copy chrome, IE, opera backslash-handling behavior.
+    // Back slashes before the query string get converted to forward slashes
+    // See: https://github.com/joyent/node/blob/386fd24f49b0e9d1a8a076592a404168faeecc34/lib/url.js#L115-L124
+    // See: https://code.google.com/p/chromium/issues/detail?id=25916
+    // https://github.com/medialize/URI.js/pull/233
+    string = string.replace(/\\/g, '/');
+
+    // extract host:port
+    var pos = string.indexOf('/');
+    var bracketPos;
+    var t;
+
+    if (pos === -1) {
+      pos = string.length;
+    }
+
+    if (string.charAt(0) === '[') {
+      // IPv6 host - http://tools.ietf.org/html/draft-ietf-6man-text-addr-representation-04#section-6
+      // I claim most client software breaks on IPv6 anyways. To simplify things, URI only accepts
+      // IPv6+port in the format [2001:db8::1]:80 (for the time being)
+      bracketPos = string.indexOf(']');
+      parts.hostname = string.substring(1, bracketPos) || null;
+      parts.port = string.substring(bracketPos + 2, pos) || null;
+      if (parts.port === '/') {
+        parts.port = null;
+      }
+    } else {
+      var firstColon = string.indexOf(':');
+      var firstSlash = string.indexOf('/');
+      var nextColon = string.indexOf(':', firstColon + 1);
+      if (nextColon !== -1 && (firstSlash === -1 || nextColon < firstSlash)) {
+        // IPv6 host contains multiple colons - but no port
+        // this notation is actually not allowed by RFC 3986, but we're a liberal parser
+        parts.hostname = string.substring(0, pos) || null;
+        parts.port = null;
+      } else {
+        t = string.substring(0, pos).split(':');
+        parts.hostname = t[0] || null;
+        parts.port = t[1] || null;
+      }
+    }
+
+    if (parts.hostname && string.substring(pos).charAt(0) !== '/') {
+      pos++;
+      string = '/' + string;
+    }
+
+    if (parts.preventInvalidHostname) {
+      URI.ensureValidHostname(parts.hostname, parts.protocol);
+    }
+
+    if (parts.port) {
+      URI.ensureValidPort(parts.port);
+    }
+
+    return string.substring(pos) || '/';
+  };
+  URI.parseAuthority = function(string, parts) {
+    string = URI.parseUserinfo(string, parts);
+    return URI.parseHost(string, parts);
+  };
+  URI.parseUserinfo = function(string, parts) {
+    // extract username:password
+    var firstSlash = string.indexOf('/');
+    var pos = string.lastIndexOf('@', firstSlash > -1 ? firstSlash : string.length - 1);
+    var t;
+
+    // authority@ must come before /path
+    if (pos > -1 && (firstSlash === -1 || pos < firstSlash)) {
+      t = string.substring(0, pos).split(':');
+      parts.username = t[0] ? URI.decode(t[0]) : null;
+      t.shift();
+      parts.password = t[0] ? URI.decode(t.join(':')) : null;
+      string = string.substring(pos + 1);
+    } else {
+      parts.username = null;
+      parts.password = null;
+    }
+
+    return string;
+  };
+  URI.parseQuery = function(string, escapeQuerySpace) {
+    if (!string) {
+      return {};
+    }
+
+    // throw out the funky business - "?"[name"="value"&"]+
+    string = string.replace(/&+/g, '&').replace(/^\?*&*|&+$/g, '');
+
+    if (!string) {
+      return {};
+    }
+
+    var items = {};
+    var splits = string.split('&');
+    var length = splits.length;
+    var v, name, value;
+
+    for (var i = 0; i < length; i++) {
+      v = splits[i].split('=');
+      name = URI.decodeQuery(v.shift(), escapeQuerySpace);
+      // no "=" is null according to http://dvcs.w3.org/hg/url/raw-file/tip/Overview.html#collect-url-parameters
+      value = v.length ? URI.decodeQuery(v.join('='), escapeQuerySpace) : null;
+
+      if (hasOwn.call(items, name)) {
+        if (typeof items[name] === 'string' || items[name] === null) {
+          items[name] = [items[name]];
+        }
+
+        items[name].push(value);
+      } else {
+        items[name] = value;
+      }
+    }
+
+    return items;
+  };
+
+  URI.build = function(parts) {
+    var t = '';
+
+    if (parts.protocol) {
+      t += parts.protocol + ':';
+    }
+
+    if (!parts.urn && (t || parts.hostname)) {
+      t += '//';
+    }
+
+    t += (URI.buildAuthority(parts) || '');
+
+    if (typeof parts.path === 'string') {
+      if (parts.path.charAt(0) !== '/' && typeof parts.hostname === 'string') {
+        t += '/';
+      }
+
+      t += parts.path;
+    }
+
+    if (typeof parts.query === 'string' && parts.query) {
+      t += '?' + parts.query;
+    }
+
+    if (typeof parts.fragment === 'string' && parts.fragment) {
+      t += '#' + parts.fragment;
+    }
+    return t;
+  };
+  URI.buildHost = function(parts) {
+    var t = '';
+
+    if (!parts.hostname) {
+      return '';
+    } else if (URI.ip6_expression.test(parts.hostname)) {
+      t += '[' + parts.hostname + ']';
+    } else {
+      t += parts.hostname;
+    }
+
+    if (parts.port) {
+      t += ':' + parts.port;
+    }
+
+    return t;
+  };
+  URI.buildAuthority = function(parts) {
+    return URI.buildUserinfo(parts) + URI.buildHost(parts);
+  };
+  URI.buildUserinfo = function(parts) {
+    var t = '';
+
+    if (parts.username) {
+      t += URI.encode(parts.username);
+    }
+
+    if (parts.password) {
+      t += ':' + URI.encode(parts.password);
+    }
+
+    if (t) {
+      t += '@';
+    }
+
+    return t;
+  };
+  URI.buildQuery = function(data, duplicateQueryParameters, escapeQuerySpace) {
+    // according to http://tools.ietf.org/html/rfc3986 or http://labs.apache.org/webarch/uri/rfc/rfc3986.html
+    // being »-._~!$&'()*+,;=:@/?« %HEX and alnum are allowed
+    // the RFC explicitly states ?/foo being a valid use case, no mention of parameter syntax!
+    // URI.js treats the query string as being application/x-www-form-urlencoded
+    // see http://www.w3.org/TR/REC-html40/interact/forms.html#form-content-type
+
+    var t = '';
+    var unique, key, i, length;
+    for (key in data) {
+      if (hasOwn.call(data, key) && key) {
+        if (isArray(data[key])) {
+          unique = {};
+          for (i = 0, length = data[key].length; i < length; i++) {
+            if (data[key][i] !== undefined && unique[data[key][i] + ''] === undefined) {
+              t += '&' + URI.buildQueryParameter(key, data[key][i], escapeQuerySpace);
+              if (duplicateQueryParameters !== true) {
+                unique[data[key][i] + ''] = true;
+              }
+            }
+          }
+        } else if (data[key] !== undefined) {
+          t += '&' + URI.buildQueryParameter(key, data[key], escapeQuerySpace);
+        }
+      }
+    }
+
+    return t.substring(1);
+  };
+  URI.buildQueryParameter = function(name, value, escapeQuerySpace) {
+    // http://www.w3.org/TR/REC-html40/interact/forms.html#form-content-type -- application/x-www-form-urlencoded
+    // don't append "=" for null values, according to http://dvcs.w3.org/hg/url/raw-file/tip/Overview.html#url-parameter-serialization
+    return URI.encodeQuery(name, escapeQuerySpace) + (value !== null ? '=' + URI.encodeQuery(value, escapeQuerySpace) : '');
+  };
+
+  URI.addQuery = function(data, name, value) {
+    if (typeof name === 'object') {
+      for (var key in name) {
+        if (hasOwn.call(name, key)) {
+          URI.addQuery(data, key, name[key]);
+        }
+      }
+    } else if (typeof name === 'string') {
+      if (data[name] === undefined) {
+        data[name] = value;
+        return;
+      } else if (typeof data[name] === 'string') {
+        data[name] = [data[name]];
+      }
+
+      if (!isArray(value)) {
+        value = [value];
+      }
+
+      data[name] = (data[name] || []).concat(value);
+    } else {
+      throw new TypeError('URI.addQuery() accepts an object, string as the name parameter');
+    }
+  };
+
+  URI.setQuery = function(data, name, value) {
+    if (typeof name === 'object') {
+      for (var key in name) {
+        if (hasOwn.call(name, key)) {
+          URI.setQuery(data, key, name[key]);
+        }
+      }
+    } else if (typeof name === 'string') {
+      data[name] = value === undefined ? null : value;
+    } else {
+      throw new TypeError('URI.setQuery() accepts an object, string as the name parameter');
+    }
+  };
+
+  URI.removeQuery = function(data, name, value) {
+    var i, length, key;
+
+    if (isArray(name)) {
+      for (i = 0, length = name.length; i < length; i++) {
+        data[name[i]] = undefined;
+      }
+    } else if (getType(name) === 'RegExp') {
+      for (key in data) {
+        if (name.test(key)) {
+          data[key] = undefined;
+        }
+      }
+    } else if (typeof name === 'object') {
+      for (key in name) {
+        if (hasOwn.call(name, key)) {
+          URI.removeQuery(data, key, name[key]);
+        }
+      }
+    } else if (typeof name === 'string') {
+      if (value !== undefined) {
+        if (getType(value) === 'RegExp') {
+          if (!isArray(data[name]) && value.test(data[name])) {
+            data[name] = undefined;
+          } else {
+            data[name] = filterArrayValues(data[name], value);
+          }
+        } else if (data[name] === String(value) && (!isArray(value) || value.length === 1)) {
+          data[name] = undefined;
+        } else if (isArray(data[name])) {
+          data[name] = filterArrayValues(data[name], value);
+        }
+      } else {
+        data[name] = undefined;
+      }
+    } else {
+      throw new TypeError('URI.removeQuery() accepts an object, string, RegExp as the first parameter');
+    }
+  };
+  URI.hasQuery = function(data, name, value, withinArray) {
+    switch (getType(name)) {
+      case 'String':
+        // Nothing to do here
+        break;
+
+      case 'RegExp':
+        for (var key in data) {
+          if (hasOwn.call(data, key)) {
+            if (name.test(key) && (value === undefined || URI.hasQuery(data, key, value))) {
+              return true;
+            }
+          }
+        }
+
+        return false;
+
+      case 'Object':
+        for (var _key in name) {
+          if (hasOwn.call(name, _key)) {
+            if (!URI.hasQuery(data, _key, name[_key])) {
+              return false;
+            }
+          }
+        }
+
+        return true;
+
+      default:
+        throw new TypeError('URI.hasQuery() accepts a string, regular expression or object as the name parameter');
+    }
+
+    switch (getType(value)) {
+      case 'Undefined':
+        // true if exists (but may be empty)
+        return name in data; // data[name] !== undefined;
+
+      case 'Boolean':
+        // true if exists and non-empty
+        var _booly = Boolean(isArray(data[name]) ? data[name].length : data[name]);
+        return value === _booly;
+
+      case 'Function':
+        // allow complex comparison
+        return !!value(data[name], name, data);
+
+      case 'Array':
+        if (!isArray(data[name])) {
+          return false;
+        }
+
+        var op = withinArray ? arrayContains : arraysEqual;
+        return op(data[name], value);
+
+      case 'RegExp':
+        if (!isArray(data[name])) {
+          return Boolean(data[name] && data[name].match(value));
+        }
+
+        if (!withinArray) {
+          return false;
+        }
+
+        return arrayContains(data[name], value);
+
+      case 'Number':
+        value = String(value);
+        /* falls through */
+      case 'String':
+        if (!isArray(data[name])) {
+          return data[name] === value;
+        }
+
+        if (!withinArray) {
+          return false;
+        }
+
+        return arrayContains(data[name], value);
+
+      default:
+        throw new TypeError('URI.hasQuery() accepts undefined, boolean, string, number, RegExp, Function as the value parameter');
+    }
+  };
+
+
+  URI.joinPaths = function() {
+    var input = [];
+    var segments = [];
+    var nonEmptySegments = 0;
+
+    for (var i = 0; i < arguments.length; i++) {
+      var url = new URI(arguments[i]);
+      input.push(url);
+      var _segments = url.segment();
+      for (var s = 0; s < _segments.length; s++) {
+        if (typeof _segments[s] === 'string') {
+          segments.push(_segments[s]);
+        }
+
+        if (_segments[s]) {
+          nonEmptySegments++;
+        }
+      }
+    }
+
+    if (!segments.length || !nonEmptySegments) {
+      return new URI('');
+    }
+
+    var uri = new URI('').segment(segments);
+
+    if (input[0].path() === '' || input[0].path().slice(0, 1) === '/') {
+      uri.path('/' + uri.path());
+    }
+
+    return uri.normalize();
+  };
+
+  URI.commonPath = function(one, two) {
+    var length = Math.min(one.length, two.length);
+    var pos;
+
+    // find first non-matching character
+    for (pos = 0; pos < length; pos++) {
+      if (one.charAt(pos) !== two.charAt(pos)) {
+        pos--;
+        break;
+      }
+    }
+
+    if (pos < 1) {
+      return one.charAt(0) === two.charAt(0) && one.charAt(0) === '/' ? '/' : '';
+    }
+
+    // revert to last /
+    if (one.charAt(pos) !== '/' || two.charAt(pos) !== '/') {
+      pos = one.substring(0, pos).lastIndexOf('/');
+    }
+
+    return one.substring(0, pos + 1);
+  };
+
+  URI.withinString = function(string, callback, options) {
+    options || (options = {});
+    var _start = options.start || URI.findUri.start;
+    var _end = options.end || URI.findUri.end;
+    var _trim = options.trim || URI.findUri.trim;
+    var _parens = options.parens || URI.findUri.parens;
+    var _attributeOpen = /[a-z0-9-]=["']?$/i;
+
+    _start.lastIndex = 0;
+    while (true) {
+      var match = _start.exec(string);
+      if (!match) {
+        break;
+      }
+
+      var start = match.index;
+      if (options.ignoreHtml) {
+        // attribut(e=["']?$)
+        var attributeOpen = string.slice(Math.max(start - 3, 0), start);
+        if (attributeOpen && _attributeOpen.test(attributeOpen)) {
+          continue;
+        }
+      }
+
+      var end = start + string.slice(start).search(_end);
+      var slice = string.slice(start, end);
+      // make sure we include well balanced parens
+      var parensEnd = -1;
+      while (true) {
+        var parensMatch = _parens.exec(slice);
+        if (!parensMatch) {
+          break;
+        }
+
+        var parensMatchEnd = parensMatch.index + parensMatch[0].length;
+        parensEnd = Math.max(parensEnd, parensMatchEnd);
+      }
+
+      if (parensEnd > -1) {
+        slice = slice.slice(0, parensEnd) + slice.slice(parensEnd).replace(_trim, '');
+      } else {
+        slice = slice.replace(_trim, '');
+      }
+
+      if (slice.length <= match[0].length) {
+        // the extract only contains the starting marker of a URI,
+        // e.g. "www" or "http://"
+        continue;
+      }
+
+      if (options.ignore && options.ignore.test(slice)) {
+        continue;
+      }
+
+      end = start + slice.length;
+      var result = callback(slice, start, end, string);
+      if (result === undefined) {
+        _start.lastIndex = end;
+        continue;
+      }
+
+      result = String(result);
+      string = string.slice(0, start) + result + string.slice(end);
+      _start.lastIndex = start + result.length;
+    }
+
+    _start.lastIndex = 0;
+    return string;
+  };
+
+  URI.ensureValidHostname = function(v, protocol) {
+    // Theoretically URIs allow percent-encoding in Hostnames (according to RFC 3986)
+    // they are not part of DNS and therefore ignored by URI.js
+
+    var hasHostname = !!v; // not null and not an empty string
+    var hasProtocol = !!protocol;
+    var rejectEmptyHostname = false;
+
+    if (hasProtocol) {
+      rejectEmptyHostname = arrayContains(URI.hostProtocols, protocol);
+    }
+
+    if (rejectEmptyHostname && !hasHostname) {
+      throw new TypeError('Hostname cannot be empty, if protocol is ' + protocol);
+    } else if (v && v.match(URI.invalid_hostname_characters)) {
+      // test punycode
+      if (!punycode) {
+        throw new TypeError('Hostname "' + v + '" contains characters other than [A-Z0-9.-:_] and Punycode.js is not available');
+      }
+      if (punycode.toASCII(v).match(URI.invalid_hostname_characters)) {
+        throw new TypeError('Hostname "' + v + '" contains characters other than [A-Z0-9.-:_]');
+      }
+    }
+  };
+
+  URI.ensureValidPort = function (v) {
+    if (!v) {
+      return;
+    }
+
+    var port = Number(v);
+    if (isInteger(port) && (port > 0) && (port < 65536)) {
+      return;
+    }
+
+    throw new TypeError('Port "' + v + '" is not a valid port');
+  };
+
+  // noConflict
+  URI.noConflict = function(removeAll) {
+    if (removeAll) {
+      var unconflicted = {
+        URI: this.noConflict()
+      };
+
+      if (root.URITemplate && typeof root.URITemplate.noConflict === 'function') {
+        unconflicted.URITemplate = root.URITemplate.noConflict();
+      }
+
+      if (root.IPv6 && typeof root.IPv6.noConflict === 'function') {
+        unconflicted.IPv6 = root.IPv6.noConflict();
+      }
+
+      if (root.SecondLevelDomains && typeof root.SecondLevelDomains.noConflict === 'function') {
+        unconflicted.SecondLevelDomains = root.SecondLevelDomains.noConflict();
+      }
+
+      return unconflicted;
+    } else if (root.URI === this) {
+      root.URI = _URI;
+    }
+
+    return this;
+  };
+
+  p.build = function(deferBuild) {
+    if (deferBuild === true) {
+      this._deferred_build = true;
+    } else if (deferBuild === undefined || this._deferred_build) {
+      this._string = URI.build(this._parts);
+      this._deferred_build = false;
+    }
+
+    return this;
+  };
+
+  p.clone = function() {
+    return new URI(this);
+  };
+
+  p.valueOf = p.toString = function() {
+    return this.build(false)._string;
+  };
+
+
+  function generateSimpleAccessor(_part){
+    return function(v, build) {
+      if (v === undefined) {
+        return this._parts[_part] || '';
+      } else {
+        this._parts[_part] = v || null;
+        this.build(!build);
+        return this;
+      }
+    };
+  }
+
+  function generatePrefixAccessor(_part, _key){
+    return function(v, build) {
+      if (v === undefined) {
+        return this._parts[_part] || '';
+      } else {
+        if (v !== null) {
+          v = v + '';
+          if (v.charAt(0) === _key) {
+            v = v.substring(1);
+          }
+        }
+
+        this._parts[_part] = v;
+        this.build(!build);
+        return this;
+      }
+    };
+  }
+
+  p.protocol = generateSimpleAccessor('protocol');
+  p.username = generateSimpleAccessor('username');
+  p.password = generateSimpleAccessor('password');
+  p.hostname = generateSimpleAccessor('hostname');
+  p.port = generateSimpleAccessor('port');
+  p.query = generatePrefixAccessor('query', '?');
+  p.fragment = generatePrefixAccessor('fragment', '#');
+
+  p.search = function(v, build) {
+    var t = this.query(v, build);
+    return typeof t === 'string' && t.length ? ('?' + t) : t;
+  };
+  p.hash = function(v, build) {
+    var t = this.fragment(v, build);
+    return typeof t === 'string' && t.length ? ('#' + t) : t;
+  };
+
+  p.pathname = function(v, build) {
+    if (v === undefined || v === true) {
+      var res = this._parts.path || (this._parts.hostname ? '/' : '');
+      return v ? (this._parts.urn ? URI.decodeUrnPath : URI.decodePath)(res) : res;
+    } else {
+      if (this._parts.urn) {
+        this._parts.path = v ? URI.recodeUrnPath(v) : '';
+      } else {
+        this._parts.path = v ? URI.recodePath(v) : '/';
+      }
+      this.build(!build);
+      return this;
+    }
+  };
+  p.path = p.pathname;
+  p.href = function(href, build) {
+    var key;
+
+    if (href === undefined) {
+      return this.toString();
+    }
+
+    this._string = '';
+    this._parts = URI._parts();
+
+    var _URI = href instanceof URI;
+    var _object = typeof href === 'object' && (href.hostname || href.path || href.pathname);
+    if (href.nodeName) {
+      var attribute = URI.getDomAttribute(href);
+      href = href[attribute] || '';
+      _object = false;
+    }
+
+    // window.location is reported to be an object, but it's not the sort
+    // of object we're looking for:
+    // * location.protocol ends with a colon
+    // * location.query != object.search
+    // * location.hash != object.fragment
+    // simply serializing the unknown object should do the trick
+    // (for location, not for everything...)
+    if (!_URI && _object && href.pathname !== undefined) {
+      href = href.toString();
+    }
+
+    if (typeof href === 'string' || href instanceof String) {
+      this._parts = URI.parse(String(href), this._parts);
+    } else if (_URI || _object) {
+      var src = _URI ? href._parts : href;
+      for (key in src) {
+        if (hasOwn.call(this._parts, key)) {
+          this._parts[key] = src[key];
+        }
+      }
+    } else {
+      throw new TypeError('invalid input');
+    }
+
+    this.build(!build);
+    return this;
+  };
+
+  // identification accessors
+  p.is = function(what) {
+    var ip = false;
+    var ip4 = false;
+    var ip6 = false;
+    var name = false;
+    var sld = false;
+    var idn = false;
+    var punycode = false;
+    var relative = !this._parts.urn;
+
+    if (this._parts.hostname) {
+      relative = false;
+      ip4 = URI.ip4_expression.test(this._parts.hostname);
+      ip6 = URI.ip6_expression.test(this._parts.hostname);
+      ip = ip4 || ip6;
+      name = !ip;
+      sld = name && SLD && SLD.has(this._parts.hostname);
+      idn = name && URI.idn_expression.test(this._parts.hostname);
+      punycode = name && URI.punycode_expression.test(this._parts.hostname);
+    }
+
+    switch (what.toLowerCase()) {
+      case 'relative':
+        return relative;
+
+      case 'absolute':
+        return !relative;
+
+      // hostname identification
+      case 'domain':
+      case 'name':
+        return name;
+
+      case 'sld':
+        return sld;
+
+      case 'ip':
+        return ip;
+
+      case 'ip4':
+      case 'ipv4':
+      case 'inet4':
+        return ip4;
+
+      case 'ip6':
+      case 'ipv6':
+      case 'inet6':
+        return ip6;
+
+      case 'idn':
+        return idn;
+
+      case 'url':
+        return !this._parts.urn;
+
+      case 'urn':
+        return !!this._parts.urn;
+
+      case 'punycode':
+        return punycode;
+    }
+
+    return null;
+  };
+
+  // component specific input validation
+  var _protocol = p.protocol;
+  var _port = p.port;
+  var _hostname = p.hostname;
+
+  p.protocol = function(v, build) {
+    if (v) {
+      // accept trailing ://
+      v = v.replace(/:(\/\/)?$/, '');
+
+      if (!v.match(URI.protocol_expression)) {
+        throw new TypeError('Protocol "' + v + '" contains characters other than [A-Z0-9.+-] or doesn\'t start with [A-Z]');
+      }
+    }
+
+    return _protocol.call(this, v, build);
+  };
+  p.scheme = p.protocol;
+  p.port = function(v, build) {
+    if (this._parts.urn) {
+      return v === undefined ? '' : this;
+    }
+
+    if (v !== undefined) {
+      if (v === 0) {
+        v = null;
+      }
+
+      if (v) {
+        v += '';
+        if (v.charAt(0) === ':') {
+          v = v.substring(1);
+        }
+
+        URI.ensureValidPort(v);
+      }
+    }
+    return _port.call(this, v, build);
+  };
+  p.hostname = function(v, build) {
+    if (this._parts.urn) {
+      return v === undefined ? '' : this;
+    }
+
+    if (v !== undefined) {
+      var x = { preventInvalidHostname: this._parts.preventInvalidHostname };
+      var res = URI.parseHost(v, x);
+      if (res !== '/') {
+        throw new TypeError('Hostname "' + v + '" contains characters other than [A-Z0-9.-]');
+      }
+
+      v = x.hostname;
+      if (this._parts.preventInvalidHostname) {
+        URI.ensureValidHostname(v, this._parts.protocol);
+      }
+    }
+
+    return _hostname.call(this, v, build);
+  };
+
+  // compound accessors
+  p.origin = function(v, build) {
+    if (this._parts.urn) {
+      return v === undefined ? '' : this;
+    }
+
+    if (v === undefined) {
+      var protocol = this.protocol();
+      var authority = this.authority();
+      if (!authority) {
+        return '';
+      }
+
+      return (protocol ? protocol + '://' : '') + this.authority();
+    } else {
+      var origin = URI(v);
+      this
+        .protocol(origin.protocol())
+        .authority(origin.authority())
+        .build(!build);
+      return this;
+    }
+  };
+  p.host = function(v, build) {
+    if (this._parts.urn) {
+      return v === undefined ? '' : this;
+    }
+
+    if (v === undefined) {
+      return this._parts.hostname ? URI.buildHost(this._parts) : '';
+    } else {
+      var res = URI.parseHost(v, this._parts);
+      if (res !== '/') {
+        throw new TypeError('Hostname "' + v + '" contains characters other than [A-Z0-9.-]');
+      }
+
+      this.build(!build);
+      return this;
+    }
+  };
+  p.authority = function(v, build) {
+    if (this._parts.urn) {
+      return v === undefined ? '' : this;
+    }
+
+    if (v === undefined) {
+      return this._parts.hostname ? URI.buildAuthority(this._parts) : '';
+    } else {
+      var res = URI.parseAuthority(v, this._parts);
+      if (res !== '/') {
+        throw new TypeError('Hostname "' + v + '" contains characters other than [A-Z0-9.-]');
+      }
+
+      this.build(!build);
+      return this;
+    }
+  };
+  p.userinfo = function(v, build) {
+    if (this._parts.urn) {
+      return v === undefined ? '' : this;
+    }
+
+    if (v === undefined) {
+      var t = URI.buildUserinfo(this._parts);
+      return t ? t.substring(0, t.length -1) : t;
+    } else {
+      if (v[v.length-1] !== '@') {
+        v += '@';
+      }
+
+      URI.parseUserinfo(v, this._parts);
+      this.build(!build);
+      return this;
+    }
+  };
+  p.resource = function(v, build) {
+    var parts;
+
+    if (v === undefined) {
+      return this.path() + this.search() + this.hash();
+    }
+
+    parts = URI.parse(v);
+    this._parts.path = parts.path;
+    this._parts.query = parts.query;
+    this._parts.fragment = parts.fragment;
+    this.build(!build);
+    return this;
+  };
+
+  // fraction accessors
+  p.subdomain = function(v, build) {
+    if (this._parts.urn) {
+      return v === undefined ? '' : this;
+    }
+
+    // convenience, return "www" from "www.example.org"
+    if (v === undefined) {
+      if (!this._parts.hostname || this.is('IP')) {
+        return '';
+      }
+
+      // grab domain and add another segment
+      var end = this._parts.hostname.length - this.domain().length - 1;
+      return this._parts.hostname.substring(0, end) || '';
+    } else {
+      var e = this._parts.hostname.length - this.domain().length;
+      var sub = this._parts.hostname.substring(0, e);
+      var replace = new RegExp('^' + escapeRegEx(sub));
+
+      if (v && v.charAt(v.length - 1) !== '.') {
+        v += '.';
+      }
+
+      if (v.indexOf(':') !== -1) {
+        throw new TypeError('Domains cannot contain colons');
+      }
+
+      if (v) {
+        URI.ensureValidHostname(v, this._parts.protocol);
+      }
+
+      this._parts.hostname = this._parts.hostname.replace(replace, v);
+      this.build(!build);
+      return this;
+    }
+  };
+  p.domain = function(v, build) {
+    if (this._parts.urn) {
+      return v === undefined ? '' : this;
+    }
+
+    if (typeof v === 'boolean') {
+      build = v;
+      v = undefined;
+    }
+
+    // convenience, return "example.org" from "www.example.org"
+    if (v === undefined) {
+      if (!this._parts.hostname || this.is('IP')) {
+        return '';
+      }
+
+      // if hostname consists of 1 or 2 segments, it must be the domain
+      var t = this._parts.hostname.match(/\./g);
+      if (t && t.length < 2) {
+        return this._parts.hostname;
+      }
+
+      // grab tld and add another segment
+      var end = this._parts.hostname.length - this.tld(build).length - 1;
+      end = this._parts.hostname.lastIndexOf('.', end -1) + 1;
+      return this._parts.hostname.substring(end) || '';
+    } else {
+      if (!v) {
+        throw new TypeError('cannot set domain empty');
+      }
+
+      if (v.indexOf(':') !== -1) {
+        throw new TypeError('Domains cannot contain colons');
+      }
+
+      URI.ensureValidHostname(v, this._parts.protocol);
+
+      if (!this._parts.hostname || this.is('IP')) {
+        this._parts.hostname = v;
+      } else {
+        var replace = new RegExp(escapeRegEx(this.domain()) + '$');
+        this._parts.hostname = this._parts.hostname.replace(replace, v);
+      }
+
+      this.build(!build);
+      return this;
+    }
+  };
+  p.tld = function(v, build) {
+    if (this._parts.urn) {
+      return v === undefined ? '' : this;
+    }
+
+    if (typeof v === 'boolean') {
+      build = v;
+      v = undefined;
+    }
+
+    // return "org" from "www.example.org"
+    if (v === undefined) {
+      if (!this._parts.hostname || this.is('IP')) {
+        return '';
+      }
+
+      var pos = this._parts.hostname.lastIndexOf('.');
+      var tld = this._parts.hostname.substring(pos + 1);
+
+      if (build !== true && SLD && SLD.list[tld.toLowerCase()]) {
+        return SLD.get(this._parts.hostname) || tld;
+      }
+
+      return tld;
+    } else {
+      var replace;
+
+      if (!v) {
+        throw new TypeError('cannot set TLD empty');
+      } else if (v.match(/[^a-zA-Z0-9-]/)) {
+        if (SLD && SLD.is(v)) {
+          replace = new RegExp(escapeRegEx(this.tld()) + '$');
+          this._parts.hostname = this._parts.hostname.replace(replace, v);
+        } else {
+          throw new TypeError('TLD "' + v + '" contains characters other than [A-Z0-9]');
+        }
+      } else if (!this._parts.hostname || this.is('IP')) {
+        throw new ReferenceError('cannot set TLD on non-domain host');
+      } else {
+        replace = new RegExp(escapeRegEx(this.tld()) + '$');
+        this._parts.hostname = this._parts.hostname.replace(replace, v);
+      }
+
+      this.build(!build);
+      return this;
+    }
+  };
+  p.directory = function(v, build) {
+    if (this._parts.urn) {
+      return v === undefined ? '' : this;
+    }
+
+    if (v === undefined || v === true) {
+      if (!this._parts.path && !this._parts.hostname) {
+        return '';
+      }
+
+      if (this._parts.path === '/') {
+        return '/';
+      }
+
+      var end = this._parts.path.length - this.filename().length - 1;
+      var res = this._parts.path.substring(0, end) || (this._parts.hostname ? '/' : '');
+
+      return v ? URI.decodePath(res) : res;
+
+    } else {
+      var e = this._parts.path.length - this.filename().length;
+      var directory = this._parts.path.substring(0, e);
+      var replace = new RegExp('^' + escapeRegEx(directory));
+
+      // fully qualifier directories begin with a slash
+      if (!this.is('relative')) {
+        if (!v) {
+          v = '/';
+        }
+
+        if (v.charAt(0) !== '/') {
+          v = '/' + v;
+        }
+      }
+
+      // directories always end with a slash
+      if (v && v.charAt(v.length - 1) !== '/') {
+        v += '/';
+      }
+
+      v = URI.recodePath(v);
+      this._parts.path = this._parts.path.replace(replace, v);
+      this.build(!build);
+      return this;
+    }
+  };
+  p.filename = function(v, build) {
+    if (this._parts.urn) {
+      return v === undefined ? '' : this;
+    }
+
+    if (typeof v !== 'string') {
+      if (!this._parts.path || this._parts.path === '/') {
+        return '';
+      }
+
+      var pos = this._parts.path.lastIndexOf('/');
+      var res = this._parts.path.substring(pos+1);
+
+      return v ? URI.decodePathSegment(res) : res;
+    } else {
+      var mutatedDirectory = false;
+
+      if (v.charAt(0) === '/') {
+        v = v.substring(1);
+      }
+
+      if (v.match(/\.?\//)) {
+        mutatedDirectory = true;
+      }
+
+      var replace = new RegExp(escapeRegEx(this.filename()) + '$');
+      v = URI.recodePath(v);
+      this._parts.path = this._parts.path.replace(replace, v);
+
+      if (mutatedDirectory) {
+        this.normalizePath(build);
+      } else {
+        this.build(!build);
+      }
+
+      return this;
+    }
+  };
+  p.suffix = function(v, build) {
+    if (this._parts.urn) {
+      return v === undefined ? '' : this;
+    }
+
+    if (v === undefined || v === true) {
+      if (!this._parts.path || this._parts.path === '/') {
+        return '';
+      }
+
+      var filename = this.filename();
+      var pos = filename.lastIndexOf('.');
+      var s, res;
+
+      if (pos === -1) {
+        return '';
+      }
+
+      // suffix may only contain alnum characters (yup, I made this up.)
+      s = filename.substring(pos+1);
+      res = (/^[a-z0-9%]+$/i).test(s) ? s : '';
+      return v ? URI.decodePathSegment(res) : res;
+    } else {
+      if (v.charAt(0) === '.') {
+        v = v.substring(1);
+      }
+
+      var suffix = this.suffix();
+      var replace;
+
+      if (!suffix) {
+        if (!v) {
+          return this;
+        }
+
+        this._parts.path += '.' + URI.recodePath(v);
+      } else if (!v) {
+        replace = new RegExp(escapeRegEx('.' + suffix) + '$');
+      } else {
+        replace = new RegExp(escapeRegEx(suffix) + '$');
+      }
+
+      if (replace) {
+        v = URI.recodePath(v);
+        this._parts.path = this._parts.path.replace(replace, v);
+      }
+
+      this.build(!build);
+      return this;
+    }
+  };
+  p.segment = function(segment, v, build) {
+    var separator = this._parts.urn ? ':' : '/';
+    var path = this.path();
+    var absolute = path.substring(0, 1) === '/';
+    var segments = path.split(separator);
+
+    if (segment !== undefined && typeof segment !== 'number') {
+      build = v;
+      v = segment;
+      segment = undefined;
+    }
+
+    if (segment !== undefined && typeof segment !== 'number') {
+      throw new Error('Bad segment "' + segment + '", must be 0-based integer');
+    }
+
+    if (absolute) {
+      segments.shift();
+    }
+
+    if (segment < 0) {
+      // allow negative indexes to address from the end
+      segment = Math.max(segments.length + segment, 0);
+    }
+
+    if (v === undefined) {
+      /*jshint laxbreak: true */
+      return segment === undefined
+        ? segments
+        : segments[segment];
+      /*jshint laxbreak: false */
+    } else if (segment === null || segments[segment] === undefined) {
+      if (isArray(v)) {
+        segments = [];
+        // collapse empty elements within array
+        for (var i=0, l=v.length; i < l; i++) {
+          if (!v[i].length && (!segments.length || !segments[segments.length -1].length)) {
+            continue;
+          }
+
+          if (segments.length && !segments[segments.length -1].length) {
+            segments.pop();
+          }
+
+          segments.push(trimSlashes(v[i]));
+        }
+      } else if (v || typeof v === 'string') {
+        v = trimSlashes(v);
+        if (segments[segments.length -1] === '') {
+          // empty trailing elements have to be overwritten
+          // to prevent results such as /foo//bar
+          segments[segments.length -1] = v;
+        } else {
+          segments.push(v);
+        }
+      }
+    } else {
+      if (v) {
+        segments[segment] = trimSlashes(v);
+      } else {
+        segments.splice(segment, 1);
+      }
+    }
+
+    if (absolute) {
+      segments.unshift('');
+    }
+
+    return this.path(segments.join(separator), build);
+  };
+  p.segmentCoded = function(segment, v, build) {
+    var segments, i, l;
+
+    if (typeof segment !== 'number') {
+      build = v;
+      v = segment;
+      segment = undefined;
+    }
+
+    if (v === undefined) {
+      segments = this.segment(segment, v, build);
+      if (!isArray(segments)) {
+        segments = segments !== undefined ? URI.decode(segments) : undefined;
+      } else {
+        for (i = 0, l = segments.length; i < l; i++) {
+          segments[i] = URI.decode(segments[i]);
+        }
+      }
+
+      return segments;
+    }
+
+    if (!isArray(v)) {
+      v = (typeof v === 'string' || v instanceof String) ? URI.encode(v) : v;
+    } else {
+      for (i = 0, l = v.length; i < l; i++) {
+        v[i] = URI.encode(v[i]);
+      }
+    }
+
+    return this.segment(segment, v, build);
+  };
+
+  // mutating query string
+  var q = p.query;
+  p.query = function(v, build) {
+    if (v === true) {
+      return URI.parseQuery(this._parts.query, this._parts.escapeQuerySpace);
+    } else if (typeof v === 'function') {
+      var data = URI.parseQuery(this._parts.query, this._parts.escapeQuerySpace);
+      var result = v.call(this, data);
+      this._parts.query = URI.buildQuery(result || data, this._parts.duplicateQueryParameters, this._parts.escapeQuerySpace);
+      this.build(!build);
+      return this;
+    } else if (v !== undefined && typeof v !== 'string') {
+      this._parts.query = URI.buildQuery(v, this._parts.duplicateQueryParameters, this._parts.escapeQuerySpace);
+      this.build(!build);
+      return this;
+    } else {
+      return q.call(this, v, build);
+    }
+  };
+  p.setQuery = function(name, value, build) {
+    var data = URI.parseQuery(this._parts.query, this._parts.escapeQuerySpace);
+
+    if (typeof name === 'string' || name instanceof String) {
+      data[name] = value !== undefined ? value : null;
+    } else if (typeof name === 'object') {
+      for (var key in name) {
+        if (hasOwn.call(name, key)) {
+          data[key] = name[key];
+        }
+      }
+    } else {
+      throw new TypeError('URI.addQuery() accepts an object, string as the name parameter');
+    }
+
+    this._parts.query = URI.buildQuery(data, this._parts.duplicateQueryParameters, this._parts.escapeQuerySpace);
+    if (typeof name !== 'string') {
+      build = value;
+    }
+
+    this.build(!build);
+    return this;
+  };
+  p.addQuery = function(name, value, build) {
+    var data = URI.parseQuery(this._parts.query, this._parts.escapeQuerySpace);
+    URI.addQuery(data, name, value === undefined ? null : value);
+    this._parts.query = URI.buildQuery(data, this._parts.duplicateQueryParameters, this._parts.escapeQuerySpace);
+    if (typeof name !== 'string') {
+      build = value;
+    }
+
+    this.build(!build);
+    return this;
+  };
+  p.removeQuery = function(name, value, build) {
+    var data = URI.parseQuery(this._parts.query, this._parts.escapeQuerySpace);
+    URI.removeQuery(data, name, value);
+    this._parts.query = URI.buildQuery(data, this._parts.duplicateQueryParameters, this._parts.escapeQuerySpace);
+    if (typeof name !== 'string') {
+      build = value;
+    }
+
+    this.build(!build);
+    return this;
+  };
+  p.hasQuery = function(name, value, withinArray) {
+    var data = URI.parseQuery(this._parts.query, this._parts.escapeQuerySpace);
+    return URI.hasQuery(data, name, value, withinArray);
+  };
+  p.setSearch = p.setQuery;
+  p.addSearch = p.addQuery;
+  p.removeSearch = p.removeQuery;
+  p.hasSearch = p.hasQuery;
+
+  // sanitizing URLs
+  p.normalize = function() {
+    if (this._parts.urn) {
+      return this
+        .normalizeProtocol(false)
+        .normalizePath(false)
+        .normalizeQuery(false)
+        .normalizeFragment(false)
+        .build();
+    }
+
+    return this
+      .normalizeProtocol(false)
+      .normalizeHostname(false)
+      .normalizePort(false)
+      .normalizePath(false)
+      .normalizeQuery(false)
+      .normalizeFragment(false)
+      .build();
+  };
+  p.normalizeProtocol = function(build) {
+    if (typeof this._parts.protocol === 'string') {
+      this._parts.protocol = this._parts.protocol.toLowerCase();
+      this.build(!build);
+    }
+
+    return this;
+  };
+  p.normalizeHostname = function(build) {
+    if (this._parts.hostname) {
+      if (this.is('IDN') && punycode) {
+        this._parts.hostname = punycode.toASCII(this._parts.hostname);
+      } else if (this.is('IPv6') && IPv6) {
+        this._parts.hostname = IPv6.best(this._parts.hostname);
+      }
+
+      this._parts.hostname = this._parts.hostname.toLowerCase();
+      this.build(!build);
+    }
+
+    return this;
+  };
+  p.normalizePort = function(build) {
+    // remove port of it's the protocol's default
+    if (typeof this._parts.protocol === 'string' && this._parts.port === URI.defaultPorts[this._parts.protocol]) {
+      this._parts.port = null;
+      this.build(!build);
+    }
+
+    return this;
+  };
+  p.normalizePath = function(build) {
+    var _path = this._parts.path;
+    if (!_path) {
+      return this;
+    }
+
+    if (this._parts.urn) {
+      this._parts.path = URI.recodeUrnPath(this._parts.path);
+      this.build(!build);
+      return this;
+    }
+
+    if (this._parts.path === '/') {
+      return this;
+    }
+
+    _path = URI.recodePath(_path);
+
+    var _was_relative;
+    var _leadingParents = '';
+    var _parent, _pos;
+
+    // handle relative paths
+    if (_path.charAt(0) !== '/') {
+      _was_relative = true;
+      _path = '/' + _path;
+    }
+
+    // handle relative files (as opposed to directories)
+    if (_path.slice(-3) === '/..' || _path.slice(-2) === '/.') {
+      _path += '/';
+    }
+
+    // resolve simples
+    _path = _path
+      .replace(/(\/(\.\/)+)|(\/\.$)/g, '/')
+      .replace(/\/{2,}/g, '/');
+
+    // remember leading parents
+    if (_was_relative) {
+      _leadingParents = _path.substring(1).match(/^(\.\.\/)+/) || '';
+      if (_leadingParents) {
+        _leadingParents = _leadingParents[0];
+      }
+    }
+
+    // resolve parents
+    while (true) {
+      _parent = _path.search(/\/\.\.(\/|$)/);
+      if (_parent === -1) {
+        // no more ../ to resolve
+        break;
+      } else if (_parent === 0) {
+        // top level cannot be relative, skip it
+        _path = _path.substring(3);
+        continue;
+      }
+
+      _pos = _path.substring(0, _parent).lastIndexOf('/');
+      if (_pos === -1) {
+        _pos = _parent;
+      }
+      _path = _path.substring(0, _pos) + _path.substring(_parent + 3);
+    }
+
+    // revert to relative
+    if (_was_relative && this.is('relative')) {
+      _path = _leadingParents + _path.substring(1);
+    }
+
+    this._parts.path = _path;
+    this.build(!build);
+    return this;
+  };
+  p.normalizePathname = p.normalizePath;
+  p.normalizeQuery = function(build) {
+    if (typeof this._parts.query === 'string') {
+      if (!this._parts.query.length) {
+        this._parts.query = null;
+      } else {
+        this.query(URI.parseQuery(this._parts.query, this._parts.escapeQuerySpace));
+      }
+
+      this.build(!build);
+    }
+
+    return this;
+  };
+  p.normalizeFragment = function(build) {
+    if (!this._parts.fragment) {
+      this._parts.fragment = null;
+      this.build(!build);
+    }
+
+    return this;
+  };
+  p.normalizeSearch = p.normalizeQuery;
+  p.normalizeHash = p.normalizeFragment;
+
+  p.iso8859 = function() {
+    // expect unicode input, iso8859 output
+    var e = URI.encode;
+    var d = URI.decode;
+
+    URI.encode = escape;
+    URI.decode = decodeURIComponent;
+    try {
+      this.normalize();
+    } finally {
+      URI.encode = e;
+      URI.decode = d;
+    }
+    return this;
+  };
+
+  p.unicode = function() {
+    // expect iso8859 input, unicode output
+    var e = URI.encode;
+    var d = URI.decode;
+
+    URI.encode = strictEncodeURIComponent;
+    URI.decode = unescape;
+    try {
+      this.normalize();
+    } finally {
+      URI.encode = e;
+      URI.decode = d;
+    }
+    return this;
+  };
+
+  p.readable = function() {
+    var uri = this.clone();
+    // removing username, password, because they shouldn't be displayed according to RFC 3986
+    uri.username('').password('').normalize();
+    var t = '';
+    if (uri._parts.protocol) {
+      t += uri._parts.protocol + '://';
+    }
+
+    if (uri._parts.hostname) {
+      if (uri.is('punycode') && punycode) {
+        t += punycode.toUnicode(uri._parts.hostname);
+        if (uri._parts.port) {
+          t += ':' + uri._parts.port;
+        }
+      } else {
+        t += uri.host();
+      }
+    }
+
+    if (uri._parts.hostname && uri._parts.path && uri._parts.path.charAt(0) !== '/') {
+      t += '/';
+    }
+
+    t += uri.path(true);
+    if (uri._parts.query) {
+      var q = '';
+      for (var i = 0, qp = uri._parts.query.split('&'), l = qp.length; i < l; i++) {
+        var kv = (qp[i] || '').split('=');
+        q += '&' + URI.decodeQuery(kv[0], this._parts.escapeQuerySpace)
+          .replace(/&/g, '%26');
+
+        if (kv[1] !== undefined) {
+          q += '=' + URI.decodeQuery(kv[1], this._parts.escapeQuerySpace)
+            .replace(/&/g, '%26');
+        }
+      }
+      t += '?' + q.substring(1);
+    }
+
+    t += URI.decodeQuery(uri.hash(), true);
+    return t;
+  };
+
+  // resolving relative and absolute URLs
+  p.absoluteTo = function(base) {
+    var resolved = this.clone();
+    var properties = ['protocol', 'username', 'password', 'hostname', 'port'];
+    var basedir, i, p;
+
+    if (this._parts.urn) {
+      throw new Error('URNs do not have any generally defined hierarchical components');
+    }
+
+    if (!(base instanceof URI)) {
+      base = new URI(base);
+    }
+
+    if (resolved._parts.protocol) {
+      // Directly returns even if this._parts.hostname is empty.
+      return resolved;
+    } else {
+      resolved._parts.protocol = base._parts.protocol;
+    }
+
+    if (this._parts.hostname) {
+      return resolved;
+    }
+
+    for (i = 0; (p = properties[i]); i++) {
+      resolved._parts[p] = base._parts[p];
+    }
+
+    if (!resolved._parts.path) {
+      resolved._parts.path = base._parts.path;
+      if (!resolved._parts.query) {
+        resolved._parts.query = base._parts.query;
+      }
+    } else {
+      if (resolved._parts.path.substring(-2) === '..') {
+        resolved._parts.path += '/';
+      }
+
+      if (resolved.path().charAt(0) !== '/') {
+        basedir = base.directory();
+        basedir = basedir ? basedir : base.path().indexOf('/') === 0 ? '/' : '';
+        resolved._parts.path = (basedir ? (basedir + '/') : '') + resolved._parts.path;
+        resolved.normalizePath();
+      }
+    }
+
+    resolved.build();
+    return resolved;
+  };
+  p.relativeTo = function(base) {
+    var relative = this.clone().normalize();
+    var relativeParts, baseParts, common, relativePath, basePath;
+
+    if (relative._parts.urn) {
+      throw new Error('URNs do not have any generally defined hierarchical components');
+    }
+
+    base = new URI(base).normalize();
+    relativeParts = relative._parts;
+    baseParts = base._parts;
+    relativePath = relative.path();
+    basePath = base.path();
+
+    if (relativePath.charAt(0) !== '/') {
+      throw new Error('URI is already relative');
+    }
+
+    if (basePath.charAt(0) !== '/') {
+      throw new Error('Cannot calculate a URI relative to another relative URI');
+    }
+
+    if (relativeParts.protocol === baseParts.protocol) {
+      relativeParts.protocol = null;
+    }
+
+    if (relativeParts.username !== baseParts.username || relativeParts.password !== baseParts.password) {
+      return relative.build();
+    }
+
+    if (relativeParts.protocol !== null || relativeParts.username !== null || relativeParts.password !== null) {
+      return relative.build();
+    }
+
+    if (relativeParts.hostname === baseParts.hostname && relativeParts.port === baseParts.port) {
+      relativeParts.hostname = null;
+      relativeParts.port = null;
+    } else {
+      return relative.build();
+    }
+
+    if (relativePath === basePath) {
+      relativeParts.path = '';
+      return relative.build();
+    }
+
+    // determine common sub path
+    common = URI.commonPath(relativePath, basePath);
+
+    // If the paths have nothing in common, return a relative URL with the absolute path.
+    if (!common) {
+      return relative.build();
+    }
+
+    var parents = baseParts.path
+      .substring(common.length)
+      .replace(/[^\/]*$/, '')
+      .replace(/.*?\//g, '../');
+
+    relativeParts.path = (parents + relativeParts.path.substring(common.length)) || './';
+
+    return relative.build();
+  };
+
+  // comparing URIs
+  p.equals = function(uri) {
+    var one = this.clone();
+    var two = new URI(uri);
+    var one_map = {};
+    var two_map = {};
+    var checked = {};
+    var one_query, two_query, key;
+
+    one.normalize();
+    two.normalize();
+
+    // exact match
+    if (one.toString() === two.toString()) {
+      return true;
+    }
+
+    // extract query string
+    one_query = one.query();
+    two_query = two.query();
+    one.query('');
+    two.query('');
+
+    // definitely not equal if not even non-query parts match
+    if (one.toString() !== two.toString()) {
+      return false;
+    }
+
+    // query parameters have the same length, even if they're permuted
+    if (one_query.length !== two_query.length) {
+      return false;
+    }
+
+    one_map = URI.parseQuery(one_query, this._parts.escapeQuerySpace);
+    two_map = URI.parseQuery(two_query, this._parts.escapeQuerySpace);
+
+    for (key in one_map) {
+      if (hasOwn.call(one_map, key)) {
+        if (!isArray(one_map[key])) {
+          if (one_map[key] !== two_map[key]) {
+            return false;
+          }
+        } else if (!arraysEqual(one_map[key], two_map[key])) {
+          return false;
+        }
+
+        checked[key] = true;
+      }
+    }
+
+    for (key in two_map) {
+      if (hasOwn.call(two_map, key)) {
+        if (!checked[key]) {
+          // two contains a parameter not present in one
+          return false;
+        }
+      }
+    }
+
+    return true;
+  };
+
+  // state
+  p.preventInvalidHostname = function(v) {
+    this._parts.preventInvalidHostname = !!v;
+    return this;
+  };
+
+  p.duplicateQueryParameters = function(v) {
+    this._parts.duplicateQueryParameters = !!v;
+    return this;
+  };
+
+  p.escapeQuerySpace = function(v) {
+    this._parts.escapeQuerySpace = !!v;
+    return this;
+  };
+
+  return URI;
+}));
+
+
+/***/ }),
+/* 39 */
+/***/ (function(module, exports) {
+
+module.exports = function(module) {
+	if(!module.webpackPolyfill) {
+		module.deprecate = function() {};
+		module.paths = [];
+		// module.parent = undefined by default
+		if(!module.children) module.children = [];
+		Object.defineProperty(module, "loaded", {
+			enumerable: true,
+			get: function() {
+				return module.l;
+			}
+		});
+		Object.defineProperty(module, "id", {
+			enumerable: true,
+			get: function() {
+				return module.i;
+			}
+		});
+		module.webpackPolyfill = 1;
+	}
+	return module;
+};
+
+
+/***/ }),
+/* 40 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 41 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["b"] = expose;
+/* harmony export (immutable) */ __webpack_exports__["a"] = addAllAnnotations;
+/* unused harmony export addAnnotation */
+/* unused harmony export deleteAnnotation */
+/* unused harmony export clear */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shared_coords__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_toml__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_toml___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_toml__);
+
+
+
+/**
+ * Expose public APIs.
+ */
+function expose () {
+    window.add = addAnnotation
+    window.addAll = addAllAnnotations
+    window.delete = deleteAnnotation
+    window.RectAnnotation = PublicRectAnnotation
+    window.SpanAnnotation = PublicSpanAnnotation
+    window.RelationAnnotation = PublicRelationAnnotation
+    window.readTOML = readTOML
+    window.clear = clear
+}
+
+/**
+ * Add all annotations.
+ *
+ * This method expect to get argument made from a TOML file parsed by `window.readTOML`.
+ */
+function addAllAnnotations (tomlObject) {
+
+    let result = {}
+
+    for (const key in tomlObject) {
+
+        let data = tomlObject[key]
+
+        if (typeof data !== 'object') {
+            continue
+        }
+
+        data.id = key
+
+        let a
+        if (data.type === 'span') {
+            a = new PublicSpanAnnotation(data)
+        } else if (data.type === 'rect') {
+            a = new PublicRectAnnotation(data)
+        } else if (data.type === 'relation') {
+            a = new PublicRelationAnnotation(data)
+        } else {
+            console.log('Unknown: ', key, data)
+        }
+
+        if (a) {
+            addAnnotation(a)
+            result[key] = a
+        }
+    }
+
+    return result
+
+}
+
+/**
+ * Add an annotation, and render it.
+ */
+function addAnnotation (publicAnnotation) {
+
+    let a = publicAnnotation.annotation
+    window.annoPage.addAnnotation(a)
+    a.render()
+    a.enableViewMode()
+    a.save()
+
+    // Restore the status of AnnoTools.
+    window.annoPage.disableAnnotateFunctions()
+    window.annoPage.enableAnnotateFunction(window.currentAnnoToolType)
+}
+
+/**
+ * Delete an annotation, and also detach it from view.
+ */
+function deleteAnnotation (publicAnnotation) {
+
+    publicAnnotation.annotation.destroy()
+}
+
+/**
+ * Rect Annotation Class wrapping the core.
+ */
+class PublicRectAnnotation {
+
+    /**
+     * Create a rect annotation from a TOML data.
+     */
+    constructor ({ page, position, label = '', id = 0 }) {
+
+        // Check inputs.
+        if (!page || typeof page !== 'number') {
+            throw new Error('Set the page as number.')
+        }
+        if (!position || position.length !== 4) {
+            throw new Error('Set the position which includes `x`, `y`, `width` and `height`.')
+        }
+
+        // position: String -> Float.
+        position = position.map(p => parseFloat(p))
+
+        let rect = window.annoPage.createRectAnnotation({
+            uuid     : id && String(id), // annotationid must be string.
+            x        : position[0],
+            y        : __WEBPACK_IMPORTED_MODULE_0__shared_coords__["a" /* convertFromExportY */](page, position[1]),
+            width    : position[2],
+            height   : position[3],
+            text     : label,
+            color    : '#FF0000',
+            readOnly : false
+        })
+
+        this.annotation = rect
+    }
+}
+/* unused harmony export PublicRectAnnotation */
+
+
+/**
+ * Rect Annotation Class wrapping the core.
+ */
+class PublicSpanAnnotation {
+
+    constructor ({ page, position, label = '', text = '', id = 0, zIndex = 10 }) {
+
+        console.log('PublicSpanAnnotation:', zIndex)
+
+        // Check inputs.
+        if (!page || typeof page !== 'number') {
+            throw new Error('Set the page as number.')
+        }
+        if (!position) {
+            throw new Error('Set the position.')
+        }
+
+        // position: String -> Float.
+        position = position.map(p => p.map(pp => parseFloat(pp)))
+
+        // Convert.
+        position = position.map(p => {
+            return {
+                page   : page,
+                x      : p[0],
+                y      : __WEBPACK_IMPORTED_MODULE_0__shared_coords__["a" /* convertFromExportY */](page, p[1]),
+                width  : p[2],
+                height : p[3]
+            }
+        })
+
+        let span = window.annoPage.createSpanAnnotation({
+            // TODO 既存のものとかぶるのではないか？
+            uuid         : id && String(id), // annotationid must be string.
+            rectangles   : position,
+            text         : label,
+            color        : '#FFFF00',
+            readOnly     : false,
+            selectedText : text,
+            zIndex
+        })
+
+        this.annotation = span
+    }
+}
+/* unused harmony export PublicSpanAnnotation */
+
+
+/**
+ * Rect Annotation Class wrapping the core.
+ */
+class PublicRelationAnnotation {
+
+    constructor ({ dir, ids, label = '', id = 0 }) {
+
+        // Check inputs.
+        if (!dir) {
+            throw new Error('Set the dir.')
+        }
+        if (!ids || ids.length !== 2) {
+            throw new Error('Set the ids.')
+        }
+
+        let r = window.annoPage.createRelationAnnotation({
+            // TODO 既存のものとかぶるのではないか？
+            uuid      : id && String(id), // annotationid must be string.
+            direction : dir,
+            rel1      : typeof ids[0] === 'object' ? ids[0].annotation : ids[0],
+            rel2      : typeof ids[1] === 'object' ? ids[1].annotation : ids[1],
+            text      : label,
+            color     : '#FF0000',
+            readOnly  : false
+        })
+
+        this.annotation = r
+    }
+}
+/* unused harmony export PublicRelationAnnotation */
+
+
+/**
+ * TOML parser.
+ */
+const readTOML = __WEBPACK_IMPORTED_MODULE_1_toml___default.a.parse
+/* harmony export (immutable) */ __webpack_exports__["c"] = readTOML;
+
+
+/**
+ * Delete all annotations.
+ */
+function clear () {
+    window.annoPage.clearAllAnnotations()
+}
+
+
+/***/ }),
+/* 42 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = setup;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shared_coords__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util_analyzer__ = __webpack_require__(23);
+/**
+ * Search functions.
+ */
+
+
+
 let pages = []
 
-function prepareSearch (pdfResult) {
-    console.log('prepareSearch!!!', pdfResult.length)
+function setup (analyzeData) {
+    console.log('search setup')
 
-    pages = []
-
-    let page
-    let body
-    let meta
-    pdfResult.split('\n').forEach(line => {
-        if (page && !line) {
-            body += ' '
-            meta.push(line)
-        } else {
-            let [
-                pageNumber,
-                type,
-                char
-            ] = line.split('\t')
-            pageNumber = parseInt(pageNumber, 10)
-            if (!page) {
-                page = pageNumber
-                body = ''
-                meta = []
-            } else if (page !== pageNumber) {
-                pages.push({
-                    body,
-                    meta,
-                    page
-                })
-                body = ''
-                meta = []
-                page = pageNumber
-            }
-            if (type === 'TEXT') {
-                body += char
-                meta.push(line)
-            }
-        }
-    })
-    pages.push({
-        body,
-        meta,
-        page
-    })
-    console.log('pages:', pages)
+    pages = __WEBPACK_IMPORTED_MODULE_1__util_analyzer__["a" /* customizeAnalyzeResult */](analyzeData)
 
     // Enable search input field.
     $('#searchWord, .js-dict-match-file').removeAttr('disabled')
@@ -12177,6 +15777,9 @@ window.addEventListener('DOMContentLoaded', () => {
     })
 })
 
+/**
+ * Highlight the prev search result.
+ */
 function prevSearchResult () {
     window.searchPosition--
     if (window.searchPosition < 0) {
@@ -12185,6 +15788,9 @@ function prevSearchResult () {
     highlightSearchResult()
 }
 
+/**
+ * Highlight the next search result.
+ */
 function nextSearchResult () {
     window.searchPosition++
     if (window.searchPosition >= window.searchHighlights.length) {
@@ -12207,7 +15813,7 @@ function highlightSearchResult () {
     // Scroll to.
     let pageHeight = window.annoPage.getViewerViewport().height
     let scale = window.annoPage.getViewerViewport().scale
-    let _y = (pageHeight + __WEBPACK_IMPORTED_MODULE_3__shared_coords__["d" /* paddingBetweenPages */]) * (highlight.page - 1) + highlight.top * scale
+    let _y = (pageHeight + __WEBPACK_IMPORTED_MODULE_0__shared_coords__["d" /* paddingBetweenPages */]) * (highlight.page - 1) + highlight.top * scale
     _y -= 100
     $('#viewer iframe').contents().find('#viewer').parent()[0].scrollTop = _y
 
@@ -12227,7 +15833,7 @@ function rerenderSearchResults () {
     window.searchHighlights.forEach((highlight, index) => {
         const $textLayer = $(`.page[data-page-number="${highlight.page}"] .textLayer`, window.iframeWindow.document)
         // set the depth.
-        highlight.$elm.css('z-index', __WEBPACK_IMPORTED_MODULE_3__shared_coords__["c" /* nextZIndex */]())
+        highlight.$elm.css('z-index', __WEBPACK_IMPORTED_MODULE_0__shared_coords__["c" /* nextZIndex */]())
         $textLayer.append(highlight.$elm)
     })
 }
@@ -12324,7 +15930,7 @@ function doSearch ({ query = null } = {}) {
                     left   : fromX * scale + 'px',
                     width  : (toX - fromX) * scale + 'px',
                     height : (toY - fromY) * scale + 'px',
-                    zIndex : __WEBPACK_IMPORTED_MODULE_3__shared_coords__["c" /* nextZIndex */]()
+                    zIndex : __WEBPACK_IMPORTED_MODULE_0__shared_coords__["c" /* nextZIndex */]()
                 })
                 $textLayer.append($div)
                 // TODO 後で、改行されたものとかにも対応できるようにする（その場合は、rectsが複数）
@@ -12380,7 +15986,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
         const files = e.target.files
         if (files.length === 0) {
-            __WEBPACK_IMPORTED_MODULE_1_anno_ui__["ui"].alertDialog.show({ message : 'Select a file.' })
+            window.annoUI.ui.alertDialog.show({ message : 'Select a file.' })
             return
         }
 
@@ -12395,7 +16001,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 return t
             })
             if (texts.length === 0) {
-                __WEBPACK_IMPORTED_MODULE_1_anno_ui__["ui"].alertDialog.show({ message : 'No text is found in the dictionary file.' })
+                window.annoUI.ui.alertDialog.show({ message : 'No text is found in the dictionary file.' })
                 return
             }
             dictonaryTexts = texts
@@ -12453,68 +16059,757 @@ function searchByDictionary (texts = []) {
 
 
 /***/ }),
-/* 32 */
-/***/ (function(module, exports, __webpack_require__) {
+/* 43 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "dist/index.html";
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = setup;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util_analyzer__ = __webpack_require__(23);
 
-/***/ }),
-/* 33 */
-/***/ (function(module, exports, __webpack_require__) {
 
-// style-loader: Adds some css to the DOM by adding a <style> tag
+let pages
 
-// load the styles
-var content = __webpack_require__(34);
-if(typeof content === 'string') content = [[module.i, content, '']];
-// add the styles to the DOM
-var update = __webpack_require__(4)(content, {});
-if(content.locals) module.exports = content.locals;
-// Hot Module Replacement
-if(false) {
-	// When the styles change, update the <style> tags
-	if(!content.locals) {
-		module.hot.accept("!!../node_modules/css-loader/index.js!./pdfanno.css", function() {
-			var newContent = require("!!../node_modules/css-loader/index.js!./pdfanno.css");
-			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-			update(newContent);
-		});
-	}
-	// When the module is disposed, remove the <style> tags
-	module.hot.dispose(function() { update(); });
+/**
+ * Setup text layers.
+ */
+function setup (analyzeData) {
+    console.log('textLayer:setup')
+
+    pages = __WEBPACK_IMPORTED_MODULE_0__util_analyzer__["a" /* customizeAnalyzeResult */](analyzeData)
+
+    // Renew text layers.
+    $('.textLayer', window.iframeWindow.document).each(function () {
+        const page = $(this).parent('.page').data('page-number')
+        createTextLayer(page)
+    })
+
+    // Listen pageRendered event.
+    window.removeEventListener('pagerendered', listenPageRendered)
+    window.addEventListener('pagerendered', listenPageRendered)
 }
 
+/**
+ * Listen pageRendered event, and create a new text layer.
+ */
+function listenPageRendered (ev) {
+    const page = ev.detail.pageNumber
+    console.log('textLayer:pageRendered:', page)
+    createTextLayer(page)
+}
+
+/**
+ * Create a new text layer.
+ */
+function createTextLayer (page) {
+    setTimeout(() => {
+
+        console.log('createTextLayer:', page)
+
+        const $textLayer = $(`.page[data-page-number="${page}"] .textLayer`, window.iframeWindow.document)
+
+        // Remove all children.
+        $textLayer.html('')
+
+        // Create text div elements.
+        const snipets = pages[page - 1].meta.map((info, index) => {
+            // console.log(index, info)
+            if (!info) {
+                return
+            }
+            const items = info.split('\t')
+            const text = items[2]
+            const [ x, y, w, h ] = items.slice(3, 7).map(parseFloat)
+            const scale = window.iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale
+            const $div = $('<div class="pdfanno-text-layer"/>').css({
+                top      : y * scale + 'px',
+                left     : x * scale + 'px',
+                width    : w * scale + 'px',
+                height   : h * scale + 'px',
+                fontSize : `${h * 0.85}px`
+            }).text(text)
+            return $div[0].outerHTML
+        })
+        $textLayer.append(snipets.join(''))
+
+    }, window.iframeWindow.TEXT_LAYER_RENDER_DELAY + 300)
+}
+
+
 /***/ }),
-/* 34 */
+/* 44 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_axios__ = __webpack_require__(45);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_axios___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_axios__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_anno_ui__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_anno_ui___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_anno_ui__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__loadFiles__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_util__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__shared_coords__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__util_window__ = __webpack_require__(22);
+
+
+
+
+
+
+
+/**
+ * PDFAnno's Annotation functions for Page produced by .
+ */
+class PDFAnnoPage {
+
+    constructor () {
+        this.autoBind()
+        this.setup()
+    }
+
+    autoBind () {
+        Object.getOwnPropertyNames(this.constructor.prototype)
+            .filter(prop => typeof this[prop] === 'function')
+            .forEach(method => {
+                this[method] = this[method].bind(this)
+            })
+    }
+
+    setup () {
+        this.listenWindowEvents()
+    }
+
+    listenWindowEvents () {
+
+        // Disable shortcut temporary.
+
+        // window.addEventListener('digit1Pressed' , () => {
+        //     this.createSpan()
+        // })
+        // window.addEventListener('digit2Pressed' , () => {
+        //     this.createRelation('one-way')
+        // })
+        // window.addEventListener('digit3Pressed' , () => {
+        //     this.createRelation('two-way')
+        // })
+        // window.addEventListener('digit4Pressed' , () => {
+        //     this.createRelation('link')
+        // })
+    }
+
+    /**
+     * Start PDFAnno Application.
+     */
+    startViewerApplication () {
+
+        // Alias for convenience.
+        window.iframeWindow = $('#viewer iframe').get(0).contentWindow
+
+        window.iframeWindow.addEventListener('DOMContentLoaded', () => {
+
+            // Adjust the height of viewer.
+            __WEBPACK_IMPORTED_MODULE_5__util_window__["a" /* adjustViewerSize */]()
+
+            // Reset the confirm dialog at leaving page.
+            __WEBPACK_IMPORTED_MODULE_5__util_window__["c" /* unlistenWindowLeaveEvent */]()
+
+            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('iframeReady')
+        })
+
+        window.iframeWindow.addEventListener('pagerendered', ev => {
+            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('pagerendered', ev.detail)
+        })
+
+        window.iframeWindow.addEventListener('annotationrendered', () => {
+
+            // Restore the status of AnnoTools.
+            this.disableAnnotateFunctions()
+            this.enableAnnotateFunction(window.currentAnnoToolType)
+
+            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered')
+        })
+
+        // Set the confirm dialog when leaving a page.
+        window.iframeWindow.addEventListener('annotationUpdated', () => {
+            __WEBPACK_IMPORTED_MODULE_5__util_window__["b" /* listenWindowLeaveEvent */]()
+            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('annotationUpdated')
+        })
+
+        // enable text input.
+        window.iframeWindow.addEventListener('enableTextInput', e => {
+            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('enableTextInput', e.detail)
+        })
+
+        // disable text input.
+        window.iframeWindow.addEventListener('disappearTextInput', e => {
+            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('disappearTextInput', e.detail)
+        })
+
+        window.iframeWindow.addEventListener('annotationDeleted', e => {
+            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('annotationDeleted', e.detail)
+        })
+
+        window.iframeWindow.addEventListener('annotationHoverIn', e => {
+            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('annotationHoverIn', e.detail)
+        })
+
+        window.iframeWindow.addEventListener('annotationHoverOut', e => {
+            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('annotationHoverOut', e.detail)
+        })
+
+        window.iframeWindow.addEventListener('annotationSelected', e => {
+            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('annotationSelected', e.detail)
+        })
+
+        window.iframeWindow.addEventListener('annotationDeselected', () => {
+            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('annotationDeselected')
+        })
+
+        window.iframeWindow.addEventListener('digit1Pressed', () => {
+            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('digit1Pressed')
+        })
+
+        window.iframeWindow.addEventListener('digit2Pressed', () => {
+            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('digit2Pressed')
+        })
+
+        window.iframeWindow.addEventListener('digit3Pressed', () => {
+            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('digit3Pressed')
+        })
+
+        window.iframeWindow.addEventListener('digit4Pressed', () => {
+            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('digit4Pressed')
+        })
+    }
+
+    /**
+     * Load files(contents and annoFiles).
+     *
+     * @param {Array<File>} files - files user selected in a file dialog.
+     * @return {Promise}
+     */
+    loadFiles (files) {
+        return __WEBPACK_IMPORTED_MODULE_2__loadFiles__["a" /* default */](files).then(result => {
+            this.contentFiles = result.contents.map(c => {
+                return Object.assign(c, {
+                    selected : false
+                })
+            })
+            this.annoFiles = result.annos.map(a => {
+                return Object.assign(a, {
+                    primary   : false,
+                    reference : false
+                })
+            })
+        })
+    }
+
+    getContentFile (name) {
+        const items = this.contentFiles.filter(c => c.name === name)
+        if (items.length > 0) {
+            return items[0]
+        }
+        return null
+    }
+
+    getAnnoFile (name) {
+        const items = this.annoFiles.filter(c => c.name === name)
+        if (items.length > 0) {
+            return items[0]
+        }
+        return null
+    }
+
+    displayContent (contentName) {
+
+        let contentFile = this.contentFiles.filter(c => c.name === contentName)
+        if (contentFile.length === 0) {
+            console.log('displayContent: NOT FOUND FILE. file=', contentName)
+            return
+        }
+
+        this.displayViewer(contentFile[0])
+    }
+
+    displayViewer (contentFile) {
+
+        // Reset settings.
+        this.resetPDFViewerSettings()
+
+        // Load PDF.
+        const uint8Array = new Uint8Array(contentFile.content)
+        window.iframeWindow.PDFViewerApplication.open(uint8Array)
+
+        // Set the PDF file name.
+        window.iframeWindow.PDFView.url = contentFile.name
+
+        // Save the current.
+        this.currentContentFile = contentFile
+    }
+
+    setCurrentContentFile (contentFile) {
+        this.currentContentFile = contentFile
+    }
+
+    getCurrentContentFile () {
+        return this.currentContentFile
+    }
+
+    /**
+     * Start the viewer.
+     */
+    initializeViewer (initialPDFPath = '../pdfs/P12-1046.pdf') {
+
+        window.pdf = null
+        window.pdfName = null
+
+        // Reset setting.
+        this.resetPDFViewerSettings()
+
+        let url = './pages/viewer.html'
+        if (initialPDFPath) {
+            url += '?file=' + initialPDFPath
+        }
+
+        // Reload pdf.js.
+        $('#viewer iframe').remove()
+        $('#viewer').html('<iframe src="' + url + '" class="anno-viewer" frameborder="0"></iframe>')
+    }
+
+    /**
+     * Close the viewer.
+     */
+    closePDFViewer () {
+        if (window.iframeWindow && window.iframeWindow.PDFViewerApplication) {
+            window.iframeWindow.PDFViewerApplication.close()
+            $('#numPages', window.iframeWindow.document).text('')
+            this.currentContentFile = null
+        }
+    }
+
+    /**
+     * Reset the setting of PDFViewer.
+     */
+    resetPDFViewerSettings () {
+        localStorage.removeItem('database')
+    }
+
+    /**
+     * Create a Span annotation.
+     */
+    createSpan ({ text = null } = {}) {
+        // TODO Refactoring: a little too long.
+
+        // Get user selection.
+        const rects = window.iframeWindow.PDFAnnoCore.default.UI.getRectangles()
+
+        // Use a search result.
+        let highlight
+        if (window.searchPosition > -1) {
+            highlight = window.searchHighlights[window.searchPosition]
+        }
+
+        // Check empty.
+        if (!rects && !highlight) {
+            return __WEBPACK_IMPORTED_MODULE_1_anno_ui__["ui"].alertDialog.show({ message : 'Text span is not selected.' })
+        }
+
+        // Create a new rectAnnotation.
+        if (rects) {
+            window.iframeWindow.PDFAnnoCore.default.UI.createSpan({ text, zIndex : __WEBPACK_IMPORTED_MODULE_4__shared_coords__["c" /* nextZIndex */]() })
+
+        } else if (highlight) {
+
+            const s = new window.SpanAnnotation({
+                page     : highlight.page,
+                position : highlight.position,
+                label    : text,
+                text     : highlight.text,
+                zIndex   : __WEBPACK_IMPORTED_MODULE_4__shared_coords__["c" /* nextZIndex */]()
+            })
+            window.add(s)
+
+            // TODO Refactoring.
+            var event = document.createEvent('CustomEvent')
+            event.initCustomEvent('enableTextInput', true, true, {
+                uuid      : s.annotation.uuid,
+                text      : text,
+                autoFocus : true
+            })
+            window.dispatchEvent(event)
+        }
+
+        // Notify annotation added.
+        __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered')
+    }
+
+    /**
+     * Create a Relation annotation.
+     */
+    createRelation ({ type, text = null } = {}) {
+
+        // for old style.
+        if (arguments.length === 1 && typeof arguments[0] === 'string') {
+            type = arguments[0]
+        }
+
+        let selectedAnnotations = window.iframeWindow.annotationContainer.getSelectedAnnotations()
+        selectedAnnotations = selectedAnnotations.filter(a => {
+            return a.type === 'area' || a.type === 'span'
+        }).sort((a1, a2) => {
+            return (a1.selectedTime - a2.selectedTime) // asc
+        })
+
+        if (selectedAnnotations.length < 2) {
+            return __WEBPACK_IMPORTED_MODULE_1_anno_ui__["ui"].alertDialog.show({ message : 'Two annotated text spans are not selected.\nTo select multiple annotated spans, click the first annotated span, then Ctrl+Click (Windows) or Cmd+Click (OSX) the second span.' })
+        }
+
+        const first  = selectedAnnotations[selectedAnnotations.length - 2]
+        const second = selectedAnnotations[selectedAnnotations.length - 1]
+        console.log('first:second,', first, second)
+
+        // Check duplicated.
+        const arrows = window.iframeWindow.annotationContainer
+                        .getAllAnnotations()
+                        .filter(a => a.type === 'relation')
+                        .filter(a => {
+                            return __WEBPACK_IMPORTED_MODULE_3__shared_util__["a" /* anyOf */](a.rel1Annotation.uuid, [first.uuid, second.uuid])
+                                    && __WEBPACK_IMPORTED_MODULE_3__shared_util__["a" /* anyOf */](a.rel2Annotation.uuid, [first.uuid, second.uuid])
+                        })
+
+        if (arrows.length > 0) {
+            console.log('same found!!!')
+            // Update!!
+            arrows[0].direction = type
+            arrows[0].rel1Annotation = first
+            arrows[0].rel2Annotation = second
+            arrows[0].text = text
+            arrows[0].save()
+            arrows[0].render()
+            arrows[0].enableViewMode()
+            // Show label input.
+            var event = document.createEvent('CustomEvent')
+            event.initCustomEvent('enableTextInput', true, true, {
+                uuid : arrows[0].uuid,
+                text : arrows[0].text
+            })
+            window.dispatchEvent(event)
+            return
+        }
+
+        window.iframeWindow.PDFAnnoCore.default.UI.createRelation({
+            type,
+            anno1 : first,
+            anno2 : second,
+            text
+        })
+
+        // Notify annotation added.
+        __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered')
+    }
+
+    /**
+        Disable annotation tool buttons.
+    */
+    disableRect () {
+        window.iframeWindow.PDFAnnoCore.default.UI.disableRect()
+    }
+
+    /**
+     * Enable an annotation tool.
+     */
+    enableRect () {
+        window.iframeWindow.PDFAnnoCore.default.UI.enableRect()
+    }
+
+    /**
+     * Display annotations an user selected.
+     */
+    displayAnnotation (isPrimary) {
+
+        // Check the viewer not clised.
+        if ($('#numPages', window.iframeWindow.document).text() === '') {
+            return
+        }
+
+        let annotations = []
+        let colors = []
+        let primaryIndex = -1
+
+        // Primary annotation.
+        if (isPrimary) {
+            $('#dropdownAnnoPrimary a').each((index, element) => {
+                let $elm = $(element)
+                if ($elm.find('.fa-check').hasClass('no-visible') === false) {
+                    let annoPath = $elm.find('.js-annoname').text()
+
+                    const annoFile = window.annoPage.getAnnoFile(annoPath)
+                    if (!annoFile) {
+                        console.log('ERROR')
+                        return
+                    }
+                    primaryIndex = 0
+                    annotations.push(annoFile.content)
+                    let color = null // Use the default color used for edit.
+                    colors.push(color)
+
+                    let filename = annoFile.name
+                    localStorage.setItem('_pdfanno_primary_annoname', filename)
+                    console.log('filename:', filename)
+                }
+            })
+        }
+
+        // Reference annotations.
+        if (!isPrimary) {
+            $('#dropdownAnnoReference a').each((index, element) => {
+                let $elm = $(element)
+                if ($elm.find('.fa-check').hasClass('no-visible') === false) {
+                    let annoPath = $elm.find('.js-annoname').text()
+
+                    const annoFile = window.annoPage.getAnnoFile(annoPath)
+
+                    if (!annoFile) {
+                        console.log('ERROR')
+                        return
+                    }
+                    annotations.push(annoFile.content)
+                    let color = $elm.find('.js-anno-palette').spectrum('get').toHexString()
+                    console.log(color)
+                    colors.push(color)
+                }
+            })
+        }
+
+        console.log('colors:', colors)
+
+        // Create import data.
+        let paperData = {
+            primary : primaryIndex,
+            colors,
+            annotations
+        }
+
+        // Import annotations to Viewer.
+        window.annoPage.importAnnotation(paperData, isPrimary)
+    }
+
+    /**
+     *  Disable annotation tool buttons.
+     */
+    disableAnnotateFunctions () {
+        window.iframeWindow.PDFAnnoCore.default.UI.disableRect()
+    }
+
+    /**
+     * Enable an annotation tool.
+     */
+    enableAnnotateFunction (type) {
+        if (type === 'rect') {
+            window.iframeWindow.PDFAnnoCore.default.UI.enableRect()
+        }
+    }
+
+    /**
+     * Get all annotations.
+     */
+    getAllAnnotations () {
+        return window.iframeWindow.annotationContainer.getAllAnnotations()
+    }
+
+    /**
+     * Get selected annotations.
+     */
+    getSelectedAnnotations () {
+        return window.iframeWindow.annotationContainer.getSelectedAnnotations()
+    }
+
+    /**
+     * Find an annotation by id.
+     */
+    findAnnotationById (id) {
+        return window.iframeWindow.annotationContainer.findById(id)
+    }
+
+    /**
+     * Clear the all annotations from the view and storage.
+     */
+    clearAllAnnotations () {
+        if (window.iframeWindow) {
+            window.iframeWindow.annotationContainer.getAllAnnotations().forEach(a => a.destroy())
+        }
+    }
+
+    /**
+     * Add an annotation to the container.
+     */
+    addAnnotation  (annotation) {
+        window.iframeWindow.annotationContainer.add(annotation)
+    }
+
+    /**
+     * Create a new rect annotation.
+     */
+    createRectAnnotation (options) {
+        return window.iframeWindow.PDFAnnoCore.default.RectAnnotation.newInstance(options)
+    }
+
+    /**
+     * Create a new span annotation.
+     */
+    createSpanAnnotation (options) {
+        return window.iframeWindow.PDFAnnoCore.default.SpanAnnotation.newInstance(options)
+    }
+
+    /**
+     * Create a new relation annotation.
+     */
+    createRelationAnnotation (options) {
+        return window.iframeWindow.PDFAnnoCore.default.RelationAnnotation.newInstance(options)
+    }
+
+    /**
+     * Import annotations from UI.
+     */
+    importAnnotation (paperData, isPrimary) {
+        window.iframeWindow.annotationContainer.importAnnotations(paperData, isPrimary).then(result => {
+            // Notify annotations added.
+            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered')
+        })
+    }
+
+    /**
+     * Scroll window to the annotation.
+     */
+    scrollToAnnotation (id) {
+
+        let annotation = window.annoPage.findAnnotationById(id)
+
+        if (annotation) {
+
+            // scroll to.
+            let _y = annotation.y || annotation.y1 || annotation.rectangles[0].y
+            let { pageNumber, y } = __WEBPACK_IMPORTED_MODULE_4__shared_coords__["b" /* convertToExportY */](_y)
+            let pageHeight = window.annoPage.getViewerViewport().height
+            let scale = window.annoPage.getViewerViewport().scale
+            _y = (pageHeight + __WEBPACK_IMPORTED_MODULE_4__shared_coords__["d" /* paddingBetweenPages */]) * (pageNumber - 1) + y * scale
+            _y -= 100
+            $('#viewer iframe').contents().find('#viewer').parent()[0].scrollTop = _y
+
+            // highlight.
+            annotation.highlight()
+            setTimeout(() => {
+                annotation.dehighlight()
+            }, 1000)
+        }
+    }
+
+    /**
+     * Get the export data of annotations.
+     *
+     * @return {Promise}
+     */
+    exportData () {
+        return window.iframeWindow.annotationContainer.exportData()
+    }
+
+    /**
+     * Get the viewport of the viewer.
+     */
+    getViewerViewport () {
+        return window.iframeWindow.PDFView.pdfViewer.getPageView(0).viewport
+    }
+
+    /**
+     * Get the content's name displayed now.
+     */
+    getCurrentContentName () {
+        return window.iframeWindow.getFileName(window.iframeWindow.PDFView.url)
+    }
+
+    /**
+     * Manage the ctrl button is enable/disable.
+     */
+    manageCtrlKey (type) {
+
+        if (type === 'on') {
+            window.iframeWindow.ctrlPressed = true
+
+        } else if (type === 'off') {
+            window.iframeWindow.ctrlPressed = false
+        }
+    }
+
+    /**
+     * Load a PDF data from the server.
+     */
+    loadPDFFromServer (url) {
+        return new Promise((resolve, reject) => {
+            // Load a PDF as ArrayBuffer.
+            var xhr = new XMLHttpRequest()
+            xhr.open('GET', window.API_ROOT + '/load_pdf?url=' + window.encodeURIComponent(url), true)
+            xhr.responseType = 'json'
+            xhr.onload = function () {
+                if (this.status === 200) {
+                    // Error handling.
+                    if (this.response.status === 'failure') {
+                        let error = this.response.err.stderr || this.response.err
+                        return reject(error)
+                    }
+                    // Get a PDF as arrayBuffer.
+                    const pdf = Uint8Array.from(atob(this.response.pdf), c => c.charCodeAt(0))
+                    const analyzeResult = this.response.analyzeResult
+                    resolve({ pdf, analyzeResult })
+                }
+            }
+            xhr.timeout = 120 * 1000 // 120s
+            xhr.ontimeout = function () {
+                reject('Failed to load the PDF.')
+            }
+            xhr.onerror = function (err) {
+                reject(err)
+            }
+            xhr.send()
+        })
+    }
+
+    /**
+     * Load an annotation file from the server.
+     */
+    loadAnnoFileFromServer (url) {
+        return __WEBPACK_IMPORTED_MODULE_0_axios___default.a.get(`${window.API_ROOT}/api/load_anno?url=${url}`).then(res => {
+            if (res.status !== 200 || res.data.status === 'failure') {
+                let reason = ''
+                if (res.data.error) {
+                    reason = '<br>Reason: ' + res.data.error
+                }
+                __WEBPACK_IMPORTED_MODULE_1_anno_ui__["ui"].alertDialog.show({ message : 'Failed to load an anno file. url=' + url + reason })
+                return Promise.reject()
+            }
+            return res.data.anno
+        })
+    }
+
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = PDFAnnoPage;
+
+
+
+/***/ }),
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(3)();
-// imports
-
-
-// module
-exports.push([module.i, "@charset \"utf-8\";\n\n/* Loading */\n.loader-container {\n    position: absolute;\n    top: 100px;\n    left: 50%;\n    width: 200px;\n    height: 200px;\n    margin-left: -150px;\n    /*margin-top: -150px;*/\n    background-color: #333;\n    padding: 16px;\n    box-shadow: 0 0 10px rgba(0,0,0,.5);\n    transition: opacity .3s ease-in-out;\n}\n.loader-container.close {\n    opacity: 0;\n}\n.loader {\n    border: 16px solid #f3f3f3; /* Light grey */\n    border-top: 16px solid #3498db; /* Blue */\n    border-radius: 50%;\n    width: 120px;\n    height: 120px;\n    animation: spin 1.5s ease-in-out infinite;\n    margin-left: auto;\n    margin-right: auto;\n}\n@keyframes spin {\n    0% { transform: rotate(0deg); }\n    100% { transform: rotate(360deg); }\n}\n.loader-container p {\n    margin-top: 16px;\n    font-size: 16px;\n    text-align: center;\n    color: white;\n}\n\n/*\n    Search UI.\n*/\n.search-control {\n    display: flex;\n}\n.search-input-container {\n    flex-grow: 1;\n    position: relative;\n}\n.search-control__input {\n    width: 100%;\n}\n.search-control__btn {\n    flex-grow: 0;\n    flex-shrink: 0;\n    flex-basis: 32px;\n}\n.search-hit {\n    position: absolute;\n    top: 50%;\n    right: 5px;\n    opacity: .5;\n    font-size: 12px;\n    line-height: 12px;\n    margin-top: -6px;\n}\n", ""]);
-
-// exports
-
+module.exports = __webpack_require__(46);
 
 /***/ }),
-/* 35 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(36);
-
-/***/ }),
-/* 36 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var utils = __webpack_require__(0);
-var bind = __webpack_require__(19);
-var Axios = __webpack_require__(37);
-var defaults = __webpack_require__(9);
+var bind = __webpack_require__(24);
+var Axios = __webpack_require__(47);
+var defaults = __webpack_require__(10);
 
 /**
  * Create an instance of Axios
@@ -12547,15 +16842,15 @@ axios.create = function create(instanceConfig) {
 };
 
 // Expose Cancel & CancelToken
-axios.Cancel = __webpack_require__(23);
-axios.CancelToken = __webpack_require__(52);
-axios.isCancel = __webpack_require__(22);
+axios.Cancel = __webpack_require__(28);
+axios.CancelToken = __webpack_require__(62);
+axios.isCancel = __webpack_require__(27);
 
 // Expose all/spread
 axios.all = function all(promises) {
   return Promise.all(promises);
 };
-axios.spread = __webpack_require__(53);
+axios.spread = __webpack_require__(63);
 
 module.exports = axios;
 
@@ -12564,18 +16859,18 @@ module.exports.default = axios;
 
 
 /***/ }),
-/* 37 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var defaults = __webpack_require__(9);
+var defaults = __webpack_require__(10);
 var utils = __webpack_require__(0);
-var InterceptorManager = __webpack_require__(47);
-var dispatchRequest = __webpack_require__(48);
-var isAbsoluteURL = __webpack_require__(50);
-var combineURLs = __webpack_require__(51);
+var InterceptorManager = __webpack_require__(57);
+var dispatchRequest = __webpack_require__(58);
+var isAbsoluteURL = __webpack_require__(60);
+var combineURLs = __webpack_require__(61);
 
 /**
  * Create a new instance of Axios
@@ -12656,7 +16951,7 @@ module.exports = Axios;
 
 
 /***/ }),
-/* 38 */
+/* 48 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -12846,7 +17141,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 39 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12865,13 +17160,13 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
 
 
 /***/ }),
-/* 40 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var createError = __webpack_require__(21);
+var createError = __webpack_require__(26);
 
 /**
  * Resolve or reject a Promise based on response status.
@@ -12897,7 +17192,7 @@ module.exports = function settle(resolve, reject, response) {
 
 
 /***/ }),
-/* 41 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12923,7 +17218,7 @@ module.exports = function enhanceError(error, config, code, response) {
 
 
 /***/ }),
-/* 42 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12998,7 +17293,7 @@ module.exports = function buildURL(url, params, paramsSerializer) {
 
 
 /***/ }),
-/* 43 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13042,7 +17337,7 @@ module.exports = function parseHeaders(headers) {
 
 
 /***/ }),
-/* 44 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13117,7 +17412,7 @@ module.exports = (
 
 
 /***/ }),
-/* 45 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13160,7 +17455,7 @@ module.exports = btoa;
 
 
 /***/ }),
-/* 46 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13220,7 +17515,7 @@ module.exports = (
 
 
 /***/ }),
-/* 47 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13279,16 +17574,16 @@ module.exports = InterceptorManager;
 
 
 /***/ }),
-/* 48 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var utils = __webpack_require__(0);
-var transformData = __webpack_require__(49);
-var isCancel = __webpack_require__(22);
-var defaults = __webpack_require__(9);
+var transformData = __webpack_require__(59);
+var isCancel = __webpack_require__(27);
+var defaults = __webpack_require__(10);
 
 /**
  * Throws a `Cancel` if cancellation has been requested.
@@ -13365,7 +17660,7 @@ module.exports = function dispatchRequest(config) {
 
 
 /***/ }),
-/* 49 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13392,7 +17687,7 @@ module.exports = function transformData(data, headers, fns) {
 
 
 /***/ }),
-/* 50 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13413,7 +17708,7 @@ module.exports = function isAbsoluteURL(url) {
 
 
 /***/ }),
-/* 51 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13432,13 +17727,13 @@ module.exports = function combineURLs(baseURL, relativeURL) {
 
 
 /***/ }),
-/* 52 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var Cancel = __webpack_require__(23);
+var Cancel = __webpack_require__(28);
 
 /**
  * A `CancelToken` is an object that can be used to request cancellation of an operation.
@@ -13496,7 +17791,7 @@ module.exports = CancelToken;
 
 
 /***/ }),
-/* 53 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13530,825 +17825,7 @@ module.exports = function spread(callback) {
 
 
 /***/ }),
-/* 54 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["d"] = addAllAnnotations;
-/* harmony export (immutable) */ __webpack_exports__["e"] = addAnnotation;
-/* harmony export (immutable) */ __webpack_exports__["g"] = deleteAnnotation;
-/* harmony export (immutable) */ __webpack_exports__["f"] = clear;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shared_coords__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_toml__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_toml___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_toml__);
-
-
-
-/**
- * Add all annotations.
- *
- * This method expect to get argument made from a TOML file parsed by `window.readTOML`.
- */
-function addAllAnnotations (tomlObject) {
-
-    let result = {}
-
-    for (const key in tomlObject) {
-
-        let data = tomlObject[key]
-
-        if (typeof data !== 'object') {
-            continue
-        }
-
-        data.id = key
-
-        let a
-        if (data.type === 'span') {
-            a = new PublicSpanAnnotation(data)
-        } else if (data.type === 'rect') {
-            a = new PublicRectAnnotation(data)
-        } else if (data.type === 'relation') {
-            a = new PublicRelationAnnotation(data)
-        } else {
-            console.log('Unknown: ', key, data)
-        }
-
-        if (a) {
-            addAnnotation(a)
-            result[key] = a
-        }
-    }
-
-    return result
-
-}
-
-/**
- * Add an annotation, and render it.
- */
-function addAnnotation (publicAnnotation) {
-
-    let a = publicAnnotation.annotation
-    window.annoPage.addAnnotation(a)
-    a.render()
-    a.enableViewMode()
-    a.save()
-
-    // Restore the status of AnnoTools.
-    window.annoPage.disableAnnotateFunctions()
-    window.annoPage.enableAnnotateFunction(window.currentAnnoToolType)
-}
-
-/**
- * Delete an annotation, and also detach it from view.
- */
-function deleteAnnotation (publicAnnotation) {
-
-    publicAnnotation.annotation.destroy()
-}
-
-/**
- * Rect Annotation Class wrapping the core.
- */
-class PublicRectAnnotation {
-
-    /**
-     * Create a rect annotation from a TOML data.
-     */
-    constructor ({ page, position, label = '', id = 0 }) {
-
-        // Check inputs.
-        if (!page || typeof page !== 'number') {
-            throw new Error('Set the page as number.')
-        }
-        if (!position || position.length !== 4) {
-            throw new Error('Set the position which includes `x`, `y`, `width` and `height`.')
-        }
-
-        // position: String -> Float.
-        position = position.map(p => parseFloat(p))
-
-        let rect = window.annoPage.createRectAnnotation({
-            uuid     : id && String(id), // annotationid must be string.
-            x        : position[0],
-            y        : __WEBPACK_IMPORTED_MODULE_0__shared_coords__["a" /* convertFromExportY */](page, position[1]),
-            width    : position[2],
-            height   : position[3],
-            text     : label,
-            color    : '#FF0000',
-            readOnly : false
-        })
-
-        this.annotation = rect
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = PublicRectAnnotation;
-
-
-/**
- * Rect Annotation Class wrapping the core.
- */
-class PublicSpanAnnotation {
-
-    constructor ({ page, position, label = '', text = '', id = 0, zIndex = 10 }) {
-
-        console.log('PublicSpanAnnotation:', zIndex)
-
-        // Check inputs.
-        if (!page || typeof page !== 'number') {
-            throw new Error('Set the page as number.')
-        }
-        if (!position) {
-            throw new Error('Set the position.')
-        }
-
-        // position: String -> Float.
-        position = position.map(p => p.map(pp => parseFloat(pp)))
-
-        // Convert.
-        position = position.map(p => {
-            return {
-                page   : page,
-                x      : p[0],
-                y      : __WEBPACK_IMPORTED_MODULE_0__shared_coords__["a" /* convertFromExportY */](page, p[1]),
-                width  : p[2],
-                height : p[3]
-            }
-        })
-
-        let span = window.annoPage.createSpanAnnotation({
-            // TODO 既存のものとかぶるのではないか？
-            uuid         : id && String(id), // annotationid must be string.
-            rectangles   : position,
-            text         : label,
-            color        : '#FFFF00',
-            readOnly     : false,
-            selectedText : text,
-            zIndex
-        })
-
-        this.annotation = span
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["c"] = PublicSpanAnnotation;
-
-
-/**
- * Rect Annotation Class wrapping the core.
- */
-class PublicRelationAnnotation {
-
-    constructor ({ dir, ids, label = '', id = 0 }) {
-
-        // Check inputs.
-        if (!dir) {
-            throw new Error('Set the dir.')
-        }
-        if (!ids || ids.length !== 2) {
-            throw new Error('Set the ids.')
-        }
-
-        let r = window.annoPage.createRelationAnnotation({
-            // TODO 既存のものとかぶるのではないか？
-            uuid      : id && String(id), // annotationid must be string.
-            direction : dir,
-            rel1      : typeof ids[0] === 'object' ? ids[0].annotation : ids[0],
-            rel2      : typeof ids[1] === 'object' ? ids[1].annotation : ids[1],
-            text      : label,
-            color     : '#FF0000',
-            readOnly  : false
-        })
-
-        this.annotation = r
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["b"] = PublicRelationAnnotation;
-
-
-/**
- * TOML parser.
- */
-const readTOML = __WEBPACK_IMPORTED_MODULE_1_toml___default.a.parse
-/* harmony export (immutable) */ __webpack_exports__["h"] = readTOML;
-
-
-/**
- * Delete all annotations.
- */
-function clear () {
-    window.annoPage.clearAllAnnotations()
-}
-
-
-/***/ }),
-/* 55 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_anno_ui__ = __webpack_require__(24);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_anno_ui___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_anno_ui__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__loadFiles__ = __webpack_require__(56);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__shared_util__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_coords__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__util_window__ = __webpack_require__(25);
-
-
-
-
-
-
-
-
-/**
- * PDFAnno's Annotation functions for Page produced by .
- */
-class PDFAnnoPage {
-
-    constructor () {
-        this.autoBind()
-        this.setup()
-    }
-
-    autoBind () {
-        Object.getOwnPropertyNames(this.constructor.prototype)
-            .filter(prop => typeof this[prop] === 'function')
-            .forEach(method => {
-                this[method] = this[method].bind(this)
-            })
-    }
-
-    setup () {
-        this.listenWindowEvents()
-    }
-
-    listenWindowEvents () {
-
-        // Disable shortcut temporary.
-
-        // window.addEventListener('digit1Pressed' , () => {
-        //     this.createSpan()
-        // })
-        // window.addEventListener('digit2Pressed' , () => {
-        //     this.createRelation('one-way')
-        // })
-        // window.addEventListener('digit3Pressed' , () => {
-        //     this.createRelation('two-way')
-        // })
-        // window.addEventListener('digit4Pressed' , () => {
-        //     this.createRelation('link')
-        // })
-    }
-
-    /**
-     * Start PDFAnno Application.
-     */
-    startViewerApplication () {
-
-        // Alias for convenience.
-        window.iframeWindow = $('#viewer iframe').get(0).contentWindow
-
-        window.iframeWindow.addEventListener('DOMContentLoaded', () => {
-
-            // Adjust the height of viewer.
-            __WEBPACK_IMPORTED_MODULE_4__util_window__["a" /* adjustViewerSize */]()
-
-            // Reset the confirm dialog at leaving page.
-            __WEBPACK_IMPORTED_MODULE_4__util_window__["c" /* unlistenWindowLeaveEvent */]()
-
-            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('iframeReady')
-        })
-
-        window.iframeWindow.addEventListener('pagerendered', () => {
-            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('pagerendered')
-        })
-
-        window.iframeWindow.addEventListener('annotationrendered', () => {
-
-            // Restore the status of AnnoTools.
-            this.disableAnnotateFunctions()
-            this.enableAnnotateFunction(window.currentAnnoToolType)
-
-            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered')
-        })
-
-        // Set the confirm dialog when leaving a page.
-        window.iframeWindow.addEventListener('annotationUpdated', () => {
-            __WEBPACK_IMPORTED_MODULE_4__util_window__["b" /* listenWindowLeaveEvent */]()
-            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('annotationUpdated')
-        })
-
-        // enable text input.
-        window.iframeWindow.addEventListener('enableTextInput', e => {
-            console.log('aaaaaaaaaaaaaaaaaaa')
-            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('enableTextInput', e.detail)
-        })
-
-        // disable text input.
-        window.iframeWindow.addEventListener('disappearTextInput', e => {
-            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('disappearTextInput', e.detail)
-        })
-
-        window.iframeWindow.addEventListener('annotationDeleted', e => {
-            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('annotationDeleted', e.detail)
-        })
-
-        window.iframeWindow.addEventListener('annotationHoverIn', e => {
-            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('annotationHoverIn', e.detail)
-        })
-
-        window.iframeWindow.addEventListener('annotationHoverOut', e => {
-            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('annotationHoverOut', e.detail)
-        })
-
-        window.iframeWindow.addEventListener('annotationSelected', e => {
-            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('annotationSelected', e.detail)
-        })
-
-        window.iframeWindow.addEventListener('annotationDeselected', () => {
-            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('annotationDeselected')
-        })
-
-        window.iframeWindow.addEventListener('digit1Pressed', () => {
-            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('digit1Pressed')
-        })
-
-        window.iframeWindow.addEventListener('digit2Pressed', () => {
-            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('digit2Pressed')
-        })
-
-        window.iframeWindow.addEventListener('digit3Pressed', () => {
-            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('digit3Pressed')
-        })
-
-        window.iframeWindow.addEventListener('digit4Pressed', () => {
-            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('digit4Pressed')
-        })
-    }
-
-    /**
-     * Load files(contents and annoFiles).
-     *
-     * @param {Array<File>} files - files user selected in a file dialog.
-     * @return {Promise}
-     */
-    loadFiles (files) {
-        return __WEBPACK_IMPORTED_MODULE_1__loadFiles__["a" /* default */](files).then(result => {
-            this.contentFiles = result.contents.map(c => {
-                return Object.assign(c, {
-                    selected : false
-                })
-            })
-            this.annoFiles = result.annos.map(a => {
-                return Object.assign(a, {
-                    primary   : false,
-                    reference : false
-                })
-            })
-        })
-    }
-
-    getContentFile (name) {
-        const items = this.contentFiles.filter(c => c.name === name)
-        if (items.length > 0) {
-            return items[0]
-        }
-        return null
-    }
-
-    getAnnoFile (name) {
-        const items = this.annoFiles.filter(c => c.name === name)
-        if (items.length > 0) {
-            return items[0]
-        }
-        return null
-    }
-
-    displayContent (contentName) {
-
-        let contentFile = this.contentFiles.filter(c => c.name === contentName)
-        if (contentFile.length === 0) {
-            console.log('displayContent: NOT FOUND FILE. file=', contentName)
-            return
-        }
-
-        this.displayViewer(contentFile[0])
-    }
-
-    displayViewer (contentFile) {
-
-        // Reset settings.
-        this.resetPDFViewerSettings()
-
-        // Load PDF.
-        const uint8Array = new Uint8Array(contentFile.content)
-        window.iframeWindow.PDFViewerApplication.open(uint8Array)
-
-        // Set the PDF file name.
-        window.iframeWindow.PDFView.url = contentFile.name
-
-        // Save the current.
-        this.currentContentFile = contentFile
-    }
-
-    setCurrentContentFile (contentFile) {
-        this.currentContentFile = contentFile
-    }
-
-    getCurrentContentFile () {
-        return this.currentContentFile
-    }
-
-    initializeViewer (initialPDFPath = '../pdfs/P12-1046.pdf') {
-
-        window.pdf = null
-        window.pdfName = null
-
-        // Reset setting.
-        this.resetPDFViewerSettings()
-
-        let url = './pages/viewer.html'
-        if (initialPDFPath) {
-            url += '?file=' + initialPDFPath
-        }
-
-        // Reload pdf.js.
-        $('#viewer iframe').remove()
-        $('#viewer').html('<iframe src="' + url + '" class="anno-viewer" frameborder="0"></iframe>')
-
-    }
-
-    closePDFViewer () {
-        console.log('closePDFViewer')
-        if (window.iframeWindow && window.iframeWindow.PDFViewerApplication) {
-            window.iframeWindow.PDFViewerApplication.close()
-            $('#numPages', window.iframeWindow.document).text('')
-            this.currentContentFile = null
-        }
-    }
-
-    /**
-     * Reset the setting of PDFViewer.
-     */
-    resetPDFViewerSettings () {
-        localStorage.removeItem('database')
-    }
-
-    /**
-     * Create a Span annotation.
-     */
-    createSpan ({ text = null } = {}) {
-        // TODO Refactoring: a little too long.
-
-        // Get user selection.
-        const rects = window.iframeWindow.PDFAnnoCore.default.UI.getRectangles()
-
-        // Use a search result.
-        let highlight
-        if (window.searchPosition > -1) {
-            highlight = window.searchHighlights[window.searchPosition]
-        }
-
-        // Check empty.
-        if (!rects && !highlight) {
-            return __WEBPACK_IMPORTED_MODULE_0_anno_ui__["ui"].alertDialog.show({ message : 'Text span is not selected.' })
-        }
-
-        // Create a new rectAnnotation.
-        if (rects) {
-            window.iframeWindow.PDFAnnoCore.default.UI.createSpan({ text, zIndex : __WEBPACK_IMPORTED_MODULE_3__shared_coords__["c" /* nextZIndex */]() })
-
-        } else if (highlight) {
-
-            const s = new window.SpanAnnotation({
-                page     : highlight.page,
-                position : highlight.position,
-                label    : text,
-                text     : highlight.text,
-                zIndex   : __WEBPACK_IMPORTED_MODULE_3__shared_coords__["c" /* nextZIndex */]()
-            })
-            window.add(s)
-
-            // TODO Refactoring.
-            var event = document.createEvent('CustomEvent')
-            event.initCustomEvent('enableTextInput', true, true, {
-                uuid      : s.annotation.uuid,
-                text      : text,
-                autoFocus : true
-            })
-            window.dispatchEvent(event)
-        }
-
-        // Notify annotation added.
-        __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered')
-    }
-
-    /**
-     * Create a Relation annotation.
-     */
-    createRelation ({ type, text = null } = {}) {
-
-        // for old style.
-        if (arguments.length === 1 && typeof arguments[0] === 'string') {
-            type = arguments[0]
-        }
-
-        let selectedAnnotations = window.iframeWindow.annotationContainer.getSelectedAnnotations()
-        selectedAnnotations = selectedAnnotations.filter(a => {
-            return a.type === 'area' || a.type === 'span'
-        }).sort((a1, a2) => {
-            return (a1.selectedTime - a2.selectedTime) // asc
-        })
-
-        if (selectedAnnotations.length < 2) {
-            return __WEBPACK_IMPORTED_MODULE_0_anno_ui__["ui"].alertDialog.show({ message : 'Two annotated text spans are not selected.\nTo select multiple annotated spans, click the first annotated span, then Ctrl+Click (Windows) or Cmd+Click (OSX) the second span.' })
-        }
-
-        const first  = selectedAnnotations[selectedAnnotations.length - 2]
-        const second = selectedAnnotations[selectedAnnotations.length - 1]
-        console.log('first:second,', first, second)
-
-        // Check duplicated.
-        const arrows = window.iframeWindow.annotationContainer
-                        .getAllAnnotations()
-                        .filter(a => a.type === 'relation')
-                        .filter(a => {
-                            return __WEBPACK_IMPORTED_MODULE_2__shared_util__["a" /* anyOf */](a.rel1Annotation.uuid, [first.uuid, second.uuid])
-                                    && __WEBPACK_IMPORTED_MODULE_2__shared_util__["a" /* anyOf */](a.rel2Annotation.uuid, [first.uuid, second.uuid])
-                        })
-
-        if (arrows.length > 0) {
-            console.log('same found!!!')
-            // Update!!
-            arrows[0].direction = type
-            arrows[0].rel1Annotation = first
-            arrows[0].rel2Annotation = second
-            arrows[0].text = text
-            arrows[0].save()
-            arrows[0].render()
-            arrows[0].enableViewMode()
-            // Show label input.
-            var event = document.createEvent('CustomEvent')
-            event.initCustomEvent('enableTextInput', true, true, {
-                uuid : arrows[0].uuid,
-                text : arrows[0].text
-            })
-            window.dispatchEvent(event)
-            return
-        }
-
-        window.iframeWindow.PDFAnnoCore.default.UI.createRelation({
-            type,
-            anno1 : first,
-            anno2 : second,
-            text
-        })
-
-        // Notify annotation added.
-        __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered')
-    }
-
-    /**
-        Disable annotation tool buttons.
-    */
-    disableRect () {
-        window.iframeWindow.PDFAnnoCore.default.UI.disableRect()
-    }
-
-    /**
-     * Enable an annotation tool.
-     */
-    enableRect () {
-        window.iframeWindow.PDFAnnoCore.default.UI.enableRect()
-    }
-
-    /**
-     * Display annotations an user selected.
-     */
-    displayAnnotation (isPrimary) {
-
-        // Check the viewer not clised.
-        if ($('#numPages', window.iframeWindow.document).text() === '') {
-            return
-        }
-
-        let annotations = []
-        let colors = []
-        let primaryIndex = -1
-
-        // Primary annotation.
-        if (isPrimary) {
-            $('#dropdownAnnoPrimary a').each((index, element) => {
-                let $elm = $(element)
-                if ($elm.find('.fa-check').hasClass('no-visible') === false) {
-                    let annoPath = $elm.find('.js-annoname').text()
-
-                    const annoFile = window.annoPage.getAnnoFile(annoPath)
-                    if (!annoFile) {
-                        console.log('ERROR')
-                        return
-                    }
-                    primaryIndex = 0
-                    annotations.push(annoFile.content)
-                    let color = null // Use the default color used for edit.
-                    colors.push(color)
-
-                    let filename = annoFile.name
-                    localStorage.setItem('_pdfanno_primary_annoname', filename)
-                    console.log('filename:', filename)
-                }
-            })
-        }
-
-        // Reference annotations.
-        if (!isPrimary) {
-            $('#dropdownAnnoReference a').each((index, element) => {
-                let $elm = $(element)
-                if ($elm.find('.fa-check').hasClass('no-visible') === false) {
-                    let annoPath = $elm.find('.js-annoname').text()
-
-                    const annoFile = window.annoPage.getAnnoFile(annoPath)
-
-                    if (!annoFile) {
-                        console.log('ERROR')
-                        return
-                    }
-                    annotations.push(annoFile.content)
-                    let color = $elm.find('.js-anno-palette').spectrum('get').toHexString()
-                    console.log(color)
-                    colors.push(color)
-                }
-            })
-        }
-
-        console.log('colors:', colors)
-
-        // Create import data.
-        let paperData = {
-            primary : primaryIndex,
-            colors,
-            annotations
-        }
-
-        // Import annotations to Viewer.
-        window.annoPage.importAnnotation(paperData, isPrimary)
-    }
-
-    /**
-     *  Disable annotation tool buttons.
-     */
-    disableAnnotateFunctions () {
-        window.iframeWindow.PDFAnnoCore.default.UI.disableRect()
-    }
-
-    /**
-     * Enable an annotation tool.
-     */
-    enableAnnotateFunction (type) {
-        if (type === 'rect') {
-            window.iframeWindow.PDFAnnoCore.default.UI.enableRect()
-        }
-    }
-
-    /**
-     * Get all annotations.
-     */
-    getAllAnnotations () {
-        return window.iframeWindow.annotationContainer.getAllAnnotations()
-    }
-
-    /**
-     * Get selected annotations.
-     */
-    getSelectedAnnotations () {
-        return window.iframeWindow.annotationContainer.getSelectedAnnotations()
-    }
-
-    /**
-     * Find an annotation by id.
-     */
-    findAnnotationById (id) {
-        return window.iframeWindow.annotationContainer.findById(id)
-    }
-
-    /**
-     * Clear the all annotations from the view and storage.
-     */
-    clearAllAnnotations () {
-        if (window.iframeWindow) {
-            window.iframeWindow.annotationContainer.getAllAnnotations().forEach(a => a.destroy())
-        }
-        localStorage.removeItem('_pdfanno_containers')
-        localStorage.removeItem('_pdfanno_primary_annoname')
-    }
-
-    /**
-     * Add an annotation to the container.
-     */
-    addAnnotation  (annotation) {
-        window.iframeWindow.annotationContainer.add(annotation)
-    }
-
-    /**
-     * Create a new rect annotation.
-     */
-    createRectAnnotation (options) {
-        return window.iframeWindow.PDFAnnoCore.default.RectAnnotation.newInstance(options)
-    }
-
-    /**
-     * Create a new span annotation.
-     */
-    createSpanAnnotation (options) {
-        return window.iframeWindow.PDFAnnoCore.default.SpanAnnotation.newInstance(options)
-    }
-
-    /**
-     * Create a new relation annotation.
-     */
-    createRelationAnnotation (options) {
-        return window.iframeWindow.PDFAnnoCore.default.RelationAnnotation.newInstance(options)
-    }
-
-    /**
-     * Import annotations from UI.
-     */
-    importAnnotation (paperData, isPrimary) {
-        window.iframeWindow.annotationContainer.importAnnotations(paperData, isPrimary).then(result => {
-            // Notify annotations added.
-            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered')
-        })
-    }
-
-    /**
-     * Scroll window to the annotation.
-     */
-    scrollToAnnotation (id) {
-
-        let annotation = window.annoPage.findAnnotationById(id)
-
-        if (annotation) {
-
-            // scroll to.
-            let _y = annotation.y || annotation.y1 || annotation.rectangles[0].y
-            let { pageNumber, y } = __WEBPACK_IMPORTED_MODULE_3__shared_coords__["b" /* convertToExportY */](_y)
-            let pageHeight = window.annoPage.getViewerViewport().height
-            let scale = window.annoPage.getViewerViewport().scale
-            _y = (pageHeight + __WEBPACK_IMPORTED_MODULE_3__shared_coords__["d" /* paddingBetweenPages */]) * (pageNumber - 1) + y * scale
-            _y -= 100
-            $('#viewer iframe').contents().find('#viewer').parent()[0].scrollTop = _y
-
-            // highlight.
-            annotation.highlight()
-            setTimeout(() => {
-                annotation.dehighlight()
-            }, 1000)
-        }
-    }
-
-    /**
-     * Get the export data of annotations.
-     *
-     * @return {Promise}
-     */
-    exportData () {
-        return window.iframeWindow.annotationContainer.exportData()
-    }
-
-    /**
-     * Get the viewport of the viewer.
-     */
-    getViewerViewport () {
-        return window.iframeWindow.PDFView.pdfViewer.getPageView(0).viewport
-    }
-
-    /**
-     * Get the content's name displayed now.
-     */
-    getCurrentContentName () {
-        return window.iframeWindow.getFileName(window.iframeWindow.PDFView.url)
-    }
-
-    /**
-     * Manage the ctrl button is enable/disable.
-     */
-    manageCtrlKey (type) {
-
-        if (type === 'on') {
-            window.iframeWindow.ctrlPressed = true
-
-        } else if (type === 'off') {
-            window.iframeWindow.ctrlPressed = false
-        }
-    }
-
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = PDFAnnoPage;
-
-
-
-/***/ }),
-/* 56 */
+/* 64 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

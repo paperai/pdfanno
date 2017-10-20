@@ -1,14 +1,9 @@
-import {
-    scaleDown,
-    getSVGLayer
-} from './utils'
+import { scaleDown, getAnnoLayerBoundingRect } from './utils'
 import SpanAnnotation from '../annotation/span'
 import * as textInput from '../utils/textInput'
 
 /**
- * Get the current window selection as rects
- *
- * @return {Array} An Array of rects
+ * Get the current window selections and texts.
  */
 function getSelectionRects () {
     try {
@@ -24,7 +19,8 @@ function getSelectionRects () {
         }
 
         if (rects.length > 0 && rects[0].width > 0 && rects[0].height > 0) {
-            return {rects, selectedText}
+            return mergeRects(rects, selectedText)
+            // return { rects, selectedText }
         }
     } catch (e) {}
 
@@ -32,29 +28,109 @@ function getSelectionRects () {
 }
 
 /**
- * Handle document.mouseup event.
+ * Merge user selections.
  */
-function handleDocumentMouseup (text, zIndex) {
+function mergeRects (rects, selectedText) {
 
-    let { rects, selectedText } = getSelectionRects()
-    console.log('rects=', rects)
-    let annotation
-    if (rects) {
-        annotation = saveSpan([...rects].map((r) => {
-            return {
-                top    : r.top,
-                left   : r.left,
-                width  : r.width,
-                height : r.height
+    // Trim a rect which is almost same to other.
+    rects = trimRects(rects)
+
+    // a virtical margin of error.
+    const error = 5
+
+    // a space margin.
+    const space = 3
+
+    // new text.
+    let texts = []
+
+    let tmp = convertToObject(rects[0])
+    let newRects = [tmp]
+    texts.push(selectedText[0])
+    for (let i = 1; i < rects.length; i++) {
+
+        // Same line -> Merge rects.
+        if (withinMargin(rects[i].top, tmp.top, error)) {
+            tmp.top    = Math.min(tmp.top, rects[i].top)
+            tmp.left   = Math.min(tmp.left, rects[i].left)
+            tmp.right  = Math.max(tmp.right, rects[i].right)
+            tmp.bottom = Math.max(tmp.bottom, rects[i].bottom)
+            tmp.x      = tmp.left
+            tmp.y      = tmp.top
+            tmp.width  = tmp.right - tmp.left
+            tmp.height = tmp.bottom - tmp.top
+
+            // check has space.
+            const prev = rects[i - 1]
+            if (rects[i].left - prev.right >= space) {
+                texts.push(' ')
             }
-        }), selectedText, text, zIndex)
+
+        // New line -> Create a new rect.
+        } else {
+            tmp = convertToObject(rects[i])
+            newRects.push(tmp)
+            // Add space.
+            if (i >= 2 && selectedText[i - 1] === '-' && selectedText[i - 2] !== ' ') {
+                // Remove "-"
+                texts.pop()
+            } else {
+                texts.push(' ')
+            }
+        }
+
+        // Add text.
+        texts.push(selectedText[i])
     }
 
-    removeSelection()
-
-    return annotation
+    return { rects : newRects, selectedText : texts.join('') }
 }
 
+/**
+ * Trim rects which is almost same other.
+ */
+function trimRects (rects) {
+
+    let newRects = [rects[0]]
+
+    for (let i = 1; i < rects.length; i++) {
+        if (Math.abs(rects[i].left - rects[i - 1].left) < 1) {
+            // Almost same.
+            continue
+        }
+        newRects.push(rects[i])
+    }
+
+    return newRects
+}
+
+
+/**
+ * Convert a DOMList to a javascript plan object.
+ */
+function convertToObject (rect) {
+    return {
+        top    : rect.top,
+        left   : rect.left,
+        right  : rect.right,
+        bottom : rect.bottom,
+        x      : rect.x,
+        y      : rect.y,
+        width  : rect.width,
+        height : rect.height
+    }
+}
+
+/**
+ * Check the value(x) within the range.
+ */
+function withinMargin (x, base, margin) {
+    return (base - margin) <= x && x <= (base + margin)
+}
+
+/**
+ * Remove user selections.
+ */
 function removeSelection () {
     let selection = window.getSelection()
     // Firefox
@@ -64,32 +140,36 @@ function removeSelection () {
 }
 
 /**
- * Save a rect annotation
- *
- * @param {String} type The type of rect (span)
- * @param {Array} rects The rects to use for annotation
- * @param {String} color The color of the rects
+ * Save a rect annotation.
  */
-function saveSpan (rects, selectedText, text, zIndex) {
-    let svg = getSVGLayer()
-    let boundingRect = svg.getBoundingClientRect()
+function saveSpan (text, zIndex) {
+
+    // Get the rect area which User selected.
+    let { rects, selectedText } = getSelectionRects()
+
+    // Remove the user selection.
+    removeSelection()
+
+    if (!rects) {
+        return
+    }
+
+    let boundingRect = getAnnoLayerBoundingRect()
 
     // Initialize the annotation
     let annotation = {
-        rectangles : [...rects].map((r) => {
-            return scaleDown(svg, {
+        rectangles : rects.map((r) => {
+            return scaleDown({
                 x      : r.left - boundingRect.left,
                 y      : r.top - boundingRect.top,
                 width  : r.width,
                 height : r.height
             })
-        }).filter((r) => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1),
+        }).filter(r => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1),
         selectedText,
         text,
         zIndex
     }
-
-    console.log('rects2:', annotation.rectangles)
 
     // Save.
     let spanAnnotation = SpanAnnotation.newInstance(annotation)
@@ -107,23 +187,25 @@ function saveSpan (rects, selectedText, text, zIndex) {
     return spanAnnotation
 }
 
+/**
+ * Get the rect area of User selected.
+ */
 export function getRectangles () {
     let { rects } = getSelectionRects()
     if (!rects) {
         return null
     }
 
-    let svg = getSVGLayer()
-    let boundingRect = svg.getBoundingClientRect()
+    const boundingRect = getAnnoLayerBoundingRect()
 
-    rects = [...rects].map((r) => {
-        return scaleDown(svg, {
+    rects = [...rects].map(r => {
+        return scaleDown({
             x      : r.left - boundingRect.left,
             y      : r.top - boundingRect.top,
             width  : r.width,
             height : r.height
         })
-    }).filter((r) => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1)
+    }).filter(r => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1)
 
     return rects
 }
@@ -132,5 +214,5 @@ export function getRectangles () {
  * Create a span by current texts selection.
  */
 export function createSpan ({ text = null, zIndex = 10 }) {
-    return handleDocumentMouseup(text, zIndex)
+    return saveSpan(text, zIndex)
 }
