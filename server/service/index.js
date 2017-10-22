@@ -5,7 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const exec = require('child_process').exec;
 const request = require('request');
-const packageJson = require('../package.json');
+const packageJson = require('../../package.json');
 
 /**
  * Save a PDF file, and return the saved path.
@@ -69,7 +69,7 @@ function execCommand(command) {
 }
 
 function getPDFExtractPath () {
-    return path.resolve(__dirname, `pdfextract-${packageJson.pdfextract.version}.jar`);
+    return path.resolve(__dirname, '..', 'extlib', `pdfextract-${packageJson.pdfextract.version}.jar`);
 }
 
 function isPDFExtractLoaded () {
