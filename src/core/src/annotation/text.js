@@ -1,11 +1,8 @@
-import { getSVGLayer, scaleUp } from '../UI/utils'
-import { addInputField } from '../UI/text'
 import AbstractAnnotation from './abstract'
 
 /**
  * Text Annotation.
  */
-// TODO No need?
 export default class TextAnnotation extends AbstractAnnotation {
 
     /**
@@ -20,10 +17,6 @@ export default class TextAnnotation extends AbstractAnnotation {
         this.y = 0
         this.readOnly = readOnly
         this.$element = this.createDummyElement()
-
-        // Updated by parent via AbstractAnnotation#setTextForceDisplay.
-        // TODO No need?
-        this.textForceDisplay = false
     }
 
     /**
@@ -88,80 +81,4 @@ export default class TextAnnotation extends AbstractAnnotation {
         this.emit('hoverout')
     }
 
-    /**
-     * Handle a click event.
-     */
-    handleClickEvent () {
-
-        // Permit only for editable.
-        if (this.parent.readOnly) {
-            return
-        }
-
-        let next = !this.$element.hasClass('--selected')
-
-        if (next) {
-            super.select()
-            this.emit('selected')
-
-        } else {
-            super.deselect()
-            this.emit('deselected')
-        }
-
-        // Check double click.
-        let currentTime = (new Date()).getTime()
-        if (this.prevClickTime && (currentTime - this.prevClickTime) < 400) {
-            this.handleDoubleClickEvent()
-        }
-        this.prevClickTime = currentTime
-    }
-
-    /**
-     * Handle a click event.
-     */
-    handleDoubleClickEvent () {
-        console.log('handleDoubleClickEvent:', this.readOnly, this.parent.readOnly)
-
-        this.$element.remove()
-
-        let svg = getSVGLayer()
-        let pos = scaleUp(svg, {
-            x : this.x,
-            y : this.y
-        })
-        let rect = svg.getBoundingClientRect()
-        pos.x += rect.left
-        pos.y += rect.top
-
-        addInputField(pos.x, pos.y, this.uuid, this.text, (text) => {
-
-            console.log('callback:', text)
-
-            if (text || text === '') {
-                this.text = text
-                this.emit('textchanged', text)
-            }
-
-            this.render()
-
-            if (!this.readOnly) {
-                this.$element.find('text').off('click').on('click', this.handleClickEvent)
-            }
-
-        })
-
-    }
-
-    enableViewMode () {
-        super.enableViewMode()
-        if (!this.readOnly) {
-            this.$element.find('text').off('click').on('click', this.handleClickEvent)
-        }
-    }
-
-    disableViewMode () {
-        super.disableViewMode()
-        this.$element.find('text').off('click', this.handleClickEvent)
-    }
 }

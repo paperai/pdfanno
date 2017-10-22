@@ -2,6 +2,20 @@ import { convertFromExportY } from '../shared/coords'
 import toml from 'toml'
 
 /**
+ * Expose public APIs.
+ */
+export function expose () {
+    window.add = addAnnotation
+    window.addAll = addAllAnnotations
+    window.delete = deleteAnnotation
+    window.RectAnnotation = PublicRectAnnotation
+    window.SpanAnnotation = PublicSpanAnnotation
+    window.RelationAnnotation = PublicRelationAnnotation
+    window.readTOML = readTOML
+    window.clear = clear
+}
+
+/**
  * Add all annotations.
  *
  * This method expect to get argument made from a TOML file parsed by `window.readTOML`.

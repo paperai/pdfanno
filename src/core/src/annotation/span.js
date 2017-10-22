@@ -74,10 +74,6 @@ export default class SpanAnnotation extends AbstractAnnotation {
      * Set a hover event.
      */
     setHoverEvent () {
-        // this.$element.find('circle').hover(
-        //     this.handleHoverInEvent,
-        //     this.handleHoverOutEvent
-        // )
         this.$element.find('.anno-circle').hover(
             this.handleHoverInEvent,
             this.handleHoverOutEvent
@@ -201,13 +197,9 @@ export default class SpanAnnotation extends AbstractAnnotation {
      * Enable view mode.
      */
     enableViewMode () {
-
         this.disableViewMode()
-
         super.enableViewMode()
-
         if (!this.readOnly) {
-            // this.$element.find('circle').on('click', this.handleClickEvent)
             this.$element.find('.anno-circle').on('click', this.handleClickEvent)
         }
     }
@@ -217,7 +209,6 @@ export default class SpanAnnotation extends AbstractAnnotation {
      */
     disableViewMode () {
         super.disableViewMode()
-        // this.$element.find('circle').off('click')
         this.$element.find('.anno-circle').off('click')
     }
 }

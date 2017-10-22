@@ -1,5 +1,3 @@
-import $ from 'jquery'
-
 /**
  * Disable the action of pageback, if `DEL` or `BackSpace` button pressed.
  */

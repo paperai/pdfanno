@@ -24,10 +24,7 @@ export function renderRect (a) {
         border   : `1px solid ${color}`
     }).addClass('anno-rect'))
 
-    $base.append(renderCircle({
-        x    : a.x,
-        y    : a.y
-    }))
+    $base.append(renderCircle(a))
 
     return $base[0]
 }

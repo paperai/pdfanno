@@ -13,7 +13,7 @@ const packageJson = require('../package.json');
 module.exports.savePDF = (fileName, content) => {
     return new Promise((resolve, reject) => {
 
-        const dataPath = path.resolve(__dirname, 'server-data');
+        const dataPath = path.resolve(__dirname, '..', 'server-data');
         if (!fs.existsSync(dataPath)) {
                 fs.mkdirSync(dataPath);
         }
@@ -44,42 +44,13 @@ module.exports.analyzePDF = (pdfPath) => {
 
         return loadPDFExract();
 
-        // // Prepare pdfreader.jar
-
-        // const exists = fs.existsSync(path.resolve(__dirname, 'pdfextract.jar'));
-        // if (exists) {
-        //     return;
-        // }
-
-        // return new Promise((resolve, reject) => {
-
-        //     const reqConfig = {
-        //         method   : 'GET',
-        //         url      : 'https://cl.naist.jp/~shindo/pdfextract.jar',
-        //         encoding : null
-        //     };
-
-        //     request(reqConfig, function(err, response, buf) {
-
-        //         if (err) {
-        //             reject(err);
-        //         }
-
-        //         fs.writeFileSync(path.resolve(__dirname, 'pdfextract.jar'), buf);
-
-        //         resolve();
-        //     });
-        // });
-
     }).then(() => {
 
-        const jarPath = path.resolve(__dirname, 'pdfextract.jar');
-        // java -classpath pdfextract.jar PDFExtractor xxx.pdf -text -bounding
+        const jarPath = path.resolve(__dirname, '..', 'pdfextract.jar');
         const cmd = `java -classpath ${jarPath} PDFExtractor ${pdfPath} -text -bounding`;
         return execCommand(cmd);
 
     }).then(({ stdout, stderr }) => {
-
         return stdout;
     });
 }
