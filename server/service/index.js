@@ -5,9 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const exec = require('child_process').exec;
 const request = require('request');
-
-
-
+const packageJson = require('../../package.json');
 
 /**
  * Save a PDF file, and return the saved path.
@@ -40,30 +38,11 @@ module.exports.analyzePDF = (pdfPath) => {
 
     }).then(() => {
 
-        const exists = fs.existsSync(path.resolve(__dirname, '..', 'pdfextract.jar'));
-        if (exists) {
+        if (isPDFExtractLoaded()) {
             return;
         }
 
-        return new Promise((resolve, reject) => {
-
-            const reqConfig = {
-                method   : 'GET',
-                url      : 'https://cl.naist.jp/~shindo/pdfextract.jar',
-                encoding : null
-            };
-
-            request(reqConfig, function(err, response, buf) {
-
-                if (err) {
-                    reject(err);
-                }
-
-                fs.writeFileSync(path.resolve(__dirname, '..', 'pdfextract.jar'), buf);
-
-                resolve();
-            });
-        });
+        return loadPDFExract();
 
     }).then(() => {
 
@@ -85,6 +64,41 @@ function execCommand(command) {
                 reject({ err, stdout, stderr });
             }
             resolve({ stdout, stderr });
+        });
+    });
+}
+
+function getPDFExtractPath () {
+    return path.resolve(__dirname, '..', 'extlib', `pdfextract-${packageJson.pdfextract.version}.jar`);
+}
+
+function isPDFExtractLoaded () {
+    return fs.existsSync(getPDFExtractPath());
+}
+
+function loadPDFExract () {
+
+    return new Promise((resolve, reject) => {
+
+        const reqConfig = {
+            method   : 'GET',
+            url      : packageJson.pdfextract.url,
+            encoding : null
+        };
+
+        request(reqConfig, function(err, response, buf) {
+
+            if (err) {
+                reject(err);
+            }
+
+            const dirPath = path.resolve(__dirname, '..', 'extlib')
+            if (!fs.existsSync(dirPath)) {
+                fs.mkdirSync(dirPath)
+            }
+
+            fs.writeFileSync(getPDFExtractPath(), buf);
+            resolve();
         });
     });
 }

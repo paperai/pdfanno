@@ -11,6 +11,7 @@ jsdoc
 
 # Server Data.
 server-data
+server/extlib/*.jar
 
 # Server dependencies.
 server/pdfextract.jar
