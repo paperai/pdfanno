@@ -73,7 +73,7 @@ function getPDFExtractPath () {
 }
 
 function isPDFExtractLoaded () {
-    return fs.exists(getPDFExtractPath());
+    return fs.existsSync(getPDFExtractPath());
 }
 
 function loadPDFExract () {
@@ -91,6 +91,12 @@ function loadPDFExract () {
             if (err) {
                 reject(err);
             }
+
+            const dirPath = path.resolve(__dirname, '..', 'extlib')
+            if (!fs.existsSync(dirPath)) {
+                fs.mkdirSync(dirPath)
+            }
+
             fs.writeFileSync(getPDFExtractPath(), buf);
             resolve();
         });
