@@ -1,13 +1,14 @@
 {
   "name": "pdfanno",
-  "version": "0.4.0-dev",
+  "version": "0.3.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "_prepare": "gulp prepare",
     "dev": "npm run _prepare && webpack-dev-server --inline",
     "watch": "npm run _prepare && webpack --watch",
-    "publish": "npm run _prepare && cross-env NODE_ENV=production webpack && gulp publish",
+    "publish:latest": "npm run _prepare && cross-env NODE_ENV=production webpack && gulp publish_latest",
+    "publish:stable": "npm run _prepare && cross-env NODE_ENV=production webpack && gulp publish_stable",
     "server": "cross-env NODE_ENV=production node server/server.js",
     "server-dev": "cross-env NODE_PORT=3000 ./node_modules/.bin/node-dev server/server.js"
   },
