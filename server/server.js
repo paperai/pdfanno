@@ -21,7 +21,7 @@ app.get('/load_pdf', controller.loadPDF);
 app.get('/api/load_anno', controller.loadAnno);
 
 // Launch the app.
-const port = process.env.NODE_PORT
-app.listen(port || 1000, function() {
+const port = process.env.NODE_PORT || 1000
+app.listen(port, function() {
     console.log(`App listening on port ${port}.`);
 });
