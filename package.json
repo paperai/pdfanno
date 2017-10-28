@@ -9,8 +9,8 @@
     "watch": "npm run _prepare && webpack --watch",
     "publish:latest": "npm run _prepare && cross-env NODE_ENV=production webpack && gulp publish_latest",
     "publish:stable": "npm run _prepare && cross-env NODE_ENV=production webpack && gulp publish_stable",
-    "server:latest": "cross-env NODE_ENV=production NODE_PORT=1000 node server/server.js",
-    "server:stable": "cross-env NODE_ENV=production NODE_PORT=1001 node server/server.js",
+    "server:latest": "cross-env NODE_ENV=production NODE_PORT=1001 node server/server.js",
+    "server:stable": "cross-env NODE_ENV=production NODE_PORT=1000 node server/server.js",
     "server:dev": "cross-env NODE_PORT=3000 ./node_modules/.bin/node-dev server/server.js"
   },
   "repository": {
