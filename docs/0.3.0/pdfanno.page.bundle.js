@@ -12752,7 +12752,7 @@ const DEFAULT_PDF_NAME = 'P12-1046.pdf'
  */
 let API_ROOT = 'http://localhost:8080'
 if (true) {
-    API_ROOT = 'https://pdfanno.hshindo.com'
+    API_ROOT = 'https://pdfanno.hshindo.com/' + "0.3.0"
 }
 window.API_ROOT = API_ROOT
 

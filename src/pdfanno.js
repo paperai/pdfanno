@@ -23,7 +23,7 @@ const DEFAULT_PDF_NAME = 'P12-1046.pdf'
  */
 let API_ROOT = 'http://localhost:8080'
 if (process.env.NODE_ENV === 'production') {
-    API_ROOT = 'https://pdfanno.hshindo.com'
+    API_ROOT = 'https://pdfanno.hshindo.com/' + process.env.SERVER_PATH
 }
 window.API_ROOT = API_ROOT
 
