@@ -16,9 +16,6 @@ function getSelectionRects () {
         let rects = range.getClientRects()
         let selectedText = selection.toString()
 
-        console.log('start:', selection.anchorNode.parentNode)
-        console.log('end:', selection.focusNode.parentNode)
-
         const pageNumber = parseInt(selection.anchorNode.parentNode.getAttribute('data-page'), 10)
         const startIndex = parseInt(selection.anchorNode.parentNode.getAttribute('data-index'), 10)
         const endIndex = parseInt(selection.focusNode.parentNode.getAttribute('data-index'), 10)
@@ -35,8 +32,7 @@ function getSelectionRects () {
         }
 
         if (rects.length > 0 && rects[0].width > 0 && rects[0].height > 0) {
-            return mergeRects(rects, selectedText)
-            // return { rects, selectedText }
+            return { rects : mergeRects(rects), selectedText }
         }
     } catch (e) {}
 
@@ -46,28 +42,17 @@ function getSelectionRects () {
 /**
  * Merge user selections.
  */
-function mergeRects (rects, selectedText) {
+function mergeRects (rects) {
 
     // Trim a rect which is almost same to other.
-    const l = rects.length
     rects = trimRects(rects)
-    console.log('length:', l, rects.length, selectedText.length)
 
     // a virtical margin of error.
     const error = 5 * scale()
 
-    // a space margin.
-    const space = 3 * scale()
-
-    // new text.
-    let texts = []
-
     let tmp = convertToObject(rects[0])
     let newRects = [tmp]
-    texts.push(selectedText[0])
     for (let i = 1; i < rects.length; i++) {
-
-        console.log('space:', /* rects[i - 1].right, rects[i].left, */(rects[i].left - rects[i - 1].right), texts.join(''), selectedText[i])
 
         // Same line -> Merge rects.
         if (withinMargin(rects[i].top, tmp.top, error)) {
@@ -80,32 +65,14 @@ function mergeRects (rects, selectedText) {
             tmp.width  = tmp.right - tmp.left
             tmp.height = tmp.bottom - tmp.top
 
-            // check has space.
-            const prev = rects[i - 1]
-            if (rects[i].left - prev.right >= space) {
-                console.log('aaa')
-                texts.push(' ')
-            }
-
         // New line -> Create a new rect.
         } else {
             tmp = convertToObject(rects[i])
             newRects.push(tmp)
-            // Add space.
-            if (i >= 2 && selectedText[i - 1] === '-' && selectedText[i - 2] !== ' ') {
-                // Remove "-"
-                texts.pop()
-            } else {
-                texts.push(' ')
-            }
         }
-
-        // Add text.
-        texts.push(selectedText[i])
     }
 
-    // return { rects : newRects, selectedText : texts.join('') }
-    return { rects : newRects, selectedText }
+    return newRects
 }
 
 /**
@@ -114,7 +81,6 @@ function mergeRects (rects, selectedText) {
 function trimRects (rects) {
 
     const error = 1.5 * scale()
-    console.log('error raito:', error)
 
     let newRects = [rects[0]]
 
@@ -128,7 +94,6 @@ function trimRects (rects) {
 
     return newRects
 }
-
 
 /**
  * Convert a DOMList to a javascript plan object.
