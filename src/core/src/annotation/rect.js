@@ -65,14 +65,14 @@ export default class RectAnnotation extends AbstractAnnotation {
      * Create an instance from a TOML object.
      */
     static newInstanceFromTomlObject (tomlObject) {
-        let d = tomlObject
+        let d      = tomlObject
         d.position = d.position.map(parseFloat)
-        d.x = d.position[0]
-        d.y = convertFromExportY(d.page, d.position[1])
-        d.width = d.position[2]
-        d.height = d.position[3]
-        d.text = d.label
-        let rect = RectAnnotation.newInstance(d)
+        d.x        = d.position[0]
+        d.y        = convertFromExportY(d.page, d.position[1])
+        d.width    = d.position[2]
+        d.height   = d.position[3]
+        d.text     = d.label
+        let rect   = RectAnnotation.newInstance(d)
         return rect
     }
 
@@ -80,7 +80,6 @@ export default class RectAnnotation extends AbstractAnnotation {
      * Set a hover event.
      */
     setHoverEvent () {
-        // this.$element.find('rect, circle').hover(
         this.$element.find('.anno-rect, .anno-circle').hover(
             this.handleHoverInEvent,
             this.handleHoverOutEvent

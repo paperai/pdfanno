@@ -16,7 +16,6 @@ export default class PDFAnnoPage {
 
     constructor () {
         this.autoBind()
-        this.setup()
     }
 
     autoBind () {
@@ -25,28 +24,6 @@ export default class PDFAnnoPage {
             .forEach(method => {
                 this[method] = this[method].bind(this)
             })
-    }
-
-    setup () {
-        this.listenWindowEvents()
-    }
-
-    listenWindowEvents () {
-
-        // Disable shortcut temporary.
-
-        // window.addEventListener('digit1Pressed' , () => {
-        //     this.createSpan()
-        // })
-        // window.addEventListener('digit2Pressed' , () => {
-        //     this.createRelation('one-way')
-        // })
-        // window.addEventListener('digit3Pressed' , () => {
-        //     this.createRelation('two-way')
-        // })
-        // window.addEventListener('digit4Pressed' , () => {
-        //     this.createRelation('link')
-        // })
     }
 
     /**
