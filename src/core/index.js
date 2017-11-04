@@ -76,7 +76,7 @@ window.addEventListener('scalechange', () => {
  */
 function removeAnnoLayer () {
     // TODO Remove #annoLayer.
-    $('#annoLayer, #annoLayer2, #tmpLayer').remove()
+    $('#annoLayer, #annoLayer2').remove()
 }
 
 /*
@@ -133,21 +133,10 @@ function renderAnno () {
         visibility : 'hidden',
         'z-index'  : 2
     })
-    // TODO no need ? can use annoLayer2 instead of this ?
-    // Add a tmp layer.
-    let $tmpLayer = $(`<div id="tmpLayer"/>`).css({   // TODO CSSClass.
-        position   : 'absolute',
-        top        : '0px',
-        left       : `${leftMargin}px`,
-        width      : `${width}px`,
-        height     : `${height}px`,
-        visibility : 'hidden',
-        'z-index'  : 2
-    })
 
     $('#viewer').css({
         position : 'relative'  // TODO css.
-    }).append($annoLayer).append($annoLayer2).append($tmpLayer)
+    }).append($annoLayer).append($annoLayer2)
 
     renderAnnotations()
 }

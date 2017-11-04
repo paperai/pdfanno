@@ -1,6 +1,5 @@
 import uuid from '../utils/uuid'
 import AbstractAnnotation from './abstract'
-import TextAnnotation from './text'
 import { getRelationTextPosition } from '../utils/relation.js'
 import { anyOf } from '../../../shared/util'
 
@@ -38,14 +37,6 @@ export default class RelationAnnotation extends AbstractAnnotation {
         globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
         globalEvent.on('enableViewMode', this.enableViewMode)
         globalEvent.on('rectmoveend', this.handleRelMoveEnd)
-
-        // TODO Maybe no need.
-        this.textAnnotation = new TextAnnotation(this.readOnly, this)
-        this.textAnnotation.on('selected', this.handleTextSelected)
-        this.textAnnotation.on('deselected', this.handleTextDeselected)
-        this.textAnnotation.on('hoverin', this.handleTextHoverIn)
-        this.textAnnotation.on('hoverout', this.handleTextHoverOut)
-        this.textAnnotation.on('textchanged', this.handleTextChanged)
     }
 
     /**
@@ -284,7 +275,6 @@ export default class RelationAnnotation extends AbstractAnnotation {
     handleRelMoveEnd (rectAnnotation) {
         if (this._rel1Annotation === rectAnnotation || this._rel2Annotation === rectAnnotation) {
             this.enableViewMode()
-            this.textAnnotation.enableViewMode()
         }
     }
 

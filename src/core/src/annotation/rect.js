@@ -1,6 +1,5 @@
 import uuid from '../utils/uuid'
 import AbstractAnnotation from './abstract'
-import TextAnnotation from './text'
 import { scaleDown } from '../UI/utils'
 import { convertFromExportY } from '../../../shared/coords'
 
@@ -34,14 +33,6 @@ export default class RectAnnotation extends AbstractAnnotation {
 
         globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
         globalEvent.on('enableViewMode', this.enableViewMode)
-
-        // TODO No need ?
-        this.textAnnotation = new TextAnnotation(this.readOnly, this)
-        this.textAnnotation.on('selected', this.handleTextSelected)
-        this.textAnnotation.on('deselected', this.handleTextDeselected)
-        this.textAnnotation.on('hoverin', this.handleTextHoverIn)
-        this.textAnnotation.on('hoverout', this.handleTextHoverOut)
-        this.textAnnotation.on('textchanged', this.handleTextChanged)
     }
 
     /**

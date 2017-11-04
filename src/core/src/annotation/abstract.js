@@ -49,7 +49,6 @@ export default class AbstractAnnotation extends EventEmitter {
 
         const base = $('#annoLayer2')[0]
         this.$element = $(appendChild(base, this))
-        this.textAnnotation && this.textAnnotation.render()
 
         if (!this.hoverEventDisable && this.setHoverEvent) {
             this.setHoverEvent()
@@ -82,7 +81,6 @@ export default class AbstractAnnotation extends EventEmitter {
 
         if (this.uuid) {
             window.annotationContainer.remove(this)
-            this.textAnnotation && this.textAnnotation.destroy()
         }
 
         return promise
@@ -93,13 +91,6 @@ export default class AbstractAnnotation extends EventEmitter {
      */
     isHit (x, y) {
         return false
-    }
-
-    /**
-     * Judge the point within the label.
-     */
-    isHitText (x, y) {
-        return this.textAnnotation && this.textAnnotation.isHit(x, y)
     }
 
     /**
@@ -161,7 +152,6 @@ export default class AbstractAnnotation extends EventEmitter {
      */
     highlight () {
         this.$element.addClass('--hover --emphasis')
-        this.textAnnotation && this.textAnnotation.highlight()
     }
 
     /**
@@ -169,7 +159,6 @@ export default class AbstractAnnotation extends EventEmitter {
      */
     dehighlight () {
         this.$element.removeClass('--hover --emphasis')
-        this.textAnnotation && this.textAnnotation.dehighlight()
     }
 
     /**
@@ -198,11 +187,8 @@ export default class AbstractAnnotation extends EventEmitter {
 
         if (this.selected) {
             this.deselect()
-            this.textAnnotation && this.textAnnotation.deselect()
-
         } else {
             this.select()
-            this.textAnnotation && this.textAnnotation.select()
         }
 
     }
@@ -254,7 +240,6 @@ export default class AbstractAnnotation extends EventEmitter {
      */
     enableViewMode () {
         this.render()
-        this.textAnnotation && this.textAnnotation.enableViewMode()
     }
 
     /**
@@ -262,7 +247,6 @@ export default class AbstractAnnotation extends EventEmitter {
      */
     disableViewMode () {
         this.render()
-        this.textAnnotation && this.textAnnotation.disableViewMode()
     }
 
     setDisableHoverEvent () {

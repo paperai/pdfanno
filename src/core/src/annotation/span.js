@@ -1,6 +1,5 @@
 import uuid from '../utils/uuid'
 import AbstractAnnotation from './abstract'
-import TextAnnotation from './text'
 import { convertFromExportY } from '../../../shared/coords'
 
 /**
@@ -24,13 +23,6 @@ export default class SpanAnnotation extends AbstractAnnotation {
 
         window.globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
         window.globalEvent.on('enableViewMode', this.enableViewMode)
-
-        this.textAnnotation = new TextAnnotation(this.readOnly, this)
-        this.textAnnotation.on('selected', this.handleTextSelected)
-        this.textAnnotation.on('deselected', this.handleTextDeselected)
-        this.textAnnotation.on('hoverin', this.handleTextHoverIn)
-        this.textAnnotation.on('hoverout', this.handleTextHoverOut)
-        this.textAnnotation.on('textchanged', this.handleTextChanged)
     }
 
     /**
