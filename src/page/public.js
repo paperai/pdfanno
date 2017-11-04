@@ -65,10 +65,6 @@ export function addAnnotation (publicAnnotation) {
     a.render()
     a.enableViewMode()
     a.save()
-
-    // Restore the status of AnnoTools.
-    window.annoPage.disableAnnotateFunctions()
-    window.annoPage.enableAnnotateFunction(window.currentAnnoToolType)
 }
 
 /**
