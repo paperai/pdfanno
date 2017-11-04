@@ -12887,7 +12887,6 @@ window.addEventListener('DOMContentLoaded', async e => {
 
     // Download anno button.
     __WEBPACK_IMPORTED_MODULE_1_anno_ui__["downloadButton"].setup({
-        selector                : '#downloadAnnoButton',
         getAnnotationTOMLString : window.annoPage.exportData,
         getCurrentContentName   : window.annoPage.getCurrentContentName,
         didDownloadCallback     : __WEBPACK_IMPORTED_MODULE_3__page_util_window__["c" /* unlistenWindowLeaveEvent */]
