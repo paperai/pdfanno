@@ -266,13 +266,11 @@ export default class RectAnnotation extends AbstractAnnotation {
 
     // TODO 共通化？
     disableTextlayer () {
-        // $('.textLayer').hide()
         $('body').addClass('disable-text-layer')
     }
 
     // TODO 共通化？
     enableTextlayer () {
-        // $('.textLayer').show()
         $('body').removeClass('disable-text-layer')
     }
 
@@ -293,7 +291,6 @@ export default class RectAnnotation extends AbstractAnnotation {
     enableViewMode () {
         super.enableViewMode()
         if (!this.readOnly) {
-            // this.$element.find('.anno-rect, circle').on('click', this.handleClickEvent)
             this.$element.find('.anno-rect, .anno-circle').on('click', this.handleClickEvent)
             this.enableDragAction()
         }
@@ -304,7 +301,6 @@ export default class RectAnnotation extends AbstractAnnotation {
      */
     disableViewMode () {
         super.disableViewMode()
-        // this.$element.find('.anno-rect, circle').off('click')
         this.$element.find('.anno-rect, .anno-circle').off('click')
         this.disableDragAction()
     }
