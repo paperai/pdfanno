@@ -72,10 +72,6 @@ export function getSVGLayer () {
     return document.getElementById('annoLayer')
 }
 
-export function getTmpLayer () {
-    return document.getElementById('tmpLayer')
-}
-
 export function getCurrentPage (e) {
 
     let { x, y } = getXY(e)

@@ -11,6 +11,7 @@ import { unlistenWindowLeaveEvent } from './page/util/window'
 import * as publicApi from './page/public'
 import * as searchUI from './page/search'
 import * as textLayer from './page/textLayer'
+import * as pdftxtDownload from './page/pdftxtdownload'
 import PDFAnnoPage from './page/pdf/PDFAnnoPage'
 
 /**
@@ -66,7 +67,7 @@ function _getY (annotation) {
 /**
  *  The entry point.
  */
-window.addEventListener('DOMContentLoaded', e => {
+window.addEventListener('DOMContentLoaded', async e => {
 
     // resizable.
     annoUI.util.setupResizableColumns()
@@ -91,7 +92,9 @@ window.addEventListener('DOMContentLoaded', e => {
         overrideWarningMessage : 'Are you sure to load another PDF ?',
         contentReloadHandler   : fileName => {
 
-            // Disable search UI.
+            dispatchWindowEvent('willChangeContent')
+
+            // Disable UI.
             $('#searchWord, .js-dict-match-file').attr('disabled', 'disabled')
 
             // Get the content.
@@ -107,8 +110,10 @@ window.addEventListener('DOMContentLoaded', e => {
             annoUI.uploadButton.uploadPDF({
                 contentFile     : content,
                 successCallback : text => {
+                    dispatchWindowEvent('didChangeContent')
                     searchUI.setup(text)
                     textLayer.setup(text)
+                    window.annoPage.pdftxt = text
                 }
             })
         }
@@ -147,12 +152,15 @@ window.addEventListener('DOMContentLoaded', e => {
         scrollToAnnotation : window.annoPage.scrollToAnnotation
     })
 
-    // Download button.
+    // Download anno button.
     annoUI.downloadButton.setup({
         getAnnotationTOMLString : window.annoPage.exportData,
         getCurrentContentName   : window.annoPage.getCurrentContentName,
         didDownloadCallback     : unlistenWindowLeaveEvent
     })
+
+    // Download pdftxt button.
+    pdftxtDownload.setup()
 
     // Label input.
     annoUI.labelInput.setup({
@@ -180,6 +188,7 @@ window.addEventListener('DOMContentLoaded', e => {
         uploadFinishCallback : (resultText) => {
             searchUI.setup(resultText)
             textLayer.setup(resultText)
+            window.annoPage.pdftxt = resultText
         }
     })
 
@@ -196,7 +205,9 @@ window.addEventListener('DOMContentLoaded', e => {
     showLoader(true)
 
     // Load a PDF file.
-    window.annoPage.loadPDFFromServer(pdfURL).then(({ pdf, analyzeResult }) => {
+    try {
+
+        let { pdf, analyzeResult } = await window.annoPage.loadPDFFromServer(pdfURL)
 
         // Init viewer.
         window.annoPage.initializeViewer(null)
@@ -212,21 +223,19 @@ window.addEventListener('DOMContentLoaded', e => {
             }, 500)
         })
 
-        const listenPageRendered = () => {
+        const listenPageRendered = async () => {
             showLoader(false)
 
             // Load and display annotations, if annoURL is set.
             if (annoURL) {
-                window.annoPage.loadAnnoFileFromServer(annoURL).then(anno => {
-                    publicApi.addAllAnnotations(publicApi.readTOML(anno))
-
-                    // Move to the annotation.
-                    if (moveTo) {
-                        setTimeout(() => {
-                            window.annoPage.scrollToAnnotation(moveTo)
-                        }, 500)
-                    }
-                })
+                let anno = await window.annoPage.loadAnnoFileFromServer(annoURL)
+                publicApi.addAllAnnotations(publicApi.readTOML(anno))
+                // Move to the annotation.
+                if (moveTo) {
+                    setTimeout(() => {
+                        window.annoPage.scrollToAnnotation(moveTo)
+                    }, 500)
+                }
             }
             window.removeEventListener('pagerendered', listenPageRendered)
         }
@@ -240,13 +249,15 @@ window.addEventListener('DOMContentLoaded', e => {
 
         // Init textLayers.
         textLayer.setup(analyzeResult)
+        window.annoPage.pdftxt = analyzeResult
 
-    }).catch(err => {
+    } catch (err) {
+
         // Hide a loading, and show the error message.
         showLoader(false)
         const message = 'Failed to analyze the PDF.<br>Reason: ' + err
         annoUI.ui.alertDialog.show({ message })
-    })
+    }
 
     // initial tab.
     if (tabIndex) {

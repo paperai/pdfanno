@@ -16,7 +16,6 @@ export default class PDFAnnoPage {
 
     constructor () {
         this.autoBind()
-        this.setup()
     }
 
     autoBind () {
@@ -25,28 +24,6 @@ export default class PDFAnnoPage {
             .forEach(method => {
                 this[method] = this[method].bind(this)
             })
-    }
-
-    setup () {
-        this.listenWindowEvents()
-    }
-
-    listenWindowEvents () {
-
-        // Disable shortcut temporary.
-
-        // window.addEventListener('digit1Pressed' , () => {
-        //     this.createSpan()
-        // })
-        // window.addEventListener('digit2Pressed' , () => {
-        //     this.createRelation('one-way')
-        // })
-        // window.addEventListener('digit3Pressed' , () => {
-        //     this.createRelation('two-way')
-        // })
-        // window.addEventListener('digit4Pressed' , () => {
-        //     this.createRelation('link')
-        // })
     }
 
     /**
@@ -73,11 +50,6 @@ export default class PDFAnnoPage {
         })
 
         window.iframeWindow.addEventListener('annotationrendered', () => {
-
-            // Restore the status of AnnoTools.
-            this.disableAnnotateFunctions()
-            this.enableAnnotateFunction(window.currentAnnoToolType)
-
             dispatchWindowEvent('annotationrendered')
         })
 
@@ -236,6 +208,7 @@ export default class PDFAnnoPage {
             window.iframeWindow.PDFViewerApplication.close()
             $('#numPages', window.iframeWindow.document).text('')
             this.currentContentFile = null
+            dispatchWindowEvent('didCloseViewer')
         }
     }
 
@@ -361,20 +334,6 @@ export default class PDFAnnoPage {
     }
 
     /**
-        Disable annotation tool buttons.
-    */
-    disableRect () {
-        window.iframeWindow.PDFAnnoCore.default.UI.disableRect()
-    }
-
-    /**
-     * Enable an annotation tool.
-     */
-    enableRect () {
-        window.iframeWindow.PDFAnnoCore.default.UI.enableRect()
-    }
-
-    /**
      * Display annotations an user selected.
      */
     displayAnnotation (isPrimary) {
@@ -444,22 +403,6 @@ export default class PDFAnnoPage {
 
         // Import annotations to Viewer.
         window.annoPage.importAnnotation(paperData, isPrimary)
-    }
-
-    /**
-     *  Disable annotation tool buttons.
-     */
-    disableAnnotateFunctions () {
-        window.iframeWindow.PDFAnnoCore.default.UI.disableRect()
-    }
-
-    /**
-     * Enable an annotation tool.
-     */
-    enableAnnotateFunction (type) {
-        if (type === 'rect') {
-            window.iframeWindow.PDFAnnoCore.default.UI.enableRect()
-        }
     }
 
     /**
@@ -640,6 +583,14 @@ export default class PDFAnnoPage {
             }
             return res.data.anno
         })
+    }
+
+    set pdftxt (text) {
+        this._pdftxt = text
+    }
+
+    get pdftxt () {
+        return this._pdftxt
     }
 
 }

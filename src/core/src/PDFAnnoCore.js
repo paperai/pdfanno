@@ -4,8 +4,6 @@ import RectAnnotation from './annotation/rect'
 import SpanAnnotation from './annotation/span'
 import RelationAnnotation from './annotation/relation'
 
-require('!style-loader!css-loader!./css/pdfanno.css')
-
 export default {
 
     /**
@@ -16,11 +14,6 @@ export default {
 
     /**
      * Render the annotations for a page in the PDF Document
-     *
-     * @param {SVGElement} svg The SVG element that annotations should be rendered to
-     * @param {PageViewport} viewport The PDFPage.getViewport data
-     * @param {Object} data The StoreAdapter.getAnnotations data
-     * @return {Promise}
      */
     render,
 

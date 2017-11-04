@@ -1,6 +1,5 @@
 import uuid from '../utils/uuid'
 import AbstractAnnotation from './abstract'
-import TextAnnotation from './text'
 import { scaleDown } from '../UI/utils'
 import { convertFromExportY } from '../../../shared/coords'
 
@@ -34,14 +33,6 @@ export default class RectAnnotation extends AbstractAnnotation {
 
         globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
         globalEvent.on('enableViewMode', this.enableViewMode)
-
-        // TODO No need ?
-        this.textAnnotation = new TextAnnotation(this.readOnly, this)
-        this.textAnnotation.on('selected', this.handleTextSelected)
-        this.textAnnotation.on('deselected', this.handleTextDeselected)
-        this.textAnnotation.on('hoverin', this.handleTextHoverIn)
-        this.textAnnotation.on('hoverout', this.handleTextHoverOut)
-        this.textAnnotation.on('textchanged', this.handleTextChanged)
     }
 
     /**
@@ -65,14 +56,14 @@ export default class RectAnnotation extends AbstractAnnotation {
      * Create an instance from a TOML object.
      */
     static newInstanceFromTomlObject (tomlObject) {
-        let d = tomlObject
+        let d      = tomlObject
         d.position = d.position.map(parseFloat)
-        d.x = d.position[0]
-        d.y = convertFromExportY(d.page, d.position[1])
-        d.width = d.position[2]
-        d.height = d.position[3]
-        d.text = d.label
-        let rect = RectAnnotation.newInstance(d)
+        d.x        = d.position[0]
+        d.y        = convertFromExportY(d.page, d.position[1])
+        d.width    = d.position[2]
+        d.height   = d.position[3]
+        d.text     = d.label
+        let rect   = RectAnnotation.newInstance(d)
         return rect
     }
 
@@ -80,7 +71,6 @@ export default class RectAnnotation extends AbstractAnnotation {
      * Set a hover event.
      */
     setHoverEvent () {
-        // this.$element.find('rect, circle').hover(
         this.$element.find('.anno-rect, .anno-circle').hover(
             this.handleHoverInEvent,
             this.handleHoverOutEvent
@@ -276,13 +266,11 @@ export default class RectAnnotation extends AbstractAnnotation {
 
     // TODO 共通化？
     disableTextlayer () {
-        // $('.textLayer').hide()
         $('body').addClass('disable-text-layer')
     }
 
     // TODO 共通化？
     enableTextlayer () {
-        // $('.textLayer').show()
         $('body').removeClass('disable-text-layer')
     }
 
@@ -303,7 +291,6 @@ export default class RectAnnotation extends AbstractAnnotation {
     enableViewMode () {
         super.enableViewMode()
         if (!this.readOnly) {
-            // this.$element.find('.anno-rect, circle').on('click', this.handleClickEvent)
             this.$element.find('.anno-rect, .anno-circle').on('click', this.handleClickEvent)
             this.enableDragAction()
         }
@@ -314,7 +301,6 @@ export default class RectAnnotation extends AbstractAnnotation {
      */
     disableViewMode () {
         super.disableViewMode()
-        // this.$element.find('.anno-rect, circle').off('click')
         this.$element.find('.anno-rect, .anno-circle').off('click')
         this.disableDragAction()
     }
