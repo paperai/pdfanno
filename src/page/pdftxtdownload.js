@@ -10,7 +10,10 @@ export function setup () {
 
     reset()
 
-    $('#downloadPDFTextButton').on('click', () => {
+    $('#downloadPDFTextButton').on('click', e => {
+
+        // Reset the selected state.
+        $(e.currentTarget).blur()
 
         // Get the result of pdfextract.
         const pdftxt = window.annoPage.pdftxt
