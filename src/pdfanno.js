@@ -11,6 +11,7 @@ import { unlistenWindowLeaveEvent } from './page/util/window'
 import * as publicApi from './page/public'
 import * as searchUI from './page/search'
 import * as textLayer from './page/textLayer'
+import * as pdftxtDownload from './page/pdftxtdownload'
 import PDFAnnoPage from './page/pdf/PDFAnnoPage'
 
 /**
@@ -91,7 +92,9 @@ window.addEventListener('DOMContentLoaded', e => {
         overrideWarningMessage : 'Are you sure to load another PDF ?',
         contentReloadHandler   : fileName => {
 
-            // Disable search UI.
+            dispatchWindowEvent('willChangeContent')
+
+            // Disable UI.
             $('#searchWord, .js-dict-match-file').attr('disabled', 'disabled')
 
             // Get the content.
@@ -107,8 +110,10 @@ window.addEventListener('DOMContentLoaded', e => {
             annoUI.uploadButton.uploadPDF({
                 contentFile     : content,
                 successCallback : text => {
+                    dispatchWindowEvent('didChangeContent')
                     searchUI.setup(text)
                     textLayer.setup(text)
+                    window.annoPage.pdftxt = text
                 }
             })
         }
@@ -147,12 +152,16 @@ window.addEventListener('DOMContentLoaded', e => {
         scrollToAnnotation : window.annoPage.scrollToAnnotation
     })
 
-    // Download button.
+    // Download anno button.
     annoUI.downloadButton.setup({
+        selector                : '#downloadAnnoButton',
         getAnnotationTOMLString : window.annoPage.exportData,
         getCurrentContentName   : window.annoPage.getCurrentContentName,
         didDownloadCallback     : unlistenWindowLeaveEvent
     })
+
+    // Download pdftxt button.
+    pdftxtDownload.setup()
 
     // Label input.
     annoUI.labelInput.setup({
@@ -180,6 +189,7 @@ window.addEventListener('DOMContentLoaded', e => {
         uploadFinishCallback : (resultText) => {
             searchUI.setup(resultText)
             textLayer.setup(resultText)
+            window.annoPage.pdftxt = resultText
         }
     })
 
@@ -240,6 +250,7 @@ window.addEventListener('DOMContentLoaded', e => {
 
         // Init textLayers.
         textLayer.setup(analyzeResult)
+        window.annoPage.pdftxt = analyzeResult
 
     }).catch(err => {
         // Hide a loading, and show the error message.

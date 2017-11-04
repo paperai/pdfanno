@@ -208,6 +208,7 @@ export default class PDFAnnoPage {
             window.iframeWindow.PDFViewerApplication.close()
             $('#numPages', window.iframeWindow.document).text('')
             this.currentContentFile = null
+            dispatchWindowEvent('didCloseViewer')
         }
     }
 
@@ -582,6 +583,14 @@ export default class PDFAnnoPage {
             }
             return res.data.anno
         })
+    }
+
+    set pdftxt (text) {
+        this._pdftxt = text
+    }
+
+    get pdftxt () {
+        return this._pdftxt
     }
 
 }
