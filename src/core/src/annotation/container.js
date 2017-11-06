@@ -142,7 +142,7 @@ export default class AnnotationContainer {
                     }
 
                 // Rect.
-                } else if (annotation.type === 'area') {
+                } else if (annotation.type === 'rect') {
 
                     /*
                         [2]

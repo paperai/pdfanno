@@ -8,21 +8,15 @@ export function renderRect (a) {
 
     let color = a.color || '#f00'
 
-    const $base = $('<div/>').css({
-        position   : 'absolute',
-        top        : 0,
-        left       : 0,
-        visibility : 'visible'
-    })
+    const $base = $('<div class="anno-rect-base"/>')
 
-    $base.append($('<div/>').css({
-        position : 'absolute',
-        top      : `${a.y}px`,
-        left     : `${a.x}px`,
-        width    : `${a.width}px`,
-        height   : `${a.height}px`,
-        border   : `1px solid ${color}`
-    }).addClass('anno-rect'))
+    $base.append($('<div class="anno-rect"/>').css({
+        top    : `${a.y}px`,
+        left   : `${a.x}px`,
+        width  : `${a.width}px`,
+        height : `${a.height}px`,
+        border : `1px solid ${color}`
+    }))
 
     $base.append(renderCircle(a))
 

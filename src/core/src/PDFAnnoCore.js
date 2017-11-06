@@ -1,4 +1,4 @@
-import render from './render'
+// import render from './render'
 import UI from './UI'
 import RectAnnotation from './annotation/rect'
 import SpanAnnotation from './annotation/span'
@@ -11,11 +11,6 @@ export default {
      * editing, and deleting annotations in the browser.
      */
     UI,
-
-    /**
-     * Render the annotations for a page in the PDF Document
-     */
-    render,
 
     /**
      * RectAnnotation Class.
