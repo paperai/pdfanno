@@ -45,7 +45,7 @@ function createTextLayer (page) {
 
         // Create text div elements.
         const snipets = pages[page - 1].meta.map((info, index) => {
-            // console.log(index, info)
+
             if (!info) {
                 return
             }
