@@ -7,8 +7,27 @@ import * as annoUI from 'anno-ui'
  * Setup the function.
  */
 export function setup () {
-
     reset()
+    setupDownloadButton()
+    window.addEventListener('didCloseViewer', disable)
+    window.addEventListener('willChangeContent', disable)
+    window.addEventListener('didChangeContent', enable)
+}
+
+/*
+ * Reset events.
+ */
+function reset () {
+    $('#downloadPDFTextButton').off('click')
+    window.removeEventListener('didCloseViewer', disable)
+    window.removeEventListener('willChangeContent', disable)
+    window.removeEventListener('didChangeContent', enable)
+}
+
+/*
+ * Setup the download button.
+ */
+function setupDownloadButton () {
 
     $('#downloadPDFTextButton').on('click', e => {
 
@@ -35,20 +54,6 @@ export function setup () {
         a.click()
         a.parentNode.removeChild(a)
     })
-
-    window.addEventListener('didCloseViewer', disable)
-    window.addEventListener('willChangeContent', disable)
-    window.addEventListener('didChangeContent', enable)
-}
-
-/*
- * Reset events.
- */
-function reset () {
-    $('#downloadPDFTextButton').off('click')
-    window.removeEventListener('didCloseViewer', disable)
-    window.removeEventListener('willChangeContent', disable)
-    window.removeEventListener('didChangeContent', enable)
 }
 
 /*

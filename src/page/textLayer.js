@@ -1,3 +1,6 @@
+/**
+ * Create text layers which enable users to select texts.
+ */
 import { customizeAnalyzeResult } from './util/analyzer'
 
 let pages
@@ -75,7 +78,6 @@ function createTextLayer (page) {
 // TODO a little tricky.
 window.getText = function (page, startIndex, endIndex) {
     const infos = pages[page - 1].meta.slice(startIndex, endIndex + 1)
-    console.log('len:', infos.length, (endIndex - startIndex))
     const texts = infos.map(info => {
         if (!info) {
             return ' '
@@ -83,6 +85,15 @@ window.getText = function (page, startIndex, endIndex) {
             return info.split('\t')[2]
         }
     })
+    const text = texts.join('')
 
-    return texts.join('')
+    // Text position.
+    const beforeCount = pages.slice(0, page - 1)
+            .reduce((v, page) => v.concat(page.meta), [])
+            .filter(info => info).length
+    const start1 = pages[page - 1].meta.slice(0, startIndex + 1).filter(info => info).length
+    const start2 = pages[page - 1].meta.slice(0, endIndex + 1).filter(info => info).length
+    const textRange = [ (beforeCount + start1), (beforeCount + start2) ]
+    // Return.
+    return { text, textRange }
 }

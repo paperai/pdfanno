@@ -122,11 +122,12 @@ export default class AnnotationContainer {
                                 .replace(/\\/g, '')
 
                     dataExport[annotation.uuid] = {
-                        type     : annotation.type,
-                        page     : pageNumber,
-                        position : rectangles,
-                        label    : annotation.text || '',
-                        text
+                        type      : annotation.type,
+                        page      : pageNumber,
+                        position  : rectangles,
+                        label     : annotation.text || '',
+                        text,
+                        textrange : annotation.textRange
                     }
 
                 // Relation.
