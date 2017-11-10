@@ -12,6 +12,10 @@ function scale () {
 function getSelectionRects () {
     try {
         let selection = window.getSelection()
+
+        if (selection.rangeCount === 0) {
+            return { rects : null, selectedText : null, textRange : null }
+        }
         let range = selection.getRangeAt(0)
         let rects = range.getClientRects()
 

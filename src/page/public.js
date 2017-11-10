@@ -116,7 +116,7 @@ export class PublicRectAnnotation {
  */
 export class PublicSpanAnnotation {
 
-    constructor ({ page, position, label = '', text = '', id = 0, zIndex = 10 }) {
+    constructor ({ page, position, label = '', text = '', id = 0, zIndex = 10, textrange = [] }) {
 
         console.log('PublicSpanAnnotation:', zIndex)
 
@@ -150,6 +150,7 @@ export class PublicSpanAnnotation {
             color        : '#FFFF00',
             readOnly     : false,
             selectedText : text,
+            textRange    : textrange,
             zIndex
         })
 

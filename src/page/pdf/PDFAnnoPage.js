@@ -245,12 +245,16 @@ export default class PDFAnnoPage {
 
         } else if (highlight) {
 
+            // Get textRange.
+            const { textRange } = window.getText(highlight.page, highlight.searchPosition.start, highlight.searchPosition.end)
+
             const s = new window.SpanAnnotation({
-                page     : highlight.page,
-                position : highlight.position,
-                label    : text,
-                text     : highlight.text,
-                zIndex   : nextZIndex()
+                page      : highlight.page,
+                position  : highlight.position,
+                label     : text,
+                text      : highlight.text,
+                textrange : textRange,
+                zIndex    : nextZIndex()
             })
             window.add(s)
 
