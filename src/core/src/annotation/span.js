@@ -36,6 +36,7 @@ export default class SpanAnnotation extends AbstractAnnotation {
         a.color        = annotation.color
         a.readOnly     = annotation.readOnly || false
         a.selectedText = annotation.selectedText
+        a.textRange    = annotation.textRange
         a.zIndex       = annotation.zIndex || 10
         return a
     }
@@ -49,6 +50,7 @@ export default class SpanAnnotation extends AbstractAnnotation {
         let position = d.position.map(p => p.map(parseFloat))
         d.selectedText = d.text
         d.text = d.label
+        d.textRange = d.textrange
         // Convert.
         d.rectangles = position.map(p => {
             return {

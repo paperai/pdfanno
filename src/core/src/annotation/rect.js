@@ -1,6 +1,6 @@
 import uuid from '../utils/uuid'
 import AbstractAnnotation from './abstract'
-import { scaleDown } from '../UI/utils'
+import { scaleDown, disableTextlayer, enableTextlayer } from '../UI/utils'
 import { convertFromExportY } from '../../../shared/coords'
 
 let globalEvent
@@ -20,8 +20,7 @@ export default class RectAnnotation extends AbstractAnnotation {
         globalEvent = window.globalEvent
 
         this.uuid     = null
-        // TODO fix the name to "rect".
-        this.type     = 'area'
+        this.type     = 'rect'
         this.x        = 0
         this.y        = 0
         this.width    = 0
@@ -206,7 +205,7 @@ export default class RectAnnotation extends AbstractAnnotation {
 
         window.globalEvent.emit('rectmovestart')
 
-        this.disableTextlayer()
+        disableTextlayer()
     }
 
     /**
@@ -260,18 +259,8 @@ export default class RectAnnotation extends AbstractAnnotation {
         document.removeEventListener('mouseup', this.handleMouseUpOnDocument)
 
         if (window.currentType !== 'rect') {
-            this.enableTextlayer()
+            enableTextlayer()
         }
-    }
-
-    // TODO 共通化？
-    disableTextlayer () {
-        $('body').addClass('disable-text-layer')
-    }
-
-    // TODO 共通化？
-    enableTextlayer () {
-        $('body').removeClass('disable-text-layer')
     }
 
     enableDragAction () {

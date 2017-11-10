@@ -1,13 +1,11 @@
 /**
- * Generate a univierally unique identifier
+ * Generate a universally unique identifier
  *
  * @return {String}
  */
 export default function uuid () {
-
-    let uid = 0
-    window.annotationContainer.getAllAnnotations().forEach(a => {
-        uid = Math.max(uid, parseInt(a.uuid))
-    })
-    return String(uid + 1)
+    const maxId = window.annotationContainer.getAllAnnotations().reduce((val, a) => {
+        return Math.max(val, parseInt(a.uuid))
+    }, 0)
+    return String(maxId + 1)
 }

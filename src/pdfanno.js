@@ -15,18 +15,13 @@ import * as pdftxtDownload from './page/pdftxtdownload'
 import PDFAnnoPage from './page/pdf/PDFAnnoPage'
 
 /**
- * Default PDF Name.
- */
-const DEFAULT_PDF_NAME = 'P12-1046.pdf'
-
-/**
  * API root point.
  */
-let API_ROOT = 'http://localhost:8080'
 if (process.env.NODE_ENV === 'production') {
-    API_ROOT = 'https://pdfanno.hshindo.com/' + process.env.SERVER_PATH
+    window.API_ROOT = 'https://pdfanno.hshindo.com/' + process.env.SERVER_PATH
+} else {
+    window.API_ROOT = 'http://localhost:8080'
 }
-window.API_ROOT = API_ROOT
 
 /**
  * Global variable.
@@ -166,13 +161,11 @@ window.addEventListener('DOMContentLoaded', async e => {
     annoUI.labelInput.setup({
         getSelectedAnnotations : window.annoPage.getSelectedAnnotations,
         saveAnnotationText     : (id, text) => {
-            console.log('saveAnnotationText:', id, text)
             const annotation = window.annoPage.findAnnotationById(id)
             if (annotation) {
                 annotation.text = text
                 annotation.save()
                 annotation.enableViewMode()
-
                 dispatchWindowEvent('annotationUpdated')
             }
         },
@@ -198,8 +191,6 @@ window.addEventListener('DOMContentLoaded', async e => {
     const annoURL  = q.anno
     const moveTo   = q.move
     const tabIndex = q.tab && parseInt(q.tab, 10)
-
-    console.log('target PDF :', pdfURL)
 
     // Show loading.
     showLoader(true)
@@ -272,7 +263,7 @@ window.addEventListener('DOMContentLoaded', async e => {
 function getDefaultPDFURL () {
     // e.g. https://paperai.github.io:80/pdfanno/pdfs/P12-1046.pdf
     const pathnames = location.pathname.split('/')
-    const pdfURL = location.protocol + '//' + location.hostname + ':' + location.port + pathnames.slice(0, pathnames.length - 1).join('/') + '/pdfs/' + DEFAULT_PDF_NAME
+    const pdfURL = location.protocol + '//' + location.hostname + ':' + location.port + pathnames.slice(0, pathnames.length - 1).join('/') + '/pdfs/P12-1046.pdf'
     return pdfURL
 }
 

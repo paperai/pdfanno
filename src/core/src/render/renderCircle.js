@@ -14,13 +14,10 @@ export function renderCircle ({ x, y }) {
     [x, y] = adjustPoint(x, (y - (DEFAULT_RADIUS + 2)), DEFAULT_RADIUS)
 
     const circle = $('<div class="anno-circle"/>').css({
-        position        : 'absolute',
-        top             : `${y}px`,
-        left            : `${x}px`,
-        backgroundColor : 'blue',
-        width           : DEFAULT_RADIUS + 'px',
-        height          : DEFAULT_RADIUS + 'px',
-        borderRadius    : '50%'
+        top    : `${y}px`,
+        left   : `${x}px`,
+        width  : DEFAULT_RADIUS + 'px',
+        height : DEFAULT_RADIUS + 'px'
     })
 
     return circle

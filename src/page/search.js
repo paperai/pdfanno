@@ -238,10 +238,11 @@ function doSearch ({ query = null } = {}) {
                 // TODO 後で、改行されたものとかにも対応できるようにする（その場合は、rectsが複数）
                 const aPosition = [[ fromX, fromY, (toX - fromX), (toY - fromY) ]]
                 window.searchHighlights.push({
-                    page     : page.page,
-                    top      : fromY,
-                    position : aPosition,
-                    $elm     : $div,
+                    page           : page.page,
+                    top            : fromY,
+                    position       : aPosition,
+                    searchPosition : position,
+                    $elm           : $div,
                     text
                 })
             })
@@ -251,11 +252,17 @@ function doSearch ({ query = null } = {}) {
     if (window.searchHighlights.length > 0) {
         // Init highlight at the current page.
         const currentPage = window.iframeWindow.PDFViewerApplication.page
+        let found = false
         for (let i = 0; i < window.searchHighlights.length; i++) {
             if (currentPage === window.searchHighlights[i].page) {
                 window.searchPosition = i
+                found = true
                 break
             }
+        }
+        // If there is no result at the current page, set the index 0.
+        if (!found) {
+            window.searchPosition = 0
         }
         highlightSearchResult()
     }

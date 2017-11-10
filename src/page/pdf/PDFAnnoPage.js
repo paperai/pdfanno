@@ -245,12 +245,16 @@ export default class PDFAnnoPage {
 
         } else if (highlight) {
 
+            // Get textRange.
+            const { textRange } = window.getText(highlight.page, highlight.searchPosition.start, highlight.searchPosition.end)
+
             const s = new window.SpanAnnotation({
-                page     : highlight.page,
-                position : highlight.position,
-                label    : text,
-                text     : highlight.text,
-                zIndex   : nextZIndex()
+                page      : highlight.page,
+                position  : highlight.position,
+                label     : text,
+                text      : highlight.text,
+                textrange : textRange,
+                zIndex    : nextZIndex()
             })
             window.add(s)
 
@@ -280,7 +284,7 @@ export default class PDFAnnoPage {
 
         let selectedAnnotations = window.iframeWindow.annotationContainer.getSelectedAnnotations()
         selectedAnnotations = selectedAnnotations.filter(a => {
-            return a.type === 'area' || a.type === 'span'
+            return a.type === 'rect' || a.type === 'span'
         }).sort((a1, a2) => {
             return (a1.selectedTime - a2.selectedTime) // asc
         })
@@ -526,12 +530,12 @@ export default class PDFAnnoPage {
      * Manage the ctrl button is enable/disable.
      */
     manageCtrlKey (type) {
-
-        if (type === 'on') {
-            window.iframeWindow.ctrlPressed = true
-
-        } else if (type === 'off') {
-            window.iframeWindow.ctrlPressed = false
+        if (window.iframeWindow) {
+            if (type === 'on') {
+                window.iframeWindow.ctrlPressed = true
+            } else if (type === 'off') {
+                window.iframeWindow.ctrlPressed = false
+            }
         }
     }
 

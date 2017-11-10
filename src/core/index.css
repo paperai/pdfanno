@@ -19,17 +19,6 @@
     text-align: center;
 }
 
-
-/**
- * Utilities.
- */
-.--hide {
-  display: none;
-}
-.no-action {
-    pointer-events: none;
-}
-
 /**
  * SVGLayer.
  */
@@ -46,6 +35,9 @@
     Annotation related.
 */
 .anno-circle {
+    position: absolute;
+    background: blue;
+    border-radius: 50%;
     transition:0.2s;
     transform-origin: center center;
 }
@@ -95,7 +87,6 @@
 /**
  * Span.
  */
-.anno-span {}
 .anno-span rect {
     /* Enable the hover event on circles and text even if they are overwraped other spans. */
     pointer-events: none;
@@ -104,7 +95,14 @@
 /**
   Rect.
 */
+.anno-rect-base {
+    position: absolute;
+    top: 0;
+    left: 0;
+    visibility: visible;
+}
 .anno-rect {
+    position: absolute;
 }
 .--hover .anno-rect {
   /*html*/

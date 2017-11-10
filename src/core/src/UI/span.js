@@ -12,31 +12,47 @@ function scale () {
 function getSelectionRects () {
     try {
         let selection = window.getSelection()
+
+        if (selection.rangeCount === 0) {
+            return { rects : null, selectedText : null, textRange : null }
+        }
         let range = selection.getRangeAt(0)
         let rects = range.getClientRects()
-        let selectedText = selection.toString()
 
         const pageNumber = parseInt(selection.anchorNode.parentNode.getAttribute('data-page'), 10)
-        const startIndex = parseInt(selection.anchorNode.parentNode.getAttribute('data-index'), 10)
-        const endIndex = parseInt(selection.focusNode.parentNode.getAttribute('data-index'), 10)
+        const startIndex = getIndex(selection.anchorNode)
+        const endIndex = getIndex(selection.focusNode)
         console.log('t:', pageNumber, startIndex, endIndex)
 
         // TODO a little tricky.
-        selectedText = window.parent.getText(pageNumber, startIndex, endIndex)
-        console.log('text:', selectedText)
+        const { text, textRange } = window.parent.getText(pageNumber, startIndex, endIndex)
+        console.log('text:', text)
+        console.log('textRange:', textRange)
 
         // Bug detect.
         // This selects loadingIcon and/or loadingSpacer.
         if (selection.anchorNode && selection.anchorNode.tagName === 'DIV') {
-            return { rects : null, selectedText : null }
+            return { rects : null, selectedText : null, textRange : null }
         }
 
         if (rects.length > 0 && rects[0].width > 0 && rects[0].height > 0) {
-            return { rects : mergeRects(rects), selectedText }
+            return { rects : mergeRects(rects), selectedText : text, textRange }
         }
-    } catch (e) {}
 
-    return { rects : null, selectedText : null }
+    } catch (e) {
+        console.log('ERROR:', e)
+    }
+
+    return { rects : null, selectedText : null, textRange : null }
+}
+
+function getIndex (elm) {
+    if (elm.parentNode.hasAttribute('data-index')) {
+        return parseInt(elm.parentNode.getAttribute('data-index'), 10)
+    } else if (elm.hasAttribute('data-index')) {
+        return parseInt(elm.getAttribute('data-index'), 10)
+    }
+    return null
 }
 
 /**
@@ -135,7 +151,7 @@ function removeSelection () {
 function saveSpan (text, zIndex) {
 
     // Get the rect area which User selected.
-    let { rects, selectedText } = getSelectionRects()
+    let { rects, selectedText, textRange } = getSelectionRects()
 
     // Remove the user selection.
     removeSelection()
@@ -158,6 +174,7 @@ function saveSpan (text, zIndex) {
         }).filter(r => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1),
         selectedText,
         text,
+        textRange,
         zIndex
     }
 

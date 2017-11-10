@@ -31,7 +31,7 @@ export default function appendChild (svg, annotation, viewport) {
 
     let child
     switch (annotation.type) {
-    case 'area':
+    case 'rect':
         child = renderRect(annotation, svg)
         break
     case 'span':

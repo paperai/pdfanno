@@ -32,7 +32,6 @@ export function renderSpan (a) {
 function createRect (r, color) {
 
     const rgba = hex2rgba(color, 0.4)
-    console.log('hex2rgba:', color, rgba)
 
     return $('<div/>').addClass('anno-span__area').css({
         position        : 'absolute',
