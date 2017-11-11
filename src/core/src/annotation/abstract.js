@@ -23,6 +23,7 @@ export default class AbstractAnnotation extends EventEmitter {
         this.deleted = false
         this.selected = false
         this.selectedTime = null
+        this.createdAt = new Date().getTime()
     }
 
     /**
