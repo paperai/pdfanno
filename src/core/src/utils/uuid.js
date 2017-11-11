@@ -1,11 +1,19 @@
 /**
- * Generate a universally unique identifier
+ * Generate an unique identifier for annotations.
  *
  * @return {String}
  */
+
+const ID_LENGTH = 8
+
+const BASE = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+const BASE_LEN = BASE.length
+
 export default function uuid () {
-    const maxId = window.annotationContainer.getAllAnnotations().reduce((val, a) => {
-        return Math.max(val, parseInt(a.uuid))
-    }, 0)
-    return String(maxId + 1)
+
+    let id = ''
+    for (let i = 0; i < ID_LENGTH; i++) {
+        id += BASE[ Math.floor(Math.random() * BASE_LEN) ]
+    }
+    return id
 }
