@@ -48,7 +48,7 @@ export function toTomlString (obj, root = true) {
 
         } else if (typeof val === 'object') {
             lines.push(`[${prop}]`)
-            lines.push(tomlString(val, false))
+            lines.push(toTomlString(val, false))
             root && lines.push('')
         }
     })

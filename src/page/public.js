@@ -1,4 +1,5 @@
 import { convertFromExportY } from '../shared/coords'
+import uuid from '../shared/uuid'
 import toml from 'toml'
 
 /**
@@ -33,6 +34,7 @@ export function addAllAnnotations (tomlObject) {
         }
 
         data.id = key
+        data.uuid = uuid()
 
         let a
         if (data.type === 'span') {
@@ -40,6 +42,7 @@ export function addAllAnnotations (tomlObject) {
         } else if (data.type === 'rect') {
             a = new PublicRectAnnotation(data)
         } else if (data.type === 'relation') {
+            data.ids = data.ids.map(refId => tomlObject[refId].uuid)
             a = new PublicRelationAnnotation(data)
         } else {
             console.log('Unknown: ', key, data)
@@ -83,7 +86,7 @@ export class PublicRectAnnotation {
     /**
      * Create a rect annotation from a TOML data.
      */
-    constructor ({ page, position, label = '', id = 0 }) {
+    constructor ({ page, position, label = '', id = 0, uuid='' }) {
 
         // Check inputs.
         if (!page || typeof page !== 'number') {
@@ -97,7 +100,7 @@ export class PublicRectAnnotation {
         position = position.map(p => parseFloat(p))
 
         let rect = window.annoPage.createRectAnnotation({
-            uuid     : id && String(id), // annotationid must be string.
+            uuid,
             x        : position[0],
             y        : convertFromExportY(page, position[1]),
             width    : position[2],
@@ -116,7 +119,7 @@ export class PublicRectAnnotation {
  */
 export class PublicSpanAnnotation {
 
-    constructor ({ page, position, label = '', text = '', id = 0, zIndex = 10, textrange = [] }) {
+    constructor ({ page, position, label = '', text = '', id = 0, uuid='', zIndex = 10, textrange = [] }) {
 
         console.log('PublicSpanAnnotation:', zIndex)
 
@@ -143,8 +146,7 @@ export class PublicSpanAnnotation {
         })
 
         let span = window.annoPage.createSpanAnnotation({
-            // TODO 既存のものとかぶるのではないか？
-            uuid         : id && String(id), // annotationid must be string.
+            uuid,
             rectangles   : position,
             text         : label,
             color        : '#FFFF00',
@@ -163,7 +165,7 @@ export class PublicSpanAnnotation {
  */
 export class PublicRelationAnnotation {
 
-    constructor ({ dir, ids, label = '', id = 0 }) {
+    constructor ({ dir, ids, label = '', id = 0, uuid='' }) {
 
         // Check inputs.
         if (!dir) {
@@ -174,8 +176,7 @@ export class PublicRelationAnnotation {
         }
 
         let r = window.annoPage.createRelationAnnotation({
-            // TODO 既存のものとかぶるのではないか？
-            uuid      : id && String(id), // annotationid must be string.
+            uuid,
             direction : dir,
             rel1      : typeof ids[0] === 'object' ? ids[0].annotation : ids[0],
             rel2      : typeof ids[1] === 'object' ? ids[1].annotation : ids[1],

@@ -1,4 +1,4 @@
-import uuid from '../utils/uuid'
+import uuid from '../../../shared/uuid'
 import AbstractAnnotation from './abstract'
 import { convertFromExportY } from '../../../shared/coords'
 

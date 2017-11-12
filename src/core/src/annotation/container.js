@@ -2,7 +2,7 @@ import ANNO_VERSION from '../version'
 import { toTomlString, fromTomlString } from '../utils/tomlString'
 import { dispatchWindowEvent } from '../utils/event'
 import { convertToExportY } from '../../../shared/coords'
-import uuid from '../utils/uuid'
+import uuid from '../../../shared/uuid'
 
 import SpanAnnotation from './span'
 import RectAnnotation from './rect'
