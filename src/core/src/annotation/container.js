@@ -90,18 +90,9 @@ export default class AnnotationContainer {
             // Only writable.
             const annos = this.getAllAnnotations().filter(a => !a.readOnly)
 
-            // All relations must be after spans and rects.
+            // Sort by create time.
             // This reason is that a relation need start/end annotation ids which are numbered at export.
-            annos.sort((a1, a2) => {
-                if (a1.type !== a2.type) {
-                    if (a1.type === 'relation') {
-                        return 1
-                    } else if (a2.type === 'relation') {
-                        return -1
-                    }
-                }
-                return 0
-            })
+            annos.sort((a1, a2) => a1.createdAt - a2.createdAt)
 
             // The ID for specifing an annotation on a TOML file.
             // This ID is sequential.

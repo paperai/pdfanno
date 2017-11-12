@@ -86,7 +86,7 @@ export class PublicRectAnnotation {
     /**
      * Create a rect annotation from a TOML data.
      */
-    constructor ({ page, position, label = '', id = 0, uuid='' }) {
+    constructor ({ page, position, label = '', id = 0, uuid = '' }) {
 
         // Check inputs.
         if (!page || typeof page !== 'number') {
@@ -119,7 +119,7 @@ export class PublicRectAnnotation {
  */
 export class PublicSpanAnnotation {
 
-    constructor ({ page, position, label = '', text = '', id = 0, uuid='', zIndex = 10, textrange = [] }) {
+    constructor ({ page, position, label = '', text = '', id = 0, uuid = '', zIndex = 10, textrange = [] }) {
 
         console.log('PublicSpanAnnotation:', zIndex)
 
@@ -165,7 +165,7 @@ export class PublicSpanAnnotation {
  */
 export class PublicRelationAnnotation {
 
-    constructor ({ dir, ids, label = '', id = 0, uuid='' }) {
+    constructor ({ dir, ids, label = '', id = 0, uuid = '' }) {
 
         // Check inputs.
         if (!dir) {
