@@ -1,6 +1,5 @@
-import toml from 'toml'
 import ANNO_VERSION from '../version'
-import tomlString from '../utils/tomlString'
+import { toTomlString, fromTomlString } from '../utils/tomlString'
 import { dispatchWindowEvent } from '../utils/event'
 import { convertToExportY } from '../../../shared/coords'
 import uuid from '../utils/uuid'
@@ -91,7 +90,7 @@ export default class AnnotationContainer {
             // Only writable.
             const annos = this.getAllAnnotations().filter(a => !a.readOnly)
 
-            // All relations are after spans and rects.
+            // All relations must be after spans and rects.
             // This reason is that a relation need start/end annotation ids which are numbered at export.
             annos.sort((a1, a2) => {
                 if (a1.type !== a2.type) {
@@ -190,7 +189,7 @@ export default class AnnotationContainer {
 
             })
 
-            resolve(tomlString(dataExport))
+            resolve(toTomlString(dataExport))
         })
     }
 
@@ -211,18 +210,10 @@ export default class AnnotationContainer {
             // Add annotations.
             data.annotations.forEach((tomlString, i) => {
 
-                // TOML to JavascriptObject.
-                // TODO Define as a function.
-                let tomlObject
-                try {
-                    if (tomlString) {
-                        tomlObject = toml.parse(tomlString)
-                    } else {
-                        tomlObject = {}
-                    }
-                } catch (e) {
-                    console.log('ERROR:', e)
-                    console.log('TOML:\n', tomlString)
+                // Create a object from TOML string.
+                let tomlObject = fromTomlString(tomlString)
+                if (!tomlObject) {
+                    return
                 }
 
                 let color = data.colors[i]
@@ -237,7 +228,7 @@ export default class AnnotationContainer {
                     }
 
                     d.uuid = uuid()
-                    d.readOnly = !isPrimary
+                    d.readOnly = readOnly
                     d.color = color
 
                     if (d.type === 'span') {

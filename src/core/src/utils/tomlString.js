@@ -1,7 +1,12 @@
 /**
+ * Utilities for TOML format.
+ */
+import toml from 'toml'
+
+/**
  * Create a TOML String from jsObject.
  */
-export default function tomlString (obj, root = true) {
+export function toTomlString (obj, root = true) {
 
     let lines = []
 
@@ -49,6 +54,19 @@ export default function tomlString (obj, root = true) {
     })
 
     return lines.join('\n')
+}
+
+/**
+ * Create a object from TOML string.
+ */
+export function fromTomlString (tomlString) {
+    try {
+        return toml.parse(tomlString)
+    } catch (e) {
+        console.log('ERROR:', e)
+        console.log('TOML:\n', tomlString)
+        return null
+    }
 }
 
 /**
