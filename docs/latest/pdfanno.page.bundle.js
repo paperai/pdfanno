@@ -465,6 +465,33 @@ function nextZIndex () {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = uuid;
+/**
+ * Generate an unique identifier for annotations.
+ *
+ * @return {String}
+ */
+
+const ID_LENGTH = 8
+
+const BASE = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+const BASE_LEN = BASE.length
+
+function uuid () {
+
+    let id = ''
+    for (let i = 0; i < ID_LENGTH; i++) {
+        id += BASE[ Math.floor(Math.random() * BASE_LEN) ]
+    }
+    return id
+}
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = anyOf;
 /* harmony export (immutable) */ __webpack_exports__["b"] = dispatchWindowEvent;
 /**
@@ -486,7 +513,6 @@ function dispatchWindowEvent (eventName, data) {
 
 
 /***/ }),
-/* 3 */,
 /* 4 */
 /***/ (function(module, exports) {
 
@@ -12723,7 +12749,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_urijs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_urijs__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_anno_ui__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_anno_ui___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_anno_ui__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__shared_util__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__shared_util__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__page_util_window__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__page_public__ = __webpack_require__(39);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__page_search__ = __webpack_require__(40);
@@ -15477,8 +15503,10 @@ module.exports = g;
 /* unused harmony export deleteAnnotation */
 /* unused harmony export clear */
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shared_coords__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_toml__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_toml___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_toml__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__shared_uuid__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_toml__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_toml___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_toml__);
+
 
 
 
@@ -15514,6 +15542,7 @@ function addAllAnnotations (tomlObject) {
         }
 
         data.id = key
+        data.uuid = __WEBPACK_IMPORTED_MODULE_1__shared_uuid__["a" /* default */]()
 
         let a
         if (data.type === 'span') {
@@ -15521,6 +15550,7 @@ function addAllAnnotations (tomlObject) {
         } else if (data.type === 'rect') {
             a = new PublicRectAnnotation(data)
         } else if (data.type === 'relation') {
+            data.ids = data.ids.map(refId => tomlObject[refId].uuid)
             a = new PublicRelationAnnotation(data)
         } else {
             console.log('Unknown: ', key, data)
@@ -15564,7 +15594,7 @@ class PublicRectAnnotation {
     /**
      * Create a rect annotation from a TOML data.
      */
-    constructor ({ page, position, label = '', id = 0 }) {
+    constructor ({ page, position, label = '', id = 0, uuid = '' }) {
 
         // Check inputs.
         if (!page || typeof page !== 'number') {
@@ -15578,7 +15608,7 @@ class PublicRectAnnotation {
         position = position.map(p => parseFloat(p))
 
         let rect = window.annoPage.createRectAnnotation({
-            uuid     : id && String(id), // annotationid must be string.
+            uuid,
             x        : position[0],
             y        : __WEBPACK_IMPORTED_MODULE_0__shared_coords__["a" /* convertFromExportY */](page, position[1]),
             width    : position[2],
@@ -15599,7 +15629,7 @@ class PublicRectAnnotation {
  */
 class PublicSpanAnnotation {
 
-    constructor ({ page, position, label = '', text = '', id = 0, zIndex = 10, textrange = [] }) {
+    constructor ({ page, position, label = '', text = '', id = 0, uuid = '', zIndex = 10, textrange = [] }) {
 
         console.log('PublicSpanAnnotation:', zIndex)
 
@@ -15626,8 +15656,7 @@ class PublicSpanAnnotation {
         })
 
         let span = window.annoPage.createSpanAnnotation({
-            // TODO 既存のものとかぶるのではないか？
-            uuid         : id && String(id), // annotationid must be string.
+            uuid,
             rectangles   : position,
             text         : label,
             color        : '#FFFF00',
@@ -15648,7 +15677,7 @@ class PublicSpanAnnotation {
  */
 class PublicRelationAnnotation {
 
-    constructor ({ dir, ids, label = '', id = 0 }) {
+    constructor ({ dir, ids, label = '', id = 0, uuid = '' }) {
 
         // Check inputs.
         if (!dir) {
@@ -15659,8 +15688,7 @@ class PublicRelationAnnotation {
         }
 
         let r = window.annoPage.createRelationAnnotation({
-            // TODO 既存のものとかぶるのではないか？
-            uuid      : id && String(id), // annotationid must be string.
+            uuid,
             direction : dir,
             rel1      : typeof ids[0] === 'object' ? ids[0].annotation : ids[0],
             rel2      : typeof ids[1] === 'object' ? ids[1].annotation : ids[1],
@@ -15678,7 +15706,7 @@ class PublicRelationAnnotation {
 /**
  * TOML parser.
  */
-const readTOML = __WEBPACK_IMPORTED_MODULE_1_toml___default.a.parse
+const readTOML = __WEBPACK_IMPORTED_MODULE_2_toml___default.a.parse
 /* harmony export (immutable) */ __webpack_exports__["c"] = readTOML;
 
 
@@ -16288,7 +16316,7 @@ function getDownloadFileName () {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_anno_ui__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_anno_ui___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_anno_ui__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__loadFiles__ = __webpack_require__(63);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_util__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_util__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__shared_coords__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__util_window__ = __webpack_require__(18);
 
