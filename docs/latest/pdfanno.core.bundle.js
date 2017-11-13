@@ -160,6 +160,33 @@ function nextZIndex () {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = uuid;
+/**
+ * Generate an unique identifier for annotations.
+ *
+ * @return {String}
+ */
+
+const ID_LENGTH = 8
+
+const BASE = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+const BASE_LEN = BASE.length
+
+function uuid () {
+
+    let id = ''
+    for (let i = 0; i < ID_LENGTH; i++) {
+        id += BASE[ Math.floor(Math.random() * BASE_LEN) ]
+    }
+    return id
+}
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = anyOf;
 /* harmony export (immutable) */ __webpack_exports__["b"] = dispatchWindowEvent;
 /**
@@ -177,25 +204,6 @@ function dispatchWindowEvent (eventName, data) {
     var event = document.createEvent('CustomEvent')
     event.initCustomEvent(eventName, true, true, data)
     window.dispatchEvent(event)
-}
-
-
-/***/ }),
-/* 3 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = uuid;
-/**
- * Generate a universally unique identifier
- *
- * @return {String}
- */
-function uuid () {
-    const maxId = window.annotationContainer.getAllAnnotations().reduce((val, a) => {
-        return Math.max(val, parseInt(a.uuid))
-    }, 0)
-    return String(maxId + 1)
 }
 
 
@@ -4580,7 +4588,7 @@ module.exports = {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_uuid__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shared_uuid__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__abstract__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__shared_coords__ = __webpack_require__(1);
 
@@ -4615,7 +4623,7 @@ class SpanAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
      */
     static newInstance (annotation) {
         let a          = new SpanAnnotation()
-        a.uuid         = annotation.uuid || __WEBPACK_IMPORTED_MODULE_0__utils_uuid__["a" /* default */]()
+        a.uuid         = annotation.uuid || __WEBPACK_IMPORTED_MODULE_0__shared_uuid__["a" /* default */]()
         a.rectangles   = annotation.rectangles
         a.text         = annotation.text
         a.color        = annotation.color
@@ -4829,6 +4837,7 @@ class AbstractAnnotation extends __WEBPACK_IMPORTED_MODULE_0_events___default.a 
         this.deleted = false
         this.selected = false
         this.selectedTime = null
+        this.createdAt = new Date().getTime()
     }
 
     /**
@@ -5151,10 +5160,10 @@ function adjustPoint (x, y, radius) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_uuid__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shared_uuid__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__abstract__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_relation_js__ = __webpack_require__(28);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_util__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_util__ = __webpack_require__(3);
 
 
 
@@ -5175,7 +5184,7 @@ class RelationAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* 
 
         globalEvent = window.globalEvent
 
-        this.uuid = __WEBPACK_IMPORTED_MODULE_0__utils_uuid__["a" /* default */]()
+        this.uuid = __WEBPACK_IMPORTED_MODULE_0__shared_uuid__["a" /* default */]()
         this.type = 'relation'
         this.direction = null
         this.rel1Annotation = null
@@ -5201,7 +5210,7 @@ class RelationAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* 
      */
     static newInstance (annotation) {
         let a            = new RelationAnnotation()
-        a.uuid           = annotation.uuid || __WEBPACK_IMPORTED_MODULE_0__utils_uuid__["a" /* default */]()
+        a.uuid           = annotation.uuid || __WEBPACK_IMPORTED_MODULE_0__shared_uuid__["a" /* default */]()
         a.direction      = annotation.direction
         a.rel1Annotation = __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* default */].isAnnotation(annotation.rel1) ? annotation.rel1 : window.annotationContainer.findById(annotation.rel1)
         a.rel2Annotation = __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* default */].isAnnotation(annotation.rel2) ? annotation.rel2 : window.annotationContainer.findById(annotation.rel2)
@@ -6197,7 +6206,7 @@ function disable () {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_uuid__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shared_uuid__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__abstract__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__UI_utils__ = __webpack_require__(26);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_coords__ = __webpack_require__(1);
@@ -6242,7 +6251,7 @@ class RectAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
      */
     static newInstance (annotation) {
         let rect      = new RectAnnotation()
-        rect.uuid     = annotation.uuid || __WEBPACK_IMPORTED_MODULE_0__utils_uuid__["a" /* default */]()
+        rect.uuid     = annotation.uuid || __WEBPACK_IMPORTED_MODULE_0__shared_uuid__["a" /* default */]()
         rect.x        = annotation.x
         rect.y        = annotation.y
         rect.width    = annotation.width
@@ -6540,7 +6549,7 @@ class RectAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shared_util__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shared_util__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_events__ = __webpack_require__(25);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_events___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_events__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_PDFAnnoCore__ = __webpack_require__(67);
@@ -6835,7 +6844,7 @@ function getSelectionRects () {
         let range = selection.getRangeAt(0)
         let rects = range.getClientRects()
 
-        const pageNumber = parseInt(selection.anchorNode.parentNode.getAttribute('data-page'), 10)
+        const pageNumber = getPageNumber(selection.anchorNode)
         const startIndex = getIndex(selection.anchorNode)
         const endIndex = getIndex(selection.focusNode)
         console.log('t:', pageNumber, startIndex, endIndex)
@@ -6860,6 +6869,15 @@ function getSelectionRects () {
     }
 
     return { rects : null, selectedText : null, textRange : null }
+}
+
+function getPageNumber (elm) {
+    if (elm.parentNode.hasAttribute('data-page')) {
+        return parseInt(elm.parentNode.getAttribute('data-page'), 10)
+    } else if (elm.hasAttribute('data-page')) {
+        return parseInt(elm.getAttribute('data-page'), 10)
+    }
+    return null
 }
 
 function getIndex (elm) {
@@ -7583,17 +7601,14 @@ function enableViewMode () {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_toml__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_toml___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_toml__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__version__ = __webpack_require__(78);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_tomlString__ = __webpack_require__(80);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_event__ = __webpack_require__(29);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__shared_coords__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__utils_uuid__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__span__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__rect__ = __webpack_require__(31);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__relation__ = __webpack_require__(14);
-
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__version__ = __webpack_require__(78);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils_tomlString__ = __webpack_require__(80);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_event__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_coords__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__shared_uuid__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__span__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__rect__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__relation__ = __webpack_require__(14);
 
 
 
@@ -7621,7 +7636,7 @@ class AnnotationContainer {
      */
     add (annotation) {
         this.set.add(annotation)
-        __WEBPACK_IMPORTED_MODULE_3__utils_event__["a" /* dispatchWindowEvent */]('annotationUpdated')
+        __WEBPACK_IMPORTED_MODULE_2__utils_event__["a" /* dispatchWindowEvent */]('annotationUpdated')
     }
 
     /**
@@ -7629,7 +7644,7 @@ class AnnotationContainer {
      */
     remove (annotation) {
         this.set.delete(annotation)
-        __WEBPACK_IMPORTED_MODULE_3__utils_event__["a" /* dispatchWindowEvent */]('annotationUpdated')
+        __WEBPACK_IMPORTED_MODULE_2__utils_event__["a" /* dispatchWindowEvent */]('annotationUpdated')
     }
 
     /**
@@ -7681,14 +7696,24 @@ class AnnotationContainer {
             let dataExport = {}
 
             // Set version.
-            dataExport.version = __WEBPACK_IMPORTED_MODULE_1__version__["a" /* default */]
+            dataExport.version = __WEBPACK_IMPORTED_MODULE_0__version__["a" /* default */]
+
+            // Only writable.
+            const annos = this.getAllAnnotations().filter(a => !a.readOnly)
+
+            // Sort by create time.
+            // This reason is that a relation need start/end annotation ids which are numbered at export.
+            annos.sort((a1, a2) => a1.createdAt - a2.createdAt)
+
+            // The ID for specifing an annotation on a TOML file.
+            // This ID is sequential.
+            let id = 0
 
             // Create export data.
-            this.getAllAnnotations().filter(a => {
-                // Just only primary annos.
-                return !a.readOnly
+            annos.forEach(annotation => {
 
-            }).forEach(annotation => {
+                // Increment to next.
+                id++
 
                 // Span.
                 if (annotation.type === 'span') {
@@ -7696,11 +7721,11 @@ class AnnotationContainer {
                     // TODO Define at annotation/span.js
 
                     // page.
-                    let { pageNumber } = __WEBPACK_IMPORTED_MODULE_4__shared_coords__["b" /* convertToExportY */](annotation.rectangles[0].y)
+                    let { pageNumber } = __WEBPACK_IMPORTED_MODULE_3__shared_coords__["b" /* convertToExportY */](annotation.rectangles[0].y)
 
                     // rectangles.
                     let rectangles = annotation.rectangles.map(rectangle => {
-                        const { y } = __WEBPACK_IMPORTED_MODULE_4__shared_coords__["b" /* convertToExportY */](rectangle.y)
+                        const { y } = __WEBPACK_IMPORTED_MODULE_3__shared_coords__["b" /* convertToExportY */](rectangle.y)
                         return [
                             rectangle.x,
                             y,
@@ -7716,7 +7741,7 @@ class AnnotationContainer {
                                 .replace(/"/g, '')
                                 .replace(/\\/g, '')
 
-                    dataExport[annotation.uuid] = {
+                    dataExport[id] = {
                         type      : annotation.type,
                         page      : pageNumber,
                         position  : rectangles,
@@ -7725,15 +7750,18 @@ class AnnotationContainer {
                         textrange : annotation.textRange
                     }
 
+                    // Save temporary for relation.
+                    annotation.exportId = id
+
                 // Relation.
                 } else if (annotation.type === 'relation') {
 
                     // TODO Define at annotation/relation.js
 
-                    dataExport[annotation.uuid] = {
+                    dataExport[id] = {
                         type  : 'relation',
                         dir   : annotation.direction,
-                        ids   : [ annotation.rel1Annotation.uuid, annotation.rel2Annotation.uuid ],
+                        ids   : [ annotation.rel1Annotation.exportId, annotation.rel2Annotation.exportId ],
                         label : annotation.text || ''
                     }
 
@@ -7747,20 +7775,23 @@ class AnnotationContainer {
                         position = ["9.24324324324326","435.94054054054055","235.7027027027027","44.65945945945946"]
                         label = "aaaa"
                     */
-                    let { pageNumber, y } = __WEBPACK_IMPORTED_MODULE_4__shared_coords__["b" /* convertToExportY */](annotation.y)
+                    let { pageNumber, y } = __WEBPACK_IMPORTED_MODULE_3__shared_coords__["b" /* convertToExportY */](annotation.y)
 
-                    dataExport[annotation.uuid] = {
+                    dataExport[id] = {
                         type     : 'rect',
                         page     : pageNumber,
                         position : [ annotation.x, y, annotation.width, annotation.height ],
                         label    : annotation.text || ''
                     }
 
+                    // Save temporary for relation.
+                    annotation.exportId = id
+
                 }
 
             })
 
-            resolve(__WEBPACK_IMPORTED_MODULE_2__utils_tomlString__["a" /* default */](dataExport))
+            resolve(__WEBPACK_IMPORTED_MODULE_1__utils_tomlString__["b" /* toTomlString */](dataExport))
         })
     }
 
@@ -7781,18 +7812,10 @@ class AnnotationContainer {
             // Add annotations.
             data.annotations.forEach((tomlString, i) => {
 
-                // TOML to JavascriptObject.
-                // TODO Define as a function.
-                let tomlObject
-                try {
-                    if (tomlString) {
-                        tomlObject = __WEBPACK_IMPORTED_MODULE_0_toml___default.a.parse(tomlString)
-                    } else {
-                        tomlObject = {}
-                    }
-                } catch (e) {
-                    console.log('ERROR:', e)
-                    console.log('TOML:\n', tomlString)
+                // Create a object from TOML string.
+                let tomlObject = __WEBPACK_IMPORTED_MODULE_1__utils_tomlString__["a" /* fromTomlString */](tomlString)
+                if (!tomlObject) {
+                    return
                 }
 
                 let color = data.colors[i]
@@ -7806,13 +7829,13 @@ class AnnotationContainer {
                         continue
                     }
 
-                    d.uuid = __WEBPACK_IMPORTED_MODULE_5__utils_uuid__["a" /* default */]()
-                    d.readOnly = !isPrimary
+                    d.uuid = __WEBPACK_IMPORTED_MODULE_4__shared_uuid__["a" /* default */]()
+                    d.readOnly = readOnly
                     d.color = color
 
                     if (d.type === 'span') {
 
-                        let span = __WEBPACK_IMPORTED_MODULE_6__span__["a" /* default */].newInstanceFromTomlObject(d)
+                        let span = __WEBPACK_IMPORTED_MODULE_5__span__["a" /* default */].newInstanceFromTomlObject(d)
                         span.save()
                         span.render()
                         span.enableViewMode()
@@ -7820,7 +7843,7 @@ class AnnotationContainer {
                     // Rect.
                     } else if (d.type === 'rect') {
 
-                        let rect = __WEBPACK_IMPORTED_MODULE_7__rect__["a" /* default */].newInstanceFromTomlObject(d)
+                        let rect = __WEBPACK_IMPORTED_MODULE_6__rect__["a" /* default */].newInstanceFromTomlObject(d)
                         rect.save()
                         rect.render()
                         rect.enableViewMode()
@@ -7830,7 +7853,7 @@ class AnnotationContainer {
 
                         d.rel1 = tomlObject[d.ids[0]].uuid
                         d.rel2 = tomlObject[d.ids[1]].uuid
-                        let relation = __WEBPACK_IMPORTED_MODULE_8__relation__["a" /* default */].newInstanceFromTomlObject(d)
+                        let relation = __WEBPACK_IMPORTED_MODULE_7__relation__["a" /* default */].newInstanceFromTomlObject(d)
                         relation.save()
                         relation.render()
                         relation.enableViewMode()
@@ -7875,11 +7898,19 @@ module.exports = {"name":"pdfanno","version":"0.4.0-dev","description":"","main"
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = tomlString;
+/* harmony export (immutable) */ __webpack_exports__["b"] = toTomlString;
+/* harmony export (immutable) */ __webpack_exports__["a"] = fromTomlString;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_toml__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_toml___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_toml__);
+/**
+ * Utilities for TOML format.
+ */
+
+
 /**
  * Create a TOML String from jsObject.
  */
-function tomlString (obj, root = true) {
+function toTomlString (obj, root = true) {
 
     let lines = []
 
@@ -7921,12 +7952,25 @@ function tomlString (obj, root = true) {
 
         } else if (typeof val === 'object') {
             lines.push(`[${prop}]`)
-            lines.push(tomlString(val, false))
+            lines.push(toTomlString(val, false))
             root && lines.push('')
         }
     })
 
     return lines.join('\n')
+}
+
+/**
+ * Create a object from TOML string.
+ */
+function fromTomlString (tomlString) {
+    try {
+        return __WEBPACK_IMPORTED_MODULE_0_toml___default.a.parse(tomlString)
+    } catch (e) {
+        console.log('ERROR:', e)
+        console.log('TOML:\n', tomlString)
+        return null
+    }
 }
 
 /**

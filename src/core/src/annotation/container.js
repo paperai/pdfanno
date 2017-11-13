@@ -1,9 +1,8 @@
-import toml from 'toml'
 import ANNO_VERSION from '../version'
-import tomlString from '../utils/tomlString'
+import { toTomlString, fromTomlString } from '../utils/tomlString'
 import { dispatchWindowEvent } from '../utils/event'
 import { convertToExportY } from '../../../shared/coords'
-import uuid from '../utils/uuid'
+import uuid from '../../../shared/uuid'
 
 import SpanAnnotation from './span'
 import RectAnnotation from './rect'
@@ -88,12 +87,22 @@ export default class AnnotationContainer {
             // Set version.
             dataExport.version = ANNO_VERSION
 
-            // Create export data.
-            this.getAllAnnotations().filter(a => {
-                // Just only primary annos.
-                return !a.readOnly
+            // Only writable.
+            const annos = this.getAllAnnotations().filter(a => !a.readOnly)
 
-            }).forEach(annotation => {
+            // Sort by create time.
+            // This reason is that a relation need start/end annotation ids which are numbered at export.
+            annos.sort((a1, a2) => a1.createdAt - a2.createdAt)
+
+            // The ID for specifing an annotation on a TOML file.
+            // This ID is sequential.
+            let id = 0
+
+            // Create export data.
+            annos.forEach(annotation => {
+
+                // Increment to next.
+                id++
 
                 // Span.
                 if (annotation.type === 'span') {
@@ -121,7 +130,7 @@ export default class AnnotationContainer {
                                 .replace(/"/g, '')
                                 .replace(/\\/g, '')
 
-                    dataExport[annotation.uuid] = {
+                    dataExport[id] = {
                         type      : annotation.type,
                         page      : pageNumber,
                         position  : rectangles,
@@ -130,15 +139,18 @@ export default class AnnotationContainer {
                         textrange : annotation.textRange
                     }
 
+                    // Save temporary for relation.
+                    annotation.exportId = id
+
                 // Relation.
                 } else if (annotation.type === 'relation') {
 
                     // TODO Define at annotation/relation.js
 
-                    dataExport[annotation.uuid] = {
+                    dataExport[id] = {
                         type  : 'relation',
                         dir   : annotation.direction,
-                        ids   : [ annotation.rel1Annotation.uuid, annotation.rel2Annotation.uuid ],
+                        ids   : [ annotation.rel1Annotation.exportId, annotation.rel2Annotation.exportId ],
                         label : annotation.text || ''
                     }
 
@@ -154,18 +166,21 @@ export default class AnnotationContainer {
                     */
                     let { pageNumber, y } = convertToExportY(annotation.y)
 
-                    dataExport[annotation.uuid] = {
+                    dataExport[id] = {
                         type     : 'rect',
                         page     : pageNumber,
                         position : [ annotation.x, y, annotation.width, annotation.height ],
                         label    : annotation.text || ''
                     }
 
+                    // Save temporary for relation.
+                    annotation.exportId = id
+
                 }
 
             })
 
-            resolve(tomlString(dataExport))
+            resolve(toTomlString(dataExport))
         })
     }
 
@@ -186,18 +201,10 @@ export default class AnnotationContainer {
             // Add annotations.
             data.annotations.forEach((tomlString, i) => {
 
-                // TOML to JavascriptObject.
-                // TODO Define as a function.
-                let tomlObject
-                try {
-                    if (tomlString) {
-                        tomlObject = toml.parse(tomlString)
-                    } else {
-                        tomlObject = {}
-                    }
-                } catch (e) {
-                    console.log('ERROR:', e)
-                    console.log('TOML:\n', tomlString)
+                // Create a object from TOML string.
+                let tomlObject = fromTomlString(tomlString)
+                if (!tomlObject) {
+                    return
                 }
 
                 let color = data.colors[i]
@@ -212,7 +219,7 @@ export default class AnnotationContainer {
                     }
 
                     d.uuid = uuid()
-                    d.readOnly = !isPrimary
+                    d.readOnly = readOnly
                     d.color = color
 
                     if (d.type === 'span') {

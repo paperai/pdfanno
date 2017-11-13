@@ -19,7 +19,7 @@ function getSelectionRects () {
         let range = selection.getRangeAt(0)
         let rects = range.getClientRects()
 
-        const pageNumber = parseInt(selection.anchorNode.parentNode.getAttribute('data-page'), 10)
+        const pageNumber = getPageNumber(selection.anchorNode)
         const startIndex = getIndex(selection.anchorNode)
         const endIndex = getIndex(selection.focusNode)
         console.log('t:', pageNumber, startIndex, endIndex)
@@ -44,6 +44,15 @@ function getSelectionRects () {
     }
 
     return { rects : null, selectedText : null, textRange : null }
+}
+
+function getPageNumber (elm) {
+    if (elm.parentNode.hasAttribute('data-page')) {
+        return parseInt(elm.parentNode.getAttribute('data-page'), 10)
+    } else if (elm.hasAttribute('data-page')) {
+        return parseInt(elm.getAttribute('data-page'), 10)
+    }
+    return null
 }
 
 function getIndex (elm) {
