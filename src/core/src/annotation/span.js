@@ -1,4 +1,4 @@
-import uuid from '../../../shared/uuid'
+import { uuid } from 'anno-ui/src/utils'
 import AbstractAnnotation from './abstract'
 import { convertFromExportY } from '../../../shared/coords'
 

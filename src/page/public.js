@@ -1,6 +1,6 @@
-import { convertFromExportY } from '../shared/coords'
-import uuid from '../shared/uuid'
+import { uuid } from 'anno-ui/src/utils'
 import toml from 'toml'
+import { convertFromExportY } from '../shared/coords'
 
 /**
  * Expose public APIs.
