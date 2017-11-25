@@ -4,6 +4,8 @@
 import { paddingBetweenPages, nextZIndex } from '../shared/coords'
 import { customizeAnalyzeResult } from './util/analyzer'
 
+// TODO 解析javaが複数回呼ばれている問題を直すと早くなるかも.
+
 let pages = []
 
 export function setup (analyzeData) {
@@ -110,8 +112,6 @@ function highlightSearchResult () {
     const highlight = window.searchHighlights[window.searchPosition]
     highlight.$elm.addClass('pdfanno-search-result--highlight')
 
-    console.log(`highlight: index=${window.searchPosition}, page=${highlight.page}`)
-
     // Scroll to.
     let pageHeight = window.annoPage.getViewerViewport().height
     let scale = window.annoPage.getViewerViewport().scale
@@ -132,6 +132,7 @@ function rerenderSearchResults () {
     $('.pdfanno-search-result', window.iframeWindow.document).remove()
 
     // Display.
+    // TODO 高速化。計測から。jQueryアクセスやappendを改善したら早そう.
     window.searchHighlights.forEach((highlight, index) => {
         const $textLayer = $(`.page[data-page-number="${highlight.page}"] .textLayer`, window.iframeWindow.document)
         // set the depth.
@@ -157,6 +158,9 @@ function search ({ hay, needle, isCaseSensitive = false, useRegexp = false }) {
             start : match.index,
             end   : match.index + match[0].length
         })
+        if (positions.length <= 11) {
+            console.log(match)
+        }
     }
     return positions
 }
@@ -359,6 +363,9 @@ window.addEventListener('DOMContentLoaded', () => {
     })
 })
 
+/**
+ * Search by a dict file.
+ */
 function searchByDictionary (texts = []) {
     console.log('searchByDictionary:', texts)
     window.searchType = 'dictionary'
