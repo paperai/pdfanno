@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 32);
+/******/ 	return __webpack_require__(__webpack_require__.s = 33);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -80,7 +80,7 @@ return /******/ (function(modules) { // webpackBootstrap
 "use strict";
 
 
-var bind = __webpack_require__(20);
+var bind = __webpack_require__(21);
 
 /*global toString:true*/
 
@@ -11610,10 +11610,10 @@ function getDefaultAdapter() {
   var adapter;
   if (typeof XMLHttpRequest !== 'undefined') {
     // For browsers use XHR adapter
-    adapter = __webpack_require__(21);
+    adapter = __webpack_require__(22);
   } else if (typeof process !== 'undefined') {
     // For node use HTTP adapter
-    adapter = __webpack_require__(21);
+    adapter = __webpack_require__(22);
   }
   return adapter;
 }
@@ -12227,7 +12227,7 @@ module.exports = defaults;
 
 }(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(37)(module), __webpack_require__(38)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(38)(module), __webpack_require__(39)))
 
 /***/ }),
 /* 16 */
@@ -12757,6 +12757,425 @@ function resizeHandler () {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony export (immutable) */ __webpack_exports__["b"] = setup;
+/* harmony export (immutable) */ __webpack_exports__["a"] = getSearchHighlight;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shared_coords__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util_analyzer__ = __webpack_require__(20);
+/**
+ * Search functions.
+ */
+
+
+
+/**
+ * The analyze data per pages.
+ */
+let pages = []
+
+/**
+ * Search type ( text / dictionary )
+ */
+let searchType = null
+
+/**
+ * The position where a search result is highlighted.
+ */
+let searchPosition = -1
+
+/**
+ * The highlights for search.
+ */
+let searchHighlights = []
+
+/**
+ * Texts for dictionary search.
+ */
+let dictonaryTexts
+
+/**
+ * Setup the search function.
+ */
+function setup (analyzeData) {
+
+    pages = __WEBPACK_IMPORTED_MODULE_1__util_analyzer__["a" /* customizeAnalyzeResult */](analyzeData)
+
+    enableSearchUI()
+}
+
+/**
+ * Get the current highlight.
+ */
+function getSearchHighlight () {
+    if (searchPosition > -1) {
+        return searchHighlights[searchPosition]
+    }
+    return null
+}
+
+function enableSearchUI () {
+    $('#searchWord, .js-dict-match-file').removeAttr('disabled')
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+
+    const DELAY = 500
+    let timerId
+
+    $('#searchWord').on('keyup', e => {
+
+        // Enter key.
+        if (e.keyCode === 13) {
+            nextResult()
+            return
+        }
+
+        if (timerId) {
+            clearTimeout(timerId)
+            timerId = null
+        }
+
+        timerId = setTimeout(() => {
+            timerId = null
+            searchType = 'text'
+            doSearch()
+        }, DELAY)
+    })
+
+    $('.js-search-case-sensitive, .js-search-regexp').on('change', () => {
+        searchType = 'text'
+        doSearch()
+    })
+
+    $('.js-search-case-sensitive, .js-search-regexp').on('click', e => {
+        $(e.currentTarget).blur()
+    })
+
+    $('.js-search-clear').on('click', e => {
+        // Clear search.
+        $('#searchWord').val('')
+        searchType = null
+        doSearch()
+        $(e.currentTarget).blur()
+    })
+
+    // Re-render the search results.
+    window.addEventListener('pagerendered', rerenderSearchResults)
+
+    $('.js-search-prev, .js-search-next').on('click', e => {
+
+        if (searchType !== 'text') {
+            return
+        }
+
+        // No action for no results.
+        if (searchHighlights.length === 0) {
+            return
+        }
+
+        if ($(e.currentTarget).hasClass('js-search-prev')) {
+            prevResult()
+        } else {
+            nextResult()
+        }
+    })
+})
+
+/**
+ * Highlight the prev search result.
+ */
+function prevResult () {
+    searchPosition--
+    if (searchPosition < 0) {
+        searchPosition = searchHighlights.length - 1
+    }
+    highlightSearchResult()
+}
+
+/**
+ * Highlight the next search result.
+ */
+function nextResult () {
+    searchPosition++
+    if (searchPosition >= searchHighlights.length) {
+        searchPosition = 0
+    }
+    highlightSearchResult()
+}
+
+/**
+ * Highlight a single search result.
+ */
+function highlightSearchResult () {
+
+    $('.search-current-position').text(searchPosition + 1)
+
+    $('.pdfanno-search-result', window.iframeWindow.document).removeClass('pdfanno-search-result--highlight')
+
+    const highlight = searchHighlights[searchPosition]
+    highlight.$elm.addClass('pdfanno-search-result--highlight')
+
+    // Scroll to.
+    let pageHeight = window.annoPage.getViewerViewport().height
+    let scale = window.annoPage.getViewerViewport().scale
+    let _y = (pageHeight + __WEBPACK_IMPORTED_MODULE_0__shared_coords__["d" /* paddingBetweenPages */]) * (highlight.page - 1) + highlight.top * scale
+    _y -= 100
+    $('#viewer iframe').contents().find('#viewer').parent()[0].scrollTop = _y
+
+}
+
+/**
+ * Render search results.
+ */
+function rerenderSearchResults () {
+
+    // Remove olds.
+    $('.pdfanno-search-result', window.iframeWindow.document).remove()
+
+    // Display.
+    // TODO 高速化。計測から。jQueryアクセスやappendを改善したら早そう.
+    searchHighlights.forEach((highlight, index) => {
+        const $textLayer = $(`.page[data-page-number="${highlight.page}"] .textLayer`, window.iframeWindow.document)
+        // set the depth.
+        highlight.$elm.css('z-index', __WEBPACK_IMPORTED_MODULE_0__shared_coords__["c" /* nextZIndex */]())
+        $textLayer.append(highlight.$elm)
+    })
+}
+
+/**
+ * Search the position of  a word / words which an user input.
+ */
+function search ({ hay, needle, isCaseSensitive = false, useRegexp = false }) {
+    if (!needle) {
+        return []
+    }
+    const SPECIAL_CHARS_REGEX = /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g
+    const flags = 'g' + (isCaseSensitive === false ? 'i' : '')
+    if (useRegexp === false) {
+        needle = needle.replace(SPECIAL_CHARS_REGEX, '\\$&')
+    }
+    let re = new RegExp(needle, flags)
+    let positions = []
+    let match
+    while ((match = re.exec(hay)) != null) {
+        positions.push({
+            start : match.index,
+            end   : match.index + match[0].length
+        })
+        if (positions.length <= 11) {
+            console.log(match)
+        }
+    }
+    return positions
+}
+
+function doSearch ({ query = null } = {}) {
+
+    // Check enable.
+    if ($('#searchWord').is('[disabled]')) {
+        console.log('Search function is not enabled yet.')
+        return
+    }
+
+    // Remove highlights for search results.
+    $('.pdfanno-search-result', window.iframeWindow.document).remove()
+    $('.search-hit').addClass('hidden')
+    $('.js-dict-match-cur-pos, .js-dict-match-hit-counts').text('000')
+
+    let text
+    let isCaseSensitive
+    let useRegexp
+    if (searchType === 'text') {
+        text = $('#searchWord').val()
+        isCaseSensitive = $('.js-search-case-sensitive')[0].checked
+        useRegexp = $('.js-search-regexp')[0].checked
+    } else {
+        text = query
+        isCaseSensitive = $('.js-dict-match-case-sensitive')[0].checked
+        useRegexp = true
+    }
+
+    console.log(`doSearch: searchType=${searchType} text="${text}", caseSensitive=${isCaseSensitive}, regexp=${useRegexp}`)
+
+    // Reset.
+    searchPosition = -1
+    searchHighlights = []
+
+    // The min length of text for searching.
+    const MIN_LEN = 2
+    if (!text || text.length < MIN_LEN) {
+        return
+    }
+
+    pages.forEach(page => {
+
+        // Search.
+        const positions = search({ hay : page.body, needle : text, isCaseSensitive, useRegexp })
+
+        // Display highlights.
+        if (positions.length > 0) {
+            positions.forEach(position => {
+                const $textLayer = $(`.page[data-page-number="${page.page}"] .textLayer`, window.iframeWindow.document)
+                const infos = page.meta.slice(position.start, position.end)
+                // console.log('infos:', infos)
+                let fromX, toX, fromY, toY
+                infos.forEach(info => {
+                    if (!info) {
+                        return
+                    }
+                    const [ x, y, w, h ] = info.split('\t').slice(3, 7).map(parseFloat)
+                    fromX = (fromX === undefined ? x : Math.min(x, fromX))
+                    toX = (toX === undefined ? (x + w) : Math.max((x + w), toX))
+                    fromY = (fromY === undefined ? y : Math.min(y, fromY))
+                    toY = (toY === undefined ? (y + h) : Math.max((y + h), toY))
+                })
+                const scale = window.iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale
+                let $div = $('<div class="pdfanno-search-result"/>')
+                $div.css({
+                    top    : fromY * scale + 'px',
+                    left   : fromX * scale + 'px',
+                    width  : (toX - fromX) * scale + 'px',
+                    height : (toY - fromY) * scale + 'px',
+                    zIndex : __WEBPACK_IMPORTED_MODULE_0__shared_coords__["c" /* nextZIndex */]()
+                })
+                $textLayer.append($div)
+                // TODO 後で、改行されたものとかにも対応できるようにする（その場合は、rectsが複数）
+                const aPosition = [[ fromX, fromY, (toX - fromX), (toY - fromY) ]]
+                searchHighlights.push({
+                    page           : page.page,
+                    top            : fromY,
+                    position       : aPosition,
+                    searchPosition : position,
+                    $elm           : $div,
+                    text
+                })
+            })
+        }
+    })
+
+    if (searchHighlights.length > 0) {
+        // Init highlight at the current page.
+        const currentPage = window.iframeWindow.PDFViewerApplication.page
+        let found = false
+        for (let i = 0; i < searchHighlights.length; i++) {
+            if (currentPage === searchHighlights[i].page) {
+                searchPosition = i
+                found = true
+                break
+            }
+        }
+        // If there is no result at the current page, set the index 0.
+        if (!found) {
+            searchPosition = 0
+        }
+        highlightSearchResult()
+    }
+
+    if (searchType === 'text') {
+        $('.search-hit').removeClass('hidden')
+        $('.search-current-position').text(searchPosition + 1)
+        $('.search-hit-count').text(searchHighlights.length)
+    } else {
+        // Dict matching.
+        $('.js-dict-match-cur-pos').text(searchPosition + 1)
+        $('.js-dict-match-hit-counts').text(searchHighlights.length)
+    }
+}
+
+/**
+ * Dictonary Matching.
+ */
+window.addEventListener('DOMContentLoaded', () => {
+
+    // Clear prev cache.
+    $('.js-dict-match-file :file').on('click', e => {
+        $(e.currentTarget).val(null)
+    })
+
+    // Load a dictionary for matching.
+    $('.js-dict-match-file :file').on('change', e => {
+
+        const files = e.target.files
+        if (files.length === 0) {
+            window.annoUI.ui.alertDialog.show({ message : 'Select a file.' })
+            return
+        }
+
+        const fname = files[0].name
+        $('.js-dict-match-file-name').text(fname)
+
+        let fileReader = new FileReader()
+        fileReader.onload = ev => {
+            const texts = ev.target.result.split('\n').map(t => {
+                return t.trim()
+            }).filter(t => {
+                return t
+            })
+            if (texts.length === 0) {
+                window.annoUI.ui.alertDialog.show({ message : 'No text is found in the dictionary file.' })
+                return
+            }
+            dictonaryTexts = texts
+            searchByDictionary(texts)
+        }
+        fileReader.readAsText(files[0])
+    })
+
+    // Clear search results.
+    $('.js-dict-match-clear').on('click', e => {
+        searchType = null
+        doSearch()
+        $(e.currentTarget).blur()
+    })
+
+    // Go to the prev/next result.
+    $('.js-dict-match-prev, .js-dict-match-next').on('click', e => {
+
+        if (searchType !== 'dictionary') {
+            return
+        }
+
+        // No action for no results.
+        if (searchHighlights.length === 0) {
+            return
+        }
+
+        // go to next or prev.
+        let num = 1
+        if ($(e.currentTarget).hasClass('js-dict-match-prev')) {
+            num = -1
+        }
+        searchPosition += num
+        if (searchPosition < 0) {
+            searchPosition = searchHighlights.length - 1
+        } else if (searchPosition >= searchHighlights.length) {
+            searchPosition = 0
+        }
+
+        highlightSearchResult()
+    })
+
+    // Set the search behavior.
+    $('.js-dict-match-case-sensitive').on('change', () => {
+        searchByDictionary(dictonaryTexts)
+    })
+})
+
+/**
+ * Search by a dict file.
+ */
+function searchByDictionary (texts = []) {
+    console.log('searchByDictionary:', texts)
+    searchType = 'dictionary'
+    const query = texts.join('|')
+    doSearch({ query })
+}
+
+
+/***/ }),
+/* 20 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = customizeAnalyzeResult;
 
 /**
@@ -12794,6 +13213,10 @@ function customizeAnalyzeResult (analyzeData) {
                 page = pageNumber
             }
             if (type === 'TEXT') {
+                // Special replace.
+                if (char.length >= 2) {
+                    char = '?'  // Like "[NO_UNICODE\]"
+                }
                 body += char
                 meta.push(line)
             }
@@ -12810,7 +13233,7 @@ function customizeAnalyzeResult (analyzeData) {
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12828,7 +13251,7 @@ module.exports = function bind(fn, thisArg) {
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12839,7 +13262,7 @@ var settle = __webpack_require__(49);
 var buildURL = __webpack_require__(51);
 var parseHeaders = __webpack_require__(52);
 var isURLSameOrigin = __webpack_require__(53);
-var createError = __webpack_require__(22);
+var createError = __webpack_require__(23);
 var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(54);
 
 module.exports = function xhrAdapter(config) {
@@ -13012,7 +13435,7 @@ module.exports = function xhrAdapter(config) {
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13036,7 +13459,7 @@ module.exports = function createError(message, config, code, response) {
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13048,7 +13471,7 @@ module.exports = function isCancel(value) {
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13074,31 +13497,31 @@ module.exports = Cancel;
 
 
 /***/ }),
-/* 25 */,
 /* 26 */,
 /* 27 */,
 /* 28 */,
 /* 29 */,
 /* 30 */,
 /* 31 */,
-/* 32 */
+/* 32 */,
+/* 33 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_urijs__ = __webpack_require__(36);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_urijs__ = __webpack_require__(37);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_urijs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_urijs__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_anno_ui__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_anno_ui___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_anno_ui__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__shared_util__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__page_util_window__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__page_public__ = __webpack_require__(39);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__page_search__ = __webpack_require__(40);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__page_public__ = __webpack_require__(40);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__page_search__ = __webpack_require__(19);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__page_textLayer__ = __webpack_require__(41);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__page_pdftxtdownload__ = __webpack_require__(42);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__page_pdf_PDFAnnoPage__ = __webpack_require__(43);
-__webpack_require__(33)
 __webpack_require__(34)
+__webpack_require__(35)
 
 
 
@@ -13205,7 +13628,7 @@ window.addEventListener('DOMContentLoaded', async e => {
                 contentFile     : content,
                 successCallback : text => {
                     __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('didChangeContent')
-                    __WEBPACK_IMPORTED_MODULE_5__page_search__["a" /* setup */](text)
+                    __WEBPACK_IMPORTED_MODULE_5__page_search__["b" /* setup */](text)
                     __WEBPACK_IMPORTED_MODULE_6__page_textLayer__["a" /* setup */](text)
                     window.annoPage.pdftxt = text
                 }
@@ -13278,7 +13701,7 @@ window.addEventListener('DOMContentLoaded', async e => {
             return window.annoPage.getCurrentContentFile()
         },
         uploadFinishCallback : (resultText) => {
-            __WEBPACK_IMPORTED_MODULE_5__page_search__["a" /* setup */](resultText)
+            __WEBPACK_IMPORTED_MODULE_5__page_search__["b" /* setup */](resultText)
             __WEBPACK_IMPORTED_MODULE_6__page_textLayer__["a" /* setup */](resultText)
             window.annoPage.pdftxt = resultText
         }
@@ -13335,7 +13758,7 @@ window.addEventListener('DOMContentLoaded', async e => {
         __WEBPACK_IMPORTED_MODULE_1_anno_ui__["uploadButton"].setResult(analyzeResult)
 
         // Init search function.
-        __WEBPACK_IMPORTED_MODULE_5__page_search__["a" /* setup */](analyzeResult)
+        __WEBPACK_IMPORTED_MODULE_5__page_search__["b" /* setup */](analyzeResult)
 
         // Init textLayers.
         __WEBPACK_IMPORTED_MODULE_6__page_textLayer__["a" /* setup */](analyzeResult)
@@ -13390,19 +13813,19 @@ function showLoader (display) {
 
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "dist/index.html";
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(35);
+var content = __webpack_require__(36);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
 var update = __webpack_require__(5)(content, {});
@@ -13422,7 +13845,7 @@ if(false) {
 }
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(4)();
@@ -13436,7 +13859,7 @@ exports.push([module.i, "@charset \"utf-8\";\n\n/* Loading */\n.loader-container
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -15779,7 +16202,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -15807,7 +16230,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports) {
 
 var g;
@@ -15834,7 +16257,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16060,389 +16483,12 @@ function clear () {
 
 
 /***/ }),
-/* 40 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = setup;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shared_coords__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util_analyzer__ = __webpack_require__(19);
-/**
- * Search functions.
- */
-
-
-
-let pages = []
-
-function setup (analyzeData) {
-    console.log('search setup')
-
-    pages = __WEBPACK_IMPORTED_MODULE_1__util_analyzer__["a" /* customizeAnalyzeResult */](analyzeData)
-
-    // Enable search input field.
-    $('#searchWord, .js-dict-match-file').removeAttr('disabled')
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-
-    const DELAY = 500
-    let timerId
-
-    $('#searchWord').on('keyup', e => {
-
-        // Enter key.
-        if (e.keyCode === 13) {
-            nextSearchResult()
-            return
-        }
-
-        if (timerId) {
-            clearTimeout(timerId)
-            timerId = null
-        }
-
-        timerId = setTimeout(() => {
-            timerId = null
-            window.searchType = 'text'
-            doSearch()
-        }, DELAY)
-    })
-
-    $('.js-search-case-sensitive, .js-search-regexp').on('change', () => {
-        window.searchType = 'text'
-        doSearch()
-    })
-
-    $('.js-search-case-sensitive, .js-search-regexp').on('click', e => {
-        $(e.currentTarget).blur()
-    })
-
-    $('.js-search-clear').on('click', e => {
-        // Clear search.
-        $('#searchWord').val('')
-        window.searchType = null
-        doSearch()
-        $(e.currentTarget).blur()
-    })
-
-    // Re-render the search results.
-    window.addEventListener('pagerendered', rerenderSearchResults)
-
-    $('.js-search-prev, .js-search-next').on('click', e => {
-
-        if (window.searchType !== 'text') {
-            return
-        }
-
-        // No action for no results.
-        if (window.searchHighlights.length === 0) {
-            return
-        }
-
-        if ($(e.currentTarget).hasClass('js-search-prev')) {
-            prevSearchResult()
-        } else {
-            nextSearchResult()
-        }
-    })
-})
-
-/**
- * Highlight the prev search result.
- */
-function prevSearchResult () {
-    window.searchPosition--
-    if (window.searchPosition < 0) {
-        window.searchPosition = window.searchHighlights.length - 1
-    }
-    highlightSearchResult()
-}
-
-/**
- * Highlight the next search result.
- */
-function nextSearchResult () {
-    window.searchPosition++
-    if (window.searchPosition >= window.searchHighlights.length) {
-        window.searchPosition = 0
-    }
-    highlightSearchResult()
-}
-
-function highlightSearchResult () {
-
-    $('.search-current-position').text(window.searchPosition + 1)
-
-    $('.pdfanno-search-result', window.iframeWindow.document).removeClass('pdfanno-search-result--highlight')
-
-    const highlight = window.searchHighlights[window.searchPosition]
-    highlight.$elm.addClass('pdfanno-search-result--highlight')
-
-    console.log(`highlight: index=${window.searchPosition}, page=${highlight.page}`)
-
-    // Scroll to.
-    let pageHeight = window.annoPage.getViewerViewport().height
-    let scale = window.annoPage.getViewerViewport().scale
-    let _y = (pageHeight + __WEBPACK_IMPORTED_MODULE_0__shared_coords__["d" /* paddingBetweenPages */]) * (highlight.page - 1) + highlight.top * scale
-    _y -= 100
-    $('#viewer iframe').contents().find('#viewer').parent()[0].scrollTop = _y
-
-}
-
-function rerenderSearchResults () {
-
-    // No action for no results.
-    if (window.searchHighlights.length === 0) {
-        return
-    }
-
-    // Remove.
-    $('.pdfanno-search-result', window.iframeWindow.document).remove()
-
-    // Display.
-    window.searchHighlights.forEach((highlight, index) => {
-        const $textLayer = $(`.page[data-page-number="${highlight.page}"] .textLayer`, window.iframeWindow.document)
-        // set the depth.
-        highlight.$elm.css('z-index', __WEBPACK_IMPORTED_MODULE_0__shared_coords__["c" /* nextZIndex */]())
-        $textLayer.append(highlight.$elm)
-    })
-}
-
-function search ({ hay, needle, isCaseSensitive = false, useRegexp = false }) {
-    if (!needle) {
-        return []
-    }
-    const SPECIAL_CHARS_REGEX = /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g
-    const flags = 'g' + (isCaseSensitive === false ? 'i' : '')
-    if (useRegexp === false) {
-        needle = needle.replace(SPECIAL_CHARS_REGEX, '\\$&')
-    }
-    let re = new RegExp(needle, flags)
-    let positions = []
-    let match
-    while ((match = re.exec(hay)) != null) {
-        positions.push({
-            start : match.index,
-            end   : match.index + match[0].length
-        })
-    }
-    return positions
-}
-
-window.searchType = null
-window.searchPosition = -1
-window.searchHighlights = []
-
-function doSearch ({ query = null } = {}) {
-
-    // Check enable.
-    if ($('#searchWord').is('[disabled]')) {
-        console.log('Search function is not enabled yet.')
-        return
-    }
-
-    // Remove highlights for search results.
-    $('.pdfanno-search-result', window.iframeWindow.document).remove()
-    $('.search-hit').addClass('hidden')
-    $('.js-dict-match-cur-pos, .js-dict-match-hit-counts').text('000')
-
-    let text
-    let isCaseSensitive
-    let useRegexp
-    if (window.searchType === 'text') {
-        text = $('#searchWord').val()
-        isCaseSensitive = $('.js-search-case-sensitive')[0].checked
-        useRegexp = $('.js-search-regexp')[0].checked
-    } else {
-        text = query
-        isCaseSensitive = $('.js-dict-match-case-sensitive')[0].checked
-        useRegexp = true
-    }
-
-    console.log(`doSearch: searchType=${window.searchType} text="${text}", caseSensitive=${isCaseSensitive}, regexp=${useRegexp}`)
-
-    // Reset.
-    window.searchPosition = -1
-    window.searchHighlights = []
-
-    // The min length of text for searching.
-    const MIN_LEN = 2
-    if (!text || text.length < MIN_LEN) {
-        return
-    }
-
-    pages.forEach(page => {
-
-        // Search.
-        const positions = search({ hay : page.body, needle : text, isCaseSensitive, useRegexp })
-
-        // Display highlights.
-        if (positions.length > 0) {
-            positions.forEach(position => {
-                const $textLayer = $(`.page[data-page-number="${page.page}"] .textLayer`, window.iframeWindow.document)
-                const infos = page.meta.slice(position.start, position.end)
-                // console.log('infos:', infos)
-                let fromX, toX, fromY, toY
-                infos.forEach(info => {
-                    if (!info) {
-                        return
-                    }
-                    const [ x, y, w, h ] = info.split('\t').slice(3, 7).map(parseFloat)
-                    fromX = (fromX === undefined ? x : Math.min(x, fromX))
-                    toX = (toX === undefined ? (x + w) : Math.max((x + w), toX))
-                    fromY = (fromY === undefined ? y : Math.min(y, fromY))
-                    toY = (toY === undefined ? (y + h) : Math.max((y + h), toY))
-                })
-                const scale = window.iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale
-                let $div = $('<div class="pdfanno-search-result"/>')
-                $div.css({
-                    top    : fromY * scale + 'px',
-                    left   : fromX * scale + 'px',
-                    width  : (toX - fromX) * scale + 'px',
-                    height : (toY - fromY) * scale + 'px',
-                    zIndex : __WEBPACK_IMPORTED_MODULE_0__shared_coords__["c" /* nextZIndex */]()
-                })
-                $textLayer.append($div)
-                // TODO 後で、改行されたものとかにも対応できるようにする（その場合は、rectsが複数）
-                const aPosition = [[ fromX, fromY, (toX - fromX), (toY - fromY) ]]
-                window.searchHighlights.push({
-                    page           : page.page,
-                    top            : fromY,
-                    position       : aPosition,
-                    searchPosition : position,
-                    $elm           : $div,
-                    text
-                })
-            })
-        }
-    })
-
-    if (window.searchHighlights.length > 0) {
-        // Init highlight at the current page.
-        const currentPage = window.iframeWindow.PDFViewerApplication.page
-        let found = false
-        for (let i = 0; i < window.searchHighlights.length; i++) {
-            if (currentPage === window.searchHighlights[i].page) {
-                window.searchPosition = i
-                found = true
-                break
-            }
-        }
-        // If there is no result at the current page, set the index 0.
-        if (!found) {
-            window.searchPosition = 0
-        }
-        highlightSearchResult()
-    }
-
-    if (window.searchType === 'text') {
-        $('.search-hit').removeClass('hidden')
-        $('.search-current-position').text(window.searchPosition + 1)
-        $('.search-hit-count').text(window.searchHighlights.length)
-    } else {
-        // Dict matching.
-        $('.js-dict-match-cur-pos').text(window.searchPosition + 1)
-        $('.js-dict-match-hit-counts').text(window.searchHighlights.length)
-    }
-}
-
-let dictonaryTexts
-
-/**
- * Dictonary Matching.
- */
-window.addEventListener('DOMContentLoaded', () => {
-
-    // Clear prev cache.
-    $('.js-dict-match-file :file').on('click', e => {
-        $(e.currentTarget).val(null)
-    })
-
-    // Load a dictionary for matching.
-    $('.js-dict-match-file :file').on('change', e => {
-
-        const files = e.target.files
-        if (files.length === 0) {
-            window.annoUI.ui.alertDialog.show({ message : 'Select a file.' })
-            return
-        }
-
-        const fname = files[0].name
-        $('.js-dict-match-file-name').text(fname)
-
-        let fileReader = new FileReader()
-        fileReader.onload = ev => {
-            const texts = ev.target.result.split('\n').map(t => {
-                return t.trim()
-            }).filter(t => {
-                return t
-            })
-            if (texts.length === 0) {
-                window.annoUI.ui.alertDialog.show({ message : 'No text is found in the dictionary file.' })
-                return
-            }
-            dictonaryTexts = texts
-            searchByDictionary(texts)
-        }
-        fileReader.readAsText(files[0])
-    })
-
-    // Clear search results.
-    $('.js-dict-match-clear').on('click', e => {
-        window.searchType = null
-        doSearch()
-        $(e.currentTarget).blur()
-    })
-
-    // Go to the prev/next result.
-    $('.js-dict-match-prev, .js-dict-match-next').on('click', e => {
-
-        if (window.searchType !== 'dictionary') {
-            return
-        }
-
-        // No action for no results.
-        if (window.searchHighlights.length === 0) {
-            return
-        }
-
-        // go to next or prev.
-        let num = 1
-        if ($(e.currentTarget).hasClass('js-dict-match-prev')) {
-            num = -1
-        }
-        window.searchPosition += num
-        if (window.searchPosition < 0) {
-            window.searchPosition = window.searchHighlights.length - 1
-        } else if (window.searchPosition >= window.searchHighlights.length) {
-            window.searchPosition = 0
-        }
-
-        highlightSearchResult()
-    })
-
-    // Set the search behavior.
-    $('.js-dict-match-case-sensitive').on('change', () => {
-        searchByDictionary(dictonaryTexts)
-    })
-})
-
-function searchByDictionary (texts = []) {
-    console.log('searchByDictionary:', texts)
-    window.searchType = 'dictionary'
-    const query = texts.join('|')
-    doSearch({ query })
-}
-
-
-/***/ }),
 /* 41 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = setup;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util_analyzer__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util_analyzer__ = __webpack_require__(20);
 /**
  * Create text layers which enable users to select texts.
  */
@@ -16482,6 +16528,9 @@ function listenPageRendered (ev) {
  * Create a new text layer.
  */
 function createTextLayer (page) {
+
+    // TODO: Performance: this function is a little heavy.
+
     setTimeout(() => {
 
         console.log('createTextLayer:', page)
@@ -16657,9 +16706,11 @@ function getDownloadFileName () {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_anno_ui__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_anno_ui___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_anno_ui__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__loadFiles__ = __webpack_require__(63);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_util__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__shared_coords__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__util_window__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__search__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__shared_util__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__shared_coords__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__util_window__ = __webpack_require__(18);
+
 
 
 
@@ -16695,72 +16746,72 @@ class PDFAnnoPage {
         window.iframeWindow.addEventListener('DOMContentLoaded', () => {
 
             // Adjust the height of viewer.
-            __WEBPACK_IMPORTED_MODULE_5__util_window__["a" /* adjustViewerSize */]()
+            __WEBPACK_IMPORTED_MODULE_6__util_window__["a" /* adjustViewerSize */]()
 
             // Reset the confirm dialog at leaving page.
-            __WEBPACK_IMPORTED_MODULE_5__util_window__["c" /* unlistenWindowLeaveEvent */]()
+            __WEBPACK_IMPORTED_MODULE_6__util_window__["c" /* unlistenWindowLeaveEvent */]()
 
-            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('iframeReady')
+            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('iframeReady')
         })
 
         window.iframeWindow.addEventListener('pagerendered', ev => {
-            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('pagerendered', ev.detail)
+            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('pagerendered', ev.detail)
         })
 
         window.iframeWindow.addEventListener('annotationrendered', () => {
-            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered')
+            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered')
         })
 
         // Set the confirm dialog when leaving a page.
         window.iframeWindow.addEventListener('annotationUpdated', () => {
-            __WEBPACK_IMPORTED_MODULE_5__util_window__["b" /* listenWindowLeaveEvent */]()
-            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('annotationUpdated')
+            __WEBPACK_IMPORTED_MODULE_6__util_window__["b" /* listenWindowLeaveEvent */]()
+            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('annotationUpdated')
         })
 
         // enable text input.
         window.iframeWindow.addEventListener('enableTextInput', e => {
-            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('enableTextInput', e.detail)
+            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('enableTextInput', e.detail)
         })
 
         // disable text input.
         window.iframeWindow.addEventListener('disappearTextInput', e => {
-            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('disappearTextInput', e.detail)
+            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('disappearTextInput', e.detail)
         })
 
         window.iframeWindow.addEventListener('annotationDeleted', e => {
-            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('annotationDeleted', e.detail)
+            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('annotationDeleted', e.detail)
         })
 
         window.iframeWindow.addEventListener('annotationHoverIn', e => {
-            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('annotationHoverIn', e.detail)
+            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('annotationHoverIn', e.detail)
         })
 
         window.iframeWindow.addEventListener('annotationHoverOut', e => {
-            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('annotationHoverOut', e.detail)
+            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('annotationHoverOut', e.detail)
         })
 
         window.iframeWindow.addEventListener('annotationSelected', e => {
-            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('annotationSelected', e.detail)
+            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('annotationSelected', e.detail)
         })
 
         window.iframeWindow.addEventListener('annotationDeselected', () => {
-            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('annotationDeselected')
+            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('annotationDeselected')
         })
 
         window.iframeWindow.addEventListener('digit1Pressed', () => {
-            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('digit1Pressed')
+            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('digit1Pressed')
         })
 
         window.iframeWindow.addEventListener('digit2Pressed', () => {
-            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('digit2Pressed')
+            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('digit2Pressed')
         })
 
         window.iframeWindow.addEventListener('digit3Pressed', () => {
-            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('digit3Pressed')
+            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('digit3Pressed')
         })
 
         window.iframeWindow.addEventListener('digit4Pressed', () => {
-            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('digit4Pressed')
+            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('digit4Pressed')
         })
     }
 
@@ -16866,7 +16917,7 @@ class PDFAnnoPage {
             window.iframeWindow.PDFViewerApplication.close()
             $('#numPages', window.iframeWindow.document).text('')
             this.currentContentFile = null
-            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('didCloseViewer')
+            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('didCloseViewer')
         }
     }
 
@@ -16886,11 +16937,8 @@ class PDFAnnoPage {
         // Get user selection.
         const rects = window.iframeWindow.PDFAnnoCore.default.UI.getRectangles()
 
-        // Use a search result.
-        let highlight
-        if (window.searchPosition > -1) {
-            highlight = window.searchHighlights[window.searchPosition]
-        }
+        // Get a search result, if exists.
+        let highlight = __WEBPACK_IMPORTED_MODULE_3__search__["a" /* getSearchHighlight */]()
 
         // Check empty.
         if (!rects && !highlight) {
@@ -16899,7 +16947,7 @@ class PDFAnnoPage {
 
         // Create a new rectAnnotation.
         if (rects) {
-            window.iframeWindow.PDFAnnoCore.default.UI.createSpan({ text, zIndex : __WEBPACK_IMPORTED_MODULE_4__shared_coords__["c" /* nextZIndex */]() })
+            window.iframeWindow.PDFAnnoCore.default.UI.createSpan({ text, zIndex : __WEBPACK_IMPORTED_MODULE_5__shared_coords__["c" /* nextZIndex */]() })
 
         } else if (highlight) {
 
@@ -16912,7 +16960,7 @@ class PDFAnnoPage {
                 label     : text,
                 text      : highlight.text,
                 textrange : textRange,
-                zIndex    : __WEBPACK_IMPORTED_MODULE_4__shared_coords__["c" /* nextZIndex */]()
+                zIndex    : __WEBPACK_IMPORTED_MODULE_5__shared_coords__["c" /* nextZIndex */]()
             })
             window.add(s)
 
@@ -16927,7 +16975,7 @@ class PDFAnnoPage {
         }
 
         // Notify annotation added.
-        __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered')
+        __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered')
     }
 
     /**
@@ -16960,8 +17008,8 @@ class PDFAnnoPage {
                         .getAllAnnotations()
                         .filter(a => a.type === 'relation')
                         .filter(a => {
-                            return __WEBPACK_IMPORTED_MODULE_3__shared_util__["a" /* anyOf */](a.rel1Annotation.uuid, [first.uuid, second.uuid])
-                                    && __WEBPACK_IMPORTED_MODULE_3__shared_util__["a" /* anyOf */](a.rel2Annotation.uuid, [first.uuid, second.uuid])
+                            return __WEBPACK_IMPORTED_MODULE_4__shared_util__["a" /* anyOf */](a.rel1Annotation.uuid, [first.uuid, second.uuid])
+                                    && __WEBPACK_IMPORTED_MODULE_4__shared_util__["a" /* anyOf */](a.rel2Annotation.uuid, [first.uuid, second.uuid])
                         })
 
         if (arrows.length > 0) {
@@ -16992,7 +17040,7 @@ class PDFAnnoPage {
         })
 
         // Notify annotation added.
-        __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered')
+        __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered')
     }
 
     /**
@@ -17131,7 +17179,7 @@ class PDFAnnoPage {
     importAnnotation (paperData, isPrimary) {
         window.iframeWindow.annotationContainer.importAnnotations(paperData, isPrimary).then(result => {
             // Notify annotations added.
-            __WEBPACK_IMPORTED_MODULE_3__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered')
+            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered')
         })
     }
 
@@ -17146,10 +17194,10 @@ class PDFAnnoPage {
 
             // scroll to.
             let _y = annotation.y || annotation.y1 || annotation.rectangles[0].y
-            let { pageNumber, y } = __WEBPACK_IMPORTED_MODULE_4__shared_coords__["b" /* convertToExportY */](_y)
+            let { pageNumber, y } = __WEBPACK_IMPORTED_MODULE_5__shared_coords__["b" /* convertToExportY */](_y)
             let pageHeight = window.annoPage.getViewerViewport().height
             let scale = window.annoPage.getViewerViewport().scale
-            _y = (pageHeight + __WEBPACK_IMPORTED_MODULE_4__shared_coords__["d" /* paddingBetweenPages */]) * (pageNumber - 1) + y * scale
+            _y = (pageHeight + __WEBPACK_IMPORTED_MODULE_5__shared_coords__["d" /* paddingBetweenPages */]) * (pageNumber - 1) + y * scale
             _y -= 100
             $('#viewer iframe').contents().find('#viewer').parent()[0].scrollTop = _y
 
@@ -17274,7 +17322,7 @@ module.exports = __webpack_require__(45);
 
 
 var utils = __webpack_require__(0);
-var bind = __webpack_require__(20);
+var bind = __webpack_require__(21);
 var Axios = __webpack_require__(46);
 var defaults = __webpack_require__(10);
 
@@ -17309,9 +17357,9 @@ axios.create = function create(instanceConfig) {
 };
 
 // Expose Cancel & CancelToken
-axios.Cancel = __webpack_require__(24);
+axios.Cancel = __webpack_require__(25);
 axios.CancelToken = __webpack_require__(61);
-axios.isCancel = __webpack_require__(23);
+axios.isCancel = __webpack_require__(24);
 
 // Expose all/spread
 axios.all = function all(promises) {
@@ -17633,7 +17681,7 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
 "use strict";
 
 
-var createError = __webpack_require__(22);
+var createError = __webpack_require__(23);
 
 /**
  * Resolve or reject a Promise based on response status.
@@ -18049,7 +18097,7 @@ module.exports = InterceptorManager;
 
 var utils = __webpack_require__(0);
 var transformData = __webpack_require__(58);
-var isCancel = __webpack_require__(23);
+var isCancel = __webpack_require__(24);
 var defaults = __webpack_require__(10);
 
 /**
@@ -18200,7 +18248,7 @@ module.exports = function combineURLs(baseURL, relativeURL) {
 "use strict";
 
 
-var Cancel = __webpack_require__(24);
+var Cancel = __webpack_require__(25);
 
 /**
  * A `CancelToken` is an object that can be used to request cancellation of an operation.
@@ -18351,6 +18399,8 @@ function loadFiles (files) {
         // Wait for complete.
         Promise.all(promises).then(results => {
 
+            results = sortByName(results)
+
             const contents = results.filter(r => r.type === 'content')
             const annos = results.filter(r => r.type === 'anno')
 
@@ -18358,6 +18408,22 @@ function loadFiles (files) {
         })
 
     })
+}
+
+/**
+ * Sort objects by name.
+ */
+function sortByName (items) {
+    items.sort((a, b) => {
+        if (a.name < b.name) {
+            return -1
+        } else if (a.name > b.name) {
+            return 1
+        } else {
+            return 0
+        }
+    })
+    return items
 }
 
 /**
