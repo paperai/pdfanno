@@ -37,6 +37,9 @@ function listenPageRendered (ev) {
  * Create a new text layer.
  */
 function createTextLayer (page) {
+
+    // TODO: Performance: this function is a little heavy.
+
     setTimeout(() => {
 
         console.log('createTextLayer:', page)

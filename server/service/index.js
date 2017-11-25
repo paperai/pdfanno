@@ -25,34 +25,26 @@ module.exports.savePDF = (fileName, content) => {
 }
 
 // Analize pdf with pdfreader.jar.
-module.exports.analyzePDF = (pdfPath) => {
+module.exports.analyzePDF = async (pdfPath) => {
 
-    return new Promise((resolve, reject) => {
+    // Check java command exits.
+    try {
+        await execCommand('java -version')
+    } catch (e) {
+        throw new Error('java command not found.')
+    }
 
-        // Check java command exits.
-        execCommand('java -version')
-            .then(resolve)
-            .catch(() => {
-                reject('java command not found.');
-            });
+    // Load pdfextract.jar.
+    if (!isPDFExtractLoaded()) {
+        await loadPDFExract()
+    }
 
-    }).then(() => {
+    // Analyze the PDF.
+    const jarPath = getPDFExtractPath()
+    const cmd = `java -classpath ${jarPath} PDFExtractor ${pdfPath} -text -bounding`;
+    const { stdout, stderr } = await execCommand(cmd);
 
-        if (isPDFExtractLoaded()) {
-            return;
-        }
-
-        return loadPDFExract();
-
-    }).then(() => {
-
-        const jarPath = getPDFExtractPath()
-        const cmd = `java -classpath ${jarPath} PDFExtractor ${pdfPath} -text -bounding`;
-        return execCommand(cmd);
-
-    }).then(({ stdout, stderr }) => {
-        return stdout;
-    });
+    return stdout
 }
 
 // Execute an external command.

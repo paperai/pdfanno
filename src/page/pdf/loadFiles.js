@@ -52,6 +52,8 @@ export default function loadFiles (files) {
         // Wait for complete.
         Promise.all(promises).then(results => {
 
+            results = sortByName(results)
+
             const contents = results.filter(r => r.type === 'content')
             const annos = results.filter(r => r.type === 'anno')
 
@@ -59,6 +61,22 @@ export default function loadFiles (files) {
         })
 
     })
+}
+
+/**
+ * Sort objects by name.
+ */
+function sortByName (items) {
+    items.sort((a, b) => {
+        if (a.name < b.name) {
+            return -1
+        } else if (a.name > b.name) {
+            return 1
+        } else {
+            return 0
+        }
+    })
+    return items
 }
 
 /**

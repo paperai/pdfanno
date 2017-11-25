@@ -1,6 +1,7 @@
 import axios from 'axios'
 import * as annoUI from 'anno-ui'
 import loadFiles from './loadFiles'
+import { getSearchHighlight } from '../search'
 import { anyOf, dispatchWindowEvent } from '../../shared/util'
 import { convertToExportY, paddingBetweenPages, nextZIndex } from '../../shared/coords'
 import {
@@ -228,11 +229,8 @@ export default class PDFAnnoPage {
         // Get user selection.
         const rects = window.iframeWindow.PDFAnnoCore.default.UI.getRectangles()
 
-        // Use a search result.
-        let highlight
-        if (window.searchPosition > -1) {
-            highlight = window.searchHighlights[window.searchPosition]
-        }
+        // Get a search result, if exists.
+        let highlight = getSearchHighlight()
 
         // Check empty.
         if (!rects && !highlight) {

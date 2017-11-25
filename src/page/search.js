@@ -4,14 +4,52 @@
 import { paddingBetweenPages, nextZIndex } from '../shared/coords'
 import { customizeAnalyzeResult } from './util/analyzer'
 
+/**
+ * The analyze data per pages.
+ */
 let pages = []
 
+/**
+ * Search type ( text / dictionary )
+ */
+let searchType = null
+
+/**
+ * The position where a search result is highlighted.
+ */
+let searchPosition = -1
+
+/**
+ * The highlights for search.
+ */
+let searchHighlights = []
+
+/**
+ * Texts for dictionary search.
+ */
+let dictonaryTexts
+
+/**
+ * Setup the search function.
+ */
 export function setup (analyzeData) {
-    console.log('search setup')
 
     pages = customizeAnalyzeResult(analyzeData)
 
-    // Enable search input field.
+    enableSearchUI()
+}
+
+/**
+ * Get the current highlight.
+ */
+export function getSearchHighlight () {
+    if (searchPosition > -1) {
+        return searchHighlights[searchPosition]
+    }
+    return null
+}
+
+function enableSearchUI () {
     $('#searchWord, .js-dict-match-file').removeAttr('disabled')
 }
 
@@ -24,7 +62,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
         // Enter key.
         if (e.keyCode === 13) {
-            nextSearchResult()
+            nextResult()
             return
         }
 
@@ -35,13 +73,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
         timerId = setTimeout(() => {
             timerId = null
-            window.searchType = 'text'
+            searchType = 'text'
             doSearch()
         }, DELAY)
     })
 
     $('.js-search-case-sensitive, .js-search-regexp').on('change', () => {
-        window.searchType = 'text'
+        searchType = 'text'
         doSearch()
     })
 
@@ -52,7 +90,7 @@ window.addEventListener('DOMContentLoaded', () => {
     $('.js-search-clear').on('click', e => {
         // Clear search.
         $('#searchWord').val('')
-        window.searchType = null
+        searchType = null
         doSearch()
         $(e.currentTarget).blur()
     })
@@ -62,19 +100,19 @@ window.addEventListener('DOMContentLoaded', () => {
 
     $('.js-search-prev, .js-search-next').on('click', e => {
 
-        if (window.searchType !== 'text') {
+        if (searchType !== 'text') {
             return
         }
 
         // No action for no results.
-        if (window.searchHighlights.length === 0) {
+        if (searchHighlights.length === 0) {
             return
         }
 
         if ($(e.currentTarget).hasClass('js-search-prev')) {
-            prevSearchResult()
+            prevResult()
         } else {
-            nextSearchResult()
+            nextResult()
         }
     })
 })
@@ -82,10 +120,10 @@ window.addEventListener('DOMContentLoaded', () => {
 /**
  * Highlight the prev search result.
  */
-function prevSearchResult () {
-    window.searchPosition--
-    if (window.searchPosition < 0) {
-        window.searchPosition = window.searchHighlights.length - 1
+function prevResult () {
+    searchPosition--
+    if (searchPosition < 0) {
+        searchPosition = searchHighlights.length - 1
     }
     highlightSearchResult()
 }
@@ -93,24 +131,25 @@ function prevSearchResult () {
 /**
  * Highlight the next search result.
  */
-function nextSearchResult () {
-    window.searchPosition++
-    if (window.searchPosition >= window.searchHighlights.length) {
-        window.searchPosition = 0
+function nextResult () {
+    searchPosition++
+    if (searchPosition >= searchHighlights.length) {
+        searchPosition = 0
     }
     highlightSearchResult()
 }
 
+/**
+ * Highlight a single search result.
+ */
 function highlightSearchResult () {
 
-    $('.search-current-position').text(window.searchPosition + 1)
+    $('.search-current-position').text(searchPosition + 1)
 
     $('.pdfanno-search-result', window.iframeWindow.document).removeClass('pdfanno-search-result--highlight')
 
-    const highlight = window.searchHighlights[window.searchPosition]
+    const highlight = searchHighlights[searchPosition]
     highlight.$elm.addClass('pdfanno-search-result--highlight')
-
-    console.log(`highlight: index=${window.searchPosition}, page=${highlight.page}`)
 
     // Scroll to.
     let pageHeight = window.annoPage.getViewerViewport().height
@@ -121,18 +160,17 @@ function highlightSearchResult () {
 
 }
 
+/**
+ * Render search results.
+ */
 function rerenderSearchResults () {
 
-    // No action for no results.
-    if (window.searchHighlights.length === 0) {
-        return
-    }
-
-    // Remove.
+    // Remove olds.
     $('.pdfanno-search-result', window.iframeWindow.document).remove()
 
     // Display.
-    window.searchHighlights.forEach((highlight, index) => {
+    // TODO 高速化。計測から。jQueryアクセスやappendを改善したら早そう.
+    searchHighlights.forEach((highlight, index) => {
         const $textLayer = $(`.page[data-page-number="${highlight.page}"] .textLayer`, window.iframeWindow.document)
         // set the depth.
         highlight.$elm.css('z-index', nextZIndex())
@@ -140,6 +178,9 @@ function rerenderSearchResults () {
     })
 }
 
+/**
+ * Search the position of  a word / words which an user input.
+ */
 function search ({ hay, needle, isCaseSensitive = false, useRegexp = false }) {
     if (!needle) {
         return []
@@ -157,13 +198,12 @@ function search ({ hay, needle, isCaseSensitive = false, useRegexp = false }) {
             start : match.index,
             end   : match.index + match[0].length
         })
+        if (positions.length <= 11) {
+            console.log(match)
+        }
     }
     return positions
 }
-
-window.searchType = null
-window.searchPosition = -1
-window.searchHighlights = []
 
 function doSearch ({ query = null } = {}) {
 
@@ -181,7 +221,7 @@ function doSearch ({ query = null } = {}) {
     let text
     let isCaseSensitive
     let useRegexp
-    if (window.searchType === 'text') {
+    if (searchType === 'text') {
         text = $('#searchWord').val()
         isCaseSensitive = $('.js-search-case-sensitive')[0].checked
         useRegexp = $('.js-search-regexp')[0].checked
@@ -191,11 +231,11 @@ function doSearch ({ query = null } = {}) {
         useRegexp = true
     }
 
-    console.log(`doSearch: searchType=${window.searchType} text="${text}", caseSensitive=${isCaseSensitive}, regexp=${useRegexp}`)
+    console.log(`doSearch: searchType=${searchType} text="${text}", caseSensitive=${isCaseSensitive}, regexp=${useRegexp}`)
 
     // Reset.
-    window.searchPosition = -1
-    window.searchHighlights = []
+    searchPosition = -1
+    searchHighlights = []
 
     // The min length of text for searching.
     const MIN_LEN = 2
@@ -237,7 +277,7 @@ function doSearch ({ query = null } = {}) {
                 $textLayer.append($div)
                 // TODO 後で、改行されたものとかにも対応できるようにする（その場合は、rectsが複数）
                 const aPosition = [[ fromX, fromY, (toX - fromX), (toY - fromY) ]]
-                window.searchHighlights.push({
+                searchHighlights.push({
                     page           : page.page,
                     top            : fromY,
                     position       : aPosition,
@@ -249,36 +289,34 @@ function doSearch ({ query = null } = {}) {
         }
     })
 
-    if (window.searchHighlights.length > 0) {
+    if (searchHighlights.length > 0) {
         // Init highlight at the current page.
         const currentPage = window.iframeWindow.PDFViewerApplication.page
         let found = false
-        for (let i = 0; i < window.searchHighlights.length; i++) {
-            if (currentPage === window.searchHighlights[i].page) {
-                window.searchPosition = i
+        for (let i = 0; i < searchHighlights.length; i++) {
+            if (currentPage === searchHighlights[i].page) {
+                searchPosition = i
                 found = true
                 break
             }
         }
         // If there is no result at the current page, set the index 0.
         if (!found) {
-            window.searchPosition = 0
+            searchPosition = 0
         }
         highlightSearchResult()
     }
 
-    if (window.searchType === 'text') {
+    if (searchType === 'text') {
         $('.search-hit').removeClass('hidden')
-        $('.search-current-position').text(window.searchPosition + 1)
-        $('.search-hit-count').text(window.searchHighlights.length)
+        $('.search-current-position').text(searchPosition + 1)
+        $('.search-hit-count').text(searchHighlights.length)
     } else {
         // Dict matching.
-        $('.js-dict-match-cur-pos').text(window.searchPosition + 1)
-        $('.js-dict-match-hit-counts').text(window.searchHighlights.length)
+        $('.js-dict-match-cur-pos').text(searchPosition + 1)
+        $('.js-dict-match-hit-counts').text(searchHighlights.length)
     }
 }
-
-let dictonaryTexts
 
 /**
  * Dictonary Matching.
@@ -321,7 +359,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Clear search results.
     $('.js-dict-match-clear').on('click', e => {
-        window.searchType = null
+        searchType = null
         doSearch()
         $(e.currentTarget).blur()
     })
@@ -329,12 +367,12 @@ window.addEventListener('DOMContentLoaded', () => {
     // Go to the prev/next result.
     $('.js-dict-match-prev, .js-dict-match-next').on('click', e => {
 
-        if (window.searchType !== 'dictionary') {
+        if (searchType !== 'dictionary') {
             return
         }
 
         // No action for no results.
-        if (window.searchHighlights.length === 0) {
+        if (searchHighlights.length === 0) {
             return
         }
 
@@ -343,11 +381,11 @@ window.addEventListener('DOMContentLoaded', () => {
         if ($(e.currentTarget).hasClass('js-dict-match-prev')) {
             num = -1
         }
-        window.searchPosition += num
-        if (window.searchPosition < 0) {
-            window.searchPosition = window.searchHighlights.length - 1
-        } else if (window.searchPosition >= window.searchHighlights.length) {
-            window.searchPosition = 0
+        searchPosition += num
+        if (searchPosition < 0) {
+            searchPosition = searchHighlights.length - 1
+        } else if (searchPosition >= searchHighlights.length) {
+            searchPosition = 0
         }
 
         highlightSearchResult()
@@ -359,9 +397,12 @@ window.addEventListener('DOMContentLoaded', () => {
     })
 })
 
+/**
+ * Search by a dict file.
+ */
 function searchByDictionary (texts = []) {
     console.log('searchByDictionary:', texts)
-    window.searchType = 'dictionary'
+    searchType = 'dictionary'
     const query = texts.join('|')
     doSearch({ query })
 }
