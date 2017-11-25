@@ -51,6 +51,10 @@ module.exports.analyzePDF = (pdfPath) => {
         return execCommand(cmd);
 
     }).then(({ stdout, stderr }) => {
+
+        // Special replace.
+        stdout = stdout.replace(/\[NO_UNICODE\]/g, '?')
+
         return stdout;
     });
 }
