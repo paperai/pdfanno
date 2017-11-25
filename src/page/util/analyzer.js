@@ -34,6 +34,10 @@ export function customizeAnalyzeResult (analyzeData) {
                 page = pageNumber
             }
             if (type === 'TEXT') {
+                // Special replace.
+                if (char.length >= 2) {
+                    char = '?'  // Like "[NO_UNICODE\]"
+                }
                 body += char
                 meta.push(line)
             }
