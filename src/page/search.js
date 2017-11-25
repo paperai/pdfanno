@@ -259,7 +259,7 @@ function doSearch ({ query = null } = {}) {
                     if (!info) {
                         return
                     }
-                    const [ x, y, w, h ] = info.split('\t').slice(3, 7).map(parseFloat)
+                    const [ x, y, w, h ] = info.split('\t').slice(4, 8).map(parseFloat)
                     fromX = (fromX === undefined ? x : Math.min(x, fromX))
                     toX = (toX === undefined ? (x + w) : Math.max((x + w), toX))
                     fromY = (fromY === undefined ? y : Math.min(y, fromY))

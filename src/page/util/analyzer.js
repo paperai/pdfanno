@@ -14,6 +14,7 @@ export function customizeAnalyzeResult (analyzeData) {
             meta.push(line)
         } else {
             let [
+                _,
                 pageNumber,
                 type,
                 char
