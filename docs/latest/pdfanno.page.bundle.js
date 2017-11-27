@@ -12961,13 +12961,22 @@ function search ({ hay, needle, isCaseSensitive = false, useRegexp = false }) {
             start : match.index,
             end   : match.index + match[0].length
         })
-        if (positions.length <= 11) {
-            console.log(match)
-        }
     }
     return positions
 }
 
+/**
+ * Reset the UI display.
+ */
+function resetUI () {
+    $('.pdfanno-search-result', window.iframeWindow.document).remove()
+    $('.search-hit').addClass('hidden')
+    $('.js-dict-match-cur-pos, .js-dict-match-hit-counts').text('000')
+}
+
+/**
+ * Search the word and display.
+ */
 function doSearch ({ query = null } = {}) {
 
     // Check enable.
@@ -12976,10 +12985,7 @@ function doSearch ({ query = null } = {}) {
         return
     }
 
-    // Remove highlights for search results.
-    $('.pdfanno-search-result', window.iframeWindow.document).remove()
-    $('.search-hit').addClass('hidden')
-    $('.js-dict-match-cur-pos, .js-dict-match-hit-counts').text('000')
+    resetUI()
 
     let text
     let isCaseSensitive
@@ -13016,13 +13022,12 @@ function doSearch ({ query = null } = {}) {
             positions.forEach(position => {
                 const $textLayer = $(`.page[data-page-number="${page.page}"] .textLayer`, window.iframeWindow.document)
                 const infos = page.meta.slice(position.start, position.end)
-                // console.log('infos:', infos)
                 let fromX, toX, fromY, toY
                 infos.forEach(info => {
                     if (!info) {
                         return
                     }
-                    const [ x, y, w, h ] = info.split('\t').slice(3, 7).map(parseFloat)
+                    const { x, y, w, h } = __WEBPACK_IMPORTED_MODULE_1__util_analyzer__["b" /* extractMeta */](info)
                     fromX = (fromX === undefined ? x : Math.min(x, fromX))
                     toX = (toX === undefined ? (x + w) : Math.max((x + w), toX))
                     fromY = (fromY === undefined ? y : Math.min(y, fromY))
@@ -13177,6 +13182,7 @@ function searchByDictionary (texts = []) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = customizeAnalyzeResult;
+/* harmony export (immutable) */ __webpack_exports__["b"] = extractMeta;
 
 /**
  * Convert analyze results as page-based.
@@ -13192,12 +13198,11 @@ function customizeAnalyzeResult (analyzeData) {
             body += ' '
             meta.push(line)
         } else {
-            let [
-                pageNumber,
+            let {
+                page : pageNumber,
                 type,
                 char
-            ] = line.split('\t')
-            pageNumber = parseInt(pageNumber, 10)
+            } = extractMeta(line)
             if (!page) {
                 page = pageNumber
                 body = ''
@@ -13213,9 +13218,9 @@ function customizeAnalyzeResult (analyzeData) {
                 page = pageNumber
             }
             if (type === 'TEXT') {
-                // Special replace.
+                // Special replace, like "[NO_UNICODE\]"
                 if (char.length >= 2) {
-                    char = '?'  // Like "[NO_UNICODE\]"
+                    char = '?'
                 }
                 body += char
                 meta.push(line)
@@ -13229,6 +13234,25 @@ function customizeAnalyzeResult (analyzeData) {
     })
 
     return pages
+}
+
+/**
+ * Interpret the meta data.
+ */
+function extractMeta (meta) {
+
+    const info = meta.split('\t')
+
+    return {
+        position : parseInt(info[0]),
+        page     : parseInt(info[1]),
+        type     : info[2],
+        char     : info[3],
+        x        : parseFloat(info[4]),
+        y        : parseFloat(info[5]),
+        w        : parseFloat(info[6]),
+        h        : parseFloat(info[7])
+    }
 }
 
 
@@ -16547,8 +16571,8 @@ function createTextLayer (page) {
                 return
             }
             const items = info.split('\t')
-            const text = items[2]
-            const [ x, y, w, h ] = items.slice(3, 7).map(parseFloat)
+            const text = items[3]
+            const [ x, y, w, h ] = items.slice(4, 8).map(parseFloat)
             const scale = window.iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale
             const $div = $('<div class="pdfanno-text-layer"/>').css({
                 top        : y * scale + 'px',
@@ -16576,12 +16600,14 @@ window.getText = function (page, startIndex, endIndex) {
         if (!info) {
             return ' '
         } else {
-            return info.split('\t')[2]
+            // TODO こんなmetaを扱う処理は、どこかにまとめておかないとメンテナンスが非常に大変..
+            return info.split('\t')[3]
         }
     })
     const text = texts.join('')
 
     // Text position.
+    // TODO Use pdfextract.jar 0.1.6 's position data.'
     const beforeCount = pages.slice(0, page - 1)
             .reduce((v, page) => v.concat(page.meta), [])
             .filter(info => info).length
