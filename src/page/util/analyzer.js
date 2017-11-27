@@ -13,12 +13,11 @@ export function customizeAnalyzeResult (analyzeData) {
             body += ' '
             meta.push(line)
         } else {
-            let [
-                pageNumber,
+            let {
+                page : pageNumber,
                 type,
                 char
-            ] = line.split('\t')
-            pageNumber = parseInt(pageNumber, 10)
+            } = extractMeta(line)
             if (!page) {
                 page = pageNumber
                 body = ''
@@ -34,9 +33,9 @@ export function customizeAnalyzeResult (analyzeData) {
                 page = pageNumber
             }
             if (type === 'TEXT') {
-                // Special replace.
+                // Special replace, like "[NO_UNICODE\]"
                 if (char.length >= 2) {
-                    char = '?'  // Like "[NO_UNICODE\]"
+                    char = '?'
                 }
                 body += char
                 meta.push(line)
@@ -50,4 +49,23 @@ export function customizeAnalyzeResult (analyzeData) {
     })
 
     return pages
+}
+
+/**
+ * Interpret the meta data.
+ */
+export function extractMeta (meta) {
+
+    const info = meta.split('\t')
+
+    return {
+        position : parseInt(info[0]),
+        page     : parseInt(info[1]),
+        type     : info[2],
+        char     : info[3],
+        x        : parseFloat(info[4]),
+        y        : parseFloat(info[5]),
+        w        : parseFloat(info[6]),
+        h        : parseFloat(info[7])
+    }
 }

@@ -2,7 +2,7 @@
  * Search functions.
  */
 import { paddingBetweenPages, nextZIndex } from '../shared/coords'
-import { customizeAnalyzeResult } from './util/analyzer'
+import { customizeAnalyzeResult, extractMeta } from './util/analyzer'
 
 /**
  * The analyze data per pages.
@@ -198,13 +198,22 @@ function search ({ hay, needle, isCaseSensitive = false, useRegexp = false }) {
             start : match.index,
             end   : match.index + match[0].length
         })
-        if (positions.length <= 11) {
-            console.log(match)
-        }
     }
     return positions
 }
 
+/**
+ * Reset the UI display.
+ */
+function resetUI () {
+    $('.pdfanno-search-result', window.iframeWindow.document).remove()
+    $('.search-hit').addClass('hidden')
+    $('.js-dict-match-cur-pos, .js-dict-match-hit-counts').text('000')
+}
+
+/**
+ * Search the word and display.
+ */
 function doSearch ({ query = null } = {}) {
 
     // Check enable.
@@ -213,10 +222,7 @@ function doSearch ({ query = null } = {}) {
         return
     }
 
-    // Remove highlights for search results.
-    $('.pdfanno-search-result', window.iframeWindow.document).remove()
-    $('.search-hit').addClass('hidden')
-    $('.js-dict-match-cur-pos, .js-dict-match-hit-counts').text('000')
+    resetUI()
 
     let text
     let isCaseSensitive
@@ -253,13 +259,12 @@ function doSearch ({ query = null } = {}) {
             positions.forEach(position => {
                 const $textLayer = $(`.page[data-page-number="${page.page}"] .textLayer`, window.iframeWindow.document)
                 const infos = page.meta.slice(position.start, position.end)
-                // console.log('infos:', infos)
                 let fromX, toX, fromY, toY
                 infos.forEach(info => {
                     if (!info) {
                         return
                     }
-                    const [ x, y, w, h ] = info.split('\t').slice(3, 7).map(parseFloat)
+                    const { x, y, w, h } = extractMeta(info)
                     fromX = (fromX === undefined ? x : Math.min(x, fromX))
                     toX = (toX === undefined ? (x + w) : Math.max((x + w), toX))
                     fromY = (fromY === undefined ? y : Math.min(y, fromY))

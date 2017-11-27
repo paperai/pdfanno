@@ -1,7 +1,7 @@
 /**
  * Create text layers which enable users to select texts.
  */
-import { customizeAnalyzeResult } from './util/analyzer'
+import { customizeAnalyzeResult, extractMeta } from './util/analyzer'
 
 let pages
 
@@ -56,8 +56,8 @@ function createTextLayer (page) {
                 return
             }
             const items = info.split('\t')
-            const text = items[2]
-            const [ x, y, w, h ] = items.slice(3, 7).map(parseFloat)
+            const text = items[3]
+            const [ x, y, w, h ] = items.slice(4, 8).map(parseFloat)
             const scale = window.iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale
             const $div = $('<div class="pdfanno-text-layer"/>').css({
                 top        : y * scale + 'px',
@@ -85,12 +85,14 @@ window.getText = function (page, startIndex, endIndex) {
         if (!info) {
             return ' '
         } else {
-            return info.split('\t')[2]
+            // TODO こんなmetaを扱う処理は、どこかにまとめておかないとメンテナンスが非常に大変..
+            return info.split('\t')[3]
         }
     })
     const text = texts.join('')
 
     // Text position.
+    // TODO Use pdfextract.jar 0.1.6 's position data.'
     const beforeCount = pages.slice(0, page - 1)
             .reduce((v, page) => v.concat(page.meta), [])
             .filter(info => info).length
