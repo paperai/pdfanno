@@ -57,6 +57,14 @@ let config = {
         '/load_pdf': {
           target: 'http://localhost:3000',
           secure: false
+        },
+        '/ws': {
+          target: 'http://localhost:3000',
+          secure: false
+        },
+        '/socket.io/socket.io.js': {
+          target: 'http://localhost:3000',
+          secure: false
         }
       }
     },

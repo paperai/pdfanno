@@ -288,3 +288,74 @@ function showLoader (display) {
         }, 1000)
     }
 }
+
+// WebSocket.
+window.addEventListener('DOMContentLoaded', () => {
+
+    const script = document.createElement('script')
+    script.type = 'text/javascript'
+    // TODO URLの指定
+    script.src = '/socket.io/socket.io.js'
+    script.onload = socketReady
+    document.head.appendChild(script)
+
+    function socketReady () {
+
+        console.log('socketReady')
+
+        // TODO URLの指定.
+        const socket = io.connect('http://localhost:8080/ws')
+        console.log('socket:', socket)
+
+        socket.on('connect', function () {
+            console.log('connected front!!')
+        })
+
+    }
+
+})
+
+// UserID.
+window.addEventListener('DOMContentLoaded', () => {
+
+    let userId = URI(document.URL).query(true).userId
+    if (!userId) {
+        userId = annoUI.util.uuid(5)
+    }
+    $('#userId').val(userId)
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

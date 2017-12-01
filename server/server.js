@@ -5,7 +5,12 @@ const bodyParser = require('body-parser');
 const controller = require('./controller');
 
 // Create an application.
-const app = express();
+const app = express()
+// TODO nginx -> nodejs のフォワーディングでhttps対応しているけど大丈夫？
+const server = require('http').Server(app)
+
+// Setup websocket.
+const ws = require('./controller/ws')(server)
 
 // Setup the body parser.
 app.use(bodyParser.json({ limit : '50mb' }));
@@ -22,6 +27,6 @@ app.get('/api/load_anno', controller.loadAnno);
 
 // Launch the app.
 const port = process.env.NODE_PORT || 1000
-app.listen(port, function() {
+server.listen(port, function() {
     console.log(`App listening on port ${port}.`);
 });
