@@ -21,7 +21,6 @@ import PDFAnnoPage from './page/pdf/PDFAnnoPage'
 if (process.env.NODE_ENV === 'production') {
     window.API_ROOT = 'https://pdfanno.hshindo.com/' + process.env.SERVER_PATH
 } else {
-    // window.API_ROOT = 'http://localhost:8080'
     window.API_ROOT = 'http://localhost:3000'
 }
 
@@ -303,61 +302,3 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // WebSocket.
 ws.setup()
-
-// window.addEventListener('DOMContentLoaded', () => {
-
-//     const script = document.createElement('script')
-//     script.type = 'text/javascript'
-//     script.src = window.API_ROOT + '/socket.io/socket.io.js'
-//     script.onload = socketReady
-//     document.head.appendChild(script)
-
-//     function socketReady () {
-
-//         console.log('socketReady')
-
-//         const socket = io.connect(window.API_ROOT + '/ws')
-//         console.log('socket:', socket)
-
-//         socket.on('connect', function () {
-//             console.log('connected front!!')
-//         })
-
-//     }
-
-// })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

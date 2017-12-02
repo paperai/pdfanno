@@ -610,7 +610,7 @@ export default class PDFAnnoPage {
 
         // TODO Refactoring. Too Long...
 
-        console.log('checkAnnotationUpdate')
+        // console.log('checkAnnotationUpdate')
 
         // prevs.
         const prevAnnotations = this.prevAnnotations
@@ -631,16 +631,23 @@ export default class PDFAnnoPage {
             })
             if (primaryAnnotationName) {
                 currentFileName = primaryAnnotationName
+                return
             }
 
             // The name of Content.
             let pdfFileName = this.getCurrentContentFile() && this.getCurrentContentFile().name
-            // TODO sometimes error. pdfFileName is undefined.
+            if (!pdfFileName) {
+                return
+                // TODO pdftxtとannoダウンロードは、Viewerが閉じている時には無効化すべし.
+            }
             let annoName = pdfFileName.replace(/\.pdf$/i, '.anno')
             currentFileName = annoName
         })()
-        console.log('currentFileName:', currentFileName)
-        console.log('currentAnnotations:', currentAnnotations.length)
+        if (!currentFileName) {
+            return
+        }
+        // console.log('currentFileName:', currentFileName)
+        // console.log('currentAnnotations:', currentAnnotations.length)
 
         // Check.
         if (prevAnnotations && prevFileName && currentAnnotations && currentFileName) {
@@ -700,8 +707,6 @@ export default class PDFAnnoPage {
             // Check if labels are modifed.
             } else {
 
-                // TODO test.
-
                 const changes = Object.keys(prevLabelMap).filter(uuid => {
                     const b = currentAnnotations.filter(aa => uuid === aa.uuid)
                     if (b.length > 0) {
@@ -709,20 +714,6 @@ export default class PDFAnnoPage {
                     }
                     return false
                 })
-
-                // const changes = prevAnnotations.filter(a => {
-                //     const b = currentAnnotations.filter(aa => a.uuid === aa.uuid)
-                //     console.log('b', b.length)
-                //     if (b.length > 0) {
-                //         console.log('text:', a.text, b[0].text)
-                //         if (a.text !== b[0].text) {
-                //             return true
-                //         }
-                //     }
-                //     return false
-                // })
-
-                console.log('changes:', changes.length, prevAnnotations.length, currentAnnotations.length)
 
                 if (changes.length > 0) {
                     socket.sendAnnotationUpdated({
@@ -732,12 +723,7 @@ export default class PDFAnnoPage {
                         annotation : await this.exportData()
                     })
                 }
-
-
             }
-
-
-
         }
 
         // Save the state.
