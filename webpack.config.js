@@ -20,6 +20,7 @@ let config = {
             exclude : /node_modules/
         }]
     },
+    plugins : [],
     devServer : {
       host : 'localhost',
       port : 8080,
@@ -37,7 +38,7 @@ if (process.env.NODE_ENV === 'production') {
             NODE_ENV : '"production"',
             SERVER_PATH : '"' + process.env.SERVER_PATH + '"'
         }
-    }));
+    }))
 }
 
 module.exports = config;
