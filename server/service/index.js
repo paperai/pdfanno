@@ -18,6 +18,7 @@ module.exports.savePDF = (fileName, content) => {
                 fs.mkdirSync(dataPath);
         }
         const pdfPath = path.resolve(dataPath, fileName);
+        // TODO Use Async.
         fs.writeFileSync(pdfPath, content);
 
         resolve(pdfPath);

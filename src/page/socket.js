@@ -25,7 +25,12 @@ export function setup () {
 
         // for debug.
         setInterval(() => {
-            send('annotation', { action : 'action text.', userId : 'userId', data : { 'aaa' : 'bbb' }})
+            send('annotation', {
+                fileName   : 'sample.anno',
+                updated    : 'some annotation is added.',
+                userId     : $('#userId').val(),
+                annotation : { 'aaa' : 'bbb' }
+            })
         }, 3000)
 
         // for debug.
