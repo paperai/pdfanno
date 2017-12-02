@@ -46,5 +46,5 @@ async function saveAnnotation({ userId, fileName, annotation }) {
     const fpath = path.join(dirpath, fileName.replace('/', ''))
 
     // TODO Use Async.
-    fs.writeFileSync(fpath, JSON.stringify(annotation), 'utf8')
+    fs.writeFileSync(fpath, annotation, 'utf8')
 }
