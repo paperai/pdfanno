@@ -75,6 +75,8 @@ function disable () {
  */
 function getDownloadFileName () {
 
+    // TODO Refactoring. this function is similar to the one in downloadButton.
+
     // The name of Primary Annotation.
     let primaryAnnotationName
     $('#dropdownAnnoPrimary a').each((index, element) => {
@@ -88,6 +90,6 @@ function getDownloadFileName () {
     }
 
     // The name of Content.
-    let pdfFileName = window.annoPage.getCurrentContentName()
+    let pdfFileName = window.annoPage.getCurrentContentFile().name
     return pdfFileName.replace(/\.pdf$/i, '.pdftxt')
 }

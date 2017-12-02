@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 33);
+/******/ 	return __webpack_require__(__webpack_require__.s = 34);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -80,7 +80,7 @@ return /******/ (function(modules) { // webpackBootstrap
 "use strict";
 
 
-var bind = __webpack_require__(21);
+var bind = __webpack_require__(22);
 
 /*global toString:true*/
 
@@ -604,10 +604,10 @@ function isArray (val) {
  *
  * @return {String}
  */
-function uuid () {
+function uuid (len = 8) {
 
     // Length of ID characters.
-    const ID_LENGTH = 8
+    const ID_LENGTH = len
 
     // Candidates.
     const BASE = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
@@ -1810,10 +1810,10 @@ function isArray (val) {
  *
  * @return {String}
  */
-function uuid () {
+function uuid (len = 8) {
 
     // Length of ID characters.
-    const ID_LENGTH = 8
+    const ID_LENGTH = len
 
     // Candidates.
     const BASE = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
@@ -11593,7 +11593,7 @@ module.exports = {
 /* WEBPACK VAR INJECTION */(function(process) {
 
 var utils = __webpack_require__(0);
-var normalizeHeaderName = __webpack_require__(48);
+var normalizeHeaderName = __webpack_require__(49);
 
 var PROTECTION_PREFIX = /^\)\]\}',?\n/;
 var DEFAULT_CONTENT_TYPE = {
@@ -11610,10 +11610,10 @@ function getDefaultAdapter() {
   var adapter;
   if (typeof XMLHttpRequest !== 'undefined') {
     // For browsers use XHR adapter
-    adapter = __webpack_require__(22);
+    adapter = __webpack_require__(23);
   } else if (typeof process !== 'undefined') {
     // For node use HTTP adapter
-    adapter = __webpack_require__(22);
+    adapter = __webpack_require__(23);
   }
   return adapter;
 }
@@ -11684,7 +11684,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = defaults;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(47)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(48)))
 
 /***/ }),
 /* 11 */,
@@ -12227,7 +12227,7 @@ module.exports = defaults;
 
 }(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(38)(module), __webpack_require__(39)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(39)(module), __webpack_require__(40)))
 
 /***/ }),
 /* 16 */
@@ -13258,6 +13258,65 @@ function extractMeta (meta) {
 
 /***/ }),
 /* 21 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["b"] = setup;
+/* harmony export (immutable) */ __webpack_exports__["a"] = sendAnnotationUpdated;
+/**
+    Websocket client for PDFAnno.
+*/
+
+let socket
+
+function setup () {
+
+    const script = document.createElement('script')
+    script.type = 'text/javascript'
+    script.src = window.API_ROOT + '/socket.io/socket.io.js'
+    script.onload = socketReady
+    document.head.appendChild(script)
+
+    function socketReady () {
+
+        // console.log('socketReady')
+
+        socket = window.io.connect(window.API_ROOT + '/ws')
+        console.log('socket:', socket)
+
+        socket.on('connect', function () {
+            console.log('connected front!!')
+        })
+
+        socket.on('annotationUpdated', function (message) {
+            let text = $('#uploadResultDummy').val()
+            if (text) {
+                text += '\n'
+            }
+            $('#uploadResultDummy').val(text + message)
+            console.log('annotationUpdated:', message)
+        })
+    }
+}
+
+function sendAnnotationUpdated (data) {
+    send('annotation', data)
+    console.log(data.updated)
+}
+
+function send (topic, data) {
+
+    if (socket) {
+        socket.emit(topic, data)
+
+    } else {
+        console.log('socket haven\'t be initialized yet.')
+    }
+}
+
+
+/***/ }),
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13275,19 +13334,19 @@ module.exports = function bind(fn, thisArg) {
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var utils = __webpack_require__(0);
-var settle = __webpack_require__(49);
-var buildURL = __webpack_require__(51);
-var parseHeaders = __webpack_require__(52);
-var isURLSameOrigin = __webpack_require__(53);
-var createError = __webpack_require__(23);
-var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(54);
+var settle = __webpack_require__(50);
+var buildURL = __webpack_require__(52);
+var parseHeaders = __webpack_require__(53);
+var isURLSameOrigin = __webpack_require__(54);
+var createError = __webpack_require__(24);
+var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(55);
 
 module.exports = function xhrAdapter(config) {
   return new Promise(function dispatchXhrRequest(resolve, reject) {
@@ -13383,7 +13442,7 @@ module.exports = function xhrAdapter(config) {
     // This is only done if running in a standard browser environment.
     // Specifically not if we're in a web worker, or react-native.
     if (utils.isStandardBrowserEnv()) {
-      var cookies = __webpack_require__(55);
+      var cookies = __webpack_require__(56);
 
       // Add xsrf header
       var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
@@ -13459,13 +13518,13 @@ module.exports = function xhrAdapter(config) {
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var enhanceError = __webpack_require__(50);
+var enhanceError = __webpack_require__(51);
 
 /**
  * Create an Error with the specified message, config, error code, and response.
@@ -13483,7 +13542,7 @@ module.exports = function createError(message, config, code, response) {
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13495,7 +13554,7 @@ module.exports = function isCancel(value) {
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13521,35 +13580,37 @@ module.exports = Cancel;
 
 
 /***/ }),
-/* 26 */,
 /* 27 */,
 /* 28 */,
 /* 29 */,
 /* 30 */,
 /* 31 */,
 /* 32 */,
-/* 33 */
+/* 33 */,
+/* 34 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_urijs__ = __webpack_require__(37);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_urijs__ = __webpack_require__(38);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_urijs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_urijs__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_anno_ui__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_anno_ui___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_anno_ui__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__shared_util__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__page_util_window__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__page_public__ = __webpack_require__(40);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__page_public__ = __webpack_require__(41);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__page_search__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__page_textLayer__ = __webpack_require__(41);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__page_pdftxtdownload__ = __webpack_require__(42);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__page_pdf_PDFAnnoPage__ = __webpack_require__(43);
-__webpack_require__(34)
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__page_textLayer__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__page_pdftxtdownload__ = __webpack_require__(43);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__page_socket__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__page_pdf_PDFAnnoPage__ = __webpack_require__(44);
 __webpack_require__(35)
+__webpack_require__(36)
 
 
 
 // UI parts.
+
 
 
 
@@ -13566,7 +13627,7 @@ __webpack_require__(35)
 if (true) {
     window.API_ROOT = 'https://pdfanno.hshindo.com/' + "latest"
 } else {
-    window.API_ROOT = 'http://localhost:8080'
+    window.API_ROOT = 'http://localhost:3000'
 }
 
 /**
@@ -13582,7 +13643,7 @@ __WEBPACK_IMPORTED_MODULE_4__page_public__["b" /* expose */]()
 /**
  * Annotation functions for a page.
  */
-window.annoPage = new __WEBPACK_IMPORTED_MODULE_8__page_pdf_PDFAnnoPage__["a" /* default */]()
+window.annoPage = new __WEBPACK_IMPORTED_MODULE_9__page_pdf_PDFAnnoPage__["a" /* default */]()
 
 // Manage ctrlKey (cmdKey on Mac).
 window.addEventListener('manageCtrlKey', e => {
@@ -13696,7 +13757,9 @@ window.addEventListener('DOMContentLoaded', async e => {
     // Download anno button.
     __WEBPACK_IMPORTED_MODULE_1_anno_ui__["downloadButton"].setup({
         getAnnotationTOMLString : window.annoPage.exportData,
-        getCurrentContentName   : window.annoPage.getCurrentContentName,
+        getCurrentContentName   : () => {
+            return window.annoPage.getCurrentContentFile().name
+        },
         didDownloadCallback     : __WEBPACK_IMPORTED_MODULE_3__page_util_window__["c" /* unlistenWindowLeaveEvent */]
     })
 
@@ -13835,21 +13898,34 @@ function showLoader (display) {
     }
 }
 
+// UserID.
+window.addEventListener('DOMContentLoaded', () => {
 
-/***/ }),
-/* 34 */
-/***/ (function(module, exports, __webpack_require__) {
+    let userId = __WEBPACK_IMPORTED_MODULE_0_urijs___default.a(document.URL).query(true).userId
+    if (!userId) {
+        userId = __WEBPACK_IMPORTED_MODULE_1_anno_ui__["util"].uuid(5)
+    }
+    $('#userId').val(userId)
+})
 
-module.exports = __webpack_require__.p + "dist/index.html";
+// WebSocket.
+__WEBPACK_IMPORTED_MODULE_8__page_socket__["b" /* setup */]()
+
 
 /***/ }),
 /* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
+module.exports = __webpack_require__.p + "dist/index.html";
+
+/***/ }),
+/* 36 */
+/***/ (function(module, exports, __webpack_require__) {
+
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(36);
+var content = __webpack_require__(37);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
 var update = __webpack_require__(5)(content, {});
@@ -13869,7 +13945,7 @@ if(false) {
 }
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(4)();
@@ -13883,7 +13959,7 @@ exports.push([module.i, "@charset \"utf-8\";\n\n/* Loading */\n.loader-container
 
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -16226,7 +16302,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -16254,7 +16330,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports) {
 
 var g;
@@ -16281,7 +16357,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16507,7 +16583,7 @@ function clear () {
 
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16516,6 +16592,8 @@ function clear () {
 /**
  * Create text layers which enable users to select texts.
  */
+// TODO Use "extractMeta"
+// import { customizeAnalyzeResult, extractMeta } from './util/analyzer'
 
 
 let pages
@@ -16620,7 +16698,7 @@ window.getText = function (page, startIndex, endIndex) {
 
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16704,6 +16782,8 @@ function disable () {
  */
 function getDownloadFileName () {
 
+    // TODO Refactoring. this function is similar to the one in downloadButton.
+
     // The name of Primary Annotation.
     let primaryAnnotationName
     $('#dropdownAnnoPrimary a').each((index, element) => {
@@ -16717,25 +16797,27 @@ function getDownloadFileName () {
     }
 
     // The name of Content.
-    let pdfFileName = window.annoPage.getCurrentContentName()
+    let pdfFileName = window.annoPage.getCurrentContentFile().name
     return pdfFileName.replace(/\.pdf$/i, '.pdftxt')
 }
 
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_axios__ = __webpack_require__(44);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_axios__ = __webpack_require__(45);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_axios___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_axios__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_anno_ui__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_anno_ui___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_anno_ui__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__loadFiles__ = __webpack_require__(63);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__loadFiles__ = __webpack_require__(64);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__search__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__shared_util__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__shared_coords__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__util_window__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__socket__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__shared_util__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__shared_coords__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__util_window__ = __webpack_require__(18);
+
 
 
 
@@ -16772,73 +16854,79 @@ class PDFAnnoPage {
         window.iframeWindow.addEventListener('DOMContentLoaded', () => {
 
             // Adjust the height of viewer.
-            __WEBPACK_IMPORTED_MODULE_6__util_window__["a" /* adjustViewerSize */]()
+            __WEBPACK_IMPORTED_MODULE_7__util_window__["a" /* adjustViewerSize */]()
 
             // Reset the confirm dialog at leaving page.
-            __WEBPACK_IMPORTED_MODULE_6__util_window__["c" /* unlistenWindowLeaveEvent */]()
+            __WEBPACK_IMPORTED_MODULE_7__util_window__["c" /* unlistenWindowLeaveEvent */]()
 
-            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('iframeReady')
+            __WEBPACK_IMPORTED_MODULE_5__shared_util__["b" /* dispatchWindowEvent */]('iframeReady')
         })
 
         window.iframeWindow.addEventListener('pagerendered', ev => {
-            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('pagerendered', ev.detail)
+            __WEBPACK_IMPORTED_MODULE_5__shared_util__["b" /* dispatchWindowEvent */]('pagerendered', ev.detail)
         })
 
         window.iframeWindow.addEventListener('annotationrendered', () => {
-            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered')
+            __WEBPACK_IMPORTED_MODULE_5__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered')
         })
 
         // Set the confirm dialog when leaving a page.
         window.iframeWindow.addEventListener('annotationUpdated', () => {
-            __WEBPACK_IMPORTED_MODULE_6__util_window__["b" /* listenWindowLeaveEvent */]()
-            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('annotationUpdated')
+            __WEBPACK_IMPORTED_MODULE_7__util_window__["b" /* listenWindowLeaveEvent */]()
+            __WEBPACK_IMPORTED_MODULE_5__shared_util__["b" /* dispatchWindowEvent */]('annotationUpdated')
         })
 
         // enable text input.
         window.iframeWindow.addEventListener('enableTextInput', e => {
-            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('enableTextInput', e.detail)
+            __WEBPACK_IMPORTED_MODULE_5__shared_util__["b" /* dispatchWindowEvent */]('enableTextInput', e.detail)
         })
 
         // disable text input.
         window.iframeWindow.addEventListener('disappearTextInput', e => {
-            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('disappearTextInput', e.detail)
+            __WEBPACK_IMPORTED_MODULE_5__shared_util__["b" /* dispatchWindowEvent */]('disappearTextInput', e.detail)
         })
 
         window.iframeWindow.addEventListener('annotationDeleted', e => {
-            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('annotationDeleted', e.detail)
+            __WEBPACK_IMPORTED_MODULE_5__shared_util__["b" /* dispatchWindowEvent */]('annotationDeleted', e.detail)
         })
 
         window.iframeWindow.addEventListener('annotationHoverIn', e => {
-            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('annotationHoverIn', e.detail)
+            __WEBPACK_IMPORTED_MODULE_5__shared_util__["b" /* dispatchWindowEvent */]('annotationHoverIn', e.detail)
         })
 
         window.iframeWindow.addEventListener('annotationHoverOut', e => {
-            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('annotationHoverOut', e.detail)
+            __WEBPACK_IMPORTED_MODULE_5__shared_util__["b" /* dispatchWindowEvent */]('annotationHoverOut', e.detail)
         })
 
         window.iframeWindow.addEventListener('annotationSelected', e => {
-            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('annotationSelected', e.detail)
+            __WEBPACK_IMPORTED_MODULE_5__shared_util__["b" /* dispatchWindowEvent */]('annotationSelected', e.detail)
         })
 
         window.iframeWindow.addEventListener('annotationDeselected', () => {
-            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('annotationDeselected')
+            __WEBPACK_IMPORTED_MODULE_5__shared_util__["b" /* dispatchWindowEvent */]('annotationDeselected')
         })
 
+        // TODO No Need.
         window.iframeWindow.addEventListener('digit1Pressed', () => {
-            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('digit1Pressed')
+            __WEBPACK_IMPORTED_MODULE_5__shared_util__["b" /* dispatchWindowEvent */]('digit1Pressed')
         })
 
+        // TODO No Need.
         window.iframeWindow.addEventListener('digit2Pressed', () => {
-            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('digit2Pressed')
+            __WEBPACK_IMPORTED_MODULE_5__shared_util__["b" /* dispatchWindowEvent */]('digit2Pressed')
         })
 
+        // TODO No Need.
         window.iframeWindow.addEventListener('digit3Pressed', () => {
-            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('digit3Pressed')
+            __WEBPACK_IMPORTED_MODULE_5__shared_util__["b" /* dispatchWindowEvent */]('digit3Pressed')
         })
 
+        // TODO No Need.
         window.iframeWindow.addEventListener('digit4Pressed', () => {
-            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('digit4Pressed')
+            __WEBPACK_IMPORTED_MODULE_5__shared_util__["b" /* dispatchWindowEvent */]('digit4Pressed')
         })
+
+        setInterval(this.checkAnnotationUpdate, 1500)
     }
 
     /**
@@ -16943,7 +17031,7 @@ class PDFAnnoPage {
             window.iframeWindow.PDFViewerApplication.close()
             $('#numPages', window.iframeWindow.document).text('')
             this.currentContentFile = null
-            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('didCloseViewer')
+            __WEBPACK_IMPORTED_MODULE_5__shared_util__["b" /* dispatchWindowEvent */]('didCloseViewer')
         }
     }
 
@@ -16973,7 +17061,7 @@ class PDFAnnoPage {
 
         // Create a new rectAnnotation.
         if (rects) {
-            window.iframeWindow.PDFAnnoCore.default.UI.createSpan({ text, zIndex : __WEBPACK_IMPORTED_MODULE_5__shared_coords__["c" /* nextZIndex */]() })
+            window.iframeWindow.PDFAnnoCore.default.UI.createSpan({ text, zIndex : __WEBPACK_IMPORTED_MODULE_6__shared_coords__["c" /* nextZIndex */]() })
 
         } else if (highlight) {
 
@@ -16986,7 +17074,7 @@ class PDFAnnoPage {
                 label     : text,
                 text      : highlight.text,
                 textrange : textRange,
-                zIndex    : __WEBPACK_IMPORTED_MODULE_5__shared_coords__["c" /* nextZIndex */]()
+                zIndex    : __WEBPACK_IMPORTED_MODULE_6__shared_coords__["c" /* nextZIndex */]()
             })
             window.add(s)
 
@@ -17001,7 +17089,7 @@ class PDFAnnoPage {
         }
 
         // Notify annotation added.
-        __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered')
+        __WEBPACK_IMPORTED_MODULE_5__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered')
     }
 
     /**
@@ -17034,8 +17122,8 @@ class PDFAnnoPage {
                         .getAllAnnotations()
                         .filter(a => a.type === 'relation')
                         .filter(a => {
-                            return __WEBPACK_IMPORTED_MODULE_4__shared_util__["a" /* anyOf */](a.rel1Annotation.uuid, [first.uuid, second.uuid])
-                                    && __WEBPACK_IMPORTED_MODULE_4__shared_util__["a" /* anyOf */](a.rel2Annotation.uuid, [first.uuid, second.uuid])
+                            return __WEBPACK_IMPORTED_MODULE_5__shared_util__["a" /* anyOf */](a.rel1Annotation.uuid, [first.uuid, second.uuid])
+                                    && __WEBPACK_IMPORTED_MODULE_5__shared_util__["a" /* anyOf */](a.rel2Annotation.uuid, [first.uuid, second.uuid])
                         })
 
         if (arrows.length > 0) {
@@ -17066,7 +17154,7 @@ class PDFAnnoPage {
         })
 
         // Notify annotation added.
-        __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered')
+        __WEBPACK_IMPORTED_MODULE_5__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered')
     }
 
     /**
@@ -17205,7 +17293,7 @@ class PDFAnnoPage {
     importAnnotation (paperData, isPrimary) {
         window.iframeWindow.annotationContainer.importAnnotations(paperData, isPrimary).then(result => {
             // Notify annotations added.
-            __WEBPACK_IMPORTED_MODULE_4__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered')
+            __WEBPACK_IMPORTED_MODULE_5__shared_util__["b" /* dispatchWindowEvent */]('annotationrendered')
         })
     }
 
@@ -17220,10 +17308,10 @@ class PDFAnnoPage {
 
             // scroll to.
             let _y = annotation.y || annotation.y1 || annotation.rectangles[0].y
-            let { pageNumber, y } = __WEBPACK_IMPORTED_MODULE_5__shared_coords__["b" /* convertToExportY */](_y)
+            let { pageNumber, y } = __WEBPACK_IMPORTED_MODULE_6__shared_coords__["b" /* convertToExportY */](_y)
             let pageHeight = window.annoPage.getViewerViewport().height
             let scale = window.annoPage.getViewerViewport().scale
-            _y = (pageHeight + __WEBPACK_IMPORTED_MODULE_5__shared_coords__["d" /* paddingBetweenPages */]) * (pageNumber - 1) + y * scale
+            _y = (pageHeight + __WEBPACK_IMPORTED_MODULE_6__shared_coords__["d" /* paddingBetweenPages */]) * (pageNumber - 1) + y * scale
             _y -= 100
             $('#viewer iframe').contents().find('#viewer').parent()[0].scrollTop = _y
 
@@ -17241,6 +17329,7 @@ class PDFAnnoPage {
      * @return {Promise}
      */
     exportData () {
+        // TODO This could remove promise, just sync method.
         return window.iframeWindow.annotationContainer.exportData()
     }
 
@@ -17329,27 +17418,159 @@ class PDFAnnoPage {
         return this._pdftxt
     }
 
+    /**
+     * Check annotation changings.
+     */
+    async checkAnnotationUpdate () {
+
+        // TODO Refactoring. Too Long...
+
+        // console.log('checkAnnotationUpdate')
+
+        // prevs.
+        const prevAnnotations = this.prevAnnotations
+        const prevFileName = this.prevFileName
+        const prevLabelMap = this.prevLabelMap
+
+        // current.
+        const currentAnnotations = this.getAllAnnotations()
+        let currentFileName // = annoUI.downloadButton.getDownloadFileName(this.getCurrentContentName)
+        // TODO Refactoring (use in downloadButton)
+        (() => {
+            let primaryAnnotationName
+            $('#dropdownAnnoPrimary a').each((index, element) => {
+                let $elm = $(element)
+                if ($elm.find('.fa-check').hasClass('no-visible') === false) {
+                    primaryAnnotationName = $elm.find('.js-annoname').text()
+                }
+            })
+            if (primaryAnnotationName) {
+                currentFileName = primaryAnnotationName
+                return
+            }
+
+            // The name of Content.
+            let pdfFileName = this.getCurrentContentFile() && this.getCurrentContentFile().name
+            if (!pdfFileName) {
+                return
+                // TODO pdftxtとannoダウンロードは、Viewerが閉じている時には無効化すべし.
+            }
+            let annoName = pdfFileName.replace(/\.pdf$/i, '.anno')
+            currentFileName = annoName
+        })()
+        if (!currentFileName) {
+            return
+        }
+        // console.log('currentFileName:', currentFileName)
+        // console.log('currentAnnotations:', currentAnnotations.length)
+
+        // Check.
+        if (prevAnnotations && prevFileName && currentAnnotations && currentFileName) {
+
+            // TODO test.
+
+            // Check the fileName.
+            if (prevFileName !== currentFileName) {
+                __WEBPACK_IMPORTED_MODULE_4__socket__["a" /* sendAnnotationUpdated */]({
+                    fileName   : currentFileName,
+                    updated    : `file was changed (${prevFileName} => ${currentFileName}).`,
+                    userId     : $('#userId').val(),
+                    annotation : await this.exportData()
+                })
+
+            // Check if added.
+            } else if (currentAnnotations.length > prevAnnotations.length) {
+
+                // TODO test => OK.
+
+                const adds = currentAnnotations.filter(a => {
+                    return prevAnnotations.indexOf(a) === -1
+                })
+
+                if (adds.length > 0) {
+                    const ids = adds.map(a => a.uuid)
+                    __WEBPACK_IMPORTED_MODULE_4__socket__["a" /* sendAnnotationUpdated */]({
+                        fileName   : currentFileName,
+                        updated    : `an annotation(${ids.join(',')}) was added.`,
+                        userId     : $('#userId').val(),
+                        annotation : await this.exportData()
+                    })
+                }
+
+            // Check if deleted.
+            } else if (currentAnnotations.length < prevAnnotations.length) {
+
+                // TODO test => OK.
+
+                const deletes = prevAnnotations.filter(a => {
+                    return currentAnnotations.indexOf(a) === -1
+                })
+
+                if (deletes.length > 0) {
+                    const ids = deletes.map(a => a.uuid)
+                    const messages = ids.map(id => {
+                        return `an annotation(${id}) was deleted.`
+                    })
+                    __WEBPACK_IMPORTED_MODULE_4__socket__["a" /* sendAnnotationUpdated */]({
+                        fileName   : currentFileName,
+                        updated    : messages.join('\n'),
+                        userId     : $('#userId').val(),
+                        annotation : await this.exportData()
+                    })
+                }
+
+            // Check if labels are modifed.
+            } else {
+
+                const changes = Object.keys(prevLabelMap).filter(uuid => {
+                    const b = currentAnnotations.filter(aa => uuid === aa.uuid)
+                    if (b.length > 0) {
+                        return prevLabelMap[uuid] !== b[0].text
+                    }
+                    return false
+                })
+
+                if (changes.length > 0) {
+                    __WEBPACK_IMPORTED_MODULE_4__socket__["a" /* sendAnnotationUpdated */]({
+                        fileName   : currentFileName,
+                        updated    : `an label(${changes.join(',')}) was changed.`,
+                        userId     : $('#userId').val(),
+                        annotation : await this.exportData()
+                    })
+                }
+            }
+        }
+
+        // Save the state.
+        this.prevAnnotations = currentAnnotations
+        this.prevFileName = currentFileName
+        this.prevLabelMap = {}
+        currentAnnotations.forEach(a => {
+            this.prevLabelMap[a.uuid] = a.text
+        })
+
+    }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = PDFAnnoPage;
 
 
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(45);
+module.exports = __webpack_require__(46);
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var utils = __webpack_require__(0);
-var bind = __webpack_require__(21);
-var Axios = __webpack_require__(46);
+var bind = __webpack_require__(22);
+var Axios = __webpack_require__(47);
 var defaults = __webpack_require__(10);
 
 /**
@@ -17383,15 +17604,15 @@ axios.create = function create(instanceConfig) {
 };
 
 // Expose Cancel & CancelToken
-axios.Cancel = __webpack_require__(25);
-axios.CancelToken = __webpack_require__(61);
-axios.isCancel = __webpack_require__(24);
+axios.Cancel = __webpack_require__(26);
+axios.CancelToken = __webpack_require__(62);
+axios.isCancel = __webpack_require__(25);
 
 // Expose all/spread
 axios.all = function all(promises) {
   return Promise.all(promises);
 };
-axios.spread = __webpack_require__(62);
+axios.spread = __webpack_require__(63);
 
 module.exports = axios;
 
@@ -17400,7 +17621,7 @@ module.exports.default = axios;
 
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17408,10 +17629,10 @@ module.exports.default = axios;
 
 var defaults = __webpack_require__(10);
 var utils = __webpack_require__(0);
-var InterceptorManager = __webpack_require__(56);
-var dispatchRequest = __webpack_require__(57);
-var isAbsoluteURL = __webpack_require__(59);
-var combineURLs = __webpack_require__(60);
+var InterceptorManager = __webpack_require__(57);
+var dispatchRequest = __webpack_require__(58);
+var isAbsoluteURL = __webpack_require__(60);
+var combineURLs = __webpack_require__(61);
 
 /**
  * Create a new instance of Axios
@@ -17492,7 +17713,7 @@ module.exports = Axios;
 
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -17682,7 +17903,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17701,13 +17922,13 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
 
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var createError = __webpack_require__(23);
+var createError = __webpack_require__(24);
 
 /**
  * Resolve or reject a Promise based on response status.
@@ -17733,7 +17954,7 @@ module.exports = function settle(resolve, reject, response) {
 
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17759,7 +17980,7 @@ module.exports = function enhanceError(error, config, code, response) {
 
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17834,7 +18055,7 @@ module.exports = function buildURL(url, params, paramsSerializer) {
 
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17878,7 +18099,7 @@ module.exports = function parseHeaders(headers) {
 
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17953,7 +18174,7 @@ module.exports = (
 
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17996,7 +18217,7 @@ module.exports = btoa;
 
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18056,7 +18277,7 @@ module.exports = (
 
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18115,15 +18336,15 @@ module.exports = InterceptorManager;
 
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var utils = __webpack_require__(0);
-var transformData = __webpack_require__(58);
-var isCancel = __webpack_require__(24);
+var transformData = __webpack_require__(59);
+var isCancel = __webpack_require__(25);
 var defaults = __webpack_require__(10);
 
 /**
@@ -18201,7 +18422,7 @@ module.exports = function dispatchRequest(config) {
 
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18228,7 +18449,7 @@ module.exports = function transformData(data, headers, fns) {
 
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18249,7 +18470,7 @@ module.exports = function isAbsoluteURL(url) {
 
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18268,13 +18489,13 @@ module.exports = function combineURLs(baseURL, relativeURL) {
 
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var Cancel = __webpack_require__(25);
+var Cancel = __webpack_require__(26);
 
 /**
  * A `CancelToken` is an object that can be used to request cancellation of an operation.
@@ -18332,7 +18553,7 @@ module.exports = CancelToken;
 
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18366,7 +18587,7 @@ module.exports = function spread(callback) {
 
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

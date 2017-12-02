@@ -12,6 +12,7 @@ import * as publicApi from './page/public'
 import * as searchUI from './page/search'
 import * as textLayer from './page/textLayer'
 import * as pdftxtDownload from './page/pdftxtdownload'
+import * as ws from './page/socket'
 import PDFAnnoPage from './page/pdf/PDFAnnoPage'
 
 /**
@@ -20,7 +21,7 @@ import PDFAnnoPage from './page/pdf/PDFAnnoPage'
 if (process.env.NODE_ENV === 'production') {
     window.API_ROOT = 'https://pdfanno.hshindo.com/' + process.env.SERVER_PATH
 } else {
-    window.API_ROOT = 'http://localhost:8080'
+    window.API_ROOT = 'http://localhost:3000'
 }
 
 /**
@@ -150,7 +151,9 @@ window.addEventListener('DOMContentLoaded', async e => {
     // Download anno button.
     annoUI.downloadButton.setup({
         getAnnotationTOMLString : window.annoPage.exportData,
-        getCurrentContentName   : window.annoPage.getCurrentContentName,
+        getCurrentContentName   : () => {
+            return window.annoPage.getCurrentContentFile().name
+        },
         didDownloadCallback     : unlistenWindowLeaveEvent
     })
 
@@ -288,3 +291,16 @@ function showLoader (display) {
         }, 1000)
     }
 }
+
+// UserID.
+window.addEventListener('DOMContentLoaded', () => {
+
+    let userId = URI(document.URL).query(true).userId
+    if (!userId) {
+        userId = annoUI.util.uuid(5)
+    }
+    $('#userId').val(userId)
+})
+
+// WebSocket.
+ws.setup()

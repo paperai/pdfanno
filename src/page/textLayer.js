@@ -1,7 +1,9 @@
 /**
  * Create text layers which enable users to select texts.
  */
-import { customizeAnalyzeResult, extractMeta } from './util/analyzer'
+// TODO Use "extractMeta"
+// import { customizeAnalyzeResult, extractMeta } from './util/analyzer'
+import { customizeAnalyzeResult } from './util/analyzer'
 
 let pages
 

@@ -11,6 +11,7 @@ jsdoc
 
 # Server Data.
 server-data
+server/userdata
 server/extlib/*.jar
 
 # Server dependencies.
