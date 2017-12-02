@@ -9,8 +9,18 @@ const app = express()
 // TODO nginx -> nodejs のフォワーディングでhttps対応しているけど大丈夫？
 const server = require('http').Server(app)
 
+// for development.
+if (process.env.NODE_PORT === '3000') {
+    console.log('DEV MODE: Allow wildcard Cross Origins.')
+    app.use((req, res, next) => {
+        res.header("Access-Control-Allow-Origin", "*")
+        res.header("Access-Control-Allow-Headers", "X-Requested-With")
+        next()
+    })
+}
+
 // Setup websocket.
-const ws = require('./controller/ws')(server)
+require('./controller/ws')(server)
 
 // Setup the body parser.
 app.use(bodyParser.json({ limit : '50mb' }));

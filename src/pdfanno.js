@@ -12,6 +12,7 @@ import * as publicApi from './page/public'
 import * as searchUI from './page/search'
 import * as textLayer from './page/textLayer'
 import * as pdftxtDownload from './page/pdftxtdownload'
+import * as ws from './page/socket'
 import PDFAnnoPage from './page/pdf/PDFAnnoPage'
 
 /**
@@ -20,7 +21,8 @@ import PDFAnnoPage from './page/pdf/PDFAnnoPage'
 if (process.env.NODE_ENV === 'production') {
     window.API_ROOT = 'https://pdfanno.hshindo.com/' + process.env.SERVER_PATH
 } else {
-    window.API_ROOT = 'http://localhost:8080'
+    // window.API_ROOT = 'http://localhost:8080'
+    window.API_ROOT = 'http://localhost:3000'
 }
 
 /**
@@ -289,32 +291,6 @@ function showLoader (display) {
     }
 }
 
-// WebSocket.
-window.addEventListener('DOMContentLoaded', () => {
-
-    const script = document.createElement('script')
-    script.type = 'text/javascript'
-    // TODO URLの指定
-    script.src = '/socket.io/socket.io.js'
-    script.onload = socketReady
-    document.head.appendChild(script)
-
-    function socketReady () {
-
-        console.log('socketReady')
-
-        // TODO URLの指定.
-        const socket = io.connect('http://localhost:8080/ws')
-        console.log('socket:', socket)
-
-        socket.on('connect', function () {
-            console.log('connected front!!')
-        })
-
-    }
-
-})
-
 // UserID.
 window.addEventListener('DOMContentLoaded', () => {
 
@@ -324,6 +300,32 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     $('#userId').val(userId)
 })
+
+// WebSocket.
+ws.setup()
+
+// window.addEventListener('DOMContentLoaded', () => {
+
+//     const script = document.createElement('script')
+//     script.type = 'text/javascript'
+//     script.src = window.API_ROOT + '/socket.io/socket.io.js'
+//     script.onload = socketReady
+//     document.head.appendChild(script)
+
+//     function socketReady () {
+
+//         console.log('socketReady')
+
+//         const socket = io.connect(window.API_ROOT + '/ws')
+//         console.log('socket:', socket)
+
+//         socket.on('connect', function () {
+//             console.log('connected front!!')
+//         })
+
+//     }
+
+// })
 
 
 

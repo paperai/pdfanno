@@ -1,0 +1,46 @@
+/**
+    Websocket client for PDFAnno.
+*/
+
+let socket
+
+export function setup () {
+
+    const script = document.createElement('script')
+    script.type = 'text/javascript'
+    script.src = window.API_ROOT + '/socket.io/socket.io.js'
+    script.onload = socketReady
+    document.head.appendChild(script)
+
+    function socketReady () {
+
+        console.log('socketReady')
+
+        socket = window.io.connect(window.API_ROOT + '/ws')
+        console.log('socket:', socket)
+
+        socket.on('connect', function () {
+            console.log('connected front!!')
+        })
+
+        // for debug.
+        setInterval(() => {
+            send('annotation', { action : 'action text.', userId : 'userId', data : { 'aaa' : 'bbb' }})
+        }, 3000)
+
+        // for debug.
+        socket.on('annotationUpdated', function (message) {
+            console.log('annotationUpdated:', message)
+        })
+    }
+}
+
+export function send (topic, data) {
+
+    if (socket) {
+        socket.emit(topic, data)
+
+    } else {
+        console.log('socket haven\'t be initialized yet.')
+    }
+}

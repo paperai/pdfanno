@@ -49,24 +49,29 @@ let config = {
         aggregateTimeout: 300,
         poll: 1000
       },
-      proxy: {
-        '/api': {
-          target: 'http://localhost:3000',
-          secure: false
-        },
-        '/load_pdf': {
-          target: 'http://localhost:3000',
-          secure: false
-        },
-        '/ws': {
-          target: 'http://localhost:3000',
-          secure: false
-        },
-        '/socket.io/socket.io.js': {
-          target: 'http://localhost:3000',
-          secure: false
-        }
-      }
+      // proxy: {
+      //   '/api': {
+      //     target: 'http://localhost:3000',
+      //     secure: false
+      //   },
+      //   '/load_pdf': {
+      //     target: 'http://localhost:3000',
+      //     secure: false
+      //   },
+      //   '/socket.io/socket.io.js': {
+      //     target: 'http://localhost:3000',
+      //     secure: false
+      //   },
+      //   '/ws': {
+      //     target: 'http://localhost:3000',
+      //     ws: true,
+      //     secure: false
+      //   },
+      //   // '/sockjs-node' : {
+      //   //   target: 'http://localhost:3000',
+      //   //   secure: false
+      //   // }
+      // }
     },
     devtool : 'source-map'
 };
