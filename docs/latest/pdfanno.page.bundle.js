@@ -17343,7 +17343,7 @@ class PDFAnnoPage {
     /**
      * Get the content's name displayed now.
      */
-    1 () {
+    getCurrentContentName () {
         return window.iframeWindow.getFileName(window.iframeWindow.PDFView.url)
     }
 
