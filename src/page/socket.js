@@ -14,7 +14,7 @@ export function setup () {
 
     function socketReady () {
 
-        console.log('socketReady')
+        // console.log('socketReady')
 
         socket = window.io.connect(window.API_ROOT + '/ws')
         console.log('socket:', socket)
@@ -22,16 +22,6 @@ export function setup () {
         socket.on('connect', function () {
             console.log('connected front!!')
         })
-
-        // for debug.
-        // setInterval(() => {
-        //     send('annotation', {
-        //         fileName   : 'sample.anno',
-        //         updated    : 'some annotation is added.',
-        //         userId     : $('#userId').val(),
-        //         annotation : JSON.stringify({ 'aaa' : 'bbb' })
-        //     })
-        // }, 3000)
 
         socket.on('annotationUpdated', function (message) {
             let text = $('#uploadResultDummy').val()

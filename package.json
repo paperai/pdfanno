@@ -58,8 +58,7 @@
     "urijs": "^1.19.0",
     "vinyl-source-stream": "^1.1.0",
     "webpack": "3.0.0",
-    "webpack-dev-server": "^1.16.5",
-    "webpack-livereload-plugin": "^0.11.0"
+    "webpack-dev-server": "^1.16.5"
   },
   "dependencies": {
     "anno-ui": "github:paperai/anno-ui#master",
