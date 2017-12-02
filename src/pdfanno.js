@@ -151,7 +151,9 @@ window.addEventListener('DOMContentLoaded', async e => {
     // Download anno button.
     annoUI.downloadButton.setup({
         getAnnotationTOMLString : window.annoPage.exportData,
-        getCurrentContentName   : window.annoPage.getCurrentContentName,
+        getCurrentContentName   : () => {
+            return window.annoPage.getCurrentContentFile().name
+        },
         didDownloadCallback     : unlistenWindowLeaveEvent
     })
 
