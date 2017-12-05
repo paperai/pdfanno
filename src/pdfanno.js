@@ -19,9 +19,13 @@ import PDFAnnoPage from './page/pdf/PDFAnnoPage'
  * API root point.
  */
 if (process.env.NODE_ENV === 'production') {
-    window.API_ROOT = 'https://pdfanno.hshindo.com/' + process.env.SERVER_PATH
+    window.API_DOMAIN = 'https://pdfanno.hshindo.com'
+    window.API_PATH = '/' + process.env.SERVER_PATH + '/'
+    window.API_ROOT = window.API_DOMAIN + window.API_PATH
 } else {
-    window.API_ROOT = 'http://localhost:3000'
+    window.API_DOMAIN = 'http://localhost:3000'
+    window.API_PATH = '/'
+    window.API_ROOT = window.API_DOMAIN + window.API_PATH
 }
 
 /**
@@ -154,7 +158,7 @@ window.addEventListener('DOMContentLoaded', async e => {
         getCurrentContentName   : () => {
             return window.annoPage.getCurrentContentFile().name
         },
-        didDownloadCallback     : unlistenWindowLeaveEvent
+        didDownloadCallback : unlistenWindowLeaveEvent
     })
 
     // Download pdftxt button.

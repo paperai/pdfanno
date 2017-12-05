@@ -552,7 +552,7 @@ export default class PDFAnnoPage {
         return new Promise((resolve, reject) => {
             // Load a PDF as ArrayBuffer.
             var xhr = new XMLHttpRequest()
-            xhr.open('GET', window.API_ROOT + '/load_pdf?url=' + window.encodeURIComponent(url), true)
+            xhr.open('GET', window.API_ROOT + 'load_pdf?url=' + window.encodeURIComponent(url), true)
             xhr.responseType = 'json'
             xhr.onload = function () {
                 if (this.status === 200) {
@@ -582,7 +582,7 @@ export default class PDFAnnoPage {
      * Load an annotation file from the server.
      */
     loadAnnoFileFromServer (url) {
-        return axios.get(`${window.API_ROOT}/api/load_anno?url=${url}`).then(res => {
+        return axios.get(`${window.API_ROOT}api/load_anno?url=${url}`).then(res => {
             if (res.status !== 200 || res.data.status === 'failure') {
                 let reason = ''
                 if (res.data.error) {

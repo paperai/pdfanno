@@ -13273,15 +13273,15 @@ function setup () {
 
     const script = document.createElement('script')
     script.type = 'text/javascript'
-    script.src = window.API_ROOT + '/socket.io/socket.io.js'
+    script.src = window.API_ROOT + 'socket.io/socket.io.js'
     script.onload = socketReady
     document.head.appendChild(script)
 
     function socketReady () {
 
-        // console.log('socketReady')
-
-        socket = window.io.connect(window.API_ROOT + '/ws')
+        socket = window.io(window.API_DOMAIN + '/ws', {
+            path : window.API_PATH + 'socket.io'
+        })
         console.log('socket:', socket)
 
         socket.on('connect', function () {
@@ -13625,9 +13625,13 @@ __webpack_require__(36)
  * API root point.
  */
 if (true) {
-    window.API_ROOT = 'https://pdfanno.hshindo.com/' + "latest"
+    window.API_DOMAIN = 'https://pdfanno.hshindo.com'
+    window.API_PATH = '/' + "latest" + '/'
+    window.API_ROOT = window.API_DOMAIN + window.API_PATH
 } else {
-    window.API_ROOT = 'http://localhost:3000'
+    window.API_DOMAIN = 'http://localhost:3000'
+    window.API_PATH = '/'
+    window.API_ROOT = window.API_DOMAIN + window.API_PATH
 }
 
 /**
@@ -13760,7 +13764,7 @@ window.addEventListener('DOMContentLoaded', async e => {
         getCurrentContentName   : () => {
             return window.annoPage.getCurrentContentFile().name
         },
-        didDownloadCallback     : __WEBPACK_IMPORTED_MODULE_3__page_util_window__["c" /* unlistenWindowLeaveEvent */]
+        didDownloadCallback : __WEBPACK_IMPORTED_MODULE_3__page_util_window__["c" /* unlistenWindowLeaveEvent */]
     })
 
     // Download pdftxt button.
@@ -17367,7 +17371,7 @@ class PDFAnnoPage {
         return new Promise((resolve, reject) => {
             // Load a PDF as ArrayBuffer.
             var xhr = new XMLHttpRequest()
-            xhr.open('GET', window.API_ROOT + '/load_pdf?url=' + window.encodeURIComponent(url), true)
+            xhr.open('GET', window.API_ROOT + 'load_pdf?url=' + window.encodeURIComponent(url), true)
             xhr.responseType = 'json'
             xhr.onload = function () {
                 if (this.status === 200) {
@@ -17397,7 +17401,7 @@ class PDFAnnoPage {
      * Load an annotation file from the server.
      */
     loadAnnoFileFromServer (url) {
-        return __WEBPACK_IMPORTED_MODULE_0_axios___default.a.get(`${window.API_ROOT}/api/load_anno?url=${url}`).then(res => {
+        return __WEBPACK_IMPORTED_MODULE_0_axios___default.a.get(`${window.API_ROOT}api/load_anno?url=${url}`).then(res => {
             if (res.status !== 200 || res.data.status === 'failure') {
                 let reason = ''
                 if (res.data.error) {
