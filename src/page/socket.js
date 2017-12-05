@@ -8,15 +8,15 @@ export function setup () {
 
     const script = document.createElement('script')
     script.type = 'text/javascript'
-    script.src = window.API_ROOT + '/socket.io/socket.io.js'
+    script.src = window.API_ROOT + 'socket.io/socket.io.js'
     script.onload = socketReady
     document.head.appendChild(script)
 
     function socketReady () {
 
-        // console.log('socketReady')
-
-        socket = window.io.connect(window.API_ROOT + '/ws')
+        socket = window.io(window.API_DOMAIN + '/ws', {
+            path : '/socket.io' + window.API_PATH
+        })
         console.log('socket:', socket)
 
         socket.on('connect', function () {
