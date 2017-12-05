@@ -20,7 +20,7 @@ import PDFAnnoPage from './page/pdf/PDFAnnoPage'
  */
 if (process.env.NODE_ENV === 'production') {
     window.API_DOMAIN = 'https://pdfanno.hshindo.com'
-    window.API_PATH = '/' + process.env.SERVER_PATH
+    window.API_PATH = '/' + process.env.SERVER_PATH + '/'
     window.API_ROOT = window.API_DOMAIN + window.API_PATH
 } else {
     window.API_DOMAIN = 'http://localhost:3000'
