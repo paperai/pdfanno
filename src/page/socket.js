@@ -15,7 +15,7 @@ export function setup () {
     function socketReady () {
 
         socket = window.io(window.API_DOMAIN + '/ws', {
-            path : '/socket.io' + window.API_PATH
+            path : window.API_PATH + 'socket.io'
         })
         console.log('socket:', socket)
 
