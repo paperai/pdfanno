@@ -10,14 +10,22 @@ const app = express()
 const server = require('http').Server(app)
 
 // for development.
-if (process.env.NODE_PORT === '3000') {
-    console.log('DEV MODE: Allow wildcard Cross Origins.')
-    app.use((req, res, next) => {
-        res.header("Access-Control-Allow-Origin", "*")
-        res.header("Access-Control-Allow-Headers", "X-Requested-With")
-        next()
-    })
-}
+// if (process.env.NODE_PORT === '3000') {
+//     console.log('DEV MODE: Allow wildcard Cross Origins.')
+//     app.use((req, res, next) => {
+//         res.header("Access-Control-Allow-Origin", "*")
+//         res.header("Access-Control-Allow-Headers", "X-Requested-With")
+//         next()
+//     })
+// }
+
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    res.header("Access-Control-Allow-Headers", "Content-Type");
+    res.header("Access-Control-Allow-Methods", "PUT, GET, POST, DELETE, OPTIONS");
+    next();
+});
 
 // Setup websocket.
 require('./controller/ws')(server)
