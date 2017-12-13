@@ -312,3 +312,26 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // WebSocket.
 ws.setup()
+
+
+// For jwt sample.
+console.log('URI(document.URL).query(true).jwt:', URI(document.URL).query(true).jwt)
+if (URI(document.URL).query(true).jwt === 'on') {
+    console.log('fire')
+    $.ajax({
+        method : 'GET',
+        url    : API_ROOT + 'api/login/check',
+        data   : {
+            token : Cookies.get('token')
+        }
+    }).then(result => {
+        console.log('login check:', result)
+        let message
+        if (result.result === true) {
+            message = `LoggedIn: userId=${result.user.id}, name=${result.user.name}`
+        } else {
+            message = 'No login'
+        }
+        alert(message)
+    })
+}
