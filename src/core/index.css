@@ -36,7 +36,7 @@
 */
 .anno-circle {
     position: absolute;
-    background: blue;
+    background-color: blue;
     border-radius: 50%;
     transition: 0.2s;
     transform-origin: center center;
@@ -44,22 +44,25 @@
 .--hover .anno-circle,
 .--selected .anno-circle {
   box-shadow: rgba(113,135,164,.2) 1px 1px 1px;
-}
-
-.anno-span.--hover .anno-circle {
   transform: scale(2);
 }
-.--hover .anno-span {
-  box-shadow: 0 0 0 1px #ccc inset;
-  border: 1px dashed #ccc;
-}
-.anno-span.--selected .anno-span__area {
+
+/*
+ * Span Annotation.
+ */
+/*TODO .anno-spanでスタイルをある程度は持ってもいいかも*/
+.anno-span {}
+.--hover .anno-span__area,
+.--selected .anno-span__area {
   border: 2px dashed black !important;
   box-sizing: border-box;
 }
 
+/*TODO Relationをホバーしたり選択しても、赤色が薄い*/
+/*TODO Relationを描画した直後は、位置が少しずれる。その後にフォーカスが外れると正しい位置へ移動する。*/
+
 /**
-  Relation.
+  Relation Annotation.
 */
 .anno-relation {
   transition:0.2s;
@@ -82,7 +85,7 @@
 }
 
 /**
- * Span.
+ * Span Annotation.
  */
 .anno-span rect {
     /* Enable the hover event on circles and text even if they are overwraped other spans. */
@@ -90,7 +93,7 @@
 }
 
 /**
-  Rect.
+  Rect Annotation.
 */
 .anno-rect-base {
     position: absolute;
@@ -102,9 +105,7 @@
     position: absolute;
 }
 .--hover .anno-rect {
-  /*html*/
   box-shadow: 0 0 0 1px #ccc inset;
-  /*svg*/
   stroke: #ccc;
   stroke-width: 0.75px;
 }
