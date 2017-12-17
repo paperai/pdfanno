@@ -7,6 +7,8 @@ import { renderCircle } from './renderCircle'
  */
 export function renderSpan (a) {
 
+    const readOnly = a.readOnly
+
     const color = a.color || '#FF0'
 
     const $base = $('<div/>').css({
@@ -18,7 +20,7 @@ export function renderSpan (a) {
     }).addClass('anno-span')
 
     a.rectangles.forEach(r => {
-        $base.append(createRect(r, color))
+        $base.append(createRect(r, color, readOnly))
     })
 
     $base.append(renderCircle({
@@ -29,7 +31,7 @@ export function renderSpan (a) {
     return $base[0]
 }
 
-function createRect (r, color) {
+function createRect (r, color, readOnly) {
 
     const rgba = hex2rgba(color, 0.4)
 

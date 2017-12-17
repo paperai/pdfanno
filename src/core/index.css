@@ -26,7 +26,7 @@
 .annoLayer > *.--viewMode {
   opacity: 0.5;
 }
-.annoLayer > *.--viewMode.--emphasis,
+.annoLayer > *.--viewMode.--hover,
 .annoLayer > *.--viewMode.--selected {
   opacity: 1;
 }
@@ -38,20 +38,17 @@
     position: absolute;
     background: blue;
     border-radius: 50%;
-    transition:0.2s;
+    transition: 0.2s;
     transform-origin: center center;
 }
-.--hover .anno-circle {
-  box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;
-  stroke: blue;
-  stroke-width: 5px;
+.--hover .anno-circle,
+.--selected .anno-circle {
+  box-shadow: rgba(113,135,164,.2) 1px 1px 1px;
 }
 
 .anno-span.--hover .anno-circle {
-  box-shadow: rgba(113,135,164,.2) 1px 1px 1px;
   transform: scale(2);
 }
-
 .--hover .anno-span {
   box-shadow: 0 0 0 1px #ccc inset;
   border: 1px dashed #ccc;
