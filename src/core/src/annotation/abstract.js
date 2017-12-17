@@ -55,8 +55,6 @@ export default class AbstractAnnotation extends EventEmitter {
             this.setHoverEvent()
         }
 
-        this.$element.addClass('--viewMode')
-
         this.selected && this.$element.addClass('--selected')
 
         this.disabled && this.disable()

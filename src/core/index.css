@@ -23,11 +23,11 @@
  * SVGLayer.
  */
 .annoLayer {}
-.annoLayer > *.--viewMode {
+.annoLayer > * {
   opacity: 0.5;
 }
-.annoLayer > *.--viewMode.--hover,
-.annoLayer > *.--viewMode.--selected {
+.annoLayer > *.--hover,
+.annoLayer > *.--selected {
   opacity: 1;
 }
 
