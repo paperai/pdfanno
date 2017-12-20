@@ -22,13 +22,13 @@ npm install pdfanno
 See the developer's guide for more details.
 
 ## Usage
-1. Visit the [online demo](https://paperai.github.io/pdfanno/0.3.0/) with the latest version of Chrome.
+1. Visit the [online demo](https://paperai.github.io/pdfanno/latest/) with the latest version of Chrome.
 1. Load your PDF and annotation file (if any). Sample PDFs and annotations are downloadable from [here](https://cl.naist.jp/%7Eshindo/pdfanno_material.zip).
     * For PDFs located on your computer:  
     Put the PDFs and annotation files (if any) in the same directory, then specify the directory via `Browse` button.
     * For PDF available on the Web:  
-    Access 'https://paperai.github.io/pdfanno/0.3.0/?pdf=' + `<URL of the PDF>`  
-    For example, https://paperai.github.io/pdfanno/0.3.0/?pdf=http://www.aclweb.org/anthology/P12-1046.pdf.  
+    Access 'https://paperai.github.io/pdfanno/latest/?pdf=' + `<URL of the PDF>`  
+    For example, https://paperai.github.io/pdfanno/latest/?pdf=http://www.aclweb.org/anthology/P12-1046.pdf.  
 1. Annotate the PDF as you like.
 1. Save your annotations via <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-download.png" width="2%"> button.  
 If you continue the annotation, respecify your directory via `Browse` button to reload the PDF and anno file.
@@ -49,7 +49,7 @@ Don't forget to download your current annotations!
 In PDFAnno, the annotation file (.anno) follows [TOML](https://github.com/toml-lang/toml) format.  
 Here is an example of anno file:
 ```
-version = 0.2
+version = 0.3
 
 [1]
 type = "span"
