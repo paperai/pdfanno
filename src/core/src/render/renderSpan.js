@@ -28,15 +28,27 @@ export function renderSpan (a) {
 
 function createRect (r, color, readOnly) {
 
-    const rgba = hex2rgba(color, 0.4)
+    if (readOnly) {
+        return $('<div class="anno-span__border"/>').css({
+            top         : r.y + 'px',
+            left        : r.x + 'px',
+            width       : r.width + 'px',
+            height      : r.height + 'px',
+            borderColor : color
+        })
 
-    return $('<div class="anno-span__area"/>').css({
-        top             : r.y + 'px',
-        left            : r.x + 'px',
-        width           : r.width + 'px',
-        height          : r.height + 'px',
-        backgroundColor : rgba
-    })
+    } else {
+
+        const rgba = hex2rgba(color, 0.4)
+
+        return $('<div class="anno-span__area"/>').css({
+            top                   : r.y + 'px',
+            left                  : r.x + 'px',
+            width                 : r.width + 'px',
+            height                : r.height + 'px',
+            backgroundBottomColor : rgba
+        })
+    }
 }
 
 /**

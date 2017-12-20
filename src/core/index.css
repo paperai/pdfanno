@@ -64,6 +64,11 @@
   border: 2px dashed black !important;
   box-sizing: border-box;
 }
+.anno-span__border {
+    position: absolute;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+}
 
 /*TODO Relationを描画した直後は、位置が少しずれる。その後にフォーカスが外れると正しい位置へ移動する。*/
 

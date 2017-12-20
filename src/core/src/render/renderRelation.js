@@ -2,6 +2,7 @@ import setAttributes from '../utils/setAttributes'
 import { DEFAULT_RADIUS } from './renderKnob'
 import { findBezierControlPoint } from '../utils/relation.js'
 
+// TODO need?
 let secondaryColor = ['green', 'blue', 'purple']
 
 /**
