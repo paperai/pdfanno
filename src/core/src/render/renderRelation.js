@@ -52,36 +52,36 @@ export function renderRelation (a) {
 
     let group = document.createElementNS('http://www.w3.org/2000/svg', 'g')
     setAttributes(group, {
-        fill        : color,
-        stroke      : color,
-        // TODO no need?
-        'data-rel1' : a.rel1,
-        'data-rel2' : a.rel2,
-        'data-text' : a.text
+        fill   : color,
+        stroke : color
     })
     group.style.visibility = 'visible'
     group.setAttribute('read-only', a.readOnly === true)
 
     $svg[0].appendChild(group)
 
-    let marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker')
-    setAttributes(marker, {
-        viewBox      : '0 0 10 10',
-        markerWidth  : 2,
-        markerHeight : 3,
-        fill         : color,
-        id           : 'relationhead',
-        orient       : 'auto-start-reverse'
-    })
-    marker.setAttribute('refX', 5)
-    marker.setAttribute('refY', 5)
-    group.appendChild(marker)
+    const markerId = 'relationhead' + color.replace('#', '')
 
-    let polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon')
-    setAttributes(polygon, {
-        points : '0,0 0,10 10,5'
-    })
-    marker.appendChild(polygon)
+    if (!document.querySelector('#' + markerId)) {
+        let marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker')
+        setAttributes(marker, {
+            viewBox      : '0 0 10 10',
+            markerWidth  : 2,
+            markerHeight : 3,
+            fill         : color,
+            id           : markerId,
+            orient       : 'auto-start-reverse'
+        })
+        marker.setAttribute('refX', 5)
+        marker.setAttribute('refY', 5)
+        group.appendChild(marker)
+
+        let polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon')
+        setAttributes(polygon, {
+            points : '0,0 0,10 10,5'
+        })
+        marker.appendChild(polygon)
+    }
 
     // Find Control points.
     let control = findBezierControlPoint(a.x1, a.y1, a.x2, a.y2)
@@ -108,17 +108,13 @@ export function renderRelation (a) {
 
     // Triangle for the end point.
     if (a.direction === 'one-way' || a.direction === 'two-way') {
-        relation.setAttribute('marker-end', 'url(#relationhead)')
+        relation.setAttribute('marker-end', `url(#${markerId})`)
     }
 
     // Triangle for the start point.
     if (a.direction === 'two-way') {
-        relation.setAttribute('marker-start', 'url(#relationhead)')
+        relation.setAttribute('marker-start', `url(#${markerId})`)
     }
-
-    // if (id) {
-    //     setAttributes(relation, { id : id })
-    // }
 
     group.appendChild(relation)
 
