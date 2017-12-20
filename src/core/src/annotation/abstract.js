@@ -224,7 +224,7 @@ export default class AbstractAnnotation extends EventEmitter {
      * Get the central position of the boundingCircle.
      */
     getBoundingCirclePosition () {
-        const $circle = this.$element.find('.anno-circle')
+        const $circle = this.$element.find('.anno-knob')
         if ($circle.length > 0) {
             return {
                 x : parseFloat($circle.css('left')) + parseFloat($circle.css('width')) / 2,

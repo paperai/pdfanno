@@ -1,4 +1,4 @@
-import { renderCircle } from './renderCircle'
+import { renderKnob } from './renderKnob'
 
 /**
  * Create a Rect element.
@@ -18,7 +18,7 @@ export function renderRect (a) {
         border : `1px solid ${color}`
     }))
 
-    $base.append(renderCircle(a))
+    $base.append(renderKnob(a))
 
     return $base[0]
 }

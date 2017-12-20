@@ -22,7 +22,6 @@
 /**
  * SVGLayer.
  */
-.annoLayer {}
 .annoLayer > * {
   opacity: 0.5;
 }
@@ -34,15 +33,16 @@
 /**
     Annotation related.
 */
-.anno-circle {
+/*TODO 形がcircleじゃ無くなるので名前を変えたい*/
+.anno-knob {
     position: absolute;
     background-color: blue;
     border-radius: 50%;
     transition: 0.2s;
     transform-origin: center center;
 }
-.--hover .anno-circle,
-.--selected .anno-circle {
+.--hover .anno-knob,
+.--selected .anno-knob {
   box-shadow: rgba(113,135,164,.2) 1px 1px 1px;
   transform: scale(2);
 }

@@ -8,12 +8,12 @@ export const DEFAULT_RADIUS = 7
  * Create a bounding circle.
  * @param {Object} the position for rendering.
  */
-export function renderCircle ({ x, y }) {
+export function renderKnob ({ x, y }) {
 
     // Adjust the position.
     [x, y] = adjustPoint(x, (y - (DEFAULT_RADIUS + 2)), DEFAULT_RADIUS)
 
-    const circle = $('<div class="anno-circle"/>').css({
+    const circle = $('<div class="anno-knob"/>').css({
         top    : `${y}px`,
         left   : `${x}px`,
         width  : DEFAULT_RADIUS + 'px',
@@ -28,7 +28,7 @@ export function renderCircle ({ x, y }) {
  */
 function adjustPoint (x, y, radius) {
 
-    const $circles = $('.anno-circle')
+    const $circles = $('.anno-knob')
 
     while (true) {
         let good = true

@@ -1,4 +1,4 @@
-import { renderCircle } from './renderCircle'
+import { renderKnob } from './renderKnob'
 
 /**
  * Create a Span element.
@@ -23,7 +23,7 @@ export function renderSpan (a) {
         $base.append(createRect(r, color, readOnly))
     })
 
-    $base.append(renderCircle({
+    $base.append(renderKnob({
         x : a.rectangles[0].x,
         y : a.rectangles[0].y
     }))
