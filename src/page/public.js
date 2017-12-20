@@ -106,7 +106,7 @@ export class PublicRectAnnotation {
             width    : position[2],
             height   : position[3],
             text     : label,
-            color    : '#FF0000',
+            color    : '#FF0',
             readOnly : false
         })
 
