@@ -138,7 +138,7 @@ function createSVGElement (top, left, width, height) {
     const margin = 50
 
     // Add an annotation layer.
-    let $svg = $(`<svg class="annoLayer"/>`).css({ // TODO why need .annoLayer
+    let $svg = $('<svg class=""/>').css({ // I don't know why, but empty class is need.
         position   : 'absolute',
         top        : `${top - margin}px`,
         left       : `${left - margin}px`,

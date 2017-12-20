@@ -11,13 +11,8 @@ export function renderSpan (a) {
 
     const color = a.color || '#FF0'
 
-    const $base = $('<div/>').css({
-        position   : 'absolute',
-        top        : 0,
-        left       : 0,
-        visibility : 'visible',
-        zIndex     : a.zIndex || 10
-    }).addClass('anno-span')
+    const $base = $('<div class="anno-span"/>')
+        .css('zIndex', a.zIndex || 10)
 
     a.rectangles.forEach(r => {
         $base.append(createRect(r, color, readOnly))
@@ -35,14 +30,12 @@ function createRect (r, color, readOnly) {
 
     const rgba = hex2rgba(color, 0.4)
 
-    return $('<div/>').addClass('anno-span__area').css({
-        position        : 'absolute',
+    return $('<div class="anno-span__area"/>').css({
         top             : r.y + 'px',
         left            : r.x + 'px',
         width           : r.width + 'px',
         height          : r.height + 'px',
-        backgroundColor : rgba,
-        border          : '1px dashed gray'
+        backgroundColor : rgba
     })
 }
 

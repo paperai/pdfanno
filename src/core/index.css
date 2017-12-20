@@ -20,7 +20,7 @@
 }
 
 /**
- * SVGLayer.
+ * Annotation Layer.
  */
 .annoLayer > * {
   opacity: 0.5;
@@ -31,9 +31,8 @@
 }
 
 /**
-    Annotation related.
+    Annotation Knob for control.
 */
-/*TODO 形がcircleじゃ無くなるので名前を変えたい*/
 .anno-knob {
     position: absolute;
     background-color: blue;
@@ -50,27 +49,30 @@
 /*
  * Span Annotation.
  */
-/*TODO .anno-spanでスタイルをある程度は持ってもいいかも*/
-.anno-span {}
+.anno-span {
+    position: absolute;
+    top: 0;
+    left: 0;
+    visibility: visible;
+}
+.anno-span__area {
+    position: absolute;
+    border: 1px dashed black;
+}
 .--hover .anno-span__area,
 .--selected .anno-span__area {
   border: 2px dashed black !important;
   box-sizing: border-box;
 }
 
-/*TODO Relationをホバーしたり選択しても、赤色が薄い*/
 /*TODO Relationを描画した直後は、位置が少しずれる。その後にフォーカスが外れると正しい位置へ移動する。*/
 
 /**
   Relation Annotation.
 */
-.anno-relation {
-  transition:0.2s;
-}
-.--hover .anno-relation {
-  stroke-width: 2px;
-}
+.--hover .anno-relation,
 .--selected .anno-relation {
+  stroke-width: 2px;
 }
 .anno-relation-outline {
   fill: none;
@@ -79,9 +81,9 @@
 .--selected .anno-relation-outline {
   visibility: visible;
   stroke: black;
-  stroke-width: 2.85px;
+  stroke-width: 4px;
   pointer-events: stroke;
-  stroke-dasharray: 3;
+  stroke-dasharray: 5;
 }
 
 /**
