@@ -2,25 +2,13 @@ import setAttributes from '../utils/setAttributes'
 import { DEFAULT_RADIUS } from './renderKnob'
 import { findBezierControlPoint } from '../utils/relation.js'
 
-// TODO need?
-let secondaryColor = ['green', 'blue', 'purple']
-
 /**
- * Create SVGGElements from an annotation definition.
- * This is used for anntations of type `relation`.
+ * Create a RELATION annotation.
  *
- * @param {Object} a The annotation definition
+ * @param {RelationAnnotation} a - The annotation definition
  * @return {SVGGElement} A group of a relation to be rendered
  */
 export function renderRelation (a) {
-    let color = a.color
-    if (!color) {
-        if (a.readOnly) {
-            color = secondaryColor[a.seq % secondaryColor.length]
-        } else {
-            color = '#F00'
-        }
-    }
 
     // Adjust the start/end points.
     let theta = Math.atan((a.y1 - a.y2) / (a.x1 - a.x2))
@@ -52,15 +40,15 @@ export function renderRelation (a) {
 
     let group = document.createElementNS('http://www.w3.org/2000/svg', 'g')
     setAttributes(group, {
-        fill   : color,
-        stroke : color
+        fill   : a.color,
+        stroke : a.color
     })
     group.style.visibility = 'visible'
     group.setAttribute('read-only', a.readOnly === true)
 
     $svg[0].appendChild(group)
 
-    const markerId = 'relationhead' + color.replace('#', '')
+    const markerId = 'relationhead' + a.color.replace('#', '')
 
     if (!document.querySelector('#' + markerId)) {
         let marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker')
@@ -68,7 +56,7 @@ export function renderRelation (a) {
             viewBox      : '0 0 10 10',
             markerWidth  : 2,
             markerHeight : 3,
-            fill         : color,
+            fill         : a.color,
             id           : markerId,
             orient       : 'auto-start-reverse'
         })
@@ -100,7 +88,7 @@ export function renderRelation (a) {
     let relation = document.createElementNS('http://www.w3.org/2000/svg', 'path')
     setAttributes(relation, {
         d           : `M ${a.x1} ${a.y1} Q ${control.x} ${control.y} ${a.x2} ${a.y2}`,
-        stroke      : color,
+        stroke      : a.color,
         strokeWidth : 1,
         fill        : 'none',
         class       : 'anno-relation'

@@ -2,7 +2,7 @@ import { renderKnob } from './renderKnob'
 import { hex2rgba } from '../utils/color'
 
 /**
- * Create a Rect element.
+ * Create a rect annotation.
  * @param {RectAnnotation} a - rect annotation.
  */
 export function renderRect (a) {
