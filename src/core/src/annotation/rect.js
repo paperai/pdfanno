@@ -70,7 +70,7 @@ export default class RectAnnotation extends AbstractAnnotation {
      * Set a hover event.
      */
     setHoverEvent () {
-        this.$element.find('.anno-rect, .anno-circle').hover(
+        this.$element.find('.anno-rect, .anno-knob').hover(
             this.handleHoverInEvent,
             this.handleHoverOutEvent
         )
@@ -280,7 +280,7 @@ export default class RectAnnotation extends AbstractAnnotation {
     enableViewMode () {
         super.enableViewMode()
         if (!this.readOnly) {
-            this.$element.find('.anno-rect, .anno-circle').on('click', this.handleClickEvent)
+            this.$element.find('.anno-rect, .anno-knob').on('click', this.handleClickEvent)
             this.enableDragAction()
         }
     }
@@ -290,7 +290,7 @@ export default class RectAnnotation extends AbstractAnnotation {
      */
     disableViewMode () {
         super.disableViewMode()
-        this.$element.find('.anno-rect, .anno-circle').off('click')
+        this.$element.find('.anno-rect, .anno-knob').off('click')
         this.disableDragAction()
     }
 

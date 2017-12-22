@@ -68,7 +68,7 @@ export default class SpanAnnotation extends AbstractAnnotation {
      * Set a hover event.
      */
     setHoverEvent () {
-        this.$element.find('.anno-circle').hover(
+        this.$element.find('.anno-knob').hover(
             this.handleHoverInEvent,
             this.handleHoverOutEvent
         )
@@ -194,7 +194,7 @@ export default class SpanAnnotation extends AbstractAnnotation {
         this.disableViewMode()
         super.enableViewMode()
         if (!this.readOnly) {
-            this.$element.find('.anno-circle').on('click', this.handleClickEvent)
+            this.$element.find('.anno-knob').on('click', this.handleClickEvent)
         }
     }
 
@@ -203,6 +203,6 @@ export default class SpanAnnotation extends AbstractAnnotation {
      */
     disableViewMode () {
         super.disableViewMode()
-        this.$element.find('.anno-circle').off('click')
+        this.$element.find('.anno-knob').off('click')
     }
 }

@@ -1,25 +1,14 @@
 import setAttributes from '../utils/setAttributes'
-import { DEFAULT_RADIUS } from './renderCircle'
+import { DEFAULT_RADIUS } from './renderKnob'
 import { findBezierControlPoint } from '../utils/relation.js'
 
-let secondaryColor = ['green', 'blue', 'purple']
-
 /**
- * Create SVGGElements from an annotation definition.
- * This is used for anntations of type `relation`.
+ * Create a RELATION annotation.
  *
- * @param {Object} a The annotation definition
+ * @param {RelationAnnotation} a - The annotation definition
  * @return {SVGGElement} A group of a relation to be rendered
  */
 export function renderRelation (a) {
-    let color = a.color
-    if (!color) {
-        if (a.readOnly) {
-            color = secondaryColor[a.seq % secondaryColor.length]
-        } else {
-            color = '#F00'
-        }
-    }
 
     // Adjust the start/end points.
     let theta = Math.atan((a.y1 - a.y2) / (a.x1 - a.x2))
@@ -51,36 +40,36 @@ export function renderRelation (a) {
 
     let group = document.createElementNS('http://www.w3.org/2000/svg', 'g')
     setAttributes(group, {
-        fill        : color,
-        stroke      : color,
-        // TODO no need?
-        'data-rel1' : a.rel1,
-        'data-rel2' : a.rel2,
-        'data-text' : a.text
+        fill   : a.color,
+        stroke : a.color
     })
     group.style.visibility = 'visible'
     group.setAttribute('read-only', a.readOnly === true)
 
     $svg[0].appendChild(group)
 
-    let marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker')
-    setAttributes(marker, {
-        viewBox      : '0 0 10 10',
-        markerWidth  : 2,
-        markerHeight : 3,
-        fill         : color,
-        id           : 'relationhead',
-        orient       : 'auto-start-reverse'
-    })
-    marker.setAttribute('refX', 5)
-    marker.setAttribute('refY', 5)
-    group.appendChild(marker)
+    const markerId = 'relationhead' + a.color.replace('#', '')
 
-    let polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon')
-    setAttributes(polygon, {
-        points : '0,0 0,10 10,5'
-    })
-    marker.appendChild(polygon)
+    if (!document.querySelector('#' + markerId)) {
+        let marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker')
+        setAttributes(marker, {
+            viewBox      : '0 0 10 10',
+            markerWidth  : 2,
+            markerHeight : 3,
+            fill         : a.color,
+            id           : markerId,
+            orient       : 'auto-start-reverse'
+        })
+        marker.setAttribute('refX', 5)
+        marker.setAttribute('refY', 5)
+        group.appendChild(marker)
+
+        let polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon')
+        setAttributes(polygon, {
+            points : '0,0 0,10 10,5'
+        })
+        marker.appendChild(polygon)
+    }
 
     // Find Control points.
     let control = findBezierControlPoint(a.x1, a.y1, a.x2, a.y2)
@@ -99,7 +88,7 @@ export function renderRelation (a) {
     let relation = document.createElementNS('http://www.w3.org/2000/svg', 'path')
     setAttributes(relation, {
         d           : `M ${a.x1} ${a.y1} Q ${control.x} ${control.y} ${a.x2} ${a.y2}`,
-        stroke      : color,
+        stroke      : a.color,
         strokeWidth : 1,
         fill        : 'none',
         class       : 'anno-relation'
@@ -107,17 +96,13 @@ export function renderRelation (a) {
 
     // Triangle for the end point.
     if (a.direction === 'one-way' || a.direction === 'two-way') {
-        relation.setAttribute('marker-end', 'url(#relationhead)')
+        relation.setAttribute('marker-end', `url(#${markerId})`)
     }
 
     // Triangle for the start point.
     if (a.direction === 'two-way') {
-        relation.setAttribute('marker-start', 'url(#relationhead)')
+        relation.setAttribute('marker-start', `url(#${markerId})`)
     }
-
-    // if (id) {
-    //     setAttributes(relation, { id : id })
-    // }
 
     group.appendChild(relation)
 
@@ -138,7 +123,7 @@ function createSVGElement (top, left, width, height) {
     const margin = 50
 
     // Add an annotation layer.
-    let $svg = $(`<svg class="annoLayer"/>`).css({ // TODO why need .annoLayer
+    let $svg = $('<svg class=""/>').css({ // I don't know why, but empty class is need.
         position   : 'absolute',
         top        : `${top - margin}px`,
         left       : `${left - margin}px`,

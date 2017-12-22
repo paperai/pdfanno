@@ -55,8 +55,6 @@ export default class AbstractAnnotation extends EventEmitter {
             this.setHoverEvent()
         }
 
-        this.$element.addClass('--viewMode')
-
         this.selected && this.$element.addClass('--selected')
 
         this.disabled && this.disable()
@@ -152,14 +150,14 @@ export default class AbstractAnnotation extends EventEmitter {
      * Highlight the annotation.
      */
     highlight () {
-        this.$element.addClass('--hover --emphasis')
+        this.$element.addClass('--hover')
     }
 
     /**
      * Dehighlight the annotation.
      */
     dehighlight () {
-        this.$element.removeClass('--hover --emphasis')
+        this.$element.removeClass('--hover')
     }
 
     /**
@@ -226,7 +224,7 @@ export default class AbstractAnnotation extends EventEmitter {
      * Get the central position of the boundingCircle.
      */
     getBoundingCirclePosition () {
-        const $circle = this.$element.find('.anno-circle')
+        const $circle = this.$element.find('.anno-knob')
         if ($circle.length > 0) {
             return {
                 x : parseFloat($circle.css('left')) + parseFloat($circle.css('width')) / 2,

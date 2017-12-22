@@ -91,26 +91,6 @@ export default class PDFAnnoPage {
             dispatchWindowEvent('annotationDeselected')
         })
 
-        // TODO No Need.
-        window.iframeWindow.addEventListener('digit1Pressed', () => {
-            dispatchWindowEvent('digit1Pressed')
-        })
-
-        // TODO No Need.
-        window.iframeWindow.addEventListener('digit2Pressed', () => {
-            dispatchWindowEvent('digit2Pressed')
-        })
-
-        // TODO No Need.
-        window.iframeWindow.addEventListener('digit3Pressed', () => {
-            dispatchWindowEvent('digit3Pressed')
-        })
-
-        // TODO No Need.
-        window.iframeWindow.addEventListener('digit4Pressed', () => {
-            dispatchWindowEvent('digit4Pressed')
-        })
-
         setInterval(this.checkAnnotationUpdate, 1500)
     }
 
