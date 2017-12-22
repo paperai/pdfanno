@@ -10,6 +10,8 @@ import { findBezierControlPoint } from '../utils/relation.js'
  */
 export function renderRelation (a) {
 
+    a.color = a.color || '#F00'
+
     // Adjust the start/end points.
     let theta = Math.atan((a.y1 - a.y2) / (a.x1 - a.x2))
     let sign = (a.x1 < a.x2 ? 1 : -1)
