@@ -45,6 +45,14 @@
   box-shadow: rgba(113,135,164,.2) 1px 1px 1px;
   transform: scale(2);
 }
+.anno-knob.is-readonly {
+    border-radius: 0;
+    transform: rotate(45deg);
+}
+.--hover .anno-knob.is-readonly,
+.--selected .anno-knob.is-readonly {
+  transform: rotate(45deg) scale(2);
+}
 
 /*
  * Span Annotation.

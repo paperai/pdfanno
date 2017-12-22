@@ -8,12 +8,19 @@ export const DEFAULT_RADIUS = 7
  * Create a bounding circle.
  * @param {Object} the position for rendering.
  */
-export function renderKnob ({ x, y }) {
+export function renderKnob ({ x, y, readOnly }) {
+
+    console.log('renderKnob:', readOnly);
 
     // Adjust the position.
     [x, y] = adjustPoint(x, (y - (DEFAULT_RADIUS + 2)), DEFAULT_RADIUS)
 
-    const circle = $('<div class="anno-knob"/>').css({
+    let cssClass = 'anno-knob'
+    if (readOnly) {
+        cssClass += ' is-readonly'
+    }
+
+    const circle = $(`<div class="${cssClass}"/>`).css({
         top    : `${y}px`,
         left   : `${x}px`,
         width  : DEFAULT_RADIUS + 'px',
