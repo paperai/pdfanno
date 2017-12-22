@@ -47,11 +47,11 @@
 }
 .anno-knob.is-readonly {
     border-radius: 0;
-    transform: rotate(45deg);
+    transform: rotate(45deg) scale(0.7);
 }
 .--hover .anno-knob.is-readonly,
 .--selected .anno-knob.is-readonly {
-  transform: rotate(45deg) scale(2);
+  transform: rotate(45deg) scale(1.4);
 }
 
 /*
