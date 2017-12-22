@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 65);
+/******/ 	return __webpack_require__(__webpack_require__.s = 66);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -4811,7 +4811,7 @@ class SpanAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
      * Set a hover event.
      */
     setHoverEvent () {
-        this.$element.find('.anno-circle').hover(
+        this.$element.find('.anno-knob').hover(
             this.handleHoverInEvent,
             this.handleHoverOutEvent
         )
@@ -4937,7 +4937,7 @@ class SpanAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
         this.disableViewMode()
         super.enableViewMode()
         if (!this.readOnly) {
-            this.$element.find('.anno-circle').on('click', this.handleClickEvent)
+            this.$element.find('.anno-knob').on('click', this.handleClickEvent)
         }
     }
 
@@ -4946,7 +4946,7 @@ class SpanAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
      */
     disableViewMode () {
         super.disableViewMode()
-        this.$element.find('.anno-circle').off('click')
+        this.$element.find('.anno-knob').off('click')
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = SpanAnnotation;
@@ -4960,8 +4960,8 @@ class SpanAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_events__ = __webpack_require__(27);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_events___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_events__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__render_appendChild__ = __webpack_require__(71);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_event__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__render_appendChild__ = __webpack_require__(72);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_event__ = __webpack_require__(32);
 
 
 
@@ -5018,8 +5018,6 @@ class AbstractAnnotation extends __WEBPACK_IMPORTED_MODULE_0_events___default.a 
         if (!this.hoverEventDisable && this.setHoverEvent) {
             this.setHoverEvent()
         }
-
-        this.$element.addClass('--viewMode')
 
         this.selected && this.$element.addClass('--selected')
 
@@ -5116,14 +5114,14 @@ class AbstractAnnotation extends __WEBPACK_IMPORTED_MODULE_0_events___default.a 
      * Highlight the annotation.
      */
     highlight () {
-        this.$element.addClass('--hover --emphasis')
+        this.$element.addClass('--hover')
     }
 
     /**
      * Dehighlight the annotation.
      */
     dehighlight () {
-        this.$element.removeClass('--hover --emphasis')
+        this.$element.removeClass('--hover')
     }
 
     /**
@@ -5190,7 +5188,7 @@ class AbstractAnnotation extends __WEBPACK_IMPORTED_MODULE_0_events___default.a 
      * Get the central position of the boundingCircle.
      */
     getBoundingCirclePosition () {
-        const $circle = this.$element.find('.anno-circle')
+        const $circle = this.$element.find('.anno-knob')
         if ($circle.length > 0) {
             return {
                 x : parseFloat($circle.css('left')) + parseFloat($circle.css('width')) / 2,
@@ -5249,7 +5247,7 @@ class AbstractAnnotation extends __WEBPACK_IMPORTED_MODULE_0_events___default.a 
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (immutable) */ __webpack_exports__["b"] = renderCircle;
+/* harmony export (immutable) */ __webpack_exports__["b"] = renderKnob;
 
 /**
  * Circle radius.
@@ -5260,21 +5258,26 @@ const DEFAULT_RADIUS = 7
 
 /**
  * Create a bounding circle.
- * @param {Object} the position for rendering.
+ * @param {Object} the data for rendering.
  */
-function renderCircle ({ x, y }) {
+function renderKnob ({ x, y, readOnly }) {
 
     // Adjust the position.
     [x, y] = adjustPoint(x, (y - (DEFAULT_RADIUS + 2)), DEFAULT_RADIUS)
 
-    const circle = $('<div class="anno-circle"/>').css({
+    // Set the CSS class.
+    let cssClass = 'anno-knob'
+    if (readOnly) {
+        cssClass += ' is-readonly'
+    }
+
+    // Create a knob.
+    return $(`<div class="${cssClass}"/>`).css({
         top    : `${y}px`,
         left   : `${x}px`,
         width  : DEFAULT_RADIUS + 'px',
         height : DEFAULT_RADIUS + 'px'
     })
-
-    return circle
 }
 
 /**
@@ -5282,8 +5285,10 @@ function renderCircle ({ x, y }) {
  */
 function adjustPoint (x, y, radius) {
 
-    const $circles = $('.anno-circle')
+    // Get all knobs.
+    const $circles = $('.anno-knob')
 
+    // Find a position where all knobs are not placed at.
     while (true) {
         let good = true
         $circles.each(function () {
@@ -5312,7 +5317,7 @@ function adjustPoint (x, y, radius) {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_anno_ui_src_utils__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__abstract__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_relation_js__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_relation_js__ = __webpack_require__(31);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_util__ = __webpack_require__(3);
 
 
@@ -6131,6 +6136,35 @@ function getAnnoLayerBoundingRect () {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = hex2rgba;
+/**
+ * Change color definition style from hex to rgba.
+ */
+function hex2rgba (hex, alpha = 1) {
+
+    // long version
+    let r = hex.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i)
+    let c = null
+    if (r) {
+        c = r.slice(1, 4).map(function (x) { return parseInt(x, 16) })
+    }
+    // short version
+    r = hex.match(/^#([0-9a-f])([0-9a-f])([0-9a-f])$/i)
+    if (r) {
+        c = r.slice(1, 4).map(function (x) { return 0x11 * parseInt(x, 16) })
+    }
+    if (!c) {
+        return hex
+    }
+    return `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${alpha})`
+}
+
+
+/***/ }),
+/* 30 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = setAttributes;
 const UPPER_REGEX = /[A-Z]/g
 
@@ -6160,7 +6194,7 @@ function setAttributes (node, attributes) {
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6311,7 +6345,7 @@ function getRelationTextPosition (x1, y1, x2, y2, text = '', parentId = null) {
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6327,7 +6361,7 @@ function dispatchWindowEvent (eventName, data) {
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6354,7 +6388,7 @@ function disable () {
 
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6434,7 +6468,7 @@ class RectAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
      * Set a hover event.
      */
     setHoverEvent () {
-        this.$element.find('.anno-rect, .anno-circle').hover(
+        this.$element.find('.anno-rect, .anno-knob').hover(
             this.handleHoverInEvent,
             this.handleHoverOutEvent
         )
@@ -6644,7 +6678,7 @@ class RectAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
     enableViewMode () {
         super.enableViewMode()
         if (!this.readOnly) {
-            this.$element.find('.anno-rect, .anno-circle').on('click', this.handleClickEvent)
+            this.$element.find('.anno-rect, .anno-knob').on('click', this.handleClickEvent)
             this.enableDragAction()
         }
     }
@@ -6654,7 +6688,7 @@ class RectAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
      */
     disableViewMode () {
         super.disableViewMode()
-        this.$element.find('.anno-rect, .anno-circle').off('click')
+        this.$element.find('.anno-rect, .anno-knob').off('click')
         this.disableDragAction()
     }
 
@@ -6664,7 +6698,6 @@ class RectAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
 
 
 /***/ }),
-/* 34 */,
 /* 35 */,
 /* 36 */,
 /* 37 */,
@@ -6695,7 +6728,8 @@ class RectAnnotation extends __WEBPACK_IMPORTED_MODULE_1__abstract__["a" /* defa
 /* 62 */,
 /* 63 */,
 /* 64 */,
-/* 65 */
+/* 65 */,
+/* 66 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6703,12 +6737,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shared_util__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_events__ = __webpack_require__(27);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_events___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_events__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_PDFAnnoCore__ = __webpack_require__(68);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__src_annotation_container__ = __webpack_require__(78);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_PDFAnnoCore__ = __webpack_require__(69);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__src_annotation_container__ = __webpack_require__(79);
 /**
     Functions for annotations rendered over a PDF file.
 */
-__webpack_require__(66)
+__webpack_require__(67)
 
 
 
@@ -6865,13 +6899,13 @@ function renderAnnotations () {
 
 
 /***/ }),
-/* 66 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(67);
+var content = __webpack_require__(68);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
 var update = __webpack_require__(5)(content, {});
@@ -6891,7 +6925,7 @@ if(false) {
 }
 
 /***/ }),
-/* 67 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(4)();
@@ -6899,18 +6933,18 @@ exports = module.exports = __webpack_require__(4)();
 
 
 // module
-exports.push([module.i, "@charset \"utf-8\";\n\n/*\n *  Search UI.\n */\n.pdfanno-search-result {\n    position: absolute;\n    background-color: rgba(0, 255, 0, 0.7)\n}\n.pdfanno-search-result--highlight {\n    background-color: rgba(255, 0, 0, 0.7)\n}\n\n/*\n * Text Layer.\n */\n.pdfanno-text-layer {\n    position: absolute;\n    text-align: center;\n}\n\n/**\n * SVGLayer.\n */\n.annoLayer {}\n.annoLayer > *.\\--viewMode {\n  opacity: 0.5;\n}\n.annoLayer > *.\\--viewMode.\\--emphasis,\n.annoLayer > *.\\--viewMode.\\--selected {\n  opacity: 1;\n}\n\n/**\n    Annotation related.\n*/\n.anno-circle {\n    position: absolute;\n    background: blue;\n    border-radius: 50%;\n    transition:0.2s;\n    transform-origin: center center;\n}\n.\\--hover .anno-circle {\n  box-shadow: rgba(113,135,164,.6) 1px 1px 1px 1px;\n  stroke: blue;\n  stroke-width: 5px;\n}\n\n.anno-span.\\--hover .anno-circle {\n  box-shadow: rgba(113,135,164,.2) 1px 1px 1px;\n  transform: scale(2);\n}\n\n.\\--hover .anno-span {\n  box-shadow: 0 0 0 1px #ccc inset;\n  border: 1px dashed #ccc;\n}\n.anno-span.\\--selected .anno-span__area {\n  border: 2px dashed black !important;\n  box-sizing: border-box;\n}\n\n/**\n  Relation.\n*/\n.anno-relation {\n  transition:0.2s;\n}\n.\\--hover .anno-relation {\n  stroke-width: 2px;\n}\n.\\--selected .anno-relation {\n}\n.anno-relation-outline {\n  fill: none;\n  visibility: hidden;\n}\n.\\--selected .anno-relation-outline {\n  visibility: visible;\n  stroke: black;\n  stroke-width: 2.85px;\n  pointer-events: stroke;\n  stroke-dasharray: 3;\n}\n\n/**\n * Span.\n */\n.anno-span rect {\n    /* Enable the hover event on circles and text even if they are overwraped other spans. */\n    pointer-events: none;\n}\n\n/**\n  Rect.\n*/\n.anno-rect-base {\n    position: absolute;\n    top: 0;\n    left: 0;\n    visibility: visible;\n}\n.anno-rect {\n    position: absolute;\n}\n.\\--hover .anno-rect {\n  /*html*/\n  box-shadow: 0 0 0 1px #ccc inset;\n  /*svg*/\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-rect {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n\n/**\n Disable text layers.\n*/\nbody.disable-text-layer .textLayer {\n    display: none;\n}\n\n", ""]);
+exports.push([module.i, "@charset \"utf-8\";\n\n/*\n *  Search UI.\n */\n.pdfanno-search-result {\n    position: absolute;\n    background-color: rgba(0, 255, 0, 0.7)\n}\n.pdfanno-search-result--highlight {\n    background-color: rgba(255, 0, 0, 0.7)\n}\n\n/*\n * Text Layer.\n */\n.pdfanno-text-layer {\n    position: absolute;\n    text-align: center;\n}\n\n/**\n * Annotation Layer.\n */\n.annoLayer > * {\n  opacity: 0.5;\n}\n.annoLayer > *.\\--hover,\n.annoLayer > *.\\--selected {\n  opacity: 1;\n}\n\n/**\n    Annotation Knob for control.\n*/\n.anno-knob {\n    position: absolute;\n    background-color: blue;\n    border-radius: 50%;\n    transition: 0.2s;\n    transform-origin: center center;\n}\n.\\--hover .anno-knob,\n.\\--selected .anno-knob {\n  box-shadow: rgba(113,135,164,.2) 1px 1px 1px;\n  transform: scale(2);\n}\n.anno-knob.is-readonly {\n    border-radius: 0;\n    transform: rotate(45deg);\n}\n.\\--hover .anno-knob.is-readonly,\n.\\--selected .anno-knob.is-readonly {\n  transform: rotate(45deg) scale(2);\n}\n\n/*\n * Span Annotation.\n */\n.anno-span {\n    position: absolute;\n    top: 0;\n    left: 0;\n    visibility: visible;\n}\n.anno-span__area {\n    position: absolute;\n    border: 1px dashed black;\n}\n.\\--hover .anno-span__area,\n.\\--selected .anno-span__area {\n  border: 2px dashed black !important;\n  box-sizing: border-box;\n}\n.anno-span__border {\n    position: absolute;\n    border-bottom-width: 1px;\n    border-bottom-style: solid;\n}\n\n/*TODO Relationを描画した直後は、位置が少しずれる。その後にフォーカスが外れると正しい位置へ移動する。*/\n\n/**\n  Relation Annotation.\n*/\n.\\--hover .anno-relation,\n.\\--selected .anno-relation {\n  stroke-width: 2px;\n}\n.anno-relation-outline {\n  fill: none;\n  visibility: hidden;\n}\n.\\--selected .anno-relation-outline {\n  visibility: visible;\n  stroke: black;\n  stroke-width: 4px;\n  pointer-events: stroke;\n  stroke-dasharray: 5;\n}\n\n/**\n * Span Annotation.\n */\n.anno-span rect {\n    /* Enable the hover event on circles and text even if they are overwraped other spans. */\n    pointer-events: none;\n}\n\n/**\n  Rect Annotation.\n*/\n.anno-rect-base {\n    position: absolute;\n    top: 0;\n    left: 0;\n    visibility: visible;\n}\n.anno-rect {\n    position: absolute;\n}\n.\\--hover .anno-rect {\n  box-shadow: 0 0 0 1px #ccc inset;\n  stroke: #ccc;\n  stroke-width: 0.75px;\n}\n.\\--selected .anno-rect {\n  stroke: black;\n  stroke-width: 0.5px;\n  stroke-dasharray: 3;\n}\n\n/**\n Disable text layers.\n*/\nbody.disable-text-layer .textLayer {\n    display: none;\n}\n\n", ""]);
 
 // exports
 
 
 /***/ }),
-/* 68 */
+/* 69 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__UI__ = __webpack_require__(69);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__annotation_rect__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__UI__ = __webpack_require__(70);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__annotation_rect__ = __webpack_require__(34);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__annotation_span__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__annotation_relation__ = __webpack_require__(14);
 // import render from './render'
@@ -6945,13 +6979,13 @@ exports.push([module.i, "@charset \"utf-8\";\n\n/*\n *  Search UI.\n */\n.pdfann
 
 
 /***/ }),
-/* 69 */
+/* 70 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__span__ = __webpack_require__(70);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__relation__ = __webpack_require__(76);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__view__ = __webpack_require__(77);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__span__ = __webpack_require__(71);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__relation__ = __webpack_require__(77);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__view__ = __webpack_require__(78);
 
 
 
@@ -6965,7 +6999,7 @@ exports.push([module.i, "@charset \"utf-8\";\n\n/*\n *  Search UI.\n */\n.pdfann
 
 
 /***/ }),
-/* 70 */
+/* 71 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6973,7 +7007,7 @@ exports.push([module.i, "@charset \"utf-8\";\n\n/*\n *  Search UI.\n */\n.pdfann
 /* harmony export (immutable) */ __webpack_exports__["a"] = createSpan;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(28);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__annotation_span__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_textInput__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_textInput__ = __webpack_require__(33);
 
 
 
@@ -7211,15 +7245,15 @@ function createSpan ({ text = null, zIndex = 10 }) {
 
 
 /***/ }),
-/* 71 */
+/* 72 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = appendChild;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderRect__ = __webpack_require__(72);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__renderSpan__ = __webpack_require__(73);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__renderText__ = __webpack_require__(74);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__renderRelation__ = __webpack_require__(75);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderRect__ = __webpack_require__(73);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__renderSpan__ = __webpack_require__(74);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__renderText__ = __webpack_require__(75);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__renderRelation__ = __webpack_require__(76);
 
 
 
@@ -7286,45 +7320,50 @@ function appendChild (svg, annotation, viewport) {
 
 
 /***/ }),
-/* 72 */
+/* 73 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = renderRect;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderCircle__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderKnob__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils_color__ = __webpack_require__(29);
+
 
 
 /**
- * Create a Rect element.
+ * Create a rect annotation.
  * @param {RectAnnotation} a - rect annotation.
  */
 function renderRect (a) {
 
-    let color = a.color || '#f00'
+    let color = a.color || '#FF0'
 
     const $base = $('<div class="anno-rect-base"/>')
 
     $base.append($('<div class="anno-rect"/>').css({
-        top    : `${a.y}px`,
-        left   : `${a.x}px`,
-        width  : `${a.width}px`,
-        height : `${a.height}px`,
-        border : `1px solid ${color}`
+        top             : `${a.y}px`,
+        left            : `${a.x}px`,
+        width           : `${a.width}px`,
+        height          : `${a.height}px`,
+        border          : `1px solid ${color}`,
+        backgroundColor : a.readOnly ? 'none' : __WEBPACK_IMPORTED_MODULE_1__utils_color__["a" /* hex2rgba */](color, 0.3)
     }))
 
-    $base.append(__WEBPACK_IMPORTED_MODULE_0__renderCircle__["b" /* renderCircle */](a))
+    $base.append(__WEBPACK_IMPORTED_MODULE_0__renderKnob__["b" /* renderKnob */](a))
 
     return $base[0]
 }
 
 
 /***/ }),
-/* 73 */
+/* 74 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = renderSpan;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderCircle__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderKnob__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils_color__ = __webpack_require__(29);
+
 
 
 /**
@@ -7334,73 +7373,59 @@ function renderRect (a) {
  */
 function renderSpan (a) {
 
+    const readOnly = a.readOnly
+
     const color = a.color || '#FF0'
 
-    const $base = $('<div/>').css({
-        position   : 'absolute',
-        top        : 0,
-        left       : 0,
-        visibility : 'visible',
-        zIndex     : a.zIndex || 10
-    }).addClass('anno-span')
+    const $base = $('<div class="anno-span"/>')
+        .css('zIndex', a.zIndex || 10)
 
     a.rectangles.forEach(r => {
-        $base.append(createRect(r, color))
+        $base.append(createRect(r, color, readOnly))
     })
 
-    $base.append(__WEBPACK_IMPORTED_MODULE_0__renderCircle__["b" /* renderCircle */]({
+    $base.append(__WEBPACK_IMPORTED_MODULE_0__renderKnob__["b" /* renderKnob */]({
         x : a.rectangles[0].x,
-        y : a.rectangles[0].y
+        y : a.rectangles[0].y,
+        readOnly
     }))
 
     return $base[0]
 }
 
-function createRect (r, color) {
+function createRect (r, color, readOnly) {
 
-    const rgba = hex2rgba(color, 0.4)
+    if (readOnly) {
+        return $('<div class="anno-span__border"/>').css({
+            top         : r.y + 'px',
+            left        : r.x + 'px',
+            width       : r.width + 'px',
+            height      : r.height + 'px',
+            borderColor : color
+        })
 
-    return $('<div/>').addClass('anno-span__area').css({
-        position        : 'absolute',
-        top             : r.y + 'px',
-        left            : r.x + 'px',
-        width           : r.width + 'px',
-        height          : r.height + 'px',
-        backgroundColor : rgba,
-        border          : '1px dashed gray'
-    })
-}
+    } else {
 
-/**
- * Change color definition style from hex to rgba.
- */
-function hex2rgba (hex, alpha = 1) {
+        const rgba = __WEBPACK_IMPORTED_MODULE_1__utils_color__["a" /* hex2rgba */](color, 0.4)
 
-    // long version
-    let r = hex.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i)
-    let c = null
-    if (r) {
-        c = r.slice(1, 4).map(function (x) { return parseInt(x, 16) })
+        return $('<div class="anno-span__area"/>').css({
+            top             : r.y + 'px',
+            left            : r.x + 'px',
+            width           : r.width + 'px',
+            height          : r.height + 'px',
+            backgroundColor : rgba
+        })
     }
-    // short version
-    r = hex.match(/^#([0-9a-f])([0-9a-f])([0-9a-f])$/i)
-    if (r) {
-        c = r.slice(1, 4).map(function (x) { return 0x11 * parseInt(x, 16) })
-    }
-    if (!c) {
-        return hex
-    }
-    return `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${alpha})`
 }
 
 
 /***/ }),
-/* 74 */
+/* 75 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = renderText;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__ = __webpack_require__(30);
 // TODO no need this file ?
 
 
@@ -7467,44 +7492,33 @@ function renderText (a, svg) {
 
 
 /***/ }),
-/* 75 */
+/* 76 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = renderRelation;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__ = __webpack_require__(29);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__renderCircle__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_relation_js__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__renderKnob__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_relation_js__ = __webpack_require__(31);
 
 
 
-
-let secondaryColor = ['green', 'blue', 'purple']
 
 /**
- * Create SVGGElements from an annotation definition.
- * This is used for anntations of type `relation`.
+ * Create a RELATION annotation.
  *
- * @param {Object} a The annotation definition
+ * @param {RelationAnnotation} a - The annotation definition
  * @return {SVGGElement} A group of a relation to be rendered
  */
 function renderRelation (a) {
-    let color = a.color
-    if (!color) {
-        if (a.readOnly) {
-            color = secondaryColor[a.seq % secondaryColor.length]
-        } else {
-            color = '#F00'
-        }
-    }
 
     // Adjust the start/end points.
     let theta = Math.atan((a.y1 - a.y2) / (a.x1 - a.x2))
     let sign = (a.x1 < a.x2 ? 1 : -1)
-    a.x1 += __WEBPACK_IMPORTED_MODULE_1__renderCircle__["a" /* DEFAULT_RADIUS */] * Math.cos(theta) * sign
-    a.x2 -= __WEBPACK_IMPORTED_MODULE_1__renderCircle__["a" /* DEFAULT_RADIUS */] * Math.cos(theta) * sign
-    a.y1 += __WEBPACK_IMPORTED_MODULE_1__renderCircle__["a" /* DEFAULT_RADIUS */] * Math.sin(theta) * sign
-    a.y2 -= __WEBPACK_IMPORTED_MODULE_1__renderCircle__["a" /* DEFAULT_RADIUS */] * Math.sin(theta) * sign
+    a.x1 += __WEBPACK_IMPORTED_MODULE_1__renderKnob__["a" /* DEFAULT_RADIUS */] * Math.cos(theta) * sign
+    a.x2 -= __WEBPACK_IMPORTED_MODULE_1__renderKnob__["a" /* DEFAULT_RADIUS */] * Math.cos(theta) * sign
+    a.y1 += __WEBPACK_IMPORTED_MODULE_1__renderKnob__["a" /* DEFAULT_RADIUS */] * Math.sin(theta) * sign
+    a.y2 -= __WEBPACK_IMPORTED_MODULE_1__renderKnob__["a" /* DEFAULT_RADIUS */] * Math.sin(theta) * sign
 
     let top    = Math.min(a.y1, a.y2)
     let left   = Math.min(a.x1, a.x2)
@@ -7528,36 +7542,36 @@ function renderRelation (a) {
 
     let group = document.createElementNS('http://www.w3.org/2000/svg', 'g')
     __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__["a" /* default */](group, {
-        fill        : color,
-        stroke      : color,
-        // TODO no need?
-        'data-rel1' : a.rel1,
-        'data-rel2' : a.rel2,
-        'data-text' : a.text
+        fill   : a.color,
+        stroke : a.color
     })
     group.style.visibility = 'visible'
     group.setAttribute('read-only', a.readOnly === true)
 
     $svg[0].appendChild(group)
 
-    let marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker')
-    __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__["a" /* default */](marker, {
-        viewBox      : '0 0 10 10',
-        markerWidth  : 2,
-        markerHeight : 3,
-        fill         : color,
-        id           : 'relationhead',
-        orient       : 'auto-start-reverse'
-    })
-    marker.setAttribute('refX', 5)
-    marker.setAttribute('refY', 5)
-    group.appendChild(marker)
+    const markerId = 'relationhead' + a.color.replace('#', '')
 
-    let polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon')
-    __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__["a" /* default */](polygon, {
-        points : '0,0 0,10 10,5'
-    })
-    marker.appendChild(polygon)
+    if (!document.querySelector('#' + markerId)) {
+        let marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker')
+        __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__["a" /* default */](marker, {
+            viewBox      : '0 0 10 10',
+            markerWidth  : 2,
+            markerHeight : 3,
+            fill         : a.color,
+            id           : markerId,
+            orient       : 'auto-start-reverse'
+        })
+        marker.setAttribute('refX', 5)
+        marker.setAttribute('refY', 5)
+        group.appendChild(marker)
+
+        let polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon')
+        __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__["a" /* default */](polygon, {
+            points : '0,0 0,10 10,5'
+        })
+        marker.appendChild(polygon)
+    }
 
     // Find Control points.
     let control = __WEBPACK_IMPORTED_MODULE_2__utils_relation_js__["a" /* findBezierControlPoint */](a.x1, a.y1, a.x2, a.y2)
@@ -7576,7 +7590,7 @@ function renderRelation (a) {
     let relation = document.createElementNS('http://www.w3.org/2000/svg', 'path')
     __WEBPACK_IMPORTED_MODULE_0__utils_setAttributes__["a" /* default */](relation, {
         d           : `M ${a.x1} ${a.y1} Q ${control.x} ${control.y} ${a.x2} ${a.y2}`,
-        stroke      : color,
+        stroke      : a.color,
         strokeWidth : 1,
         fill        : 'none',
         class       : 'anno-relation'
@@ -7584,17 +7598,13 @@ function renderRelation (a) {
 
     // Triangle for the end point.
     if (a.direction === 'one-way' || a.direction === 'two-way') {
-        relation.setAttribute('marker-end', 'url(#relationhead)')
+        relation.setAttribute('marker-end', `url(#${markerId})`)
     }
 
     // Triangle for the start point.
     if (a.direction === 'two-way') {
-        relation.setAttribute('marker-start', 'url(#relationhead)')
+        relation.setAttribute('marker-start', `url(#${markerId})`)
     }
-
-    // if (id) {
-    //     setAttributes(relation, { id : id })
-    // }
 
     group.appendChild(relation)
 
@@ -7615,7 +7625,7 @@ function createSVGElement (top, left, width, height) {
     const margin = 50
 
     // Add an annotation layer.
-    let $svg = $(`<svg class="annoLayer"/>`).css({ // TODO why need .annoLayer
+    let $svg = $('<svg class=""/>').css({ // I don't know why, but empty class is need.
         position   : 'absolute',
         top        : `${top - margin}px`,
         left       : `${left - margin}px`,
@@ -7633,12 +7643,12 @@ function createSVGElement (top, left, width, height) {
 
 
 /***/ }),
-/* 76 */
+/* 77 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = createRelation;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_textInput__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_textInput__ = __webpack_require__(33);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__annotation_relation__ = __webpack_require__(14);
 
 
@@ -7682,7 +7692,7 @@ function createRelation ({ type, anno1, anno2, text }) {
 
 
 /***/ }),
-/* 77 */
+/* 78 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7748,17 +7758,17 @@ function enableViewMode () {
 
 
 /***/ }),
-/* 78 */
+/* 79 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_anno_ui_src_utils__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__version__ = __webpack_require__(79);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_tomlString__ = __webpack_require__(81);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_event__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__version__ = __webpack_require__(80);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_tomlString__ = __webpack_require__(82);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_event__ = __webpack_require__(32);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__shared_coords__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__span__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__rect__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__rect__ = __webpack_require__(34);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__relation__ = __webpack_require__(14);
 
 
@@ -8024,11 +8034,11 @@ class AnnotationContainer {
 
 
 /***/ }),
-/* 79 */
+/* 80 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-let packageJson = __webpack_require__(80)
+let packageJson = __webpack_require__(81)
 /**
  * Paper Anno Version.
  * This is overwritten at build.
@@ -8038,13 +8048,13 @@ let ANNO_VERSION = packageJson.version
 
 
 /***/ }),
-/* 80 */
+/* 81 */
 /***/ (function(module, exports) {
 
-module.exports = {"name":"pdfanno","version":"0.4.0-dev","description":"","main":"index.js","scripts":{"_prepare":"gulp prepare","dev":"npm run _prepare && webpack-dev-server --inline","watch":"npm run _prepare && webpack --watch","publish:latest":"npm run _prepare && cross-env NODE_ENV=production SERVER_PATH=latest webpack && gulp publish_latest","publish:stable":"npm run _prepare && cross-env NODE_ENV=production SERVER_PATH=0.3.0  webpack && gulp publish_stable","server:latest":"cross-env NODE_ENV=production NODE_PORT=1001 node server/server.js","server:stable":"cross-env NODE_ENV=production NODE_PORT=1000 node server/server.js","server:dev":"cross-env NODE_PORT=3000 ./node_modules/.bin/node-dev server/server.js"},"repository":{"type":"git","url":"git+https://github.com/paperai/pdfanno"},"author":"hshindo, yoheiMune","license":"MIT","bugs":{"url":"https://github.com/paperai/pdfanno/issues"},"homepage":"https://github.com/paperai/pdfanno#readme","pdfextract":{"version":"0.1.6","url":"https://github.com/paperai/pdfextract/releases/download/v0.1.6/pdfextract-0.1.6.jar"},"devDependencies":{"babel-cli":"^6.26.0","babel-core":"^6.26.0","babel-eslint":"^7.2.3","babel-loader":"6.2.4","babel-messages":"^6.23.0","babel-plugin-add-module-exports":"^0.2.1","babel-preset-es2015":"^6.24.1","babel-preset-stage-1":"^6.24.1","copy":"^0.3.0","cpr":"^2.2.0","cross-env":"^5.0.5","css-loader":"^0.25.0","deep-assign":"^2.0.0","eslint":"^3.19.0","eslint-config-standard":"^6.2.1","eslint-friendly-formatter":"^2.0.7","eslint-loader":"^1.7.1","eslint-plugin-html":"^2.0.0","eslint-plugin-promise":"^3.5.0","eslint-plugin-standard":"^2.3.1","file-loader":"^0.9.0","fs-extra":"^1.0.0","fuse.js":"^3.1.0","gulp":"^3.9.1","gulp-cli":"^1.4.0","node-dev":"^3.1.3","style-loader":"^0.13.2","urijs":"^1.19.0","vinyl-source-stream":"^1.1.0","webpack":"3.0.0","webpack-dev-server":"^1.16.5"},"dependencies":{"anno-ui":"github:paperai/anno-ui#master","axios":"^0.15.2","body-parser":"^1.17.2","express":"^4.15.4","json-loader":"^0.5.7","mkdirp-promise":"^5.0.1","multer":"^1.3.0","request":"^2.81.0","requirejs":"^2.3.5","socket.io":"^2.0.4","toml":"github:yoheiMune/toml-node"}}
+module.exports = {"name":"pdfanno","version":"0.4.0-dev","description":"","main":"index.js","scripts":{"_prepare":"gulp prepare","dev":"npm run _prepare && webpack-dev-server --inline","watch":"npm run _prepare && webpack --watch","publish:latest":"npm run _prepare && cross-env NODE_ENV=production SERVER_PATH=latest webpack && gulp publish_latest","publish:stable":"npm run _prepare && cross-env NODE_ENV=production SERVER_PATH=0.3.0  webpack && gulp publish_stable","server:latest":"cross-env NODE_ENV=production NODE_PORT=1001 node server/server.js","server:stable":"cross-env NODE_ENV=production NODE_PORT=1000 node server/server.js","server:dev":"cross-env NODE_PORT=3000 ./node_modules/.bin/node-dev server/server.js"},"repository":{"type":"git","url":"git+https://github.com/paperai/pdfanno"},"author":"hshindo, yoheiMune","license":"MIT","bugs":{"url":"https://github.com/paperai/pdfanno/issues"},"homepage":"https://github.com/paperai/pdfanno#readme","pdfextract":{"version":"0.1.6","url":"https://github.com/paperai/pdfextract/releases/download/v0.1.6/pdfextract-0.1.6.jar"},"devDependencies":{"babel-cli":"^6.26.0","babel-core":"^6.26.0","babel-eslint":"^7.2.3","babel-loader":"6.2.4","babel-messages":"^6.23.0","babel-plugin-add-module-exports":"^0.2.1","babel-preset-es2015":"^6.24.1","babel-preset-stage-1":"^6.24.1","copy":"^0.3.0","cpr":"^2.2.0","cross-env":"^5.0.5","css-loader":"^0.25.0","deep-assign":"^2.0.0","eslint":"^3.19.0","eslint-config-standard":"^6.2.1","eslint-friendly-formatter":"^2.0.7","eslint-loader":"^1.7.1","eslint-plugin-html":"^2.0.0","eslint-plugin-promise":"^3.5.0","eslint-plugin-standard":"^2.3.1","file-loader":"^0.9.0","fs-extra":"^1.0.0","fuse.js":"^3.1.0","gulp":"^3.9.1","gulp-cli":"^1.4.0","node-dev":"^3.1.3","style-loader":"^0.13.2","vinyl-source-stream":"^1.1.0","webpack":"3.0.0","webpack-dev-server":"^1.16.5"},"dependencies":{"anno-ui":"github:paperai/anno-ui#master","axios":"^0.15.2","body-parser":"^1.17.2","express":"^4.15.4","json-loader":"^0.5.7","mkdirp-promise":"^5.0.1","multer":"^1.3.0","request":"^2.81.0","requirejs":"^2.3.5","socket.io":"^2.0.4","toml":"github:yoheiMune/toml-node","urijs":"^1.19.0"}}
 
 /***/ }),
-/* 81 */
+/* 82 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
