@@ -210,7 +210,7 @@ export default class PDFAnnoPage {
     /**
      * Create a Span annotation.
      */
-    createSpan ({ text = null } = {}) {
+    createSpan ({ text = null, color = null } = {}) {
         // TODO Refactoring: a little too long.
 
         // Get user selection.
@@ -226,20 +226,22 @@ export default class PDFAnnoPage {
 
         // Create a new rectAnnotation.
         if (rects) {
-            window.iframeWindow.PDFAnnoCore.default.UI.createSpan({ text, zIndex : nextZIndex() })
+            window.iframeWindow.PDFAnnoCore.default.UI.createSpan({ text, zIndex : nextZIndex(), color })
 
         } else if (highlight) {
 
             // Get textRange.
             const { textRange } = window.getText(highlight.page, highlight.searchPosition.start, highlight.searchPosition.end)
 
+            // Refactoring: use window.annoPage.createSpanAnnotation ?
             const s = new window.SpanAnnotation({
                 page      : highlight.page,
                 position  : highlight.position,
                 label     : text,
                 text      : highlight.text,
                 textrange : textRange,
-                zIndex    : nextZIndex()
+                zIndex    : nextZIndex(),
+                color
             })
             window.add(s)
 
@@ -442,6 +444,7 @@ export default class PDFAnnoPage {
      * Create a new span annotation.
      */
     createSpanAnnotation (options) {
+        console.log('createSpanAnnotation:', options)
         return window.iframeWindow.PDFAnnoCore.default.SpanAnnotation.newInstance(options)
     }
 

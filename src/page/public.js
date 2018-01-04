@@ -119,7 +119,7 @@ export class PublicRectAnnotation {
  */
 export class PublicSpanAnnotation {
 
-    constructor ({ page, position, label = '', text = '', id = 0, uuid = '', zIndex = 10, textrange = [] }) {
+    constructor ({ page, position, label = '', text = '', id = 0, uuid = '', zIndex = 10, textrange = [], color = null }) {
 
         console.log('PublicSpanAnnotation:', zIndex)
 
@@ -149,7 +149,7 @@ export class PublicSpanAnnotation {
             uuid,
             rectangles   : position,
             text         : label,
-            color        : '#FFFF00',
+            color        : color || '#FFEB3B',
             readOnly     : false,
             selectedText : text,
             textRange    : textrange,
