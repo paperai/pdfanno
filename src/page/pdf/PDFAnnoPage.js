@@ -262,7 +262,7 @@ export default class PDFAnnoPage {
     /**
      * Create a Relation annotation.
      */
-    createRelation ({ type, text = null } = {}) {
+    createRelation ({ type, text = null, color = null } = {}) {
 
         // for old style.
         if (arguments.length === 1 && typeof arguments[0] === 'string') {
@@ -300,6 +300,7 @@ export default class PDFAnnoPage {
             arrows[0].rel1Annotation = first
             arrows[0].rel2Annotation = second
             arrows[0].text = text
+            arrows[0].color = color || arrows[0].color
             arrows[0].save()
             arrows[0].render()
             arrows[0].enableViewMode()
@@ -317,7 +318,8 @@ export default class PDFAnnoPage {
             type,
             anno1 : first,
             anno2 : second,
-            text
+            text,
+            color
         })
 
         // Notify annotation added.
