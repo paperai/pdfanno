@@ -76,8 +76,10 @@ export default class AnnotationContainer {
 
     /**
      * Change the annotations color, if the text is the same in an annotation.
+     *
+     * annoType : span, one-way, two-way, link
      */
-    changeColor ({ text, color, uuid }) {
+    changeColor ({ text, color, uuid, annoType }) {
         console.log('changeColor: ', text, color, uuid)
         if (uuid) {
             const a = this.findById(uuid)
@@ -89,7 +91,15 @@ export default class AnnotationContainer {
             this.getAllAnnotations()
                 .filter(a => !a.readOnly)
                 .filter(a => a.text === text)
-                .forEach(a => {
+                .filter(a => {
+                    if (annoType === 'span') {
+                        return a.type === annoType
+                    } else if (annoType === 'one-way' || annoType === 'two-way' || annoType === 'link') {
+                        return a.type === 'relation'
+                    } else {
+                        return false
+                    }
+                }).forEach(a => {
                     a.color = color
                     a.render()
                 })
