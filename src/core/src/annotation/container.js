@@ -75,6 +75,28 @@ export default class AnnotationContainer {
     }
 
     /**
+     * Change the annotations color, if the text is the same in an annotation.
+     */
+    changeColor ({ text, color, uuid }) {
+        console.log('changeColor: ', text, color, uuid)
+        if (uuid) {
+            const a = this.findById(uuid)
+            if (a) {
+                a.color = color
+                a.render()
+            }
+        } else {
+            this.getAllAnnotations()
+                .filter(a => !a.readOnly)
+                .filter(a => a.text === text)
+                .forEach(a => {
+                    a.color = color
+                    a.render()
+                })
+        }
+    }
+
+    /**
      * Export annotations as a TOML string.
      */
     exportData () {
