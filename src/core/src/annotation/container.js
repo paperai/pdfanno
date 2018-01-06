@@ -86,6 +86,7 @@ export default class AnnotationContainer {
             if (a) {
                 a.color = color
                 a.render()
+                a.enableViewMode()
             }
         } else {
             this.getAllAnnotations()
@@ -103,6 +104,7 @@ export default class AnnotationContainer {
                 }).forEach(a => {
                     a.color = color
                     a.render()
+                    a.enableViewMode()
                 })
         }
     }
