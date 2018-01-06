@@ -178,7 +178,7 @@ window.addEventListener('DOMContentLoaded', async e => {
         },
         createSpanAnnotation : window.annoPage.createSpan,
         createRelAnnotation  : window.annoPage.createRelation,
-        colorChangeListener : (v) => {
+        colorChangeListener  : v => {
             window.iframeWindow.annotationContainer.changeColor(v)
         }
     })

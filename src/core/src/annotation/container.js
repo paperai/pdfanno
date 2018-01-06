@@ -226,7 +226,7 @@ export default class AnnotationContainer {
         const readOnly = !isPrimary
         const colorMap = data.colorMap
 
-        function getColor(index, type, text) {
+        function getColor (index, type, text) {
             if (readOnly) {
                 return data.colors[index]
             } else {
