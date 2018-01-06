@@ -336,6 +336,9 @@ export default class PDFAnnoPage {
             return
         }
 
+        const colorMap = annoUI.labelInput.getColorMap()
+        console.log('colorMap:', colorMap)
+
         let annotations = []
         let colors = []
         let primaryIndex = -1
@@ -391,7 +394,8 @@ export default class PDFAnnoPage {
         let paperData = {
             primary : primaryIndex,
             colors,
-            annotations
+            annotations,
+            colorMap
         }
 
         // Import annotations to Viewer.

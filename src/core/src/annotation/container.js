@@ -95,10 +95,11 @@ export default class AnnotationContainer {
                     if (annoType === 'span') {
                         return a.type === annoType
                     } else if (annoType === 'one-way' || annoType === 'two-way' || annoType === 'link') {
-                        return a.type === 'relation'
-                    } else {
-                        return false
+                        if (a.type === 'relation' && a.direction === annoType) {
+                            return true
+                        }
                     }
+                    return false
                 }).forEach(a => {
                     a.color = color
                     a.render()
@@ -221,6 +222,20 @@ export default class AnnotationContainer {
     importAnnotations (data, isPrimary) {
 
         const readOnly = !isPrimary
+        const colorMap = data.colorMap
+
+        function getColor(index, type, text) {
+            if (readOnly) {
+                return data.colors[index]
+            } else {
+                let color = colorMap.default
+                if (colorMap[type] && colorMap[type][text]) {
+                    color = colorMap[type][text]
+                }
+                // console.log('getColor:', type, text, colorMap[type][text], color)
+                return color
+            }
+        }
 
         return new Promise((resolve, reject) => {
 
@@ -238,7 +253,7 @@ export default class AnnotationContainer {
                     return
                 }
 
-                let color = data.colors[i]
+                // let color = data.colors[i]
 
                 for (const key in tomlObject) {
 
@@ -251,11 +266,12 @@ export default class AnnotationContainer {
 
                     d.uuid = uuid()
                     d.readOnly = readOnly
-                    d.color = color
+                    // d.color = data.colors[i]
 
                     if (d.type === 'span') {
 
                         let span = SpanAnnotation.newInstanceFromTomlObject(d)
+                        span.color = getColor(i, span.type, span.text)
                         span.save()
                         span.render()
                         span.enableViewMode()
@@ -264,6 +280,7 @@ export default class AnnotationContainer {
                     } else if (d.type === 'rect') {
 
                         let rect = RectAnnotation.newInstanceFromTomlObject(d)
+                        rect.color = getColor(i, rect.type, rect.text)
                         rect.save()
                         rect.render()
                         rect.enableViewMode()
@@ -274,6 +291,7 @@ export default class AnnotationContainer {
                         d.rel1 = tomlObject[d.ids[0]].uuid
                         d.rel2 = tomlObject[d.ids[1]].uuid
                         let relation = RelationAnnotation.newInstanceFromTomlObject(d)
+                        relation.color = getColor(i, relation.direction, relation.text)
                         relation.save()
                         relation.render()
                         relation.enableViewMode()
