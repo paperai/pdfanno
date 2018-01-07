@@ -177,7 +177,10 @@ window.addEventListener('DOMContentLoaded', async e => {
             }
         },
         createSpanAnnotation : window.annoPage.createSpan,
-        createRelAnnotation  : window.annoPage.createRelation
+        createRelAnnotation  : window.annoPage.createRelation,
+        colorChangeListener  : v => {
+            window.iframeWindow.annotationContainer.changeColor(v)
+        }
     })
 
     // Upload button.

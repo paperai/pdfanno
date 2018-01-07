@@ -157,7 +157,7 @@ function removeSelection () {
 /**
  * Save a rect annotation.
  */
-function saveSpan (text, zIndex) {
+function saveSpan (text, zIndex, color) {
 
     // Get the rect area which User selected.
     let { rects, selectedText, textRange } = getSelectionRects()
@@ -184,7 +184,8 @@ function saveSpan (text, zIndex) {
         selectedText,
         text,
         textRange,
-        zIndex
+        zIndex,
+        color
     }
 
     // Save.
@@ -229,6 +230,6 @@ export function getRectangles () {
 /**
  * Create a span by current texts selection.
  */
-export function createSpan ({ text = null, zIndex = 10 }) {
-    return saveSpan(text, zIndex)
+export function createSpan ({ text = null, zIndex = 10, color = null }) {
+    return saveSpan(text, zIndex, color)
 }

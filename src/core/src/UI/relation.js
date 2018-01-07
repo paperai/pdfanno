@@ -4,7 +4,7 @@ import RelationAnnotation from '../annotation/relation'
 /**
  * Create a new Relation annotation.
  */
-export function createRelation ({ type, anno1, anno2, text }) {
+export function createRelation ({ type, anno1, anno2, text, color }) {
     // TODO No need?
     // for old style.
     if (arguments.length === 3) {
@@ -18,6 +18,7 @@ export function createRelation ({ type, anno1, anno2, text }) {
     annotation.rel1Annotation = anno1
     annotation.rel2Annotation = anno2
     annotation.text = text
+    annotation.color = color
 
     annotation.save()
     annotation.render()

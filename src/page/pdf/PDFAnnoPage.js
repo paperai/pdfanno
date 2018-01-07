@@ -210,7 +210,7 @@ export default class PDFAnnoPage {
     /**
      * Create a Span annotation.
      */
-    createSpan ({ text = null } = {}) {
+    createSpan ({ text = null, color = null } = {}) {
         // TODO Refactoring: a little too long.
 
         // Get user selection.
@@ -226,20 +226,22 @@ export default class PDFAnnoPage {
 
         // Create a new rectAnnotation.
         if (rects) {
-            window.iframeWindow.PDFAnnoCore.default.UI.createSpan({ text, zIndex : nextZIndex() })
+            window.iframeWindow.PDFAnnoCore.default.UI.createSpan({ text, zIndex : nextZIndex(), color })
 
         } else if (highlight) {
 
             // Get textRange.
             const { textRange } = window.getText(highlight.page, highlight.searchPosition.start, highlight.searchPosition.end)
 
+            // Refactoring: use window.annoPage.createSpanAnnotation ?
             const s = new window.SpanAnnotation({
                 page      : highlight.page,
                 position  : highlight.position,
                 label     : text,
                 text      : highlight.text,
                 textrange : textRange,
-                zIndex    : nextZIndex()
+                zIndex    : nextZIndex(),
+                color
             })
             window.add(s)
 
@@ -260,7 +262,7 @@ export default class PDFAnnoPage {
     /**
      * Create a Relation annotation.
      */
-    createRelation ({ type, text = null } = {}) {
+    createRelation ({ type, text = null, color = null } = {}) {
 
         // for old style.
         if (arguments.length === 1 && typeof arguments[0] === 'string') {
@@ -298,6 +300,7 @@ export default class PDFAnnoPage {
             arrows[0].rel1Annotation = first
             arrows[0].rel2Annotation = second
             arrows[0].text = text
+            arrows[0].color = color || arrows[0].color
             arrows[0].save()
             arrows[0].render()
             arrows[0].enableViewMode()
@@ -315,7 +318,8 @@ export default class PDFAnnoPage {
             type,
             anno1 : first,
             anno2 : second,
-            text
+            text,
+            color
         })
 
         // Notify annotation added.
@@ -331,6 +335,9 @@ export default class PDFAnnoPage {
         if ($('#numPages', window.iframeWindow.document).text() === '') {
             return
         }
+
+        const colorMap = annoUI.labelInput.getColorMap()
+        console.log('colorMap:', colorMap)
 
         let annotations = []
         let colors = []
@@ -387,7 +394,8 @@ export default class PDFAnnoPage {
         let paperData = {
             primary : primaryIndex,
             colors,
-            annotations
+            annotations,
+            colorMap
         }
 
         // Import annotations to Viewer.
@@ -442,6 +450,7 @@ export default class PDFAnnoPage {
      * Create a new span annotation.
      */
     createSpanAnnotation (options) {
+        console.log('createSpanAnnotation:', options)
         return window.iframeWindow.PDFAnnoCore.default.SpanAnnotation.newInstance(options)
     }
 

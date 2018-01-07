@@ -164,6 +164,7 @@ function nextZIndex () {
 /* unused harmony export tomlString */
 /* harmony export (immutable) */ __webpack_exports__["a"] = uuid;
 /* unused harmony export download */
+/* unused harmony export loadFileAsText */
 /**
  * Make the UI resizable.
  */
@@ -329,6 +330,23 @@ function download (fileName, content) {
     a.href = blobURL
     a.click()
     a.parentNode.removeChild(a)
+}
+
+/**
+ * Load a file as a text.
+ */
+function loadFileAsText (file) {
+    return new Promise((resolve, reject) => {
+        let fileReader = new FileReader()
+        fileReader.onload = event => {
+            const text = event.target.result
+            resolve(text)
+        }
+        fileReader.onerror = err => {
+            reject(err)
+        }
+        fileReader.readAsText(file)
+    })
 }
 
 
@@ -7167,7 +7185,7 @@ function removeSelection () {
 /**
  * Save a rect annotation.
  */
-function saveSpan (text, zIndex) {
+function saveSpan (text, zIndex, color) {
 
     // Get the rect area which User selected.
     let { rects, selectedText, textRange } = getSelectionRects()
@@ -7194,7 +7212,8 @@ function saveSpan (text, zIndex) {
         selectedText,
         text,
         textRange,
-        zIndex
+        zIndex,
+        color
     }
 
     // Save.
@@ -7239,8 +7258,8 @@ function getRectangles () {
 /**
  * Create a span by current texts selection.
  */
-function createSpan ({ text = null, zIndex = 10 }) {
-    return saveSpan(text, zIndex)
+function createSpan ({ text = null, zIndex = 10, color = null }) {
+    return saveSpan(text, zIndex, color)
 }
 
 
@@ -7658,7 +7677,7 @@ function createSVGElement (top, left, width, height) {
 /**
  * Create a new Relation annotation.
  */
-function createRelation ({ type, anno1, anno2, text }) {
+function createRelation ({ type, anno1, anno2, text, color }) {
     // TODO No need?
     // for old style.
     if (arguments.length === 3) {
@@ -7672,6 +7691,7 @@ function createRelation ({ type, anno1, anno2, text }) {
     annotation.rel1Annotation = anno1
     annotation.rel2Annotation = anno2
     annotation.text = text
+    annotation.color = color
 
     annotation.save()
     annotation.render()
@@ -7849,6 +7869,41 @@ class AnnotationContainer {
     }
 
     /**
+     * Change the annotations color, if the text is the same in an annotation.
+     *
+     * annoType : span, one-way, two-way, link
+     */
+    changeColor ({ text, color, uuid, annoType }) {
+        console.log('changeColor: ', text, color, uuid)
+        if (uuid) {
+            const a = this.findById(uuid)
+            if (a) {
+                a.color = color
+                a.render()
+                a.enableViewMode()
+            }
+        } else {
+            this.getAllAnnotations()
+                .filter(a => !a.readOnly)
+                .filter(a => a.text === text)
+                .filter(a => {
+                    if (annoType === 'span') {
+                        return a.type === annoType
+                    } else if (annoType === 'one-way' || annoType === 'two-way' || annoType === 'link') {
+                        if (a.type === 'relation' && a.direction === annoType) {
+                            return true
+                        }
+                    }
+                    return false
+                }).forEach(a => {
+                    a.color = color
+                    a.render()
+                    a.enableViewMode()
+                })
+        }
+    }
+
+    /**
      * Export annotations as a TOML string.
      */
     exportData () {
@@ -7963,6 +8018,20 @@ class AnnotationContainer {
     importAnnotations (data, isPrimary) {
 
         const readOnly = !isPrimary
+        const colorMap = data.colorMap
+
+        function getColor (index, type, text) {
+            if (readOnly) {
+                return data.colors[index]
+            } else {
+                let color = colorMap.default
+                if (colorMap[type] && colorMap[type][text]) {
+                    color = colorMap[type][text]
+                }
+                // console.log('getColor:', type, text, colorMap[type][text], color)
+                return color
+            }
+        }
 
         return new Promise((resolve, reject) => {
 
@@ -7980,7 +8049,7 @@ class AnnotationContainer {
                     return
                 }
 
-                let color = data.colors[i]
+                // let color = data.colors[i]
 
                 for (const key in tomlObject) {
 
@@ -7993,11 +8062,12 @@ class AnnotationContainer {
 
                     d.uuid = __WEBPACK_IMPORTED_MODULE_0_anno_ui_src_utils__["a" /* uuid */]()
                     d.readOnly = readOnly
-                    d.color = color
+                    // d.color = data.colors[i]
 
                     if (d.type === 'span') {
 
                         let span = __WEBPACK_IMPORTED_MODULE_5__span__["a" /* default */].newInstanceFromTomlObject(d)
+                        span.color = getColor(i, span.type, span.text)
                         span.save()
                         span.render()
                         span.enableViewMode()
@@ -8006,6 +8076,7 @@ class AnnotationContainer {
                     } else if (d.type === 'rect') {
 
                         let rect = __WEBPACK_IMPORTED_MODULE_6__rect__["a" /* default */].newInstanceFromTomlObject(d)
+                        rect.color = getColor(i, rect.type, rect.text)
                         rect.save()
                         rect.render()
                         rect.enableViewMode()
@@ -8016,6 +8087,7 @@ class AnnotationContainer {
                         d.rel1 = tomlObject[d.ids[0]].uuid
                         d.rel2 = tomlObject[d.ids[1]].uuid
                         let relation = __WEBPACK_IMPORTED_MODULE_7__relation__["a" /* default */].newInstanceFromTomlObject(d)
+                        relation.color = getColor(i, relation.direction, relation.text)
                         relation.save()
                         relation.render()
                         relation.enableViewMode()
