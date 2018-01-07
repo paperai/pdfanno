@@ -1064,7 +1064,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 6);
+/******/ 	return __webpack_require__(__webpack_require__.s = 7);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -1078,7 +1078,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /**
  * UI - Alert dialog.
  */
-__webpack_require__(11)
+__webpack_require__(12)
 
 function create ({ type = 'alert', message = '' }) {
     const id = 'modal-' + (new Date().getTime())
@@ -1243,7 +1243,7 @@ var singleton = null;
 var	singletonCounter = 0;
 var	stylesInsertedAtTop = [];
 
-var	fixUrls = __webpack_require__(9);
+var	fixUrls = __webpack_require__(10);
 
 module.exports = function(list, options) {
 	if (typeof DEBUG !== "undefined" && DEBUG) {
@@ -1568,7 +1568,7 @@ function updateLink (link, options, obj) {
 /* harmony export (immutable) */ __webpack_exports__["d"] = isCurrent;
 /* harmony export (immutable) */ __webpack_exports__["e"] = isValidInput;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__uis_alertDialog__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__color__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__color__ = __webpack_require__(4);
 /**
  * Core facilities for Label Input.
  */
@@ -1705,6 +1705,154 @@ function isValidInput (text) {
 
 /***/ }),
 /* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["g"] = setup;
+/* harmony export (immutable) */ __webpack_exports__["a"] = choice;
+/* harmony export (immutable) */ __webpack_exports__["e"] = getPaletteColors;
+/* harmony export (immutable) */ __webpack_exports__["c"] = find;
+/* harmony export (immutable) */ __webpack_exports__["f"] = notifyColorChanged;
+/* harmony export (immutable) */ __webpack_exports__["d"] = getColorMap;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__db__ = __webpack_require__(5);
+// labelInput/color.js
+
+
+/**
+ * Colors for a picker.
+ */
+const colors = [
+    // Pick from https://www.materialui.co/colors.
+    '#FFEB3B', // yellow
+    '#FF5722', // orange
+    '#795548', // brown
+    '#F44336', // red
+    '#E91E63', // pink
+    '#9C27B0', // purple
+    '#3F51B5', // blue
+    '#4CAF50'  // green
+]
+/* harmony export (immutable) */ __webpack_exports__["b"] = colors;
+
+
+let _colorChangeListener
+
+function setup (colorChangeListener) {
+    _colorChangeListener = colorChangeListener
+}
+
+function choice () {
+    return colors[Math.floor(Math.random() * colors.length) % colors.length]
+}
+
+function getPaletteColors () {
+    return [
+        colors.slice(0, Math.floor(colors.length / 2)),
+        colors.slice(Math.floor(colors.length / 2), colors.length)
+    ]
+}
+
+/**
+* Find a color for the text in the type.
+*/
+function find (type, text) {
+
+    // Default color.
+    let color = colors[0]
+
+    const labelList = __WEBPACK_IMPORTED_MODULE_0__db__["a" /* getLabelList */]()
+    labelList[type].labels.forEach(item => {
+        // old style.
+        if (typeof item === 'string') {
+            return
+        }
+        const [aText, aColor] = item
+        if (text === aText) {
+            color = aColor
+        }
+    })
+
+    return color
+}
+
+function notifyColorChanged ({ text, color, uuid, annoType }) {
+    _colorChangeListener(...arguments)
+}
+
+/**
+ * Get the color map.
+
+    Example:
+    ---
+    {
+        "span" : {
+            "label1" : color1,
+            "label2" : color2
+        },
+        "one-way" : {
+            "label1" : color1,
+            "label2" : color2
+        },
+        "two-way" : {
+            "label1" : color1,
+            "label2" : color2
+        },
+        "link-way" : {
+            "label1" : color1,
+            "label2" : color2
+        },
+        "default" : defaultColor
+    }
+ */
+function getColorMap () {
+    const labelMap = __WEBPACK_IMPORTED_MODULE_0__db__["a" /* getLabelList */]()
+    Object.keys(labelMap).forEach(type => {
+        labelMap[type].labels.forEach(item => {
+            // old style.
+            if (typeof item === 'string') {
+                labelMap[type][item] = colors[0]
+            } else {
+                labelMap[type][item[0]] = item[1]
+            }
+        })
+        delete labelMap[type].labels
+    })
+    labelMap.default = colors[0]
+    return labelMap
+}
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = getLabelList;
+/* harmony export (immutable) */ __webpack_exports__["b"] = saveLabelList;
+/**
+ * Storage for label settings.
+ */
+
+// LocalStorage key to save label data.
+const LSKEY_LABEL_LIST = 'pdfanno-label-list'
+
+/**
+ * Get the labels from the storage.
+ */
+function getLabelList () {
+    return JSON.parse(localStorage.getItem(LSKEY_LABEL_LIST) || '{}')
+}
+
+/**
+ * Save the labels to the storage.
+ */
+function saveLabelList (data) {
+    localStorage.setItem(LSKEY_LABEL_LIST, JSON.stringify(data))
+}
+
+
+/***/ }),
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1900,54 +2048,25 @@ function loadFileAsText (file) {
 
 
 /***/ }),
-/* 5 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = getLabelList;
-/* harmony export (immutable) */ __webpack_exports__["b"] = saveLabelList;
-/**
- * Storage for label settings.
- */
-
-// LocalStorage key to save label data.
-const LSKEY_LABEL_LIST = 'pdfanno-label-list'
-
-/**
- * Get the labels from the storage.
- */
-function getLabelList () {
-    return JSON.parse(localStorage.getItem(LSKEY_LABEL_LIST) || '{}')
-}
-
-/**
- * Save the labels to the storage.
- */
-function saveLabelList (data) {
-    localStorage.setItem(LSKEY_LABEL_LIST, JSON.stringify(data))
-}
-
-
-/***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_browseButton__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_contentDropdown__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__components_primaryAnnoDropdown__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_referenceAnnoDropdown__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_annoListDropdown__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__components_downloadButton__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__components_annoRectButton__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__components_annoRelButton__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__components_annoSpanButton__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__components_labelInput__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_browseButton__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_contentDropdown__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__components_primaryAnnoDropdown__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_referenceAnnoDropdown__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_annoListDropdown__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__components_downloadButton__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__components_annoRectButton__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__components_annoRelButton__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__components_annoSpanButton__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__components_labelInput__ = __webpack_require__(22);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__components_uploadButton__ = __webpack_require__(30);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__uis__ = __webpack_require__(32);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__events__ = __webpack_require__(33);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__utils__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__utils__ = __webpack_require__(6);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "browseButton", function() { return __WEBPACK_IMPORTED_MODULE_0__components_browseButton__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "contentDropdown", function() { return __WEBPACK_IMPORTED_MODULE_1__components_contentDropdown__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "primaryAnnoDropdown", function() { return __WEBPACK_IMPORTED_MODULE_2__components_primaryAnnoDropdown__; });
@@ -1962,7 +2081,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "ui", function() { return __WEBPACK_IMPORTED_MODULE_11__uis__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "event", function() { return __WEBPACK_IMPORTED_MODULE_12__events__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "util", function() { return __WEBPACK_IMPORTED_MODULE_13__utils__; });
-__webpack_require__(7)
+__webpack_require__(8)
 
 
 
@@ -1983,13 +2102,13 @@ __webpack_require__(7)
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(8);
+var content = __webpack_require__(9);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // Prepare cssTransformation
 var transform;
@@ -2014,7 +2133,7 @@ if(false) {
 }
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(undefined);
@@ -2028,7 +2147,7 @@ exports.push([module.i, "@charset 'utf-8';\n\n/* Reset CSS */\nhtml{color:#000;b
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports) {
 
 
@@ -2123,7 +2242,7 @@ module.exports = function (css) {
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2423,13 +2542,13 @@ function getContentDropdownInitialText () {
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(12);
+var content = __webpack_require__(13);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // Prepare cssTransformation
 var transform;
@@ -2454,7 +2573,7 @@ if(false) {
 }
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(undefined);
@@ -2468,7 +2587,7 @@ exports.push([module.i, "/**\n * UI - Alert Dialog.\n */\n\n.alertdialog-danger 
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2554,7 +2673,7 @@ function resetCheckReferenceAnnoDropdown () {
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2621,7 +2740,7 @@ function setup ({
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2664,7 +2783,7 @@ function setup ({
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2731,7 +2850,7 @@ function setup ({
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2794,7 +2913,7 @@ function _getDownloadFileName (getCurrentContentName) {
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2827,7 +2946,7 @@ function setup ({ enableRect, disableRect }) {
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2848,7 +2967,7 @@ function setup ({ createRelAnnotation }) {
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2866,20 +2985,20 @@ function setup ({ createSpanAnnotation }) {
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (immutable) */ __webpack_exports__["setup"] = setup;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__behavior__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__behavior__ = __webpack_require__(25);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__listener__ = __webpack_require__(29);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__color__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__color__ = __webpack_require__(4);
 /**
  * UI parts - Input Label.
  */
-__webpack_require__(22)
+__webpack_require__(23)
 
 
 
@@ -2916,13 +3035,13 @@ const getColorMap = __WEBPACK_IMPORTED_MODULE_3__color__["d" /* getColorMap */]
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(23);
+var content = __webpack_require__(24);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // Prepare cssTransformation
 var transform;
@@ -2947,7 +3066,7 @@ if(false) {
 }
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(undefined);
@@ -2955,24 +3074,24 @@ exports = module.exports = __webpack_require__(1)(undefined);
 
 
 // module
-exports.push([module.i, "\n.inputLabel {\n    font-size: 20px;\n}\n\n/**\n * Label list.\n */\n.label-list {}\n.label-list .label-list__item {\n    display: flex;\n    align-items: center;\n    padding: 0 10px;\n    border-bottom: 1px solid #eee;\n}\n.label-list .label-list__item:last-child {\n    padding-top: 5px;\n    padding-bottom: 5px;\n    border-bottom: 0 solid rgba(0,0,0,0);\n}\n.label-list__btn {\n    width: 40px;\n    height: 40px;\n    line-height: 50px;\n    font-size: 16px;\n    text-align: center;\n    cursor: pointer;\n    border-radius: 3px;\n    background-color: white;\n    margin-right: 5px;\n    flex: 0 0 30px;\n}\n.label-list__btn:hover,\n.label-list__text:hover {\n    box-shadow: 0 1px 3px rgba(0,0,0,.3);\n}\n.label-list__text {\n    flex-grow: 1;\n    cursor: pointer;\n    padding: 2px;\n    font-size: 20px;\n    min-height: 1em;\n}\n.label-list__input {\n    flex-grow: 1;\n    padding: 2px 5px;\n}\n\n/** Override color picker style. */\n.label-list .sp-replacer {\n    border: none;\n    background-color: rgba(0, 0, 0, 0);\n    padding: 0;\n}\n.label-list .sp-dd {\n    display: none;\n}\n", ""]);
+exports.push([module.i, "\n.inputLabel {\n    font-size: 20px;\n}\n\n/**\n * Label list.\n */\n.label-list {}\n.label-list .label-list__item {\n    display: flex;\n    align-items: center;\n    padding: 0 10px;\n    border-bottom: 1px solid #eee;\n}\n.label-list .label-list__item:last-child {\n    padding-top: 5px;\n    padding-bottom: 5px;\n    border-bottom: 0 solid rgba(0,0,0,0);\n}\n.label-list__btn {\n    width: 40px;\n    height: 40px;\n    line-height: 50px;\n    font-size: 16px;\n    text-align: center;\n    cursor: pointer;\n    border-radius: 3px;\n    background-color: white;\n    margin-right: 13px;\n    flex: 0 0 30px;\n}\n.label-list__btn:hover,\n.label-list__text:hover {\n    box-shadow: 0 1px 3px rgba(0,0,0,.3);\n}\n.label-list__text {\n    flex-grow: 1;\n    cursor: pointer;\n    padding: 2px;\n    font-size: 20px;\n    min-height: 1em;\n    margin-left: 13px;\n}\n.label-list__input {\n    flex-grow: 1;\n    padding: 2px 5px;\n}\n\n/** Override color picker style. */\n.label-list .sp-replacer {\n    border: none;\n    background-color: rgba(0, 0, 0, 0);\n    padding: 0;\n}\n.label-list .sp-dd {\n    display: none;\n}\n.label-list .sp-preview {\n    margin-right: 0;\n}\n", ""]);
 
 // exports
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = setup;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_toml__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_toml__ = __webpack_require__(26);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_toml___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_toml__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__uis_alertDialog__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__db__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__color__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__color__ = __webpack_require__(4);
 /**
  * Define the behaviors of label input component.
  */
@@ -3253,11 +3372,11 @@ function setupImportExportLink () {
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var parser = __webpack_require__(26);
-var compiler = __webpack_require__(27);
+var parser = __webpack_require__(27);
+var compiler = __webpack_require__(28);
 
 module.exports = {
   parse: function(input) {
@@ -3268,7 +3387,7 @@ module.exports = {
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports) {
 
 module.exports = (function() {
@@ -7115,7 +7234,7 @@ module.exports = (function() {
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7316,125 +7435,6 @@ function compile(nodes) {
 module.exports = {
   compile: compile
 };
-
-
-/***/ }),
-/* 28 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["g"] = setup;
-/* harmony export (immutable) */ __webpack_exports__["a"] = choice;
-/* harmony export (immutable) */ __webpack_exports__["e"] = getPaletteColors;
-/* harmony export (immutable) */ __webpack_exports__["c"] = find;
-/* harmony export (immutable) */ __webpack_exports__["f"] = notifyColorChanged;
-/* harmony export (immutable) */ __webpack_exports__["d"] = getColorMap;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__db__ = __webpack_require__(5);
-// labelInput/color.js
-
-
-/**
- * Colors for a picker.
- */
-const colors = [
-    // Pick from https://www.materialui.co/colors.
-    '#FFEB3B', // yellow
-    '#FF5722', // orange
-    '#795548', // brown
-    '#F44336', // red
-    '#E91E63', // pink
-    '#9C27B0', // purple
-    '#3F51B5', // blue
-    '#4CAF50'  // green
-]
-/* harmony export (immutable) */ __webpack_exports__["b"] = colors;
-
-
-let _colorChangeListener
-
-function setup (colorChangeListener) {
-    _colorChangeListener = colorChangeListener
-}
-
-function choice () {
-    return colors[Math.floor(Math.random() * colors.length) % colors.length]
-}
-
-function getPaletteColors () {
-    return [
-        colors.slice(0, Math.floor(colors.length / 2)),
-        colors.slice(Math.floor(colors.length / 2), colors.length)
-    ]
-}
-
-/**
-* Find a color for the text in the type.
-*/
-function find (type, text) {
-
-    // Default color.
-    let color = colors[0]
-
-    const labelList = __WEBPACK_IMPORTED_MODULE_0__db__["a" /* getLabelList */]()
-    labelList[type].labels.forEach(item => {
-        // old style.
-        if (typeof item === 'string') {
-            return
-        }
-        const [aText, aColor] = item
-        if (text === aText) {
-            color = aColor
-        }
-    })
-
-    return color
-}
-
-function notifyColorChanged ({ text, color, uuid, annoType }) {
-    _colorChangeListener(...arguments)
-}
-
-/**
- * Get the color map.
-
-    Example:
-    ---
-    {
-        "span" : {
-            "label1" : color1,
-            "label2" : color2
-        },
-        "one-way" : {
-            "label1" : color1,
-            "label2" : color2
-        },
-        "two-way" : {
-            "label1" : color1,
-            "label2" : color2
-        },
-        "link-way" : {
-            "label1" : color1,
-            "label2" : color2
-        },
-        "default" : defaultColor
-    }
- */
-function getColorMap () {
-    const labelMap = __WEBPACK_IMPORTED_MODULE_0__db__["a" /* getLabelList */]()
-    Object.keys(labelMap).forEach(type => {
-        labelMap[type].labels.forEach(item => {
-            // old style.
-            if (typeof item === 'string') {
-                labelMap[type][item] = colors[0]
-            } else {
-                labelMap[type][item[0]] = item[1]
-            }
-        })
-        delete labelMap[type].labels
-    })
-    labelMap.default = colors[0]
-    return labelMap
-}
 
 
 /***/ }),
