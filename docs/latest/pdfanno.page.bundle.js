@@ -1735,6 +1735,8 @@ const colors = [
 /* harmony export (immutable) */ __webpack_exports__["b"] = colors;
 
 
+const defaultColor = '#AAA'
+
 let _colorChangeListener
 
 function setup (colorChangeListener) {
@@ -1758,7 +1760,7 @@ function getPaletteColors () {
 function find (type, text) {
 
     // Default color.
-    let color = colors[0]
+    let color = defaultColor
 
     const labelList = __WEBPACK_IMPORTED_MODULE_0__db__["a" /* getLabelList */]()
     labelList[type].labels.forEach(item => {
@@ -1817,7 +1819,7 @@ function getColorMap () {
         })
         delete labelMap[type].labels
     })
-    labelMap.default = colors[0]
+    labelMap.default = defaultColor
     return labelMap
 }
 
