@@ -337,10 +337,8 @@ export default class PDFAnnoPage {
         }
 
         const colorMap = annoUI.labelInput.getColorMap()
-        console.log('colorMap:', colorMap)
 
         let annotations = []
-        let colors = []
         let primaryIndex = -1
 
         // Primary annotation.
@@ -357,8 +355,6 @@ export default class PDFAnnoPage {
                     }
                     primaryIndex = 0
                     annotations.push(annoFile.content)
-                    let color = null // Use the default color used for edit.
-                    colors.push(color)
 
                     let filename = annoFile.name
                     localStorage.setItem('_pdfanno_primary_annoname', filename)
@@ -381,19 +377,13 @@ export default class PDFAnnoPage {
                         return
                     }
                     annotations.push(annoFile.content)
-                    let color = $elm.find('.js-anno-palette').spectrum('get').toHexString()
-                    console.log(color)
-                    colors.push(color)
                 }
             })
         }
 
-        console.log('colors:', colors)
-
         // Create import data.
         let paperData = {
             primary : primaryIndex,
-            colors,
             annotations,
             colorMap
         }
