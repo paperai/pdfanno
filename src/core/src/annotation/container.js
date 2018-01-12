@@ -249,8 +249,6 @@ export default class AnnotationContainer {
                     return
                 }
 
-                // let color = data.colors[i]
-
                 for (const key in tomlObject) {
 
                     let d = tomlObject[key]
@@ -262,7 +260,6 @@ export default class AnnotationContainer {
 
                     d.uuid = uuid()
                     d.readOnly = readOnly
-                    // d.color = data.colors[i]
 
                     if (d.type === 'span') {
 
