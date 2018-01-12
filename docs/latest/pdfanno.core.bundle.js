@@ -7884,7 +7884,6 @@ class AnnotationContainer {
             }
         } else {
             this.getAllAnnotations()
-                .filter(a => !a.readOnly)
                 .filter(a => a.text === text)
                 .filter(a => {
                     if (annoType === 'span') {
@@ -8021,16 +8020,11 @@ class AnnotationContainer {
         const colorMap = data.colorMap
 
         function getColor (index, type, text) {
-            if (readOnly) {
-                return data.colors[index]
-            } else {
-                let color = colorMap.default
-                if (colorMap[type] && colorMap[type][text]) {
-                    color = colorMap[type][text]
-                }
-                // console.log('getColor:', type, text, colorMap[type][text], color)
-                return color
+            let color = colorMap.default
+            if (colorMap[type] && colorMap[type][text]) {
+                color = colorMap[type][text]
             }
+            return color
         }
 
         return new Promise((resolve, reject) => {
@@ -8049,8 +8043,6 @@ class AnnotationContainer {
                     return
                 }
 
-                // let color = data.colors[i]
-
                 for (const key in tomlObject) {
 
                     let d = tomlObject[key]
@@ -8062,7 +8054,6 @@ class AnnotationContainer {
 
                     d.uuid = __WEBPACK_IMPORTED_MODULE_0_anno_ui_src_utils__["a" /* uuid */]()
                     d.readOnly = readOnly
-                    // d.color = data.colors[i]
 
                     if (d.type === 'span') {
 
