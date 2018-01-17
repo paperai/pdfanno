@@ -217,15 +217,28 @@ export default class PDFAnnoPage {
         const rects = window.iframeWindow.PDFAnnoCore.default.UI.getRectangles()
 
         // Get a search result, if exists.
-        let highlight = getSearchHighlight()
+        const highlight = getSearchHighlight()
+
+        // Get selected annotations.
+        const selectedAnnotations = window.iframeWindow.annotationContainer.getSelectedAnnotations()
 
         // Check empty.
-        if (!rects && !highlight) {
-            return annoUI.ui.alertDialog.show({ message : 'Text span is not selected.' })
+        if (!rects && !highlight && selectedAnnotations.length === 0) {
+            return annoUI.ui.alertDialog.show({ message : 'Select text span or an annotation.' })
         }
 
+        // Change color and label.
+        if (selectedAnnotations.length > 0) {
+            selectedAnnotations
+                .filter(anno => anno.type === 'span')
+                .forEach(anno => {
+                    anno.color = color
+                    anno.text = text
+                    anno.render()
+                })
+
         // Create a new rectAnnotation.
-        if (rects) {
+        } else if (rects) {
             window.iframeWindow.PDFAnnoCore.default.UI.createSpan({ text, zIndex : nextZIndex(), color })
 
         } else if (highlight) {
