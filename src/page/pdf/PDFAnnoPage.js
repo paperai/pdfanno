@@ -235,7 +235,9 @@ export default class PDFAnnoPage {
                     anno.color = color
                     anno.text = text
                     anno.render()
+                    anno.enableViewMode()
                 })
+            dispatchWindowEvent('disappearTextInput')
 
         // Create a new rectAnnotation.
         } else if (rects) {
@@ -280,6 +282,21 @@ export default class PDFAnnoPage {
         // for old style.
         if (arguments.length === 1 && typeof arguments[0] === 'string') {
             type = arguments[0]
+        }
+
+        // If a user select relation annotation(s), change the color and text only.
+        const relAnnos = window.iframeWindow.annotationContainer.getSelectedAnnotations()
+                            .filter(anno => anno.type === 'relation')
+        if (relAnnos.length > 0) {
+            relAnnos
+                .filter(anno => anno.direction === type)
+                .forEach(anno => {
+                    anno.text = text
+                    anno.color = color
+                    anno.render()
+                    anno.enableViewMode()
+                })
+            return
         }
 
         let selectedAnnotations = window.iframeWindow.annotationContainer.getSelectedAnnotations()
