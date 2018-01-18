@@ -17162,15 +17162,30 @@ class PDFAnnoPage {
         const rects = window.iframeWindow.PDFAnnoCore.default.UI.getRectangles()
 
         // Get a search result, if exists.
-        let highlight = __WEBPACK_IMPORTED_MODULE_3__search__["a" /* getSearchHighlight */]()
+        const highlight = __WEBPACK_IMPORTED_MODULE_3__search__["a" /* getSearchHighlight */]()
+
+        // Get selected annotations.
+        const selectedAnnotations = window.iframeWindow.annotationContainer.getSelectedAnnotations()
 
         // Check empty.
-        if (!rects && !highlight) {
-            return __WEBPACK_IMPORTED_MODULE_1_anno_ui__["ui"].alertDialog.show({ message : 'Text span is not selected.' })
+        if (!rects && !highlight && selectedAnnotations.length === 0) {
+            return __WEBPACK_IMPORTED_MODULE_1_anno_ui__["ui"].alertDialog.show({ message : 'Select text span or an annotation.' })
         }
 
+        // Change color and label.
+        if (selectedAnnotations.length > 0) {
+            selectedAnnotations
+                .filter(anno => anno.type === 'span')
+                .forEach(anno => {
+                    anno.color = color
+                    anno.text = text
+                    anno.render()
+                    anno.enableViewMode()
+                })
+            __WEBPACK_IMPORTED_MODULE_5__shared_util__["b" /* dispatchWindowEvent */]('disappearTextInput')
+
         // Create a new rectAnnotation.
-        if (rects) {
+        } else if (rects) {
             window.iframeWindow.PDFAnnoCore.default.UI.createSpan({ text, zIndex : __WEBPACK_IMPORTED_MODULE_6__shared_coords__["c" /* nextZIndex */](), color })
 
         } else if (highlight) {
@@ -17212,6 +17227,21 @@ class PDFAnnoPage {
         // for old style.
         if (arguments.length === 1 && typeof arguments[0] === 'string') {
             type = arguments[0]
+        }
+
+        // If a user select relation annotation(s), change the color and text only.
+        const relAnnos = window.iframeWindow.annotationContainer.getSelectedAnnotations()
+                            .filter(anno => anno.type === 'relation')
+        if (relAnnos.length > 0) {
+            relAnnos
+                .filter(anno => anno.direction === type)
+                .forEach(anno => {
+                    anno.text = text
+                    anno.color = color
+                    anno.render()
+                    anno.enableViewMode()
+                })
+            return
         }
 
         let selectedAnnotations = window.iframeWindow.annotationContainer.getSelectedAnnotations()
