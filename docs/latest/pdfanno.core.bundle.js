@@ -7052,6 +7052,11 @@ function getSelectionRects () {
         const endIndex = getIndex(selection.focusNode)
         console.log('t:', pageNumber, startIndex, endIndex)
 
+        // When no text is selected.
+        if (!pageNumber || !startIndex || !endIndex) {
+            return { rects : null, selectedText : null, textRange : null }
+        }
+
         // TODO a little tricky.
         const { text, textRange } = window.parent.getText(pageNumber, startIndex, endIndex)
         console.log('text:', text)
