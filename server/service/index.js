@@ -48,6 +48,18 @@ module.exports.analyzePDF = async (pdfPath) => {
     return stdout
 }
 
+// Get a user annotation.
+module.exports.getUserAnnotation = (documentId, userId) => {
+
+    const annotationPath = path.resolve(__dirname, '..', 'userdata', 'anno', userId, `${documentId}.anno`)
+    console.log('annotationPath:', annotationPath)
+    if (!fs.existsSync(annotationPath)) {
+        return null
+    }
+
+    return fs.readFileSync(annotationPath, 'utf-8')
+}
+
 // Execute an external command.
 function execCommand(command) {
     console.log('execCommand: ' + command);

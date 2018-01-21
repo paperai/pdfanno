@@ -6,18 +6,7 @@ const controller = require('./controller');
 
 // Create an application.
 const app = express()
-// TODO nginx -> nodejs のフォワーディングでhttps対応しているけど大丈夫？
 const server = require('http').Server(app)
-
-// for development.
-// if (process.env.NODE_PORT === '3000') {
-//     console.log('DEV MODE: Allow wildcard Cross Origins.')
-//     app.use((req, res, next) => {
-//         res.header("Access-Control-Allow-Origin", "*")
-//         res.header("Access-Control-Allow-Headers", "X-Requested-With")
-//         next()
-//     })
-// }
 
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -34,14 +23,23 @@ require('./controller/ws')(server)
 app.use(bodyParser.json({ limit : '50mb' }));
 app.use(bodyParser.urlencoded({ limit : '50mb', expented : true }));
 
+/***********************
+    Internal APIs.
+************************/
 // API: upload a pdf and analyze it.
-app.post('/api/pdf_upload', upload.fields([]), controller.uploadPDF);
-
+app.post('/api/pdf_upload', upload.fields([]), controller.internal.uploadPDF);
 // API: load a pdf from web.
-app.get('/load_pdf', controller.loadPDF);
-
+app.get('/load_pdf', controller.internal.loadPDF);
 // API: load a annotations from web.
-app.get('/api/load_anno', controller.loadAnno);
+app.get('/api/load_anno', controller.internal.loadAnno);
+
+/***********************
+    External APIs.
+************************/
+app.get('/papi/documents/:documentId/annotations', controller.external.getUserAnnotation)
+
+
+
 
 // Launch the app.
 const port = process.env.NODE_PORT || 1000
