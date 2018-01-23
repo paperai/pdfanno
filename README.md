@@ -5,6 +5,9 @@ PDFAnno is a browser-based linguistic annotation tool for PDF documents.
 It offers functions for annotating PDF with labels and relations.  
 For natural language processing and machine learning, it is suitable for development of gold-standard data with named entity spans, dependency relations, and coreference chains.  
 
+If you use PDFAnno, please cite the following paper:
+* Hiroyuki Shindo, Yohei Munesada and Yuji Matsumoto, "PDFAnno: a Web-based Linguistic Annotation Tool for PDF Documents", In Proceedings of LREC, 2018.
+
 * [Online Demo (v0.3.1)](https://paperai.github.io/pdfanno/0.3.1/)
 * [Online Demo (latest)](https://paperai.github.io/pdfanno/latest/)  
 **It is highly recommended to use the latest version of Chrome.** (Firefox will also be supported in future.)
