@@ -561,7 +561,7 @@ export default class PDFAnnoPage {
         return new Promise((resolve, reject) => {
             // Load a PDF as ArrayBuffer.
             var xhr = new XMLHttpRequest()
-            xhr.open('GET', window.API_ROOT + 'load_pdf?url=' + window.encodeURIComponent(url), true)
+            xhr.open('GET', window.API_ROOT + 'internal/api/pdfs?url=' + window.encodeURIComponent(url), true)
             xhr.responseType = 'json'
             xhr.onload = function () {
                 if (this.status === 200) {

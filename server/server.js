@@ -29,7 +29,7 @@ app.use(bodyParser.urlencoded({ limit : '50mb', expented : true }));
 // API: upload a pdf and analyze it.
 app.post('/api/pdf_upload', upload.fields([]), controller.internal.uploadPDF);
 // API: load a pdf from web.
-app.get('/load_pdf', controller.internal.loadPDF);
+app.get('/internal/api/pdfs', controller.internal.loadPDF);
 // API: load a annotations from web.
 app.get('/api/load_anno', controller.internal.loadAnno);
 
