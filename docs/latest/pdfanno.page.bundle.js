@@ -7528,12 +7528,11 @@ function upload ({
     const contentBase64 = arrayBufferToBase64(contentFile.content)
 
     // API endpoint.
-    const url = window.API_ROOT + '/api/pdf_upload'
+    const url = window.API_ROOT + 'internal/api/pdfs/' + contentFile.name
 
     // API params.
     let data = {
-        filename : contentFile.name,
-        pdf      : contentBase64
+        pdf : contentBase64
     }
 
     // Callback before ajax call.
@@ -14031,7 +14030,7 @@ function showLoader (display) {
 // UserID.
 window.addEventListener('DOMContentLoaded', () => {
 
-    let userId = __WEBPACK_IMPORTED_MODULE_0_urijs___default.a(document.URL).query(true).userId
+    let userId = __WEBPACK_IMPORTED_MODULE_0_urijs___default.a(document.URL).query(true).user_id
     if (!userId) {
         userId = __WEBPACK_IMPORTED_MODULE_1_anno_ui__["util"].uuid(5)
     }
@@ -17506,7 +17505,7 @@ class PDFAnnoPage {
         return new Promise((resolve, reject) => {
             // Load a PDF as ArrayBuffer.
             var xhr = new XMLHttpRequest()
-            xhr.open('GET', window.API_ROOT + 'load_pdf?url=' + window.encodeURIComponent(url), true)
+            xhr.open('GET', window.API_ROOT + 'internal/api/pdfs?url=' + window.encodeURIComponent(url), true)
             xhr.responseType = 'json'
             xhr.onload = function () {
                 if (this.status === 200) {
@@ -17536,7 +17535,7 @@ class PDFAnnoPage {
      * Load an annotation file from the server.
      */
     loadAnnoFileFromServer (url) {
-        return __WEBPACK_IMPORTED_MODULE_0_axios___default.a.get(`${window.API_ROOT}api/load_anno?url=${url}`).then(res => {
+        return __WEBPACK_IMPORTED_MODULE_0_axios___default.a.get(`${window.API_ROOT}internal/api/annotations?url=${url}`).then(res => {
             if (res.status !== 200 || res.data.status === 'failure') {
                 let reason = ''
                 if (res.data.error) {
