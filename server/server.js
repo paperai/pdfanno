@@ -36,7 +36,7 @@ app.get('/internal/api/annotations', controller.internal.loadAnno);
 /***********************
     External APIs.
 ************************/
-app.get('/papi/documents/:documentId/annotations', controller.external.getUserAnnotation)
+app.get('/api/documents/:documentId/annotations', controller.external.getUserAnnotation)
 
 
 
