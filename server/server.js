@@ -31,7 +31,7 @@ app.post('/internal/api/pdfs/:documentId', upload.fields([]), controller.interna
 // API: load a pdf from web.
 app.get('/internal/api/pdfs', controller.internal.loadPDF);
 // API: load a annotations from web.
-app.get('/api/load_anno', controller.internal.loadAnno);
+app.get('/internal/api/annotations', controller.internal.loadAnno);
 
 /***********************
     External APIs.

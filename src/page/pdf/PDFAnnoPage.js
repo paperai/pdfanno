@@ -591,7 +591,7 @@ export default class PDFAnnoPage {
      * Load an annotation file from the server.
      */
     loadAnnoFileFromServer (url) {
-        return axios.get(`${window.API_ROOT}api/load_anno?url=${url}`).then(res => {
+        return axios.get(`${window.API_ROOT}internal/api/annotations?url=${url}`).then(res => {
             if (res.status !== 200 || res.data.status === 'failure') {
                 let reason = ''
                 if (res.data.error) {
