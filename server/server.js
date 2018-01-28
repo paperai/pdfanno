@@ -27,7 +27,7 @@ app.use(bodyParser.urlencoded({ limit : '50mb', expented : true }));
     Internal APIs.
 ************************/
 // API: upload a pdf and analyze it.
-app.post('/api/pdf_upload', upload.fields([]), controller.internal.uploadPDF);
+app.post('/internal/api/pdfs/:documentId', upload.fields([]), controller.internal.uploadPDF);
 // API: load a pdf from web.
 app.get('/internal/api/pdfs', controller.internal.loadPDF);
 // API: load a annotations from web.
