@@ -68,6 +68,7 @@
     "mkdirp-promise": "^5.0.1",
     "multer": "^1.3.0",
     "request": "^2.81.0",
+    "request-promise": "^4.2.2",
     "requirejs": "^2.3.5",
     "socket.io": "^2.0.4",
     "toml": "github:yoheiMune/toml-node",
