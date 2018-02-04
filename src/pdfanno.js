@@ -302,7 +302,7 @@ function showLoader (display) {
 // UserID.
 window.addEventListener('DOMContentLoaded', () => {
 
-    let userId = URI(document.URL).query(true).userId
+    let userId = URI(document.URL).query(true).user_id
     if (!userId) {
         userId = annoUI.util.uuid(5)
     }

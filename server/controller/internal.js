@@ -11,12 +11,12 @@ const service = require('../service');
 module.exports.uploadPDF = function (req, res) {
 
     // Get an uploaded file.
-    const fileName = req.body.filename;
+    const documentId = req.params.documentId
     const buf = Buffer.from(req.body.pdf, 'base64');
-    console.log(`${fileName} is uploaded. fileSize=${buf.length}Bytes`);
+    console.log(`${documentId} is uploaded. fileSize=${buf.length}Bytes`);
 
     // Save.
-    service .savePDF(fileName, buf).then(pdfPath => {
+    service .savePDF(documentId, buf).then(pdfPath => {
         // Analyze.
         return service .analyzePDF(pdfPath);
     }).then(result => {
