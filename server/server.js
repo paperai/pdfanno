@@ -23,21 +23,23 @@ require('./controller/ws')(server)
 app.use(bodyParser.json({ limit : '50mb' }));
 app.use(bodyParser.urlencoded({ limit : '50mb', expented : true }));
 
+
 /***********************
     Internal APIs.
 ************************/
-// API: upload a pdf and analyze it.
-app.post('/api/pdf_upload', upload.fields([]), controller.internal.uploadPDF);
-// API: load a pdf from web.
-app.get('/load_pdf', controller.internal.loadPDF);
-// API: load a annotations from web.
-app.get('/api/load_anno', controller.internal.loadAnno);
+// Upload a PDF and analyze it.
+app.post('/internal/api/pdfs/:documentId', upload.fields([]), controller.internal.uploadPDF);
+// Load a PDF from the web.
+app.get('/internal/api/pdfs', controller.internal.loadPDF);
+// Load an annotation from the web.
+app.get('/internal/api/annotations', controller.internal.loadAnno);
+
 
 /***********************
     External APIs.
 ************************/
-app.get('/papi/documents/:documentId/annotations', controller.external.getUserAnnotation)
-
+// Get the user annotation which belongs to the specified document.
+app.get('/api/documents/:documentId/annotations', controller.external.getUserAnnotation)
 
 
 
