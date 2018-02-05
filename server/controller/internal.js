@@ -33,50 +33,46 @@ module.exports.uploadPDF = function (req, res) {
  * Load a PDF file from web.
  *
  * Examples:
- *  - http://localhost:8080/dist/?pdf=http://www.yoheim.net/tmp/pdf-sample.pdf
- *  - http://localhost:8080/dist/?pdf=https://arxiv.org/pdf/1707.03141
+ *  # Use deepscholar pdftxt.
+ *      - http://localhost:8080/dist/?pdf=http://www.deepscholar.org/api/documents/PMC5000131/PMC5000131.pdf
+ *  # Otherwise.
+ *      - http://localhost:8080/dist/?pdf=http://www.yoheim.net/tmp/pdf-sample.pdf
+ *      - http://localhost:8080/dist/?pdf=https://arxiv.org/pdf/1707.03141
  */
-module.exports.loadPDF = function (req, res) {
+module.exports.loadPDF = async function (req, res) {
 
-    const pdfURL = req.query.url;
-    console.log('pdfURL=', pdfURL);
+    const pdfUrl = req.query.url;
+    console.log(`loadPDF: ${pdfUrl}`);
 
-    const reqConfig = {
-        method   : 'GET',
-        url      : pdfURL,
-        headers  : {
-            // behave as a browser.
-            'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.19 Safari/537.36'
-        },
-        // treat a response as a binary.
-        encoding : null
-    };
+    try {
 
-    request(reqConfig, function(error, response, body) {
+        const pdf = await service.fetchPDF(pdfUrl);
+        if (!pdf) {
+            return res.send(404, 'Not Found.');
+        }
 
-        // Save as temporary.
-        const tmpFileName = Date.now() + '.pdf';
-        service .savePDF(tmpFileName, body).then(pdfPath => {
-            // Analyze.
-            return service.analyzePDF(pdfPath);
-        }).then(analyzeResult => {
-            // Response as success.
-            res.json({
-                status : 'success',
-                pdf    : new Buffer(body).toString('base64'),
-                analyzeResult,
-            });
-        }).catch(err => {
+        const pdftxtUrl = pdfUrl + '.txt'
+        let pdftxt = await service.fetchPDFText(pdftxtUrl)
 
-            console.log('ERROR:', err);
+        if (!pdftxt) {
+            // Fallback to local pdfextract.
+            console.log(`Fallback to local pdfextract. Not found at deepscholar - ${pdftxtUrl}`)
+            const tmpFileName = Date.now() + '.pdf'
+            const pdfPath = await service.savePDF(tmpFileName, pdf)
+            pdftxt = await service.analyzePDF(pdfPath)
+        }
 
-            // Response as error.
-            res.json({
-                status : 'failure',
-                err    : err
-            });
-        })
-    });
+        res.json({
+            status        : 'success',
+            pdf           : new Buffer(pdf).toString('base64'),
+            analyzeResult : pdftxt,
+        });
+
+
+    } catch (e) {
+        console.log('Failed to load PDF. reason is', e)
+        res.send(500, 'Failed.');
+    }
 }
 
 /**
