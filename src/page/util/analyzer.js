@@ -2,22 +2,26 @@
 /**
  * Convert analyze results as page-based.
  */
-export function customizeAnalyzeResult (analyzeData) {
+export function customizeAnalyzeResult (pdftxt) {
 
     let pages = []
     let page
     let body
     let meta
-    analyzeData.split('\n').forEach(line => {
+    pdftxt.split('\n').forEach(line => {
         if (page && !line) {
             body += ' '
             meta.push(line)
         } else {
+            const info = line.split('\t')
+            if (!isTextLine(info)) {
+                return
+            }
             let {
                 page : pageNumber,
                 type,
                 char
-            } = extractMeta(line)
+            } = extractMeta(info)
             if (!page) {
                 page = pageNumber
                 body = ''
@@ -52,20 +56,31 @@ export function customizeAnalyzeResult (analyzeData) {
 }
 
 /**
+ * Check the line is TEXT.
+ */
+function isTextLine (info) {
+    return info.length >= 2 && info[2] === 'TEXT'
+}
+
+/**
  * Interpret the meta data.
  */
-export function extractMeta (meta) {
+export function extractMeta (info) {
 
-    const info = meta.split('\t')
+    if (typeof info === 'string') {
+        info = info.split('\t')
+    }
+
+    const [ x, y, w, h ] = info[4].split(' ').map(parseFloat)
 
     return {
         position : parseInt(info[0]),
         page     : parseInt(info[1]),
         type     : info[2],
         char     : info[3],
-        x        : parseFloat(info[4]),
-        y        : parseFloat(info[5]),
-        w        : parseFloat(info[6]),
-        h        : parseFloat(info[7])
+        x,
+        y,
+        w,
+        h
     }
 }
