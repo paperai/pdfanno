@@ -93,7 +93,7 @@ module.exports.analyzePDF = async (pdfPath) => {
 
     // Analyze the PDF.
     const jarPath = getPDFExtractPath()
-    const cmd = `java -classpath ${jarPath} PDFExtractor ${pdfPath} -text -bounding`;
+    const cmd = `java -classpath ${jarPath} PDFExtractor ${pdfPath}`;
     const { stdout, stderr } = await execCommand(cmd);
 
     return stdout

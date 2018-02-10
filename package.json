@@ -23,8 +23,8 @@
   },
   "homepage": "https://github.com/paperai/pdfanno#readme",
   "pdfextract": {
-    "version": "0.1.6",
-    "url": "https://github.com/paperai/pdfextract/releases/download/v0.1.6/pdfextract-0.1.6.jar"
+    "version": "0.2.1",
+    "url": "https://github.com/paperai/pdfextract/releases/download/v0.2.1/pdfextract-0.2.1.jar"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

@@ -1,9 +1,7 @@
 /**
  * Create text layers which enable users to select texts.
  */
-// TODO Use "extractMeta"
-// import { customizeAnalyzeResult, extractMeta } from './util/analyzer'
-import { customizeAnalyzeResult } from './util/analyzer'
+import { customizeAnalyzeResult, extractMeta } from './util/analyzer'
 
 let pages
 
@@ -57,9 +55,7 @@ function createTextLayer (page) {
             if (!info) {
                 return
             }
-            const items = info.split('\t')
-            const text = items[3]
-            const [ x, y, w, h ] = items.slice(4, 8).map(parseFloat)
+            const { char, x, y, w, h } = extractMeta(info)
             const scale = window.iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale
             const $div = $('<div class="pdfanno-text-layer"/>').css({
                 top        : y * scale + 'px',
@@ -72,7 +68,7 @@ function createTextLayer (page) {
             })
             .attr('data-page', page)
             .attr('data-index', index)
-            .text(text)
+            .text(char)
             return $div[0].outerHTML
         })
         $textLayer.append(snipets.join(''))
