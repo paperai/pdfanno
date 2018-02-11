@@ -258,6 +258,11 @@ window.addEventListener('DOMContentLoaded', async e => {
         showLoader(false)
         const message = 'Failed to analyze the PDF.<br>Reason: ' + err
         annoUI.ui.alertDialog.show({ message })
+
+        // Init viewer.
+        window.annoPage.initializeViewer(null)
+        // Start application.
+        window.annoPage.startViewerApplication()
     }
 
     // initial tab.
