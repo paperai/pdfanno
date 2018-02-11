@@ -7528,12 +7528,11 @@ function upload ({
     const contentBase64 = arrayBufferToBase64(contentFile.content)
 
     // API endpoint.
-    const url = window.API_ROOT + '/api/pdf_upload'
+    const url = window.API_ROOT + 'internal/api/pdfs/' + contentFile.name
 
     // API params.
     let data = {
-        filename : contentFile.name,
-        pdf      : contentBase64
+        pdf : contentBase64
     }
 
     // Callback before ajax call.
@@ -13309,22 +13308,26 @@ function searchByDictionary (texts = []) {
 /**
  * Convert analyze results as page-based.
  */
-function customizeAnalyzeResult (analyzeData) {
+function customizeAnalyzeResult (pdftxt) {
 
     let pages = []
     let page
     let body
     let meta
-    analyzeData.split('\n').forEach(line => {
+    pdftxt.split('\n').forEach(line => {
         if (page && !line) {
             body += ' '
             meta.push(line)
         } else {
+            const info = line.split('\t')
+            if (!isTextLine(info)) {
+                return
+            }
             let {
                 page : pageNumber,
                 type,
                 char
-            } = extractMeta(line)
+            } = extractMeta(info)
             if (!page) {
                 page = pageNumber
                 body = ''
@@ -13359,21 +13362,32 @@ function customizeAnalyzeResult (analyzeData) {
 }
 
 /**
+ * Check the line is TEXT.
+ */
+function isTextLine (info) {
+    return info.length >= 2 && info[2] === 'TEXT'
+}
+
+/**
  * Interpret the meta data.
  */
-function extractMeta (meta) {
+function extractMeta (info) {
 
-    const info = meta.split('\t')
+    if (typeof info === 'string') {
+        info = info.split('\t')
+    }
+
+    const [ x, y, w, h ] = info[4].split(' ').map(parseFloat)
 
     return {
         position : parseInt(info[0]),
         page     : parseInt(info[1]),
         type     : info[2],
         char     : info[3],
-        x        : parseFloat(info[4]),
-        y        : parseFloat(info[5]),
-        w        : parseFloat(info[6]),
-        h        : parseFloat(info[7])
+        x,
+        y,
+        w,
+        h
     }
 }
 
@@ -14031,7 +14045,7 @@ function showLoader (display) {
 // UserID.
 window.addEventListener('DOMContentLoaded', () => {
 
-    let userId = __WEBPACK_IMPORTED_MODULE_0_urijs___default.a(document.URL).query(true).userId
+    let userId = __WEBPACK_IMPORTED_MODULE_0_urijs___default.a(document.URL).query(true).user_id
     if (!userId) {
         userId = __WEBPACK_IMPORTED_MODULE_1_anno_ui__["util"].uuid(5)
     }
@@ -16722,8 +16736,6 @@ function clear () {
 /**
  * Create text layers which enable users to select texts.
  */
-// TODO Use "extractMeta"
-// import { customizeAnalyzeResult, extractMeta } from './util/analyzer'
 
 
 let pages
@@ -16778,9 +16790,7 @@ function createTextLayer (page) {
             if (!info) {
                 return
             }
-            const items = info.split('\t')
-            const text = items[3]
-            const [ x, y, w, h ] = items.slice(4, 8).map(parseFloat)
+            const { char, x, y, w, h } = __WEBPACK_IMPORTED_MODULE_0__util_analyzer__["b" /* extractMeta */](info)
             const scale = window.iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale
             const $div = $('<div class="pdfanno-text-layer"/>').css({
                 top        : y * scale + 'px',
@@ -16793,7 +16803,7 @@ function createTextLayer (page) {
             })
             .attr('data-page', page)
             .attr('data-index', index)
-            .text(text)
+            .text(char)
             return $div[0].outerHTML
         })
         $textLayer.append(snipets.join(''))
@@ -17506,7 +17516,7 @@ class PDFAnnoPage {
         return new Promise((resolve, reject) => {
             // Load a PDF as ArrayBuffer.
             var xhr = new XMLHttpRequest()
-            xhr.open('GET', window.API_ROOT + 'load_pdf?url=' + window.encodeURIComponent(url), true)
+            xhr.open('GET', window.API_ROOT + 'internal/api/pdfs?url=' + window.encodeURIComponent(url), true)
             xhr.responseType = 'json'
             xhr.onload = function () {
                 if (this.status === 200) {
@@ -17536,7 +17546,7 @@ class PDFAnnoPage {
      * Load an annotation file from the server.
      */
     loadAnnoFileFromServer (url) {
-        return __WEBPACK_IMPORTED_MODULE_0_axios___default.a.get(`${window.API_ROOT}api/load_anno?url=${url}`).then(res => {
+        return __WEBPACK_IMPORTED_MODULE_0_axios___default.a.get(`${window.API_ROOT}internal/api/annotations?url=${url}`).then(res => {
             if (res.status !== 200 || res.data.status === 'failure') {
                 let reason = ''
                 if (res.data.error) {

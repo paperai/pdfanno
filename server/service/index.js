@@ -5,7 +5,58 @@ const path = require('path');
 const fs = require('fs');
 const exec = require('child_process').exec;
 const request = require('request');
+const rp = require('request-promise');
 const packageJson = require('../../package.json');
+
+
+module.exports.fetchPDF = async url => {
+
+    const options = {
+        method   : 'GET',
+        url      : url,
+        headers  : {
+            // behave as a browser.
+            'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.19 Safari/537.36'
+        },
+        // treat a response as a binary.
+        encoding : null
+    };
+
+    try {
+        const pdf = await rp(options);
+        return pdf;
+    } catch (res) {
+        const statusCode = res.statusCode;
+        if (statusCode === 404) {
+            console.log(`PDF not found. url=${url}`);
+            return null;
+        }
+        throw res;
+    }
+}
+
+module.exports.fetchPDFText = async url => {
+
+    const options = {
+        method   : 'GET',
+        url      : url,
+        encoding : 'utf8'
+    }
+
+    try {
+        const pdftxt = await rp(options)
+        return pdftxt
+    } catch (res) {
+        const statusCode = res.statusCode
+        if (statusCode === 404) {
+            console.log(`PDFText not found. url=${url}`)
+            return null;
+        }
+        throw res;
+    }
+
+
+}
 
 /**
  * Save a PDF file, and return the saved path.
@@ -42,7 +93,7 @@ module.exports.analyzePDF = async (pdfPath) => {
 
     // Analyze the PDF.
     const jarPath = getPDFExtractPath()
-    const cmd = `java -classpath ${jarPath} PDFExtractor ${pdfPath} -text -bounding`;
+    const cmd = `java -classpath ${jarPath} PDFExtractor ${pdfPath}`;
     const { stdout, stderr } = await execCommand(cmd);
 
     return stdout

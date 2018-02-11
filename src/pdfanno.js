@@ -258,6 +258,11 @@ window.addEventListener('DOMContentLoaded', async e => {
         showLoader(false)
         const message = 'Failed to analyze the PDF.<br>Reason: ' + err
         annoUI.ui.alertDialog.show({ message })
+
+        // Init viewer.
+        window.annoPage.initializeViewer(null)
+        // Start application.
+        window.annoPage.startViewerApplication()
     }
 
     // initial tab.
@@ -302,7 +307,7 @@ function showLoader (display) {
 // UserID.
 window.addEventListener('DOMContentLoaded', () => {
 
-    let userId = URI(document.URL).query(true).userId
+    let userId = URI(document.URL).query(true).user_id
     if (!userId) {
         userId = annoUI.util.uuid(5)
     }

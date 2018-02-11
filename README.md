@@ -158,13 +158,14 @@ First, install [Node.js](https://nodejs.org/) and npm. The version of Node.js mu
 Then, run the following commands:
 ```
 npm install
-npm run publish:latest
+npm run front:publish:latest
 ```
 where the output is on `docs/latest`, and you can access PDFAnno via `docs/latest/index.html`.  
 
 For developing,
 ```
-npm run dev
+npm run server:dev
+npm run front:dev
 ```
 This command starts Webpack Dev Server and you can access  [http://localhost:8080/dist/index.html](http://localhost:8080/dist/index.html) in your browser.
 
