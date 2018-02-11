@@ -15,10 +15,10 @@ let searchHighlights = []
  */
 export function setup (analyzeData) {
     searchUI.setup({
-        pages    : customizeAnalyzeResult(analyzeData),
-        scrollTo    : highlightSearchResult.bind(this), // TODO: 引数としてスクロールすべきヒット文字列位置を得る
-        renderer    : renderHighlight.bind(this),       // TODO: 引数としてpositions(#search() の結果)を受け取る
-        resetUI    : resetUI.bind(this)                 // TODO: ハイライトレンダリングに関するリセットを行う。操作系についてはsearchEngind内にて実施
+        pages                : customizeAnalyzeResult(analyzeData),
+        scrollTo             : highlightSearchResult.bind(this), // TODO: 引数としてスクロールすべきヒット文字列位置を得る
+        searchResultRenderer : renderHighlight.bind(this),       // TODO: 引数としてpositions(#search() の結果)を受け取る
+        resetUIAfter         : resetUI.bind(this)                 // TODO: ハイライトレンダリングに関するリセットを行う。操作系についてはsearchEngind内にて実施
     })
     searchUI.enableSearchUI()
 }
@@ -35,8 +35,8 @@ export function getSearchHighlight () {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  // Re-render the search results.
-  window.addEventListener('pagerendered', rerenderSearchResults)
+    // Re-render the search results.
+    window.addEventListener('pagerendered', rerenderSearchResults)
 })
 
 /**
@@ -83,12 +83,13 @@ function rerenderSearchResults () {
  */
 function resetUI () {
     $('.pdfanno-search-result', window.iframeWindow.document).remove()
+    searchHighlights = []
 }
 
 /**
  * render search results as highlight.
  */
-function renderHighlight(positions, pages) {
+function renderHighlight (positions, page, searchWord) {
     // Display highlights.
     if (positions.length > 0) {
         positions.forEach(position => {
@@ -123,7 +124,7 @@ function renderHighlight(positions, pages) {
                 position       : aPosition,
                 searchPosition : position,
                 $elm           : $div,
-                text
+                searchWord
             })
         })
     }
