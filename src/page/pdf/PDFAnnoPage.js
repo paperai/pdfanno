@@ -574,6 +574,8 @@ export default class PDFAnnoPage {
                     const pdf = Uint8Array.from(atob(this.response.pdf), c => c.charCodeAt(0))
                     const analyzeResult = this.response.analyzeResult
                     resolve({ pdf, analyzeResult })
+                } else {
+                    reject(this.status)
                 }
             }
             xhr.timeout = 120 * 1000 // 120s
