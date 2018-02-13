@@ -91,5 +91,5 @@ function getDownloadFileName () {
 
     // The name of Content.
     let pdfFileName = window.annoPage.getCurrentContentFile().name
-    return pdfFileName.replace(/\.pdf$/i, '.pdftxt')
+    return pdfFileName + '.txt'
 }
