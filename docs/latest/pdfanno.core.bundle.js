@@ -5084,14 +5084,6 @@ class AbstractAnnotation extends __WEBPACK_IMPORTED_MODULE_0_events___default.a 
 
             if (this.selected) {
 
-                // deselect another annotations.
-                if (window.ctrlPressed === false) {
-                    window.annotationContainer
-                        .getSelectedAnnotations()
-                        .filter(a => a.uuid !== this.uuid)
-                        .forEach(a => a.deselect())
-                }
-
                 // TODO Use common function.
                 let event = document.createEvent('CustomEvent')
                 event.initCustomEvent('annotationSelected', true, true, this)
@@ -6778,25 +6770,6 @@ window.annotationContainer = new __WEBPACK_IMPORTED_MODULE_3__src_annotation_con
 
 // Enable a view mode.
 __WEBPACK_IMPORTED_MODULE_2__src_PDFAnnoCore__["a" /* default */].UI.enableViewMode()
-
-// Check Ctrl or Cmd button clicked.
-// ** ATTENTION!! ALSO UPDATED by pdfanno.js **
-window.ctrlPressed = false
-$(document).on('keydown', e => {
-    // Allow any keyboard events for <input/>.
-    if (e.target.tagName.toLowerCase() === 'input') {
-        return
-    }
-    if (e.keyCode === 17 || e.keyCode === 91) { // 17:ctrlKey, 91:cmdKey
-        window.ctrlPressed = true
-    }
-}).on('keyup', e => {
-    // Allow any keyboard events for <input/>.
-    if (e.target.tagName.toLowerCase() === 'input') {
-        return
-    }
-    window.ctrlPressed = false
-})
 
 // The event called at page rendered by pdfjs.
 window.addEventListener('pagerendered', function (ev) {

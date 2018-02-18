@@ -13786,11 +13786,6 @@ __WEBPACK_IMPORTED_MODULE_4__page_public__["b" /* expose */]()
  */
 window.annoPage = new __WEBPACK_IMPORTED_MODULE_9__page_pdf_PDFAnnoPage__["a" /* default */]()
 
-// Manage ctrlKey (cmdKey on Mac).
-window.addEventListener('manageCtrlKey', e => {
-    window.annoPage.manageCtrlKey(e.detail)
-})
-
 /**
  * Get the y position in the annotation.
  */
@@ -17494,19 +17489,6 @@ class PDFAnnoPage {
      */
     getCurrentContentName () {
         return window.iframeWindow.getFileName(window.iframeWindow.PDFView.url)
-    }
-
-    /**
-     * Manage the ctrl button is enable/disable.
-     */
-    manageCtrlKey (type) {
-        if (window.iframeWindow) {
-            if (type === 'on') {
-                window.iframeWindow.ctrlPressed = true
-            } else if (type === 'off') {
-                window.iframeWindow.ctrlPressed = false
-            }
-        }
     }
 
     /**
