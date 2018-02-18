@@ -20,25 +20,6 @@ window.annotationContainer = new AnnotationContainer()
 // Enable a view mode.
 PDFAnnoCore.UI.enableViewMode()
 
-// Check Ctrl or Cmd button clicked.
-// ** ATTENTION!! ALSO UPDATED by pdfanno.js **
-window.ctrlPressed = false
-$(document).on('keydown', e => {
-    // Allow any keyboard events for <input/>.
-    if (e.target.tagName.toLowerCase() === 'input') {
-        return
-    }
-    if (e.keyCode === 17 || e.keyCode === 91) { // 17:ctrlKey, 91:cmdKey
-        window.ctrlPressed = true
-    }
-}).on('keyup', e => {
-    // Allow any keyboard events for <input/>.
-    if (e.target.tagName.toLowerCase() === 'input') {
-        return
-    }
-    window.ctrlPressed = false
-})
-
 // The event called at page rendered by pdfjs.
 window.addEventListener('pagerendered', function (ev) {
     console.log('pagerendered:', ev.detail.pageNumber)

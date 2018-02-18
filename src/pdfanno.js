@@ -43,11 +43,6 @@ publicApi.expose()
  */
 window.annoPage = new PDFAnnoPage()
 
-// Manage ctrlKey (cmdKey on Mac).
-window.addEventListener('manageCtrlKey', e => {
-    window.annoPage.manageCtrlKey(e.detail)
-})
-
 /**
  * Get the y position in the annotation.
  */
