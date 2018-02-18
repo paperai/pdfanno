@@ -542,19 +542,6 @@ export default class PDFAnnoPage {
     }
 
     /**
-     * Manage the ctrl button is enable/disable.
-     */
-    manageCtrlKey (type) {
-        if (window.iframeWindow) {
-            if (type === 'on') {
-                window.iframeWindow.ctrlPressed = true
-            } else if (type === 'off') {
-                window.iframeWindow.ctrlPressed = false
-            }
-        }
-    }
-
-    /**
      * Load a PDF data from the server.
      */
     loadPDFFromServer (url) {

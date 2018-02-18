@@ -102,14 +102,6 @@ export default class AbstractAnnotation extends EventEmitter {
 
             if (this.selected) {
 
-                // deselect another annotations.
-                if (window.ctrlPressed === false) {
-                    window.annotationContainer
-                        .getSelectedAnnotations()
-                        .filter(a => a.uuid !== this.uuid)
-                        .forEach(a => a.deselect())
-                }
-
                 // TODO Use common function.
                 let event = document.createEvent('CustomEvent')
                 event.initCustomEvent('annotationSelected', true, true, this)
