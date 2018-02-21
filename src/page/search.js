@@ -96,15 +96,17 @@ function renderHighlight (positions, page, searchWord) {
             const $textLayer = $(`.page[data-page-number="${page.page}"] .textLayer`, window.iframeWindow.document)
             const infos = page.meta.slice(position.start, position.end)
             let fromX, toX, fromY, toY
+            let text = ''
             infos.forEach(info => {
                 if (!info) {
                     return
                 }
-                const { x, y, w, h } = extractMeta(info)
+                const { x, y, w, h, char } = extractMeta(info)
                 fromX = (fromX === undefined ? x : Math.min(x, fromX))
                 toX = (toX === undefined ? (x + w) : Math.max((x + w), toX))
                 fromY = (fromY === undefined ? y : Math.min(y, fromY))
                 toY = (toY === undefined ? (y + h) : Math.max((y + h), toY))
+                text += char
             })
             const scale = window.iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale
             let $div = $('<div class="pdfanno-search-result"/>')
@@ -124,7 +126,7 @@ function renderHighlight (positions, page, searchWord) {
                 position       : aPosition,
                 searchPosition : position,
                 $elm           : $div,
-                searchWord
+                text
             })
         })
     }
