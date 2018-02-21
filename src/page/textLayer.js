@@ -2,6 +2,7 @@
  * Create text layers which enable users to select texts.
  */
 import { customizeAnalyzeResult, extractMeta } from './util/analyzer'
+import { dispatchWindowEvent } from '../shared/util'
 
 let pages
 
@@ -72,6 +73,8 @@ function createTextLayer (page) {
             return $div[0].outerHTML
         })
         $textLayer.append(snipets.join(''))
+
+        dispatchWindowEvent('textlayercreated', page)
 
     }, window.iframeWindow.TEXT_LAYER_RENDER_DELAY + 300)
 }
