@@ -465,6 +465,31 @@ function nextZIndex () {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = anyOf;
+/* harmony export (immutable) */ __webpack_exports__["b"] = dispatchWindowEvent;
+/**
+ * Utility.
+ */
+
+function anyOf (target, candidates) {
+    return candidates.filter(c => c === target).length > 0
+}
+
+/**
+ * Dispatch a custom event to `window` object.
+ */
+function dispatchWindowEvent (eventName, data) {
+    var event = document.createEvent('CustomEvent')
+    event.initCustomEvent(eventName, true, true, data)
+    window.dispatchEvent(event)
+}
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* unused harmony export setupResizableColumns */
 /* unused harmony export tomlString */
 /* harmony export (immutable) */ __webpack_exports__["a"] = uuid;
@@ -656,340 +681,7 @@ function loadFileAsText (file) {
 
 
 /***/ }),
-/* 3 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = anyOf;
-/* harmony export (immutable) */ __webpack_exports__["b"] = dispatchWindowEvent;
-/**
- * Utility.
- */
-
-function anyOf (target, candidates) {
-    return candidates.filter(c => c === target).length > 0
-}
-
-/**
- * Dispatch a custom event to `window` object.
- */
-function dispatchWindowEvent (eventName, data) {
-    var event = document.createEvent('CustomEvent')
-    event.initCustomEvent(eventName, true, true, data)
-    window.dispatchEvent(event)
-}
-
-
-/***/ }),
 /* 4 */
-/***/ (function(module, exports) {
-
-/*
-	MIT License http://www.opensource.org/licenses/mit-license.php
-	Author Tobias Koppers @sokra
-*/
-// css base code, injected by the css-loader
-module.exports = function() {
-	var list = [];
-
-	// return the list of modules as css string
-	list.toString = function toString() {
-		var result = [];
-		for(var i = 0; i < this.length; i++) {
-			var item = this[i];
-			if(item[2]) {
-				result.push("@media " + item[2] + "{" + item[1] + "}");
-			} else {
-				result.push(item[1]);
-			}
-		}
-		return result.join("");
-	};
-
-	// import a list of modules into the list
-	list.i = function(modules, mediaQuery) {
-		if(typeof modules === "string")
-			modules = [[null, modules, ""]];
-		var alreadyImportedModules = {};
-		for(var i = 0; i < this.length; i++) {
-			var id = this[i][0];
-			if(typeof id === "number")
-				alreadyImportedModules[id] = true;
-		}
-		for(i = 0; i < modules.length; i++) {
-			var item = modules[i];
-			// skip already imported module
-			// this implementation is not 100% perfect for weird media query combinations
-			//  when a module is imported multiple times with different media queries.
-			//  I hope this will never occur (Hey this way we have smaller bundles)
-			if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
-				if(mediaQuery && !item[2]) {
-					item[2] = mediaQuery;
-				} else if(mediaQuery) {
-					item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
-				}
-				list.push(item);
-			}
-		}
-	};
-	return list;
-};
-
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports) {
-
-/*
-	MIT License http://www.opensource.org/licenses/mit-license.php
-	Author Tobias Koppers @sokra
-*/
-var stylesInDom = {},
-	memoize = function(fn) {
-		var memo;
-		return function () {
-			if (typeof memo === "undefined") memo = fn.apply(this, arguments);
-			return memo;
-		};
-	},
-	isOldIE = memoize(function() {
-		return /msie [6-9]\b/.test(self.navigator.userAgent.toLowerCase());
-	}),
-	getHeadElement = memoize(function () {
-		return document.head || document.getElementsByTagName("head")[0];
-	}),
-	singletonElement = null,
-	singletonCounter = 0,
-	styleElementsInsertedAtTop = [];
-
-module.exports = function(list, options) {
-	if(typeof DEBUG !== "undefined" && DEBUG) {
-		if(typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
-	}
-
-	options = options || {};
-	// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
-	// tags it will allow on a page
-	if (typeof options.singleton === "undefined") options.singleton = isOldIE();
-
-	// By default, add <style> tags to the bottom of <head>.
-	if (typeof options.insertAt === "undefined") options.insertAt = "bottom";
-
-	var styles = listToStyles(list);
-	addStylesToDom(styles, options);
-
-	return function update(newList) {
-		var mayRemove = [];
-		for(var i = 0; i < styles.length; i++) {
-			var item = styles[i];
-			var domStyle = stylesInDom[item.id];
-			domStyle.refs--;
-			mayRemove.push(domStyle);
-		}
-		if(newList) {
-			var newStyles = listToStyles(newList);
-			addStylesToDom(newStyles, options);
-		}
-		for(var i = 0; i < mayRemove.length; i++) {
-			var domStyle = mayRemove[i];
-			if(domStyle.refs === 0) {
-				for(var j = 0; j < domStyle.parts.length; j++)
-					domStyle.parts[j]();
-				delete stylesInDom[domStyle.id];
-			}
-		}
-	};
-}
-
-function addStylesToDom(styles, options) {
-	for(var i = 0; i < styles.length; i++) {
-		var item = styles[i];
-		var domStyle = stylesInDom[item.id];
-		if(domStyle) {
-			domStyle.refs++;
-			for(var j = 0; j < domStyle.parts.length; j++) {
-				domStyle.parts[j](item.parts[j]);
-			}
-			for(; j < item.parts.length; j++) {
-				domStyle.parts.push(addStyle(item.parts[j], options));
-			}
-		} else {
-			var parts = [];
-			for(var j = 0; j < item.parts.length; j++) {
-				parts.push(addStyle(item.parts[j], options));
-			}
-			stylesInDom[item.id] = {id: item.id, refs: 1, parts: parts};
-		}
-	}
-}
-
-function listToStyles(list) {
-	var styles = [];
-	var newStyles = {};
-	for(var i = 0; i < list.length; i++) {
-		var item = list[i];
-		var id = item[0];
-		var css = item[1];
-		var media = item[2];
-		var sourceMap = item[3];
-		var part = {css: css, media: media, sourceMap: sourceMap};
-		if(!newStyles[id])
-			styles.push(newStyles[id] = {id: id, parts: [part]});
-		else
-			newStyles[id].parts.push(part);
-	}
-	return styles;
-}
-
-function insertStyleElement(options, styleElement) {
-	var head = getHeadElement();
-	var lastStyleElementInsertedAtTop = styleElementsInsertedAtTop[styleElementsInsertedAtTop.length - 1];
-	if (options.insertAt === "top") {
-		if(!lastStyleElementInsertedAtTop) {
-			head.insertBefore(styleElement, head.firstChild);
-		} else if(lastStyleElementInsertedAtTop.nextSibling) {
-			head.insertBefore(styleElement, lastStyleElementInsertedAtTop.nextSibling);
-		} else {
-			head.appendChild(styleElement);
-		}
-		styleElementsInsertedAtTop.push(styleElement);
-	} else if (options.insertAt === "bottom") {
-		head.appendChild(styleElement);
-	} else {
-		throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");
-	}
-}
-
-function removeStyleElement(styleElement) {
-	styleElement.parentNode.removeChild(styleElement);
-	var idx = styleElementsInsertedAtTop.indexOf(styleElement);
-	if(idx >= 0) {
-		styleElementsInsertedAtTop.splice(idx, 1);
-	}
-}
-
-function createStyleElement(options) {
-	var styleElement = document.createElement("style");
-	styleElement.type = "text/css";
-	insertStyleElement(options, styleElement);
-	return styleElement;
-}
-
-function createLinkElement(options) {
-	var linkElement = document.createElement("link");
-	linkElement.rel = "stylesheet";
-	insertStyleElement(options, linkElement);
-	return linkElement;
-}
-
-function addStyle(obj, options) {
-	var styleElement, update, remove;
-
-	if (options.singleton) {
-		var styleIndex = singletonCounter++;
-		styleElement = singletonElement || (singletonElement = createStyleElement(options));
-		update = applyToSingletonTag.bind(null, styleElement, styleIndex, false);
-		remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true);
-	} else if(obj.sourceMap &&
-		typeof URL === "function" &&
-		typeof URL.createObjectURL === "function" &&
-		typeof URL.revokeObjectURL === "function" &&
-		typeof Blob === "function" &&
-		typeof btoa === "function") {
-		styleElement = createLinkElement(options);
-		update = updateLink.bind(null, styleElement);
-		remove = function() {
-			removeStyleElement(styleElement);
-			if(styleElement.href)
-				URL.revokeObjectURL(styleElement.href);
-		};
-	} else {
-		styleElement = createStyleElement(options);
-		update = applyToTag.bind(null, styleElement);
-		remove = function() {
-			removeStyleElement(styleElement);
-		};
-	}
-
-	update(obj);
-
-	return function updateStyle(newObj) {
-		if(newObj) {
-			if(newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap)
-				return;
-			update(obj = newObj);
-		} else {
-			remove();
-		}
-	};
-}
-
-var replaceText = (function () {
-	var textStore = [];
-
-	return function (index, replacement) {
-		textStore[index] = replacement;
-		return textStore.filter(Boolean).join('\n');
-	};
-})();
-
-function applyToSingletonTag(styleElement, index, remove, obj) {
-	var css = remove ? "" : obj.css;
-
-	if (styleElement.styleSheet) {
-		styleElement.styleSheet.cssText = replaceText(index, css);
-	} else {
-		var cssNode = document.createTextNode(css);
-		var childNodes = styleElement.childNodes;
-		if (childNodes[index]) styleElement.removeChild(childNodes[index]);
-		if (childNodes.length) {
-			styleElement.insertBefore(cssNode, childNodes[index]);
-		} else {
-			styleElement.appendChild(cssNode);
-		}
-	}
-}
-
-function applyToTag(styleElement, obj) {
-	var css = obj.css;
-	var media = obj.media;
-
-	if(media) {
-		styleElement.setAttribute("media", media)
-	}
-
-	if(styleElement.styleSheet) {
-		styleElement.styleSheet.cssText = css;
-	} else {
-		while(styleElement.firstChild) {
-			styleElement.removeChild(styleElement.firstChild);
-		}
-		styleElement.appendChild(document.createTextNode(css));
-	}
-}
-
-function updateLink(linkElement, obj) {
-	var css = obj.css;
-	var sourceMap = obj.sourceMap;
-
-	if(sourceMap) {
-		// http://stackoverflow.com/a/26603875
-		css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
-	}
-
-	var blob = new Blob([css], { type: "text/css" });
-
-	var oldSrc = linkElement.href;
-
-	linkElement.href = URL.createObjectURL(blob);
-
-	if(oldSrc)
-		URL.revokeObjectURL(oldSrc);
-}
-
-
-/***/ }),
-/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -2063,9 +1755,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__components_downloadButton__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__components_labelInput__ = __webpack_require__(19);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__components_uploadButton__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__uis__ = __webpack_require__(29);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__events__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__utils__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__components_searchUI__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__uis__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__events__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__utils__ = __webpack_require__(6);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "browseButton", function() { return __WEBPACK_IMPORTED_MODULE_0__components_browseButton__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "contentDropdown", function() { return __WEBPACK_IMPORTED_MODULE_1__components_contentDropdown__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "primaryAnnoDropdown", function() { return __WEBPACK_IMPORTED_MODULE_2__components_primaryAnnoDropdown__; });
@@ -2074,10 +1767,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "downloadButton", function() { return __WEBPACK_IMPORTED_MODULE_5__components_downloadButton__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "labelInput", function() { return __WEBPACK_IMPORTED_MODULE_6__components_labelInput__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "uploadButton", function() { return __WEBPACK_IMPORTED_MODULE_7__components_uploadButton__; });
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "ui", function() { return __WEBPACK_IMPORTED_MODULE_8__uis__; });
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "event", function() { return __WEBPACK_IMPORTED_MODULE_9__events__; });
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "util", function() { return __WEBPACK_IMPORTED_MODULE_10__utils__; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "searchUI", function() { return __WEBPACK_IMPORTED_MODULE_8__components_searchUI__; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "ui", function() { return __WEBPACK_IMPORTED_MODULE_9__uis__; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "event", function() { return __WEBPACK_IMPORTED_MODULE_10__events__; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "util", function() { return __WEBPACK_IMPORTED_MODULE_11__utils__; });
 __webpack_require__(8)
+
 
 
 
@@ -7471,7 +7166,7 @@ function uploadPDF ({
     const $progressBar = $('.js-upload-progress')
 
     // Upload and analyze the PDF.
-    __WEBPACK_IMPORTED_MODULE_1__funcs_upload__["a" /* upload */]({
+    Object(__WEBPACK_IMPORTED_MODULE_1__funcs_upload__["a" /* upload */])({
         contentFile,
         willStartCallback : () => {
             // Reset the result text.
@@ -7589,6 +7284,352 @@ function arrayBufferToBase64 (buffer) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (immutable) */ __webpack_exports__["setup"] = setup;
+/* harmony export (immutable) */ __webpack_exports__["enableSearchUI"] = enableSearchUI;
+/* harmony export (immutable) */ __webpack_exports__["searchPosition"] = searchPosition;
+/* harmony export (immutable) */ __webpack_exports__["setSearchPosition"] = setSearchPosition;
+/* harmony export (immutable) */ __webpack_exports__["searchType"] = searchType;
+/**
+ * Search functions.
+ */
+
+/**
+ * The analyze data per pages.
+ */
+let _pages = []
+
+/**
+ * Search type ( text / dictionary )
+ */
+let _searchType = null
+
+/**
+ * The position where a search result is highlighted.
+ */
+let _searchPosition = -1
+
+/**
+ * Texts for dictionary search.
+ */
+let dictonaryTexts
+
+let _scrollTo
+
+let _searchResultRenderer
+
+let _resetUIAfter
+
+let _hitCount
+
+/**
+ * Setup the search function.
+ */
+function setup ({
+    pages,
+    scrollTo,
+    searchResultRenderer,
+    resetUIAfter
+}) {
+    _pages = pages
+    _scrollTo = scrollTo
+    _searchResultRenderer = searchResultRenderer
+    _resetUIAfter = resetUIAfter
+}
+
+function enableSearchUI () {
+    $('#searchWord, .js-dict-match-file').removeAttr('disabled')
+}
+
+function searchPosition () {
+    return _searchPosition
+}
+
+function setSearchPosition (value) {
+    _searchPosition = value
+    highlightSearchResult()
+}
+
+function searchType () {
+    return _searchType
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+
+    const DELAY = 500
+    let timerId
+
+    $('#searchWord').on('keyup', e => {
+
+        // Enter key.
+        if (e.keyCode === 13) {
+            nextResult()
+            return
+        }
+
+        if (timerId) {
+            clearTimeout(timerId)
+            timerId = null
+        }
+
+        timerId = setTimeout(() => {
+            timerId = null
+            _searchType = 'text'
+            doSearch()
+        }, DELAY)
+    })
+
+    $('.js-search-case-sensitive, .js-search-regexp').on('change', () => {
+        _searchType = 'text'
+        doSearch()
+    })
+
+    $('.js-search-case-sensitive, .js-search-regexp').on('click', e => {
+        $(e.currentTarget).blur()
+    })
+
+    $('.js-search-clear').on('click', e => {
+        // Clear search.
+        $('#searchWord').val('')
+        _searchType = null
+        doSearch()
+        $(e.currentTarget).blur()
+    })
+
+    $('.js-search-prev, .js-search-next').on('click', e => {
+
+        if (_searchType !== 'text') {
+            return
+        }
+
+        // No action for no results.
+        if (_hitCount === 0) {
+            return
+        }
+
+        if ($(e.currentTarget).hasClass('js-search-prev')) {
+            prevResult()
+        } else {
+            nextResult()
+        }
+    })
+})
+
+/**
+ * Highlight the prev search result.
+ */
+function prevResult () {
+    _searchPosition--
+    if (_searchPosition < 0) {
+        _searchPosition = _hitCount - 1
+    }
+    highlightSearchResult()
+}
+
+/**
+ * Highlight the next search result.
+ */
+function nextResult () {
+    _searchPosition++
+    if (_searchPosition >= _hitCount) {
+        _searchPosition = 0
+    }
+    highlightSearchResult()
+}
+
+/**
+ * Highlight a single search result.
+ */
+function highlightSearchResult () {
+    $('.search-current-position').text(_searchPosition + 1)
+    _scrollTo(_searchPosition)
+}
+
+/**
+ * Search the position of  a word / words which an user input.
+ */
+function search ({ hay, needle, isCaseSensitive = false, useRegexp = false }) {
+    if (!needle) {
+        return []
+    }
+    const SPECIAL_CHARS_REGEX = /[-[\]/{}()*+?.\\^$|]/g
+    const flags = 'g' + (isCaseSensitive === false ? 'i' : '')
+    if (useRegexp === false) {
+        needle = needle.replace(SPECIAL_CHARS_REGEX, '\\$&')
+    }
+    let re = new RegExp(needle, flags)
+    let positions = []
+    let match
+    while ((match = re.exec(hay)) != null) {
+        positions.push({
+            start : match.index,
+            end   : match.index + match[0].length
+        })
+    }
+    return positions
+}
+
+/**
+ * Reset the UI display.
+ */
+function resetUI () {
+    $('.search-hit').addClass('hidden')
+    $('.js-dict-match-cur-pos, .js-dict-match-hit-counts').text('000')
+    _resetUIAfter()
+}
+
+/**
+ * Search the word and display.
+ */
+function doSearch ({ query = null } = {}) {
+
+    // Check enable.
+    if ($('#searchWord').is('[disabled]')) {
+        console.log('Search function is not enabled yet.')
+        return
+    }
+
+    resetUI()
+
+    let text
+    let isCaseSensitive
+    let useRegexp
+    if (_searchType === 'text') {
+        text = $('#searchWord').val()
+        isCaseSensitive = $('.js-search-case-sensitive')[0].checked
+        useRegexp = $('.js-search-regexp')[0].checked
+    } else {
+        text = query
+        isCaseSensitive = $('.js-dict-match-case-sensitive')[0].checked
+        useRegexp = true
+    }
+
+    console.log(`doSearch: _searchType=${_searchType} text="${text}", caseSensitive=${isCaseSensitive}, regexp=${useRegexp}`)
+
+    // Reset.
+    _searchPosition = -1
+
+    // The min length of text for searching.
+    const MIN_LEN = 2
+    if (!text || text.length < MIN_LEN) {
+        return
+    }
+
+    _hitCount = 0
+    _pages.forEach(page => {
+
+        // Search.
+        const _positions = search({ hay : page.body, needle : text, isCaseSensitive, useRegexp })
+        _searchResultRenderer(_positions, page, text)
+        _hitCount += _positions.length
+    })
+
+    if (_searchType === 'text') {
+        $('.search-hit').removeClass('hidden')
+        $('.search-current-position').text(_searchPosition + 1)
+        $('.search-hit-count').text(_hitCount) // TODO: searchHighlights(=_positionsを元にハイライトされた個数)と_positionsが不一致になることは？
+    } else {
+        // Dict matching.
+        $('.js-dict-match-cur-pos').text(_searchPosition + 1)
+        $('.js-dict-match-hit-counts').text(_hitCount)
+    }
+}
+
+/**
+ * Dictonary Matching.
+ */
+window.addEventListener('DOMContentLoaded', () => {
+
+    // Clear prev cache.
+    $('.js-dict-match-file :file').on('click', e => {
+        $(e.currentTarget).val(null)
+    })
+
+    // Load a dictionary for matching.
+    $('.js-dict-match-file :file').on('change', e => {
+
+        const files = e.target.files
+        if (files.length === 0) {
+            window.annoUI.ui.alertDialog.show({ message : 'Select a file.' })
+            return
+        }
+
+        const fname = files[0].name
+        $('.js-dict-match-file-name').text(fname)
+
+        let fileReader = new FileReader()
+        fileReader.onload = ev => {
+            const texts = ev.target.result.split('\n').map(t => {
+                return t.trim()
+            }).filter(t => {
+                return t
+            })
+            if (texts.length === 0) {
+                window.annoUI.ui.alertDialog.show({ message : 'No text is found in the dictionary file.' })
+                return
+            }
+            dictonaryTexts = texts
+            searchByDictionary(texts)
+        }
+        fileReader.readAsText(files[0])
+    })
+
+    // Clear search results.
+    $('.js-dict-match-clear').on('click', e => {
+        _searchType = null
+        doSearch()
+        $(e.currentTarget).blur()
+    })
+
+    // Go to the prev/next result.
+    $('.js-dict-match-prev, .js-dict-match-next').on('click', e => {
+
+        if (_searchType !== 'dictionary') {
+            return
+        }
+
+        // No action for no results.
+        if (_hitCount === 0) {
+            return
+        }
+
+        // go to next or prev.
+        let num = 1
+        if ($(e.currentTarget).hasClass('js-dict-match-prev')) {
+            num = -1
+        }
+        _searchPosition += num
+        if (_searchPosition < 0) {
+            _searchPosition = _hitCount - 1
+        } else if (_searchPosition >= _hitCount) {
+            _searchPosition = 0
+        }
+
+        highlightSearchResult()
+    })
+
+    // Set the search behavior.
+    $('.js-dict-match-case-sensitive').on('change', () => {
+        searchByDictionary(dictonaryTexts)
+    })
+})
+
+/**
+ * Search by a dict file.
+ */
+function searchByDictionary (texts = []) {
+    console.log('searchByDictionary:', texts)
+    _searchType = 'dictionary'
+    const query = texts.join('|')
+    doSearch({ query })
+}
+
+
+/***/ }),
+/* 30 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__alertDialog__ = __webpack_require__(0);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "alertDialog", function() { return __WEBPACK_IMPORTED_MODULE_0__alertDialog__; });
 
@@ -7597,7 +7638,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7639,6 +7680,314 @@ function dispatchWindowEvent (eventName, data) {
 /******/ ]);
 });
 //# sourceMappingURL=index.js.map
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports) {
+
+/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+// css base code, injected by the css-loader
+module.exports = function() {
+	var list = [];
+
+	// return the list of modules as css string
+	list.toString = function toString() {
+		var result = [];
+		for(var i = 0; i < this.length; i++) {
+			var item = this[i];
+			if(item[2]) {
+				result.push("@media " + item[2] + "{" + item[1] + "}");
+			} else {
+				result.push(item[1]);
+			}
+		}
+		return result.join("");
+	};
+
+	// import a list of modules into the list
+	list.i = function(modules, mediaQuery) {
+		if(typeof modules === "string")
+			modules = [[null, modules, ""]];
+		var alreadyImportedModules = {};
+		for(var i = 0; i < this.length; i++) {
+			var id = this[i][0];
+			if(typeof id === "number")
+				alreadyImportedModules[id] = true;
+		}
+		for(i = 0; i < modules.length; i++) {
+			var item = modules[i];
+			// skip already imported module
+			// this implementation is not 100% perfect for weird media query combinations
+			//  when a module is imported multiple times with different media queries.
+			//  I hope this will never occur (Hey this way we have smaller bundles)
+			if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
+				if(mediaQuery && !item[2]) {
+					item[2] = mediaQuery;
+				} else if(mediaQuery) {
+					item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
+				}
+				list.push(item);
+			}
+		}
+	};
+	return list;
+};
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports) {
+
+/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+var stylesInDom = {},
+	memoize = function(fn) {
+		var memo;
+		return function () {
+			if (typeof memo === "undefined") memo = fn.apply(this, arguments);
+			return memo;
+		};
+	},
+	isOldIE = memoize(function() {
+		return /msie [6-9]\b/.test(self.navigator.userAgent.toLowerCase());
+	}),
+	getHeadElement = memoize(function () {
+		return document.head || document.getElementsByTagName("head")[0];
+	}),
+	singletonElement = null,
+	singletonCounter = 0,
+	styleElementsInsertedAtTop = [];
+
+module.exports = function(list, options) {
+	if(typeof DEBUG !== "undefined" && DEBUG) {
+		if(typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
+	}
+
+	options = options || {};
+	// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
+	// tags it will allow on a page
+	if (typeof options.singleton === "undefined") options.singleton = isOldIE();
+
+	// By default, add <style> tags to the bottom of <head>.
+	if (typeof options.insertAt === "undefined") options.insertAt = "bottom";
+
+	var styles = listToStyles(list);
+	addStylesToDom(styles, options);
+
+	return function update(newList) {
+		var mayRemove = [];
+		for(var i = 0; i < styles.length; i++) {
+			var item = styles[i];
+			var domStyle = stylesInDom[item.id];
+			domStyle.refs--;
+			mayRemove.push(domStyle);
+		}
+		if(newList) {
+			var newStyles = listToStyles(newList);
+			addStylesToDom(newStyles, options);
+		}
+		for(var i = 0; i < mayRemove.length; i++) {
+			var domStyle = mayRemove[i];
+			if(domStyle.refs === 0) {
+				for(var j = 0; j < domStyle.parts.length; j++)
+					domStyle.parts[j]();
+				delete stylesInDom[domStyle.id];
+			}
+		}
+	};
+}
+
+function addStylesToDom(styles, options) {
+	for(var i = 0; i < styles.length; i++) {
+		var item = styles[i];
+		var domStyle = stylesInDom[item.id];
+		if(domStyle) {
+			domStyle.refs++;
+			for(var j = 0; j < domStyle.parts.length; j++) {
+				domStyle.parts[j](item.parts[j]);
+			}
+			for(; j < item.parts.length; j++) {
+				domStyle.parts.push(addStyle(item.parts[j], options));
+			}
+		} else {
+			var parts = [];
+			for(var j = 0; j < item.parts.length; j++) {
+				parts.push(addStyle(item.parts[j], options));
+			}
+			stylesInDom[item.id] = {id: item.id, refs: 1, parts: parts};
+		}
+	}
+}
+
+function listToStyles(list) {
+	var styles = [];
+	var newStyles = {};
+	for(var i = 0; i < list.length; i++) {
+		var item = list[i];
+		var id = item[0];
+		var css = item[1];
+		var media = item[2];
+		var sourceMap = item[3];
+		var part = {css: css, media: media, sourceMap: sourceMap};
+		if(!newStyles[id])
+			styles.push(newStyles[id] = {id: id, parts: [part]});
+		else
+			newStyles[id].parts.push(part);
+	}
+	return styles;
+}
+
+function insertStyleElement(options, styleElement) {
+	var head = getHeadElement();
+	var lastStyleElementInsertedAtTop = styleElementsInsertedAtTop[styleElementsInsertedAtTop.length - 1];
+	if (options.insertAt === "top") {
+		if(!lastStyleElementInsertedAtTop) {
+			head.insertBefore(styleElement, head.firstChild);
+		} else if(lastStyleElementInsertedAtTop.nextSibling) {
+			head.insertBefore(styleElement, lastStyleElementInsertedAtTop.nextSibling);
+		} else {
+			head.appendChild(styleElement);
+		}
+		styleElementsInsertedAtTop.push(styleElement);
+	} else if (options.insertAt === "bottom") {
+		head.appendChild(styleElement);
+	} else {
+		throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");
+	}
+}
+
+function removeStyleElement(styleElement) {
+	styleElement.parentNode.removeChild(styleElement);
+	var idx = styleElementsInsertedAtTop.indexOf(styleElement);
+	if(idx >= 0) {
+		styleElementsInsertedAtTop.splice(idx, 1);
+	}
+}
+
+function createStyleElement(options) {
+	var styleElement = document.createElement("style");
+	styleElement.type = "text/css";
+	insertStyleElement(options, styleElement);
+	return styleElement;
+}
+
+function createLinkElement(options) {
+	var linkElement = document.createElement("link");
+	linkElement.rel = "stylesheet";
+	insertStyleElement(options, linkElement);
+	return linkElement;
+}
+
+function addStyle(obj, options) {
+	var styleElement, update, remove;
+
+	if (options.singleton) {
+		var styleIndex = singletonCounter++;
+		styleElement = singletonElement || (singletonElement = createStyleElement(options));
+		update = applyToSingletonTag.bind(null, styleElement, styleIndex, false);
+		remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true);
+	} else if(obj.sourceMap &&
+		typeof URL === "function" &&
+		typeof URL.createObjectURL === "function" &&
+		typeof URL.revokeObjectURL === "function" &&
+		typeof Blob === "function" &&
+		typeof btoa === "function") {
+		styleElement = createLinkElement(options);
+		update = updateLink.bind(null, styleElement);
+		remove = function() {
+			removeStyleElement(styleElement);
+			if(styleElement.href)
+				URL.revokeObjectURL(styleElement.href);
+		};
+	} else {
+		styleElement = createStyleElement(options);
+		update = applyToTag.bind(null, styleElement);
+		remove = function() {
+			removeStyleElement(styleElement);
+		};
+	}
+
+	update(obj);
+
+	return function updateStyle(newObj) {
+		if(newObj) {
+			if(newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap)
+				return;
+			update(obj = newObj);
+		} else {
+			remove();
+		}
+	};
+}
+
+var replaceText = (function () {
+	var textStore = [];
+
+	return function (index, replacement) {
+		textStore[index] = replacement;
+		return textStore.filter(Boolean).join('\n');
+	};
+})();
+
+function applyToSingletonTag(styleElement, index, remove, obj) {
+	var css = remove ? "" : obj.css;
+
+	if (styleElement.styleSheet) {
+		styleElement.styleSheet.cssText = replaceText(index, css);
+	} else {
+		var cssNode = document.createTextNode(css);
+		var childNodes = styleElement.childNodes;
+		if (childNodes[index]) styleElement.removeChild(childNodes[index]);
+		if (childNodes.length) {
+			styleElement.insertBefore(cssNode, childNodes[index]);
+		} else {
+			styleElement.appendChild(cssNode);
+		}
+	}
+}
+
+function applyToTag(styleElement, obj) {
+	var css = obj.css;
+	var media = obj.media;
+
+	if(media) {
+		styleElement.setAttribute("media", media)
+	}
+
+	if(styleElement.styleSheet) {
+		styleElement.styleSheet.cssText = css;
+	} else {
+		while(styleElement.firstChild) {
+			styleElement.removeChild(styleElement.firstChild);
+		}
+		styleElement.appendChild(document.createTextNode(css));
+	}
+}
+
+function updateLink(linkElement, obj) {
+	var css = obj.css;
+	var sourceMap = obj.sourceMap;
+
+	if(sourceMap) {
+		// http://stackoverflow.com/a/26603875
+		css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
+	}
+
+	var blob = new Blob([css], { type: "text/css" });
+
+	var oldSrc = linkElement.href;
+
+	linkElement.href = URL.createObjectURL(blob);
+
+	if(oldSrc)
+		URL.revokeObjectURL(oldSrc);
+}
+
 
 /***/ }),
 /* 7 */
@@ -12882,26 +13231,14 @@ function resizeHandler () {
 /* harmony export (immutable) */ __webpack_exports__["a"] = getSearchHighlight;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shared_coords__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util_analyzer__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_anno_ui__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_anno_ui___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_anno_ui__);
 /**
  * Search functions.
  */
 
 
 
-/**
- * The analyze data per pages.
- */
-let pages = []
-
-/**
- * Search type ( text / dictionary )
- */
-let searchType = null
-
-/**
- * The position where a search result is highlighted.
- */
-let searchPosition = -1
 
 /**
  * The highlights for search.
@@ -12909,127 +13246,38 @@ let searchPosition = -1
 let searchHighlights = []
 
 /**
- * Texts for dictionary search.
- */
-let dictonaryTexts
-
-/**
  * Setup the search function.
  */
 function setup (analyzeData) {
-
-    pages = __WEBPACK_IMPORTED_MODULE_1__util_analyzer__["a" /* customizeAnalyzeResult */](analyzeData)
-
-    enableSearchUI()
+    __WEBPACK_IMPORTED_MODULE_2_anno_ui__["searchUI"].setup({
+        pages                : __WEBPACK_IMPORTED_MODULE_1__util_analyzer__["a" /* customizeAnalyzeResult */](analyzeData),
+        scrollTo             : highlightSearchResult.bind(this), // TODO: 引数としてスクロールすべきヒット文字列位置を得る
+        searchResultRenderer : renderHighlight.bind(this),       // TODO: 引数としてpositions(#search() の結果)を受け取る
+        resetUIAfter         : resetUI.bind(this)                 // TODO: ハイライトレンダリングに関するリセットを行う。操作系についてはsearchEngind内にて実施
+    })
+    __WEBPACK_IMPORTED_MODULE_2_anno_ui__["searchUI"].enableSearchUI()
 }
 
 /**
  * Get the current highlight.
  */
 function getSearchHighlight () {
+    const searchPosition = __WEBPACK_IMPORTED_MODULE_2_anno_ui__["searchUI"].searchPosition()
     if (searchPosition > -1) {
         return searchHighlights[searchPosition]
     }
     return null
 }
 
-function enableSearchUI () {
-    $('#searchWord, .js-dict-match-file').removeAttr('disabled')
-}
-
 window.addEventListener('DOMContentLoaded', () => {
-
-    const DELAY = 500
-    let timerId
-
-    $('#searchWord').on('keyup', e => {
-
-        // Enter key.
-        if (e.keyCode === 13) {
-            nextResult()
-            return
-        }
-
-        if (timerId) {
-            clearTimeout(timerId)
-            timerId = null
-        }
-
-        timerId = setTimeout(() => {
-            timerId = null
-            searchType = 'text'
-            doSearch()
-        }, DELAY)
-    })
-
-    $('.js-search-case-sensitive, .js-search-regexp').on('change', () => {
-        searchType = 'text'
-        doSearch()
-    })
-
-    $('.js-search-case-sensitive, .js-search-regexp').on('click', e => {
-        $(e.currentTarget).blur()
-    })
-
-    $('.js-search-clear').on('click', e => {
-        // Clear search.
-        $('#searchWord').val('')
-        searchType = null
-        doSearch()
-        $(e.currentTarget).blur()
-    })
-
     // Re-render the search results.
-    window.addEventListener('pagerendered', rerenderSearchResults)
-
-    $('.js-search-prev, .js-search-next').on('click', e => {
-
-        if (searchType !== 'text') {
-            return
-        }
-
-        // No action for no results.
-        if (searchHighlights.length === 0) {
-            return
-        }
-
-        if ($(e.currentTarget).hasClass('js-search-prev')) {
-            prevResult()
-        } else {
-            nextResult()
-        }
-    })
+    window.addEventListener('textlayercreated', rerenderSearchResults)
 })
-
-/**
- * Highlight the prev search result.
- */
-function prevResult () {
-    searchPosition--
-    if (searchPosition < 0) {
-        searchPosition = searchHighlights.length - 1
-    }
-    highlightSearchResult()
-}
-
-/**
- * Highlight the next search result.
- */
-function nextResult () {
-    searchPosition++
-    if (searchPosition >= searchHighlights.length) {
-        searchPosition = 0
-    }
-    highlightSearchResult()
-}
 
 /**
  * Highlight a single search result.
  */
-function highlightSearchResult () {
-
-    $('.search-current-position').text(searchPosition + 1)
-
+function highlightSearchResult (searchPosition) {
     $('.pdfanno-search-result', window.iframeWindow.document).removeClass('pdfanno-search-result--highlight')
 
     const highlight = searchHighlights[searchPosition]
@@ -13049,6 +13297,7 @@ function highlightSearchResult () {
  */
 function rerenderSearchResults () {
 
+    // TODO: これは #resetUI() を呼び出してもよいかも
     // Remove olds.
     $('.pdfanno-search-result', window.iframeWindow.document).remove()
 
@@ -13060,123 +13309,62 @@ function rerenderSearchResults () {
         highlight.$elm.css('z-index', __WEBPACK_IMPORTED_MODULE_0__shared_coords__["c" /* nextZIndex */]())
         $textLayer.append(highlight.$elm)
     })
-}
 
-/**
- * Search the position of  a word / words which an user input.
- */
-function search ({ hay, needle, isCaseSensitive = false, useRegexp = false }) {
-    if (!needle) {
-        return []
-    }
-    const SPECIAL_CHARS_REGEX = /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g
-    const flags = 'g' + (isCaseSensitive === false ? 'i' : '')
-    if (useRegexp === false) {
-        needle = needle.replace(SPECIAL_CHARS_REGEX, '\\$&')
-    }
-    let re = new RegExp(needle, flags)
-    let positions = []
-    let match
-    while ((match = re.exec(hay)) != null) {
-        positions.push({
-            start : match.index,
-            end   : match.index + match[0].length
-        })
-    }
-    return positions
 }
 
 /**
  * Reset the UI display.
+ * @see anno-ui.searchUI#resetUI()
  */
 function resetUI () {
     $('.pdfanno-search-result', window.iframeWindow.document).remove()
-    $('.search-hit').addClass('hidden')
-    $('.js-dict-match-cur-pos, .js-dict-match-hit-counts').text('000')
+    searchHighlights = []
 }
 
 /**
- * Search the word and display.
+ * render search results as highlight.
  */
-function doSearch ({ query = null } = {}) {
-
-    // Check enable.
-    if ($('#searchWord').is('[disabled]')) {
-        console.log('Search function is not enabled yet.')
-        return
-    }
-
-    resetUI()
-
-    let text
-    let isCaseSensitive
-    let useRegexp
-    if (searchType === 'text') {
-        text = $('#searchWord').val()
-        isCaseSensitive = $('.js-search-case-sensitive')[0].checked
-        useRegexp = $('.js-search-regexp')[0].checked
-    } else {
-        text = query
-        isCaseSensitive = $('.js-dict-match-case-sensitive')[0].checked
-        useRegexp = true
-    }
-
-    console.log(`doSearch: searchType=${searchType} text="${text}", caseSensitive=${isCaseSensitive}, regexp=${useRegexp}`)
-
-    // Reset.
-    searchPosition = -1
-    searchHighlights = []
-
-    // The min length of text for searching.
-    const MIN_LEN = 2
-    if (!text || text.length < MIN_LEN) {
-        return
-    }
-
-    pages.forEach(page => {
-
-        // Search.
-        const positions = search({ hay : page.body, needle : text, isCaseSensitive, useRegexp })
-
-        // Display highlights.
-        if (positions.length > 0) {
-            positions.forEach(position => {
-                const $textLayer = $(`.page[data-page-number="${page.page}"] .textLayer`, window.iframeWindow.document)
-                const infos = page.meta.slice(position.start, position.end)
-                let fromX, toX, fromY, toY
-                infos.forEach(info => {
-                    if (!info) {
-                        return
-                    }
-                    const { x, y, w, h } = __WEBPACK_IMPORTED_MODULE_1__util_analyzer__["b" /* extractMeta */](info)
-                    fromX = (fromX === undefined ? x : Math.min(x, fromX))
-                    toX = (toX === undefined ? (x + w) : Math.max((x + w), toX))
-                    fromY = (fromY === undefined ? y : Math.min(y, fromY))
-                    toY = (toY === undefined ? (y + h) : Math.max((y + h), toY))
-                })
-                const scale = window.iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale
-                let $div = $('<div class="pdfanno-search-result"/>')
-                $div.css({
-                    top    : fromY * scale + 'px',
-                    left   : fromX * scale + 'px',
-                    width  : (toX - fromX) * scale + 'px',
-                    height : (toY - fromY) * scale + 'px',
-                    zIndex : __WEBPACK_IMPORTED_MODULE_0__shared_coords__["c" /* nextZIndex */]()
-                })
-                $textLayer.append($div)
-                // TODO 後で、改行されたものとかにも対応できるようにする（その場合は、rectsが複数）
-                const aPosition = [[ fromX, fromY, (toX - fromX), (toY - fromY) ]]
-                searchHighlights.push({
-                    page           : page.page,
-                    top            : fromY,
-                    position       : aPosition,
-                    searchPosition : position,
-                    $elm           : $div,
-                    text
-                })
+function renderHighlight (positions, page, searchWord) {
+    // Display highlights.
+    if (positions.length > 0) {
+        positions.forEach(position => {
+            const $textLayer = $(`.page[data-page-number="${page.page}"] .textLayer`, window.iframeWindow.document)
+            const infos = page.meta.slice(position.start, position.end)
+            let fromX, toX, fromY, toY
+            let text = ''
+            infos.forEach(info => {
+                if (!info) {
+                    return
+                }
+                const { x, y, w, h, char } = __WEBPACK_IMPORTED_MODULE_1__util_analyzer__["b" /* extractMeta */](info)
+                fromX = (fromX === undefined ? x : Math.min(x, fromX))
+                toX = (toX === undefined ? (x + w) : Math.max((x + w), toX))
+                fromY = (fromY === undefined ? y : Math.min(y, fromY))
+                toY = (toY === undefined ? (y + h) : Math.max((y + h), toY))
+                text += char
             })
-        }
-    })
+            const scale = window.iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale
+            let $div = $('<div class="pdfanno-search-result"/>')
+            $div.css({
+                top    : fromY * scale + 'px',
+                left   : fromX * scale + 'px',
+                width  : (toX - fromX) * scale + 'px',
+                height : (toY - fromY) * scale + 'px',
+                zIndex : __WEBPACK_IMPORTED_MODULE_0__shared_coords__["c" /* nextZIndex */]()
+            })
+            $textLayer.append($div)
+            // TODO 後で、改行されたものとかにも対応できるようにする（その場合は、rectsが複数）
+            const aPosition = [[ fromX, fromY, (toX - fromX), (toY - fromY) ]]
+            searchHighlights.push({
+                page           : page.page,
+                top            : fromY,
+                position       : aPosition,
+                searchPosition : position,
+                $elm           : $div,
+                text
+            })
+        })
+    }
 
     if (searchHighlights.length > 0) {
         // Init highlight at the current page.
@@ -13184,116 +13372,16 @@ function doSearch ({ query = null } = {}) {
         let found = false
         for (let i = 0; i < searchHighlights.length; i++) {
             if (currentPage === searchHighlights[i].page) {
-                searchPosition = i
+                __WEBPACK_IMPORTED_MODULE_2_anno_ui__["searchUI"].setSearchPosition(i)
                 found = true
                 break
             }
         }
         // If there is no result at the current page, set the index 0.
         if (!found) {
-            searchPosition = 0
+            __WEBPACK_IMPORTED_MODULE_2_anno_ui__["searchUI"].setSearchPosition(0)
         }
-        highlightSearchResult()
     }
-
-    if (searchType === 'text') {
-        $('.search-hit').removeClass('hidden')
-        $('.search-current-position').text(searchPosition + 1)
-        $('.search-hit-count').text(searchHighlights.length)
-    } else {
-        // Dict matching.
-        $('.js-dict-match-cur-pos').text(searchPosition + 1)
-        $('.js-dict-match-hit-counts').text(searchHighlights.length)
-    }
-}
-
-/**
- * Dictonary Matching.
- */
-window.addEventListener('DOMContentLoaded', () => {
-
-    // Clear prev cache.
-    $('.js-dict-match-file :file').on('click', e => {
-        $(e.currentTarget).val(null)
-    })
-
-    // Load a dictionary for matching.
-    $('.js-dict-match-file :file').on('change', e => {
-
-        const files = e.target.files
-        if (files.length === 0) {
-            window.annoUI.ui.alertDialog.show({ message : 'Select a file.' })
-            return
-        }
-
-        const fname = files[0].name
-        $('.js-dict-match-file-name').text(fname)
-
-        let fileReader = new FileReader()
-        fileReader.onload = ev => {
-            const texts = ev.target.result.split('\n').map(t => {
-                return t.trim()
-            }).filter(t => {
-                return t
-            })
-            if (texts.length === 0) {
-                window.annoUI.ui.alertDialog.show({ message : 'No text is found in the dictionary file.' })
-                return
-            }
-            dictonaryTexts = texts
-            searchByDictionary(texts)
-        }
-        fileReader.readAsText(files[0])
-    })
-
-    // Clear search results.
-    $('.js-dict-match-clear').on('click', e => {
-        searchType = null
-        doSearch()
-        $(e.currentTarget).blur()
-    })
-
-    // Go to the prev/next result.
-    $('.js-dict-match-prev, .js-dict-match-next').on('click', e => {
-
-        if (searchType !== 'dictionary') {
-            return
-        }
-
-        // No action for no results.
-        if (searchHighlights.length === 0) {
-            return
-        }
-
-        // go to next or prev.
-        let num = 1
-        if ($(e.currentTarget).hasClass('js-dict-match-prev')) {
-            num = -1
-        }
-        searchPosition += num
-        if (searchPosition < 0) {
-            searchPosition = searchHighlights.length - 1
-        } else if (searchPosition >= searchHighlights.length) {
-            searchPosition = 0
-        }
-
-        highlightSearchResult()
-    })
-
-    // Set the search behavior.
-    $('.js-dict-match-case-sensitive').on('change', () => {
-        searchByDictionary(dictonaryTexts)
-    })
-})
-
-/**
- * Search by a dict file.
- */
-function searchByDictionary (texts = []) {
-    console.log('searchByDictionary:', texts)
-    searchType = 'dictionary'
-    const query = texts.join('|')
-    doSearch({ query })
 }
 
 
@@ -13731,9 +13819,9 @@ module.exports = Cancel;
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_urijs__ = __webpack_require__(39);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_urijs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_urijs__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_anno_ui__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_anno_ui__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_anno_ui___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_anno_ui__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__shared_util__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__shared_util__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__page_util_window__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__page_public__ = __webpack_require__(42);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__page_search__ = __webpack_require__(19);
@@ -14072,7 +14160,7 @@ module.exports = __webpack_require__.p + "dist/index.html";
 var content = __webpack_require__(38);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
-var update = __webpack_require__(5)(content, {});
+var update = __webpack_require__(6)(content, {});
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
@@ -14092,7 +14180,7 @@ if(false) {
 /* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(4)();
+exports = module.exports = __webpack_require__(5)();
 // imports
 
 
@@ -16510,7 +16598,7 @@ module.exports = g;
 /* unused harmony export addAnnotation */
 /* unused harmony export deleteAnnotation */
 /* unused harmony export clear */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_anno_ui_src_utils__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_anno_ui_src_utils__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_toml__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_toml___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_toml__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__shared_coords__ = __webpack_require__(1);
@@ -16733,9 +16821,11 @@ function clear () {
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = setup;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util_analyzer__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__shared_util__ = __webpack_require__(2);
 /**
  * Create text layers which enable users to select texts.
  */
+
 
 
 let pages
@@ -16808,6 +16898,8 @@ function createTextLayer (page) {
         })
         $textLayer.append(snipets.join(''))
 
+        __WEBPACK_IMPORTED_MODULE_1__shared_util__["b" /* dispatchWindowEvent */]('textlayercreated', page)
+
     }, window.iframeWindow.TEXT_LAYER_RENDER_DELAY + 300)
 }
 
@@ -16843,7 +16935,7 @@ window.getText = function (page, startIndex, endIndex) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = setup;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_anno_ui__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_anno_ui__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_anno_ui___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_anno_ui__);
 /*
  * Download the result of pdfextract.jar.
@@ -16949,12 +17041,12 @@ function getDownloadFileName () {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_axios__ = __webpack_require__(46);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_axios___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_axios__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_anno_ui__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_anno_ui__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_anno_ui___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_anno_ui__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__loadFiles__ = __webpack_require__(65);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__search__ = __webpack_require__(19);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__socket__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__shared_util__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__shared_util__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__shared_coords__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__util_window__ = __webpack_require__(18);
 
