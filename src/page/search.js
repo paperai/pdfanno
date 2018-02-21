@@ -36,7 +36,7 @@ export function getSearchHighlight () {
 
 window.addEventListener('DOMContentLoaded', () => {
     // Re-render the search results.
-    window.addEventListener('pagerendered', rerenderSearchResults)
+    window.addEventListener('textlayercreated', rerenderSearchResults)
 })
 
 /**
@@ -59,7 +59,6 @@ function highlightSearchResult (searchPosition) {
 
 /**
  * Render search results.
- * TODO: 機能は違いますがrenderHighlightと名前が被ってしまってしまっているのでどちらかを変更
  */
 function rerenderSearchResults () {
 
@@ -75,6 +74,7 @@ function rerenderSearchResults () {
         highlight.$elm.css('z-index', nextZIndex())
         $textLayer.append(highlight.$elm)
     })
+
 }
 
 /**
