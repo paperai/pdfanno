@@ -13996,6 +13996,11 @@ window.addEventListener('DOMContentLoaded', async e => {
         showLoader(false)
         const message = 'Failed to analyze the PDF.<br>Reason: ' + err
         __WEBPACK_IMPORTED_MODULE_1_anno_ui__["ui"].alertDialog.show({ message })
+
+        // Init viewer.
+        window.annoPage.initializeViewer(null)
+        // Start application.
+        window.annoPage.startViewerApplication()
     }
 
     // initial tab.
@@ -17511,6 +17516,8 @@ class PDFAnnoPage {
                     const pdf = Uint8Array.from(atob(this.response.pdf), c => c.charCodeAt(0))
                     const analyzeResult = this.response.analyzeResult
                     resolve({ pdf, analyzeResult })
+                } else {
+                    reject(this.status)
                 }
             }
             xhr.timeout = 120 * 1000 // 120s
