@@ -108,6 +108,19 @@ export default class AnnotationContainer {
         }
     }
 
+    setColor (colorMap) {
+        console.log('setColor:', colorMap)
+        Object.keys(colorMap).forEach(annoType => {
+            if (annoType === 'default') {
+                return
+            }
+            Object.keys(colorMap[annoType]).forEach(text => {
+                const color = colorMap[annoType][text]
+                this.changeColor({ text, color, annoType })
+            })
+        })
+    }
+
     /**
      * Export annotations as a TOML string.
      */

@@ -226,6 +226,9 @@ window.addEventListener('DOMContentLoaded', async e => {
             if (annoURL) {
                 let anno = await window.annoPage.loadAnnoFileFromServer(annoURL)
                 publicApi.addAllAnnotations(publicApi.readTOML(anno))
+                // Set colors.
+                const colorMap = annoUI.labelInput.getColorMap()
+                window.iframeWindow.annotationContainer.setColor(colorMap)
                 // Move to the annotation.
                 if (moveTo) {
                     setTimeout(() => {
