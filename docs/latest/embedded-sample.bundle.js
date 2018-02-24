@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 60);
+/******/ 	return __webpack_require__(__webpack_require__.s = 83);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -18361,36 +18361,46 @@ function _excludeBaseDirName (filePath) {
 /* 57 */,
 /* 58 */,
 /* 59 */,
-/* 60 */
+/* 60 */,
+/* 61 */,
+/* 62 */,
+/* 63 */,
+/* 64 */,
+/* 65 */,
+/* 66 */,
+/* 67 */,
+/* 68 */,
+/* 69 */,
+/* 70 */,
+/* 71 */,
+/* 72 */,
+/* 73 */,
+/* 74 */,
+/* 75 */,
+/* 76 */,
+/* 77 */,
+/* 78 */,
+/* 79 */,
+/* 80 */,
+/* 81 */,
+/* 82 */,
+/* 83 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_urijs__ = __webpack_require__(23);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_urijs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_urijs__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_anno_ui__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_anno_ui___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_anno_ui__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__shared_util__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__page_util_window__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__page_public__ = __webpack_require__(26);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__page_search__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__page_textLayer__ = __webpack_require__(64);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__page_pdftxtdownload__ = __webpack_require__(65);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__page_socket__ = __webpack_require__(22);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__page_pdf_PDFAnnoPage__ = __webpack_require__(27);
-__webpack_require__(61)
-__webpack_require__(62)
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__page_pdf_PDFAnnoPage__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__page_public__ = __webpack_require__(26);
+__webpack_require__(84)
+__webpack_require__(85)
+
+// sample.
+// ?pdf=https://yoheim.net/tmp/bitcoin.pdf&anno=https://yoheim.net/tmp/bitcoin.anno
 
 
-
-// UI parts.
-
-
-
-
-
-
-
+// TODO 後でコア機能は別JSに移してもいいかも.
 
 
 
@@ -18408,308 +18418,98 @@ if (true) {
     window.API_ROOT = window.API_DOMAIN + window.API_PATH
 }
 
-/**
- * Global variable.
- */
-window.pdfanno = {}
+window.annoPage = new __WEBPACK_IMPORTED_MODULE_1__page_pdf_PDFAnnoPage__["a" /* default */]()
 
-/**
- * Expose public APIs.
- */
-__WEBPACK_IMPORTED_MODULE_4__page_public__["b" /* expose */]()
-
-/**
- * Annotation functions for a page.
- */
-window.annoPage = new __WEBPACK_IMPORTED_MODULE_9__page_pdf_PDFAnnoPage__["a" /* default */]()
-
-/**
- * Get the y position in the annotation.
- */
-function _getY (annotation) {
-
-    if (annotation.rectangles) {
-        return annotation.rectangles[0].y
-
-    } else if (annotation.y1) {
-        return annotation.y1
-
-    } else {
-        return annotation.y
-    }
+function getPDFUrlFromQuery () {
+    return __WEBPACK_IMPORTED_MODULE_0_urijs___default.a(document.URL).query(true).pdf
 }
 
-/**
- *  The entry point.
- */
-window.addEventListener('DOMContentLoaded', async e => {
-
-    // resizable.
-    __WEBPACK_IMPORTED_MODULE_1_anno_ui__["util"].setupResizableColumns()
-
-    // Start event listeners.
-    __WEBPACK_IMPORTED_MODULE_1_anno_ui__["event"].setup()
-
-    // Browse button.
-    __WEBPACK_IMPORTED_MODULE_1_anno_ui__["browseButton"].setup({
-        loadFiles                          : window.annoPage.loadFiles,
-        clearAllAnnotations                : window.annoPage.clearAllAnnotations,
-        displayCurrentReferenceAnnotations : () => window.annoPage.displayAnnotation(false, false),
-        displayCurrentPrimaryAnnotations   : () => window.annoPage.displayAnnotation(true, false),
-        getContentFiles                    : () => window.annoPage.contentFiles,
-        getAnnoFiles                       : () => window.annoPage.annoFiles,
-        closePDFViewer                     : window.annoPage.closePDFViewer
-    })
-
-    // PDF dropdown.
-    __WEBPACK_IMPORTED_MODULE_1_anno_ui__["contentDropdown"].setup({
-        initialText            : 'PDF File',
-        overrideWarningMessage : 'Are you sure to load another PDF ?',
-        contentReloadHandler   : fileName => {
-
-            __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('willChangeContent')
-
-            // Disable UI.
-            $('#searchWord, .js-dict-match-file').attr('disabled', 'disabled')
-
-            // Get the content.
-            const content = window.annoPage.getContentFile(fileName)
-
-            // Reset annotations displayed.
-            window.annoPage.clearAllAnnotations()
-
-            // Display the PDF on the viewer.
-            window.annoPage.displayViewer(content)
-
-            // Upload and analyze the PDF for search.
-            __WEBPACK_IMPORTED_MODULE_1_anno_ui__["uploadButton"].uploadPDF({
-                contentFile     : content,
-                successCallback : text => {
-                    __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('didChangeContent')
-                    __WEBPACK_IMPORTED_MODULE_5__page_search__["b" /* setup */](text)
-                    __WEBPACK_IMPORTED_MODULE_6__page_textLayer__["a" /* setup */](text)
-                    window.annoPage.pdftxt = text
-                }
-            })
-        }
-    })
-
-    // Primary anno dropdown.
-    __WEBPACK_IMPORTED_MODULE_1_anno_ui__["primaryAnnoDropdown"].setup({
-        clearPrimaryAnnotations  : window.annoPage.clearAllAnnotations,
-        displayPrimaryAnnotation : annoName => window.annoPage.displayAnnotation(true)
-    })
-
-    // Reference anno dropdown.
-    __WEBPACK_IMPORTED_MODULE_1_anno_ui__["referenceAnnoDropdown"].setup({
-        displayReferenceAnnotations : annoNames => window.annoPage.displayAnnotation(false)
-    })
-
-    // Anno list dropdown.
-    __WEBPACK_IMPORTED_MODULE_1_anno_ui__["annoListDropdown"].setup({
-        getAnnotations : () => {
-
-            // Get displayed annotations.
-            let annotations = window.annoPage.getAllAnnotations()
-
-            // Filter only Primary.
-            annotations = annotations.filter(a => {
-                return !a.readOnly
-            })
-
-            // Sort by offsetY.
-            annotations = annotations.sort((a1, a2) => {
-                return _getY(a1) - _getY(a2)
-            })
-
-            return annotations
-        },
-        scrollToAnnotation : window.annoPage.scrollToAnnotation
-    })
-
-    // Download anno button.
-    __WEBPACK_IMPORTED_MODULE_1_anno_ui__["downloadButton"].setup({
-        getAnnotationTOMLString : window.annoPage.exportData,
-        getCurrentContentName   : () => {
-            return window.annoPage.getCurrentContentFile().name
-        },
-        didDownloadCallback : __WEBPACK_IMPORTED_MODULE_3__page_util_window__["c" /* unlistenWindowLeaveEvent */]
-    })
-
-    // Download pdftxt button.
-    __WEBPACK_IMPORTED_MODULE_7__page_pdftxtdownload__["a" /* setup */]()
-
-    // Label input.
-    __WEBPACK_IMPORTED_MODULE_1_anno_ui__["labelInput"].setup({
-        getSelectedAnnotations : window.annoPage.getSelectedAnnotations,
-        saveAnnotationText     : (id, text) => {
-            const annotation = window.annoPage.findAnnotationById(id)
-            if (annotation) {
-                annotation.text = text
-                annotation.save()
-                annotation.enableViewMode()
-                __WEBPACK_IMPORTED_MODULE_2__shared_util__["b" /* dispatchWindowEvent */]('annotationUpdated')
-            }
-        },
-        createSpanAnnotation : window.annoPage.createSpan,
-        createRelAnnotation  : window.annoPage.createRelation,
-        colorChangeListener  : v => {
-            window.iframeWindow.annotationContainer.changeColor(v)
-        }
-    })
-
-    // Upload button.
-    __WEBPACK_IMPORTED_MODULE_1_anno_ui__["uploadButton"].setup({
-        getCurrentDisplayContentFile : () => {
-            return window.annoPage.getCurrentContentFile()
-        },
-        uploadFinishCallback : (resultText) => {
-            __WEBPACK_IMPORTED_MODULE_5__page_search__["b" /* setup */](resultText)
-            __WEBPACK_IMPORTED_MODULE_6__page_textLayer__["a" /* setup */](resultText)
-            window.annoPage.pdftxt = resultText
-        }
-    })
-
-    // Display a PDF specified via URL query parameter.
-    const q        = __WEBPACK_IMPORTED_MODULE_0_urijs___default.a(document.URL).query(true)
-    const pdfURL   = q.pdf || getDefaultPDFURL()
-    const annoURL  = q.anno
-    const moveTo   = q.move
-    const tabIndex = q.tab && parseInt(q.tab, 10)
-
-    // Show loading.
-    showLoader(true)
-
-    // Load a PDF file.
-    try {
-
-        let { pdf, analyzeResult } = await window.annoPage.loadPDFFromServer(pdfURL)
-
-        // Init viewer.
-        window.annoPage.initializeViewer(null)
-        // Start application.
-        window.annoPage.startViewerApplication()
-
-        window.addEventListener('iframeReady', () => {
-            setTimeout(() => {
-                window.annoPage.displayViewer({
-                    name    : getPDFName(pdfURL),
-                    content : pdf
-                })
-            }, 500)
-        })
-
-        const listenPageRendered = async () => {
-            showLoader(false)
-
-            // Load and display annotations, if annoURL is set.
-            if (annoURL) {
-                let anno = await window.annoPage.loadAnnoFileFromServer(annoURL)
-                __WEBPACK_IMPORTED_MODULE_4__page_public__["a" /* addAllAnnotations */](__WEBPACK_IMPORTED_MODULE_4__page_public__["c" /* readTOML */](anno))
-                // Set colors.
-                const colorMap = __WEBPACK_IMPORTED_MODULE_1_anno_ui__["labelInput"].getColorMap()
-                window.iframeWindow.annotationContainer.setColor(colorMap)
-                // Move to the annotation.
-                if (moveTo) {
-                    setTimeout(() => {
-                        window.annoPage.scrollToAnnotation(moveTo)
-                    }, 500)
-                }
-            }
-            window.removeEventListener('pagerendered', listenPageRendered)
-        }
-        window.addEventListener('pagerendered', listenPageRendered)
-
-        // Set the analyzeResult.
-        __WEBPACK_IMPORTED_MODULE_1_anno_ui__["uploadButton"].setResult(analyzeResult)
-
-        // Init search function.
-        __WEBPACK_IMPORTED_MODULE_5__page_search__["b" /* setup */](analyzeResult)
-
-        // Init textLayers.
-        __WEBPACK_IMPORTED_MODULE_6__page_textLayer__["a" /* setup */](analyzeResult)
-        window.annoPage.pdftxt = analyzeResult
-
-    } catch (err) {
-
-        // Hide a loading, and show the error message.
-        showLoader(false)
-        const message = 'Failed to analyze the PDF.<br>Reason: ' + err
-        __WEBPACK_IMPORTED_MODULE_1_anno_ui__["ui"].alertDialog.show({ message })
-
-        // Init viewer.
-        window.annoPage.initializeViewer(null)
-        // Start application.
-        window.annoPage.startViewerApplication()
-    }
-
-    // initial tab.
-    if (tabIndex) {
-        $(`.nav-tabs a[href="#tab${tabIndex}"]`).click()
-    }
-
-})
-
-/**
- * Get the URL of the default PDF.
- */
-function getDefaultPDFURL () {
-    // e.g. https://paperai.github.io:80/pdfanno/pdfs/P12-1046.pdf
-    const pathnames = location.pathname.split('/')
-    const pdfURL = location.protocol + '//' + location.hostname + ':' + location.port + pathnames.slice(0, pathnames.length - 1).join('/') + '/pdfs/P12-1046.pdf'
-    return pdfURL
+function getAnnoUrlFromQuery () {
+    return __WEBPACK_IMPORTED_MODULE_0_urijs___default.a(document.URL).query(true).anno
 }
 
-/**
- * Get a PDF name from URL.
- */
+function loadDefaultPDFViewer () {
+    window.annoPage.initializeViewer()
+}
+
 function getPDFName (url) {
     const a = url.split('/')
     return a[a.length - 1]
 }
 
-/**
- * Show or hide a loding.
- */
-function showLoader (display) {
-    if (display) {
-        $('#pdfLoading').removeClass('close hidden')
-    } else {
-        $('#pdfLoading').addClass('close')
-        setTimeout(function () {
-            $('#pdfLoading').addClass('hidden')
-        }, 1000)
-    }
-}
+window.addEventListener('DOMContentLoaded', async () => {
 
-// UserID.
-window.addEventListener('DOMContentLoaded', () => {
+    const pdfUrl = getPDFUrlFromQuery()
 
-    let userId = __WEBPACK_IMPORTED_MODULE_0_urijs___default.a(document.URL).query(true).user_id
-    if (!userId) {
-        userId = __WEBPACK_IMPORTED_MODULE_1_anno_ui__["util"].uuid(5)
+    // Load a default pdf, if no one was specified.
+    if (!pdfUrl) {
+        loadDefaultPDFViewer()
+        return
     }
-    $('#userId').val(userId)
+
+    // Get pdf and pdf.txt.
+    let { pdf, analyzeResult } = await window.annoPage.loadPDFFromServer(pdfUrl)
+
+    // Init without a pdf.
+    window.annoPage.initializeViewer(null)
+
+    // Start application.
+    window.annoPage.startViewerApplication()
+
+    // Wait until iframe ready.
+    // TODO できればwindowにしたくない..が、displayViewer()が中でwindowを期待している.
+    window.addEventListener('iframeReady', () => {
+        setTimeout(() => {
+            window.annoPage.displayViewer({
+                name    : getPDFName(pdfUrl),
+                content : pdf
+            })
+        }, 500)
+    })
+
+    const annoUrl = getAnnoUrlFromQuery()
+    console.log('annoUrl:', annoUrl)
+    if (!annoUrl) {
+        return
+    }
+
+    const listenPageRendered = async () => {
+        // Load and display annotations.
+        let anno = await window.annoPage.loadAnnoFileFromServer(annoUrl)
+        console.log('anno:', anno)
+        __WEBPACK_IMPORTED_MODULE_2__page_public__["a" /* addAllAnnotations */](__WEBPACK_IMPORTED_MODULE_2__page_public__["c" /* readTOML */](anno))
+        window.removeEventListener('pagerendered', listenPageRendered)
+    }
+    window.addEventListener('pagerendered', listenPageRendered)
+
+
+
+
+
+
+
+
+
+
+
 })
 
-// WebSocket.
-__WEBPACK_IMPORTED_MODULE_8__page_socket__["b" /* setup */]()
 
 
 /***/ }),
-/* 61 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "dist/index.html";
+module.exports = __webpack_require__.p + "dist/embedded-sample.html";
 
 /***/ }),
-/* 62 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(63);
+var content = __webpack_require__(86);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
 var update = __webpack_require__(7)(content, {});
@@ -18718,8 +18518,8 @@ if(content.locals) module.exports = content.locals;
 if(false) {
 	// When the styles change, update the <style> tags
 	if(!content.locals) {
-		module.hot.accept("!!../node_modules/css-loader/index.js!./pdfanno.css", function() {
-			var newContent = require("!!../node_modules/css-loader/index.js!./pdfanno.css");
+		module.hot.accept("!!../node_modules/css-loader/index.js!./embedded-sample.css", function() {
+			var newContent = require("!!../node_modules/css-loader/index.js!./embedded-sample.css");
 			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 			update(newContent);
 		});
@@ -18729,7 +18529,7 @@ if(false) {
 }
 
 /***/ }),
-/* 63 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(6)();
@@ -18737,236 +18537,12 @@ exports = module.exports = __webpack_require__(6)();
 
 
 // module
-exports.push([module.i, "@charset \"utf-8\";\n\n/* Loading */\n.loader-container {\n    position: absolute;\n    top: 100px;\n    left: 50%;\n    width: 200px;\n    height: 200px;\n    margin-left: -150px;\n    /*margin-top: -150px;*/\n    background-color: #333;\n    padding: 16px;\n    box-shadow: 0 0 10px rgba(0,0,0,.5);\n    transition: opacity .3s ease-in-out;\n}\n.loader-container.close {\n    opacity: 0;\n}\n.loader {\n    border: 16px solid #f3f3f3; /* Light grey */\n    border-top: 16px solid #3498db; /* Blue */\n    border-radius: 50%;\n    width: 120px;\n    height: 120px;\n    animation: spin 1.5s ease-in-out infinite;\n    margin-left: auto;\n    margin-right: auto;\n}\n@keyframes spin {\n    0% { transform: rotate(0deg); }\n    100% { transform: rotate(360deg); }\n}\n.loader-container p {\n    margin-top: 16px;\n    font-size: 16px;\n    text-align: center;\n    color: white;\n}\n\n/*\n    Search UI.\n*/\n.search-control {\n    display: flex;\n}\n.search-input-container {\n    flex-grow: 1;\n    position: relative;\n}\n.search-control__input {\n    width: 100%;\n}\n.search-control__btn {\n    flex-grow: 0;\n    flex-shrink: 0;\n    flex-basis: 32px;\n}\n.search-hit {\n    position: absolute;\n    top: 50%;\n    right: 5px;\n    opacity: .5;\n    font-size: 12px;\n    line-height: 12px;\n    margin-top: -6px;\n}\n", ""]);
+exports.push([module.i, "@charset 'utf-8';\n\n* {\n    padding: 0;\n    margin: 0;\n    box-sizing: border-box;\n}\nhtml, body {\n    height: 100%;\n}\n.h1 {\n    font-size: 32px;\n    text-align: center;\n    height: 60px;\n    line-height: 60px;\n}\n.viewer {\n    width: 80%;\n    height: calc(100% - 60px);\n    margin-left: 10%;\n}\n\n.viewer iframe {\n    width: 100%;\n    height: 100%;\n}\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 // exports
-
-
-/***/ }),
-/* 64 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = setup;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util_analyzer__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__shared_util__ = __webpack_require__(2);
-/**
- * Create text layers which enable users to select texts.
- */
-
-
-
-let pages
-
-/**
- * Setup text layers.
- */
-function setup (analyzeData) {
-    console.log('textLayer:setup')
-
-    pages = __WEBPACK_IMPORTED_MODULE_0__util_analyzer__["a" /* customizeAnalyzeResult */](analyzeData)
-
-    // Renew text layers.
-    $('.textLayer', window.iframeWindow.document).each(function () {
-        const page = $(this).parent('.page').data('page-number')
-        createTextLayer(page)
-    })
-
-    // Listen pageRendered event.
-    window.removeEventListener('pagerendered', listenPageRendered)
-    window.addEventListener('pagerendered', listenPageRendered)
-}
-
-/**
- * Listen pageRendered event, and create a new text layer.
- */
-function listenPageRendered (ev) {
-    const page = ev.detail.pageNumber
-    console.log('textLayer:pageRendered:', page)
-    createTextLayer(page)
-}
-
-/**
- * Create a new text layer.
- */
-function createTextLayer (page) {
-
-    // TODO: Performance: this function is a little heavy.
-
-    setTimeout(() => {
-
-        console.log('createTextLayer:', page)
-
-        const $textLayer = $(`.page[data-page-number="${page}"] .textLayer`, window.iframeWindow.document)
-
-        // Remove all children.
-        $textLayer.html('')
-
-        // Create text div elements.
-        if (!pages[page - 1] || !pages[page - 1].meta) {
-            console.log('modify:', pages, page)
-            return
-        }
-        const snipets = pages[page - 1].meta.map((info, index) => {
-
-            if (!info) {
-                return
-            }
-            const { char, x, y, w, h } = __WEBPACK_IMPORTED_MODULE_0__util_analyzer__["b" /* extractMeta */](info)
-            const scale = window.iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale
-            const $div = $('<div class="pdfanno-text-layer"/>').css({
-                top        : y * scale + 'px',
-                left       : x * scale + 'px',
-                width      : w * scale + 'px',
-                height     : h * scale + 'px',
-                fontSize   : `${h * 0.85}px`,
-                lineHeight : h * scale + 'px',
-                textAlign  : 'center'
-            })
-            .attr('data-page', page)
-            .attr('data-index', index)
-            .text(char)
-            return $div[0].outerHTML
-        })
-        $textLayer.append(snipets.join(''))
-
-        __WEBPACK_IMPORTED_MODULE_1__shared_util__["b" /* dispatchWindowEvent */]('textlayercreated', page)
-
-    }, window.iframeWindow.TEXT_LAYER_RENDER_DELAY + 300)
-}
-
-// TODO a little tricky.
-window.getText = function (page, startIndex, endIndex) {
-    const infos = pages[page - 1].meta.slice(startIndex, endIndex + 1)
-    const texts = infos.map(info => {
-        if (!info) {
-            return ' '
-        } else {
-            // TODO こんなmetaを扱う処理は、どこかにまとめておかないとメンテナンスが非常に大変..
-            return info.split('\t')[3]
-        }
-    })
-    const text = texts.join('')
-
-    // Text position.
-    // TODO Use pdfextract.jar 0.1.6 's position data.'
-    const beforeCount = pages.slice(0, page - 1)
-            .reduce((v, page) => v.concat(page.meta), [])
-            .filter(info => info).length
-    const start1 = pages[page - 1].meta.slice(0, startIndex + 1).filter(info => info).length
-    const start2 = pages[page - 1].meta.slice(0, endIndex + 1).filter(info => info).length
-    const textRange = [ (beforeCount + start1), (beforeCount + start2) ]
-    // Return.
-    return { text, textRange }
-}
-
-
-/***/ }),
-/* 65 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = setup;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_anno_ui__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_anno_ui___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_anno_ui__);
-/*
- * Download the result of pdfextract.jar.
- */
-
-
-/*
- * Setup the function.
- */
-function setup () {
-    reset()
-    setupDownloadButton()
-    window.addEventListener('didCloseViewer', disable)
-    window.addEventListener('willChangeContent', disable)
-    window.addEventListener('didChangeContent', enable)
-}
-
-/*
- * Reset events.
- */
-function reset () {
-    $('#downloadPDFTextButton').off('click')
-    window.removeEventListener('didCloseViewer', disable)
-    window.removeEventListener('willChangeContent', disable)
-    window.removeEventListener('didChangeContent', enable)
-}
-
-/*
- * Setup the download button.
- */
-function setupDownloadButton () {
-
-    $('#downloadPDFTextButton').on('click', e => {
-
-        // Reset the selected state.
-        $(e.currentTarget).blur()
-
-        // Get the result of pdfextract.
-        const pdftxt = window.annoPage.pdftxt
-        if (!pdftxt) {
-            __WEBPACK_IMPORTED_MODULE_0_anno_ui__["ui"].alertDialog.show({ message : 'No pdftxt is available.' })
-            return
-        }
-
-        // File name for download.
-        const fname = getDownloadFileName()
-
-        // Download.
-        let blob = new Blob([pdftxt])
-        let blobURL = window.URL.createObjectURL(blob)
-        let a = document.createElement('a')
-        document.body.appendChild(a) // for firefox working correctly.
-        a.download = fname
-        a.href = blobURL
-        a.click()
-        a.parentNode.removeChild(a)
-    })
-}
-
-/*
- * Enable UI.
- */
-function enable () {
-    $('#downloadPDFTextButton').removeAttr('disabled')
-}
-
-/*
- * Disable UI.
- */
-function disable () {
-    $('#downloadPDFTextButton').attr('disabled', 'disabled')
-}
-
-/**
- * Get the file name for download.
- */
-function getDownloadFileName () {
-
-    // TODO Refactoring. this function is similar to the one in downloadButton.
-
-    // The name of Primary Annotation.
-    let primaryAnnotationName
-    $('#dropdownAnnoPrimary a').each((index, element) => {
-        let $elm = $(element)
-        if ($elm.find('.fa-check').hasClass('no-visible') === false) {
-            primaryAnnotationName = $elm.find('.js-annoname').text()
-        }
-    })
-    if (primaryAnnotationName) {
-        return primaryAnnotationName.replace('.anno', '') + 'pdftxt'
-    }
-
-    // The name of Content.
-    let pdfFileName = window.annoPage.getCurrentContentFile().name
-    return pdfFileName + '.txt'
-}
 
 
 /***/ })
 /******/ ]);
 });
-//# sourceMappingURL=pdfanno.page.bundle.js.map
+//# sourceMappingURL=embedded-sample.bundle.js.map
