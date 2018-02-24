@@ -4,7 +4,8 @@ const webpack = require('webpack');
 let config = {
     entry : {
         'pdfanno.page' : './src/pdfanno.js',
-        'pdfanno.core' : './src/core/index.js'
+        'pdfanno.core' : './src/core/index.js',
+        'embedded-sample' : './src/embedded-sample.js',
     },
     output : {
         filename : './dist/[name].bundle.js',
