@@ -170,7 +170,7 @@ export default class PDFAnnoPage {
     /**
      * Start the viewer.
      */
-    initializeViewer (initialPDFPath = '../pdfs/P12-1046.pdf') {
+    initializeViewer (initialPDFPath = '../pdfs/P12-1046.pdf', viewerSelector = '#viewer') {
 
         window.pdf = null
         window.pdfName = null
@@ -184,8 +184,8 @@ export default class PDFAnnoPage {
         }
 
         // Reload pdf.js.
-        $('#viewer iframe').remove()
-        $('#viewer').html('<iframe src="' + url + '" class="anno-viewer" frameborder="0"></iframe>')
+        $(viewerSelector + ' iframe').remove()
+        $(viewerSelector).html('<iframe src="' + url + '" class="anno-viewer" frameborder="0"></iframe>')
     }
 
     /**

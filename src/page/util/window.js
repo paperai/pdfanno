@@ -24,6 +24,12 @@ export function unlistenWindowLeaveEvent () {
     Adjust the height of viewer according to window height.
 */
 export function adjustViewerSize () {
+
+    // Only pdfanno.
+    if ($('#dropdownPdf ul').length === 0) {
+        return
+    }
+
     window.removeEventListener('resize', resizeHandler)
     window.addEventListener('resize', resizeHandler)
     resizeHandler()
