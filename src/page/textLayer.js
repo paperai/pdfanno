@@ -51,6 +51,10 @@ function createTextLayer (page) {
         $textLayer.html('')
 
         // Create text div elements.
+        if (!pages[page - 1] || !pages[page - 1].meta) {
+            console.log('modify:', pages, page)
+            return
+        }
         const snipets = pages[page - 1].meta.map((info, index) => {
 
             if (!info) {
