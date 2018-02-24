@@ -7440,7 +7440,14 @@ function nextResult () {
  * Highlight a single search result.
  */
 function highlightSearchResult () {
-    $('.search-current-position').text(_searchPosition + 1)
+    switch(_searchType) {
+      case 'text':
+        $('.search-current-position').text(_searchPosition + 1)
+        break
+      case 'dictionary':
+        $('.js-dict-match-cur-pos').text(_searchPosition + 1)
+        break
+    }
     _scrollTo(_searchPosition)
 }
 
@@ -7473,6 +7480,7 @@ function search ({ hay, needle, isCaseSensitive = false, useRegexp = false }) {
  */
 function resetUI () {
     $('.search-hit').addClass('hidden')
+    $('.search-current-position, .search-hit-count').text('0')
     $('.js-dict-match-cur-pos, .js-dict-match-hit-counts').text('000')
     _resetUIAfter()
 }
@@ -7526,7 +7534,7 @@ function doSearch ({ query = null } = {}) {
     if (_searchType === 'text') {
         $('.search-hit').removeClass('hidden')
         $('.search-current-position').text(_searchPosition + 1)
-        $('.search-hit-count').text(_hitCount) // TODO: searchHighlights(=_positionsを元にハイライトされた個数)と_positionsが不一致になることは？
+        $('.search-hit-count').text(_hitCount)
     } else {
         // Dict matching.
         $('.js-dict-match-cur-pos').text(_searchPosition + 1)
