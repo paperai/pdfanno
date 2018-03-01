@@ -1,5 +1,11 @@
 const path = require('path');
 const webpack = require('webpack');
+const MinifyPlugin = require("babel-minify-webpack-plugin");
+
+let plugins = []
+if (process.env.NODE_ENV === 'production') {
+    plugins.push(new MinifyPlugin())
+}
 
 let config = {
     entry : {
@@ -21,7 +27,7 @@ let config = {
             exclude : /node_modules/
         }]
     },
-    plugins : [],
+    plugins,
     devServer : {
       host : 'localhost',
       port : 8080,
