@@ -4,8 +4,10 @@
 const path = require('path');
 const fs = require('fs');
 const exec = require('child_process').exec;
+const crypto = require('crypto');
 const request = require('request');
 const rp = require('request-promise');
+const mkdirp = require('mkdirp');
 const packageJson = require('../../package.json');
 
 
@@ -64,9 +66,9 @@ module.exports.fetchPDFText = async url => {
 module.exports.savePDF = (fileName, content) => {
     return new Promise((resolve, reject) => {
 
-        const dataPath = path.resolve(__dirname, '..', 'server-data');
+        const dataPath = path.resolve(__dirname, '..', 'server-data', 'pdf');
         if (!fs.existsSync(dataPath)) {
-                fs.mkdirSync(dataPath);
+            mkdirp.sync(dataPath)
         }
         const pdfPath = path.resolve(dataPath, fileName);
         // TODO Use Async.
@@ -109,6 +111,43 @@ module.exports.getUserAnnotation = (documentId, userId) => {
     }
 
     return fs.readFileSync(annotationPath, 'utf-8')
+}
+
+module.exports.loadCachePdftxt = pdf => {
+
+    const path = getPdftxtPath(pdf)
+
+    if (fs.existsSync(path)) {
+        return fs.readFileSync(path, 'utf-8')
+    }
+
+    return null
+}
+
+module.exports.savePdftxt = (pdf, pdftxt) => {
+
+    const dir = getPdftxtDir()
+    if (!fs.existsSync(dir)) {
+        mkdirp.sync(dir)
+    }
+
+    const path = getPdftxtPath(pdf)
+    fs.writeFileSync(path, pdftxt, 'utf-8')
+}
+
+function createHashFromPdf (pdf) {
+    const sha256 = crypto.createHash('sha256')
+    sha256.update(pdf, 'binary')
+    return sha256.digest('hex')
+}
+
+function getPdftxtDir () {
+    return path.resolve(__dirname, '..', 'server-data', 'pdftxt', packageJson.pdfextract.version)
+}
+
+function getPdftxtPath (pdf) {
+    const hash = createHashFromPdf(pdf)
+    return path.resolve(getPdftxtDir(), hash)
 }
 
 // Execute an external command.
