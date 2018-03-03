@@ -1,7 +1,6 @@
 /**
     APIs for PDFAnno.
 */
-
 const request = require('request');
 const service = require('../service');
 
@@ -51,8 +50,18 @@ module.exports.loadPDF = async function (req, res) {
             return res.send(404, 'Not Found.');
         }
 
+        // Load from cache.
+        let pdftxt = service.loadCachePdftxt(pdf)
+        if (pdftxt) {
+            return res.json({
+                status        : 'success',
+                pdf           : new Buffer(pdf).toString('base64'),
+                analyzeResult : pdftxt,
+            });
+        }
+
         const pdftxtUrl = pdfUrl + '.txt'
-        let pdftxt = await service.fetchPDFText(pdftxtUrl)
+        pdftxt = await service.fetchPDFText(pdftxtUrl)
 
         if (!pdftxt) {
             // Fallback to local pdfextract.
@@ -61,6 +70,9 @@ module.exports.loadPDF = async function (req, res) {
             const pdfPath = await service.savePDF(tmpFileName, pdf)
             pdftxt = await service.analyzePDF(pdfPath)
         }
+
+        // Save a pdftxt as a cache.
+        service.savePdftxt(pdf, pdftxt)
 
         res.json({
             status        : 'success',
