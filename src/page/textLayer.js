@@ -39,44 +39,47 @@ function listenPageRendered (ev) {
  */
 function createTextLayer (page) {
 
-    // TODO: Performance: this function is a little heavy.
-
     setTimeout(() => {
 
         console.log('createTextLayer:', page)
 
         const $textLayer = $(`.page[data-page-number="${page}"] .textLayer`, window.iframeWindow.document)
 
-        // Remove all children.
-        $textLayer.html('')
-
         // Create text div elements.
         if (!pages[page - 1] || !pages[page - 1].meta) {
             console.log('modify:', pages, page)
             return
         }
-        const snipets = pages[page - 1].meta.map((info, index) => {
+        const scale = window.iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale
+
+        let snipet = ''
+        pages[page - 1].meta.forEach((info, index) => {
 
             if (!info) {
                 return
             }
             const { char, x, y, w, h } = extractMeta(info)
-            const scale = window.iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale
-            const $div = $('<div class="pdfanno-text-layer"/>').css({
-                top        : y * scale + 'px',
-                left       : x * scale + 'px',
-                width      : w * scale + 'px',
-                height     : h * scale + 'px',
-                fontSize   : `${h * 0.85}px`,
-                lineHeight : h * scale + 'px',
-                textAlign  : 'center'
-            })
-            .attr('data-page', page)
-            .attr('data-index', index)
-            .text(char)
-            return $div[0].outerHTML
+
+            const style = `
+                top: ${y * scale}px;
+                left: ${x * scale}px;
+                width: ${w * scale}px;
+                height: ${h * scale}px;
+                font-size: ${h * 0.85}px;
+                line-height: ${h * scale}px;
+                text-align: center;
+            `.replace(/\n/g, '')
+
+            snipet += `
+                <div
+                    class="pdfanno-text-layer"
+                    style="${style}"
+                    data-page="${page}"
+                    data-index="${index}">${char}</div>
+            `
         })
-        $textLayer.append(snipets.join(''))
+
+        $textLayer[0].innerHTML = snipet
 
         dispatchWindowEvent('textlayercreated', page)
 
