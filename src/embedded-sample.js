@@ -4,7 +4,6 @@ require('!style-loader!css-loader!./embedded-sample.css')
 // sample.
 // ?pdf=https://yoheim.net/tmp/bitcoin.pdf&anno=https://yoheim.net/tmp/bitcoin.anno
 
-
 // TODO 後でコア機能は別JSに移してもいいかも.
 import URI from 'urijs'
 import PDFAnnoPage from './page/pdf/PDFAnnoPage'
@@ -53,7 +52,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Get pdf and pdf.txt.
-    let { pdf, analyzeResult } = await window.annoPage.loadPDFFromServer(pdfUrl)
+    let { pdf } = await window.annoPage.loadPDFFromServer(pdfUrl)
 
     // Init without a pdf.
     window.annoPage.initializeViewer(null)
@@ -86,16 +85,6 @@ window.addEventListener('DOMContentLoaded', async () => {
         window.removeEventListener('pagerendered', listenPageRendered)
     }
     window.addEventListener('pagerendered', listenPageRendered)
-
-
-
-
-
-
-
-
-
-
 
 })
 
