@@ -26,7 +26,7 @@ gulp.task('_minify-js', () => {
     assert(baseDir, 'baseDir must be set.')
     return gulp.src([
             path.join(baseDir, '**', '*.js'),
-            '!' + path.join(baseDir, '**', '*.bundle.js')
+            '!' + path.join(baseDir, '**', '*.bundle.js') // already was minified via webpack.
         ])
         .pipe(sourcemaps.init())
         .pipe(uglify())
