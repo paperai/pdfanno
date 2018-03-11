@@ -1,6 +1,7 @@
 const assert = require('assert')
 const gulp = require('gulp')
 const uglify = require('gulp-uglify-es').default
+const cleanCSS = require('gulp-clean-css')
 const gutil = require('gulp-util')
 const sourcemaps = require('gulp-sourcemaps')
 const runSequence = require('run-sequence')
@@ -19,14 +20,14 @@ function checkIsStableVersion () {
 function publish (cb) {
     fs.removeSync(baseDir)
     fs.copySync('dist', baseDir)
-    runSequence('_minify-js', cb)
+    runSequence('_minify-js', '_minify-css', cb)
 }
 
 gulp.task('_minify-js', () => {
     assert(baseDir, 'baseDir must be set.')
     return gulp.src([
             path.join(baseDir, '**', '*.js'),
-            '!' + path.join(baseDir, '**', '*.bundle.js') // already was minified via webpack.
+            '!' + path.join(baseDir, '**', '*.bundle.js') // already minified via webpack.
         ])
         .pipe(sourcemaps.init())
         .pipe(uglify())
@@ -34,6 +35,16 @@ gulp.task('_minify-js', () => {
             gutil.log(gutil.colors.red('[Error]'), err.toString())
         })
         .pipe(sourcemaps.write('.'))
+        .pipe(gulp.dest(baseDir))
+})
+
+gulp.task('_minify-css', () => {
+    assert(baseDir, 'baseDir must be set.')
+    return gulp.src(path.join(baseDir, '**', '*.css'))
+        .pipe(cleanCSS())
+        .on('error', function (err) {
+            gutil.log(gutil.colors.red('[Error]'), err.toString())
+        })
         .pipe(gulp.dest(baseDir))
 })
 

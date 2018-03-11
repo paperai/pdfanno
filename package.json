@@ -53,6 +53,7 @@
     "fs-extra": "^1.0.0",
     "fuse.js": "^3.1.0",
     "gulp": "^3.9.1",
+    "gulp-clean-css": "^3.9.3",
     "gulp-cli": "^1.4.0",
     "gulp-sourcemaps": "^2.6.4",
     "gulp-uglify-es": "^1.0.1",
