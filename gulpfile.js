@@ -2,6 +2,7 @@ const assert = require('assert')
 const gulp = require('gulp')
 const uglify = require('gulp-uglify-es').default
 const cleanCSS = require('gulp-clean-css')
+const htmlmin = require('gulp-htmlmin')
 const gutil = require('gulp-util')
 const sourcemaps = require('gulp-sourcemaps')
 const runSequence = require('run-sequence')
@@ -20,7 +21,7 @@ function checkIsStableVersion () {
 function publish (cb) {
     fs.removeSync(baseDir)
     fs.copySync('dist', baseDir)
-    runSequence('_minify-js', '_minify-css', cb)
+    runSequence('_minify-js', '_minify-css', '_minify-html', cb)
 }
 
 gulp.task('_minify-js', () => {
@@ -42,6 +43,19 @@ gulp.task('_minify-css', () => {
     assert(baseDir, 'baseDir must be set.')
     return gulp.src(path.join(baseDir, '**', '*.css'))
         .pipe(cleanCSS())
+        .on('error', function (err) {
+            gutil.log(gutil.colors.red('[Error]'), err.toString())
+        })
+        .pipe(gulp.dest(baseDir))
+})
+
+gulp.task('_minify-html', () => {
+    assert(baseDir, 'baseDir must be set.')
+    return gulp.src(path.join(baseDir, '**', '*.html'))
+        .pipe(htmlmin({
+            collapseWhitespace : true,
+            removeComments : true
+        }))
         .on('error', function (err) {
             gutil.log(gutil.colors.red('[Error]'), err.toString())
         })

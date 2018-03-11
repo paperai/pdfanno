@@ -70,6 +70,7 @@
     "axios": "^0.15.2",
     "body-parser": "^1.17.2",
     "express": "^4.15.4",
+    "gulp-htmlmin": "^4.0.0",
     "json-loader": "^0.5.7",
     "mkdirp": "^0.5.1",
     "mkdirp-promise": "^5.0.1",
