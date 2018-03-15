@@ -69,6 +69,16 @@ gulp.task('prepare', () => {
     fs.copySync('pdfs', path.join('dist', 'pdfs'))
 })
 
+gulp.task('copy-sw', () => {
+    return gulp
+            .src(path.join('src', 'sw.js'))
+            .pipe(gulp.dest('dist'))
+})
+
+gulp.task('watch-sw', () => {
+    gulp.watch([ 'src/sw.js' ], [ 'copy-sw' ])
+})
+
 gulp.task('publish_latest', cb => {
     baseDir = path.join('docs', 'latest')
     publish(cb)

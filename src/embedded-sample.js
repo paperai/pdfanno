@@ -22,6 +22,25 @@ if (process.env.NODE_ENV === 'production') {
     window.API_ROOT = window.API_DOMAIN + window.API_PATH
 }
 
+// ServiceWorker.
+// import runtime from 'serviceworker-webpack-plugin/lib/runtime'
+// if ('serviceWorker' in navigator) {
+//     console.log('runtime:', runtime)
+//     const registration = runtime.register()
+//     console.log('registration:', registration)
+// }
+(async () => {
+    if ('serviceWorker' in navigator) {
+        try {
+            const registration = navigator.serviceWorker.register('./sw.js')
+            console.log('ServiceWorker registration successed. with scope: ' + registration.scope)
+        } catch (err) {
+            console.log('ServiceWorker registration failed. reason: ' + err)
+        }
+    }
+})();
+
+
 window.annoPage = new PDFAnnoPage()
 
 function getPDFUrlFromQuery () {
