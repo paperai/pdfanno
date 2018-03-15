@@ -14,9 +14,15 @@ html, body {
     height: 60px;
     line-height: 60px;
 }
+.select-area {
+    display: block;
+    text-align: center;
+    height: 40px;
+    line-height: 40px;
+}
 .viewer {
     width: 80%;
-    height: calc(100% - 60px);
+    height: calc(100% - 60px - 40px);
     margin-left: 10%;
 }
 

@@ -5,7 +5,7 @@ require('!style-loader!css-loader!./embedded-sample.css')
 // ?pdf=https://yoheim.net/tmp/bitcoin.pdf&anno=https://yoheim.net/tmp/bitcoin.anno
 
 // TODO 後でコア機能は別JSに移してもいいかも.
-import URI from 'urijs'
+import URI from 'urijs' // TODO これが意外と重たいようだ... setTimeoutで時間かかりすぎの警告が出ている.
 import PDFAnnoPage from './page/pdf/PDFAnnoPage'
 import * as publicApi from './page/public'
 
@@ -23,12 +23,6 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // ServiceWorker.
-// import runtime from 'serviceworker-webpack-plugin/lib/runtime'
-// if ('serviceWorker' in navigator) {
-//     console.log('runtime:', runtime)
-//     const registration = runtime.register()
-//     console.log('registration:', registration)
-// }
 (async () => {
     if ('serviceWorker' in navigator) {
         try {
@@ -52,7 +46,7 @@ function getAnnoUrlFromQuery () {
 }
 
 function loadDefaultPDFViewer () {
-    window.annoPage.initializeViewer()
+    window.annoPage.initializeViewer(null)
 }
 
 function getPDFName (url) {
@@ -105,5 +99,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
     window.addEventListener('pagerendered', listenPageRendered)
 
+    $('#pdfSelect').on('change', () => {
+        const url = $('#pdfSelect').val()
+        console.log('url:', url)
+    })
 })
 
