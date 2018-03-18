@@ -8,6 +8,7 @@ require('!style-loader!css-loader!./embedded-sample.css')
 import URI from 'urijs' // TODO これが意外と重たいようだ... setTimeoutで時間かかりすぎの警告が出ている.
 import PDFAnnoPage from './page/pdf/PDFAnnoPage'
 import * as publicApi from './page/public'
+import { unlistenWindowLeaveEvent } from './page/util/window'
 
 /**
  * API root point.
@@ -34,7 +35,6 @@ if (process.env.NODE_ENV === 'production') {
     }
 })();
 
-
 window.annoPage = new PDFAnnoPage()
 
 function getPDFUrlFromQuery () {
@@ -43,10 +43,6 @@ function getPDFUrlFromQuery () {
 
 function getAnnoUrlFromQuery () {
     return URI(document.URL).query(true).anno
-}
-
-function loadDefaultPDFViewer () {
-    window.annoPage.initializeViewer(null)
 }
 
 function getPDFName (url) {
@@ -58,17 +54,16 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     const pdfUrl = getPDFUrlFromQuery()
 
+    // Init without a pdf.
+    window.annoPage.initializeViewer(null)
+
     // Load a default pdf, if no one was specified.
     if (!pdfUrl) {
-        loadDefaultPDFViewer()
         return
     }
 
     // Get pdf and pdf.txt.
     let { pdf } = await window.annoPage.loadPDFFromServer(pdfUrl)
-
-    // Init without a pdf.
-    window.annoPage.initializeViewer(null)
 
     // Start application.
     window.annoPage.startViewerApplication()
@@ -103,5 +98,8 @@ window.addEventListener('DOMContentLoaded', async () => {
         const url = $('#pdfSelect').val()
         console.log('url:', url)
     })
+
+    // temporary.
+    setInterval(unlistenWindowLeaveEvent, 500)
 })
 
