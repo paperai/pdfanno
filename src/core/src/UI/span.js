@@ -25,8 +25,10 @@ function getSelectionRects () {
         console.log('t:', pageNumber, startIndex, endIndex)
 
         // When no text is selected.
-        if (!pageNumber || !startIndex || !endIndex) {
-            return { rects : null, selectedText : null, textRange : null }
+        if ((pageNumber === null || pageNumber === undefined)
+            || (startIndex === null || startIndex === undefined)
+            || (endIndex === null || endIndex === undefined)) {
+                return { rects : null, selectedText : null, textRange : null }
         }
 
         // TODO a little tricky.
