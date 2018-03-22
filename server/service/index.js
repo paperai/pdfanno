@@ -17,18 +17,8 @@ module.exports.fetchPDF = async url => {
         method   : 'GET',
         url,
         headers  : {
-            // behave as a browser.
-            // 'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.124 Safari/537.36',
-            // 'User-Agent' : 'curl/7.54.0',
-            'User-Agent': 'curl/7.54.0'
-            // followAllRedirects : true,
-            // 'Upgrade-Insecure-Requests' : '1',
-            // 'Host' : 'arxiv.org',
-            // 'Accept' : 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-            // 'Accept-Encoding' : 'gzip, deflate, br',
-            // 'Accept-Language' : 'ja,en-US;q=0.9,en;q=0.8',
+            'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.124 Safari/537.36',
         },
-        // proxy : 'http://localhost:8888',
         // treat a response as a binary.
         encoding : null
     };
