@@ -61,7 +61,11 @@ module.exports.loadPDF = async function (req, res) {
         }
 
         const pdftxtUrl = pdfUrl + '.txt'
-        pdftxt = await service.fetchPDFText(pdftxtUrl)
+        try {
+            pdftxt = await service.fetchPDFText(pdftxtUrl)
+        } catch (e) {
+            // Skip.
+        }
 
         if (!pdftxt) {
             // Fallback to local pdfextract.
