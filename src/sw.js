@@ -33,7 +33,7 @@ const urlsToCache = [
     `/${baseDir}/build/pdf.worker.js`,
     'https://code.jquery.com/jquery-3.1.1.min.js',
 ]
-console.log('urlsToCache:', urlsToCache)
+console.log('urlsToCache:', urlsToCache.join('\n'))
 
 self.addEventListener('install', event => {
     console.log('install:', event)
@@ -47,7 +47,7 @@ self.addEventListener('install', event => {
 })
 
 self.addEventListener('fetch', event => {
-    console.log('fetch:', event.request.method, event.request.url, event)
+    // console.log('fetch:', event.request.method, event.request.url)
     event.respondWith(
         caches.match(event.request, { ignoreSearch : true }).then(response => {
             if (response) {

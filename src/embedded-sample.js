@@ -50,56 +50,74 @@ function getPDFName (url) {
     return a[a.length - 1]
 }
 
+function initViewer () {
+    return new Promise((resolve, reject) => {
+        window.addEventListener('iframeReady', () => {
+            // setTimeout(resolve, 500, true)
+            // setTimeout(() => {
+            //     window.annoPage.displayViewer({
+            //         name    : getPDFName(pdfUrl),
+            //         content : pdf
+            //     })
+            // }, 500)
+            resolve(true)
+        })
+        // Create a viewer without a pdf.
+        window.annoPage.initializeViewer(null)
+        window.annoPage.startViewerApplication()
+    })
+}
+
+function waitUntilRendered () {
+    return new Promise((resolve, reject) => {
+        const listenPageRendered = () => {
+            window.removeEventListener('pagerendered', listenPageRendered)
+            resolve(true)
+        }
+        window.addEventListener('pagerendered', listenPageRendered)
+    })
+}
+
 window.addEventListener('DOMContentLoaded', async () => {
 
     const pdfUrl = getPDFUrlFromQuery()
-
-    // Init without a pdf.
-    window.annoPage.initializeViewer(null)
-
-    // Load a default pdf, if no one was specified.
     if (!pdfUrl) {
         return
     }
 
-    // Get pdf and pdf.txt.
-    let { pdf } = await window.annoPage.loadPDFFromServer(pdfUrl)
-
-    // Start application.
-    window.annoPage.startViewerApplication()
-
-    // Wait until iframe ready.
-    // TODO できればwindowにしたくない..が、displayViewer()が中でwindowを期待している.
-    window.addEventListener('iframeReady', () => {
-        setTimeout(() => {
-            window.annoPage.displayViewer({
-                name    : getPDFName(pdfUrl),
-                content : pdf
-            })
-        }, 500)
+    // Create a viewer, and load/display a PDF.
+    let [ ok1, { pdf } ] = await Promise.all([
+        initViewer(),
+        window.annoPage.loadPDFFromServer(pdfUrl)
+    ])
+    console.log('ok:', ok1)
+    window.annoPage.displayViewer({
+        name    : getPDFName(pdfUrl),
+        content : pdf
     })
 
     const annoUrl = getAnnoUrlFromQuery()
-    console.log('annoUrl:', annoUrl)
     if (!annoUrl) {
         return
     }
 
-    const listenPageRendered = async () => {
-        // Load and display annotations.
-        let anno = await window.annoPage.loadAnnoFileFromServer(annoUrl)
-        console.log('anno:', anno)
-        publicApi.addAllAnnotations(publicApi.readTOML(anno))
-        window.removeEventListener('pagerendered', listenPageRendered)
-    }
-    window.addEventListener('pagerendered', listenPageRendered)
+    // Show annotations.
+    let [ ok2, anno ] = await Promise.all([
+        waitUntilRendered(),
+        window.annoPage.loadAnnoFileFromServer(annoUrl)
+    ])
+    console.log('ok:', ok2)
+    publicApi.addAllAnnotations(publicApi.readTOML(anno))
 
-    $('#pdfSelect').on('change', () => {
-        const url = $('#pdfSelect').val()
-        console.log('url:', url)
-    })
+    // const listenPageRendered = async () => {
+    //     // Load and display annotations.
+    //     let anno = await window.annoPage.loadAnnoFileFromServer(annoUrl)
+    //     console.log('anno:', anno)
+    //     publicApi.addAllAnnotations(publicApi.readTOML(anno))
+    //     window.removeEventListener('pagerendered', listenPageRendered)
+    // }
+    // window.addEventListener('pagerendered', listenPageRendered)
 
     // temporary.
     setInterval(unlistenWindowLeaveEvent, 500)
 })
-
