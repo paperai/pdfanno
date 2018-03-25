@@ -6,6 +6,7 @@ const htmlmin = require('gulp-htmlmin')
 const gutil = require('gulp-util')
 const sourcemaps = require('gulp-sourcemaps')
 const runSequence = require('run-sequence')
+const replace = require('gulp-replace')
 const fs = require('fs-extra')
 const path = require('path')
 const version = require('./package.json').version
@@ -67,6 +68,40 @@ gulp.task('prepare', () => {
     fs.copySync('build', path.join('dist', 'build'))
     fs.copySync('pages', path.join('dist', 'pages'))
     fs.copySync('pdfs', path.join('dist', 'pdfs'))
+})
+
+gulp.task('copy-sw', () => {
+    return gulp
+            .src(path.join('src', 'sw.js'))
+            .pipe(gulp.dest('dist'))
+})
+
+gulp.task('replace-sw', () => {
+
+    let dir
+    if (process.env.BUILD_TARGET === 'latest') {
+        dir = 'pdfanno/latest'
+    } else if (process.env.BUILD_TARGET === 'stable') {
+        dir = 'pdfanno/' + version
+    } else {
+        // for webpack-dev-server.
+        dir = 'dist'
+    }
+    console.log('dir:', dir)
+
+    return gulp
+            .src(path.join('dist', 'sw.js'))
+            .pipe(replace('#VERSION', new Date().getTime()))
+            .pipe(replace('#BASEDIR', dir))
+            .pipe(gulp.dest('dist'))
+})
+
+gulp.task('build-sw', cb => {
+    runSequence('copy-sw', 'replace-sw', cb)
+})
+
+gulp.task('watch-sw', () => {
+    gulp.watch([ 'src/sw.js' ], [ 'build-sw' ])
 })
 
 gulp.task('publish_latest', cb => {

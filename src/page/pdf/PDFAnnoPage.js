@@ -426,6 +426,9 @@ export default class PDFAnnoPage {
      * Get all annotations.
      */
     getAllAnnotations () {
+        if (!window.iframeWindow || !window.iframeWindow.annotationContainer) {
+            return []
+        }
         return window.iframeWindow.annotationContainer.getAllAnnotations()
     }
 
@@ -607,8 +610,6 @@ export default class PDFAnnoPage {
     async checkAnnotationUpdate () {
 
         // TODO Refactoring. Too Long...
-
-        // console.log('checkAnnotationUpdate')
 
         // prevs.
         const prevAnnotations = this.prevAnnotations
