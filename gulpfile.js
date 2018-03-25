@@ -80,9 +80,9 @@ gulp.task('replace-sw', () => {
 
     let dir
     if (process.env.BUILD_TARGET === 'latest') {
-        dir = 'latest'
+        dir = 'pdfanno/latest'
     } else if (process.env.BUILD_TARGET === 'stable') {
-        dir = version
+        dir = 'pdfanno/' + version
     } else {
         // for webpack-dev-server.
         dir = 'dist'
