@@ -178,7 +178,7 @@ export default class PDFAnnoPage {
         // Reset setting.
         this.resetPDFViewerSettings()
 
-        let url = './pages/viewer.html'
+        let url = './viewer.html'
         if (initialPDFPath) {
             url += '?file=' + initialPDFPath
         }

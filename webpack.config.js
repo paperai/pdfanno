@@ -12,6 +12,10 @@ let config = {
         'pdfanno.page' : './src/pdfanno.js',
         'pdfanno.core' : './src/core/index.js',
         'embedded-sample' : './src/embedded-sample.js',
+        'viewer' : './src/viewer.js',
+        'debugger' : './src/debugger.js',
+        'compatibility' : './src/compatibility.js',
+        'l10n' : './src/l10n.js'
     },
     output : {
         filename : './dist/[name].bundle.js',
@@ -25,6 +29,17 @@ let config = {
             enforce : 'pre',
             include : [path.join(__dirname, 'src')],
             exclude : /node_modules/
+        }, {
+            test: /\.css$/,
+            use : [
+                { loader : 'style-loader' },
+                {
+                    loader : 'css-loader',
+                    options : {
+                        url : false
+                    }
+                }
+            ]
         }]
     },
     plugins,

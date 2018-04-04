@@ -19,6 +19,7 @@ function getSelectionRects () {
         let range = selection.getRangeAt(0)
         let rects = range.getClientRects()
 
+        console.log('selection:', selection)
         const pageNumber = getPageNumber(selection.anchorNode)
         const startIndex = getIndex(selection.anchorNode)
         const endIndex = getIndex(selection.focusNode)
