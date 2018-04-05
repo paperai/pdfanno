@@ -24,8 +24,9 @@
            RenderingStates, UNKNOWN_SCALE, DEFAULT_SCALE_VALUE,
            IGNORE_CURRENT_POSITION_ON_ZOOM: true */
 
-require('file-loader?name=dist/viewer.html!./viewer.html')
-import style from './viewer.css'
+// require('file-loader?name=dist/viewer.html!./viewer.html')
+
+import _ from './viewer.css'
 
 // var DEFAULT_URL = '../pdfs/P12-1046.pdf';
 var DEFAULT_URL = null;
