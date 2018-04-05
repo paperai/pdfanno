@@ -34,9 +34,12 @@ export default class PDFAnnoPage {
     startViewerApplication () {
 
         // Alias for convenience.
-        window.iframeWindow = $('#viewer iframe').get(0).contentWindow
+        // window.iframeWindow = $('#viewer iframe').get(0).contentWindow
 
-        window.iframeWindow.addEventListener('DOMContentLoaded', () => {
+      // 仮で.
+      window.iframeWindow = window
+
+        // window.iframeWindow.addEventListener('DOMContentLoaded', () => {
 
             // Adjust the height of viewer.
             adjustViewerSize()
@@ -45,51 +48,51 @@ export default class PDFAnnoPage {
             unlistenWindowLeaveEvent()
 
             dispatchWindowEvent('iframeReady')
-        })
+        // })
 
-        window.iframeWindow.addEventListener('pagerendered', ev => {
-            dispatchWindowEvent('pagerendered', ev.detail)
-        })
+        // window.iframeWindow.addEventListener('pagerendered', ev => {
+        //     dispatchWindowEvent('pagerendered', ev.detail)
+        // })
 
-        window.iframeWindow.addEventListener('annotationrendered', () => {
-            dispatchWindowEvent('annotationrendered')
-        })
+        // window.iframeWindow.addEventListener('annotationrendered', () => {
+        //     dispatchWindowEvent('annotationrendered')
+        // })
 
         // Set the confirm dialog when leaving a page.
-        window.iframeWindow.addEventListener('annotationUpdated', () => {
-            listenWindowLeaveEvent()
-            dispatchWindowEvent('annotationUpdated')
-        })
+        // window.iframeWindow.addEventListener('annotationUpdated', () => {
+        //     listenWindowLeaveEvent()
+        //     dispatchWindowEvent('annotationUpdated')
+        // })
 
         // enable text input.
-        window.iframeWindow.addEventListener('enableTextInput', e => {
-            dispatchWindowEvent('enableTextInput', e.detail)
-        })
-
-        // disable text input.
-        window.iframeWindow.addEventListener('disappearTextInput', e => {
-            dispatchWindowEvent('disappearTextInput', e.detail)
-        })
-
-        window.iframeWindow.addEventListener('annotationDeleted', e => {
-            dispatchWindowEvent('annotationDeleted', e.detail)
-        })
-
-        window.iframeWindow.addEventListener('annotationHoverIn', e => {
-            dispatchWindowEvent('annotationHoverIn', e.detail)
-        })
-
-        window.iframeWindow.addEventListener('annotationHoverOut', e => {
-            dispatchWindowEvent('annotationHoverOut', e.detail)
-        })
-
-        window.iframeWindow.addEventListener('annotationSelected', e => {
-            dispatchWindowEvent('annotationSelected', e.detail)
-        })
-
-        window.iframeWindow.addEventListener('annotationDeselected', () => {
-            dispatchWindowEvent('annotationDeselected')
-        })
+        // window.iframeWindow.addEventListener('enableTextInput', e => {
+        //     dispatchWindowEvent('enableTextInput', e.detail)
+        // })
+        //
+        // // disable text input.
+        // window.iframeWindow.addEventListener('disappearTextInput', e => {
+        //     dispatchWindowEvent('disappearTextInput', e.detail)
+        // })
+        //
+        // window.iframeWindow.addEventListener('annotationDeleted', e => {
+        //     dispatchWindowEvent('annotationDeleted', e.detail)
+        // })
+        //
+        // window.iframeWindow.addEventListener('annotationHoverIn', e => {
+        //     dispatchWindowEvent('annotationHoverIn', e.detail)
+        // })
+        //
+        // window.iframeWindow.addEventListener('annotationHoverOut', e => {
+        //     dispatchWindowEvent('annotationHoverOut', e.detail)
+        // })
+        //
+        // window.iframeWindow.addEventListener('annotationSelected', e => {
+        //     dispatchWindowEvent('annotationSelected', e.detail)
+        // })
+        //
+        // window.iframeWindow.addEventListener('annotationDeselected', () => {
+        //     dispatchWindowEvent('annotationDeselected')
+        // })
 
         setInterval(this.checkAnnotationUpdate, 1500)
     }
@@ -178,14 +181,14 @@ export default class PDFAnnoPage {
         // Reset setting.
         this.resetPDFViewerSettings()
 
-        let url = './viewer.html'
-        if (initialPDFPath) {
-            url += '?file=' + initialPDFPath
-        }
+        // let url = './viewer.html'
+        // if (initialPDFPath) {
+        //     url += '?file=' + initialPDFPath
+        // }
 
-        // Reload pdf.js.
-        $(viewerSelector + ' iframe').remove()
-        $(viewerSelector).html('<iframe src="' + url + '" class="anno-viewer" frameborder="0"></iframe>')
+        // // Reload pdf.js.
+        // $(viewerSelector + ' iframe').remove()
+        // $(viewerSelector).html('<iframe src="' + url + '" class="anno-viewer" frameborder="0"></iframe>')
     }
 
     /**

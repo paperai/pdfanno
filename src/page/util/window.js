@@ -41,8 +41,11 @@ export function adjustViewerSize () {
 export function resizeHandler () {
 
     // PDFViewer.
-    let height = $(window).innerHeight() - $('#viewer').offset().top
-    $('#viewer iframe').css('height', `${height}px`)
+    let height = $(window).innerHeight() - $('#viewerInner').offset().top
+    $('#viewerInner').css('height', `${height}px`)
+
+  // とりあえず.
+  $('.loadingInProgress').css('height', '99%')
 
     // TODO move to anno-ui.
 

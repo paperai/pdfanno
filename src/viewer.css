@@ -163,7 +163,7 @@ div[data-canvas-width] {
   overflow: visible;
   border: 9px solid transparent;
   background-clip: content-box;
-  border-image: url(images/shadow.png) 9 9 repeat;
+  /*border-image: url(images/shadow.png) 9 9 repeat;*/
   background-color: white;
 }
 
@@ -357,6 +357,11 @@ html[dir='rtl'] .innerCenter {
   position: relative;
 }
 
+/*仮で*/
+#outerContainer {
+  background-color: #404040;
+}
+
 #sidebarContainer {
   position: absolute;
   top: 0;
@@ -367,7 +372,10 @@ html[dir='rtl'] .innerCenter {
   -webkit-transition-timing-function: ease;
   transition-duration: 200ms;
   transition-timing-function: ease;
-
+}
+/*仮で*/
+#sidebarContainer {
+  display: none;
 }
 html[dir='ltr'] #sidebarContainer {
   -webkit-transition-property: left;

@@ -35,7 +35,7 @@ module.exports = {
     "space-infix-ops" : 1,
     "no-unused-vars" : 1,
     "no-multiple-empty-lines" : 1,
-    "indent" : [1, 4],
+    "indent" : [1, 2],
     "quotes" : 1,
     "no-duplicate-imports" : 1,
     "eqeqeq" : 1,

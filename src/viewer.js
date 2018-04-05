@@ -25,10 +25,7 @@
            IGNORE_CURRENT_POSITION_ON_ZOOM: true */
 
 require('file-loader?name=dist/viewer.html!./viewer.html')
-// require('!style-loader!css-loader!./viewer.css')
-
 import style from './viewer.css'
-
 
 // var DEFAULT_URL = '../pdfs/P12-1046.pdf';
 var DEFAULT_URL = null;
@@ -43,8 +40,10 @@ var DISABLE_AUTO_FETCH_LOADING_BAR_TIMEOUT = 5000;
 
 
 // ********** Extentions. ****************
-let pdfData = window.parent.pdf;
-let pdfName = window.parent.pdfName;
+// let pdfData = window.parent.pdf;
+// let pdfName = window.parent.pdfName;
+let pdfData = window.pdf;
+let pdfName = window.pdfName;
 if (pdfData) {
   DEFAULT_URL = pdfData;
   DEFAULT_PDF_NAME = pdfName;
