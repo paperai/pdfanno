@@ -24,8 +24,6 @@
            RenderingStates, UNKNOWN_SCALE, DEFAULT_SCALE_VALUE,
            IGNORE_CURRENT_POSITION_ON_ZOOM: true */
 
-// require('file-loader?name=dist/viewer.html!./viewer.html')
-
 import _ from './viewer.css'
 
 // var DEFAULT_URL = '../pdfs/P12-1046.pdf';
@@ -154,7 +152,7 @@ function scrollIntoView(element, spot, skipOverflowHiddenElements) {
  * PDF.js friendly one: with scroll debounce and scroll direction.
  */
 function watchScroll(viewAreaElement, callback) {
-  var debounceScroll = function debounceScroll(evt) {
+  var debounceScroll = function debounceScroll() {
     if (rAF) {
       return;
     }

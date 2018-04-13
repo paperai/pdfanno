@@ -10,19 +10,19 @@ export const BORDER_COLOR = '#00BFFF'
  */
 export function scaleUp (svg, rect) {
 
-    if (arguments.length === 1) {
-        rect = svg
-        svg = getSVGLayer()
-    }
+  if (arguments.length === 1) {
+    rect = svg
+    svg = getSVGLayer()
+  }
 
-    let result = {}
-    const viewport = window.PDFView.pdfViewer.getPageView(0).viewport
+  let result = {}
+  const viewport = window.PDFView.pdfViewer.getPageView(0).viewport
 
-    Object.keys(rect).forEach((key) => {
-        result[key] = rect[key] * viewport.scale
-    })
+  Object.keys(rect).forEach((key) => {
+    result[key] = rect[key] * viewport.scale
+  })
 
-    return result
+  return result
 }
 
 /**
@@ -33,72 +33,72 @@ export function scaleUp (svg, rect) {
  */
 export function scaleDown (rect) {
 
-    // TODO for old style:  scaleDown(svg, rect)
-    if (arguments.length === 2) {
-        rect = arguments[1]
-    }
+  // TODO for old style:  scaleDown(svg, rect)
+  if (arguments.length === 2) {
+    rect = arguments[1]
+  }
 
-    let result = {}
-    const viewport = window.PDFView.pdfViewer.getPageView(0).viewport
-    Object.keys(rect).forEach((key) => {
-        result[key] = rect[key] / viewport.scale
-    })
+  let result = {}
+  const viewport = window.PDFView.pdfViewer.getPageView(0).viewport
+  Object.keys(rect).forEach((key) => {
+    result[key] = rect[key] / viewport.scale
+  })
 
-    return result
+  return result
 }
 
 /**
  * Disable all text layers.
  */
 export function disableTextlayer () {
-    $('body').addClass('disable-text-layer')
+  $('body').addClass('disable-text-layer')
 }
 
 /**
  * Enable all text layers.
  */
 export function enableTextlayer () {
-    $('body').removeClass('disable-text-layer')
+  $('body').removeClass('disable-text-layer')
 }
 
 export function getXY (e) {
-    let rect2 = $('#annoLayer2')[0].getBoundingClientRect()
-    let y = e.clientY + $('#annoLayer2').scrollTop() - rect2.top
-    let x = e.clientX - rect2.left
-    return { x, y }
+  let rect2 = $('#annoLayer2')[0].getBoundingClientRect()
+  let y = e.clientY + $('#annoLayer2').scrollTop() - rect2.top
+  let x = e.clientX - rect2.left
+  return { x, y }
 }
 
 export function getSVGLayer () {
-    return document.getElementById('annoLayer')
+  return document.getElementById('annoLayer')
 }
 
 export function getCurrentPage (e) {
 
-    let { x, y } = getXY(e)
+  let { x, y } = getXY(e)
 
-    let scrollTop = $('#annoLayer2')[0].getBoundingClientRect().top
-    let scrollLeft = $('#annoLayer2')[0].getBoundingClientRect().left
+  let scrollTop = $('#annoLayer2')[0].getBoundingClientRect().top
+  let scrollLeft = $('#annoLayer2')[0].getBoundingClientRect().left
 
-    let elements = document.querySelectorAll('.canvasWrapper')
+  let elements = document.querySelectorAll('.canvasWrapper')
 
-    for (let i = 0, l = elements.length; i < l; i++) {
-        let el = elements[i]
-        let rect = el.getBoundingClientRect()
-        let minX = rect.left - scrollLeft
-        let maxX = rect.right - scrollLeft
-        let minY = rect.top - scrollTop
-        let maxY = rect.bottom - scrollTop
+  for (let i = 0, l = elements.length; i < l; i++) {
+    let el = elements[i]
+    let rect = el.getBoundingClientRect()
+    let minX = rect.left - scrollLeft
+    let maxX = rect.right - scrollLeft
+    let minY = rect.top - scrollTop
+    let maxY = rect.bottom - scrollTop
 
-        if (minX <= x && x <= maxX && minY <= y && y <= maxY) {
-            let page = parseInt(el.parentNode.id.replace('pageContainer', ''))
-            return { page, minX, maxX, minY, maxY }
-        }
+    if (minX <= x && x <= maxX && minY <= y && y <= maxY) {
+      let page = parseInt(el.parentNode.id.replace('pageContainer', ''))
+      return { page, minX, maxX, minY, maxY }
     }
+  }
 
-    console.log('notfound ><...')
-    return null
+  console.log('notfound ><...')
+  return null
 }
 
 export function getAnnoLayerBoundingRect () {
-    return $('#annoLayer2')[0].getBoundingClientRect()
+  return $('#annoLayer2')[0].getBoundingClientRect()
 }

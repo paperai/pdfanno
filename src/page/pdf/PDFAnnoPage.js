@@ -6,7 +6,6 @@ import * as socket from '../socket'
 import { anyOf, dispatchWindowEvent } from '../../shared/util'
 import { convertToExportY, paddingBetweenPages, nextZIndex } from '../../shared/coords'
 import {
-  listenWindowLeaveEvent,
   unlistenWindowLeaveEvent,
   adjustViewerSize
 } from '../util/window'

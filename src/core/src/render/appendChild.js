@@ -11,8 +11,8 @@ import { renderRelation } from './renderRelation'
  * @return {Node}
  */
 function transform (node, viewport) {
-    node.style.transform = `scale(${viewport.scale})`
-    return node
+  node.style.transform = `scale(${viewport.scale})`
+  return node
 }
 
 /**
@@ -24,40 +24,40 @@ function transform (node, viewport) {
  * @return {SVGElement} A node that was created and appended by this function
  */
 export default function appendChild (svg, annotation, viewport) {
-    // TODO no need third argument(viewport) ?
-    if (!viewport) {
-        viewport = window.PDFView.pdfViewer.getPageView(0).viewport
+  // TODO no need third argument(viewport) ?
+  if (!viewport) {
+    viewport = window.PDFView.pdfViewer.getPageView(0).viewport
+  }
+
+  let child
+  switch (annotation.type) {
+  case 'rect':
+    child = renderRect(annotation, svg)
+    break
+  case 'span':
+    child = renderSpan(annotation, svg)
+    break
+  case 'textbox':
+    child = renderText(annotation, svg)
+    break
+  case 'relation':
+    child = renderRelation(annotation, svg)
+    break
+  }
+
+  // If no type was provided for an annotation it will result in node being null.
+  // Skip appending/transforming if node doesn't exist.
+  if (child) {
+
+    let elm = transform(child, viewport)
+
+    if (annotation.type === 'textbox') {
+      svg.appendChild(elm)
+
+      // `text` show above other type elements.
+    } else {
+      svg.append(elm)
     }
-
-    let child
-    switch (annotation.type) {
-    case 'rect':
-        child = renderRect(annotation, svg)
-        break
-    case 'span':
-        child = renderSpan(annotation, svg)
-        break
-    case 'textbox':
-        child = renderText(annotation, svg)
-        break
-    case 'relation':
-        child = renderRelation(annotation, svg)
-        break
-    }
-
-    // If no type was provided for an annotation it will result in node being null.
-    // Skip appending/transforming if node doesn't exist.
-    if (child) {
-
-        let elm = transform(child, viewport)
-
-        if (annotation.type === 'textbox') {
-            svg.appendChild(elm)
-
-        // `text` show above other type elements.
-        } else {
-            svg.append(elm)
-        }
-    }
-    return child
+  }
+  return child
 }

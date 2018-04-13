@@ -3,16 +3,16 @@
  */
 export function convertToExportY (y) {
 
-    let meta = getPageSize()
+  let meta = getPageSize()
 
-    y -= paddingTop
+  y -= paddingTop
 
-    let pageHeight = meta.height + paddingBetweenPages
+  let pageHeight = meta.height + paddingBetweenPages
 
-    let pageNumber = Math.floor(y / pageHeight) + 1
-    let yInPage = y - (pageNumber - 1) * pageHeight
+  let pageNumber = Math.floor(y / pageHeight) + 1
+  let yInPage = y - (pageNumber - 1) * pageHeight
 
-    return { pageNumber, y : yInPage }
+  return { pageNumber, y : yInPage }
 }
 
 /**
@@ -20,15 +20,15 @@ export function convertToExportY (y) {
  */
 export function convertFromExportY (pageNumber, yInPage) {
 
-    let meta = getPageSize()
+  let meta = getPageSize()
 
-    let y = yInPage + paddingTop
+  let y = yInPage + paddingTop
 
-    let pagePadding = paddingBetweenPages
+  let pagePadding = paddingBetweenPages
 
-    y += (pageNumber - 1) * (meta.height + pagePadding)
+  y += (pageNumber - 1) * (meta.height + pagePadding)
 
-    return y
+  return y
 }
 
 /**
@@ -46,11 +46,11 @@ export const paddingBetweenPages = 9
  */
 export function getPageSize () {
 
-    let pdfView = window.PDFView || window.iframeWindow.PDFView
+  let pdfView = window.PDFView || window.iframeWindow.PDFView
 
-    let viewBox = pdfView.pdfViewer.getPageView(0).viewport.viewBox
-    let size = { width : viewBox[2], height : viewBox[3] }
-    return size
+  let viewBox = pdfView.pdfViewer.getPageView(0).viewport.viewBox
+  let size = { width : viewBox[2], height : viewBox[3] }
+  return size
 }
 
 /**
@@ -58,11 +58,11 @@ export function getPageSize () {
  */
 export function nextZIndex () {
 
-    let w = (window.iframeWindow ? window.iframeWindow : window)
+  let w = (window.iframeWindow ? window.iframeWindow : window)
 
-    if (!w.nextZIndex) {
-        w.nextZIndex = 10
-    }
+  if (!w.nextZIndex) {
+    w.nextZIndex = 10
+  }
 
-    return w.nextZIndex++
+  return w.nextZIndex++
 }

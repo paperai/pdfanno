@@ -14,110 +14,110 @@ import { unlistenWindowLeaveEvent } from './page/util/window'
  * API root point.
  */
 if (process.env.NODE_ENV === 'production') {
-    window.API_DOMAIN = 'https://pdfanno.hshindo.com'
-    window.API_PATH = '/' + process.env.SERVER_PATH + '/'
-    window.API_ROOT = window.API_DOMAIN + window.API_PATH
+  window.API_DOMAIN = 'https://pdfanno.hshindo.com'
+  window.API_PATH = '/' + process.env.SERVER_PATH + '/'
+  window.API_ROOT = window.API_DOMAIN + window.API_PATH
 } else {
-    window.API_DOMAIN = 'http://localhost:3000'
-    window.API_PATH = '/'
-    window.API_ROOT = window.API_DOMAIN + window.API_PATH
+  window.API_DOMAIN = 'http://localhost:3000'
+  window.API_PATH = '/'
+  window.API_ROOT = window.API_DOMAIN + window.API_PATH
 }
 
 // ServiceWorker.
 (async () => {
-    if ('serviceWorker' in navigator) {
-        try {
-            const registration = navigator.serviceWorker.register('./sw.js')
-            console.log('ServiceWorker registration successed. with scope: ' + registration.scope)
-        } catch (err) {
-            console.log('ServiceWorker registration failed. reason: ' + err)
-        }
+  if ('serviceWorker' in navigator) {
+    try {
+      const registration = navigator.serviceWorker.register('./sw.js')
+      console.log('ServiceWorker registration successed. with scope: ' + registration.scope)
+    } catch (err) {
+      console.log('ServiceWorker registration failed. reason: ' + err)
     }
+  }
 })();
 
 window.annoPage = new PDFAnnoPage()
 
 function getPDFUrlFromQuery () {
-    return URI(document.URL).query(true).pdf
+  return URI(document.URL).query(true).pdf
 }
 
 function getAnnoUrlFromQuery () {
-    return URI(document.URL).query(true).anno
+  return URI(document.URL).query(true).anno
 }
 
 function getPDFName (url) {
-    const a = url.split('/')
-    return a[a.length - 1]
+  const a = url.split('/')
+  return a[a.length - 1]
 }
 
 function initViewer () {
-    return new Promise((resolve, reject) => {
-        window.addEventListener('iframeReady', () => {
-            // setTimeout(resolve, 500, true)
-            // setTimeout(() => {
-            //     window.annoPage.displayViewer({
-            //         name    : getPDFName(pdfUrl),
-            //         content : pdf
-            //     })
-            // }, 500)
-            resolve(true)
-        })
-        // Create a viewer without a pdf.
-        window.annoPage.initializeViewer(null)
-        window.annoPage.startViewerApplication()
+  return new Promise((resolve, reject) => {
+    window.addEventListener('iframeReady', () => {
+      // setTimeout(resolve, 500, true)
+      // setTimeout(() => {
+      //     window.annoPage.displayViewer({
+      //         name    : getPDFName(pdfUrl),
+      //         content : pdf
+      //     })
+      // }, 500)
+      resolve(true)
     })
+    // Create a viewer without a pdf.
+    window.annoPage.initializeViewer(null)
+    window.annoPage.startViewerApplication()
+  })
 }
 
 function waitUntilRendered () {
-    return new Promise((resolve, reject) => {
-        const listenPageRendered = () => {
-            window.removeEventListener('pagerendered', listenPageRendered)
-            resolve(true)
-        }
-        window.addEventListener('pagerendered', listenPageRendered)
-    })
+  return new Promise((resolve, reject) => {
+    const listenPageRendered = () => {
+      window.removeEventListener('pagerendered', listenPageRendered)
+      resolve(true)
+    }
+    window.addEventListener('pagerendered', listenPageRendered)
+  })
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
 
-    const pdfUrl = getPDFUrlFromQuery()
-    if (!pdfUrl) {
-        return
-    }
+  const pdfUrl = getPDFUrlFromQuery()
+  if (!pdfUrl) {
+    return
+  }
 
-    // Create a viewer, and load/display a PDF.
-    let [ ok1, { pdf } ] = await Promise.all([
-        initViewer(),
-        window.annoPage.loadPDFFromServer(pdfUrl)
-    ])
-    console.log('ok:', ok1)
-    window.annoPage.displayViewer({
-        name    : getPDFName(pdfUrl),
-        content : pdf
-    })
+  // Create a viewer, and load/display a PDF.
+  let [ ok1, { pdf } ] = await Promise.all([
+    initViewer(),
+    window.annoPage.loadPDFFromServer(pdfUrl)
+  ])
+  console.log('ok:', ok1)
+  window.annoPage.displayViewer({
+    name    : getPDFName(pdfUrl),
+    content : pdf
+  })
 
-    const annoUrl = getAnnoUrlFromQuery()
-    if (!annoUrl) {
-        return
-    }
+  const annoUrl = getAnnoUrlFromQuery()
+  if (!annoUrl) {
+    return
+  }
 
-    // Show annotations.
-    let [ ok2, anno ] = await Promise.all([
-        waitUntilRendered(),
-        window.annoPage.loadAnnoFileFromServer(annoUrl)
-    ])
-    console.log('ok:', ok2)
-    publicApi.addAllAnnotations(publicApi.readTOML(anno))
+  // Show annotations.
+  let [ ok2, anno ] = await Promise.all([
+    waitUntilRendered(),
+    window.annoPage.loadAnnoFileFromServer(annoUrl)
+  ])
+  console.log('ok:', ok2)
+  publicApi.addAllAnnotations(publicApi.readTOML(anno))
 
-    // const listenPageRendered = async () => {
-    //     // Load and display annotations.
-    //     let anno = await window.annoPage.loadAnnoFileFromServer(annoUrl)
-    //     console.log('anno:', anno)
-    //     publicApi.addAllAnnotations(publicApi.readTOML(anno))
-    //     window.removeEventListener('pagerendered', listenPageRendered)
-    // }
-    // window.addEventListener('pagerendered', listenPageRendered)
+  // const listenPageRendered = async () => {
+  //     // Load and display annotations.
+  //     let anno = await window.annoPage.loadAnnoFileFromServer(annoUrl)
+  //     console.log('anno:', anno)
+  //     publicApi.addAllAnnotations(publicApi.readTOML(anno))
+  //     window.removeEventListener('pagerendered', listenPageRendered)
+  // }
+  // window.addEventListener('pagerendered', listenPageRendered)
 
-    // temporary.
-    setInterval(unlistenWindowLeaveEvent, 500)
+  // temporary.
+  setInterval(unlistenWindowLeaveEvent, 500)
 })

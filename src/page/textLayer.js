@@ -10,28 +10,28 @@ let pages
  * Setup text layers.
  */
 export function setup (analyzeData) {
-    console.log('textLayer:setup')
+  console.log('textLayer:setup')
 
-    pages = customizeAnalyzeResult(analyzeData)
+  pages = customizeAnalyzeResult(analyzeData)
 
-    // Renew text layers.
-    $('.textLayer', window.iframeWindow.document).each(function () {
-        const page = $(this).parent('.page').data('page-number')
-        createTextLayer(page)
-    })
+  // Renew text layers.
+  $('.textLayer', window.iframeWindow.document).each(function () {
+    const page = $(this).parent('.page').data('page-number')
+    createTextLayer(page)
+  })
 
-    // Listen pageRendered event.
-    window.removeEventListener('pagerendered', listenPageRendered)
-    window.addEventListener('pagerendered', listenPageRendered)
+  // Listen pageRendered event.
+  window.removeEventListener('pagerendered', listenPageRendered)
+  window.addEventListener('pagerendered', listenPageRendered)
 }
 
 /**
  * Listen pageRendered event, and create a new text layer.
  */
 function listenPageRendered (ev) {
-    const page = ev.detail.pageNumber
-    console.log('textLayer:pageRendered:', page)
-    createTextLayer(page)
+  const page = ev.detail.pageNumber
+  console.log('textLayer:pageRendered:', page)
+  createTextLayer(page)
 }
 
 /**
@@ -39,28 +39,28 @@ function listenPageRendered (ev) {
  */
 function createTextLayer (page) {
 
-    setTimeout(() => {
+  setTimeout(() => {
 
-        console.log('createTextLayer:', page)
+    console.log('createTextLayer:', page)
 
-        const $textLayer = $(`.page[data-page-number="${page}"] .textLayer`, window.iframeWindow.document)
+    const $textLayer = $(`.page[data-page-number="${page}"] .textLayer`, window.iframeWindow.document)
 
-        // Create text div elements.
-        if (!pages[page - 1] || !pages[page - 1].meta) {
-            console.log('modify:', pages, page)
-            return
-        }
-        const scale = window.iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale
+    // Create text div elements.
+    if (!pages[page - 1] || !pages[page - 1].meta) {
+      console.log('modify:', pages, page)
+      return
+    }
+    const scale = window.iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale
 
-        let snipet = ''
-        pages[page - 1].meta.forEach((info, index) => {
+    let snipet = ''
+    pages[page - 1].meta.forEach((info, index) => {
 
-            if (!info) {
-                return
-            }
-            const { char, x, y, w, h } = extractMeta(info)
+      if (!info) {
+        return
+      }
+      const { char, x, y, w, h } = extractMeta(info)
 
-            const style = `
+      const style = `
                 top: ${y * scale}px;
                 left: ${x * scale}px;
                 width: ${w * scale}px;
@@ -70,43 +70,43 @@ function createTextLayer (page) {
                 text-align: center;
             `.replace(/\n/g, '')
 
-            snipet += `
+      snipet += `
                 <div
                     class="pdfanno-text-layer"
                     style="${style}"
                     data-page="${page}"
                     data-index="${index}">${char}</div>
             `
-        })
+    })
 
-        $textLayer[0].innerHTML = snipet
+    $textLayer[0].innerHTML = snipet
 
-        dispatchWindowEvent('textlayercreated', page)
+    dispatchWindowEvent('textlayercreated', page)
 
-    }, window.iframeWindow.TEXT_LAYER_RENDER_DELAY + 300)
+  }, window.iframeWindow.TEXT_LAYER_RENDER_DELAY + 300)
 }
 
 // TODO a little tricky.
 window.getText = function (page, startIndex, endIndex) {
-    const infos = pages[page - 1].meta.slice(startIndex, endIndex + 1)
-    const texts = infos.map(info => {
-        if (!info) {
-            return ' '
-        } else {
-            // TODO こんなmetaを扱う処理は、どこかにまとめておかないとメンテナンスが非常に大変..
-            return info.split('\t')[3]
-        }
-    })
-    const text = texts.join('')
+  const infos = pages[page - 1].meta.slice(startIndex, endIndex + 1)
+  const texts = infos.map(info => {
+    if (!info) {
+      return ' '
+    } else {
+      // TODO こんなmetaを扱う処理は、どこかにまとめておかないとメンテナンスが非常に大変..
+      return info.split('\t')[3]
+    }
+  })
+  const text = texts.join('')
 
-    // Text position.
-    // TODO Use pdfextract.jar 0.1.6 's position data.'
-    const beforeCount = pages.slice(0, page - 1)
-            .reduce((v, page) => v.concat(page.meta), [])
-            .filter(info => info).length
-    const start1 = pages[page - 1].meta.slice(0, startIndex + 1).filter(info => info).length
-    const start2 = pages[page - 1].meta.slice(0, endIndex + 1).filter(info => info).length
-    const textRange = [ (beforeCount + start1), (beforeCount + start2) ]
-    // Return.
-    return { text, textRange }
+  // Text position.
+  // TODO Use pdfextract.jar 0.1.6 's position data.'
+  const beforeCount = pages.slice(0, page - 1)
+    .reduce((v, page) => v.concat(page.meta), [])
+    .filter(info => info).length
+  const start1 = pages[page - 1].meta.slice(0, startIndex + 1).filter(info => info).length
+  const start2 = pages[page - 1].meta.slice(0, endIndex + 1).filter(info => info).length
+  const textRange = [ (beforeCount + start1), (beforeCount + start2) ]
+  // Return.
+  return { text, textRange }
 }
