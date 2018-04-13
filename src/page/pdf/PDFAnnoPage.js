@@ -34,9 +34,7 @@ export default class PDFAnnoPage {
   startViewerApplication () {
 
     // Alias for convenience.
-    // window.iframeWindow = $('#viewer iframe').get(0).contentWindow
-
-    // 仮で.
+    // TODO Remove this alias.
     window.iframeWindow = window
 
     // window.iframeWindow.addEventListener('DOMContentLoaded', () => {

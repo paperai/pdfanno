@@ -53,7 +53,7 @@ function highlightSearchResult (searchPosition) {
     let scale = window.annoPage.getViewerViewport().scale
     let _y = (pageHeight + paddingBetweenPages) * (highlight.page - 1) + highlight.top * scale
     _y -= 100
-    $('#viewer iframe').contents().find('#viewer').parent()[0].scrollTop = _y
+    $('#viewer').parent()[0].scrollTop = _y
 
 }
 
