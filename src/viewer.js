@@ -2185,7 +2185,6 @@ var SecondaryToolbar = {
 
     // Define the toolbar buttons.
     this.toggleButton = options.toggleButton;
-    this.openFile = options.openFile;
     this.print = options.print;
     this.download = options.download;
     this.viewBookmark = options.viewBookmark;
@@ -2201,7 +2200,6 @@ var SecondaryToolbar = {
       { element: this.toggleButton, handler: this.toggle },
       // All items within the secondary toolbar
       // (except for toggleHandTool, hand_tool.js is responsible for it):
-      { element: this.openFile, handler: this.openFileClick },
       { element: this.print, handler: this.printClick },
       { element: this.download, handler: this.downloadClick },
       { element: this.viewBookmark, handler: this.viewBookmarkClick },
@@ -2219,11 +2217,6 @@ var SecondaryToolbar = {
         element.addEventListener('click', elements[item].handler.bind(this));
       }
     }
-  },
-
-  openFileClick: function secondaryToolbarOpenFileClick(evt) {
-    document.getElementById('fileInput').click();
-    this.close();
   },
 
   printClick: function secondaryToolbarPrintClick(evt) {
@@ -4954,7 +4947,6 @@ window.PDFViewerApplication = {
     SecondaryToolbar.initialize({
       toolbar: document.getElementById('secondaryToolbar'),
       toggleButton: document.getElementById('secondaryToolbarToggle'),
-      openFile: document.getElementById('secondaryOpenFile'),
       print: document.getElementById('secondaryPrint'),
       download: document.getElementById('secondaryDownload'),
       viewBookmark: document.getElementById('secondaryViewBookmark'),
@@ -5797,20 +5789,6 @@ function webViewerInitialized() {
   var file = 'file' in params ? params.file : DEFAULT_URL;
   validateFileURL(file);
 
-  var fileInput = document.createElement('input');
-  fileInput.id = 'fileInput';
-  fileInput.className = 'fileInput';
-  fileInput.setAttribute('type', 'file');
-  fileInput.oncontextmenu = noContextMenuHandler;
-  document.body.appendChild(fileInput);
-
-  if (!window.File || !window.FileReader || !window.FileList || !window.Blob) {
-    document.getElementById('openFile').setAttribute('hidden', 'true');
-    document.getElementById('secondaryOpenFile').setAttribute('hidden', 'true');
-  } else {
-    document.getElementById('fileInput').value = null;
-  }
-
   var locale = PDFJS.locale || navigator.language;
 
   if (PDFViewerApplication.preferencePdfBugEnabled) {
@@ -5938,9 +5916,6 @@ function webViewerInitialized() {
     }
     PDFViewerApplication.pdfViewer.currentScaleValue = this.value;
   });
-
-  document.getElementById('openFile').addEventListener('click',
-    SecondaryToolbar.openFileClick.bind(SecondaryToolbar));
 
   document.getElementById('print').addEventListener('click',
     SecondaryToolbar.printClick.bind(SecondaryToolbar));
@@ -6097,40 +6072,6 @@ window.addEventListener('hashchange', function webViewerHashchange(evt) {
     }
   }
 });
-
-window.addEventListener('change', function webViewerChange(evt) {
-  if (evt.target.getAttribute('id') !== 'fileInput') {
-    return
-  }
-  var files = evt.target.files
-  if (!files || files.length === 0) {
-    return;
-  }
-  var file = files[0];
-
-  if (!PDFJS.disableCreateObjectURL &&
-      typeof URL !== 'undefined' && URL.createObjectURL) {
-    PDFViewerApplication.open(URL.createObjectURL(file));
-  } else {
-    // Read the local file into a Uint8Array.
-    var fileReader = new FileReader();
-    fileReader.onload = function webViewerChangeFileReaderOnload(evt) {
-      var buffer = evt.target.result;
-      var uint8Array = new Uint8Array(buffer);
-      PDFViewerApplication.open(uint8Array);
-    };
-    fileReader.readAsArrayBuffer(file);
-  }
-
-  PDFViewerApplication.setTitleUsingUrl(file.name);
-
-  // URL does not reflect proper document location - hiding some icons.
-  document.getElementById('viewBookmark').setAttribute('hidden', 'true');
-  document.getElementById('secondaryViewBookmark').
-    setAttribute('hidden', 'true');
-  document.getElementById('download').setAttribute('hidden', 'true');
-  document.getElementById('secondaryDownload').setAttribute('hidden', 'true');
-}, true);
 
 function selectScaleOption(value) {
   var options = document.getElementById('scaleSelect').options;
