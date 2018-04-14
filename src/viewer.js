@@ -58,7 +58,6 @@ function configure(PDFJS) {
 
 var mozL10n = document.mozL10n || document.webL10n;
 
-
 var CSS_UNITS = 96.0 / 72.0;
 var DEFAULT_SCALE_VALUE = 'auto';
 var DEFAULT_SCALE = 1.0;
@@ -466,7 +465,8 @@ var DEFAULT_PREFERENCES = {
   defaultZoomValue: '',
   sidebarViewOnLoad: 0,
   enableHandToolOnLoad: false,
-  enableWebGL: false,
+  // enableWebGL: false,
+  enableWebGL: true,
   pdfBugEnabled: false,
   disableRange: false,
   disableStream: false,
