@@ -7713,48 +7713,6 @@ window.addEventListener('pagechange', function pagechange(evt) {
   }
 }, true);
 
-function handleMouseWheel(evt) {
-  var MOUSE_WHEEL_DELTA_FACTOR = 40;
-  var ticks = (evt.type === 'DOMMouseScroll') ? -evt.detail :
-              evt.wheelDelta / MOUSE_WHEEL_DELTA_FACTOR;
-  var direction = (ticks < 0) ? 'zoomOut' : 'zoomIn';
-
-  var pdfViewer = PDFViewerApplication.pdfViewer;
-  if (pdfViewer.isInPresentationMode) {
-    evt.preventDefault();
-    PDFViewerApplication.scrollPresentationMode(ticks *
-                                                MOUSE_WHEEL_DELTA_FACTOR);
-  } else if (evt.ctrlKey || evt.metaKey) {
-    var support = PDFViewerApplication.supportedMouseWheelZoomModifierKeys;
-    if ((evt.ctrlKey && !support.ctrlKey) ||
-        (evt.metaKey && !support.metaKey)) {
-      return;
-    }
-    // Only zoom the pages, not the entire viewer.
-    evt.preventDefault();
-
-    var previousScale = pdfViewer.currentScale;
-
-    PDFViewerApplication[direction](Math.abs(ticks));
-
-    var currentScale = pdfViewer.currentScale;
-    if (previousScale !== currentScale) {
-      // After scaling the page via zoomIn/zoomOut, the position of the upper-
-      // left corner is restored. When the mouse wheel is used, the position
-      // under the cursor should be restored instead.
-      var scaleCorrectionFactor = currentScale / previousScale - 1;
-      var rect = pdfViewer.container.getBoundingClientRect();
-      var dx = evt.clientX - rect.left;
-      var dy = evt.clientY - rect.top;
-      pdfViewer.container.scrollLeft += dx * scaleCorrectionFactor;
-      pdfViewer.container.scrollTop += dy * scaleCorrectionFactor;
-    }
-  }
-}
-
-window.addEventListener('DOMMouseScroll', handleMouseWheel);
-window.addEventListener('mousewheel', handleMouseWheel);
-
 window.addEventListener('click', function click(evt) {
   if (SecondaryToolbar.opened &&
       PDFViewerApplication.pdfViewer.containsElement(evt.target)) {
