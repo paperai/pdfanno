@@ -7594,7 +7594,10 @@ window.addEventListener('hashchange', function webViewerHashchange(evt) {
 });
 
 window.addEventListener('change', function webViewerChange(evt) {
-  var files = evt.target.files;
+  if (evt.target.getAttribute('id') !== 'fileInput') {
+    return
+  }
+  var files = evt.target.files
   if (!files || files.length === 0) {
     return;
   }
