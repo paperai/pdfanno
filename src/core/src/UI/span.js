@@ -10,7 +10,7 @@ let prevprevSelectionRects
 let prevSelectionRects
 
 // TODO Need a good idea.
-function watchSelectionRects() {
+function watchSelectionRects () {
   setInterval(() => {
     prevprevSelectionRects = prevSelectionRects
     prevSelectionRects = getSelectionRects()
@@ -69,7 +69,7 @@ function getSelectionRects () {
 function getPageNumber (elm) {
   if (elm.parentNode.hasAttribute('data-page')) {
     return parseInt(elm.parentNode.getAttribute('data-page'), 10)
-  } else if (elm.hasAttribute('data-page')) {
+  } else if (elm.hasAttribute && elm.hasAttribute('data-page')) {
     return parseInt(elm.getAttribute('data-page'), 10)
   }
   return null
@@ -78,7 +78,7 @@ function getPageNumber (elm) {
 function getIndex (elm) {
   if (elm.parentNode.hasAttribute('data-index')) {
     return parseInt(elm.parentNode.getAttribute('data-index'), 10)
-  } else if (elm.hasAttribute('data-index')) {
+  } else if (elm.hasAttribute && elm.hasAttribute('data-index')) {
     return parseInt(elm.getAttribute('data-index'), 10)
   }
   return null

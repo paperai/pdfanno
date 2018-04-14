@@ -33,7 +33,7 @@ if (process.env.NODE_ENV === 'production') {
       console.log('ServiceWorker registration failed. reason: ' + err)
     }
   }
-})();
+})()
 
 window.annoPage = new PDFAnnoPage()
 

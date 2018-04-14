@@ -7266,19 +7266,20 @@ function webViewerInitialized() {
     if ('locale' in hashParams) {
       locale = hashParams['locale'];
     }
-    if ('textlayer' in hashParams) {
-      switch (hashParams['textlayer']) {
-        case 'off':
-          PDFJS.disableTextLayer = true;
-          break;
-        case 'visible':
-        case 'shadow':
-        case 'hover':
-          var viewer = document.getElementById('viewer');
-          viewer.classList.add('textLayer-' + hashParams['textlayer']);
-          break;
-      }
-    }
+    PDFJS.disableTextLayer = true
+    // if ('textlayer' in hashParams) {
+    //   switch (hashParams['textlayer']) {
+    //     case 'off':
+    //       PDFJS.disableTextLayer = true;
+    //       break;
+    //     case 'visible':
+    //     case 'shadow':
+    //     case 'hover':
+    //       var viewer = document.getElementById('viewer');
+    //       viewer.classList.add('textLayer-' + hashParams['textlayer']);
+    //       break;
+    //   }
+    // }
     if ('pdfbug' in hashParams) {
       PDFJS.pdfBug = true;
       var pdfBug = hashParams['pdfbug'];

@@ -101,10 +101,10 @@ export default class AnnotationContainer {
           }
           return false
         }).forEach(a => {
-        a.color = color
-        a.render()
-        a.enableViewMode()
-      })
+          a.color = color
+          a.render()
+          a.enableViewMode()
+        })
     }
   }
 

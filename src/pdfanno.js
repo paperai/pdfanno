@@ -210,14 +210,12 @@ window.addEventListener('DOMContentLoaded', async e => {
     // Start application.
     window.annoPage.startViewerApplication()
 
-    // window.addEventListener('iframeReady', () => {
-      setTimeout(() => {
-        window.annoPage.displayViewer({
-          name    : getPDFName(pdfURL),
-          content : pdf
-        })
-      }, 500)
-    // })
+    setTimeout(() => {
+      window.annoPage.displayViewer({
+        name    : getPDFName(pdfURL),
+        content : pdf
+      })
+    }, 500)
 
     const listenPageRendered = async () => {
       showLoader(false)
