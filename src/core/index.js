@@ -1,6 +1,6 @@
 /**
-    Functions for annotations rendered over a PDF file.
-*/
+ Functions for annotations rendered over a PDF file.
+ */
 require('!style-loader!css-loader!./index.css')
 import { dispatchWindowEvent } from '../shared/util'
 
@@ -22,42 +22,43 @@ PDFAnnoCore.UI.enableViewMode()
 
 // The event called at page rendered by pdfjs.
 window.addEventListener('pagerendered', function (ev) {
-    console.log('pagerendered:', ev.detail.pageNumber)
+  console.log('pagerendered:', ev.detail.pageNumber)
 
-    // No action, if the viewer is closed.
-    if (!window.PDFView.pdfViewer.getPageView(0)) {
-        return
-    }
+  // No action, if the viewer is closed.
+  if (!window.PDFView.pdfViewer.getPageView(0)) {
+    return
+  }
 
-    renderAnno()
+  renderAnno()
 
-    // Issue Fix.
-    // Correctly rendering when changing scaling.
-    // The margin between pages is fixed(9px), and never be scaled in default,
-    // then manually have to change the margin.
-    let scale = window.PDFView.pdfViewer.getPageView(0).viewport.scale
-    let borderWidth = `${9 * scale}px`
-    let marginBottom = `${-9 * scale}px`
-    $('.page').css({
-        'border-top-width'    : borderWidth,
-        'border-bottom-width' : borderWidth,
-        'margin-bottom'       : marginBottom
-    })
+  // Issue Fix.
+  // Correctly rendering when changing scaling.
+  // The margin between pages is fixed(9px), and never be scaled in default,
+  // then manually have to change the margin.
+
+  // let scale = window.PDFView.pdfViewer.getPageView(0).viewport.scale
+  // let borderWidth = `${9 * scale}px`
+  // let marginBottom = `${-9 * scale}px`
+  // $('.page').css({
+  //     'border-top-width'    : borderWidth,
+  //     'border-bottom-width' : borderWidth,
+  //     'margin-bottom'       : marginBottom
+  // })
 })
 
 // Adapt to scale change.
 window.addEventListener('scalechange', () => {
-    console.log('scalechange')
-    removeAnnoLayer()
-    renderAnno()
+  console.log('scalechange')
+  removeAnnoLayer()
+  renderAnno()
 })
 
 /*
  * Remove the annotation layer and the temporary rendering layer.
  */
 function removeAnnoLayer () {
-    // TODO Remove #annoLayer.
-    $('#annoLayer, #annoLayer2').remove()
+  // TODO Remove #annoLayer.
+  $('#annoLayer, #annoLayer2').remove()
 }
 
 /*
@@ -65,74 +66,74 @@ function removeAnnoLayer () {
  */
 function renderAnno () {
 
-    // No action, if the viewer is closed.
-    if (!window.PDFView.pdfViewer.getPageView(0)) {
-        return
-    }
+  // No action, if the viewer is closed.
+  if (!window.PDFView.pdfViewer.getPageView(0)) {
+    return
+  }
 
-    // TODO make it a global const.
-    const svgLayerId = 'annoLayer'
-    const annoLayer2Id = 'annoLayer2'
+  // TODO make it a global const.
+  const svgLayerId = 'annoLayer'
+  const annoLayer2Id = 'annoLayer2'
 
-    // Check already exists.
-    if ($('#' + svgLayerId).length > 0) {
-        return
-    }
-    if ($('#' + annoLayer2Id).length > 0) {
-        return
-    }
+  // Check already exists.
+  if ($('#' + svgLayerId).length > 0) {
+    return
+  }
+  if ($('#' + annoLayer2Id).length > 0) {
+    return
+  }
 
-    let leftMargin = ($('#viewer').width() - $('.page').width()) / 2
+  let leftMargin = ($('#viewer').width() - $('.page').width()) / 2
 
-    // At window.width < page.width.
-    if (leftMargin < 0) {
-        leftMargin = 9
-    }
+  // At window.width < page.width.
+  if (leftMargin < 0) {
+    leftMargin = 9
+  }
 
-    let height = $('#viewer').height()
+  let height = $('#viewer').height()
 
-    let width = $('.page').width()
+  let width = $('.page').width()
 
-    // TODO no need ?
-    // Add an annotation layer.
-    let $annoLayer = $(`<svg id="${svgLayerId}" class="${svgLayerId}"/>`).css({   // TODO CSSClass.
-        position   : 'absolute',
-        top        : '0px',
-        left       : `${leftMargin}px`,
-        width      : `${width}px`,
-        height     : `${height}px`,
-        visibility : 'hidden',
-        'z-index'  : 2
-    })
-    // Add an annotation layer.
-    let $annoLayer2 = $(`<div id="${annoLayer2Id}"/>`).addClass('annoLayer').css({   // TODO CSSClass.
-        position   : 'absolute',
-        top        : '0px',
-        left       : `${leftMargin}px`,
-        width      : `${width}px`,
-        height     : `${height}px`,
-        visibility : 'hidden',
-        'z-index'  : 2
-    })
+  // TODO no need ?
+  // Add an annotation layer.
+  let $annoLayer = $(`<svg id="${svgLayerId}" class="${svgLayerId}"/>`).css({   // TODO CSSClass.
+    position   : 'absolute',
+    top        : '0px',
+    left       : `${leftMargin}px`,
+    width      : `${width}px`,
+    height     : `${height}px`,
+    visibility : 'hidden',
+    'z-index'  : 2
+  })
+  // Add an annotation layer.
+  let $annoLayer2 = $(`<div id="${annoLayer2Id}"/>`).addClass('annoLayer').css({   // TODO CSSClass.
+    position   : 'absolute',
+    top        : '0px',
+    left       : `${leftMargin}px`,
+    width      : `${width}px`,
+    height     : `${height}px`,
+    visibility : 'hidden',
+    'z-index'  : 2
+  })
 
-    $('#viewer').css({
-        position : 'relative'  // TODO css.
-    }).append($annoLayer).append($annoLayer2)
+  $('#viewer').css({
+    position : 'relative'  // TODO css.
+  }).append($annoLayer).append($annoLayer2)
 
-    renderAnnotations()
+  renderAnnotations()
 }
 
 /**
  * Render all annotations.
  */
 function renderAnnotations () {
-    const annotations = window.annotationContainer.getAllAnnotations()
-    if (annotations.length === 0) {
-        return
-    }
-    annotations.forEach(a => {
-        a.render()
-        a.enableViewMode()
-    })
-    dispatchWindowEvent('annotationrendered')
+  const annotations = window.annotationContainer.getAllAnnotations()
+  if (annotations.length === 0) {
+    return
+  }
+  annotations.forEach(a => {
+    a.render()
+    a.enableViewMode()
+  })
+  dispatchWindowEvent('annotationrendered')
 }

@@ -66,7 +66,7 @@ gulp.task('_minify-html', () => {
 gulp.task('prepare', () => {
     fs.removeSync('dist')
     fs.copySync('build', path.join('dist', 'build'))
-    fs.copySync('pages', path.join('dist', 'pages'))
+    fs.copySync('pages', path.join('dist'))
     fs.copySync('pdfs', path.join('dist', 'pdfs'))
 })
 

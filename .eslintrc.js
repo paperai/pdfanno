@@ -10,6 +10,7 @@ module.exports = {
   env: {
     browser: true,
     jquery: true,
+    node: true
   },
   // https://github.com/feross/standard/blob/master/RULES.md#javascript-standard-style
   extends: 'standard',
@@ -34,7 +35,7 @@ module.exports = {
     "space-infix-ops" : 1,
     "no-unused-vars" : 1,
     "no-multiple-empty-lines" : 1,
-    "indent" : [1, 4],
+    "indent" : [1, 2],
     "quotes" : 1,
     "no-duplicate-imports" : 1,
     "eqeqeq" : 1,

@@ -3,8 +3,8 @@ import { createRelation } from './relation'
 import { enableViewMode } from './view'
 
 export default {
-    createSpan,
-    getRectangles,
-    createRelation,
-    enableViewMode
+  createSpan,
+  getRectangles,
+  createRelation,
+  enableViewMode
 }

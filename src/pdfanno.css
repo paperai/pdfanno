@@ -65,3 +65,11 @@
     line-height: 12px;
     margin-top: -6px;
 }
+
+/*
+  viewer.cssに合わせてとりあえず.
+  TODO リファクタリング.
+ */
+.dropdown, .dropup {
+  z-index: 10000;
+}

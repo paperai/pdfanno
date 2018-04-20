@@ -10,22 +10,22 @@ export const DEFAULT_RADIUS = 7
  */
 export function renderKnob ({ x, y, readOnly }) {
 
-    // Adjust the position.
-    [x, y] = adjustPoint(x, (y - (DEFAULT_RADIUS + 2)), DEFAULT_RADIUS)
+  // Adjust the position.
+  [x, y] = adjustPoint(x, (y - (DEFAULT_RADIUS + 2)), DEFAULT_RADIUS)
 
-    // Set the CSS class.
-    let cssClass = 'anno-knob'
-    if (readOnly) {
-        cssClass += ' is-readonly'
-    }
+  // Set the CSS class.
+  let cssClass = 'anno-knob'
+  if (readOnly) {
+    cssClass += ' is-readonly'
+  }
 
-    // Create a knob.
-    return $(`<div class="${cssClass}"/>`).css({
-        top    : `${y}px`,
-        left   : `${x}px`,
-        width  : DEFAULT_RADIUS + 'px',
-        height : DEFAULT_RADIUS + 'px'
-    })
+  // Create a knob.
+  return $(`<div class="${cssClass}"/>`).css({
+    top    : `${y}px`,
+    left   : `${x}px`,
+    width  : DEFAULT_RADIUS + 'px',
+    height : DEFAULT_RADIUS + 'px'
+  })
 }
 
 /**
@@ -33,26 +33,26 @@ export function renderKnob ({ x, y, readOnly }) {
  */
 function adjustPoint (x, y, radius) {
 
-    // Get all knobs.
-    const $circles = $('.anno-knob')
+  // Get all knobs.
+  const $circles = $('.anno-knob')
 
-    // Find a position where all knobs are not placed at.
-    while (true) {
-        let good = true
-        $circles.each(function () {
-            const $this = $(this)
-            const x1 = parseInt($this.css('left'))
-            const y1 = parseInt($this.css('top'))
-            const distance1 = Math.pow(x - x1, 2) + Math.pow(y - y1, 2)
-            const distance2 = Math.pow(radius, 2)
-            if (distance1 < distance2) {
-                good = false
-            }
-        })
-        if (good) {
-            break
-        }
-        y -= 1
+  // Find a position where all knobs are not placed at.
+  while (true) {
+    let good = true
+    $circles.each(function () {
+      const $this = $(this)
+      const x1 = parseInt($this.css('left'))
+      const y1 = parseInt($this.css('top'))
+      const distance1 = Math.pow(x - x1, 2) + Math.pow(y - y1, 2)
+      const distance2 = Math.pow(radius, 2)
+      if (distance1 < distance2) {
+        good = false
+      }
+    })
+    if (good) {
+      break
     }
-    return [x, y]
+    y -= 1
+  }
+  return [x, y]
 }
