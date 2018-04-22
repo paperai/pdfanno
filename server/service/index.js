@@ -57,14 +57,33 @@ module.exports.fetchPDFText = async url => {
         }
         throw res;
     }
+}
 
+module.exports.fetchAnnotation = async url => {
 
+  const options = {
+    method   : 'GET',
+    url      : url,
+    encoding : 'utf8'
+  }
+
+  try {
+    const pdftxt = await rp(options)
+    return pdftxt
+  } catch (res) {
+    const statusCode = res.statusCode
+    if (statusCode === 404) {
+      console.log(`Annotation not found. url=${url}`)
+      return null;
+    }
+    throw res;
+  }
 }
 
 /**
  * Save a PDF file, and return the saved path.
  */
-module.exports.savePDF = (fileName, content) => {
+const savePDF = (fileName, content) => {
     return new Promise((resolve, reject) => {
 
         const dataPath = path.resolve(__dirname, '..', 'server-data', 'pdf');
@@ -78,9 +97,18 @@ module.exports.savePDF = (fileName, content) => {
         resolve(pdfPath);
     });
 }
+module.exports.savePDF = savePDF
+
+module.exports.createPdftxt = async (pdf) => {
+  const fname = String(new Date().getTime())
+  const fpath = await savePDF(fname, pdf)
+  const pdftxt = await analyzePDF(fpath)
+  return pdftxt
+}
+
 
 // Analize pdf with pdfreader.jar.
-module.exports.analyzePDF = async (pdfPath) => {
+const analyzePDF = async (pdfPath) => {
 
     // Check java command exits.
     try {
@@ -101,6 +129,7 @@ module.exports.analyzePDF = async (pdfPath) => {
 
     return stdout
 }
+module.exports.analyzePDF = analyzePDF
 
 // Get a user annotation.
 module.exports.getUserAnnotation = (documentId, userId) => {
