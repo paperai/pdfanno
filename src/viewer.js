@@ -17,10 +17,10 @@
            DownloadManager, getFileName, getPDFFileNameFromURL,
            PDFHistory, Preferences, ViewHistory, Stats,
            PDFThumbnailViewer, URL, noContextMenuHandler, SecondaryToolbar,
-           PasswordPrompt, PDFDocumentProperties, HandTool,
+           PasswordPrompt, PDFPresentationMode, PDFDocumentProperties, HandTool,
            Promise, PDFLinkService,
            OverlayManager, PDFFindController, PDFFindBar, PDFViewer,
-           PDFRenderingQueue, parseQueryString,
+           PDFRenderingQueue, PresentationModeState, parseQueryString,
            RenderingStates, UNKNOWN_SCALE, DEFAULT_SCALE_VALUE,
            IGNORE_CURRENT_POSITION_ON_ZOOM: true */
 
@@ -1808,6 +1808,7 @@ var PDFHistory = (function () {
       this.reInitialized = false;
       this.allowHashChange = true;
       this.historyUnlocked = true;
+      this.isViewerInPresentationMode = false;
 
       this.previousHash = window.location.hash.substring(1);
       this.currentBookmark = '';
@@ -1937,6 +1938,9 @@ var PDFHistory = (function () {
         window.addEventListener('beforeunload', pdfHistoryBeforeUnload, false);
       }, false);
 
+      window.addEventListener('presentationmodechanged', function(e) {
+        self.isViewerInPresentationMode = !!e.detail.active;
+      });
     },
 
     clearHistoryState: function pdfHistory_clearHistoryState() {
@@ -2082,6 +2086,9 @@ var PDFHistory = (function () {
         return null;
       }
       var params = {hash: this.currentBookmark, page: this.currentPage};
+      if (this.isViewerInPresentationMode) {
+        params.hash = null;
+      }
       return params;
     },
 
@@ -2185,6 +2192,8 @@ var SecondaryToolbar = {
 
     // Define the toolbar buttons.
     this.toggleButton = options.toggleButton;
+    this.presentationModeButton = options.presentationModeButton;
+    this.openFile = options.openFile;
     this.print = options.print;
     this.download = options.download;
     this.viewBookmark = options.viewBookmark;
@@ -2200,6 +2209,9 @@ var SecondaryToolbar = {
       { element: this.toggleButton, handler: this.toggle },
       // All items within the secondary toolbar
       // (except for toggleHandTool, hand_tool.js is responsible for it):
+      { element: this.presentationModeButton,
+        handler: this.presentationModeClick },
+      { element: this.openFile, handler: this.openFileClick },
       { element: this.print, handler: this.printClick },
       { element: this.download, handler: this.downloadClick },
       { element: this.viewBookmark, handler: this.viewBookmarkClick },
@@ -2217,6 +2229,17 @@ var SecondaryToolbar = {
         element.addEventListener('click', elements[item].handler.bind(this));
       }
     }
+  },
+
+  // Event handling functions.
+  presentationModeClick: function secondaryToolbarPresentationModeClick(evt) {
+    PDFViewerApplication.requestPresentationMode();
+    this.close();
+  },
+
+  openFileClick: function secondaryToolbarOpenFileClick(evt) {
+    document.getElementById('fileInput').click();
+    this.close();
   },
 
   printClick: function secondaryToolbarPrintClick(evt) {
@@ -2300,6 +2323,383 @@ var SecondaryToolbar = {
     }
   }
 };
+
+
+var DELAY_BEFORE_RESETTING_SWITCH_IN_PROGRESS = 1500; // in ms
+var DELAY_BEFORE_HIDING_CONTROLS = 3000; // in ms
+var ACTIVE_SELECTOR = 'pdfPresentationMode';
+var CONTROLS_SELECTOR = 'pdfPresentationModeControls';
+
+/**
+ * @typedef {Object} PDFPresentationModeOptions
+ * @property {HTMLDivElement} container - The container for the viewer element.
+ * @property {HTMLDivElement} viewer - (optional) The viewer element.
+ * @property {PDFViewer} pdfViewer - The document viewer.
+ * @property {PDFThumbnailViewer} pdfThumbnailViewer - (optional) The thumbnail
+ *   viewer.
+ * @property {Array} contextMenuItems - (optional) The menuitems that are added
+ *   to the context menu in Presentation Mode.
+ */
+
+/**
+ * @class
+ */
+var PDFPresentationMode = (function PDFPresentationModeClosure() {
+  /**
+   * @constructs PDFPresentationMode
+   * @param {PDFPresentationModeOptions} options
+   */
+  function PDFPresentationMode(options) {
+    this.container = options.container;
+    this.viewer = options.viewer || options.container.firstElementChild;
+    this.pdfViewer = options.pdfViewer;
+    var contextMenuItems = options.contextMenuItems || null;
+
+    this.active = false;
+    this.args = null;
+    this.contextMenuOpen = false;
+    this.mouseScrollTimeStamp = 0;
+    this.mouseScrollDelta = 0;
+
+    if (contextMenuItems) {
+      for (var i = 0, ii = contextMenuItems.length; i < ii; i++) {
+        var item = contextMenuItems[i];
+        item.element.addEventListener('click', function (handler) {
+          this.contextMenuOpen = false;
+          handler();
+        }.bind(this, item.handler));
+      }
+    }
+  }
+
+  PDFPresentationMode.prototype = {
+    /**
+     * Request the browser to enter fullscreen mode.
+     * @returns {boolean} Indicating if the request was successful.
+     */
+    request: function PDFPresentationMode_request() {
+      if (this.switchInProgress || this.active ||
+          !this.viewer.hasChildNodes()) {
+        return false;
+      }
+      this._addFullscreenChangeListeners();
+      this._setSwitchInProgress();
+      this._notifyStateChange();
+
+      if (this.container.requestFullscreen) {
+        this.container.requestFullscreen();
+      } else if (this.container.mozRequestFullScreen) {
+        this.container.mozRequestFullScreen();
+      } else if (this.container.webkitRequestFullscreen) {
+        this.container.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+      } else if (this.container.msRequestFullscreen) {
+        this.container.msRequestFullscreen();
+      } else {
+        return false;
+      }
+
+      this.args = {
+        page: this.pdfViewer.currentPageNumber,
+        previousScale: this.pdfViewer.currentScaleValue,
+      };
+
+      return true;
+    },
+
+    /**
+     * Switches page when the user scrolls (using a scroll wheel or a touchpad)
+     * with large enough motion, to prevent accidental page switches.
+     * @param {number} delta - The delta value from the mouse event.
+     */
+    mouseScroll: function PDFPresentationMode_mouseScroll(delta) {
+      if (!this.active) {
+        return;
+      }
+      var MOUSE_SCROLL_COOLDOWN_TIME = 50;
+      var PAGE_SWITCH_THRESHOLD = 120;
+      var PageSwitchDirection = {
+        UP: -1,
+        DOWN: 1
+      };
+
+      var currentTime = (new Date()).getTime();
+      var storedTime = this.mouseScrollTimeStamp;
+
+      // If we've already switched page, avoid accidentally switching again.
+      if (currentTime > storedTime &&
+          currentTime - storedTime < MOUSE_SCROLL_COOLDOWN_TIME) {
+        return;
+      }
+      // If the scroll direction changed, reset the accumulated scroll delta.
+      if ((this.mouseScrollDelta > 0 && delta < 0) ||
+          (this.mouseScrollDelta < 0 && delta > 0)) {
+        this._resetMouseScrollState();
+      }
+      this.mouseScrollDelta += delta;
+
+      if (Math.abs(this.mouseScrollDelta) >= PAGE_SWITCH_THRESHOLD) {
+        var pageSwitchDirection = (this.mouseScrollDelta > 0) ?
+          PageSwitchDirection.UP : PageSwitchDirection.DOWN;
+        var page = this.pdfViewer.currentPageNumber;
+        this._resetMouseScrollState();
+
+        // If we're at the first/last page, we don't need to do anything.
+        if ((page === 1 && pageSwitchDirection === PageSwitchDirection.UP) ||
+            (page === this.pdfViewer.pagesCount &&
+             pageSwitchDirection === PageSwitchDirection.DOWN)) {
+          return;
+        }
+        this.pdfViewer.currentPageNumber = (page + pageSwitchDirection);
+        this.mouseScrollTimeStamp = currentTime;
+      }
+    },
+
+    get isFullscreen() {
+      return !!(document.fullscreenElement ||
+                document.mozFullScreen ||
+                document.webkitIsFullScreen ||
+                document.msFullscreenElement);
+    },
+
+    /**
+     * @private
+     */
+    _notifyStateChange: function PDFPresentationMode_notifyStateChange() {
+      var event = document.createEvent('CustomEvent');
+      event.initCustomEvent('presentationmodechanged', true, true, {
+        active: this.active,
+        switchInProgress: !!this.switchInProgress
+      });
+      window.dispatchEvent(event);
+    },
+
+    /**
+     * Used to initialize a timeout when requesting Presentation Mode,
+     * i.e. when the browser is requested to enter fullscreen mode.
+     * This timeout is used to prevent the current page from being scrolled
+     * partially, or completely, out of view when entering Presentation Mode.
+     * NOTE: This issue seems limited to certain zoom levels (e.g. page-width).
+     * @private
+     */
+    _setSwitchInProgress: function PDFPresentationMode_setSwitchInProgress() {
+      if (this.switchInProgress) {
+        clearTimeout(this.switchInProgress);
+      }
+      this.switchInProgress = setTimeout(function switchInProgressTimeout() {
+        this._removeFullscreenChangeListeners();
+        delete this.switchInProgress;
+        this._notifyStateChange();
+      }.bind(this), DELAY_BEFORE_RESETTING_SWITCH_IN_PROGRESS);
+    },
+
+    /**
+     * @private
+     */
+    _resetSwitchInProgress:
+        function PDFPresentationMode_resetSwitchInProgress() {
+      if (this.switchInProgress) {
+        clearTimeout(this.switchInProgress);
+        delete this.switchInProgress;
+      }
+    },
+
+    /**
+     * @private
+     */
+    _enter: function PDFPresentationMode_enter() {
+      this.active = true;
+      this._resetSwitchInProgress();
+      this._notifyStateChange();
+      this.container.classList.add(ACTIVE_SELECTOR);
+
+      // Ensure that the correct page is scrolled into view when entering
+      // Presentation Mode, by waiting until fullscreen mode in enabled.
+      setTimeout(function enterPresentationModeTimeout() {
+        this.pdfViewer.currentPageNumber = this.args.page;
+        this.pdfViewer.currentScaleValue = 'page-fit';
+      }.bind(this), 0);
+
+      this._addWindowListeners();
+      this._showControls();
+      this.contextMenuOpen = false;
+      this.container.setAttribute('contextmenu', 'viewerContextMenu');
+
+      // Text selection is disabled in Presentation Mode, thus it's not possible
+      // for the user to deselect text that is selected (e.g. with "Select all")
+      // when entering Presentation Mode, hence we remove any active selection.
+      window.getSelection().removeAllRanges();
+    },
+
+    /**
+     * @private
+     */
+    _exit: function PDFPresentationMode_exit() {
+      var page = this.pdfViewer.currentPageNumber;
+      this.container.classList.remove(ACTIVE_SELECTOR);
+
+      // Ensure that the correct page is scrolled into view when exiting
+      // Presentation Mode, by waiting until fullscreen mode is disabled.
+      setTimeout(function exitPresentationModeTimeout() {
+        this.active = false;
+        this._removeFullscreenChangeListeners();
+        this._notifyStateChange();
+
+        this.pdfViewer.currentScaleValue = this.args.previousScale;
+        this.pdfViewer.currentPageNumber = page;
+        this.args = null;
+      }.bind(this), 0);
+
+      this._removeWindowListeners();
+      this._hideControls();
+      this._resetMouseScrollState();
+      this.container.removeAttribute('contextmenu');
+      this.contextMenuOpen = false;
+
+    },
+
+    /**
+     * @private
+     */
+    _mouseDown: function PDFPresentationMode_mouseDown(evt) {
+      if (this.contextMenuOpen) {
+        this.contextMenuOpen = false;
+        evt.preventDefault();
+        return;
+      }
+      if (evt.button === 0) {
+        // Enable clicking of links in presentation mode. Please note:
+        // Only links pointing to destinations in the current PDF document work.
+        var isInternalLink = (evt.target.href &&
+                              evt.target.classList.contains('internalLink'));
+        if (!isInternalLink) {
+          // Unless an internal link was clicked, advance one page.
+          evt.preventDefault();
+          this.pdfViewer.currentPageNumber += (evt.shiftKey ? -1 : 1);
+        }
+      }
+    },
+
+    /**
+     * @private
+     */
+    _contextMenu: function PDFPresentationMode_contextMenu() {
+      this.contextMenuOpen = true;
+    },
+
+    /**
+     * @private
+     */
+    _showControls: function PDFPresentationMode_showControls() {
+      if (this.controlsTimeout) {
+        clearTimeout(this.controlsTimeout);
+      } else {
+        this.container.classList.add(CONTROLS_SELECTOR);
+      }
+      this.controlsTimeout = setTimeout(function showControlsTimeout() {
+        this.container.classList.remove(CONTROLS_SELECTOR);
+        delete this.controlsTimeout;
+      }.bind(this), DELAY_BEFORE_HIDING_CONTROLS);
+    },
+
+    /**
+     * @private
+     */
+    _hideControls: function PDFPresentationMode_hideControls() {
+      if (!this.controlsTimeout) {
+        return;
+      }
+      clearTimeout(this.controlsTimeout);
+      this.container.classList.remove(CONTROLS_SELECTOR);
+      delete this.controlsTimeout;
+    },
+
+    /**
+     * Resets the properties used for tracking mouse scrolling events.
+     * @private
+     */
+    _resetMouseScrollState:
+        function PDFPresentationMode_resetMouseScrollState() {
+      this.mouseScrollTimeStamp = 0;
+      this.mouseScrollDelta = 0;
+    },
+
+    /**
+     * @private
+     */
+    _addWindowListeners: function PDFPresentationMode_addWindowListeners() {
+      this.showControlsBind = this._showControls.bind(this);
+      this.mouseDownBind = this._mouseDown.bind(this);
+      this.resetMouseScrollStateBind = this._resetMouseScrollState.bind(this);
+      this.contextMenuBind = this._contextMenu.bind(this);
+
+      window.addEventListener('mousemove', this.showControlsBind);
+      window.addEventListener('mousedown', this.mouseDownBind);
+      window.addEventListener('keydown', this.resetMouseScrollStateBind);
+      window.addEventListener('contextmenu', this.contextMenuBind);
+    },
+
+    /**
+     * @private
+     */
+    _removeWindowListeners:
+        function PDFPresentationMode_removeWindowListeners() {
+      window.removeEventListener('mousemove', this.showControlsBind);
+      window.removeEventListener('mousedown', this.mouseDownBind);
+      window.removeEventListener('keydown', this.resetMouseScrollStateBind);
+      window.removeEventListener('contextmenu', this.contextMenuBind);
+
+      delete this.showControlsBind;
+      delete this.mouseDownBind;
+      delete this.resetMouseScrollStateBind;
+      delete this.contextMenuBind;
+    },
+
+    /**
+     * @private
+     */
+    _fullscreenChange: function PDFPresentationMode_fullscreenChange() {
+      if (this.isFullscreen) {
+        this._enter();
+      } else {
+        this._exit();
+      }
+    },
+
+    /**
+     * @private
+     */
+    _addFullscreenChangeListeners:
+        function PDFPresentationMode_addFullscreenChangeListeners() {
+      this.fullscreenChangeBind = this._fullscreenChange.bind(this);
+
+      window.addEventListener('fullscreenchange', this.fullscreenChangeBind);
+      window.addEventListener('mozfullscreenchange', this.fullscreenChangeBind);
+      window.addEventListener('webkitfullscreenchange',
+                              this.fullscreenChangeBind);
+      window.addEventListener('MSFullscreenChange', this.fullscreenChangeBind);
+    },
+
+    /**
+     * @private
+     */
+    _removeFullscreenChangeListeners:
+        function PDFPresentationMode_removeFullscreenChangeListeners() {
+      window.removeEventListener('fullscreenchange', this.fullscreenChangeBind);
+      window.removeEventListener('mozfullscreenchange',
+                                 this.fullscreenChangeBind);
+      window.removeEventListener('webkitfullscreenchange',
+                              this.fullscreenChangeBind);
+      window.removeEventListener('MSFullscreenChange',
+                                 this.fullscreenChangeBind);
+
+      delete this.fullscreenChangeBind;
+    }
+  };
+
+  return PDFPresentationMode;
+})();
+
+
 
 var GrabToPan = (function GrabToPanClosure() {
   /**
@@ -2538,12 +2938,36 @@ var HandTool = {
         }.bind(this), function rejected(reason) {});
       }.bind(this));
 
+      window.addEventListener('presentationmodechanged', function (evt) {
+        if (evt.detail.switchInProgress) {
+          return;
+        }
+        if (evt.detail.active) {
+          this.enterPresentationMode();
+        } else {
+          this.exitPresentationMode();
+        }
+      }.bind(this));
     }
   },
 
   toggle: function handToolToggle() {
     this.handTool.toggle();
     SecondaryToolbar.close();
+  },
+
+  enterPresentationMode: function handToolEnterPresentationMode() {
+    if (this.handTool.active) {
+      this.wasActive = true;
+      this.handTool.deactivate();
+    }
+  },
+
+  exitPresentationMode: function handToolExitPresentationMode() {
+    if (this.wasActive) {
+      this.wasActive = null;
+      this.handTool.activate();
+    }
   }
 };
 
@@ -2948,6 +3372,13 @@ var PDFDocumentProperties = (function PDFDocumentPropertiesClosure() {
   return PDFDocumentProperties;
 })();
 
+
+var PresentationModeState = {
+  UNKNOWN: 0,
+  NORMAL: 1,
+  CHANGING: 2,
+  FULLSCREEN: 3,
+};
 
 var IGNORE_CURRENT_POSITION_ON_ZOOM = false;
 var DEFAULT_CACHE_SIZE = 10;
@@ -4162,6 +4593,7 @@ var PDFViewer = (function pdfViewer() {
 
     this.scroll = watchScroll(this.container, this._scrollUpdate.bind(this));
     this.updateInProgress = false;
+    this.presentationModeState = PresentationModeState.UNKNOWN;
     this._resetView();
 
     if (this.removePageBorders) {
@@ -4452,7 +4884,8 @@ var PDFViewer = (function pdfViewer() {
 
       if (!noScroll) {
         var page = this._currentPageNumber, dest;
-        if (this._location && !IGNORE_CURRENT_POSITION_ON_ZOOM) {
+        if (this._location && !IGNORE_CURRENT_POSITION_ON_ZOOM &&
+            !(this.isInPresentationMode || this.isChangingPresentationMode)) {
           page = this._location.pageNumber;
           dest = [null, { name: 'XYZ' }, this._location.left,
                   this._location.top, null];
@@ -4477,8 +4910,10 @@ var PDFViewer = (function pdfViewer() {
         if (!currentPage) {
           return;
         }
-        var hPadding = SCROLLBAR_PADDING;
-        var vPadding = VERTICAL_PADDING;
+        var hPadding = (this.isInPresentationMode || this.removePageBorders) ?
+          0 : SCROLLBAR_PADDING;
+        var vPadding = (this.isInPresentationMode || this.removePageBorders) ?
+          0 : VERTICAL_PADDING;
         var pageWidthScale = (this.container.clientWidth - hPadding) /
                              currentPage.width * currentPage.scale;
         var pageHeightScale = (this.container.clientHeight - vPadding) /
@@ -4527,6 +4962,16 @@ var PDFViewer = (function pdfViewer() {
 
       var pageView = this._pages[pageNumber - 1];
 
+      if (this.isInPresentationMode) {
+        if (this._currentPageNumber !== pageView.id) {
+          // Avoid breaking getVisiblePages in presentation mode.
+          this.currentPageNumber = pageView.id;
+          return;
+        }
+        dest = null;
+        // Fixes the case when PDF has different page sizes.
+        this._setScale(this._currentScaleValue, true);
+      }
       if (!dest) {
         scrollIntoView(pageView.div);
         return;
@@ -4676,6 +5121,10 @@ var PDFViewer = (function pdfViewer() {
         currentId = visiblePages[0].id;
       }
 
+      if (!this.isInPresentationMode) {
+        this.currentPageNumber = currentId;
+      }
+
       this._updateLocation(firstPage);
 
       this.updateInProgress = false;
@@ -4694,17 +5143,30 @@ var PDFViewer = (function pdfViewer() {
       this.container.focus();
     },
 
+    get isInPresentationMode() {
+      return this.presentationModeState === PresentationModeState.FULLSCREEN;
+    },
+
+    get isChangingPresentationMode() {
+      return this.presentationModeState === PresentationModeState.CHANGING;
+    },
+
     get isHorizontalScrollbarEnabled() {
-      return this.container.scrollWidth > this.container.clientWidth;
+      return (this.isInPresentationMode ?
+        false : (this.container.scrollWidth > this.container.clientWidth));
     },
 
     _getVisiblePages: function () {
-      // The algorithm in getVisibleElements doesn't work in all browsers and
-      // configurations when presentation mode is active.
-      var visible = [];
-      var currentPage = this._pages[this._currentPageNumber - 1];
-      visible.push({ id: currentPage.id, view: currentPage });
-      return { first: currentPage, last: currentPage, views: visible };
+      if (!this.isInPresentationMode) {
+        return getVisibleElements(this.container, this._pages, true);
+      } else {
+        // The algorithm in getVisibleElements doesn't work in all browsers and
+        // configurations when presentation mode is active.
+        var visible = [];
+        var currentPage = this._pages[this._currentPageNumber - 1];
+        visible.push({ id: currentPage.id, view: currentPage });
+        return { first: currentPage, last: currentPage, views: visible };
+      }
     },
 
     cleanup: function () {
@@ -4770,7 +5232,7 @@ var PDFViewer = (function pdfViewer() {
         textLayerDiv: textLayerDiv,
         pageIndex: pageIndex,
         viewport: viewport,
-        findController: this.findController
+        findController: this.isInPresentationMode ? null : this.findController
       });
     },
 
@@ -4856,6 +5318,8 @@ window.PDFViewerApplication = {
   pdfViewer: null,
   /** @type {PDFRenderingQueue} */
   pdfRenderingQueue: null,
+  /** @type {PDFPresentationMode} */
+  pdfPresentationMode: null,
   /** @type {PDFDocumentProperties} */
   pdfDocumentProperties: null,
   /** @type {PDFLinkService} */
@@ -4947,6 +5411,9 @@ window.PDFViewerApplication = {
     SecondaryToolbar.initialize({
       toolbar: document.getElementById('secondaryToolbar'),
       toggleButton: document.getElementById('secondaryToolbarToggle'),
+      presentationModeButton:
+        document.getElementById('secondaryPresentationMode'),
+      openFile: document.getElementById('secondaryOpenFile'),
       print: document.getElementById('secondaryPrint'),
       download: document.getElementById('secondaryDownload'),
       viewBookmark: document.getElementById('secondaryViewBookmark'),
@@ -4956,6 +5423,25 @@ window.PDFViewerApplication = {
       pageRotateCcw: document.getElementById('pageRotateCcw'),
       documentPropertiesButton: document.getElementById('documentProperties')
     });
+
+    if (this.supportsFullscreen) {
+      var toolbar = SecondaryToolbar;
+      this.pdfPresentationMode = new PDFPresentationMode({
+        container: container,
+        viewer: viewer,
+        pdfViewer: this.pdfViewer,
+        contextMenuItems: [
+          { element: document.getElementById('contextFirstPage'),
+            handler: toolbar.firstPageClick.bind(toolbar) },
+          { element: document.getElementById('contextLastPage'),
+            handler: toolbar.lastPageClick.bind(toolbar) },
+          { element: document.getElementById('contextPageRotateCw'),
+            handler: toolbar.pageRotateCwClick.bind(toolbar) },
+          { element: document.getElementById('contextPageRotateCcw'),
+            handler: toolbar.pageRotateCcwClick.bind(toolbar) }
+        ]
+      });
+    }
 
     PasswordPrompt.initialize({
       overlayName: 'passwordOverlay',
@@ -5743,8 +6229,24 @@ window.PDFViewerApplication = {
     this.forceRendering();
 
     this.pdfViewer.scrollPageIntoView(pageNumber);
-  }
+  },
 
+  requestPresentationMode: function pdfViewRequestPresentationMode() {
+    if (!this.pdfPresentationMode) {
+      return;
+    }
+    this.pdfPresentationMode.request();
+  },
+
+  /**
+   * @param {number} delta - The delta value from the mouse event.
+   */
+  scrollPresentationMode: function pdfViewScrollPresentationMode(delta) {
+    if (!this.pdfPresentationMode) {
+      return;
+    }
+    this.pdfPresentationMode.mouseScroll(delta);
+  }
 };
 window.PDFView = PDFViewerApplication; // obsolete name, using it as an alias
 
@@ -5860,6 +6362,12 @@ function webViewerInitialized() {
     document.getElementById('secondaryPrint').classList.add('hidden');
   }
 
+  if (!PDFViewerApplication.supportsFullscreen) {
+    document.getElementById('presentationMode').classList.add('hidden');
+    document.getElementById('secondaryPresentationMode').
+      classList.add('hidden');
+  }
+
   if (PDFViewerApplication.supportsIntegratedFind) {
     document.getElementById('viewFind').classList.add('hidden');
   }
@@ -5916,6 +6424,12 @@ function webViewerInitialized() {
     }
     PDFViewerApplication.pdfViewer.currentScaleValue = this.value;
   });
+
+  document.getElementById('presentationMode').addEventListener('click',
+    SecondaryToolbar.presentationModeClick.bind(SecondaryToolbar));
+
+  document.getElementById('openFile').addEventListener('click',
+    SecondaryToolbar.openFileClick.bind(SecondaryToolbar));
 
   document.getElementById('print').addEventListener('click',
     SecondaryToolbar.printClick.bind(SecondaryToolbar));
@@ -5999,6 +6513,14 @@ document.addEventListener('namedaction', function (e) {
       break;
   }
 }, true);
+
+window.addEventListener('presentationmodechanged', function (e) {
+  var active = e.detail.active;
+  var switchInProgress = e.detail.switchInProgress;
+  PDFViewerApplication.pdfViewer.presentationModeState =
+    switchInProgress ? PresentationModeState.CHANGING :
+    active ? PresentationModeState.FULLSCREEN : PresentationModeState.NORMAL;
+});
 
 window.addEventListener('updateviewarea', function (evt) {
   if (!PDFViewerApplication.initialized) {
