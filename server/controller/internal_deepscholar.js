@@ -81,7 +81,7 @@ module.exports.upload = (req, res) => {
     })
   }
 
-  // TODO Send an uplod request to Deep Scholar, and treat the response.
+  // TODO Send an upload request to Deep Scholar, and treat the response.
 
   res.json({ message : 'ok' })
 }
