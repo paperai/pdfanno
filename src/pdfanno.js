@@ -292,6 +292,7 @@ function getPDFName (url) {
   const a = url.split('/')
   return a[a.length - 1]
 }
+window.getPDFName = getPDFName
 
 /**
  * Show or hide a loding.

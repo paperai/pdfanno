@@ -14,6 +14,9 @@ export function isTarget () {
   return params['api_root'] && params['paper_id']
 }
 
+/**
+ * Init for displaying for DeepScholar.
+ */
 export async function initialize () {
 
   // Remove `Browse` button.
@@ -37,15 +40,25 @@ export async function initialize () {
 
   // Get results.
   const pdfBase64 = json.pdf
+  const pdf = Uint8Array.from(atob(pdfBase64), c => c.charCodeAt(0))
   console.log('pdfBase64:', pdfBase64.length)
+  const pdfName = json.pdfName
   const pdftxt = json.pdftxt
   console.log('pdftxt:', pdftxt.length)
   const annotations = json.annotations
   console.log('annotations:', annotations)
 
+  // TODO need maybe.
+  // Init viewer.
+  // window.annoPage.initializeViewer(null)
+  // // Start application.
+  // window.annoPage.startViewerApplication()
 
+  // Display PDF.
+  window.annoPage.displayViewer({
+    name    : pdfName,
+    content : pdf
+  })
 
-
-
-
+  
 }

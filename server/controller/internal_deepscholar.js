@@ -62,6 +62,7 @@ module.exports.get = async (req, res) => {
     return res.json({
       status        : 'ok',
       pdf           : new Buffer(pdf).toString('base64'),
+      pdfName       : 'bitcoin.pdf',   // TODO Get this.
       pdftxt,
       annotations
     })
