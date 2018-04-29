@@ -37,8 +37,8 @@ app.get('/internal/api/annotations', controller.internal.loadAnno)
 /***********************
  Internal APIs with DeepScholar.
  ************************/
-app.get('/internal/deepscholar/:documentId', controller.internalDeepScholar.get)
-app.post('/internal/deepscholar/:documentId', controller.internalDeepScholar.upload)
+app.get('/internal/api/deepscholar/:documentId', controller.internalDeepScholar.get)
+app.post('/internal/api/deepscholar/:documentId', controller.internalDeepScholar.upload)
 
 /***********************
  External APIs.
