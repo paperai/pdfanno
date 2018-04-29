@@ -14,6 +14,7 @@ import * as textLayer from './page/textLayer'
 import * as pdftxtDownload from './page/pdftxtdownload'
 import * as ws from './page/socket'
 import PDFAnnoPage from './page/pdf/PDFAnnoPage'
+import * as deepscholar from './deepscholar'
 
 /**
  * API root point.
@@ -63,6 +64,12 @@ function _getY (annotation) {
  *  The entry point.
  */
 window.addEventListener('DOMContentLoaded', async e => {
+
+  // for DeepScholar.
+  if (deepscholar.isTarget()) {
+    console.log('for deepscholar.')
+    deepscholar.initialize()
+  }
 
   // resizable.
   annoUI.util.setupResizableColumns()

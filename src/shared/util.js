@@ -14,3 +14,19 @@ export function dispatchWindowEvent (eventName, data) {
   event.initCustomEvent(eventName, true, true, data)
   window.dispatchEvent(event)
 }
+
+/**
+ * Parse URL queries, and return it as a Map.
+ * @returns {{}}
+ */
+// TODO make as common?
+export function parseUrlQuery () {
+  return window.location.search
+    .replace('?', '')
+    .split('&')
+    .reduce((map, keyValue) => {
+      const [ key, value ] = keyValue.split('=')
+      map[key] = value
+      return map
+    }, {})
+}
