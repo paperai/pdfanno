@@ -1,4 +1,3 @@
-const request = require('request')
 const service = require('../service')
 
 // Reference: API document with Deep Scholar.
@@ -12,56 +11,65 @@ const service = require('../service')
  */
 module.exports.get = async (req, res) => {
 
-  const deepScholar = {
-    apiRoot    : req.query.api_root,
-    documentId : req.param('documentId'),
-    user       : {
-      id    : req.query.user_id,
-      token : req.query.user_token
+  try {
+
+    const deepScholar = {
+      apiRoot    : req.query.api_root,
+      documentId : req.param('documentId'),
+      user       : {
+        id    : req.query.user_id,
+        token : req.query.user_token
+      }
     }
-  }
 
-  if (!deepScholar.apiRoot) {
-    return res.status(400).json({ message : 'api_root is required.' })
-  } else if (!deepScholar.documentId) {
-    return res.status(400).json({ message : 'documentId is required.' })
-  } else if (!deepScholar.user.id) {
-    return res.status(400).json({ message : 'user_id is required.' })
-  } else if (!deepScholar.user.token) {
-    return res.status(400).json({ message : 'user_token is required.' })
-  }
+    // TODO user_id and user_token are enable to be blank, if he/she is a guest.
 
-  // TODO this is a mock implementation.
-  // For real, get a pdf from Deep Scholar.
-  const pdf = await service.fetchPDF('https://www.yoheim.net/tmp/bitcoin.pdf')
-
-  // TODO this is a mock implementation.
-  // For real, get a pdftxt from Deep Scholar.
-  const pdftxt = await service.createPdftxt(pdf)
-
-  // TODO this is a mock implementation.
-  // For real, get annotations from Deep Scholar.
-  const annotations = [
-    {
-      user : { id : 'user1', name : 'USER1' },
-      anno : await fetchAnnotation('https://www.yoheim.net/tmp/bitcoin_1.anno')
-    },
-    {
-      user : { id : 'user2', name : 'USER2' },
-      anno : await fetchAnnotation('https://www.yoheim.net/tmp/bitcoin_2.anno')
-    },
-    {
-      user : { id : 'user3', name : 'USER3' },
-      anno : await fetchAnnotation('https://www.yoheim.net/tmp/bitcoin_3.anno')
+    if (!deepScholar.apiRoot) {
+      return res.status(400).json({ message : 'api_root is required.' })
+    } else if (!deepScholar.documentId) {
+      return res.status(400).json({ message : 'documentId is required.' })
+      // } else if (!deepScholar.user.id) {
+      //   return res.status(400).json({ message : 'user_id is required.' })
+      // } else if (!deepScholar.user.token) {
+      //   return res.status(400).json({ message : 'user_token is required.' })
     }
-  ]
 
-  return res.json({
-    status        : 'ok',
-    pdf           : new Buffer(pdf).toString('base64'),
-    pdftxt,
-    annotations
-  })
+    // TODO this is a mock implementation.
+    // For real, get a pdf from Deep Scholar.
+    const pdf = await service.fetchPDF('https://www.yoheim.net/tmp/bitcoin.pdf')
+
+    // TODO this is a mock implementation.
+    // For real, get a pdftxt from Deep Scholar.
+    const pdftxt = await service.createPdftxt(pdf)
+
+    // TODO this is a mock implementation.
+    // For real, get annotations from Deep Scholar.
+    const annotations = [
+      {
+        user : { id : 'user1', name : 'USER1' },
+        anno : await service.fetchAnnotation('https://www.yoheim.net/tmp/bitcoin_1.anno')
+      },
+      {
+        user : { id : 'user2', name : 'USER2' },
+        anno : await service.fetchAnnotation('https://www.yoheim.net/tmp/bitcoin_2.anno')
+      },
+      {
+        user : { id : 'user3', name : 'USER3' },
+        anno : await service.fetchAnnotation('https://www.yoheim.net/tmp/bitcoin_3.anno')
+      }
+    ]
+
+    return res.json({
+      status        : 'ok',
+      pdf           : new Buffer(pdf).toString('base64'),
+      pdftxt,
+      annotations
+    })
+
+  } catch (e) {
+    console.log('internal_deepscholar:get:Server Error.', e)
+    return res.status(500).json({ message : 'Server Error.' })
+  }
 
 }
 
