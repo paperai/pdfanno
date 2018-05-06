@@ -161,11 +161,12 @@ div[data-canvas-width] {
   margin: 1px auto -8px auto;
   position: relative;
   overflow: visible;
-  /*border: 9px solid transparent;*/
+  border: 9px solid transparent;
   background-clip: content-box;
   /*border-image: url(images/shadow.png) 9 9 repeat;*/  /*とりあえず*/
-  margin-top: 20px;  /*とりあえず*/
+  /*margin-top: 20px;*/  /*とりあえず*/
   background-color: white;
+  box-sizing: content-box; /*Add*/
 }
 
 .pdfViewer.removePageBorders .page {
