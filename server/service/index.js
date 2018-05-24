@@ -1,14 +1,16 @@
 /**
  * Service - PDF related.
  */
-const path = require('path');
-const fs = require('fs');
-const exec = require('child_process').exec;
-const crypto = require('crypto');
-const request = require('request');
-const rp = require('request-promise');
-const mkdirp = require('mkdirp');
-const packageJson = require('../../package.json');
+const path = require('path')
+const fs = require('fs')
+const exec = require('child_process').exec
+const crypto = require('crypto')
+const request = require('request')
+const rp = require('request-promise')
+const mkdirp = require('mkdirp')
+const packageJson = require('../../package.json')
+
+module.exports.deepscholarService = require('./deepscholar')
 
 
 module.exports.fetchPDF = async url => {
