@@ -48,8 +48,10 @@ module.exports.get = async (req, res) => {
     const pdftxt = await service.createPdftxt(pdf)
 
     // Get annotations.
-    // TODO this api is only available under logged-in, is this correct?
-    const annotations = await service.deepscholarService.getAnnotations(deepScholar)
+    let annotations = []
+    if (deepScholar.token) {
+      annotations = await service.deepscholarService.getAnnotations(deepScholar)
+    }
 
     return res.json({
       pdf : new Buffer(pdf).toString('base64'),
