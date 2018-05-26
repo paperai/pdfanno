@@ -5,14 +5,21 @@
  *  https://github.com/paperai/paperanno-ja/blob/master/with-deepscholar.md
  */
 import { parseUrlQuery } from '../shared/util'
+import * as textLayer from '../page/textLayer'
 import { showLoader } from '../page/util/display'
+
+// Get data from URL query.
+const params = parseUrlQuery()
+const apiRoot = params['api_root']
+const documentId = params['document_id']
+const userToken = params['user_token']
+const userId = params['user_id']
 
 /**
  * Check whether PDFAnno should behave for DeepScholar.
  */
 export function isTarget () {
-  const params = parseUrlQuery()
-  return params['api_root'] && params['document_id']
+  return apiRoot && documentId
 }
 
 /**
@@ -25,24 +32,17 @@ export async function initialize () {
 
   try {
 
-    // fetch API.
     const data = await fetchResources()
 
-    // Get results.
-    const pdfBase64 = data.pdf
-    const pdf = Uint8Array.from(atob(pdfBase64), c => c.charCodeAt(0))
-    console.log('pdfBase64:', pdfBase64.length)
-    const pdfName = data.pdfName
-    const pdftxt = data.pdftxt
-    console.log('pdftxt:', pdftxt.length)
-    const annotations = data.annotations
-    console.log('annotations:', annotations)
+    displayPDF(data.pdf, data.pdfName)
 
-    // Display PDF.
-    window.annoPage.displayViewer({
-      name    : pdfName,
-      content : pdf
-    })
+    addTextLayer(data.pdftxt)
+
+    showPrimaryAnnotation(data.annotations)
+
+    showReferenceAnnotation(data.annotations)
+
+    setupUploadButton()
 
   } catch (e) {
     alert('Error!!')
@@ -72,4 +72,73 @@ async function fetchResources() {
     return alert('API Error.')
   }
   return await response.json()
+
+  // TODO LogタブにAPIのログを表示する.
+}
+
+/**
+ * Display a PDF.
+ * @param pdfBase64 - PDF from DeepScholar.
+ * @param pdfName - the PDF name.
+ */
+function displayPDF(pdfBase64, pdfName) {
+
+  const pdf = Uint8Array.from(atob(pdfBase64), c => c.charCodeAt(0))
+
+  // Display PDF.
+  window.annoPage.displayViewer({
+    name    : pdfName,
+    content : pdf
+  })
+}
+
+/**
+ * Add text layers.
+ * @param pdftxt - pdftxt from DeepScholar.
+ */
+function addTextLayer (pdftxt) {
+  textLayer.setup(pdftxt)
+  window.annoPage.pdftxt = pdftxt
+}
+
+/**
+ * Display and setup the primary annotations.
+ * @param annotations - annotations from DeepScholar.
+ */
+function showPrimaryAnnotation (annotations) {
+  // TODO あとでデータができたら実装する.
+  console.log('annotations:', annotations)
+
+  // userIdを元に、自分のアノテーションを取得.
+  // 画面に表示.
+  // Anno Fileのセレクトボックスにも表示（セレクトボックスはReadOnlyにしよう）
+  // Anno Listのセレクトボックスにも表示
+  // moveクエリがあればそれを強調表示.
+
+}
+
+/**
+ * Setup the reference annotations.
+ * @param annotations - annotations from DeepScholar.
+ */
+function showReferenceAnnotation (annotations) {
+  // TODO あとでデータができたら実装する.
+  console.log('annotations:', annotations)
+
+  // userIdを元に、自分以外のアノテーションを取得.
+  // ReferenceAnnoのセレクトボックスに表示.
+}
+
+/**
+ * Setup the upload button.
+ */
+function setupUploadButton () {
+
+  // TODO 実装する.
+  // userIdがない状態でボタンを押したら、エラー表示.
+  // upload用のAPIを開発.
+  // アノテーションをAPI経由でアップロード.
+  // 成功したらその旨を表示する.
+  // 失敗したらエラーを返す.
+  // Logタブにも表示.
 }
