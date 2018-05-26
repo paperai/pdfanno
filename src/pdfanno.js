@@ -12,6 +12,7 @@ import * as publicApi from './page/public'
 import * as searchUI from './page/search'
 import * as textLayer from './page/textLayer'
 import * as pdftxtDownload from './page/pdftxtdownload'
+import { showLoader } from './page/util/display'
 import * as ws from './page/socket'
 import PDFAnnoPage from './page/pdf/PDFAnnoPage'
 import * as deepscholar from './deepscholar'
@@ -63,14 +64,105 @@ function _getY (annotation) {
 /**
  *  The entry point.
  */
-window.addEventListener('DOMContentLoaded', async e => {
+window.addEventListener('DOMContentLoaded', async () => {
 
-  // for DeepScholar.
-  if (deepscholar.isTarget()) {
-    console.log('for deepscholar.')
-    deepscholar.initialize()
+  // UI.
+  setupUI()
+
+  // Show loading.
+  showLoader(true)
+
+  // Init viewer.
+  window.annoPage.initializeViewer(null)
+
+  // Start application.
+  window.annoPage.startViewerApplication()
+
+  // initial tab.
+  const q        = URI(document.URL).query(true)
+  const tabIndex = q.tab && parseInt(q.tab, 10)
+  if (tabIndex) {
+    $(`.nav-tabs a[href="#tab${tabIndex}"]`).click()
   }
 
+  if (deepscholar.isTarget()) {
+    // Display for DeepScholar.
+    deepscholar.initialize()
+
+  } else {
+    // Show a content.
+    displayViewer()
+  }
+
+})
+
+async function displayViewer () {
+
+  // Display a PDF specified via URL query parameter.
+  const q        = URI(document.URL).query(true)
+  const pdfURL   = q.pdf || getDefaultPDFURL()
+  const annoURL  = q.anno
+  const moveTo   = q.move
+
+  // Load a PDF file.
+  try {
+
+    let { pdf, analyzeResult } = await window.annoPage.loadPDFFromServer(pdfURL)
+
+    setTimeout(() => {
+      window.annoPage.displayViewer({
+        name    : getPDFName(pdfURL),
+        content : pdf
+      })
+    }, 500)
+
+    const listenPageRendered = async () => {
+      showLoader(false)
+
+      // Load and display annotations, if annoURL is set.
+      if (annoURL) {
+        let anno = await window.annoPage.loadAnnoFileFromServer(annoURL)
+        publicApi.addAllAnnotations(publicApi.readTOML(anno))
+        // Set colors.
+        const colorMap = annoUI.labelInput.getColorMap()
+        window.iframeWindow.annotationContainer.setColor(colorMap)
+        // Move to the annotation.
+        if (moveTo) {
+          setTimeout(() => {
+            window.annoPage.scrollToAnnotation(moveTo)
+          }, 500)
+        }
+      }
+      window.removeEventListener('pagerendered', listenPageRendered)
+    }
+    window.addEventListener('pagerendered', listenPageRendered)
+
+    // Set the analyzeResult.
+    annoUI.uploadButton.setResult(analyzeResult)
+
+    // Init search function.
+    searchUI.setup(analyzeResult)
+
+    // Init textLayers.
+    textLayer.setup(analyzeResult)
+    window.annoPage.pdftxt = analyzeResult
+
+  } catch (err) {
+
+    // Hide a loading, and show the error message.
+    showLoader(false)
+    const message = 'Failed to analyze the PDF.<br>Reason: ' + err
+    annoUI.ui.alertDialog.show({ message })
+
+    // Init viewer.
+    window.annoPage.initializeViewer(null)
+    // Start application.
+    window.annoPage.startViewerApplication()
+  }
+
+}
+
+function setupUI () {
   // resizable.
   annoUI.util.setupResizableColumns()
 
@@ -197,83 +289,7 @@ window.addEventListener('DOMContentLoaded', async e => {
     }
   })
 
-  // Display a PDF specified via URL query parameter.
-  const q        = URI(document.URL).query(true)
-  const pdfURL   = q.pdf || getDefaultPDFURL()
-  const annoURL  = q.anno
-  const moveTo   = q.move
-  const tabIndex = q.tab && parseInt(q.tab, 10)
-
-  // Show loading.
-  showLoader(true)
-
-  // Load a PDF file.
-  try {
-
-    let { pdf, analyzeResult } = await window.annoPage.loadPDFFromServer(pdfURL)
-
-    // Init viewer.
-    window.annoPage.initializeViewer(null)
-    // Start application.
-    window.annoPage.startViewerApplication()
-
-    setTimeout(() => {
-      window.annoPage.displayViewer({
-        name    : getPDFName(pdfURL),
-        content : pdf
-      })
-    }, 500)
-
-    const listenPageRendered = async () => {
-      showLoader(false)
-
-      // Load and display annotations, if annoURL is set.
-      if (annoURL) {
-        let anno = await window.annoPage.loadAnnoFileFromServer(annoURL)
-        publicApi.addAllAnnotations(publicApi.readTOML(anno))
-        // Set colors.
-        const colorMap = annoUI.labelInput.getColorMap()
-        window.iframeWindow.annotationContainer.setColor(colorMap)
-        // Move to the annotation.
-        if (moveTo) {
-          setTimeout(() => {
-            window.annoPage.scrollToAnnotation(moveTo)
-          }, 500)
-        }
-      }
-      window.removeEventListener('pagerendered', listenPageRendered)
-    }
-    window.addEventListener('pagerendered', listenPageRendered)
-
-    // Set the analyzeResult.
-    annoUI.uploadButton.setResult(analyzeResult)
-
-    // Init search function.
-    searchUI.setup(analyzeResult)
-
-    // Init textLayers.
-    textLayer.setup(analyzeResult)
-    window.annoPage.pdftxt = analyzeResult
-
-  } catch (err) {
-
-    // Hide a loading, and show the error message.
-    showLoader(false)
-    const message = 'Failed to analyze the PDF.<br>Reason: ' + err
-    annoUI.ui.alertDialog.show({ message })
-
-    // Init viewer.
-    window.annoPage.initializeViewer(null)
-    // Start application.
-    window.annoPage.startViewerApplication()
-  }
-
-  // initial tab.
-  if (tabIndex) {
-    $(`.nav-tabs a[href="#tab${tabIndex}"]`).click()
-  }
-
-})
+}
 
 /**
  * Get the URL of the default PDF.
@@ -293,20 +309,6 @@ function getPDFName (url) {
   return a[a.length - 1]
 }
 window.getPDFName = getPDFName
-
-/**
- * Show or hide a loding.
- */
-function showLoader (display) {
-  if (display) {
-    $('#pdfLoading').removeClass('close hidden')
-  } else {
-    $('#pdfLoading').addClass('close')
-    setTimeout(function () {
-      $('#pdfLoading').addClass('hidden')
-    }, 1000)
-  }
-}
 
 // UserID.
 window.addEventListener('DOMContentLoaded', () => {
