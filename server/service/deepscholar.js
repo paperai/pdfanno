@@ -50,3 +50,40 @@ module.exports.getAnnotations = async ({ apiRoot, documentId, token }) => {
 
 }
 
+module.exports.upload = async ({ apiRoot, documentId, token, anno }) => {
+
+  return await rp({
+    url : `${apiRoot}/papers/${documentId}/annotations/pdf`,
+    method : 'PUT',
+    headers : {
+      authorization : `bearer ${token}`
+    },
+    json : true,
+    body : { anno }
+  })
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

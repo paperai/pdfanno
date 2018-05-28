@@ -50,7 +50,12 @@ module.exports.get = async (req, res) => {
     // Get annotations.
     let annotations = []
     if (deepScholar.token) {
-      annotations = await service.deepscholarService.getAnnotations(deepScholar)
+      try {
+        annotations = await service.deepscholarService.getAnnotations(deepScholar)
+      } catch (e) {
+        // e.g. token is invalid.
+        console.log('ERROR:', e)
+      }
     }
 
     return res.json({
@@ -66,24 +71,37 @@ module.exports.get = async (req, res) => {
 
 }
 
-// TODO Implements.
-module.exports.upload = (req, res) => {
+/**
+ * Upload annotations to DeepScholar.
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
+module.exports.upload = async (req, res) => {
 
-  const token = req.query.token
-  const body = req.body
+  const documentId = req.params['documentId']
+  const apiRoot = req.body['api_root']
+  const token = req.body['token']
+  const anno = req.body['anno']
 
-  if (!token) {
-    return res.status(401).json({
-      message : 'user_token is required.'
-    })
-  } else if (!body.user || !body.user.id || !body.anno) {
-    return res.status(400).json({
-      message : 'POST data is invalid.',
-      data : body
-    })
+  if (!apiRoot || !documentId || !token || anno == null) {
+    console.log('body is invalid.', apiRoot, documentId, token, anno)
+    return res.status(401).json({ message : 'request body is invalid.' })
   }
 
-  // TODO Send an upload request to Deep Scholar, and treat the response.
+  try {
+    await service.deepscholarService.upload({ apiRoot, documentId, token, anno })
+    return res.json({ message : 'ok' })
 
-  res.json({ message : 'ok' })
+  } catch (e) {
+    if (e.statusCode === 401) {
+      return res.status(401).json({ message : 'Authentication error.' })
+    }
+    if (e.statusCode === 404) {
+      return res.status(404).json({ message : 'Document not found.' })
+    }
+    console.log('error:', e)
+    return res.status(500).json({ message : 'Server error.' })
+  }
+
 }
