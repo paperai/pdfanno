@@ -16,7 +16,7 @@ module.exports.get = async (req, res) => {
   const deepScholar = {
     apiRoot    : req.query.api_root,
     documentId : req.param('documentId'),
-    token : req.query.token
+    token : req.query.token || req.query.user_token
   }
 
   // Check is valid.

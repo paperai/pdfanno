@@ -14,6 +14,7 @@ const apiRoot = params['api_root']
 const documentId = params['document_id']
 const userToken = params['user_token']
 const userId = params['user_id']
+const moveTo = params['move']
 
 /**
  * Check whether PDFAnno should behave for DeepScholar.
@@ -37,6 +38,8 @@ export async function initialize () {
     displayPDF(data.pdf, data.pdfName)
 
     addTextLayer(data.pdftxt)
+
+    displayDocumentName()
 
     showPrimaryAnnotation(data.annotations)
 
@@ -77,6 +80,32 @@ async function fetchResources() {
 }
 
 /**
+ * Upload annotations
+ * @param anno
+ * @returns {Promise<Error>}
+ */
+async function uploadAnnotation(anno) {
+
+  const url = window.API_ROOT + `internal/api/deepscholar/${documentId}/annotations`
+  const response = await fetch(url, {
+    method : 'PUT',
+    body: JSON.stringify({
+      api_root : apiRoot,
+      token : userToken,
+      anno
+    }),
+    headers : new Headers({ 'Content-type' : 'application/json' })
+  })
+  console.log('response:', response)
+  const body = await response.json()
+  console.log(response.status, body)
+  if (response.status !== 200) {
+    return body.message
+  }
+  return null
+}
+
+/**
  * Display a PDF.
  * @param pdfBase64 - PDF from DeepScholar.
  * @param pdfName - the PDF name.
@@ -101,19 +130,36 @@ function addTextLayer (pdftxt) {
   window.annoPage.pdftxt = pdftxt
 }
 
+function displayDocumentName () {
+  $('#dropdownPdf').addClass('no-action')
+  $('#dropdownPdf .js-text').text(documentId)
+  $('#dropdownPdf .caret').remove()
+}
+
 /**
  * Display and setup the primary annotations.
  * @param annotations - annotations from DeepScholar.
  */
 function showPrimaryAnnotation (annotations) {
-  // TODO あとでデータができたら実装する.
-  console.log('annotations:', annotations)
 
-  // userIdを元に、自分のアノテーションを取得.
-  // 画面に表示.
-  // Anno Fileのセレクトボックスにも表示（セレクトボックスはReadOnlyにしよう）
-  // Anno Listのセレクトボックスにも表示
-  // moveクエリがあればそれを強調表示.
+  setTimeout(() => {
+    annotations = annotations.filter(annotation => annotation.userId === userId)
+    if (annotations.length > 0) {
+      const anno = annotations[0].anno
+      const results = window.addAll(window.readTOML(anno))
+
+      if (moveTo && results[moveTo - 1]) {
+        setTimeout(() => {
+          const annotation = results[moveTo - 1].annotation
+          window.annoPage.scrollToAnnotation(annotation.uuid)
+        }, 500)
+      }
+    }
+  }, 1000)  // wait until viewer rendered.
+
+  $('#dropdownAnnoPrimary').addClass('no-action')
+  $('#dropdownAnnoPrimary .js-text').text(userId)
+  $('#dropdownAnnoPrimary .caret').remove()
 
 }
 
@@ -134,11 +180,27 @@ function showReferenceAnnotation (annotations) {
  */
 function setupUploadButton () {
 
-  // TODO 実装する.
-  // userIdがない状態でボタンを押したら、エラー表示.
-  // upload用のAPIを開発.
-  // アノテーションをAPI経由でアップロード.
-  // 成功したらその旨を表示する.
-  // 失敗したらエラーを返す.
-  // Logタブにも表示.
+  $('#deepschoarUploadButton').off().on('click', async () => {
+
+    // TODO 実装する.
+    // userIdがない状態でボタンを押したら、エラー表示.
+    // upload用のAPIを開発.
+    // アノテーションをAPI経由でアップロード.
+    // 成功したらその旨を表示する.
+    // 失敗したらエラーを返す.
+    // Logタブにも表示.
+
+    // Get current annotations.
+    const anno = await window.annoPage.exportData()
+
+    // Upload.
+    const err = await uploadAnnotation(anno)
+    if (err) {
+      alert(err)  // TODO Dialog UI.
+    } else {
+      alert('Success.') // TODO Dialog UI.
+    }
+
+  })
+
 }

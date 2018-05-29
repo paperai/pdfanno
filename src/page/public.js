@@ -23,7 +23,8 @@ export function expose () {
  */
 export function addAllAnnotations (tomlObject) {
 
-  let result = {}
+  // let result = {}
+  let results = []
 
   for (const key in tomlObject) {
 
@@ -50,11 +51,13 @@ export function addAllAnnotations (tomlObject) {
 
     if (a) {
       addAnnotation(a)
-      result[key] = a
+      // result[key] = a
+      results.push(a)
     }
   }
 
-  return result
+  // return result
+  return results
 
 }
 
