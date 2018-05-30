@@ -40,9 +40,9 @@ window.addEventListener('pagerendered', function (ev) {
   let borderWidth = `${9 * scale}px`
   let marginBottom = `${-9 * scale}px`
   $('.page').css({
-      'border-top-width'    : borderWidth,
-      'border-bottom-width' : borderWidth,
-      'margin-bottom'       : marginBottom
+    'border-top-width'    : borderWidth,
+    'border-bottom-width' : borderWidth,
+    'margin-bottom'       : marginBottom
   })
 })
 

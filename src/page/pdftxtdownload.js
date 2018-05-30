@@ -2,6 +2,7 @@
  * Download the result of pdfextract.jar.
  */
 import * as annoUI from 'anno-ui'
+import { parseUrlQuery } from '../shared/util'
 
 /*
  * Setup the function.
@@ -74,6 +75,10 @@ function disable () {
  * Get the file name for download.
  */
 function getDownloadFileName () {
+
+  if (parseUrlQuery()['document_id']) {
+    return parseUrlQuery()['document_id'] + '.pdftxt'
+  }
 
   // TODO Refactoring. this function is similar to the one in downloadButton.
 

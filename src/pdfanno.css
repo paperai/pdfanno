@@ -73,3 +73,31 @@
 .dropdown, .dropup {
   z-index: 10000;
 }
+
+.row.anno-ui {
+  padding: 0 15px 10px;
+}
+
+/*
+  UI for DeepScholar.
+ */
+.deepscholar #browseButton {
+  display: none !important;
+}
+.deepscholar #deepschoarUploadButton {
+  display: inline-block !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

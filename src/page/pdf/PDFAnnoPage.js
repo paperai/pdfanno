@@ -488,7 +488,7 @@ export default class PDFAnnoPage {
    * Import annotations from UI.
    */
   importAnnotation (paperData, isPrimary) {
-    window.iframeWindow.annotationContainer.importAnnotations(paperData, isPrimary).then(result => {
+    window.iframeWindow.annotationContainer.importAnnotations(paperData, isPrimary).then(() => {
       // Notify annotations added.
       dispatchWindowEvent('annotationrendered')
     })
