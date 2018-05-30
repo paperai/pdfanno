@@ -8,6 +8,8 @@ import { parseUrlQuery } from '../shared/util'
 import * as textLayer from '../page/textLayer'
 import { showLoader } from '../page/util/display'
 
+// arxiv1103.1918
+
 // Get data from URL query.
 const params = parseUrlQuery()
 const apiRoot = params['api_root']
@@ -40,6 +42,10 @@ export async function initialize () {
     addTextLayer(data.pdftxt)
 
     displayDocumentName()
+
+    window.annoPage.annoFiles = data.annotations.map(a => {
+      return { name : a.userId, content : a.anno }
+    })
 
     showPrimaryAnnotation(data.annotations)
 
@@ -173,6 +179,9 @@ function showReferenceAnnotation (annotations) {
 
   // userIdを元に、自分以外のアノテーションを取得.
   // ReferenceAnnoのセレクトボックスに表示.
+
+  annotations = annotations.filter(annotation => annotation.userId !== userId)
+  setAnnoDropdownList(annotations)
 }
 
 /**
@@ -201,6 +210,31 @@ function setupUploadButton () {
       alert('Success.') // TODO Dialog UI.
     }
 
+  })
+
+}
+
+/**
+ * Reset and setup the primary/reference annotation dropdown.
+ */
+function setAnnoDropdownList (annotations) {
+
+  // Reset the UI of primary/reference anno dropdowns.
+  $('#dropdownAnnoReference ul').html('')
+  $('#dropdownAnnoReference .js-text').text('Reference Annos')
+
+  // Setup anno / reference dropdown.
+  annotations.forEach(anno => {
+
+    let snipet = `
+            <li>
+                <a href="#">
+                    <i class="fa fa-check no-visible" aria-hidden="true"></i>
+                    <span class="js-annoname">${anno.userId}</span>
+                </a>
+            </li>
+        `
+    $('#dropdownAnnoReference ul').append(snipet)
   })
 
 }
