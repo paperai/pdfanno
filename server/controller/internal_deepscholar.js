@@ -48,7 +48,11 @@ module.exports.get = async (req, res) => {
 
     // Get a pdftxt.
     // TODO docInfo has `pdftxt` url, but it's not correct, so ignore it.
-    const pdftxt = await service.createPdftxt(pdf)
+    let pdftxt = service.loadCachePdftxt(pdf)
+    if (!pdftxt) {
+      pdftxt = await service.createPdftxt(pdf)
+      service.savePdftxt(pdf, pdftxt)
+    }
     logs.push(`got a pdftxt from PDFExtractor.`)
 
     // Get annotations.
