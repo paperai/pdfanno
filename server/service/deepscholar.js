@@ -12,7 +12,7 @@ module.exports.getDocumentInformation = async ({ apiRoot, documentId }) => {
   try {
 
     return await rp({
-      url  : `${apiRoot}/papers/${documentId}`,
+      url  : `${apiRoot}/papers/${documentId}?source=pdf,pdftxt`,
       json : true
     })
 
