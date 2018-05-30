@@ -68,7 +68,7 @@ export async function initialize () {
  * Fetch the resources from API - PDF, pdftxt, annotations.
  * @returns {Promise<*>}
  */
-async function fetchResources() {
+async function fetchResources () {
   const params = parseUrlQuery()
   let url = window.API_ROOT + `internal/api/deepscholar/${params['document_id']}`
   const queries = Object.keys(params).map(key => {
@@ -92,14 +92,14 @@ async function fetchResources() {
  * @param anno
  * @returns {Promise<Error>}
  */
-async function uploadAnnotation(anno) {
+async function uploadAnnotation (anno) {
 
   const url = window.API_ROOT + `internal/api/deepscholar/${documentId}/annotations`
   const response = await fetch(url, {
     method : 'PUT',
-    body: JSON.stringify({
+    body   : JSON.stringify({
       api_root : apiRoot,
-      token : userToken,
+      token    : userToken,
       anno
     }),
     headers : new Headers({ 'Content-type' : 'application/json' })
@@ -118,7 +118,7 @@ async function uploadAnnotation(anno) {
  * @param pdfBase64 - PDF from DeepScholar.
  * @param pdfName - the PDF name.
  */
-function displayPDF(pdfBase64, pdfName) {
+function displayPDF (pdfBase64, pdfName) {
 
   const pdf = Uint8Array.from(atob(pdfBase64), c => c.charCodeAt(0))
 
@@ -237,7 +237,7 @@ function setAnnoDropdownList (annotations) {
 
 }
 
-function addLogs(logs) {
+function addLogs (logs) {
   logs.forEach(log => {
     let text = $('#uploadResultDummy').val()
     if (text) {
