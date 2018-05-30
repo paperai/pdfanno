@@ -6,7 +6,7 @@ import URI from 'urijs'
 // UI parts.
 import * as annoUI from 'anno-ui'
 
-import { dispatchWindowEvent } from './shared/util'
+import { dispatchWindowEvent, parseUrlQuery } from './shared/util'
 import { unlistenWindowLeaveEvent } from './page/util/window'
 import * as publicApi from './page/public'
 import * as searchUI from './page/search'
@@ -250,6 +250,9 @@ function setupUI () {
   annoUI.downloadButton.setup({
     getAnnotationTOMLString : window.annoPage.exportData,
     getCurrentContentName   : () => {
+      if (parseUrlQuery()['document_id']) {
+        return parseUrlQuery()['document_id'] + '.pdf'
+      }
       return window.annoPage.getCurrentContentFile().name
     },
     didDownloadCallback : unlistenWindowLeaveEvent

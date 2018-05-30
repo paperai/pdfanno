@@ -12,6 +12,8 @@ const service = require('../service')
  */
 module.exports.get = async (req, res) => {
 
+  const logs = [ 'api starts. ']
+
   // Get conditions from the request.
   const deepScholar = {
     apiRoot    : req.query.api_root,
@@ -21,12 +23,11 @@ module.exports.get = async (req, res) => {
 
   // Check is valid.
   if (!deepScholar.apiRoot) {
-
-    return res.status(400).json({ message : 'api_root is required.' })
-
+    logs.push('api_root is required.')
+    return res.status(400).json({ message : 'api_root is required.', logs })
   } else if (!deepScholar.documentId) {
-
-    return res.status(400).json({ message : 'documentId is required.' })
+    logs.push('documentId is required.')
+    return res.status(400).json({ message : 'documentId is required.', logs })
   }
 
   // Call APIs.
@@ -37,36 +38,45 @@ module.exports.get = async (req, res) => {
     if (!docInfo) {
       return res.status(400).json({ message : 'DeepScholar returned empty document information.' })
     }
+    logs.push('got document info from DeepScholar.')
 
     console.log('docInfo:', docInfo)
 
     // Get a PDF file.
     const pdf = await service.fetchPDF(docInfo.pdf)
+    logs.push(`got a PDF from ${docInfo.pdf}.`)
 
     // Get a pdftxt.
     // TODO docInfo has `pdftxt` url, but it's not correct, so ignore it.
     const pdftxt = await service.createPdftxt(pdf)
+    logs.push(`got a pdftxt from PDFExtractor.`)
 
     // Get annotations.
     let annotations = []
     if (deepScholar.token) {
       try {
         annotations = await service.deepscholarService.getAnnotations(deepScholar)
+        logs.push(`got annotations from PDFExtractor.`)
       } catch (e) {
         // e.g. token is invalid.
         console.log('ERROR:', e)
+        logs.push(`failed to get annotations from PDFExtractor. reason: ${e}`)
       }
     }
+
+    logs.push('api finished.')
 
     return res.json({
       pdf : new Buffer(pdf).toString('base64'),
       pdftxt,
-      annotations
+      annotations,
+      logs
     })
 
   } catch (e) {
+    logs.push(`something happened. reason: ${e}`)
     console.log('internal_deepscholar:get:Server Error.', e)
-    return res.status(500).json({ message : 'Server Error.' })
+    return res.status(500).json({ message : 'Server Error.', logs })
   }
 
 }

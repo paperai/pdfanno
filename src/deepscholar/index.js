@@ -7,6 +7,7 @@
 import { parseUrlQuery } from '../shared/util'
 import * as textLayer from '../page/textLayer'
 import { showLoader } from '../page/util/display'
+import * as annoUI from 'anno-ui'
 
 // arxiv1103.1918
 
@@ -77,12 +78,13 @@ async function fetchResources() {
 
   const response = await fetch(url)
   if (response.status !== 200) {
-    // TODO デザインをanno-uiのダイアログに変更.
-    return alert('API Error.')
+    return annoUI.ui.alertDialog.show({ message : 'API Error.' })
   }
-  return await response.json()
+  const data = await response.json()
 
-  // TODO LogタブにAPIのログを表示する.
+  addLogs(data.logs)
+
+  return data
 }
 
 /**
@@ -193,10 +195,6 @@ function setupUploadButton () {
 
     // TODO 実装する.
     // userIdがない状態でボタンを押したら、エラー表示.
-    // upload用のAPIを開発.
-    // アノテーションをAPI経由でアップロード.
-    // 成功したらその旨を表示する.
-    // 失敗したらエラーを返す.
     // Logタブにも表示.
 
     // Get current annotations.
@@ -207,7 +205,7 @@ function setupUploadButton () {
     if (err) {
       alert(err)  // TODO Dialog UI.
     } else {
-      alert('Success.') // TODO Dialog UI.
+      alert('Success.')  // TODO Dialog UI.
     }
 
   })
@@ -237,4 +235,15 @@ function setAnnoDropdownList (annotations) {
     $('#dropdownAnnoReference ul').append(snipet)
   })
 
+}
+
+function addLogs(logs) {
+  logs.forEach(log => {
+    let text = $('#uploadResultDummy').val()
+    if (text) {
+      text += '\n'
+    }
+    text += log
+    $('#uploadResultDummy').val(text)
+  })
 }
