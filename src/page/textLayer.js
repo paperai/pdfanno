@@ -39,51 +39,53 @@ function listenPageRendered (ev) {
  */
 function createTextLayer (page) {
 
-  setTimeout(() => {
+  // Disabled.
 
-    console.log('createTextLayer:', page)
-
-    const $textLayer = $(`.page[data-page-number="${page}"] .textLayer`, window.iframeWindow.document)
-
-    // Create text div elements.
-    if (!pages[page - 1] || !pages[page - 1].meta) {
-      console.log('modify:', pages, page)
-      return
-    }
-    const scale = window.iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale
-
-    let snipet = ''
-    pages[page - 1].meta.forEach((info, index) => {
-
-      if (!info) {
-        return
-      }
-      const { char, x, y, w, h } = extractMeta(info)
-
-      const style = `
-                top: ${y * scale}px;
-                left: ${x * scale}px;
-                width: ${w * scale}px;
-                height: ${h * scale}px;
-                font-size: ${h * 0.85}px;
-                line-height: ${h * scale}px;
-                text-align: center;
-            `.replace(/\n/g, '')
-
-      snipet += `
-                <div
-                    class="pdfanno-text-layer"
-                    style="${style}"
-                    data-page="${page}"
-                    data-index="${index}">${char}</div>
-            `
-    })
-
-    $textLayer[0].innerHTML = snipet
-
-    dispatchWindowEvent('textlayercreated', page)
-
-  }, window.iframeWindow.TEXT_LAYER_RENDER_DELAY + 300)
+  // setTimeout(() => {
+  //
+  //   console.log('createTextLayer:', page)
+  //
+  //   const $textLayer = $(`.page[data-page-number="${page}"] .textLayer`, window.iframeWindow.document)
+  //
+  //   // Create text div elements.
+  //   if (!pages[page - 1] || !pages[page - 1].meta) {
+  //     console.log('modify:', pages, page)
+  //     return
+  //   }
+  //   const scale = window.iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale
+  //
+  //   let snipet = ''
+  //   pages[page - 1].meta.forEach((info, index) => {
+  //
+  //     if (!info) {
+  //       return
+  //     }
+  //     const { char, x, y, w, h } = extractMeta(info)
+  //
+  //     const style = `
+  //               top: ${y * scale}px;
+  //               left: ${x * scale}px;
+  //               width: ${w * scale}px;
+  //               height: ${h * scale}px;
+  //               font-size: ${h * 0.85}px;
+  //               line-height: ${h * scale}px;
+  //               text-align: center;
+  //           `.replace(/\n/g, '')
+  //
+  //     snipet += `
+  //               <div
+  //                   class="pdfanno-text-layer"
+  //                   style="${style}"
+  //                   data-page="${page}"
+  //                   data-index="${index}">${char}</div>
+  //           `
+  //   })
+  //
+  //   $textLayer[0].innerHTML = snipet
+  //
+  //   dispatchWindowEvent('textlayercreated', page)
+  //
+  // }, window.iframeWindow.TEXT_LAYER_RENDER_DELAY + 300)
 }
 
 // TODO a little tricky.

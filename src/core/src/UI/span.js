@@ -255,3 +255,157 @@ export function getRectangles () {
 export function createSpan ({ text = null, zIndex = 10, color = null }) {
   return saveSpan(text, zIndex, color)
 }
+
+// Temporary.
+window.addEventListener('DOMContentLoaded', () => {
+
+  function getXY (e) {
+    let rect = $('#viewer')[0].getBoundingClientRect()
+    let y = e.clientY + $('#viewer').scrollTop() - rect.top
+    let x = e.clientX - rect.left - ($('#viewer').width() - $('#pageContainer1').width()) / 2
+    return { x, y }
+  }
+
+  function getTmpLayer () {
+    return document.getElementById('annoLayer2')  // TODO 2 is what?
+  }
+
+  let overlay
+  let startX
+  let startY
+
+  $('#viewer').on('mousedown', e => {
+    const { x, y } = getXY(e)
+    console.log('mousedown:', x, y, e)
+
+    startX = x
+    startY = y
+
+    overlay = document.createElement('div')
+    overlay.style.position = 'absolute'
+    overlay.style.top = `${startY}px`
+    overlay.style.left = `${startX}px`
+    overlay.style.width = 0
+    overlay.style.height = 0
+    overlay.style.border = `2px solid #00BFFF` // Blue.
+    overlay.style.boxSizing = 'border-box'
+    overlay.style.visibility = 'visible'
+    overlay.style.pointerEvents = 'none'
+    getTmpLayer().appendChild(overlay)
+  })
+
+  $('#viewer').on('mousemove', e => {
+
+    if (!overlay) {
+      return
+    }
+
+    // if (mousedownFired) {
+    //   mousemoveFired = true
+    // }
+
+    // $(document.body).addClass('no-action')
+
+    let { x : curX, y : curY } = getXY(e)
+
+    let x = Math.min(startX, curX)
+    let y = Math.min(startY, curY)
+    let w = Math.abs(startX - curX)
+    let h = Math.abs(startY - curY)
+
+    // Restrict in page.
+    // x = Math.min(enableArea.maxX, Math.max(enableArea.minX, x))
+    // y = Math.min(enableArea.maxY, Math.max(enableArea.minY, y))
+    // if (x > enableArea.minX) {
+    //   w = Math.min(w, enableArea.maxX - x)
+    // } else {
+    //   w = originX - enableArea.minX
+    // }
+    // if (y > enableArea.minY) {
+    //   h = Math.min(h, enableArea.maxY - y)
+    // } else {
+    //   h = originY - enableArea.minY
+    // }
+
+    // Move and Resize.
+    overlay.style.left = x + 'px'
+    overlay.style.top = y + 'px'
+    overlay.style.width = w + 'px'
+    overlay.style.height = h + 'px'
+  })
+
+  $('#viewer').on('mouseup', e => {
+
+    // $(document.body).removeClass('no-action')
+
+    // let clicked = mousedownFired && !mousemoveFired
+    //
+    // if (clicked) {
+    //
+    //   let anno = _findAnnotation(e)
+    //   if (anno) {
+    //     anno.handleClickEvent()
+    //   }
+    //
+    //   $(overlay).remove()
+    //   overlay = null
+    //
+    //   return
+    // }
+    //
+    // mousedownFired = false
+    // mousemoveFired = false
+
+    if (!overlay) {
+      return
+    }
+
+    const rect = {
+      x      : parseInt(overlay.style.left, 10),
+      y      : parseInt(overlay.style.top, 10),
+      width  : parseInt(overlay.style.width, 10),
+      height : parseInt(overlay.style.height, 10)
+    }
+
+    if (rect.width > 0 && rect.height > 0) {
+      // saveRect(rect)
+    }
+
+    $(overlay).remove()
+    overlay = null
+
+  })
+
+
+
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
