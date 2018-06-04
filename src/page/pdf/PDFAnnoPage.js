@@ -224,6 +224,7 @@ export default class PDFAnnoPage {
 
     // Check empty.
     if (!rects && !highlight && selectedAnnotations.length === 0) {
+      console.log('check:', rects)
       return annoUI.ui.alertDialog.show({ message : 'Select text span or an annotation.' })
     }
 

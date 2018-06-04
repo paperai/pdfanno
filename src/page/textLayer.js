@@ -112,3 +112,61 @@ window.getText = function (page, startIndex, endIndex) {
   // Return.
   return { text, textRange }
 }
+
+// TODO a little tricky.
+window.findTexts = function (page, rect) {
+
+  let found = false
+  let text = ''
+  let rects = []
+  let startIndex = 0
+  let endIndex = 0
+
+  pages[page - 1].meta.forEach((info, index) => {
+
+    if (!info) {
+      if (found) {
+        text += ' '
+      }
+      return
+    }
+    const { char, x, y, w, h } = extractMeta(info)
+
+    // is Hit?
+    if (Math.abs(rect.x - x) < rect.w / 2 + w / 2
+      && Math.abs(rect.y - y) < rect.h / 2 + h / 2) {
+      console.log("hitX:", char, rect.x, (rect.x + rect.w), x, (x + w))
+      console.log("hitY:", char, rect.y, (rect.y + rect.h), y, (y + h))
+
+      found = true
+      text += char
+      rects.push({ x, y, w, h })
+
+      if (!startIndex) {
+        startIndex = index
+      }
+      endIndex = Math.max(endIndex, index)
+
+    } else {
+      found = false
+    }
+  })
+
+  let { textRange } = window.getText(page, startIndex, endIndex)
+
+  return { text, rects, textRange }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

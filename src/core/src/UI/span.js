@@ -1,4 +1,4 @@
-import { scaleDown, getAnnoLayerBoundingRect } from './utils'
+import { scaleDown, scaleUp, getAnnoLayerBoundingRect, getCurrentPage } from './utils'
 import SpanAnnotation from '../annotation/span'
 import * as textInput from '../utils/textInput'
 
@@ -88,6 +88,15 @@ function getIndex (elm) {
  * Merge user selections.
  */
 function mergeRects (rects) {
+
+  // Normalize.
+  rects = rects.map(rect => {
+    rect.top = rect.top || rect.y
+    rect.left = rect.left || rect.x
+    rect.right = rect.right || (rect.x + rect.w)
+    rect.bottom = rect.bottom || (rect.y + rect.h)
+    return rect
+  })
 
   // Trim a rect which is almost same to other.
   rects = trimRects(rects)
@@ -181,10 +190,14 @@ function saveSpan (text, zIndex, color) {
 
   // Get the rect area which User selected.
   // let { rects, selectedText, textRange } = getSelectionRects()
-  let { rects, selectedText, textRange } = prevprevSelectionRects || prevSelectionRects
+  // let { rects, selectedText, textRange } = prevprevSelectionRects || prevSelectionRects
+
+  let rects = selectedRects
+  // let selectedText = selectedText
+  let textRange = selectedTextRanges
 
   // Remove the user selection.
-  removeSelection()
+  // removeSelection()
 
   if (!rects) {
     return
@@ -195,9 +208,9 @@ function saveSpan (text, zIndex, color) {
   // Initialize the annotation
   let annotation = {
     rectangles : rects.map((r) => {
-      return scaleDown({
-        x      : r.left - boundingRect.left,
-        y      : r.top - boundingRect.top,
+      return scaleUp({
+        x      : r.left, // - boundingRect.left,
+        y      : r.top, // - boundingRect.top,
         width  : r.width,
         height : r.height
       })
@@ -208,6 +221,15 @@ function saveSpan (text, zIndex, color) {
     zIndex,
     color
   }
+
+  console.log('annotation:', annotation, rects.map((r) => {
+    return scaleUp({
+      x      : r.left, // - boundingRect.left,
+      y      : r.top, // - boundingRect.top,
+      width  : r.width,
+      height : r.height
+    })
+  }))
 
   // Save.
   let spanAnnotation = SpanAnnotation.newInstance(annotation)
@@ -230,7 +252,8 @@ function saveSpan (text, zIndex, color) {
  */
 export function getRectangles () {
   // let { rects } = getSelectionRects()
-  let { rects } = prevprevSelectionRects || prevSelectionRects
+  // let { rects } = prevprevSelectionRects || prevSelectionRects
+  let rects = selectedRects
   if (!rects) {
     return null
   }
@@ -276,7 +299,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   $('#viewer').on('mousedown', e => {
     const { x, y } = getXY(e)
-    console.log('mousedown:', x, y, e)
+    // console.log('mousedown:', x, y, e)
 
     startX = x
     startY = y
@@ -300,32 +323,12 @@ window.addEventListener('DOMContentLoaded', () => {
       return
     }
 
-    // if (mousedownFired) {
-    //   mousemoveFired = true
-    // }
-
-    // $(document.body).addClass('no-action')
-
     let { x : curX, y : curY } = getXY(e)
 
     let x = Math.min(startX, curX)
     let y = Math.min(startY, curY)
     let w = Math.abs(startX - curX)
     let h = Math.abs(startY - curY)
-
-    // Restrict in page.
-    // x = Math.min(enableArea.maxX, Math.max(enableArea.minX, x))
-    // y = Math.min(enableArea.maxY, Math.max(enableArea.minY, y))
-    // if (x > enableArea.minX) {
-    //   w = Math.min(w, enableArea.maxX - x)
-    // } else {
-    //   w = originX - enableArea.minX
-    // }
-    // if (y > enableArea.minY) {
-    //   h = Math.min(h, enableArea.maxY - y)
-    // } else {
-    //   h = originY - enableArea.minY
-    // }
 
     // Move and Resize.
     overlay.style.left = x + 'px'
@@ -336,50 +339,58 @@ window.addEventListener('DOMContentLoaded', () => {
 
   $('#viewer').on('mouseup', e => {
 
-    // $(document.body).removeClass('no-action')
-
-    // let clicked = mousedownFired && !mousemoveFired
-    //
-    // if (clicked) {
-    //
-    //   let anno = _findAnnotation(e)
-    //   if (anno) {
-    //     anno.handleClickEvent()
-    //   }
-    //
-    //   $(overlay).remove()
-    //   overlay = null
-    //
-    //   return
-    // }
-    //
-    // mousedownFired = false
-    // mousemoveFired = false
-
     if (!overlay) {
       return
     }
 
-    const rect = {
-      x      : parseInt(overlay.style.left, 10),
-      y      : parseInt(overlay.style.top, 10),
-      width  : parseInt(overlay.style.width, 10),
-      height : parseInt(overlay.style.height, 10)
-    }
-
-    if (rect.width > 0 && rect.height > 0) {
-      // saveRect(rect)
+    let rect = {
+      x : parseFloat(overlay.style.left),
+      y : parseFloat(overlay.style.top),
+      w : parseFloat(overlay.style.width),
+      h : parseFloat(overlay.style.height)
     }
 
     $(overlay).remove()
     overlay = null
 
+    if (rect.w < 0 && rect.h < 0) {
+      // return
+    }
+
+    let pageData = getCurrentPage(rect.y)
+
+    // console.log('mouseup:', rect, pageData)
+
+    // Coordinates for a page.
+    rect.y -= pageData.minY
+
+    // Scale fit.
+    // rect = scaleDown(rect)
+
+    // Find texts.
+    const result = window.findTexts(pageData.page, rect)
+    if (!result.text) {
+      console.log('notFoundX:', rect.x, (rect.x + rect.w))
+      console.log('notFoundY:', rect.y, (rect.y + rect.h))
+      selectedText = ''
+      selectedRects = null
+      selectedTextRanges = null
+      return
+    }
+
+    selectedText = result.text
+    selectedRects = mergeRects(result.rects)
+    selectedTextRanges = result.textRange
+
+      console.log('span selected:', selectedText, selectedRects, selectedTextRanges);
+
   })
-
-
 
 })
 
+let selectedText
+let selectedRects
+let selectedTextRanges
 
 
 
