@@ -186,15 +186,25 @@ function removeSelection () {
 /**
  * Save a rect annotation.
  */
-function saveSpan (text, zIndex, color) {
+// function saveSpan (text, zIndex = 10, color = '#ffff00', save = true) {
+function saveSpan ({
+  text = '',
+  rects = [],
+  textRange = [],
+  zIndex = 10,
+  color = '#ffff00',
+  page = 1,
+  save = true,
+  focusToLabel = true
+}) {
 
   // Get the rect area which User selected.
   // let { rects, selectedText, textRange } = getSelectionRects()
   // let { rects, selectedText, textRange } = prevprevSelectionRects || prevSelectionRects
 
-  let rects = selectedRects
+  // let rects = selectedRects
   // let selectedText = selectedText
-  let textRange = selectedTextRanges
+  // let textRange = selectedTextRanges
 
   // Remove the user selection.
   // removeSelection()
@@ -203,17 +213,26 @@ function saveSpan (text, zIndex, color) {
     return
   }
 
+  let paddingTop = parseFloat($('.page').css('borderTopWidth'))
+  let pageHeight = parseFloat($('.page').css('height'))
+  pageHeight /= window.PDFView.pdfViewer.getPageView(0).viewport.scale
+  let pageTopY = paddingTop + (paddingTop + pageHeight) * (page - 1)
+  // TODO これでAnnoを生成するとannoファイルのrectsがpdftxtとずれてしまう.
+
+  // TODO ページが後ろの方に行くと、少しずれてしまう.
+
   let boundingRect = getAnnoLayerBoundingRect()
 
   // Initialize the annotation
   let annotation = {
     rectangles : rects.map((r) => {
-      return scaleUp({
-        x      : r.left, // - boundingRect.left,
-        y      : r.top, // - boundingRect.top,
-        width  : r.width,
-        height : r.height
-      })
+      // return scaleUp({
+      return {
+          x      : r.left, // - boundingRect.left,
+          y      : r.top + pageTopY, // - boundingRect.top,
+          width  : r.width || r.right - r.left,
+          height : r.height || r.bottom - r.top
+      }
     }).filter(r => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1),
     selectedText,
     text,
@@ -222,18 +241,33 @@ function saveSpan (text, zIndex, color) {
     color
   }
 
-  console.log('annotation:', annotation, rects.map((r) => {
-    return scaleUp({
-      x      : r.left, // - boundingRect.left,
-      y      : r.top, // - boundingRect.top,
-      width  : r.width,
-      height : r.height
-    })
-  }))
+  // if (annotation.rectangles.length === 0) {
+  //   console.log('zero:', rects, rects.map((r) => {
+  //     // return scaleUp({
+  //     return {
+  //       x      : r.left, // - boundingRect.left,
+  //       y      : r.top, // - boundingRect.top,
+  //       width  : r.width,
+  //       height : r.height
+  //     }
+  //   }))
+  // }
+
+
+  // console.log('annotation:', annotation, rects.map((r) => {
+  //   return scaleUp({
+  //     x      : r.left, // - boundingRect.left,
+  //     y      : r.top, // - boundingRect.top,
+  //     width  : r.width,
+  //     height : r.height
+  //   })
+  // }))
 
   // Save.
   let spanAnnotation = SpanAnnotation.newInstance(annotation)
-  spanAnnotation.save()
+  if (save) {
+    spanAnnotation.save()
+  }
 
   // Render.
   spanAnnotation.render()
@@ -242,7 +276,9 @@ function saveSpan (text, zIndex, color) {
   spanAnnotation.select()
 
   // Enable label input.
-  textInput.enable({ uuid : spanAnnotation.uuid, autoFocus : true, text })
+  if (focusToLabel) {
+    textInput.enable({ uuid : spanAnnotation.uuid, autoFocus : true, text })
+  }
 
   return spanAnnotation
 }
@@ -282,10 +318,12 @@ export function createSpan ({ text = null, zIndex = 10, color = null }) {
 // Temporary.
 window.addEventListener('DOMContentLoaded', () => {
 
-  function getXY (e) {
-    let rect = $('#viewer')[0].getBoundingClientRect()
-    let y = e.clientY + $('#viewer').scrollTop() - rect.top
-    let x = e.clientX - rect.left - ($('#viewer').width() - $('#pageContainer1').width()) / 2
+  function getXY (e, pageElement) {
+    const $viewer = $('#viewer')
+    // let rect = $viewer[0].getBoundingClientRect()
+    let rect = pageElement.getBoundingClientRect()
+    let y = e.clientY + $viewer.scrollTop() - rect.top
+    let x = e.clientX - rect.left - ($viewer.width() - $('#pageContainer1').width()) / 2
     return { x, y }
   }
 
@@ -293,98 +331,167 @@ window.addEventListener('DOMContentLoaded', () => {
     return document.getElementById('annoLayer2')  // TODO 2 is what?
   }
 
+  function addItem(item) {
+    if (items.filter(i => i.position === item.position).length === 0) {
+      items.push(item)
+      items = items.filter(i => i.position <= item.position)
+      items = items.sort((o1, o2) => o1.position - o2.position)
+    }
+  }
+
+  function setPositions(e) {
+    console.log('e:', e.clientX, e.clientY)
+    // Get pageNumber, x, and y.
+    const canvasElement = e.currentTarget
+    const pageElement = canvasElement.parentNode
+    const page = parseInt(pageElement.getAttribute('data-page-number'))
+    const { top, left } = canvasElement.getBoundingClientRect()
+    const x = e.clientX - left
+    const y = e.clientY - top
+    console.log('page:x:y:', page, x, y)
+
+    // Find the data in pdftxt.
+    const item = window.findText(page, scaleDown({ x, y }))
+    console.log('item:', item)
+
+    if (item) {
+      addItem(item)
+      // if (startPosition === null && endPosition === null) {
+      //   startPosition = item.position
+      //   endPosition = item.position
+      // } else {
+      //   const p1 = item.position
+      //   const p2 = startPosition
+      //   const p3 = endPosition
+      //   startPosition = Math.min(p1, Math.min(p2, p3))
+      //   endPosition = Math.max(p1, Math.max(p2, p3))
+      // }
+      // console.log('start:end:', startPosition, endPosition)
+    }
+
+    return page
+  }
+
+  function makeSelections(e) {
+    // const page = setPositions(e)
+    const page = setPositions(e)
+    // if (startPosition) {
+    //   const items = window.findTexts(page, startPosition, endPosition)
+    //   console.log('items:', items)
+    // }
+
+    if (spanAnnotation) {
+      spanAnnotation.destroy()
+      spanAnnotation = null
+    }
+
+    if (items.length > 0) {
+      // console.log('items:', items)
+      const mergedRect = mergeRects(items)
+      // console.log('mergedRect:', mergedRect)
+      spanAnnotation = saveSpan({
+        rects : mergedRect,
+        page,
+        save  : false,
+        focusToLabel : false
+      })
+      spanAnnotation.disable()
+    }
+  }
+
   let overlay
   let startX
   let startY
 
-  $('#viewer').on('mousedown', e => {
-    const { x, y } = getXY(e)
-    // console.log('mousedown:', x, y, e)
+  let mouseDown = false
+  let startPosition = null
+  let endPosition = null
+  let items = []
 
-    startX = x
-    startY = y
+  let spanAnnotation = null
 
-    overlay = document.createElement('div')
-    overlay.style.position = 'absolute'
-    overlay.style.top = `${startY}px`
-    overlay.style.left = `${startX}px`
-    overlay.style.width = 0
-    overlay.style.height = 0
-    overlay.style.border = `2px solid #00BFFF` // Blue.
-    overlay.style.boxSizing = 'border-box'
-    overlay.style.visibility = 'visible'
-    overlay.style.pointerEvents = 'none'
-    getTmpLayer().appendChild(overlay)
+  const $viewer = $('#viewer')
+
+  $viewer.on('mousedown', '.canvasWrapper', e => {
+    mouseDown = true
+    items = []
+    if (spanAnnotation) {
+      spanAnnotation.destroy()
+      spanAnnotation = null
+    }
+    makeSelections(e)
+  })
+  $viewer.on('mousemove', '.canvasWrapper', e => {
+    mouseDown && makeSelections(e)
+  })
+  $viewer.on('mouseup', '.canvasWrapper', e => {
+    console.log('mouseup')
+    mouseDown && makeSelections(e)
+    mouseDown = false
+    items = []
+    startPosition = null
+    endPosition = null
   })
 
-  $('#viewer').on('mousemove', e => {
-
-    if (!overlay) {
-      return
-    }
-
-    let { x : curX, y : curY } = getXY(e)
-
-    let x = Math.min(startX, curX)
-    let y = Math.min(startY, curY)
-    let w = Math.abs(startX - curX)
-    let h = Math.abs(startY - curY)
-
-    // Move and Resize.
-    overlay.style.left = x + 'px'
-    overlay.style.top = y + 'px'
-    overlay.style.width = w + 'px'
-    overlay.style.height = h + 'px'
-  })
-
-  $('#viewer').on('mouseup', e => {
-
-    if (!overlay) {
-      return
-    }
-
-    let rect = {
-      x : parseFloat(overlay.style.left),
-      y : parseFloat(overlay.style.top),
-      w : parseFloat(overlay.style.width),
-      h : parseFloat(overlay.style.height)
-    }
-
-    $(overlay).remove()
-    overlay = null
-
-    if (rect.w < 0 && rect.h < 0) {
-      // return
-    }
-
-    let pageData = getCurrentPage(rect.y)
-
-    // console.log('mouseup:', rect, pageData)
-
-    // Coordinates for a page.
-    rect.y -= pageData.minY
-
-    // Scale fit.
-    // rect = scaleDown(rect)
-
-    // Find texts.
-    const result = window.findTexts(pageData.page, rect)
-    if (!result.text) {
-      console.log('notFoundX:', rect.x, (rect.x + rect.w))
-      console.log('notFoundY:', rect.y, (rect.y + rect.h))
-      selectedText = ''
-      selectedRects = null
-      selectedTextRanges = null
-      return
-    }
-
-    selectedText = result.text
-    selectedRects = mergeRects(result.rects)
-    selectedTextRanges = result.textRange
-
-      console.log('span selected:', selectedText, selectedRects, selectedTextRanges);
-
-  })
+  // $('.textLayer').on('mouseup', e => {
+  //
+  //   if (1 === 1) {
+  //     return
+  //   }
+  //
+  //   if (!overlay) {
+  //     return
+  //   }
+  //
+  //   let rect = {
+  //     x : parseFloat(overlay.style.left),
+  //     y : parseFloat(overlay.style.top),
+  //     w : parseFloat(overlay.style.width),
+  //     h : parseFloat(overlay.style.height)
+  //   }
+  //
+  //   // console.log('1x:y:w:h:', rect, getCurrentPage(rect.y).minY)
+  //
+  //   $(overlay).remove()
+  //   overlay = null
+  //
+  //   if (rect.w < 0 && rect.h < 0) {
+  //     // return
+  //   }
+  //
+  //   let pageData = getCurrentPage(rect.y)
+  //   console.log('mouseup:', pageData, rect.y)
+  //
+  //   // Coordinates for a page.
+  //   rect.y -= pageData.minY
+  //
+  //   console.log('2x:y:w:h:', rect, getCurrentPage(rect.y).minY)
+  //
+  //   // Scale fit.
+  //   rect = scaleUp(rect)
+  //
+  //   // Find texts.
+  //   const result = window.findTexts(pageData.page, rect)
+  //   if (!result.text) {
+  //     console.log('notFoundX:', rect.x, (rect.x + rect.w))
+  //     console.log('notFoundY:', rect.y, (rect.y + rect.h))
+  //     selectedText = ''
+  //     selectedRects = null
+  //     selectedTextRanges = null
+  //     return
+  //   } else {
+  //     console.log('found', result.text)
+  //   }
+  //
+  //   selectedText = result.text
+  //   selectedRects = mergeRects(result.rects)
+  //   selectedTextRanges = result.textRange
+  //
+  //   tmpAnnotation = saveSpan('', 10, '#ffff00', false)
+  //
+  //   console.log('span selected:', selectedText, selectedRects, selectedTextRanges)
+  //
+  // })
 
 })
 
@@ -392,7 +499,7 @@ let selectedText
 let selectedRects
 let selectedTextRanges
 
-
+let tmpAnnotation
 
 
 

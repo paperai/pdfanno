@@ -114,53 +114,81 @@ window.getText = function (page, startIndex, endIndex) {
 }
 
 // TODO a little tricky.
-window.findTexts = function (page, rect) {
+// window.findTexts = function (page, rect) {
+//
+//   let found = false
+//   let text = ''
+//   let rects = []
+//   let startIndex = 0
+//   let endIndex = 0
+//
+//   pages[page - 1].meta.forEach((info, index) => {
+//
+//     if (!info) {
+//       if (found) {
+//         text += ' '
+//       }
+//       return
+//     }
+//     const { char, x, y, w, h } = extractMeta(info)
+//
+//     // is Hit?
+//     if (Math.abs(rect.x - x) < rect.w / 2 + w / 2
+//       && Math.abs(rect.y - y) < rect.h / 2 + h / 2) {
+//       // console.log("hitX:", char, rect.x, (rect.x + rect.w), x, (x + w))
+//       // console.log("hitY:", char, rect.y, (rect.y + rect.h), y, (y + h))
+//
+//       found = true
+//       text += char
+//       rects.push({ x, y, w, h })
+//
+//       if (!startIndex) {
+//         startIndex = index
+//       }
+//       endIndex = Math.max(endIndex, index)
+//
+//     } else {
+//       found = false
+//     }
+//   })
+//
+//   let { textRange } = window.getText(page, startIndex, endIndex)
+//
+//   return { text, rects, textRange }
+// }
 
-  let found = false
-  let text = ''
-  let rects = []
-  let startIndex = 0
-  let endIndex = 0
+window.findText = function (page, point) {
 
-  pages[page - 1].meta.forEach((info, index) => {
+  for (let index = 0, len = pages[page - 1].meta.length; index < len; index++) {
+    const info = pages[page - 1].meta[index]
 
     if (!info) {
-      if (found) {
-        text += ' '
-      }
-      return
+      continue
     }
-    const { char, x, y, w, h } = extractMeta(info)
+
+    const { position, char, x, y, w, h } = extractMeta(info)
 
     // is Hit?
-    if (Math.abs(rect.x - x) < rect.w / 2 + w / 2
-      && Math.abs(rect.y - y) < rect.h / 2 + h / 2) {
-      console.log("hitX:", char, rect.x, (rect.x + rect.w), x, (x + w))
-      console.log("hitY:", char, rect.y, (rect.y + rect.h), y, (y + h))
+    if (x <= point.x && point.x <= (x + w)
+      && y <= point.y && point.y <= (y + h)) {
+      return { position, char, x, y, w, h }
+    }
+  }
 
-      found = true
-      text += char
-      rects.push({ x, y, w, h })
+  return null
+}
 
-      if (!startIndex) {
-        startIndex = index
-      }
-      endIndex = Math.max(endIndex, index)
+window.findTexts = function (page, startIndex, endIndex) {
 
-    } else {
-      found = false
+  let items = []
+  pages[page - 1].meta.forEach((info, index) => {
+    if (startIndex <= index && index <= endIndex) {
+      items.push(extractMeta(info))
     }
   })
 
-  let { textRange } = window.getText(page, startIndex, endIndex)
-
-  return { text, rects, textRange }
+  return items
 }
-
-
-
-
-
 
 
 

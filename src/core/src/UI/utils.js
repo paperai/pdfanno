@@ -101,24 +101,40 @@ export function getSVGLayer () {
 
 export function getCurrentPage (y) {
 
-  let viewerY = $('#viewerContainer')[0].getBoundingClientRect().top
-  let scrollTop = $('#annoLayer2')[0].getBoundingClientRect().top // - viewerY
+  let pageHeight = $('.canvasWrapper').height()
+  let pageMargin = parseFloat($('#pageContainer1').css('borderTopWidth'))
+  let page = $('.page').length
 
-  let elements = document.querySelectorAll('.canvasWrapper')
-  for (let i = 0, l = elements.length; i < l; i++) {
-    let el = elements[i]
-    let rect = el.getBoundingClientRect()
-    let minY = rect.top - scrollTop
-    let maxY = rect.bottom - scrollTop
+
+  for (let i = 0; i < page; i++) {
+    let minY = pageMargin + (pageHeight + pageMargin) * i
+    let maxY = minY + pageHeight
 
     if (minY <= y && y <= maxY) {
-      let page = parseInt(el.parentNode.id.replace('pageContainer', ''))
-      // console.log('found:', page, minY, maxY, viewerY, rect, scrollTop)
-      return { page, minY, maxY }
+      return { page : (i + 1), minY, maxY }
     }
   }
 
-  console.log('notfound ><...')
+  // let viewerY = $('#viewerContainer')[0].getBoundingClientRect().top
+  // let scrollTop = $('#annoLayer2')[0].getBoundingClientRect().top // - viewerY
+  //
+  // let elements = document.querySelectorAll('.canvasWrapper')
+  // for (let i = 0, l = elements.length; i < l; i++) {
+  //   let el = elements[i]
+  //   let rect = el.getBoundingClientRect()
+  //   let minY = rect.top - scrollTop
+  //   let maxY = rect.bottom - scrollTop
+  //
+  //   console.log('minYmax:', minY, y, maxY, rect, scrollTop)
+  //
+  //   if (minY <= y && y <= maxY) {
+  //     let page = parseInt(el.parentNode.id.replace('pageContainer', ''))
+  //     // console.log('found:', page, minY, maxY, viewerY, rect, scrollTop)
+  //     return { page, minY, maxY }
+  //   }
+  // }
+
+  console.log('notfound ><...', y)
   return null
 }
 
