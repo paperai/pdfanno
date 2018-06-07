@@ -19,11 +19,13 @@ export function renderSpan (a) {
     $base.append(createRect(r, color, readOnly))
   })
 
-  $base.append(renderKnob({
-    x : a.rectangles[0].x,
-    y : a.rectangles[0].y,
-    readOnly
-  }))
+  if (a.knob) {
+    $base.append(renderKnob({
+      x : a.rectangles[0].x,
+      y : a.rectangles[0].y,
+      readOnly
+    }))
+  }
 
   return $base[0]
 }

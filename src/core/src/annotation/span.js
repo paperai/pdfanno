@@ -19,6 +19,9 @@ export default class SpanAnnotation extends AbstractAnnotation {
     this.text       = null
     this.color      = null
     this.readOnly   = false
+    this.selectedText = null
+    this.textRange = null
+    this.knob      = true
     this.$element   = this.createDummyElement()
 
     window.globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
@@ -38,6 +41,8 @@ export default class SpanAnnotation extends AbstractAnnotation {
     a.selectedText = annotation.selectedText
     a.textRange    = annotation.textRange
     a.zIndex       = annotation.zIndex || 10
+    a.knob         = (typeof annotation.knob === 'boolean' ? annotation.knob : true)
+    console.log('newInstance', a.knob, annotation.knob)
     return a
   }
 

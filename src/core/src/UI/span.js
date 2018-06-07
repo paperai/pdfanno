@@ -195,8 +195,11 @@ function saveSpan ({
   color = '#ffff00',
   page = 1,
   save = true,
-  focusToLabel = true
+  focusToLabel = true,
+  knob = true
 }) {
+
+  console.log('saveSpan:', knob)
 
   // Get the rect area which User selected.
   // let { rects, selectedText, textRange } = getSelectionRects()
@@ -253,6 +256,7 @@ function saveSpan ({
     zIndex,
     color,
     // page
+    knob
   }
 
   console.log('y:', annotation.rectangles[0].y)
@@ -414,7 +418,9 @@ window.addEventListener('DOMContentLoaded', () => {
         rects : mergedRect,
         page,
         save  : false,
-        focusToLabel : false
+        focusToLabel : false,
+        color: '#0f0',
+        knob : false
       })
       spanAnnotation.disable()
     }
