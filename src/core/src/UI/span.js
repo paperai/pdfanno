@@ -213,15 +213,28 @@ function saveSpan ({
     return
   }
 
-  let paddingTop = parseFloat($('.page').css('borderTopWidth'))
-  let pageHeight = parseFloat($('.page').css('height'))
-  pageHeight /= window.PDFView.pdfViewer.getPageView(0).viewport.scale
-  let pageTopY = paddingTop + (paddingTop + pageHeight) * (page - 1)
+  let scale = window.PDFView.pdfViewer.getPageView(0).viewport.scale
+  // let paddingTop = 9 // parseFloat($('.page').css('borderTopWidth')) / scale
+  // let paddingTop = parseFloat($('.page').css('borderTopWidth'))
+  let paddingTop = 9
+  // let paddingTop = 9.5  // why?
+
+
+  // let pageHeight = parseFloat($('.page').css('height')) / scale
+  // let pageHeight = window.PDFView.pdfViewer.getPageView(0).viewport.height
+  let pageHeight = window.PDFView.pdfViewer.getPageView(0).viewport.viewBox[3]
+  // pageHeight /= window.PDFView.pdfViewer.getPageView(0).viewport.scale
+
+  let merginBetweenPages = 1
+
+  let pageTopY = paddingTop + (paddingTop + pageHeight + merginBetweenPages) * (page - 1)
   // TODO これでAnnoを生成するとannoファイルのrectsがpdftxtとずれてしまう.
 
   // TODO ページが後ろの方に行くと、少しずれてしまう.
 
-  let boundingRect = getAnnoLayerBoundingRect()
+  console.log('pageTopY:', pageTopY, rects[0].top)
+
+  // let boundingRect = getAnnoLayerBoundingRect()
 
   // Initialize the annotation
   let annotation = {
@@ -238,8 +251,11 @@ function saveSpan ({
     text,
     textRange,
     zIndex,
-    color
+    color,
+    // page
   }
+
+  console.log('y:', annotation.rectangles[0].y)
 
   // if (annotation.rectangles.length === 0) {
   //   console.log('zero:', rects, rects.map((r) => {
@@ -317,6 +333,11 @@ export function createSpan ({ text = null, zIndex = 10, color = null }) {
 
 // Temporary.
 window.addEventListener('DOMContentLoaded', () => {
+
+  // // debug
+  // document.body.addEventListener('click', e => {
+  //   console.log('body:', e.clientX, e.clientY)
+  // })
 
   function getXY (e, pageElement) {
     const $viewer = $('#viewer')
