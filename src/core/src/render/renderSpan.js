@@ -15,14 +15,44 @@ export function renderSpan (a) {
   const $base = $('<div class="anno-span"/>')
     .css('zIndex', a.zIndex || 10)
 
-  a.rectangles.forEach(r => {
+
+  let paddingTop = 9
+  let pageHeight = window.PDFView.pdfViewer.getPageView(0).viewport.viewBox[3]
+  let merginBetweenPages = 1
+  let pageTopY = paddingTop + (paddingTop + pageHeight + merginBetweenPages) * (a.page - 1)
+
+  const rectangles = a.rectangles.map(r => {
+    return {
+      x      : r.left,
+      y      : r.top + pageTopY,
+      width  : r.width || r.right - r.left,
+      height : r.height || r.bottom - r.top
+    }
+  }).filter(r => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1)
+
+  console.log('pageTopY:', a.page, pageTopY, rectangles, a.rectangles.map(r => {
+    return {
+      x      : r.left,
+      y      : r.top + pageTopY,
+      width  : r.width || r.right - r.left,
+      height : r.height || r.bottom - r.top
+    }
+  }))
+
+  rectangles.forEach(r => {
     $base.append(createRect(r, color, readOnly))
   })
 
+  // a.rectangles.forEach(r => {
+  //   $base.append(createRect(r, color, readOnly))
+  // })
+
   if (a.knob) {
     $base.append(renderKnob({
-      x : a.rectangles[0].x,
-      y : a.rectangles[0].y,
+      // x : a.rectangles[0].x,
+      // y : a.rectangles[0].y,
+      x : rectangles[0].x,
+      y : rectangles[0].y,
       readOnly
     }))
   }

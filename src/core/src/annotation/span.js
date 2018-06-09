@@ -21,6 +21,7 @@ export default class SpanAnnotation extends AbstractAnnotation {
     this.readOnly   = false
     this.selectedText = null
     this.textRange = null
+    this.page      = null
     this.knob      = true
     this.$element   = this.createDummyElement()
 
@@ -32,6 +33,7 @@ export default class SpanAnnotation extends AbstractAnnotation {
    * Create an instance from an annotation data.
    */
   static newInstance (annotation) {
+    console.log('newInstance:', annotation.selectedText)
     let a          = new SpanAnnotation()
     a.uuid         = annotation.uuid || uuid()
     a.rectangles   = annotation.rectangles
@@ -40,6 +42,7 @@ export default class SpanAnnotation extends AbstractAnnotation {
     a.readOnly     = annotation.readOnly || false
     a.selectedText = annotation.selectedText
     a.textRange    = annotation.textRange
+    a.page         = annotation.page
     a.zIndex       = annotation.zIndex || 10
     a.knob         = (typeof annotation.knob === 'boolean' ? annotation.knob : true)
     console.log('newInstance', a.knob, annotation.knob)
