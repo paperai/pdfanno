@@ -178,14 +178,33 @@ window.findText = function (page, point) {
   return null
 }
 
-window.findTexts = function (page, startIndex, endIndex) {
+window.findTexts = function (page, startPosition, endPosition) {
 
-  let items = []
-  pages[page - 1].meta.forEach((info, index) => {
-    if (startIndex <= index && index <= endIndex) {
-      items.push(extractMeta(info))
+  const items = []
+  let inRange = false
+
+  for (let index = 0, len = pages[page - 1].meta.length; index < len; index++) {
+    const info = pages[page - 1].meta[index]
+
+    if (!info) {
+      if (inRange) {
+        items.push(null)
+      }
+      continue
     }
-  })
+
+    const data = extractMeta(info)
+    const { position } = data
+
+    if (startPosition <= position) {
+      inRange = true
+      items.push(data)
+    }
+
+    if (endPosition <= position) {
+      break
+    }
+  }
 
   return items
 }

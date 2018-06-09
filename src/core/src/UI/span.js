@@ -89,6 +89,9 @@ function getIndex (elm) {
  */
 function mergeRects (rects) {
 
+  // Remove null ones.
+  rects = rects.map(rect => rect)
+
   // Normalize.
   rects = rects.map(rect => {
     rect.top = rect.top || rect.y
@@ -199,7 +202,7 @@ function saveSpan ({
   knob = true
 }) {
 
-  console.log('saveSpan:', knob)
+  console.log('saveSpan:', ...arguments)
 
   // Get the rect area which User selected.
   // let { rects, selectedText, textRange } = getSelectionRects()
@@ -259,7 +262,7 @@ function saveSpan ({
     knob
   }
 
-  console.log('y:', annotation.rectangles[0].y)
+  // console.log('y:', annotation.rectangles[0].y)
 
   // if (annotation.rectangles.length === 0) {
   //   console.log('zero:', rects, rects.map((r) => {
@@ -307,99 +310,148 @@ function saveSpan ({
  * Get the rect area of User selected.
  */
 export function getRectangles () {
-  // let { rects } = getSelectionRects()
-  // let { rects } = prevprevSelectionRects || prevSelectionRects
-  let rects = selectedRects
-  if (!rects) {
+
+  if (!currentPage || !startPosition || !endPosition) {
     return null
+
+  } else {
+    let targets = findTexts(currentPage, startPosition, endPosition)
+    // Remove null(this means whitespace) items.
+    targets = targets.filter(item => item)
+
+    const mergedRect = mergeRects(targets)
+    return mergedRect
   }
 
-  const boundingRect = getAnnoLayerBoundingRect()
 
-  rects = [...rects].map(r => {
-    return scaleDown({
-      x      : r.left - boundingRect.left,
-      y      : r.top - boundingRect.top,
-      width  : r.width,
-      height : r.height
-    })
-  }).filter(r => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1)
 
-  return rects
+
+
+  // let { rects } = getSelectionRects()
+  // let { rects } = prevprevSelectionRects || prevSelectionRects
+  // let rects = selectedRects
+  // if (!rects) {
+  //   return null
+  // }
+  //
+  // const boundingRect = getAnnoLayerBoundingRect()
+  //
+  // rects = [...rects].map(r => {
+  //   return scaleDown({
+  //     x      : r.left - boundingRect.left,
+  //     y      : r.top - boundingRect.top,
+  //     width  : r.width,
+  //     height : r.height
+  //   })
+  // }).filter(r => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1)
+  //
+  // return rects
 }
 
 /**
  * Create a span by current texts selection.
  */
 export function createSpan ({ text = null, zIndex = 10, color = null }) {
-  return saveSpan(text, zIndex, color)
+
+  if (!currentPage || !startPosition || !endPosition) {
+    return null
+
+  } else {
+    let targets = findTexts(currentPage, startPosition, endPosition)
+    // Remove null(this means whitespace) items.
+    targets = targets.filter(item => item)
+
+    if (targets.length === 0) {
+      return null
+    }
+
+    const mergedRect = mergeRects(targets)
+    const annotation = saveSpan({
+      rects : mergedRect,
+      page  : currentPage,
+      text,
+      zIndex,
+      color
+    })
+
+    // Remove user selection.
+    if (spanAnnotation) {
+      spanAnnotation.destroy()
+    }
+    startPosition = null
+    endPosition = null
+    currentPage = null
+    spanAnnotation = null
+
+    return annotation
+  }
+
+  // return saveSpan({ text, zIndex, color })
 }
 
 // Temporary.
 window.addEventListener('DOMContentLoaded', () => {
 
-  // // debug
-  // document.body.addEventListener('click', e => {
-  //   console.log('body:', e.clientX, e.clientY)
-  // })
+  // function getXY (e, pageElement) {
+  //   const $viewer = $('#viewer')
+  //   // let rect = $viewer[0].getBoundingClientRect()
+  //   let rect = pageElement.getBoundingClientRect()
+  //   let y = e.clientY + $viewer.scrollTop() - rect.top
+  //   let x = e.clientX - rect.left - ($viewer.width() - $('#pageContainer1').width()) / 2
+  //   return { x, y }
+  // }
+  //
+  // function getTmpLayer () {
+  //   return document.getElementById('annoLayer2')
+  // }
 
-  function getXY (e, pageElement) {
-    const $viewer = $('#viewer')
-    // let rect = $viewer[0].getBoundingClientRect()
-    let rect = pageElement.getBoundingClientRect()
-    let y = e.clientY + $viewer.scrollTop() - rect.top
-    let x = e.clientX - rect.left - ($viewer.width() - $('#pageContainer1').width()) / 2
-    return { x, y }
-  }
+  function addItem(item, page) {
 
-  function getTmpLayer () {
-    return document.getElementById('annoLayer2')  // TODO 2 is what?
-  }
+    // if (items.filter(i => i.position === item.position).length === 0) {
+    //   items.push(item)
+    //   items = items.filter(i => i.position <= item.position)
+    //   items = items.sort((o1, o2) => o1.position - o2.position)
+    // }
 
-  function addItem(item) {
-    if (items.filter(i => i.position === item.position).length === 0) {
-      items.push(item)
-      items = items.filter(i => i.position <= item.position)
-      items = items.sort((o1, o2) => o1.position - o2.position)
-    }
+    // const newPosition = item.position
+    // const indexes = items.map(i => i.position).concat([newPosition])
+    // const minIndex = indexes.reduce((prev, v) => Math.min(prev, v), Number.MAX_SAFE_INTEGER)
+    // const maxIndex = indexes.reduce((prev, v) => Math.min(prev, v), -1)
+
+
+
   }
 
   function setPositions(e) {
-    console.log('e:', e.clientX, e.clientY)
-    // Get pageNumber, x, and y.
+
     const canvasElement = e.currentTarget
     const pageElement = canvasElement.parentNode
     const page = parseInt(pageElement.getAttribute('data-page-number'))
+    currentPage = page
+
     const { top, left } = canvasElement.getBoundingClientRect()
     const x = e.clientX - left
     const y = e.clientY - top
-    console.log('page:x:y:', page, x, y)
 
     // Find the data in pdftxt.
     const item = window.findText(page, scaleDown({ x, y }))
-    console.log('item:', item)
+    console.log('item:', item) // { position, char, x, y, w, h }
 
     if (item) {
-      addItem(item)
-      // if (startPosition === null && endPosition === null) {
-      //   startPosition = item.position
-      //   endPosition = item.position
-      // } else {
-      //   const p1 = item.position
-      //   const p2 = startPosition
-      //   const p3 = endPosition
-      //   startPosition = Math.min(p1, Math.min(p2, p3))
-      //   endPosition = Math.max(p1, Math.max(p2, p3))
-      // }
-      // console.log('start:end:', startPosition, endPosition)
+      if (!startPosition || !endPosition) {
+        startPosition = item.position
+        endPosition = item.position
+      } else {
+        // startPosition = Math.min(startPosition, item.position)
+        // endPosition = Math.max(endPosition, item.position)
+        endPosition = item.position
+      }
     }
-
-    return page
   }
 
   function makeSelections(e) {
     // const page = setPositions(e)
-    const page = setPositions(e)
+    setPositions(e)
     // if (startPosition) {
     //   const items = window.findTexts(page, startPosition, endPosition)
     //   console.log('items:', items)
@@ -410,13 +462,17 @@ window.addEventListener('DOMContentLoaded', () => {
       spanAnnotation = null
     }
 
-    if (items.length > 0) {
+    let targets = findTexts(currentPage, startPosition, endPosition)
+    // Remove null(this means whitespace) items.
+    targets = targets.filter(item => item)
+
+    if (targets.length > 0) {
       // console.log('items:', items)
-      const mergedRect = mergeRects(items)
+      const mergedRect = mergeRects(targets)
       // console.log('mergedRect:', mergedRect)
       spanAnnotation = saveSpan({
         rects : mergedRect,
-        page,
+        page  : currentPage,
         save  : false,
         focusToLabel : false,
         color: '#0f0',
@@ -424,24 +480,42 @@ window.addEventListener('DOMContentLoaded', () => {
       })
       spanAnnotation.disable()
     }
+
+
+    // if (items.length > 0) {
+    //   // console.log('items:', items)
+    //   const mergedRect = mergeRects(items)
+    //   // console.log('mergedRect:', mergedRect)
+    //   spanAnnotation = saveSpan({
+    //     rects : mergedRect,
+    //     page,
+    //     save  : false,
+    //     focusToLabel : false,
+    //     color: '#0f0',
+    //     knob : false
+    //   })
+    //   spanAnnotation.disable()
+    // }
   }
 
   let overlay
   let startX
   let startY
 
-  let mouseDown = false
-  let startPosition = null
-  let endPosition = null
+
+
+
   let items = []
 
-  let spanAnnotation = null
 
   const $viewer = $('#viewer')
 
   $viewer.on('mousedown', '.canvasWrapper', e => {
     mouseDown = true
     items = []
+    currentPage = null
+    startPosition = null
+    endPosition = null
     if (spanAnnotation) {
       spanAnnotation.destroy()
       spanAnnotation = null
@@ -449,15 +523,19 @@ window.addEventListener('DOMContentLoaded', () => {
     makeSelections(e)
   })
   $viewer.on('mousemove', '.canvasWrapper', e => {
-    mouseDown && makeSelections(e)
+    if (mouseDown) {
+      makeSelections(e)
+    }
   })
   $viewer.on('mouseup', '.canvasWrapper', e => {
-    console.log('mouseup')
-    mouseDown && makeSelections(e)
+    if (mouseDown) {
+      makeSelections(e)
+    }
     mouseDown = false
-    items = []
-    startPosition = null
-    endPosition = null
+    // items = []
+    // currentPage = null
+    // startPosition = null
+    // endPosition = null
   })
 
   // $('.textLayer').on('mouseup', e => {
@@ -522,7 +600,15 @@ window.addEventListener('DOMContentLoaded', () => {
 
 })
 
-let selectedText
+let mouseDown = false
+let startPosition = null
+let endPosition = null
+let currentPage = null
+let spanAnnotation = null
+
+
+
+  let selectedText
 let selectedRects
 let selectedTextRanges
 
