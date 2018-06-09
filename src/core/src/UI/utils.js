@@ -12,7 +12,6 @@ export function scaleUp (svg, rect) {
 
   if (arguments.length === 1) {
     rect = svg
-    svg = getSVGLayer()
   }
 
   let result = {}
@@ -59,46 +58,4 @@ export function disableTextlayer () {
  */
 export function enableTextlayer () {
   $('body').removeClass('disable-text-layer')
-}
-
-export function getXY (e) {
-  let rect2 = $('#annoLayer2')[0].getBoundingClientRect()
-  let y = e.clientY + $('#annoLayer2').scrollTop() - rect2.top
-  let x = e.clientX - rect2.left
-  return { x, y }
-}
-
-export function getSVGLayer () {
-  return document.getElementById('annoLayer')
-}
-
-export function getCurrentPage (e) {
-
-  let { x, y } = getXY(e)
-
-  let scrollTop = $('#annoLayer2')[0].getBoundingClientRect().top
-  let scrollLeft = $('#annoLayer2')[0].getBoundingClientRect().left
-
-  let elements = document.querySelectorAll('.canvasWrapper')
-
-  for (let i = 0, l = elements.length; i < l; i++) {
-    let el = elements[i]
-    let rect = el.getBoundingClientRect()
-    let minX = rect.left - scrollLeft
-    let maxX = rect.right - scrollLeft
-    let minY = rect.top - scrollTop
-    let maxY = rect.bottom - scrollTop
-
-    if (minX <= x && x <= maxX && minY <= y && y <= maxY) {
-      let page = parseInt(el.parentNode.id.replace('pageContainer', ''))
-      return { page, minX, maxX, minY, maxY }
-    }
-  }
-
-  console.log('notfound ><...')
-  return null
-}
-
-export function getAnnoLayerBoundingRect () {
-  return $('#annoLayer2')[0].getBoundingClientRect()
 }

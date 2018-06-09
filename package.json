@@ -1,13 +1,14 @@
 {
   "name": "pdfanno",
-  "version": "0.4.0-dev",
+  "version": "0.4.1-dev",
   "description": "",
   "main": "index.js",
   "scripts": {
     "_prepare": "gulp prepare",
+    "start": "concurrently --kill-others \"npm run server:dev\" \"npm run front:dev\"",
     "front:sw": "gulp build-sw",
     "front:sw:watch": "gulp watch-sw",
-    "front:dev": "npm run _prepare && npm run front:sw && webpack-dev-server --inline | npm run front:sw:watch",
+    "front:dev": "concurrently --kill-others \"npm run _prepare && npm run front:sw && webpack-dev-server --inline\" \"npm run front:sw:watch\"",
     "front:publish:latest": "npm run _prepare && cross-env BUILD_TARGET=latest npm run front:sw && cross-env NODE_ENV=production SERVER_PATH=latest webpack && gulp publish_latest",
     "front:publish:stable": "npm run _prepare && cross-env BUILD_TARGET=stable  npm run front:sw && cross-env NODE_ENV=production SERVER_PATH=0.3.1  webpack && gulp publish_stable",
     "server:latest": "cross-env NODE_ENV=production NODE_PORT=1001 node server/server.js",

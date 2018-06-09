@@ -19,6 +19,10 @@ export default class SpanAnnotation extends AbstractAnnotation {
     this.text       = null
     this.color      = null
     this.readOnly   = false
+    this.selectedText = null
+    this.textRange = null
+    this.page      = null
+    this.knob      = true
     this.$element   = this.createDummyElement()
 
     window.globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
@@ -29,6 +33,7 @@ export default class SpanAnnotation extends AbstractAnnotation {
    * Create an instance from an annotation data.
    */
   static newInstance (annotation) {
+    console.log('newInstance:', annotation.selectedText)
     let a          = new SpanAnnotation()
     a.uuid         = annotation.uuid || uuid()
     a.rectangles   = annotation.rectangles
@@ -37,7 +42,10 @@ export default class SpanAnnotation extends AbstractAnnotation {
     a.readOnly     = annotation.readOnly || false
     a.selectedText = annotation.selectedText
     a.textRange    = annotation.textRange
+    a.page         = annotation.page
     a.zIndex       = annotation.zIndex || 10
+    a.knob         = (typeof annotation.knob === 'boolean' ? annotation.knob : true)
+    console.log('newInstance', a.knob, annotation.knob)
     return a
   }
 
@@ -55,13 +63,23 @@ export default class SpanAnnotation extends AbstractAnnotation {
     d.rectangles = position.map(p => {
       return {
         x      : p[0],
-        y      : convertFromExportY(d.page, p[1]),
+        // y      : convertFromExportY(d.page, p[1]),
+        y      : p[1],
         width  : p[2],
         height : p[3]
       }
     })
     let span = SpanAnnotation.newInstance(d)
     return span
+
+    // let rectangles = annotation.rectangles.map(rectangle => {
+    //   return [
+    //     rectangle.x,
+    //     rectangle.y,
+    //     rectangle.width,
+    //     rectangle.height
+    //   ]
+    // })
   }
 
   /**

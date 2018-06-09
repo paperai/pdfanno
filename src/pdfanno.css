@@ -88,6 +88,9 @@
   display: inline-block !important;
 }
 
+.textLayer {
+  display: none;
+}
 
 
 

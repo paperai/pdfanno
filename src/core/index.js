@@ -39,10 +39,12 @@ window.addEventListener('pagerendered', function (ev) {
   let scale = window.PDFView.pdfViewer.getPageView(0).viewport.scale
   let borderWidth = `${9 * scale}px`
   let marginBottom = `${-9 * scale}px`
+  let marginTop = `${1 * scale}px`
   $('.page').css({
     'border-top-width'    : borderWidth,
     'border-bottom-width' : borderWidth,
-    'margin-bottom'       : marginBottom
+    'margin-bottom'       : marginBottom,
+    marginTop
   })
 })
 

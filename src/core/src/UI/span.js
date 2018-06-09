@@ -1,4 +1,4 @@
-import { scaleDown, getAnnoLayerBoundingRect } from './utils'
+import { scaleDown } from './utils'
 import SpanAnnotation from '../annotation/span'
 import * as textInput from '../utils/textInput'
 
@@ -6,88 +6,22 @@ function scale () {
   return window.PDFView.pdfViewer.getPageView(0).viewport.scale
 }
 
-let prevprevSelectionRects
-let prevSelectionRects
-
-// TODO Need a good idea.
-function watchSelectionRects () {
-  setInterval(() => {
-    prevprevSelectionRects = prevSelectionRects
-    prevSelectionRects = getSelectionRects()
-  }, 250)
-}
-watchSelectionRects()
-
-/**
- * Get the current window selections and texts.
- */
-function getSelectionRects () {
-  try {
-    let selection = window.getSelection()
-
-    if (selection.rangeCount === 0) {
-      return { rects : null, selectedText : null, textRange : null }
-    }
-    let range = selection.getRangeAt(0)
-    let rects = range.getClientRects()
-
-    // console.log('selection:', selection)
-    const pageNumber = getPageNumber(selection.anchorNode)
-    const startIndex = getIndex(selection.anchorNode)
-    const endIndex = getIndex(selection.focusNode)
-    // console.log('t:', pageNumber, startIndex, endIndex)
-
-    // When no text is selected.
-    if ((pageNumber === null || pageNumber === undefined)
-      || (startIndex === null || startIndex === undefined)
-      || (endIndex === null || endIndex === undefined)) {
-      return { rects : null, selectedText : null, textRange : null }
-    }
-
-    // TODO a little tricky.
-    const { text, textRange } = window.getText(pageNumber, startIndex, endIndex)
-    // console.log('text:', text)
-    // console.log('textRange:', textRange)
-
-    // Bug detect.
-    // This selects loadingIcon and/or loadingSpacer.
-    if (selection.anchorNode && selection.anchorNode.tagName === 'DIV') {
-      return { rects : null, selectedText : null, textRange : null }
-    }
-
-    if (rects.length > 0 && rects[0].width > 0 && rects[0].height > 0) {
-      return { rects : mergeRects(rects), selectedText : text, textRange }
-    }
-
-  } catch (e) {
-    console.log('ERROR:', e)
-  }
-
-  return { rects : null, selectedText : null, textRange : null }
-}
-
-function getPageNumber (elm) {
-  if (elm.parentNode.hasAttribute('data-page')) {
-    return parseInt(elm.parentNode.getAttribute('data-page'), 10)
-  } else if (elm.hasAttribute && elm.hasAttribute('data-page')) {
-    return parseInt(elm.getAttribute('data-page'), 10)
-  }
-  return null
-}
-
-function getIndex (elm) {
-  if (elm.parentNode.hasAttribute('data-index')) {
-    return parseInt(elm.parentNode.getAttribute('data-index'), 10)
-  } else if (elm.hasAttribute && elm.hasAttribute('data-index')) {
-    return parseInt(elm.getAttribute('data-index'), 10)
-  }
-  return null
-}
-
 /**
  * Merge user selections.
  */
 function mergeRects (rects) {
+
+  // Remove null ones.
+  rects = rects.filter(rect => rect)
+
+  // Normalize.
+  rects = rects.map(rect => {
+    rect.top = rect.top || rect.y
+    rect.left = rect.left || rect.x
+    rect.right = rect.right || (rect.x + rect.w)
+    rect.bottom = rect.bottom || (rect.y + rect.h)
+    return rect
+  })
 
   // Trim a rect which is almost same to other.
   rects = trimRects(rects)
@@ -164,54 +98,41 @@ function withinMargin (x, base, margin) {
 }
 
 /**
- * Remove user selections.
- */
-function removeSelection () {
-  let selection = window.getSelection()
-  // Firefox
-  selection.removeAllRanges && selection.removeAllRanges()
-  // Chrome
-  selection.empty && selection.empty()
-}
-
-/**
  * Save a rect annotation.
  */
-function saveSpan (text, zIndex, color) {
-
-  // Get the rect area which User selected.
-  // let { rects, selectedText, textRange } = getSelectionRects()
-  let { rects, selectedText, textRange } = prevprevSelectionRects || prevSelectionRects
-
-  // Remove the user selection.
-  removeSelection()
+function saveSpan ({
+  text = '',
+  rects = [],
+  textRange = [],
+  selectedText = '',
+  zIndex = 10,
+  color = '#ffff00',
+  page = 1,
+  save = true,
+  focusToLabel = true,
+  knob = true
+}) {
 
   if (!rects) {
     return
   }
 
-  let boundingRect = getAnnoLayerBoundingRect()
-
-  // Initialize the annotation
   let annotation = {
-    rectangles : rects.map((r) => {
-      return scaleDown({
-        x      : r.left - boundingRect.left,
-        y      : r.top - boundingRect.top,
-        width  : r.width,
-        height : r.height
-      })
-    }).filter(r => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1),
+    rectangles : rects,
     selectedText,
     text,
     textRange,
     zIndex,
-    color
+    color,
+    page,
+    knob
   }
 
   // Save.
   let spanAnnotation = SpanAnnotation.newInstance(annotation)
-  spanAnnotation.save()
+  if (save) {
+    spanAnnotation.save()
+  }
 
   // Render.
   spanAnnotation.render()
@@ -220,7 +141,9 @@ function saveSpan (text, zIndex, color) {
   spanAnnotation.select()
 
   // Enable label input.
-  textInput.enable({ uuid : spanAnnotation.uuid, autoFocus : true, text })
+  if (focusToLabel) {
+    textInput.enable({ uuid : spanAnnotation.uuid, autoFocus : true, text })
+  }
 
   return spanAnnotation
 }
@@ -229,29 +152,156 @@ function saveSpan (text, zIndex, color) {
  * Get the rect area of User selected.
  */
 export function getRectangles () {
-  // let { rects } = getSelectionRects()
-  let { rects } = prevprevSelectionRects || prevSelectionRects
-  if (!rects) {
+
+  if (!currentPage || !startPosition || !endPosition) {
     return null
+
+  } else {
+    let targets = findTexts(currentPage, startPosition, endPosition)
+    return mergeRects(targets)
   }
 
-  const boundingRect = getAnnoLayerBoundingRect()
-
-  rects = [...rects].map(r => {
-    return scaleDown({
-      x      : r.left - boundingRect.left,
-      y      : r.top - boundingRect.top,
-      width  : r.width,
-      height : r.height
-    })
-  }).filter(r => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1)
-
-  return rects
 }
 
 /**
  * Create a span by current texts selection.
  */
 export function createSpan ({ text = null, zIndex = 10, color = null }) {
-  return saveSpan(text, zIndex, color)
+
+  if (!currentPage || !startPosition || !endPosition) {
+    return null
+
+  } else {
+
+    let targets = findTexts(currentPage, startPosition, endPosition)
+    if (targets.length === 0) {
+      return null
+    }
+
+    let selectedText = targets.map(t => {
+      return t ? t.char : ' '
+    }).join('')
+
+    const mergedRect = mergeRects(targets)
+    const annotation = saveSpan({
+      rects : mergedRect,
+      page  : currentPage,
+      text,
+      zIndex,
+      color,
+      textRange: [ startPosition, endPosition ],
+      selectedText
+    })
+
+    // Remove user selection.
+    if (spanAnnotation) {
+      spanAnnotation.destroy()
+    }
+    startPosition = null
+    endPosition = null
+    currentPage = null
+    spanAnnotation = null
+
+    return annotation
+  }
+
 }
+
+window.addEventListener('DOMContentLoaded', () => {
+
+  function setPositions(e) {
+
+    const canvasElement = e.currentTarget
+    const pageElement = canvasElement.parentNode
+    const page = parseInt(pageElement.getAttribute('data-page-number'))
+    currentPage = page
+
+    const { top, left } = canvasElement.getBoundingClientRect()
+    const x = e.clientX - left
+    const y = e.clientY - top
+
+    // Find the data in pdftxt.
+    const item = window.findText(page, scaleDown({ x, y }))
+    if (item) {
+      if (!startPosition || !endPosition) {
+        startPosition = item.position
+        endPosition = item.position
+      } else {
+        endPosition = item.position
+      }
+    }
+  }
+
+  function makeSelections(e) {
+
+    setPositions(e)
+
+    if (spanAnnotation) {
+      spanAnnotation.destroy()
+      spanAnnotation = null
+    }
+
+    let targets = findTexts(currentPage, startPosition, endPosition)
+    if (targets.length > 0) {
+      const mergedRect = mergeRects(targets)
+      spanAnnotation = saveSpan({
+        rects        : mergedRect,
+        page         : currentPage,
+        save         : false,
+        focusToLabel : false,
+        color        : '#0f0',
+        knob         : false
+      })
+      spanAnnotation.disable()
+    }
+  }
+
+  let items = []
+
+
+  const $viewer = $('#viewer')
+
+  $viewer.on('mousedown', '.canvasWrapper', e => {
+    if (otherAnnotationTreating) {
+      // Ignore, if other annotation is detected.
+      return
+    }
+    mouseDown = true
+    items = []
+    currentPage = null
+    startPosition = null
+    endPosition = null
+    if (spanAnnotation) {
+      spanAnnotation.destroy()
+      spanAnnotation = null
+    }
+    makeSelections(e)
+  })
+  $viewer.on('mousemove', '.canvasWrapper', e => {
+    if (mouseDown) {
+      makeSelections(e)
+    }
+  })
+  $viewer.on('mouseup', '.canvasWrapper', e => {
+    if (mouseDown) {
+      makeSelections(e)
+    }
+    mouseDown = false
+  })
+
+  let otherAnnotationTreating = false
+  window.addEventListener('annotationHoverIn', () => {
+    otherAnnotationTreating = true
+  })
+  window.addEventListener('annotationHoverOut', () => {
+    otherAnnotationTreating = false
+  })
+
+})
+
+let mouseDown = false
+let startPosition = null
+let endPosition = null
+let currentPage = null
+let spanAnnotation = null
+

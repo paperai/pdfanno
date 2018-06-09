@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-/*temporary*/
-div[data-canvas-width] {
+/* Disable text layer. */
+div[data-canvas-width],
+.textLayer > div {
     display: none;
 }
 

@@ -156,18 +156,27 @@ export default class AnnotationContainer {
           // TODO Define at annotation/span.js
 
           // page.
-          let { pageNumber } = convertToExportY(annotation.rectangles[0].y)
+          // let { pageNumber } = convertToExportY(annotation.rectangles[0].y)
+          let pageNumber = annotation.page
 
           // rectangles.
           let rectangles = annotation.rectangles.map(rectangle => {
-            const { y } = convertToExportY(rectangle.y)
-            return [
-              rectangle.x,
-              y,
-              rectangle.width,
-              rectangle.height
-            ]
+              return [
+                rectangle.x,
+                rectangle.y,
+                rectangle.width,
+                rectangle.height
+              ]
           })
+          // let rectangles = annotation.rectangles.map(rectangle => {
+          //   const { y } = convertToExportY(rectangle.y)
+          //   return [
+          //     rectangle.x,
+          //     y,
+          //     rectangle.width,
+          //     rectangle.height
+          //   ]
+          // })
 
           let text = (annotation.selectedText || '')
             .replace(/\r\n/g, ' ')
