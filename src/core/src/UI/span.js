@@ -1,87 +1,9 @@
-import { scaleDown, scaleUp, getAnnoLayerBoundingRect, getCurrentPage } from './utils'
+import { scaleDown } from './utils'
 import SpanAnnotation from '../annotation/span'
 import * as textInput from '../utils/textInput'
 
 function scale () {
   return window.PDFView.pdfViewer.getPageView(0).viewport.scale
-}
-
-let prevprevSelectionRects
-let prevSelectionRects
-
-// TODO Need a good idea.
-function watchSelectionRects () {
-  setInterval(() => {
-    prevprevSelectionRects = prevSelectionRects
-    prevSelectionRects = getSelectionRects()
-  }, 250)
-}
-watchSelectionRects()
-
-/**
- * Get the current window selections and texts.
- */
-function getSelectionRects () {
-  try {
-    let selection = window.getSelection()
-
-    if (selection.rangeCount === 0) {
-      return { rects : null, selectedText : null, textRange : null }
-    }
-    let range = selection.getRangeAt(0)
-    let rects = range.getClientRects()
-
-    // console.log('selection:', selection)
-    const pageNumber = getPageNumber(selection.anchorNode)
-    const startIndex = getIndex(selection.anchorNode)
-    const endIndex = getIndex(selection.focusNode)
-    // console.log('t:', pageNumber, startIndex, endIndex)
-
-    // When no text is selected.
-    if ((pageNumber === null || pageNumber === undefined)
-      || (startIndex === null || startIndex === undefined)
-      || (endIndex === null || endIndex === undefined)) {
-      return { rects : null, selectedText : null, textRange : null }
-    }
-
-    // TODO a little tricky.
-    const { text, textRange } = window.getText(pageNumber, startIndex, endIndex)
-    // console.log('text:', text)
-    // console.log('textRange:', textRange)
-
-    // Bug detect.
-    // This selects loadingIcon and/or loadingSpacer.
-    if (selection.anchorNode && selection.anchorNode.tagName === 'DIV') {
-      return { rects : null, selectedText : null, textRange : null }
-    }
-
-    if (rects.length > 0 && rects[0].width > 0 && rects[0].height > 0) {
-      return { rects : mergeRects(rects), selectedText : text, textRange }
-    }
-
-  } catch (e) {
-    console.log('ERROR:', e)
-  }
-
-  return { rects : null, selectedText : null, textRange : null }
-}
-
-function getPageNumber (elm) {
-  if (elm.parentNode.hasAttribute('data-page')) {
-    return parseInt(elm.parentNode.getAttribute('data-page'), 10)
-  } else if (elm.hasAttribute && elm.hasAttribute('data-page')) {
-    return parseInt(elm.getAttribute('data-page'), 10)
-  }
-  return null
-}
-
-function getIndex (elm) {
-  if (elm.parentNode.hasAttribute('data-index')) {
-    return parseInt(elm.parentNode.getAttribute('data-index'), 10)
-  } else if (elm.hasAttribute && elm.hasAttribute('data-index')) {
-    return parseInt(elm.getAttribute('data-index'), 10)
-  }
-  return null
 }
 
 /**
@@ -191,28 +113,10 @@ function saveSpan ({
   knob = true
 }) {
 
-  console.log('saveSpan:', ...arguments)
-
   if (!rects) {
     return
   }
 
-  let paddingTop = 9
-  let pageHeight = window.PDFView.pdfViewer.getPageView(0).viewport.viewBox[3]
-  let merginBetweenPages = 1
-  let pageTopY = paddingTop + (paddingTop + pageHeight + merginBetweenPages) * (page - 1)
-
-  // selectedText = rects.map(rect => {
-  //   if (!rect) {
-  //     return ' '
-  //   } else {
-  //     return rect.char
-  //   }
-  // }).join('')
-  //
-  // console.log('saveSpan:', selectedText, rects)
-
-  // Initialize the annotation
   let annotation = {
     rectangles : rects,
     selectedText,
@@ -223,7 +127,6 @@ function saveSpan ({
     page,
     knob
   }
-
 
   // Save.
   let spanAnnotation = SpanAnnotation.newInstance(annotation)
@@ -269,10 +172,8 @@ export function createSpan ({ text = null, zIndex = 10, color = null }) {
     return null
 
   } else {
-    let targets = findTexts(currentPage, startPosition, endPosition)
-    // Remove null(this means whitespace) items.
-    // targets = targets.filter(item => item)
 
+    let targets = findTexts(currentPage, startPosition, endPosition)
     if (targets.length === 0) {
       return null
     }
@@ -289,7 +190,6 @@ export function createSpan ({ text = null, zIndex = 10, color = null }) {
       zIndex,
       color,
       textRange: [ startPosition, endPosition ],
-      // page : currentPage,
       selectedText
     })
 
@@ -322,8 +222,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Find the data in pdftxt.
     const item = window.findText(page, scaleDown({ x, y }))
-    console.log('item:', item) // { position, char, x, y, w, h }
-
     if (item) {
       if (!startPosition || !endPosition) {
         startPosition = item.position
@@ -344,9 +242,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     let targets = findTexts(currentPage, startPosition, endPosition)
-    // Remove null(this means whitespace) items.
-    targets = targets.filter(item => item)
-
     if (targets.length > 0) {
       const mergedRect = mergeRects(targets)
       spanAnnotation = saveSpan({
@@ -409,8 +304,4 @@ let startPosition = null
 let endPosition = null
 let currentPage = null
 let spanAnnotation = null
-
-
-
-let selectedText
 
