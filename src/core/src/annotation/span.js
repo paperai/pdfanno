@@ -63,13 +63,23 @@ export default class SpanAnnotation extends AbstractAnnotation {
     d.rectangles = position.map(p => {
       return {
         x      : p[0],
-        y      : convertFromExportY(d.page, p[1]),
+        // y      : convertFromExportY(d.page, p[1]),
+        y      : p[1],
         width  : p[2],
         height : p[3]
       }
     })
     let span = SpanAnnotation.newInstance(d)
     return span
+
+    // let rectangles = annotation.rectangles.map(rectangle => {
+    //   return [
+    //     rectangle.x,
+    //     rectangle.y,
+    //     rectangle.width,
+    //     rectangle.height
+    //   ]
+    // })
   }
 
   /**

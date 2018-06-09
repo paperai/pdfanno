@@ -1,5 +1,8 @@
 import { renderKnob } from './renderKnob'
 import { hex2rgba } from '../utils/color'
+import ANNO_VERSION from '../version'
+
+console.log('ANNO_VERSION:', ANNO_VERSION)
 
 /**
  * Create a Span element.
@@ -23,21 +26,12 @@ export function renderSpan (a) {
 
   const rectangles = a.rectangles.map(r => {
     return {
-      x      : r.left,
-      y      : r.top + pageTopY,
+      x      : r.x || r.left,
+      y      : (r.y || r.top) + pageTopY,
       width  : r.width || r.right - r.left,
       height : r.height || r.bottom - r.top
     }
   }).filter(r => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1)
-
-  console.log('pageTopY:', a.page, pageTopY, rectangles, a.rectangles.map(r => {
-    return {
-      x      : r.left,
-      y      : r.top + pageTopY,
-      width  : r.width || r.right - r.left,
-      height : r.height || r.bottom - r.top
-    }
-  }))
 
   rectangles.forEach(r => {
     $base.append(createRect(r, color, readOnly))

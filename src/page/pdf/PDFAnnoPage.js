@@ -506,11 +506,19 @@ export default class PDFAnnoPage {
     if (annotation) {
 
       // scroll to.
-      let _y = annotation.y || annotation.y1 || annotation.rectangles[0].y
-      let { pageNumber, y } = convertToExportY(_y)
+      let pageNumber, y
+      if (annotation.type === 'span') {
+        pageNumber = annotation.page
+        y = annotation.rectangles[0].y
+      } else {
+        let _y = annotation.y || annotation.y1
+        let d = convertToExportY(_y)
+        pageNumber = d.pageNumber
+        y = d.y
+      }
       let pageHeight = window.annoPage.getViewerViewport().height
       let scale = window.annoPage.getViewerViewport().scale
-      _y = (pageHeight + paddingBetweenPages) * (pageNumber - 1) + y * scale
+      let _y = (pageHeight + paddingBetweenPages) * (pageNumber - 1) + y * scale
       _y -= 100
       $('#viewer').parent()[0].scrollTop = _y
 

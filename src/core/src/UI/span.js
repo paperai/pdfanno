@@ -367,6 +367,10 @@ window.addEventListener('DOMContentLoaded', () => {
   const $viewer = $('#viewer')
 
   $viewer.on('mousedown', '.canvasWrapper', e => {
+    if (otherAnnotationTreating) {
+      // Ignore, if other annotation is detected.
+      return
+    }
     mouseDown = true
     items = []
     currentPage = null
@@ -388,6 +392,14 @@ window.addEventListener('DOMContentLoaded', () => {
       makeSelections(e)
     }
     mouseDown = false
+  })
+
+  let otherAnnotationTreating = false
+  window.addEventListener('annotationHoverIn', () => {
+    otherAnnotationTreating = true
+  })
+  window.addEventListener('annotationHoverOut', () => {
+    otherAnnotationTreating = false
   })
 
 })
