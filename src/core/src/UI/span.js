@@ -296,6 +296,9 @@ window.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('annotationHoverOut', () => {
     otherAnnotationTreating = false
   })
+  window.addEventListener('annotationDeleted', () => {
+    otherAnnotationTreating = false
+  })
 
 })
 
