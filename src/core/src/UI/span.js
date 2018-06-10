@@ -285,6 +285,9 @@ window.addEventListener('DOMContentLoaded', () => {
   $viewer.on('mouseup', '.canvasWrapper', e => {
     if (mouseDown) {
       makeSelections(e)
+      if (spanAnnotation) {
+        spanAnnotation.deselect()
+      }
     }
     mouseDown = false
   })
