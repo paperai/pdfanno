@@ -110,7 +110,8 @@ function saveSpan ({
   page = 1,
   save = true,
   focusToLabel = true,
-  knob = true
+  knob = true,
+  border = true
 }) {
 
   if (!rects) {
@@ -125,7 +126,8 @@ function saveSpan ({
     zIndex,
     color,
     page,
-    knob
+    knob,
+    border
   }
 
   // Save.
@@ -250,7 +252,8 @@ window.addEventListener('DOMContentLoaded', () => {
         save         : false,
         focusToLabel : false,
         color        : '#0f0',
-        knob         : false
+        knob         : false,
+        border       : false
       })
       spanAnnotation.disable()
     }
