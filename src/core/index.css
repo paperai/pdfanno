@@ -69,8 +69,13 @@
 }
 .--hover .anno-span__area,
 .--selected .anno-span__area {
-  border: 2px dashed black !important;
+  border: 2px dashed black;
   box-sizing: border-box;
+}
+.anno-span__area.no-border,
+.--hover .anno-span__area.no-border,
+.--selected .anno-span__area.no-border {
+  border-width: 0;
 }
 .anno-span__border {
     position: absolute;

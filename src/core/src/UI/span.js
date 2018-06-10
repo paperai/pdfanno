@@ -110,7 +110,8 @@ function saveSpan ({
   page = 1,
   save = true,
   focusToLabel = true,
-  knob = true
+  knob = true,
+  border = true
 }) {
 
   if (!rects) {
@@ -125,7 +126,8 @@ function saveSpan ({
     zIndex,
     color,
     page,
-    knob
+    knob,
+    border
   }
 
   // Save.
@@ -224,10 +226,17 @@ window.addEventListener('DOMContentLoaded', () => {
     const item = window.findText(page, scaleDown({ x, y }))
     if (item) {
       if (!startPosition || !endPosition) {
+        initPosition = item.position
         startPosition = item.position
         endPosition = item.position
       } else {
-        endPosition = item.position
+        if (item.position < initPosition) {
+          startPosition = item.position
+          endPosition = initPosition
+        } else {
+          startPosition = initPosition
+          endPosition = item.position
+        }
       }
     }
   }
@@ -250,7 +259,8 @@ window.addEventListener('DOMContentLoaded', () => {
         save         : false,
         focusToLabel : false,
         color        : '#0f0',
-        knob         : false
+        knob         : false,
+        border       : false
       })
       spanAnnotation.disable()
     }
@@ -269,6 +279,7 @@ window.addEventListener('DOMContentLoaded', () => {
     mouseDown = true
     items = []
     currentPage = null
+    initPosition = null
     startPosition = null
     endPosition = null
     if (spanAnnotation) {
@@ -285,6 +296,9 @@ window.addEventListener('DOMContentLoaded', () => {
   $viewer.on('mouseup', '.canvasWrapper', e => {
     if (mouseDown) {
       makeSelections(e)
+      if (spanAnnotation) {
+        spanAnnotation.deselect()
+      }
     }
     mouseDown = false
   })
@@ -296,10 +310,14 @@ window.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('annotationHoverOut', () => {
     otherAnnotationTreating = false
   })
+  window.addEventListener('annotationDeleted', () => {
+    otherAnnotationTreating = false
+  })
 
 })
 
 let mouseDown = false
+let initPosition = null
 let startPosition = null
 let endPosition = null
 let currentPage = null

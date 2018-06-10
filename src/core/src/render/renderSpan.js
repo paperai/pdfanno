@@ -34,17 +34,11 @@ export function renderSpan (a) {
   }).filter(r => r.width > 0 && r.height > 0 && r.x > -1 && r.y > -1)
 
   rectangles.forEach(r => {
-    $base.append(createRect(r, color, readOnly))
+    $base.append(createRect(a, r, color, readOnly))
   })
-
-  // a.rectangles.forEach(r => {
-  //   $base.append(createRect(r, color, readOnly))
-  // })
 
   if (a.knob) {
     $base.append(renderKnob({
-      // x : a.rectangles[0].x,
-      // y : a.rectangles[0].y,
       x : rectangles[0].x,
       y : rectangles[0].y,
       readOnly
@@ -54,7 +48,7 @@ export function renderSpan (a) {
   return $base[0]
 }
 
-function createRect (r, color, readOnly) {
+function createRect (a, r, color, readOnly) {
 
   if (readOnly) {
     return $('<div class="anno-span__border"/>').css({
@@ -68,8 +62,9 @@ function createRect (r, color, readOnly) {
   } else {
 
     const rgba = hex2rgba(color, 0.4)
+    const borderCss = (a.border === false ? 'no-border' : '')
 
-    return $('<div class="anno-span__area"/>').css({
+    return $(`<div class="anno-span__area ${borderCss}"/>`).css({
       top             : r.y + 'px',
       left            : r.x + 'px',
       width           : r.width + 'px',

@@ -13,17 +13,18 @@ export default class SpanAnnotation extends AbstractAnnotation {
   constructor () {
     super()
 
-    this.uuid       = null
-    this.type       = 'span'
-    this.rectangles = []
-    this.text       = null
-    this.color      = null
-    this.readOnly   = false
+    this.uuid         = null
+    this.type         = 'span'
+    this.rectangles   = []
+    this.text         = null
+    this.color        = null
+    this.readOnly     = false
     this.selectedText = null
-    this.textRange = null
-    this.page      = null
-    this.knob      = true
-    this.$element   = this.createDummyElement()
+    this.textRange    = null
+    this.page         = null
+    this.knob         = true
+    this.border       = true
+    this.$element     = this.createDummyElement()
 
     window.globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
     window.globalEvent.on('enableViewMode', this.enableViewMode)
@@ -33,7 +34,6 @@ export default class SpanAnnotation extends AbstractAnnotation {
    * Create an instance from an annotation data.
    */
   static newInstance (annotation) {
-    console.log('newInstance:', annotation.selectedText)
     let a          = new SpanAnnotation()
     a.uuid         = annotation.uuid || uuid()
     a.rectangles   = annotation.rectangles
@@ -45,7 +45,7 @@ export default class SpanAnnotation extends AbstractAnnotation {
     a.page         = annotation.page
     a.zIndex       = annotation.zIndex || 10
     a.knob         = (typeof annotation.knob === 'boolean' ? annotation.knob : true)
-    console.log('newInstance', a.knob, annotation.knob)
+    a.border       = annotation.border !== false
     return a
   }
 
@@ -71,15 +71,6 @@ export default class SpanAnnotation extends AbstractAnnotation {
     })
     let span = SpanAnnotation.newInstance(d)
     return span
-
-    // let rectangles = annotation.rectangles.map(rectangle => {
-    //   return [
-    //     rectangle.x,
-    //     rectangle.y,
-    //     rectangle.width,
-    //     rectangle.height
-    //   ]
-    // })
   }
 
   /**
