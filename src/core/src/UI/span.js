@@ -226,10 +226,17 @@ window.addEventListener('DOMContentLoaded', () => {
     const item = window.findText(page, scaleDown({ x, y }))
     if (item) {
       if (!startPosition || !endPosition) {
+        initPosition = item.position
         startPosition = item.position
         endPosition = item.position
       } else {
-        endPosition = item.position
+        if (item.position < initPosition) {
+          startPosition = item.position
+          endPosition = initPosition
+        } else {
+          startPosition = initPosition
+          endPosition = item.position
+        }
       }
     }
   }
@@ -272,6 +279,7 @@ window.addEventListener('DOMContentLoaded', () => {
     mouseDown = true
     items = []
     currentPage = null
+    initPosition = null
     startPosition = null
     endPosition = null
     if (spanAnnotation) {
@@ -309,6 +317,7 @@ window.addEventListener('DOMContentLoaded', () => {
 })
 
 let mouseDown = false
+let initPosition = null
 let startPosition = null
 let endPosition = null
 let currentPage = null

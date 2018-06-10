@@ -63,7 +63,7 @@ function createRect (a, r, color, readOnly) {
 
     const rgba = hex2rgba(color, 0.4)
     const borderCss = (a.border === false ? 'no-border' : '')
-    
+
     return $(`<div class="anno-span__area ${borderCss}"/>`).css({
       top             : r.y + 'px',
       left            : r.x + 'px',
