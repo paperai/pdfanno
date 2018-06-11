@@ -20,9 +20,11 @@ export function renderSpan (a) {
 
 
   let paddingTop = 9
-  const viewBox = window.PDFView.pdfViewer.getPageView(0).viewport.viewBox
+  const pageView = window.PDFView.pdfViewer.getPageView(0)
+  const viewport = pageView.viewport
+  const viewBox = viewport.viewBox
   let pageHeight = viewBox[3] - viewBox[1]
-  let merginBetweenPages = 1
+  let merginBetweenPages =  1 // - (viewBox[1] * (pageView.scale - 1))
   let pageTopY = paddingTop + (paddingTop + pageHeight + merginBetweenPages) * (a.page - 1)
 
   const rectangles = a.rectangles.map(r => {
