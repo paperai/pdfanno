@@ -43,7 +43,7 @@ window.addEventListener('pagerendered', function (ev) {
   $('.page').css({
     'border-top-width'    : borderWidth,
     'border-bottom-width' : borderWidth,
-    'margin-bottom'       : marginBottom,
+    marginBottom,
     marginTop
   })
 })
