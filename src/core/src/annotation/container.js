@@ -1,5 +1,5 @@
 import { uuid } from 'anno-ui/src/utils'
-import ANNO_VERSION from '../version'
+import { ANNO_VERSION, PDFEXTRACT_VERSION } from '../version'
 import { toTomlString, fromTomlString } from '../utils/tomlString'
 import { dispatchWindowEvent } from '../utils/event'
 import { convertToExportY } from '../../../shared/coords'
@@ -132,6 +132,7 @@ export default class AnnotationContainer {
 
       // Set version.
       dataExport.version = ANNO_VERSION
+      dataExport['pdfextract-version'] = PDFEXTRACT_VERSION
 
       // Only writable.
       const annos = this.getAllAnnotations().filter(a => !a.readOnly)
@@ -156,7 +157,6 @@ export default class AnnotationContainer {
           // TODO Define at annotation/span.js
 
           // page.
-          // let { pageNumber } = convertToExportY(annotation.rectangles[0].y)
           let pageNumber = annotation.page
 
           // rectangles.
@@ -168,15 +168,6 @@ export default class AnnotationContainer {
                 rectangle.height
               ]
           })
-          // let rectangles = annotation.rectangles.map(rectangle => {
-          //   const { y } = convertToExportY(rectangle.y)
-          //   return [
-          //     rectangle.x,
-          //     y,
-          //     rectangle.width,
-          //     rectangle.height
-          //   ]
-          // })
 
           let text = (annotation.selectedText || '')
             .replace(/\r\n/g, ' ')

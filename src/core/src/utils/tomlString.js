@@ -10,11 +10,13 @@ export function toTomlString (obj, root = true) {
 
   let lines = []
 
-  // `version` is first.
+  // `version` and `pdfextract-version` are the first.
   if ('version' in obj) {
     lines.push(`version = "${obj['version']}"`)
+    lines.push(`pdfextract-version = "${obj['pdfextract-version']}"`)
     lines.push('')
     delete obj['version']
+    delete obj['pdfextract-version']
   }
 
   // #paperanno-ja/issues/38
