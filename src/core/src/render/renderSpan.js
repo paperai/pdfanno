@@ -24,7 +24,7 @@ export function renderSpan (a) {
   const viewport = pageView.viewport
   const viewBox = viewport.viewBox
   let pageHeight = viewBox[3] - viewBox[1]
-  let merginBetweenPages =  1 // - (viewBox[1] * (pageView.scale - 1))
+  let merginBetweenPages =  1
   let pageTopY = paddingTop + (paddingTop + pageHeight + merginBetweenPages) * (a.page - 1)
 
   const rectangles = a.rectangles.map(r => {
@@ -72,7 +72,8 @@ function createRect (a, r, color, readOnly) {
       left            : r.x + 'px',
       width           : r.width + 'px',
       height          : r.height + 'px',
-      backgroundColor : rgba
+      backgroundColor : rgba,
+      borderColor     : color
     })
   }
 }
