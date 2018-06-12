@@ -65,11 +65,11 @@
 }
 .anno-span__area {
     position: absolute;
-    border: 1px dashed black;
+    border: 1px solid black;
 }
 .--hover .anno-span__area,
 .--selected .anno-span__area {
-  border: 2px dashed black;
+  border: 1px dashed black !important;
   box-sizing: border-box;
 }
 .anno-span__area.no-border,
@@ -99,7 +99,7 @@
 .--selected .anno-relation-outline {
   visibility: visible;
   stroke: black;
-  stroke-width: 4px;
+  stroke-width: 3px;
   pointer-events: stroke;
   stroke-dasharray: 5;
 }

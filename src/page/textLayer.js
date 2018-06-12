@@ -137,6 +137,11 @@ window.findText = function (page, point) {
 window.findTexts = function (page, startPosition, endPosition) {
 
   const items = []
+
+  if (startPosition == null || endPosition == null) {
+    return items
+  }
+
   let inRange = false
 
   for (let index = 0, len = pages[page - 1].meta.length; index < len; index++) {
