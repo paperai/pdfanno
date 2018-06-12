@@ -99,7 +99,7 @@
 .--selected .anno-relation-outline {
   visibility: visible;
   stroke: black;
-  stroke-width: 4px;
+  stroke-width: 3px;
   pointer-events: stroke;
   stroke-dasharray: 5;
 }
