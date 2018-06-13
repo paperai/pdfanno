@@ -14,7 +14,7 @@ import * as annoUI from 'anno-ui'
 // Get data from URL query.
 const params = parseUrlQuery()
 const apiRoot = params['api_root']
-const documentId = params['document_id']
+const paperId = params['paper_id']
 const userToken = params['user_token']
 const userId = params['user_id']
 const moveTo = params['move']
@@ -23,7 +23,7 @@ const moveTo = params['move']
  * Check whether PDFAnno should behave for DeepScholar.
  */
 export function isTarget () {
-  return apiRoot && documentId
+  return apiRoot && paperId
 }
 
 /**
@@ -70,7 +70,7 @@ export async function initialize () {
  */
 async function fetchResources () {
   const params = parseUrlQuery()
-  let url = window.API_ROOT + `internal/api/deepscholar/${params['document_id']}`
+  let url = window.API_ROOT + `internal/api/deepscholar/${paperId}`
   const queries = Object.keys(params).map(key => {
     return `${key}=${params[key]}`
   })
@@ -94,7 +94,7 @@ async function fetchResources () {
  */
 async function uploadAnnotation (anno) {
 
-  const url = window.API_ROOT + `internal/api/deepscholar/${documentId}/annotations`
+  const url = window.API_ROOT + `internal/api/deepscholar/${paperId}/annotations`
   const response = await fetch(url, {
     method : 'PUT',
     body   : JSON.stringify({
@@ -140,7 +140,7 @@ function addTextLayer (pdftxt) {
 
 function displayDocumentName () {
   $('#dropdownPdf').addClass('no-action')
-  $('#dropdownPdf .js-text').text(documentId)
+  $('#dropdownPdf .js-text').text(paperId)
   $('#dropdownPdf .caret').remove()
 }
 
