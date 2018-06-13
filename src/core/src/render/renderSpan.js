@@ -18,6 +18,12 @@ export function renderSpan (a) {
   const $base = $('<div class="anno-span"/>')
     .css('zIndex', a.zIndex || 10)
 
+  if (!a.page) {
+    if (a.rectangles.length > 0) {
+      a.page = a.rectangles[0].page
+    }
+  }
+
 
   let paddingTop = 9
   const pageView = window.PDFView.pdfViewer.getPageView(0)
