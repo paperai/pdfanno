@@ -24,8 +24,10 @@ export function setup (analyzeData) {
  */
 window.findText = function (page, point) {
 
-  for (let index = 0, len = pages[page - 1].meta.length; index < len; index++) {
-    const info = pages[page - 1].meta[index]
+  const metaList = pages[page - 1].meta
+
+  for (let i = 0, len = metaList.length; i < len; i++) {
+    const info = metaList.meta[i]
 
     if (!info) {
       continue
@@ -58,11 +60,13 @@ window.findTexts = function (page, startPosition, endPosition) {
     return items
   }
 
+  const metaList = pages[page - 1].meta
+
   let inRange = false
 
-  for (let index = 0, len = pages[page - 1].meta.length; index < len; index++) {
+  for (let index = 0, len = metaList.length; index < len; index++) {
 
-    const info = pages[page - 1].meta[index]
+    const info = metaList[index]
 
     if (!info) {
       if (inRange) {
