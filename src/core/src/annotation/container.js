@@ -153,77 +153,20 @@ export default class AnnotationContainer {
 
         // Span.
         if (annotation.type === 'span') {
-
-          // TODO Define at annotation/span.js
-
-          // page.
-          let pageNumber = annotation.page
-
-          // rectangles.
-          let rectangles = annotation.rectangles.map(rectangle => {
-              return [
-                rectangle.x,
-                rectangle.y,
-                rectangle.width,
-                rectangle.height
-              ]
-          })
-
-          let text = (annotation.selectedText || '')
-            .replace(/\r\n/g, ' ')
-            .replace(/\r/g, ' ')
-            .replace(/\n/g, ' ')
-            .replace(/"/g, '')
-            .replace(/\\/g, '')
-
-          dataExport[id] = {
-            type      : annotation.type,
-            page      : pageNumber,
-            position  : rectangles,
-            label     : annotation.text || '',
-            text,
-            textrange : annotation.textRange
-          }
-
+          dataExport[id] = annotation.export()
           // Save temporary for relation.
           annotation.exportId = id
 
-          // Relation.
+        // Relation.
         } else if (annotation.type === 'relation') {
-
-          // TODO Define at annotation/relation.js
-
-          dataExport[id] = {
-            type  : 'relation',
-            dir   : annotation.direction,
-            ids   : [ annotation.rel1Annotation.exportId, annotation.rel2Annotation.exportId ],
-            label : annotation.text || ''
-          }
-
-          // Rect.
-        } else if (annotation.type === 'rect') {
-
-          /*
-              [2]
-              type = "rect"
-              page = 1
-              position = ["9.24324324324326","435.94054054054055","235.7027027027027","44.65945945945946"]
-              label = "aaaa"
-          */
-          let { pageNumber, y } = convertToExportY(annotation.y)
-
-          dataExport[id] = {
-            type     : 'rect',
-            page     : pageNumber,
-            position : [ annotation.x, y, annotation.width, annotation.height ],
-            label    : annotation.text || ''
-          }
-
-          // Save temporary for relation.
-          annotation.exportId = id
-
+          dataExport[id] = annotation.export()
         }
 
+      })
+
+      // Remove exportId.
+      annos.forEach(annotation => {
+        delete annotation.exportId
       })
 
       resolve(toTomlString(dataExport))
