@@ -59,7 +59,7 @@ window.findTexts = function (page, startPosition, endPosition) {
   if (startPosition == null || endPosition == null) {
     return items
   }
-  
+
   const metaList = pages[page - 1].meta
 
   let inRange = false
@@ -90,7 +90,6 @@ window.findTexts = function (page, startPosition, endPosition) {
 
   return items
 }
-
 
 /**
  * Merge user selections.
