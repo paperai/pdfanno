@@ -11,7 +11,7 @@ function scale () {
  */
 function mergeRects (rects) {
 
-  // Remove null ones.
+  // Remove null.
   rects = rects.filter(rect => rect)
 
   // Normalize.
@@ -22,9 +22,6 @@ function mergeRects (rects) {
     rect.bottom = rect.bottom || (rect.y + rect.h)
     return rect
   })
-
-  // Trim a rect which is almost same to other.
-  rects = trimRects(rects)
 
   // a virtical margin of error.
   const error = 5 * scale()
@@ -49,26 +46,6 @@ function mergeRects (rects) {
       tmp = convertToObject(rects[i])
       newRects.push(tmp)
     }
-  }
-
-  return newRects
-}
-
-/**
- * Trim rects which is almost same other.
- */
-function trimRects (rects) {
-
-  const error = 1.5 * scale()
-
-  let newRects = [rects[0]]
-
-  for (let i = 1; i < rects.length; i++) {
-    if (Math.abs(rects[i].left - rects[i - 1].left) < error) {
-      // Almost same.
-      continue
-    }
-    newRects.push(rects[i])
   }
 
   return newRects
@@ -260,14 +237,12 @@ window.addEventListener('DOMContentLoaded', () => {
         focusToLabel : false,
         color        : '#0f0',
         knob         : false,
-        border       : false
+        border       : false,
+        textRange    : [ startPosition, endPosition ]
       })
       spanAnnotation.disable()
     }
   }
-
-  let items = []
-
 
   const $viewer = $('#viewer')
 
@@ -277,7 +252,6 @@ window.addEventListener('DOMContentLoaded', () => {
       return
     }
     mouseDown = true
-    items = []
     currentPage = null
     initPosition = null
     startPosition = null

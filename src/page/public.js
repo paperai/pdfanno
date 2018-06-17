@@ -124,33 +124,14 @@ export class PublicSpanAnnotation {
 
   constructor ({ page, position, label = '', text = '', id = 0, uuid = '', zIndex = 10, textrange = [], color = null }) {
 
-    console.log('PublicSpanAnnotation:', zIndex)
-
     // Check inputs.
     if (!page || typeof page !== 'number') {
       throw new Error('Set the page as number.')
     }
-    if (!position) {
-      throw new Error('Set the position.')
-    }
-
-    // position: String -> Float.
-    position = position.map(p => p.map(pp => parseFloat(pp)))
-
-    // Convert.
-    position = position.map(p => {
-      return {
-        page   : page,
-        x      : p[0],
-        y      : convertFromExportY(page, p[1]),
-        width  : p[2],
-        height : p[3]
-      }
-    })
 
     let span = window.annoPage.createSpanAnnotation({
       uuid,
-      rectangles   : position,
+      page,
       text         : label,
       color        : color || '#FFEB3B',
       readOnly     : false,
