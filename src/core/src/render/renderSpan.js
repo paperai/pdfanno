@@ -59,6 +59,8 @@ export function renderSpan (a) {
 
 function createRect (a, r, color, readOnly) {
 
+  /*
+  // #135 Change the style of Reference Anno
   if (readOnly) {
     return $('<div class="anno-span__border"/>').css({
       top         : r.y + 'px',
@@ -82,4 +84,19 @@ function createRect (a, r, color, readOnly) {
       borderColor     : color
     })
   }
+  */
+
+  let className = readOnly ? 'anno-span__border' : 'anno-span__area'
+  if (a.border === false) {
+    className += ' no-border'
+  }
+
+  return $(`<div class="${className}"/>`).css({
+    top             : r.y + 'px',
+    left            : r.x + 'px',
+    width           : r.width + 'px',
+    height          : r.height + 'px',
+    backgroundColor : hex2rgba(color, 0.4),
+    borderColor     : color
+  })
 }

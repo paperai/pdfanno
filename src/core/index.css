@@ -78,9 +78,13 @@
   border-width: 0;
 }
 .anno-span__border {
-    position: absolute;
-    border-bottom-width: 1px;
-    border-bottom-style: solid;
+  position: absolute;
+  /*
+  #135 Change the style of Reference Anno
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  */
+  border: 1px solid black;
 }
 
 /*TODO Relationを描画した直後は、位置が少しずれる。その後にフォーカスが外れると正しい位置へ移動する。*/
@@ -141,4 +145,3 @@
 body.disable-text-layer .textLayer {
     display: none;
 }
-
