@@ -313,15 +313,5 @@ function getPDFName (url) {
 }
 window.getPDFName = getPDFName
 
-// UserID.
-window.addEventListener('DOMContentLoaded', () => {
-
-  let userId = URI(document.URL).query(true).user_id
-  if (!userId) {
-    userId = annoUI.util.uuid(5)
-  }
-  $('#userId').val(userId)
-})
-
 // WebSocket.
 ws.setup()

@@ -1,6 +1,7 @@
 import { uuid } from 'anno-ui/src/utils'
 import AbstractAnnotation from './abstract'
 import { convertFromExportY } from '../../../shared/coords'
+import appendChild from '../render/appendChild'
 
 /**
  * Span Annotation.
@@ -36,7 +37,6 @@ export default class SpanAnnotation extends AbstractAnnotation {
   static newInstance (annotation) {
     let a          = new SpanAnnotation()
     a.uuid         = annotation.uuid || uuid()
-    a.rectangles   = annotation.rectangles
     a.text         = annotation.text
     a.color        = annotation.color
     a.readOnly     = annotation.readOnly || false
@@ -46,6 +46,12 @@ export default class SpanAnnotation extends AbstractAnnotation {
     a.zIndex       = annotation.zIndex || 10
     a.knob         = (typeof annotation.knob === 'boolean' ? annotation.knob : true)
     a.border       = annotation.border !== false
+
+    // Calc the position.
+    let rects = window.findTexts(a.page, a.textRange[0], a.textRange[1])
+    rects = window.mergeRects(rects)
+    a.rectangles = rects
+
     return a
   }
 
@@ -54,24 +60,30 @@ export default class SpanAnnotation extends AbstractAnnotation {
    */
   static newInstanceFromTomlObject (tomlObject) {
     let d = tomlObject
-    // position: String -> Float.
-    let position = d.position.map(p => p.map(parseFloat))
     d.selectedText = d.text
     d.text = d.label
     d.textRange = d.textrange
-    // Convert.
-    d.rectangles = position.map(p => {
-      return {
-        x      : p[0],
-        // y      : convertFromExportY(d.page, p[1]),
-        y      : p[1],
-        width  : p[2],
-        height : p[3]
-      }
-    })
     let span = SpanAnnotation.newInstance(d)
     return span
   }
+
+  /**
+   * Render annotation(s).
+   */
+  render () {
+
+    if (!this.rectangles || this.rectangles.length === 0) {
+      if (!this.page || !this.textRange) {
+        return console.log('ERROR: span missing page or textRange. span=', this)
+      }
+      let rects = window.findTexts(this.page, this.textRange[0], this.textRange[1])
+      rects = window.mergeRects(rects)
+      this.rectangles = rects
+    }
+
+    return super.render()
+  }
+
 
   /**
    * Set a hover event.
@@ -194,6 +206,24 @@ export default class SpanAnnotation extends AbstractAnnotation {
    */
   handleClickEvent (e) {
     super.handleClickEvent(e)
+  }
+
+  export () {
+
+    let text = (this.selectedText || '')
+      .replace(/\r\n/g, ' ')
+      .replace(/\r/g, ' ')
+      .replace(/\n/g, ' ')
+      .replace(/"/g, '')
+      .replace(/\\/g, '')
+
+    return {
+      type      : this.type,
+      page      : this.page,
+      label     : this.text || '',
+      text,
+      textrange : this.textRange
+    }
   }
 
   /**
