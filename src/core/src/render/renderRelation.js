@@ -55,13 +55,16 @@ export function renderRelation (a) {
   if (!document.querySelector('#' + markerId)) {
     let marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker')
     setAttributes(marker, {
-      viewBox      : '0 0 10 10',
-      markerWidth  : 2,
-      markerHeight : 3,
-      fill         : a.color,
-      id           : markerId,
-      orient       : 'auto-start-reverse'
+      viewBox : '0 0 10 10',
+      // markerWidth  : 2,
+      // markerHeight : 3,
+      fill    : a.color,
+      id      : markerId,
+      orient  : 'auto-start-reverse'
     })
+    marker.setAttribute('preserveAspectRatio', 'none')
+    marker.setAttribute('markerWidth', 5)
+    marker.setAttribute('markerHeight', 5)
     marker.setAttribute('refX', 5)
     marker.setAttribute('refY', 5)
     group.appendChild(marker)
