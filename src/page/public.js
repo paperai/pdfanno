@@ -1,6 +1,7 @@
 import { uuid } from 'anno-ui/src/utils'
 import toml from 'toml'
 import { convertFromExportY } from '../shared/coords'
+import * as annoUI from 'anno-ui'
 
 /**
  * Expose public APIs.
@@ -23,7 +24,6 @@ export function expose () {
  */
 export function addAllAnnotations (tomlObject) {
 
-  // let result = {}
   let results = []
 
   for (const key in tomlObject) {
@@ -36,6 +36,8 @@ export function addAllAnnotations (tomlObject) {
 
     data.id = key
     data.uuid = uuid()
+
+    setColor(data)
 
     let a
     if (data.type === 'span') {
@@ -51,7 +53,6 @@ export function addAllAnnotations (tomlObject) {
 
     if (a) {
       addAnnotation(a)
-      // result[key] = a
       results.push(a)
     }
   }
@@ -60,6 +61,30 @@ export function addAllAnnotations (tomlObject) {
   return results
 
 }
+
+/**
+ * Set the color to the annotation.
+ * @param data - Annotation.
+ */
+function setColor (data) {
+
+  const colorMap = annoUI.labelInput.getColorMap()
+
+  let colors = null
+  if (data.type === 'span') {
+    colors = colorMap[data.type]
+  } else {
+    colors = colorMap[data.dir]
+  }
+
+  if (colors) {
+    const color = colors[data.label]
+    if (color) {
+      data.color = color
+    }
+  }
+}
+
 
 /**
  * Add an annotation, and render it.
@@ -149,7 +174,7 @@ export class PublicSpanAnnotation {
  */
 export class PublicRelationAnnotation {
 
-  constructor ({ dir, ids, label = '', id = 0, uuid = '' }) {
+  constructor ({ dir, ids, label = '', id = 0, uuid = '', color = '#FF0000' }) {
 
     // Check inputs.
     if (!dir) {
@@ -165,7 +190,7 @@ export class PublicRelationAnnotation {
       rel1      : typeof ids[0] === 'object' ? ids[0].annotation : ids[0],
       rel2      : typeof ids[1] === 'object' ? ids[1].annotation : ids[1],
       text      : label,
-      color     : '#FF0000',
+      color,
       readOnly  : false
     })
 
