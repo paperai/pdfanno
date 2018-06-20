@@ -77,7 +77,7 @@ function disable () {
 function getDownloadFileName () {
 
   if (parseUrlQuery()['paper_id']) {
-    return parseUrlQuery()['paper_id'] + '.pdftxt'
+    return parseUrlQuery()['paper_id'] + '.pdf.txt'
   }
 
   // TODO Refactoring. this function is similar to the one in downloadButton.
