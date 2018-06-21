@@ -250,8 +250,8 @@ function setupUI () {
   annoUI.downloadButton.setup({
     getAnnotationTOMLString : window.annoPage.exportData,
     getCurrentContentName   : () => {
-      if (parseUrlQuery()['document_id']) {
-        return parseUrlQuery()['document_id'] + '.pdf'
+      if (parseUrlQuery()['paper_id']) {
+        return parseUrlQuery()['paper_id'] + '.pdf'
       }
       return window.annoPage.getCurrentContentFile().name
     },

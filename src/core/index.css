@@ -75,7 +75,7 @@
 .anno-span__area.no-border,
 .--hover .anno-span__area.no-border,
 .--selected .anno-span__area.no-border {
-  border-width: 0;
+  border-width: 0 !important;
 }
 .anno-span__border {
   position: absolute;
