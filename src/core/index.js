@@ -29,13 +29,23 @@ window.addEventListener('pagerendered', function (ev) {
     return
   }
 
+  adjustPageGaps()
   renderAnno()
+})
 
+// Adapt to scale change.
+window.addEventListener('scalechange', () => {
+  console.log('scalechange')
+  adjustPageGaps()
+  removeAnnoLayer()
+  renderAnno()
+})
+
+function adjustPageGaps () {
   // Issue Fix.
   // Correctly rendering when changing scaling.
   // The margin between pages is fixed(9px), and never be scaled in default,
   // then manually have to change the margin.
-
   let scale = window.PDFView.pdfViewer.getPageView(0).viewport.scale
   let borderWidth = `${9 * scale}px`
   let marginBottom = `${-9 * scale}px`
@@ -46,14 +56,7 @@ window.addEventListener('pagerendered', function (ev) {
     marginBottom,
     marginTop
   })
-})
-
-// Adapt to scale change.
-window.addEventListener('scalechange', () => {
-  console.log('scalechange')
-  removeAnnoLayer()
-  renderAnno()
-})
+}
 
 /*
  * Remove the annotation layer and the temporary rendering layer.

@@ -30,11 +30,13 @@ export function renderSpan (a) {
   const scale = viewport.scale
   // const viewBox = viewport.viewBox
   // let pageHeight = viewBox[3] - viewBox[1]
-  let merginBetweenPages =  1
+  // let merginBetweenPages =  1
 
   // #139 correct the absolute position of annotation
   // let pageTopY = paddingTop + (paddingTop + pageHeight + merginBetweenPages) * (a.page - 1)
-  let pageTopY = $('#pageContainer' + a.page).position().top / scale + paddingTop + merginBetweenPages
+  let pageTopY = $('#pageContainer' + a.page).position().top / scale + paddingTop
+
+  // console.log('renderSpan()', scale, pageTopY, a.rectangles)
 
   const rectangles = a.rectangles.map(r => {
     return {
