@@ -12,13 +12,13 @@ const service = require('../service')
  */
 module.exports.get = async (req, res) => {
 
-  const logs = [ 'api starts. ']
+  const logs = [ 'api starts. ' ]
 
   // Get conditions from the request.
   const deepScholar = {
     apiRoot    : req.query.api_root,
     documentId : req.param('documentId'),
-    token : req.query.token || req.query.user_token
+    token      : req.query.token || req.query.user_token
   }
 
   // Check is valid.
@@ -47,13 +47,27 @@ module.exports.get = async (req, res) => {
     logs.push(`got a PDF from ${docInfo.pdf}.`)
 
     // Get a pdftxt.
-    // TODO docInfo has `pdftxt` url, but it's not correct, so ignore it.
-    let pdftxt = service.loadCachePdftxt(pdf)
+    let pdftxt = null
+    if (docInfo.pdftxt && docInfo.pdftxt.toLowerCase().endsWith('.pdf.txt')) {
+      // from remote server.
+      pdftxt = await service.fetchPDFText(docInfo.pdftxt)
+      if (pdftxt) {
+        logs.push(`got a pdftxt from remove: ${docInfo.pdftxt}.`)
+      }
+    }
     if (!pdftxt) {
+      // from local cache.
+      pdftxt = service.loadCachePdftxt(pdf)
+      if (pdftxt) {
+        logs.push(`got a pdftxt from a local cache.`)
+      }
+    }
+    if (!pdftxt) {
+      // Create a new pdftxt and save it as a cache.
       pdftxt = await service.createPdftxt(pdf)
       service.savePdftxt(pdf, pdftxt)
+      logs.push(`create a new pdftxt.`)
     }
-    logs.push(`got a pdftxt from PDFExtractor.`)
 
     // Get annotations.
     let annotations = []
