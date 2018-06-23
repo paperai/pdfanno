@@ -46,6 +46,8 @@ module.exports.fetchPDF = async url => {
  */
 module.exports.fetchPDFText = async url => {
 
+  console.log('fetching a pdftxt from remove:', url)
+
   const options = {
     method   : 'GET',
     url      : url,
