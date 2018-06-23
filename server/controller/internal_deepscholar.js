@@ -52,7 +52,7 @@ module.exports.get = async (req, res) => {
       // from remote server.
       pdftxt = await service.fetchPDFText(docInfo.pdftxt)
       if (pdftxt) {
-        logs.push(`got a pdftxt from remove: ${docInfo.pdftxt}.`)
+        logs.push(`got a pdftxt from remote: ${docInfo.pdftxt}.`)
       }
     }
     if (!pdftxt) {
