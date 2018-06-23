@@ -12,53 +12,56 @@ const packageJson = require('../../package.json')
 
 module.exports.deepscholarService = require('./deepscholar')
 
-
 module.exports.fetchPDF = async url => {
 
-    const options = {
-        method   : 'GET',
-        url,
-        headers  : {
-            'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.124 Safari/537.36',
-        },
-        // treat a response as a binary.
-        encoding : null
-    };
+  const options = {
+    method  : 'GET',
+    url,
+    headers : {
+      'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.124 Safari/537.36',
+    },
+    // treat a response as a binary.
+    encoding : null
+  }
 
-    try {
-        const pdf = await rp(options);
-        console.log('PDF URL:', url)
-        console.log('PDF SIZE:', pdf.length)
-        return pdf;
-    } catch (res) {
-        const statusCode = res.statusCode;
-        if (statusCode === 404) {
-            console.log(`PDF not found. url=${url}`);
-            return null;
-        }
-        throw res;
+  try {
+    const pdf = await rp(options)
+    console.log('PDF URL:', url)
+    console.log('PDF SIZE:', pdf.length)
+    return pdf
+  } catch (res) {
+    const statusCode = res.statusCode
+    if (statusCode === 404) {
+      console.log(`PDF not found. url=${url}`)
+      return null
     }
+    throw res
+  }
 }
 
+/**
+ * Get a pdftxt file from remote.
+ * @param url
+ * @returns {Promise<null>}
+ */
 module.exports.fetchPDFText = async url => {
 
-    const options = {
-        method   : 'GET',
-        url      : url,
-        encoding : 'utf8'
-    }
+  const options = {
+    method   : 'GET',
+    url      : url,
+    encoding : 'utf8'
+  }
 
-    try {
-        const pdftxt = await rp(options)
-        return pdftxt
-    } catch (res) {
-        const statusCode = res.statusCode
-        if (statusCode === 404) {
-            console.log(`PDFText not found. url=${url}`)
-            return null;
-        }
-        throw res;
+  try {
+    return await rp(options)
+  } catch (res) {
+    const statusCode = res.statusCode
+    if (statusCode === 404) {
+      console.log(`PDFText not found. url=${url}`)
+      return null
     }
+    throw res
+  }
 }
 
 module.exports.fetchAnnotation = async url => {
@@ -76,9 +79,9 @@ module.exports.fetchAnnotation = async url => {
     const statusCode = res.statusCode
     if (statusCode === 404) {
       console.log(`Annotation not found. url=${url}`)
-      return null;
+      return null
     }
-    throw res;
+    throw res
   }
 }
 
@@ -86,18 +89,18 @@ module.exports.fetchAnnotation = async url => {
  * Save a PDF file, and return the saved path.
  */
 const savePDF = (fileName, content) => {
-    return new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
 
-        const dataPath = path.resolve(__dirname, '..', 'server-data', 'pdf');
-        if (!fs.existsSync(dataPath)) {
-            mkdirp.sync(dataPath)
-        }
-        const pdfPath = path.resolve(dataPath, fileName);
-        // TODO Use Async.
-        fs.writeFileSync(pdfPath, content);
+    const dataPath = path.resolve(__dirname, '..', 'server-data', 'pdf')
+    if (!fs.existsSync(dataPath)) {
+      mkdirp.sync(dataPath)
+    }
+    const pdfPath = path.resolve(dataPath, fileName)
+    // TODO Use Async.
+    fs.writeFileSync(pdfPath, content)
 
-        resolve(pdfPath);
-    });
+    resolve(pdfPath)
+  })
 }
 module.exports.savePDF = savePDF
 
@@ -112,120 +115,120 @@ module.exports.createPdftxt = async (pdf) => {
 // Analize pdf with pdfreader.jar.
 const analyzePDF = async (pdfPath) => {
 
-    // Check java command exits.
-    try {
-        await execCommand('java -version')
-    } catch (e) {
-        throw new Error('java command not found.')
-    }
+  // Check java command exits.
+  try {
+    await execCommand('java -version')
+  } catch (e) {
+    throw new Error('java command not found.')
+  }
 
-    // Load pdfextract.jar.
-    if (!isPDFExtractLoaded()) {
-        await loadPDFExract()
-    }
+  // Load pdfextract.jar.
+  if (!isPDFExtractLoaded()) {
+    await loadPDFExract()
+  }
 
-    // Analyze the PDF.
-    const jarPath = getPDFExtractPath()
-    const cmd = `java -classpath ${jarPath} PDFExtractor ${pdfPath}`;
-    const { stdout, stderr } = await execCommand(cmd);
+  // Analyze the PDF.
+  const jarPath = getPDFExtractPath()
+  const cmd = `java -classpath ${jarPath} PDFExtractor ${pdfPath}`
+  const { stdout, stderr } = await execCommand(cmd)
 
-    return stdout
+  return stdout
 }
 module.exports.analyzePDF = analyzePDF
 
 // Get a user annotation.
 module.exports.getUserAnnotation = (documentId, userId) => {
 
-    const annotationPath = path.resolve(__dirname, '..', 'userdata', 'anno', userId, `${documentId}.anno`)
-    console.log('annotationPath:', annotationPath)
-    if (!fs.existsSync(annotationPath)) {
-        return null
-    }
+  const annotationPath = path.resolve(__dirname, '..', 'userdata', 'anno', userId, `${documentId}.anno`)
+  console.log('annotationPath:', annotationPath)
+  if (!fs.existsSync(annotationPath)) {
+    return null
+  }
 
-    return fs.readFileSync(annotationPath, 'utf-8')
+  return fs.readFileSync(annotationPath, 'utf-8')
 }
 
 module.exports.loadCachePdftxt = pdf => {
 
-    const path = getPdftxtPath(pdf)
+  const path = getPdftxtPath(pdf)
 
-    if (fs.existsSync(path)) {
-        return fs.readFileSync(path, 'utf-8')
-    }
+  if (fs.existsSync(path)) {
+    return fs.readFileSync(path, 'utf-8')
+  }
 
-    return null
+  return null
 }
 
 module.exports.savePdftxt = (pdf, pdftxt) => {
 
-    const dir = getPdftxtDir()
-    if (!fs.existsSync(dir)) {
-        mkdirp.sync(dir)
-    }
+  const dir = getPdftxtDir()
+  if (!fs.existsSync(dir)) {
+    mkdirp.sync(dir)
+  }
 
-    const path = getPdftxtPath(pdf)
-    fs.writeFileSync(path, pdftxt, 'utf-8')
+  const path = getPdftxtPath(pdf)
+  fs.writeFileSync(path, pdftxt, 'utf-8')
 }
 
 function createHashFromPdf (pdf) {
-    const sha256 = crypto.createHash('sha256')
-    sha256.update(pdf, 'binary')
-    return sha256.digest('hex')
+  const sha256 = crypto.createHash('sha256')
+  sha256.update(pdf, 'binary')
+  return sha256.digest('hex')
 }
 
 function getPdftxtDir () {
-    return path.resolve(__dirname, '..', 'server-data', 'pdftxt', packageJson.pdfextract.version)
+  return path.resolve(__dirname, '..', 'server-data', 'pdftxt', packageJson.pdfextract.version)
 }
 
 function getPdftxtPath (pdf) {
-    const hash = createHashFromPdf(pdf)
-    return path.resolve(getPdftxtDir(), hash)
+  const hash = createHashFromPdf(pdf)
+  return path.resolve(getPdftxtDir(), hash)
 }
 
 // Execute an external command.
 function execCommand(command) {
-    console.log('execCommand: ' + command);
-    return new Promise((resolve, reject) => {
-        exec(command, { maxBuffer : 1024 * 1024 * 50 }, (err, stdout, stderr) => {
-            if (err) {
-                reject({ err, stdout, stderr });
-            }
-            resolve({ stdout, stderr });
-        });
-    });
+  console.log('execCommand: ' + command)
+  return new Promise((resolve, reject) => {
+    exec(command, { maxBuffer : 1024 * 1024 * 50 }, (err, stdout, stderr) => {
+      if (err) {
+        reject({ err, stdout, stderr })
+      }
+      resolve({ stdout, stderr })
+    })
+  })
 }
 
 function getPDFExtractPath () {
-    return path.resolve(__dirname, '..', 'extlib', `pdfextract-${packageJson.pdfextract.version}.jar`);
+  return path.resolve(__dirname, '..', 'extlib', `pdfextract-${packageJson.pdfextract.version}.jar`)
 }
 
 function isPDFExtractLoaded () {
-    return fs.existsSync(getPDFExtractPath());
+  return fs.existsSync(getPDFExtractPath())
 }
 
 function loadPDFExract () {
 
-    return new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
 
-        const reqConfig = {
-            method   : 'GET',
-            url      : packageJson.pdfextract.url,
-            encoding : null
-        };
+    const reqConfig = {
+      method   : 'GET',
+      url      : packageJson.pdfextract.url,
+      encoding : null
+    }
 
-        request(reqConfig, function(err, response, buf) {
+    request(reqConfig, function(err, response, buf) {
 
-            if (err) {
-                reject(err);
-            }
+      if (err) {
+        reject(err)
+      }
 
-            const dirPath = path.resolve(__dirname, '..', 'extlib')
-            if (!fs.existsSync(dirPath)) {
-                fs.mkdirSync(dirPath)
-            }
+      const dirPath = path.resolve(__dirname, '..', 'extlib')
+      if (!fs.existsSync(dirPath)) {
+        fs.mkdirSync(dirPath)
+      }
 
-            fs.writeFileSync(getPDFExtractPath(), buf);
-            resolve();
-        });
-    });
+      fs.writeFileSync(getPDFExtractPath(), buf)
+      resolve()
+    })
+  })
 }

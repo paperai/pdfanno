@@ -12,13 +12,13 @@ const service = require('../service')
  */
 module.exports.get = async (req, res) => {
 
-  const logs = [ 'api starts. ']
+  const logs = [ 'api starts. ' ]
 
   // Get conditions from the request.
   const deepScholar = {
     apiRoot    : req.query.api_root,
     documentId : req.param('documentId'),
-    token : req.query.token || req.query.user_token
+    token      : req.query.token || req.query.user_token
   }
 
   // Check is valid.
