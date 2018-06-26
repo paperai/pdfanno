@@ -535,9 +535,8 @@ export default class PDFAnnoPage {
    *
    * @return {Promise}
    */
-  exportData () {
-    // TODO This could remove promise, just sync method.
-    return window.iframeWindow.annotationContainer.exportData()
+  exportData ({exportType = 'toml'} = {}) {
+    return window.iframeWindow.annotationContainer.exportData(...arguments)
   }
 
   /**

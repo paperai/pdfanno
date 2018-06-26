@@ -124,7 +124,7 @@ export default class AnnotationContainer {
   /**
    * Export annotations as a TOML string.
    */
-  exportData () {
+  exportData ({exportType = 'toml'} = {}) {
 
     return new Promise((resolve, reject) => {
 
@@ -169,7 +169,11 @@ export default class AnnotationContainer {
         delete annotation.exportId
       })
 
-      resolve(toTomlString(dataExport))
+      if (exportType === 'json') {
+        resolve(dataExport)
+      } else {
+        resolve(toTomlString(dataExport))
+      }
     })
   }
 

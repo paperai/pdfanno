@@ -94,6 +94,7 @@ async function fetchResources () {
  */
 async function uploadAnnotation (anno) {
 
+
   const url = window.API_ROOT + `internal/api/deepscholar/${paperId}/annotations`
   const response = await fetch(url, {
     method : 'PUT',
@@ -154,7 +155,8 @@ function showPrimaryAnnotation (annotations) {
     annotations = annotations.filter(annotation => annotation.userId === userId)
     if (annotations.length > 0) {
       const anno = annotations[0].anno
-      const results = window.addAll(window.readTOML(anno))
+      console.log('anno:', anno)
+      const results = window.addAll(anno)
 
       if (moveTo && results[moveTo - 1]) {
         setTimeout(() => {
@@ -198,7 +200,7 @@ function setupUploadButton () {
     // Logタブにも表示.
 
     // Get current annotations.
-    const anno = await window.annoPage.exportData()
+    const anno = await window.annoPage.exportData({ exportType : 'json' })
 
     // Upload.
     const err = await uploadAnnotation(anno)

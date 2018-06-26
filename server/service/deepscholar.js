@@ -59,7 +59,7 @@ module.exports.upload = async ({ apiRoot, documentId, token, anno }) => {
       authorization : `bearer ${token}`
     },
     json : true,
-    body : { anno }
+    body : anno
   })
 
 }
