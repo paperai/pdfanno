@@ -1,3 +1,5 @@
+const constants = require('../../shared/constants')
+
 /**
  *  Functions depending on pdfanno-core.js.
  */
@@ -100,7 +102,8 @@ function getContents (files) {
     // Get files only PDFs or Anno files.
     if (relativePath.match(/\.pdf$/i)) {
       pdfNames.push(file)
-    } else if (relativePath.match(/\.anno$/i)) {
+    // } else if (relativePath.match(/\.anno$/i)) {
+    } else if (relativePath.match(new RegExp(`\\.${constants.ANNO_FILE_EXTENSION}$`, 'i'))) {
       annoNames.push(file)
     }
   }

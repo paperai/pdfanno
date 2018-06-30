@@ -9,6 +9,7 @@ const request = require('request')
 const rp = require('request-promise')
 const mkdirp = require('mkdirp')
 const packageJson = require('../../package.json')
+const constants = require('../../src/shared/constants')
 
 module.exports.deepscholarService = require('./deepscholar')
 
@@ -141,7 +142,8 @@ module.exports.analyzePDF = analyzePDF
 // Get a user annotation.
 module.exports.getUserAnnotation = (documentId, userId) => {
 
-  const annotationPath = path.resolve(__dirname, '..', 'userdata', 'anno', userId, `${documentId}.anno`)
+  // const annotationPath = path.resolve(__dirname, '..', 'userdata', 'anno', userId, `${documentId}.anno`)
+  const annotationPath = path.resolve(__dirname, '..', 'userdata', 'anno', userId, `${documentId}.${constants.ANNO_FILE_EXTENSION}`)
   console.log('annotationPath:', annotationPath)
   if (!fs.existsSync(annotationPath)) {
     return null
