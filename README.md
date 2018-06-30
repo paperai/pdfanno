@@ -13,17 +13,25 @@ If you use PDFAnno, please cite the following paper:
 * [Online Demo (latest)](https://paperai.github.io/pdfanno/latest/)  
 **It is highly recommended to use the latest version of Chrome.** (Firefox will also be supported in future.)
 
+## Installation
 If you install PDFAnno locally,
 ```
 git clone https://github.com/paperai/pdfanno.git
 cd pdfanno
 npm install
+cp .env.example .env
 ```
-or
+
+Then, edit `.env` as you like.  
+The default values are:
 ```
-npm install pdfanno
+SERVER_PORT=1000
 ```
-See the developer's guide for more details.
+
+### Run Server
+```
+npm run server
+```
 
 ## Usage
 1. Visit the [online demo](https://paperai.github.io/pdfanno/latest/) with the latest version of Chrome.
