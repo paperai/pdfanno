@@ -1,3 +1,5 @@
+const constants = require('../shared/constants')
+
 /*
  * Download the result of pdfextract.jar.
  */
@@ -91,7 +93,8 @@ function getDownloadFileName () {
     }
   })
   if (primaryAnnotationName) {
-    return primaryAnnotationName.replace('.anno', '') + 'pdftxt'
+    // return primaryAnnotationName.replace('.anno', '') + 'pdftxt'
+    return primaryAnnotationName.replace(`.${constants.ANNO_FILE_EXTENSION}`, '') + 'pdftxt'
   }
 
   // The name of Content.
