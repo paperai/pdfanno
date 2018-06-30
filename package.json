@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "_prepare": "gulp prepare",
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs",
     "start": "concurrently --kill-others \"npm run server:dev\" \"npm run front:dev\"",
     "front:sw": "gulp build-sw",
     "front:sw:watch": "gulp watch-sw",
@@ -67,6 +69,7 @@
     "run-sequence": "^2.2.1",
     "style-loader": "^0.13.2",
     "vinyl-source-stream": "^1.1.0",
+    "vuepress": "^0.10.2",
     "webpack": "3.0.0",
     "webpack-dev-server": "^1.16.5"
   },

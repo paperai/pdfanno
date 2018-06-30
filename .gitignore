@@ -5,6 +5,7 @@ node_modules
 pdfjs/build
 dest
 work/pdf-annotatejs/dist
+site/
 
 dist
 jsdoc
