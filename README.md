@@ -7,12 +7,16 @@ PDFAnno is a browser-based linguistic annotation tool for PDF documents.
 It offers functions for annotating PDF with labels and relations.  
 For natural language processing and machine learning, it is suitable for development of gold-standard data with named entity spans, dependency relations, and coreference chains.
 
-If you use PDFAnno, please cite the following paper:  
-**Hiroyuki Shindo, Yohei Munesada and Yuji Matsumoto, "PDFAnno: a Web-based Linguistic Annotation Tool for PDF Documents", In Proceedings of LREC, 2018.**
-
+If you use PDFAnno, please cite the following paper:
+```
+Hiroyuki Shindo, Yohei Munesada and Yuji Matsumoto,
+"PDFAnno: a Web-based Linguistic Annotation Tool for PDF Documents",
+In Proceedings of LREC, 2018.
+```
 
 * [Online Demo (v0.3.1)](https://paperai.github.io/pdfanno/0.3.1/)
 * [Online Demo (latest)](https://paperai.github.io/pdfanno/latest/)  
+
 **It is highly recommended to use the latest version of Chrome.** (Firefox will also be supported in future.)
 
 ## Installation
@@ -55,12 +59,10 @@ Don't forget to download your current annotations!
 |:---:|:---:|
 | <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-pencil.png" width="7%"> | Span highlighting. It is disallowed to cross page boundaries. |
 | <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-long-arrow-right.png" width="7%"> | One-way relation. This is used for annotating dependency relation between spans. |
-| <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-arrows-h.png" width="7%"> | Two-way relation. |
-| <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-minus.png" width="7%"> | Link relation. If you want to add non-directional relation between spans, use this. |
 | <img src="https://github.com/paperai/pdfanno/blob/master/icons/fa-square-o.png" width="7%"> | Rectangle. It is disallowed to cross page boundaries. |
 
 ## Annotation File (.anno)
-In PDFAnno, the annotation file (.anno) follows [TOML](https://github.com/toml-lang/toml) format.  
+In PDFAnno, an annotation file (.anno) follows [TOML](https://github.com/toml-lang/toml) format.  
 Here is an example of anno file:
 ```
 version = 0.3
@@ -97,91 +99,8 @@ For example, if you create `a.anno` and an another annotator creates `b.anno` fo
 This is useful to check inter-annotator agreement and resolving annotation conflicts.  
 Note that the reference files are rendered as read-only.
 
-## Annotation API
-`PDFAnno` provides annotation API.
-
-### Span
-```
-var span = new SpanAnnotation({
-  page: 1,
-  position:
- [["139.03536681054345","60.237086766202694","155.97302418023767","14.366197183098592"]],
-  label: 'orange',
-  text: 'Ready?',
-  id: 1
-});
-window.add(span);
-window.delete(span);
-```
-
-### Relation
-```
-var rel = new RelationAnnotation({
-  dir: 'link',
-  ids: ["1","2"],
-  label: 'sample'
-});
-window.add(rel);
-window.delete(rel);
-```
-
-### Rectangle
-```
-var rect = new RectAnnotation({
-  page:1,
-  position:["9.24324324324326","435.94054054054055","235.7027027027027","44.65945945945946"],
-  label: 'rect-label',
-  id: 2
-});
-window.add(rect);
-window.delete(rect);
-```
-
-### Read from TOML or JSON
-```
-var toml = `
-
-version = 0.2
-
-[1]
-type = "span"
-page = 1
-position = [["139.03536681054345","60.237086766202694","155.97302418023767","14.366197183098592"]]
-label = "orange"
-text = "Ready?"
-`;
-
-var anno = readTOML(toml);
-var annoObj = window.addAll(anno);
-window.delete(annoObj["1"]);
-
-// delete all annotations
-window.clear();
-```
-
-## Developer's Guide
-PDFAnno is built upon [pdf.js](https://github.com/mozilla/pdf.js) for PDF viewer.
-We implement custom layers for rendering annotations on pdf.js.
-
-### Install and Build
-First, install [Node.js](https://nodejs.org/) and npm. The version of Node.js must be 6+.  
-Then, run the following commands:
-```
-npm install
-npm run front:publish:latest
-```
-where the output is on `docs/latest`, and you can access PDFAnno via `docs/latest/index.html`.  
-
-For developing,
-```
-npm run server:dev
-npm run front:dev
-```
-This command starts Webpack Dev Server and you can access  [http://localhost:8080/dist/index.html](http://localhost:8080/dist/index.html) in your browser.
-
-## Authors
-* [hshindo](https://github.com/hshindo)
-* [yoheiMune](https://github.com/yoheiMune)
+## Contact
+Please contact [hshindo](https://github.com/hshindo) or feel free to create an issue.
 
 ## LICENSE
 MIT

@@ -4,6 +4,8 @@ module.exports = {
   themeConfig: {
     sidebar: [
       ['/', 'Home'],
+      '/api',
+      '/dev-guide'
     ]
   }
 }
