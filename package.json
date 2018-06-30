@@ -70,8 +70,8 @@
     "style-loader": "^0.13.2",
     "vinyl-source-stream": "^1.1.0",
     "vuepress": "^0.10.2",
-    "webpack": "3.0.0",
-    "webpack-dev-server": "^1.16.5"
+    "webpack": "^4.14.0",
+    "webpack-dev-server": "^3.1.4"
   },
   "dependencies": {
     "anno-ui": "github:paperai/anno-ui#master",
@@ -88,6 +88,7 @@
     "requirejs": "^2.3.5",
     "socket.io": "^2.0.4",
     "toml": "github:yoheiMune/toml-node",
-    "urijs": "^1.19.0"
+    "urijs": "^1.19.0",
+    "webpack-cli": "^3.0.8"
   }
 }

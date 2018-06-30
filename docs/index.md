@@ -8,7 +8,7 @@ If you use PDFAnno, please cite the following paper:
 
 
 * [Online Demo (v0.3.1)](https://paperai.github.io/pdfanno/0.3.1/)
-* [Online Demo (v0.3.1)](https://paperai.github.io/pdfanno/0.4.0/)
+* [Online Demo (v0.4.0)](https://paperai.github.io/pdfanno/0.4.0/)
 * [Online Demo (latest)](https://paperai.github.io/pdfanno/latest/)  
 **It is highly recommended to use the latest version of Chrome.** (Firefox will also be supported in future.)
 
