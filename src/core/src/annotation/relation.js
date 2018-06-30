@@ -315,9 +315,21 @@ export default class RelationAnnotation extends AbstractAnnotation {
 
   /**
    * Export Data for TOML.
-   * @returns {{type: string, dir: null, ids: *[], label: *|string}}
+   * @returns
    */
   export () {
+    return {
+      head  : this.rel1Annotation.exportId + '',
+      tail  : this.rel2Annotation.exportId + '',
+      label : this.text || ''
+    }
+  }
+
+    /**
+   * Export Data for TOML.
+   * @returns {{type: string, dir: null, ids: *[], label: *|string}}
+   */
+  export040 () {
     return {
       type  : this.type,
       dir   : this.direction,

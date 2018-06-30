@@ -153,15 +153,20 @@ export default class AnnotationContainer {
 
         // Span.
         if (annotation.type === 'span') {
-          dataExport[id] = annotation.export()
+          if (!dataExport['spans']) {
+            dataExport['spans'] = []
+          }
+          dataExport['spans'].push(annotation.export(id))
           // Save temporary for relation.
           annotation.exportId = id
 
         // Relation.
         } else if (annotation.type === 'relation') {
-          dataExport[id] = annotation.export()
+          if (!dataExport['relations']) {
+            dataExport['relations'] = []
+          }
+          dataExport['relations'].push(annotation.export())
         }
-
       })
 
       // Remove exportId.

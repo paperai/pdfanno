@@ -208,7 +208,25 @@ export default class SpanAnnotation extends AbstractAnnotation {
     super.handleClickEvent(e)
   }
 
-  export () {
+  export (id) {
+
+    let text = (this.selectedText || '')
+      .replace(/\r\n/g, ' ')
+      .replace(/\r/g, ' ')
+      .replace(/\n/g, ' ')
+      .replace(/"/g, '')
+      .replace(/\\/g, '')
+
+    return {
+      id        : id + '',
+      page      : this.page,
+      label     : this.text || '',
+      text,
+      textrange : this.textRange
+    }
+  }
+
+  export040 () {
 
     let text = (this.selectedText || '')
       .replace(/\r\n/g, ' ')

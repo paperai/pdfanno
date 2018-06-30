@@ -12,6 +12,55 @@ export function toTomlString (obj, root = true) {
 
   // `version` and `pdfextract-version` are the first.
   if ('version' in obj) {
+    lines.push(`pdfanno = "${obj['version']}"`)
+    lines.push(`pdfextract = "${obj['pdfextract-version']}"`)
+    lines.push('')
+    delete obj['version']
+    delete obj['pdfextract-version']
+  }
+
+  console.log(obj)
+
+  Object.keys(obj).forEach(prop => {
+
+    let val = obj[prop]
+    if (typeof val === 'string') {
+      lines.push(`${prop} = "${val}"`)
+      root && lines.push('')
+
+    } else if (typeof val === 'number') {
+      lines.push(`${prop} = ${val}`)
+      root && lines.push('')
+
+    } else if (prop === 'spans' || prop === 'relations') {
+      if (isArray(val)) {
+        val.forEach(v => {
+          lines.push(`[[${prop}]]`)
+          // root && lines.push('')
+          lines.push(toTomlString(v, false))
+          root && lines.push('')
+        })
+      }
+
+    } else if (isArray(val)) {
+      lines.push(`${prop} = ${JSON.stringify(val)}`)
+      root && lines.push('')
+
+    }
+  })
+
+  return lines.join('\n')
+}
+
+/**
+ * Create a TOML String from jsObject.
+ */
+export function toTomlString040 (obj, root = true) {
+
+  let lines = []
+
+  // `version` and `pdfextract-version` are the first.
+  if ('version' in obj) {
     lines.push(`version = "${obj['version']}"`)
     lines.push(`pdfextract-version = "${obj['pdfextract-version']}"`)
     lines.push('')
@@ -50,7 +99,7 @@ export function toTomlString (obj, root = true) {
 
     } else if (typeof val === 'object') {
       lines.push(`[${prop}]`)
-      lines.push(toTomlString(val, false))
+      lines.push(toTomlString040(val, false))
       root && lines.push('')
     }
   })
