@@ -4,7 +4,7 @@ node_modules
 .env
 
 pdfjs/build
-dest
+dist
 work/pdf-annotatejs/dist
 site/
 
