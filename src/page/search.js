@@ -31,6 +31,13 @@ export function setup (analyzeData) {
     resetUIAfter         : resetUI.bind(this)                 // TODO: ハイライトレンダリングに関するリセットを行う。操作系についてはsearchEngind内にて実施
   })
   searchUI.enableSearchUI()
+
+  // Adjusting window resize.
+  window.addEventListener('annotationlayercreated', () => {
+    searchHighlights.forEach(span => {
+      span.render()
+    })
+  })
 }
 
 /**

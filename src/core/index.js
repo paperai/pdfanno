@@ -125,6 +125,8 @@ function renderAnno () {
     position : 'relative'  // TODO css.
   }).append($annoLayer).append($annoLayer2)
 
+  dispatchWindowEvent('annotationlayercreated')
+
   renderAnnotations()
 }
 
