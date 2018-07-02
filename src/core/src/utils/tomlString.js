@@ -19,8 +19,6 @@ export function toTomlString (obj, root = true) {
     delete obj['pdfextract-version']
   }
 
-  console.log(obj)
-
   Object.keys(obj).forEach(prop => {
 
     let val = obj[prop]
@@ -36,7 +34,6 @@ export function toTomlString (obj, root = true) {
       if (isArray(val)) {
         val.forEach(v => {
           lines.push(`[[${prop}]]`)
-          // root && lines.push('')
           lines.push(toTomlString(v, false))
           root && lines.push('')
         })
