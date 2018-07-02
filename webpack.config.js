@@ -8,6 +8,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 let config = {
+    mode : 'none',
     entry : {
         'pdfanno.page' : './src/pdfanno.js',
         'pdfanno.core' : './src/core/index.js',
@@ -42,7 +43,9 @@ let config = {
             ]
         }]
     },
-    plugins,
+    plugins : [
+      new webpack.LoaderOptionsPlugin({ options: {} })
+    ],
     devServer : {
       host : 'localhost',
       port : 8080,
