@@ -77,7 +77,7 @@ function withinMargin (x, base, margin) {
 /**
  * Save a rect annotation.
  */
-function saveSpan ({
+export function saveSpan ({
   text = '',
   rects = [],
   textRange = [],
@@ -126,6 +126,7 @@ function saveSpan ({
 
   return spanAnnotation
 }
+window.saveSpan = saveSpan
 
 /**
  * Get the rect area of User selected.

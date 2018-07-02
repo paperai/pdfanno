@@ -6,6 +6,16 @@ import { customizeAnalyzeResult, extractMeta } from './util/analyzer'
 import { searchUI } from 'anno-ui'
 
 /**
+ * the Color for search results.
+ */
+const SEARCH_COLOR = '#FF0'
+
+/**
+ * the Color for a selected search result.
+ */
+const SEARCH_COLOR_HIGHLIGHT = '#0F0'
+
+/**
  * The highlights for search.
  */
 let searchHighlights = []
@@ -34,47 +44,29 @@ export function getSearchHighlight () {
   return null
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-  // Re-render the search results.
-  window.addEventListener('textlayercreated', rerenderSearchResults)
-})
-
 /**
  * Highlight a single search result.
  */
 function highlightSearchResult (searchPosition) {
-  $('.pdfanno-search-result', window.iframeWindow.document).removeClass('pdfanno-search-result--highlight')
 
   const highlight = searchHighlights[searchPosition]
-  highlight.$elm.addClass('pdfanno-search-result--highlight')
+  highlight.color = SEARCH_COLOR_HIGHLIGHT
+  highlight.render()
+
+  // Reset others.
+  searchHighlights.forEach((span, i) => {
+    if (searchPosition !== i) {
+      span.color = SEARCH_COLOR
+      span.render()
+    }
+  })
 
   // Scroll to.
   let pageHeight = window.annoPage.getViewerViewport().height
   let scale = window.annoPage.getViewerViewport().scale
-  let _y = (pageHeight + paddingBetweenPages) * (highlight.page - 1) + highlight.top * scale
+  let _y = (pageHeight + paddingBetweenPages) * (highlight.page - 1) + highlight.rectangles[0].top * scale
   _y -= 100
   $('#viewer').parent()[0].scrollTop = _y
-
-}
-
-/**
- * Render search results.
- */
-function rerenderSearchResults () {
-
-  // TODO: これは #resetUI() を呼び出してもよいかも
-  // Remove olds.
-  $('.pdfanno-search-result', window.iframeWindow.document).remove()
-
-  // Display.
-  // TODO 高速化。計測から。jQueryアクセスやappendを改善したら早そう.
-  searchHighlights.forEach((highlight, index) => {
-    const $textLayer = $(`.page[data-page-number="${highlight.page}"] .textLayer`, window.iframeWindow.document)
-    // set the depth.
-    highlight.$elm.css('z-index', nextZIndex())
-    $textLayer.append(highlight.$elm)
-  })
-
 }
 
 /**
@@ -82,58 +74,42 @@ function rerenderSearchResults () {
  * @see anno-ui.searchUI#resetUI()
  */
 function resetUI () {
-  $('.pdfanno-search-result', window.iframeWindow.document).remove()
+  searchHighlights.forEach(span => span.destroy())
   searchHighlights = []
 }
 
 /**
  * render search results as highlight.
  */
-function renderHighlight (positions, page, searchWord) {
-  // Display highlights.
-  if (positions.length > 0) {
-    positions.forEach(position => {
-      const $textLayer = $(`.page[data-page-number="${page.page}"] .textLayer`, window.iframeWindow.document)
-      const infos = page.meta.slice(position.start, position.end)
-      let fromX, toX, fromY, toY
-      let text = ''
-      infos.forEach(info => {
-        if (!info) {
-          return
-        }
-        const { x, y, w, h, char } = extractMeta(info)
-        fromX = (fromX === undefined ? x : Math.min(x, fromX))
-        toX = (toX === undefined ? (x + w) : Math.max((x + w), toX))
-        fromY = (fromY === undefined ? y : Math.min(y, fromY))
-        toY = (toY === undefined ? (y + h) : Math.max((y + h), toY))
-        text += char
-      })
-      const scale = window.iframeWindow.PDFView.pdfViewer.getPageView(0).viewport.scale
-      let $div = $('<div class="pdfanno-search-result"/>')
-      $div.css({
-        top    : fromY * scale + 'px',
-        left   : fromX * scale + 'px',
-        width  : (toX - fromX) * scale + 'px',
-        height : (toY - fromY) * scale + 'px',
-        zIndex : nextZIndex()
-      })
-      $textLayer.append($div)
-      // TODO 後で、改行されたものとかにも対応できるようにする（その場合は、rectsが複数）
-      const aPosition = [[ fromX, fromY, (toX - fromX), (toY - fromY) ]]
-      searchHighlights.push({
-        page           : page.page,
-        top            : fromY,
-        position       : aPosition,
-        searchPosition : position,
-        $elm           : $div,
-        text
-      })
+function renderHighlight (positions, pageData) {
+
+  positions.forEach(position => {
+
+    const targets = pageData.meta.slice(position.start, position.end).map(meta => {
+      return extractMeta(meta)
     })
-  }
+    if (targets.length > 0) {
+      const startPosition = targets[0].position
+      const endPosition = targets[targets.length - 1].position
+      const mergedRect = window.mergeRects(targets)
+      const spanAnnotation = window.saveSpan({
+        rects        : mergedRect,
+        page         : pageData.page,
+        save         : false,
+        focusToLabel : false,
+        color        : SEARCH_COLOR,
+        knob         : false,
+        border       : false,
+        textRange    : [ startPosition, endPosition ]
+      })
+      spanAnnotation.disable()
+      searchHighlights.push(spanAnnotation)
+    }
+  })
 
   if (searchHighlights.length > 0) {
-    // Init highlight at the current page.
-    const currentPage = window.iframeWindow.PDFViewerApplication.page
+    // Highlight one at the current page.
+    const currentPage = window.PDFViewerApplication.page
     let found = false
     for (let i = 0; i < searchHighlights.length; i++) {
       if (currentPage === searchHighlights[i].page) {
@@ -142,6 +118,7 @@ function renderHighlight (positions, page, searchWord) {
         break
       }
     }
+
     // If there is no result at the current page, set the index 0.
     if (!found) {
       searchUI.setSearchPosition(0)
