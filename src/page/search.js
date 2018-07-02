@@ -26,9 +26,9 @@ let searchHighlights = []
 export function setup (analyzeData) {
   searchUI.setup({
     pages                : customizeAnalyzeResult(analyzeData),
-    scrollTo             : highlightSearchResult.bind(this), // TODO: 引数としてスクロールすべきヒット文字列位置を得る
-    searchResultRenderer : renderHighlight.bind(this),       // TODO: 引数としてpositions(#search() の結果)を受け取る
-    resetUIAfter         : resetUI.bind(this)                 // TODO: ハイライトレンダリングに関するリセットを行う。操作系についてはsearchEngind内にて実施
+    scrollTo             : highlightSearchResult.bind(this),
+    searchResultRenderer : renderHighlight.bind(this),
+    resetUIAfter         : resetUI.bind(this)
   })
   searchUI.enableSearchUI()
 
