@@ -99,6 +99,9 @@ function renderHighlight (positions, pageData) {
       const startPosition = targets[0].position
       const endPosition = targets[targets.length - 1].position
       const mergedRect = window.mergeRects(targets)
+      const selectedText = targets.map(t => {
+        return t ? t.char : ' '
+      }).join('')
       const spanAnnotation = window.saveSpan({
         rects        : mergedRect,
         page         : pageData.page,
@@ -107,7 +110,8 @@ function renderHighlight (positions, pageData) {
         color        : SEARCH_COLOR,
         knob         : false,
         border       : false,
-        textRange    : [ startPosition, endPosition ]
+        textRange    : [ startPosition, endPosition ],
+        selectedText
       })
       spanAnnotation.disable()
       searchHighlights.push(spanAnnotation)

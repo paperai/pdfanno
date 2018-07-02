@@ -9,6 +9,7 @@ import {
   unlistenWindowLeaveEvent,
   adjustViewerSize
 } from '../util/window'
+import { saveSpan } from '../../core/src/UI/span'
 
 /**
  * PDFAnno's Annotation functions for Page produced by .
@@ -247,22 +248,20 @@ export default class PDFAnnoPage {
 
     } else if (highlight) {
 
-      const s = new window.SpanAnnotation({
+      const span = window.saveSpan({
         page         : highlight.page,
-        position     : highlight.position,
-        label        : highlight.text,
-        text         : highlight.text,
-        textrange    : highlight.textRange,
+        rects        : highlight.rectangles,
+        text,
         zIndex       : nextZIndex(),
         color,
+        textRange    : highlight.textRange,
         selectedText : highlight.selectedText
       })
-      window.add(s)
+      this.addAnnotation(span)
 
-      // TODO Refactoring.
       var event = document.createEvent('CustomEvent')
       event.initCustomEvent('enableTextInput', true, true, {
-        uuid      : s.annotation.uuid,
+        uuid      : span.uuid,
         text      : text,
         autoFocus : true
       })
