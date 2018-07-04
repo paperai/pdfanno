@@ -236,3 +236,13 @@ function loadPDFExract () {
     })
   })
 }
+
+module.exports.getAnnotationSchema  = () => {
+  const schemaPath = path.resolve(__dirname, '..', '..', 'schemas', 'pdfanno-schema.json')
+
+  if (fs.existsSync(schemaPath)) {
+    // return JSON.parse(fs.readFileSync(schemaPath, 'utf-8'))
+    return fs.readFileSync(schemaPath, 'utf-8')
+  }
+  return null
+}
