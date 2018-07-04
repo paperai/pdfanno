@@ -7,7 +7,7 @@ import SpanAnnotation from './span'
 import RectAnnotation from './rect'
 import RelationAnnotation from './relation'
 import semver from 'semver'
-
+import Ajv from 'ajv'
 /**
  * Annotation Container.
  */
@@ -18,6 +18,10 @@ export default class AnnotationContainer {
    */
   constructor () {
     this.set = new Set()
+    this.ajv = new Ajv({
+      allErrors : true
+    })
+    this.validate = this.ajv.compile(require('../../../../schemas/pdfanno-schema.json'))
   }
 
   /**
@@ -132,8 +136,8 @@ export default class AnnotationContainer {
       let dataExport = {}
 
       // Set version.
-      dataExport.version = ANNO_VERSION
-      dataExport['pdfextract-version'] = PDFEXTRACT_VERSION
+      dataExport.pdfanno = ANNO_VERSION
+      dataExport.pdfextract = PDFEXTRACT_VERSION
 
       // Only writable.
       const annos = this.getAllAnnotations().filter(a => !a.readOnly)
@@ -174,6 +178,14 @@ export default class AnnotationContainer {
       annos.forEach(annotation => {
         delete annotation.exportId
       })
+
+      // schema Validation
+      if (!this.validate(dataExport)) {
+        // errorをcatchしづらい
+        // reject(this.validate.errors)
+        // return
+        console.error(JSON.stringify(this.validate.errors))
+      }
 
       if (exportType === 'json') {
         resolve(dataExport)
@@ -224,6 +236,11 @@ export default class AnnotationContainer {
         let pdfannoVersion = tomlObject.pdfanno || tomlObject.version
 
         if (semver.gt(pdfannoVersion, '0.4.0')) {
+          // schema Validation
+          if (!this.validate(tomlObject)) {
+            reject(this.validate.errors)
+            return
+          }
           this.importAnnotations041(tomlObject, i, readOnly, getColor)
         } else {
           this.importAnnotations040(tomlObject, i, readOnly, getColor)

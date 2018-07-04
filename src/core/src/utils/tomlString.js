@@ -11,12 +11,12 @@ export function toTomlString (obj, root = true) {
   let lines = []
 
   // `version` and `pdfextract-version` are the first.
-  if ('version' in obj) {
-    lines.push(`pdfanno = "${obj['version']}"`)
-    lines.push(`pdfextract = "${obj['pdfextract-version']}"`)
+  if ('pdfanno' in obj) {
+    lines.push(`pdfanno = "${obj['pdfanno']}"`)
+    lines.push(`pdfextract = "${obj['pdfextract']}"`)
     lines.push('')
-    delete obj['version']
-    delete obj['pdfextract-version']
+    delete obj['pdfanno']
+    delete obj['pdfextract']
   }
 
   Object.keys(obj).forEach(prop => {
