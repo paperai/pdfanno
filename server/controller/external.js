@@ -24,3 +24,16 @@ module.exports.getUserAnnotation = (req, res) => {
 
     res.send(annotation)
 }
+
+module.exports.getAnnotationSchema = (req, res) => {
+
+  res.set('Content-Type', 'text/plain')
+  const schema = service.getAnnotationSchema()
+
+  if (!schema) {
+    res.status(404).send('Annotation schema file is not found.')
+    return
+  }
+
+  res.send(schema)
+}

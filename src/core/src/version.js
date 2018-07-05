@@ -1,4 +1,5 @@
-let packageJson = require('json-loader!../../../package.json')
+// let packageJson = require('json-loader!../../../package.json')
+const packageJson = require('../../../package.json')
 /**
  * Paper Anno Version.
  * This is overwritten at build.

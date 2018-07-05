@@ -46,7 +46,8 @@ app.put('/internal/api/deepscholar/:documentId/annotations', controller.internal
 // Get the user annotation which belongs to the specified document.
 app.get('/api/documents/:documentId/annotations', controller.external.getUserAnnotation)
 
-
+// Get the annotation schema pdfanno-schema.json
+app.get('/api/schema', controller.external.getAnnotationSchema)
 
 // Launch the app.
 const port = process.env.NODE_PORT || 1000

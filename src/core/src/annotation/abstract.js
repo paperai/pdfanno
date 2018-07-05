@@ -1,5 +1,6 @@
 import EventEmitter from 'events'
 import appendChild from '../render/appendChild'
+import { DEFAULT_RADIUS } from '../render/renderKnob'
 import { dispatchWindowEvent } from '../utils/event'
 
 /**
@@ -219,8 +220,10 @@ export default class AbstractAnnotation extends EventEmitter {
     const $circle = this.$element.find('.anno-knob')
     if ($circle.length > 0) {
       return {
-        x : parseFloat($circle.css('left')) + parseFloat($circle.css('width')) / 2,
-        y : parseFloat($circle.css('top')) + parseFloat($circle.css('height')) / 2
+        // x : parseFloat($circle.css('left')) + parseFloat($circle.css('width')) / 2,
+        // y : parseFloat($circle.css('top')) + parseFloat($circle.css('height')) / 2
+        x : parseFloat($circle.css('left')) + DEFAULT_RADIUS / 2.0,
+        y : parseFloat($circle.css('top')) + DEFAULT_RADIUS / 2.0
       }
     }
     return null
