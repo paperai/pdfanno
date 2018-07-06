@@ -482,6 +482,19 @@ export default class PDFAnnoPage {
     return window.iframeWindow.PDFAnnoCore.default.RelationAnnotation.newInstance(options)
   }
 
+  validateSchemaErrors (errors) {
+    let messages = []
+    errors.forEach(error => {
+      Object.keys(error).forEach(key => {
+        let value = error[key]
+        value = typeof value === 'object' ? JSON.stringify(value) : value
+        messages.push(`${key}: ${value}`)
+      })
+      messages.push('')
+    })
+    return messages.join('<br />')
+  }
+
   /**
    * Import annotations from UI.
    */
@@ -489,6 +502,8 @@ export default class PDFAnnoPage {
     window.iframeWindow.annotationContainer.importAnnotations(paperData, isPrimary).then(() => {
       // Notify annotations added.
       dispatchWindowEvent('annotationrendered')
+    }).catch(errors => {
+      annoUI.ui.alertDialog.show({ message : this.validateSchemaErrors(errors) })
     })
   }
 
