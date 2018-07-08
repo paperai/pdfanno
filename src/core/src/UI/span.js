@@ -199,6 +199,8 @@ window.addEventListener('DOMContentLoaded', () => {
     const x = e.clientX - left
     const y = e.clientY - top
 
+    console.log('aaaaaa', x, y, left, top)
+
     // Find the data in pdftxt.
     const item = window.findText(page, scaleDown({ x, y }))
     if (item) {
@@ -247,10 +249,19 @@ window.addEventListener('DOMContentLoaded', () => {
   const $viewer = $('#viewer')
 
   $viewer.on('mousedown', '.canvasWrapper', e => {
+
     if (otherAnnotationTreating) {
       // Ignore, if other annotation is detected.
       return
     }
+
+    // Only over the texts.
+    setPositions(e)
+    let targets = findTexts(currentPage, startPosition, endPosition)
+    if (targets.length === 0) {
+      return
+    }
+
     mouseDown = true
     currentPage = null
     initPosition = null

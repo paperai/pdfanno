@@ -21,6 +21,7 @@ export default class RectAnnotation extends AbstractAnnotation {
 
     this.uuid     = null
     this.type     = 'rect'
+    this.page     = 1
     this.x        = 0
     this.y        = 0
     this.width    = 0
@@ -28,6 +29,8 @@ export default class RectAnnotation extends AbstractAnnotation {
     this.text     = null
     this.color    = null
     this.readOnly = false
+    this.zIndex   = 10
+    this.knob     = true
     this.$element = this.createDummyElement()
 
     globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
@@ -40,6 +43,7 @@ export default class RectAnnotation extends AbstractAnnotation {
   static newInstance (annotation) {
     let rect      = new RectAnnotation()
     rect.uuid     = annotation.uuid || uuid()
+    rect.page     = annotation.page
     rect.x        = annotation.x
     rect.y        = annotation.y
     rect.width    = annotation.width
@@ -47,6 +51,7 @@ export default class RectAnnotation extends AbstractAnnotation {
     rect.text     = annotation.text
     rect.color    = annotation.color
     rect.readOnly = annotation.readOnly || false
+    rect.knob     = (typeof annotation.knob === 'boolean' ? annotation.knob : true)
     rect.zIndex   = annotation.zIndex || 10
     return rect
   }
@@ -62,8 +67,8 @@ export default class RectAnnotation extends AbstractAnnotation {
     d.width    = d.position[2]
     d.height   = d.position[3]
     d.text     = d.label
-    let rect   = RectAnnotation.newInstance(d)
-    return rect
+
+    return RectAnnotation.newInstance(d)
   }
 
   /**
@@ -115,6 +120,7 @@ export default class RectAnnotation extends AbstractAnnotation {
    * Get the position for text.
    */
   getTextPosition () {
+    // TODO 不要かも.
     return {
       x : this.x + 7,
       y : this.y - 20
@@ -155,6 +161,7 @@ export default class RectAnnotation extends AbstractAnnotation {
    * Save a new text.
    */
   handleTextChanged (newText) {
+    // TODO 不要かも.
     console.log('rect:handleTextChanged:', newText)
     this.text = newText
     this.save()
@@ -195,6 +202,7 @@ export default class RectAnnotation extends AbstractAnnotation {
    * Handle a mousedown event.
    */
   handleMouseDownOnRect () {
+    // TODO 必要？
     console.log('handleMouseDownOnRect')
 
     this.originalX = this.x
@@ -212,6 +220,8 @@ export default class RectAnnotation extends AbstractAnnotation {
    * Handle a mousemove event.
    */
   handleMouseMoveOnDocument (e) {
+
+    // TODO 必要？
 
     this._dragging = true
 
@@ -239,6 +249,8 @@ export default class RectAnnotation extends AbstractAnnotation {
    * Handle a mouseup event.
    */
   handleMouseUpOnDocument () {
+
+    // TODO 必要？
 
     if (this._dragging) {
       this._dragging = false
