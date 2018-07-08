@@ -9,6 +9,7 @@ import {
   unlistenWindowLeaveEvent,
   adjustViewerSize
 } from '../util/window'
+import { getDrawingRect } from '../../core/src/UI/rect'
 
 /**
  * PDFAnno's Annotation functions for Page produced by .
@@ -353,6 +354,49 @@ export default class PDFAnnoPage {
       text,
       color
     })
+
+    // Notify annotation added.
+    dispatchWindowEvent('annotationrendered')
+  }
+
+  /**
+   * Create a Rect annotation.
+   */
+  createRect ({ text = null, color = null } = {}) {
+
+    // Get user created annotation.
+    const rect = window.PDFAnnoCore.default.UI.getDrawingRect()
+
+    // TODO これは何に使うんだっけ？
+    // Get selected annotations.
+    // const selectedAnnotations = window.iframeWindow.annotationContainer.getSelectedAnnotations()
+
+    // Check empty.
+    // TODO 条件を戻す.
+    // if (!rects && !highlight && selectedAnnotations.length === 0) {
+    if (!rect) {
+      return annoUI.ui.alertDialog.show({ message : 'Create or select a rect.' })
+    }
+
+    window.PDFAnnoCore.default.UI.createRect({ text, zIndex : nextZIndex(), color })
+
+    // TODO あとで対応.
+    // // Change color and label.
+    // if (selectedAnnotations.length > 0) {
+    //   selectedAnnotations
+    //     .filter(anno => anno.type === 'span')
+    //     .forEach(anno => {
+    //       anno.color = color
+    //       anno.text = text
+    //       anno.render()
+    //       anno.enableViewMode()
+    //     })
+    //   dispatchWindowEvent('disappearTextInput')
+    //
+    //   // Create a new rectAnnotation.
+    // } else if (rects) {
+    //   window.iframeWindow.PDFAnnoCore.default.UI.createSpan({ text, zIndex : nextZIndex(), color })
+    // }
 
     // Notify annotation added.
     dispatchWindowEvent('annotationrendered')

@@ -14,18 +14,21 @@ export function renderRect (a) {
   const marginBetweenPages =  1
   let pageTopY = $('#pageContainer' + a.page).position().top / scale + paddingTop + marginBetweenPages
 
+  const x = a.x
+  const y = a.y + pageTopY
+
   const $base = $('<div class="anno-rect-base"/>')
 
   $base.append($('<div class="anno-rect"/>').css({
-    top    : `${a.y + pageTopY}px`,
-    left   : `${a.x}px`,
+    top    : `${y}px`,
+    left   : `${x}px`,
     width  : `${a.width}px`,
     height : `${a.height}px`,
     border : `1px solid ${color}`
   }))
 
   if (a.knob) {
-    $base.append(renderKnob(a))
+    $base.append(renderKnob({ x, y, readOnly : a.readOnly }))
   }
 
   return $base[0]

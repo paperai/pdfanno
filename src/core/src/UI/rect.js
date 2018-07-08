@@ -92,6 +92,22 @@ let drawingRectAnnotation = null
 //   return (base - margin) <= x && x <= (base + margin)
 // }
 
+
+export function getDrawingRect () {
+
+  if (!x1 || !y1 || !x2 || !y2) {
+    return
+  }
+
+  return {
+    page   : currentPage,
+    x      : Math.min(x1, x2),
+    y      : Math.min(y1, y2),
+    width  : Math.abs(x1 - x2),
+    height : Math.abs(y1 - y2)
+  }
+}
+
 /**
  * Save a rect annotation.
  */
@@ -134,50 +150,35 @@ function saveRect ({
 /**
  * Create a span by current texts selection.
  */
-// TODO 不要.
 export function createRect ({ text = null, zIndex = 10, color = null }) {
 
-  if (!currentPage || !startPosition || !endPosition) {
-    return null
 
-  } else {
-
-    let targets = findTexts(currentPage, startPosition, endPosition)
-    if (targets.length === 0) {
-      return null
-    }
-
-    let selectedText = targets.map(t => {
-      return t ? t.char : ' '
-    }).join('')
-
-    const mergedRect = mergeRects(targets)
-    const annotation = saveSpan({
-      rects : mergedRect,
-      page  : currentPage,
-      text,
-      zIndex,
-      color,
-      textRange: [ startPosition, endPosition ],
-      selectedText
-    })
-
-    // Remove user selection.
-    if (spanAnnotation) {
-      spanAnnotation.destroy()
-    }
-    startPosition = null
-    endPosition = null
-    currentPage = null
-    spanAnnotation = null
-
-    return annotation
+  const area = getDrawingRect()
+  if (!area) {
+    return
   }
 
+  const annotation = saveRect(Object.assign(area, {
+    text,
+    zIndex,
+    color
+  }))
+
+  if (drawingRectAnnotation) {
+    drawingRectAnnotation.destroy()
+    drawingRectAnnotation = null
+  }
+
+  x1 = null
+  y1 = null
+  x2 = null
+  y2 = null
+
+  return annotation
 }
 
 
-// TODO 不要.
+// TODO 不要?
 function setPositions(e) {
 
   const canvasElement = e.currentTarget
