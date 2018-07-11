@@ -255,22 +255,26 @@ window.addEventListener('DOMContentLoaded', () => {
       return
     }
 
-    // Only over the texts.
-    setPositions(e)
-    let targets = findTexts(currentPage, startPosition, endPosition)
-    if (targets.length === 0) {
-      return
-    }
-
-    mouseDown = true
-    currentPage = null
-    initPosition = null
-    startPosition = null
-    endPosition = null
     if (spanAnnotation) {
       spanAnnotation.destroy()
       spanAnnotation = null
     }
+
+    currentPage = null
+    initPosition = null
+    startPosition = null
+    endPosition = null
+
+    // Only over the texts.
+    setPositions(e)
+    let targets = findTexts(currentPage, startPosition, endPosition)
+    if (targets.length === 0) {
+      console.log('bbbbbbbbbbbbbbbb:', mouseDown)
+      return
+    }
+
+    mouseDown = true
+
     makeSelections(e)
   })
   $viewer.on('mousemove', '.canvasWrapper', e => {
