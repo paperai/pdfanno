@@ -367,36 +367,28 @@ export default class PDFAnnoPage {
     // Get user created annotation.
     const rect = window.PDFAnnoCore.default.UI.getDrawingRect()
 
-    // TODO これは何に使うんだっけ？
-    // Get selected annotations.
-    // const selectedAnnotations = window.iframeWindow.annotationContainer.getSelectedAnnotations()
+    // Get the selected annotation.
+    const selectedAnnotation = window.annotationContainer.getSelectedAnnotations().filter(a => {
+      return a.type === 'rect'
+    })[0]
 
     // Check empty.
-    // TODO 条件を戻す.
-    // if (!rects && !highlight && selectedAnnotations.length === 0) {
-    if (!rect) {
+    if (!rect && !selectedAnnotation) {
       return annoUI.ui.alertDialog.show({ message : 'Create or select a rect.' })
     }
 
-    window.PDFAnnoCore.default.UI.createRect({ text, zIndex : nextZIndex(), color })
+    if (rect) {
+      window.PDFAnnoCore.default.UI.createRect({ text, zIndex : nextZIndex(), color })
+    }
 
-    // TODO あとで対応.
-    // // Change color and label.
-    // if (selectedAnnotations.length > 0) {
-    //   selectedAnnotations
-    //     .filter(anno => anno.type === 'span')
-    //     .forEach(anno => {
-    //       anno.color = color
-    //       anno.text = text
-    //       anno.render()
-    //       anno.enableViewMode()
-    //     })
-    //   dispatchWindowEvent('disappearTextInput')
-    //
-    //   // Create a new rectAnnotation.
-    // } else if (rects) {
-    //   window.iframeWindow.PDFAnnoCore.default.UI.createSpan({ text, zIndex : nextZIndex(), color })
-    // }
+    // Change color and label.
+    if (selectedAnnotation) {
+      selectedAnnotation.color = color
+      selectedAnnotation.text = text
+      selectedAnnotation.render()
+      selectedAnnotation.enableViewMode()
+      dispatchWindowEvent('disappearTextInput')
+    }
 
     // Notify annotation added.
     dispatchWindowEvent('annotationrendered')

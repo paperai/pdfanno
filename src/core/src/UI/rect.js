@@ -175,6 +175,18 @@ function updateDrawingRect(e) {
   drawingRectAnnotation.disable()
 }
 
+function reset () {
+  drawingPage = null
+  x1 = null
+  y1 = null
+  x2 = null
+  y2 = null
+  if (drawingRectAnnotation) {
+    drawingRectAnnotation.destroy()
+    drawingRectAnnotation = null
+  }
+}
+
 /**
  * The entry point.
  */
@@ -190,16 +202,7 @@ window.addEventListener('DOMContentLoaded', () => {
       return
     }
 
-    drawingPage = null
-    x1 = null
-    y1 = null
-    x2 = null
-    y2 = null
-
-    if (drawingRectAnnotation) {
-      drawingRectAnnotation.destroy()
-      drawingRectAnnotation = null
-    }
+    reset()
 
     // Only over the texts.
     setPositions(e)
@@ -225,6 +228,10 @@ window.addEventListener('DOMContentLoaded', () => {
       updateDrawingRect(e)
       if (drawingRectAnnotation) {
         drawingRectAnnotation.deselect()
+      }
+      // Remove if only click without dragging.
+      if (x1 ===  x2 && y1 === y2) {
+        reset()
       }
     }
     mouseDown = false
