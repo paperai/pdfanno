@@ -88,7 +88,6 @@ function saveRect ({
  */
 export function createRect ({ text = null, zIndex = 10, color = null }) {
 
-
   const area = getDrawingRect()
   if (!area) {
     return
@@ -116,7 +115,7 @@ export function createRect ({ text = null, zIndex = 10, color = null }) {
 /**
  * Set the rect area which user is drawing.
  */
-function setPositions(e) {
+function setPositions (e) {
 
   const canvasElement = e.currentTarget
   const pageElement = canvasElement.parentNode
@@ -153,7 +152,7 @@ function setPositions(e) {
 /**
  * Update the drawing rect - user drawing rect.
  */
-function updateDrawingRect(e) {
+function updateDrawingRect (e) {
 
   setPositions(e)
 
@@ -206,7 +205,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Only over the texts.
     setPositions(e)
-    let target = findText(drawingPage, { x : x1, y : y1 })
+    let target = window.findText(drawingPage, { x : x1, y : y1 })
     if (target) {
       console.log('text was found, so not started to drawing rect.', target, drawingPage, x1, y1)
       return

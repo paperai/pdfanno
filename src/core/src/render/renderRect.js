@@ -1,5 +1,4 @@
 import { renderKnob } from './renderKnob'
-import { hex2rgba } from '../utils/color'
 
 /**
  * Create a rect annotation.

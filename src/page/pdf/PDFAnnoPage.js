@@ -9,7 +9,6 @@ import {
   unlistenWindowLeaveEvent,
   adjustViewerSize
 } from '../util/window'
-import { getDrawingRect } from '../../core/src/UI/rect'
 
 /**
  * PDFAnno's Annotation functions for Page produced by .
