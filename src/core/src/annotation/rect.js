@@ -120,7 +120,6 @@ export default class RectAnnotation extends AbstractAnnotation {
    * Get the position for text.
    */
   getTextPosition () {
-    // TODO 不要かも.
     return {
       x : this.x + 7,
       y : this.y - 20
@@ -161,7 +160,6 @@ export default class RectAnnotation extends AbstractAnnotation {
    * Save a new text.
    */
   handleTextChanged (newText) {
-    // TODO 不要かも.
     console.log('rect:handleTextChanged:', newText)
     this.text = newText
     this.save()
@@ -202,7 +200,6 @@ export default class RectAnnotation extends AbstractAnnotation {
    * Handle a mousedown event.
    */
   handleMouseDownOnRect () {
-    // TODO 必要？
     console.log('handleMouseDownOnRect')
 
     this.originalX = this.x
@@ -220,8 +217,6 @@ export default class RectAnnotation extends AbstractAnnotation {
    * Handle a mousemove event.
    */
   handleMouseMoveOnDocument (e) {
-
-    // TODO 必要？
 
     this._dragging = true
 
@@ -249,8 +244,6 @@ export default class RectAnnotation extends AbstractAnnotation {
    * Handle a mouseup event.
    */
   handleMouseUpOnDocument () {
-
-    // TODO 必要？
 
     if (this._dragging) {
       this._dragging = false

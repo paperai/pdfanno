@@ -199,8 +199,6 @@ window.addEventListener('DOMContentLoaded', () => {
     const x = e.clientX - left
     const y = e.clientY - top
 
-    console.log('aaaaaa', x, y, left, top)
-
     // Find the data in pdftxt.
     const item = window.findText(page, scaleDown({ x, y }))
     if (item) {
@@ -269,7 +267,6 @@ window.addEventListener('DOMContentLoaded', () => {
     setPositions(e)
     let targets = findTexts(currentPage, startPosition, endPosition)
     if (targets.length === 0) {
-      console.log('bbbbbbbbbbbbbbbb:', mouseDown)
       return
     }
 
