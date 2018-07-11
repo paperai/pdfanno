@@ -8,3 +8,5 @@ textrange
 coords
 mkdirp
 toml
+mousemove
+mouseup

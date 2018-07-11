@@ -1,5 +1,4 @@
 import { renderKnob } from './renderKnob'
-import { hex2rgba } from '../utils/color'
 
 /**
  * Create a rect annotation.
@@ -7,20 +6,29 @@ import { hex2rgba } from '../utils/color'
  */
 export function renderRect (a) {
 
-  let color = a.color || '#FF0'
+  let color = a.color || '#FF0000'
+
+  let paddingTop = 9
+  const scale = window.PDFView.pdfViewer.getPageView(0).viewport.scale
+  const marginBetweenPages =  1
+  let pageTopY = $('#pageContainer' + a.page).position().top / scale + paddingTop + marginBetweenPages
+
+  const x = a.x
+  const y = a.y + pageTopY
 
   const $base = $('<div class="anno-rect-base"/>')
 
   $base.append($('<div class="anno-rect"/>').css({
-    top             : `${a.y}px`,
-    left            : `${a.x}px`,
-    width           : `${a.width}px`,
-    height          : `${a.height}px`,
-    border          : `1px solid ${color}`,
-    backgroundColor : a.readOnly ? 'none' : hex2rgba(color, 0.3)
+    top    : `${y}px`,
+    left   : `${x}px`,
+    width  : `${a.width}px`,
+    height : `${a.height}px`,
+    border : `1px solid ${color}`
   }))
 
-  $base.append(renderKnob(a))
+  if (a.knob) {
+    $base.append(renderKnob({ x, y, readOnly : a.readOnly }))
+  }
 
   return $base[0]
 }

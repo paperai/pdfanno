@@ -247,19 +247,31 @@ window.addEventListener('DOMContentLoaded', () => {
   const $viewer = $('#viewer')
 
   $viewer.on('mousedown', '.canvasWrapper', e => {
+
     if (otherAnnotationTreating) {
       // Ignore, if other annotation is detected.
       return
     }
-    mouseDown = true
-    currentPage = null
-    initPosition = null
-    startPosition = null
-    endPosition = null
+
     if (spanAnnotation) {
       spanAnnotation.destroy()
       spanAnnotation = null
     }
+
+    currentPage = null
+    initPosition = null
+    startPosition = null
+    endPosition = null
+
+    // Only over the texts.
+    setPositions(e)
+    let targets = findTexts(currentPage, startPosition, endPosition)
+    if (targets.length === 0) {
+      return
+    }
+
+    mouseDown = true
+
     makeSelections(e)
   })
   $viewer.on('mousemove', '.canvasWrapper', e => {
