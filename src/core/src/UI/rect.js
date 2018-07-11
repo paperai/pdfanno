@@ -1,98 +1,38 @@
 import { scaleDown } from './utils'
-import SpanAnnotation from '../annotation/span'
 import * as textInput from '../utils/textInput'
 import RectAnnotation from '../annotation/rect'
 
-// TODO 整理.
+/**
+ * Whether the mouse is down.
+ */
 let mouseDown = false
-let initPosition = null
-let startPosition = null
-let endPosition = null
-let currentPage = null
-let spanAnnotation = null
 
+/**
+ * The page the rect is drawing.
+ */
+let drawingPage = null
+
+/**
+ * Viewer DOM element (DOM cache).
+ */
 let $viewer = $('#viewer')
 
+/**
+ * The positions for the rect.
+ */
 let x1 = null
 let y1 = null
 let x2 = null
 let y2 = null
 
+/**
+ * The rect for user drawing.
+ */
 let drawingRectAnnotation = null
 
-// function scale () {
-//   return window.PDFView.pdfViewer.getPageView(0).viewport.scale
-// }
-
 /**
- * Merge user selections.
+ * Get the drawing rect data.
  */
-// function mergeRects (rects) {
-//
-//   // Remove null.
-//   rects = rects.filter(rect => rect)
-//
-//   // Normalize.
-//   rects = rects.map(rect => {
-//     rect.top = rect.top || rect.y
-//     rect.left = rect.left || rect.x
-//     rect.right = rect.right || (rect.x + rect.w)
-//     rect.bottom = rect.bottom || (rect.y + rect.h)
-//     return rect
-//   })
-//
-//   // a virtical margin of error.
-//   const error = 5 * scale()
-//
-//   let tmp = convertToObject(rects[0])
-//   let newRects = [tmp]
-//   for (let i = 1; i < rects.length; i++) {
-//
-//     // Same line -> Merge rects.
-//     if (withinMargin(rects[i].top, tmp.top, error)) {
-//       tmp.top    = Math.min(tmp.top, rects[i].top)
-//       tmp.left   = Math.min(tmp.left, rects[i].left)
-//       tmp.right  = Math.max(tmp.right, rects[i].right)
-//       tmp.bottom = Math.max(tmp.bottom, rects[i].bottom)
-//       tmp.x      = tmp.left
-//       tmp.y      = tmp.top
-//       tmp.width  = tmp.right - tmp.left
-//       tmp.height = tmp.bottom - tmp.top
-//
-//       // New line -> Create a new rect.
-//     } else {
-//       tmp = convertToObject(rects[i])
-//       newRects.push(tmp)
-//     }
-//   }
-//
-//   return newRects
-// }
-
-/**
- * Convert a DOMList to a javascript plan object.
- */
-// function convertToObject (rect) {
-//   return {
-//     top    : rect.top,
-//     left   : rect.left,
-//     right  : rect.right,
-//     bottom : rect.bottom,
-//     x      : rect.x,
-//     y      : rect.y,
-//     width  : rect.width,
-//     height : rect.height
-//   }
-// }
-
-/**
- * Check the value(x) within the range.
- */
-// function withinMargin (x, base, margin) {
-//   return (base - margin) <= x && x <= (base + margin)
-// }
-
-
 export function getDrawingRect () {
 
   if (!x1 || !y1 || !x2 || !y2) {
@@ -100,7 +40,7 @@ export function getDrawingRect () {
   }
 
   return {
-    page   : currentPage,
+    page   : drawingPage,
     x      : Math.min(x1, x2),
     y      : Math.min(y1, y2),
     width  : Math.abs(x1 - x2),
@@ -111,7 +51,6 @@ export function getDrawingRect () {
 /**
  * Save a rect annotation.
  */
-// TODO 修正する.
 function saveRect ({
   page = 1,
   x = 0,
@@ -127,19 +66,16 @@ function saveRect ({
   knob = true
 }) {
 
-  // Save.
   let rectAnnotation = RectAnnotation.newInstance(...arguments)
+
   if (save) {
     rectAnnotation.save()
   }
 
-  // Render.
   rectAnnotation.render()
 
-  // Select.
   rectAnnotation.select()
 
-  // Enable label input.
   if (focusToLabel) {
     textInput.enable({ uuid : rectAnnotation.uuid, autoFocus : true, text })
   }
@@ -177,24 +113,34 @@ export function createRect ({ text = null, zIndex = 10, color = null }) {
   return annotation
 }
 
-
-// TODO 不要?
+/**
+ * Set the rect area which user is drawing.
+ */
 function setPositions(e) {
 
   const canvasElement = e.currentTarget
   const pageElement = canvasElement.parentNode
   const page = parseInt(pageElement.getAttribute('data-page-number'))
-  currentPage = page
+
+  // Set the page for rendering a rect.
+  // Only set the page at starting to draw, and after that, never change.
+  if (!drawingPage) {
+    drawingPage = page
+  }
+
+  // Only permitted to draw in one page.
+  if (drawingPage !== page) {
+    return
+  }
 
   const { top, left } = canvasElement.getBoundingClientRect()
-  // let x = e.clientX - left
-  // let y = e.clientY - top
 
   const { x, y } = scaleDown({
     x : e.clientX - left,
     y : e.clientY - top
   })
 
+  // Set the positions.
   if (!x1 || !y1) {
     x1 = x
     y1 = y
@@ -204,7 +150,10 @@ function setPositions(e) {
 
 }
 
-function makeSelections(e) {
+/**
+ * Update the drawing rect - user drawing rect.
+ */
+function updateDrawingRect(e) {
 
   setPositions(e)
 
@@ -213,31 +162,22 @@ function makeSelections(e) {
     drawingRectAnnotation = null
   }
 
-  if (!x1 || !y1 || !x2 || !y2) {
-    return
-  }
+  const area = getDrawingRect()
 
-  const x = Math.min(x1, x2)
-  const y = Math.min(y1, y2)
-  const width = Math.abs(x1 - x2)
-  const height = Math.abs(y1 - y2)
-
-  drawingRectAnnotation = saveRect({
-    page         : currentPage,
-    x,
-    y,
-    width,
-    height,
+  drawingRectAnnotation = saveRect(Object.assign(area, {
     color        : '#00FF00',
     readOnly     : true,
     save         : false,
     focusToLabel : false,
     knob         : false
-  })
+  }))
+
   drawingRectAnnotation.disable()
 }
 
-
+/**
+ * The entry point.
+ */
 window.addEventListener('DOMContentLoaded', () => {
 
   // Cache.
@@ -250,17 +190,12 @@ window.addEventListener('DOMContentLoaded', () => {
       return
     }
 
-    currentPage = null
-    initPosition = null
-    startPosition = null
-    endPosition = null
-
+    drawingPage = null
     x1 = null
     y1 = null
     x2 = null
     y2 = null
 
-    // TODO 不要な気がするけど..
     if (drawingRectAnnotation) {
       drawingRectAnnotation.destroy()
       drawingRectAnnotation = null
@@ -268,47 +203,31 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Only over the texts.
     setPositions(e)
-    let target = findText(currentPage, { x : x1, y : y1 })
+    let target = findText(drawingPage, { x : x1, y : y1 })
     if (target) {
-      console.log('findText:', target, currentPage, x1, y1)
+      console.log('text was found, so not started to drawing rect.', target, drawingPage, x1, y1)
       return
     }
 
     mouseDown = true
 
-    makeSelections(e)
+    updateDrawingRect(e)
   })
 
   $viewer.on('mousemove', '.canvasWrapper', e => {
     if (mouseDown) {
-      makeSelections(e)
+      updateDrawingRect(e)
     }
   })
 
   $viewer.on('mouseup', '.canvasWrapper', e => {
     if (mouseDown) {
-      makeSelections(e)
+      updateDrawingRect(e)
       if (drawingRectAnnotation) {
         drawingRectAnnotation.deselect()
       }
-
-      // Create a rect annotation.
-      // if (!x1 || !y1 || !x2 || !y2) {
-      //   return
-      // }
-      // saveRect({
-      //   page   : currentPage,
-      //   x      : Math.min(x1, x2),
-      //   y      : Math.min(y1, y2),
-      //   width  : Math.abs(x1 - x2),
-      //   height : Math.abs(y1 - y2)
-      // })
     }
     mouseDown = false
-    // if (drawingRectAnnotation) {
-    //   drawingRectAnnotation.destroy()
-    //   drawingRectAnnotation = null
-    // }
   })
 
   let otherAnnotationTreating = false
