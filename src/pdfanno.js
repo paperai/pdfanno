@@ -301,7 +301,10 @@ function getDefaultPDFURL () {
   // e.g. https://paperai.github.io:80/pdfanno/pdfs/P12-1046.pdf
   const pathnames = location.pathname.split('/')
   const pdfURL = location.protocol + '//' + location.hostname + ':' + location.port + pathnames.slice(0, pathnames.length - 1).join('/') + '/pdfs/P12-1046.pdf'
-  return pdfURL
+  // console.log(location.pathname, pathnames, pdfURL)
+  // return pdfURL
+  // XXX 今回のみ
+  return 'https://paperai.github.io/pdfanno/0.4.1/pdfs/P12-1046.pdf'
 }
 
 /**
