@@ -15,6 +15,7 @@
     "front:publish:stable": "npm run _prepare && cross-env BUILD_TARGET=stable  npm run front:sw && cross-env NODE_ENV=production SERVER_PATH=0.3.1  webpack && gulp publish_stable",
     "server:latest": "cross-env NODE_ENV=production NODE_PORT=1001 node server/server.js",
     "server:stable": "cross-env NODE_ENV=production NODE_PORT=1000 node server/server.js",
+    "server:0-4-1": "cross-env NODE_ENV=production NODE_PORT=1002 node server/server.js",
     "server:dev": "cross-env NODE_PORT=3000 ./node_modules/.bin/node-dev server/server.js"
   },
   "repository": {
