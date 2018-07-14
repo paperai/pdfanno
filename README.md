@@ -14,8 +14,8 @@ Hiroyuki Shindo, Yohei Munesada and Yuji Matsumoto,
 In Proceedings of LREC, 2018.
 ```
 
-* [Online Demo (v0.3.1)](https://paperai.github.io/pdfanno/0.3.1/)
-* [Online Demo (latest)](https://paperai.github.io/pdfanno/latest/)  
+* [Online Demo (v0.4.1)](https://paperai.github.io/pdfanno/0.4.1/)
+* [Online Demo (latest, experimental)](https://paperai.github.io/pdfanno/latest/)  
 
 **It is highly recommended to use the latest version of Chrome.** (Firefox will also be supported in future.)
 
@@ -65,33 +65,31 @@ Don't forget to download your current annotations!
 In PDFAnno, an annotation file (.anno) follows [TOML](https://github.com/toml-lang/toml) format.  
 Here is an example of anno file:
 ```
-version = 0.3
+pdfanno = "0.4.1"
+pdfextract = "0.2.4"
 
-[1]
-type = "span"
+[[spans]]
+id = "1"
 page = 1
-position = [["95.818", "252.977", "181.761", "10.909"], ["95.818", "264.806", "107.136", "10.909"]]
-label = "label-1"
+label = "label1"
+text = "AgBi 0.05 Sb 0.95 Te 2"
+textrange = [1422,1438]
 
-[2]
-type = "span"
+[[spans]]
+id = "2"
 page = 1
-position = [["323.863", "230.715", "213.988", "11.590"], ["313.125", "244.522", "224.829", "10.795"]]
-label = "label-2"
+label = "label1"
+text = "0.48 Wm [NO_UNICODE] 1 K [NO_UNICODE] 1 )"
+textrange = [1386,1397]
 
-[3]
-type = "rect"
-page = 1
-position = ["323.863", "230.715", "213.988", "11.590"]
-label = "label-3"
-
-[4]
-type = "relation"
-dir = "two-way"
-ids = ["1", "2"]
-label = "label-4"
+[[relations]]
+head = "1"
+tail = "2"
+label = "relation1"
 ```
-where `position` indicates `(x, y, width, height)` of the annotation.  
+where `textrange` corresponds to the start and end token id of `pdftxt`.  
+`pdftxt` is a text file extracted from the original pdf file.  
+You can download `pdftxt` via `pdf.txt` button at the top right of the screen.
 
 ## Reference Anno File
 To support multi-user annotation, PDFAnno allows to load `reference anno file`.  
