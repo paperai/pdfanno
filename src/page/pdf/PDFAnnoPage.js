@@ -10,6 +10,7 @@ import {
   adjustViewerSize
 } from '../util/window'
 import { saveSpan } from '../../core/src/UI/span'
+import * as constants from '../../shared/constants'
 
 /**
  * PDFAnno's Annotation functions for Page produced by .
@@ -503,7 +504,11 @@ export default class PDFAnnoPage {
       // Notify annotations added.
       dispatchWindowEvent('annotationrendered')
     }).catch(errors => {
-      annoUI.ui.alertDialog.show({ message : this.validateSchemaErrors(errors) })
+      let message = errors
+      if (Array.isArray(errors)) {
+        message = this.validateSchemaErrors(errors)
+      }
+      annoUI.ui.alertDialog.show({ message })
     })
   }
 
@@ -659,7 +664,8 @@ export default class PDFAnnoPage {
         return
         // TODO pdftxtとannoダウンロードは、Viewerが閉じている時には無効化すべし.
       }
-      let annoName = pdfFileName.replace(/\.pdf$/i, '.anno')
+      // let annoName = pdfFileName.replace(/\.pdf$/i, '.anno')
+      let annoName = pdfFileName.replace(/\.pdf$/i, '.' + constants.ANNO_FILE_EXTENSION)
       currentFileName = annoName
     })()
     if (!currentFileName) {

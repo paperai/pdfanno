@@ -33,5 +33,5 @@
             }
         }
     },
-    "required": ["pdfanno", "pdfextract", "spans", "relations"]
+    "required": ["pdfanno", "pdfextract"]
 }
