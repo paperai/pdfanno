@@ -504,7 +504,11 @@ export default class PDFAnnoPage {
       // Notify annotations added.
       dispatchWindowEvent('annotationrendered')
     }).catch(errors => {
-      annoUI.ui.alertDialog.show({ message : this.validateSchemaErrors(errors) })
+      let message = errors
+      if (Array.isArray(errors)) {
+        message = this.validateSchemaErrors(errors)
+      }
+      annoUI.ui.alertDialog.show({ message })
     })
   }
 
