@@ -16,6 +16,7 @@ import { showLoader } from './page/util/display'
 import * as ws from './page/socket'
 import PDFAnnoPage from './page/pdf/PDFAnnoPage'
 import * as deepscholar from './deepscholar'
+import * as constants from './shared/constants'
 
 /**
  * API root point.
@@ -251,9 +252,15 @@ function setupUI () {
     getAnnotationTOMLString : window.annoPage.exportData,
     getCurrentContentName   : () => {
       if (parseUrlQuery()['paper_id']) {
-        return parseUrlQuery()['paper_id'] + '.pdf'
+        // return parseUrlQuery()['paper_id'] + '.pdf'
+        return parseUrlQuery()['paper_id'] + '.' + constants.ANNO_FILE_EXTENSION
       }
-      return window.annoPage.getCurrentContentFile().name
+      if (window.annoPage.getCurrentContentFile() && window.annoPage.getCurrentContentFile().name) {
+        let filename = window.annoPage.getCurrentContentFile().name
+        return filename.replace(/\.pdf$/i, '.' + constants.ANNO_FILE_EXTENSION)
+      } else {
+        return 'noname.' + constants.ANNO_FILE_EXTENSION
+      }
     },
     didDownloadCallback : unlistenWindowLeaveEvent
   })
@@ -301,7 +308,7 @@ function getDefaultPDFURL () {
   // e.g. https://paperai.github.io:80/pdfanno/pdfs/P12-1046.pdf
   const pathnames = location.pathname.split('/')
   const pdfURL = location.protocol + '//' + location.hostname + ':' + location.port + pathnames.slice(0, pathnames.length - 1).join('/') + '/pdfs/P12-1046.pdf'
-  // console.log(location.pathname, pathnames, pdfURL)
+  console.log(location.pathname, pathnames, pdfURL)
   // return pdfURL
   // XXX 今回のみ
   return 'https://paperai.github.io/pdfanno/0.4.1/pdfs/P12-1046.pdf'
