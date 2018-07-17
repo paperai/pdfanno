@@ -13,7 +13,6 @@ In Proceedings of LREC, 2018.
 ```
 
 * [Online Demo (v0.4.1)](https://paperai.github.io/pdfanno/0.4.1/)
-* [Online Demo (latest, experimental)](https://paperai.github.io/pdfanno/latest/)  
 
 **It is highly recommended to use the latest version of Chrome.** (Firefox will also be supported in future.)
 
