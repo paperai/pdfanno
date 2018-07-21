@@ -99,7 +99,7 @@ export default class AnnotationContainer {
         .filter(a => {
           if (annoType === 'span') {
             return a.type === annoType
-          } else if (annoType === 'one-way' || annoType === 'two-way' || annoType === 'link') {
+          } else if (annoType === 'relation') {
             if (a.type === 'relation' && a.direction === annoType) {
               return true
             }

@@ -100,13 +100,8 @@ export function renderRelation (a) {
   })
 
   // Triangle for the end point.
-  if (a.direction === 'one-way' || a.direction === 'two-way') {
+  if (a.direction === 'relation') {
     relation.setAttribute('marker-end', `url(#${markerId})`)
-  }
-
-  // Triangle for the start point.
-  if (a.direction === 'two-way') {
-    relation.setAttribute('marker-start', `url(#${markerId})`)
   }
 
   group.appendChild(relation)
