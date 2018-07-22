@@ -363,7 +363,7 @@ function setupUI () {
   // Download anno button.
   anno_ui__WEBPACK_IMPORTED_MODULE_1__["downloadButton"].setup({
     getAnnotationTOMLString : window.annoPage.exportData,
-    getCurrentContentName   : () => {
+    getDownloadFileName     : () => {
       if (Object(_shared_util__WEBPACK_IMPORTED_MODULE_2__["parseUrlQuery"])()['paper_id']) {
         // return parseUrlQuery()['paper_id'] + '.pdf'
         return Object(_shared_util__WEBPACK_IMPORTED_MODULE_2__["parseUrlQuery"])()['paper_id'] + '.' + _shared_constants__WEBPACK_IMPORTED_MODULE_12__["ANNO_FILE_EXTENSION"]
@@ -5002,7 +5002,7 @@ function applicationName () {
     return _applicationName
 }
 
-const validLabelTypes = ['span', 'one-way', 'two-way', 'link']
+const validLabelTypes = ['span', 'relation']
 /* harmony export (immutable) */ __webpack_exports__["validLabelTypes"] = validLabelTypes;
 
 
@@ -5015,9 +5015,14 @@ const validLabelTypes = ['span', 'one-way', 'two-way', 'link']
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (immutable) */ __webpack_exports__["setupResizableColumns"] = setupResizableColumns;
 /* harmony export (immutable) */ __webpack_exports__["tomlString"] = tomlString;
+/* harmony export (immutable) */ __webpack_exports__["toml2object"] = toml2object;
 /* harmony export (immutable) */ __webpack_exports__["uuid"] = uuid;
 /* harmony export (immutable) */ __webpack_exports__["download"] = download;
 /* harmony export (immutable) */ __webpack_exports__["loadFileAsText"] = loadFileAsText;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_toml__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_toml___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_toml__);
+
+
 /**
  * Make the UI resizable.
  */
@@ -5094,51 +5099,60 @@ function setupResizableColumns () {
 }
 
 /**
- * Convert object to TOML String.
+ * Convert label object to TOML String.
  */
-function tomlString (obj, root = true) {
+function tomlString (obj, type = null) {
     let lines = []
-
-    // `version` is first.
-    if ('version' in obj) {
-        lines.push(`version = "${obj['version']}"`)
-        lines.push('')
-        delete obj['version']
-    }
-
-    // #paperanno-ja/issues/38
-    // Make all values in `position` as string.
-    if ('position' in obj) {
-        let position = obj.position
-        position = position.map(p => {
-            if (typeof p === 'number') {
-                return String(p)
-            } else {
-                return p.map(v => String(v))
-            }
-        })
-        obj.position = position
-    }
 
     Object.keys(obj).forEach(prop => {
         let val = obj[prop]
-        if (typeof val === 'string') {
-            lines.push(`${prop} = "${val}"`)
-            root && lines.push('')
-        } else if (typeof val === 'number') {
-            lines.push(`${prop} = ${val}`)
-            root && lines.push('')
-        } else if (isArray(val)) {
-            lines.push(`${prop} = ${JSON.stringify(val)}`)
-            root && lines.push('')
-        } else if (typeof val === 'object') {
-            lines.push(`[${prop}]`)
-            lines.push(tomlString(val, false))
-            root && lines.push('')
+        if (prop === 'span' || prop === 'relation') {
+            lines.push(tomlString(val, prop))
+        } else if (prop === 'labels') {
+            if (isArray(val)) {
+                val.forEach(v => {
+                    if (type !== null) {
+                        lines.push(`[[${type}]]`)
+                    }
+                    lines.push(`label = "${escapeDoubleQuote(v[0])}"`)
+                    lines.push(`color = "${escapeDoubleQuote(v[1])}"`)
+                    lines.push('')
+                })
+            }
         }
     })
 
     return lines.join('\n')
+}
+
+/**
+ * Convert TOML String to label object.
+ *
+ * @export
+ * @param {String} tomlData
+ */
+function toml2object (tomlData) {
+    const data = __WEBPACK_IMPORTED_MODULE_0_toml___default.a.parse(tomlData)
+    const object = {}
+    ;['span', 'relation'].forEach(type => {
+        object[type] = {}
+        object[type].labels = []
+        if (isArray(data[type])) {
+            data[type].forEach(item => {
+                object[type].labels.push([unescapeDoubleQuote(item.label), unescapeDoubleQuote(item.color)])
+            })
+        }
+    })
+
+    return object
+}
+
+function escapeDoubleQuote (str) {
+    return str.replace(/"/g, '\\"')
+}
+
+function unescapeDoubleQuote (str) {
+    return str.replace(/\\"/g, '"')
 }
 
 /**
@@ -5317,7 +5331,7 @@ exports = module.exports = __webpack_require__(1)(undefined);
 
 
 // module
-exports.push([module.i, "@charset 'utf-8';\n\n/* Reset CSS */\nhtml{color:#000;background:#FFF}body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,textarea,p,blockquote,th,td{margin:0;padding:0}table{border-collapse:collapse;border-spacing:0}fieldset,img{border:0}address,caption,cite,code,dfn,em,strong,th,var{font-style:normal;font-weight:normal}ol,ul{list-style:none}caption,th{text-align:left}h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal}q:before,q:after{content:''}abbr,acronym{border:0;font-variant:normal}sup{vertical-align:text-top}sub{vertical-align:text-bottom}input,textarea,select{font-family:inherit;font-size:inherit;font-weight:inherit;*font-size:100%}legend{color:#000}\n\n/* Super Hack to disable autofill style for Chrome. */\ninput:-webkit-autofill,\ninput:-webkit-autofill:hover,\ninput:-webkit-autofill:focus,\ninput:-webkit-autofill:active {\n    transition: background-color 5000s ease-in-out 0s;\n}\n\n.u-mt-10 {margin-top: 10px;}\n.u-mt-20 {margin-top: 20px;}\n.u-mb-10 {margin-bottom: 10px;}\n.u-ml-15 {margin-left: 15px;}\n.u-disp-iblock {display: inline-block;}\n.no-visible {visibility: hidden;}\n.no-action {pointer-events: none;}\n\n/**\n * Viewer size.\n * This height will be override to fit the browser height (by pdfanno.js).\n */\n.anno-viewer {\n    width: 100%;\n    height: 500px;\n}\n\n/**\n * Annotation Select UI Layout.\n */\n.anno-select-layout {}\n.anno-select-layout .row:first-child {\n    margin-bottom: 10px;\n}\n.anno-select-layout [type=\"radio\"] {\n    margin-right: 5px;\n}\n.anno-select-layout [type=\"file\"] {\n    display: inline-block;\n    margin-left: 5px;\n    line-height: 1em;\n}\n.anno-select-layout .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-select-layout .sp-dd {\n    display: none;\n}\n\n/**\n * Dropdown.\n */\n.dropdown-menu {\n    overflow: scroll;\n}\n\n/**\n * Color picker.\n */\n.anno-ui .sp-replacer {\n    padding: 0;\n    border: none;\n}\n.anno-ui .sp-dd {\n    display: none;\n}\n.anno-ui .sp-preview {\n    margin-right: 0;\n}\n\n.js-label-tab-content {\n    overflow-y: scroll;\n    overflow-x: hidden;\n    max-height: calc(100vh - 25em); /* Adjust for HD size(1366x768) */\n}\n\n.js-label-tab-content .label-list__text {\n    word-break: break-all;\n}\n\n.js-label-tab-content .label-list__input {\n    width: 100%;\n}\n\n.js-label-tab-content .sp-replacer {\n    overflow: inherit;\n}\n\n.js-export-label.disabled {\n    cursor: not-allowed;\n}\n", ""]);
+exports.push([module.i, "@charset 'utf-8';\r\n\r\n/* Reset CSS */\r\nhtml{color:#000;background:#FFF}body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,textarea,p,blockquote,th,td{margin:0;padding:0}table{border-collapse:collapse;border-spacing:0}fieldset,img{border:0}address,caption,cite,code,dfn,em,strong,th,var{font-style:normal;font-weight:normal}ol,ul{list-style:none}caption,th{text-align:left}h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal}q:before,q:after{content:''}abbr,acronym{border:0;font-variant:normal}sup{vertical-align:text-top}sub{vertical-align:text-bottom}input,textarea,select{font-family:inherit;font-size:inherit;font-weight:inherit;*font-size:100%}legend{color:#000}\r\n\r\n/* Super Hack to disable autofill style for Chrome. */\r\ninput:-webkit-autofill,\r\ninput:-webkit-autofill:hover,\r\ninput:-webkit-autofill:focus,\r\ninput:-webkit-autofill:active {\r\n    transition: background-color 5000s ease-in-out 0s;\r\n}\r\n\r\n.u-mt-10 {margin-top: 10px;}\r\n.u-mt-20 {margin-top: 20px;}\r\n.u-mb-10 {margin-bottom: 10px;}\r\n.u-ml-15 {margin-left: 15px;}\r\n.u-disp-iblock {display: inline-block;}\r\n.no-visible {visibility: hidden;}\r\n.no-action {pointer-events: none;}\r\n\r\n/**\r\n * Viewer size.\r\n * This height will be override to fit the browser height (by pdfanno.js).\r\n */\r\n.anno-viewer {\r\n    width: 100%;\r\n    height: 500px;\r\n}\r\n\r\n/**\r\n * Annotation Select UI Layout.\r\n */\r\n.anno-select-layout {}\r\n.anno-select-layout .row:first-child {\r\n    margin-bottom: 10px;\r\n}\r\n.anno-select-layout [type=\"radio\"] {\r\n    margin-right: 5px;\r\n}\r\n.anno-select-layout [type=\"file\"] {\r\n    display: inline-block;\r\n    margin-left: 5px;\r\n    line-height: 1em;\r\n}\r\n.anno-select-layout .sp-replacer {\r\n    padding: 0;\r\n    border: none;\r\n}\r\n.anno-select-layout .sp-dd {\r\n    display: none;\r\n}\r\n\r\n/**\r\n * Dropdown.\r\n */\r\n.dropdown-menu {\r\n    overflow: scroll;\r\n}\r\n\r\n/**\r\n * Color picker.\r\n */\r\n.anno-ui .sp-replacer {\r\n    padding: 0;\r\n    border: none;\r\n}\r\n.anno-ui .sp-dd {\r\n    display: none;\r\n}\r\n.anno-ui .sp-preview {\r\n    margin-right: 0;\r\n}\r\n\r\n.js-label-tab-content {\r\n    overflow-y: scroll;\r\n    overflow-x: hidden;\r\n    max-height: calc(100vh - 25em); /* Adjust for HD size(1366x768) */\r\n}\r\n\r\n.js-label-tab-content .label-list__text {\r\n    word-break: break-all;\r\n}\r\n\r\n.js-label-tab-content .label-list__input {\r\n    width: 100%;\r\n}\r\n\r\n.js-label-tab-content .sp-replacer {\r\n    overflow: inherit;\r\n}\r\n\r\n.js-export-label.disabled {\r\n    cursor: not-allowed;\r\n}\r\n", ""]);
 
 // exports
 
@@ -5707,7 +5721,7 @@ exports = module.exports = __webpack_require__(1)(undefined);
 
 
 // module
-exports.push([module.i, "/**\n * UI - Alert Dialog.\n */\n\n.alertdialog-danger .modal-header {\n    color: #a94442;\n    background-color: #f2dede;\n    border-color: #ebccd1;\n}\n.alertdialog {\n    margin-top: 200px;\n}\n.alertdialog .modal-dialog {\n    width: 50%;\n}\n.alertdialog .modal-footer {\n    border-top: 0px solid rgba(0,0,0,0);\n}\n", ""]);
+exports.push([module.i, "/**\r\n * UI - Alert Dialog.\r\n */\r\n\r\n.alertdialog-danger .modal-header {\r\n    color: #a94442;\r\n    background-color: #f2dede;\r\n    border-color: #ebccd1;\r\n}\r\n.alertdialog {\r\n    margin-top: 200px;\r\n}\r\n.alertdialog .modal-dialog {\r\n    width: 50%;\r\n}\r\n.alertdialog .modal-footer {\r\n    border-top: 0px solid rgba(0,0,0,0);\r\n}\r\n", ""]);
 
 // exports
 
@@ -5933,12 +5947,8 @@ function setup ({
             let icon
             if (a.type === 'span') {
                 icon = '<i class="fa fa-pencil"></i>'
-            } else if (a.type === 'relation' && a.direction === 'one-way') {
+            } else if (a.type === 'relation' && a.direction === 'relation') {
                 icon = '<i class="fa fa-long-arrow-right"></i>'
-            } else if (a.type === 'relation' && a.direction === 'two-way') {
-                icon = '<i class="fa fa-arrows-h"></i>'
-            } else if (a.type === 'relation' && a.direction === 'link') {
-                icon = '<i class="fa fa-minus"></i>'
             } else if (a.type === 'area') {
                 icon = '<i class="fa fa-square-o"></i>'
             }
@@ -5991,7 +6001,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
  */
 function setup ({
     getAnnotationTOMLString,
-    getCurrentContentName,
+    getDownloadFileName,
     didDownloadCallback = function () {}
 }) {
     $('#downloadButton').off('click').on('click', e => {
@@ -6002,7 +6012,7 @@ function setup ({
             let blobURL = window.URL.createObjectURL(blob)
             let a = document.createElement('a')
             document.body.appendChild(a) // for firefox working correctly.
-            a.download = _getDownloadFileName(getCurrentContentName)
+            a.download = _getDownloadFileName(getDownloadFileName)
             a.href = blobURL
             a.click()
             a.parentNode.removeChild(a)
@@ -6017,7 +6027,7 @@ function setup ({
 /**
  * Get the file name for download.
  */
-function _getDownloadFileName (getCurrentContentName) {
+function _getDownloadFileName (getDownloadFileName) {
 
     // The name of Primary Annotation.
     let primaryAnnotationName
@@ -6031,10 +6041,8 @@ function _getDownloadFileName (getCurrentContentName) {
         return primaryAnnotationName
     }
 
-    // The name of Content.
-    let pdfFileName = getCurrentContentName()
-    let annoName = pdfFileName.replace(/\.pdf$/i, '.anno')
-    return annoName
+    // The name of Annotation file.
+    return getDownloadFileName()
 }
 
 
@@ -6118,7 +6126,7 @@ exports = module.exports = __webpack_require__(1)(undefined);
 
 
 // module
-exports.push([module.i, "\n.inputLabel {\n    font-size: 20px;\n}\n\n/**\n * Label list.\n */\n.label-list {}\n.label-list .label-list__item {\n    display: flex;\n    align-items: center;\n    padding: 0 10px;\n    border-bottom: 1px solid #eee;\n}\n.label-list .label-list__item:last-child {\n    padding-top: 5px;\n    padding-bottom: 5px;\n    border-bottom: 0 solid rgba(0,0,0,0);\n}\n.label-list__btn {\n    width: 40px;\n    height: 40px;\n    line-height: 50px;\n    font-size: 16px;\n    text-align: center;\n    cursor: pointer;\n    border-radius: 3px;\n    background-color: white;\n    margin-right: 13px;\n    flex: 0 0 30px;\n}\n.label-list__btn:hover,\n.label-list__text:hover {\n    box-shadow: 0 1px 3px rgba(0,0,0,.3);\n}\n.label-list__text {\n    flex-grow: 1;\n    cursor: pointer;\n    padding: 2px;\n    font-size: 20px;\n    min-height: 1em;\n    margin-left: 13px;\n}\n.label-list__input {\n    flex-grow: 1;\n    padding: 2px 5px;\n}\n\n/** Override color picker style. */\n.label-list .sp-replacer {\n    border: none;\n    background-color: rgba(0, 0, 0, 0);\n    padding: 0;\n}\n.label-list .sp-dd {\n    display: none;\n}\n.label-list .sp-preview {\n    margin-right: 0;\n}\n", ""]);
+exports.push([module.i, "\r\n.inputLabel {\r\n    font-size: 20px;\r\n}\r\n\r\n/**\r\n * Label list.\r\n */\r\n.label-list {}\r\n.label-list .label-list__item {\r\n    display: flex;\r\n    align-items: center;\r\n    padding: 0 10px;\r\n    border-bottom: 1px solid #eee;\r\n}\r\n.label-list .label-list__item:last-child {\r\n    padding-top: 5px;\r\n    padding-bottom: 5px;\r\n    border-bottom: 0 solid rgba(0,0,0,0);\r\n}\r\n.label-list__btn {\r\n    width: 40px;\r\n    height: 40px;\r\n    line-height: 50px;\r\n    font-size: 16px;\r\n    text-align: center;\r\n    cursor: pointer;\r\n    border-radius: 3px;\r\n    background-color: white;\r\n    margin-right: 13px;\r\n    flex: 0 0 30px;\r\n}\r\n.label-list__btn:hover,\r\n.label-list__text:hover {\r\n    box-shadow: 0 1px 3px rgba(0,0,0,.3);\r\n}\r\n.label-list__text {\r\n    flex-grow: 1;\r\n    cursor: pointer;\r\n    padding: 2px;\r\n    font-size: 20px;\r\n    min-height: 1em;\r\n    margin-left: 13px;\r\n}\r\n.label-list__input {\r\n    flex-grow: 1;\r\n    padding: 2px 5px;\r\n}\r\n\r\n/** Override color picker style. */\r\n.label-list .sp-replacer {\r\n    border: none;\r\n    background-color: rgba(0, 0, 0, 0);\r\n    padding: 0;\r\n}\r\n.label-list .sp-dd {\r\n    display: none;\r\n}\r\n.label-list .sp-preview {\r\n    margin-right: 0;\r\n}\r\n", ""]);
 
 // exports
 
@@ -6135,7 +6143,7 @@ exports.push([module.i, "\n.inputLabel {\n    font-size: 20px;\n}\n\n/**\n * Lab
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__db__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__color__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__reader__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__reader__ = __webpack_require__(27);
 /**
  * Define the behaviors of label input component.
  */
@@ -6355,7 +6363,7 @@ function setupLabelText (createSpanAnnotation, createRelAnnotation) {
         console.log('add:', color)
         if (type === 'span') {
             createSpanAnnotation({ text, color })
-        } else if (type === 'one-way' || type === 'two-way' || type === 'link') {
+        } else if (type === 'relation') {
             createRelAnnotation({ type, text, color })
         }
     })
@@ -6438,45 +6446,10 @@ function setupImportExportLink (namingRuleForExport) {
 
 /***/ }),
 /* 24 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_toml__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_toml___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_toml__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core__ = __webpack_require__(5);
-
-
-
-
-/**
- * Read the label list from File object
- * @param File(Blob) object
- * @return Promise.resolve(labelData) ... success, returned labelData (this will use to `db.setLabelList(labelData)`)
- * @return Promise.reject(DOMError) ... error occurred on read the fileObj
- * @return Promise.reject(TypeError) ... invalid label type is found in read from fileObj
- */
-/* harmony default export */ __webpack_exports__["a"] = (async function (fileObj) {
-    const tomlString = await __WEBPACK_IMPORTED_MODULE_1__utils__["loadFileAsText"](fileObj)
-    if (tomlString === '') {
-        throw new TypeError('Empty data')
-    }
-    const labelData = __WEBPACK_IMPORTED_MODULE_0_toml___default.a.parse(tomlString)
-    for (let key in labelData) {
-        if (!__WEBPACK_IMPORTED_MODULE_2__core__["validLabelTypes"].includes(key)) {
-            throw new TypeError('Invalid label type; ' + key)
-        }
-    }
-    return labelData
-});
-
-
-/***/ }),
-/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var parser = __webpack_require__(26);
-var compiler = __webpack_require__(27);
+var parser = __webpack_require__(25);
+var compiler = __webpack_require__(26);
 
 module.exports = {
   parse: function(input) {
@@ -6487,7 +6460,7 @@ module.exports = {
 
 
 /***/ }),
-/* 26 */
+/* 25 */
 /***/ (function(module, exports) {
 
 module.exports = (function() {
@@ -10334,7 +10307,7 @@ module.exports = (function() {
 
 
 /***/ }),
-/* 27 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10535,6 +10508,39 @@ function compile(nodes) {
 module.exports = {
   compile: compile
 };
+
+
+/***/ }),
+/* 27 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core__ = __webpack_require__(5);
+// import toml from 'toml'
+
+
+
+/**
+ * Read the label list from File object
+ * @param File(Blob) object
+ * @return Promise.resolve(labelData) ... success, returned labelData (this will use to `db.setLabelList(labelData)`)
+ * @return Promise.reject(DOMError) ... error occurred on read the fileObj
+ * @return Promise.reject(TypeError) ... invalid label type is found in read from fileObj
+ */
+/* harmony default export */ __webpack_exports__["a"] = (async function (fileObj) {
+    const tomlString = await __WEBPACK_IMPORTED_MODULE_0__utils__["loadFileAsText"](fileObj)
+    if (tomlString === '') {
+        throw new TypeError('Empty data')
+    }
+    const labelData = __WEBPACK_IMPORTED_MODULE_0__utils__["toml2object"](tomlString)
+    for (let key in labelData) {
+        if (!__WEBPACK_IMPORTED_MODULE_1__core__["validLabelTypes"].includes(key)) {
+            throw new TypeError('Invalid label type; ' + key)
+        }
+    }
+    return labelData
+});
 
 
 /***/ }),
@@ -11583,9 +11589,14 @@ function clear () {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setupResizableColumns", function() { return setupResizableColumns; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "tomlString", function() { return tomlString; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "toml2object", function() { return toml2object; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "uuid", function() { return uuid; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "download", function() { return download; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "loadFileAsText", function() { return loadFileAsText; });
+/* harmony import */ var toml__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(17);
+/* harmony import */ var toml__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(toml__WEBPACK_IMPORTED_MODULE_0__);
+
+
 /**
  * Make the UI resizable.
  */
@@ -11662,51 +11673,60 @@ function setupResizableColumns () {
 }
 
 /**
- * Convert object to TOML String.
+ * Convert label object to TOML String.
  */
-function tomlString (obj, root = true) {
+function tomlString (obj, type = null) {
     let lines = []
-
-    // `version` is first.
-    if ('version' in obj) {
-        lines.push(`version = "${obj['version']}"`)
-        lines.push('')
-        delete obj['version']
-    }
-
-    // #paperanno-ja/issues/38
-    // Make all values in `position` as string.
-    if ('position' in obj) {
-        let position = obj.position
-        position = position.map(p => {
-            if (typeof p === 'number') {
-                return String(p)
-            } else {
-                return p.map(v => String(v))
-            }
-        })
-        obj.position = position
-    }
 
     Object.keys(obj).forEach(prop => {
         let val = obj[prop]
-        if (typeof val === 'string') {
-            lines.push(`${prop} = "${val}"`)
-            root && lines.push('')
-        } else if (typeof val === 'number') {
-            lines.push(`${prop} = ${val}`)
-            root && lines.push('')
-        } else if (isArray(val)) {
-            lines.push(`${prop} = ${JSON.stringify(val)}`)
-            root && lines.push('')
-        } else if (typeof val === 'object') {
-            lines.push(`[${prop}]`)
-            lines.push(tomlString(val, false))
-            root && lines.push('')
+        if (prop === 'span' || prop === 'relation') {
+            lines.push(tomlString(val, prop))
+        } else if (prop === 'labels') {
+            if (isArray(val)) {
+                val.forEach(v => {
+                    if (type !== null) {
+                        lines.push(`[[${type}]]`)
+                    }
+                    lines.push(`label = "${escapeDoubleQuote(v[0])}"`)
+                    lines.push(`color = "${escapeDoubleQuote(v[1])}"`)
+                    lines.push('')
+                })
+            }
         }
     })
 
     return lines.join('\n')
+}
+
+/**
+ * Convert TOML String to label object.
+ *
+ * @export
+ * @param {String} tomlData
+ */
+function toml2object (tomlData) {
+    const data = toml__WEBPACK_IMPORTED_MODULE_0___default.a.parse(tomlData)
+    const object = {}
+    ;['span', 'relation'].forEach(type => {
+        object[type] = {}
+        object[type].labels = []
+        if (isArray(data[type])) {
+            data[type].forEach(item => {
+                object[type].labels.push([unescapeDoubleQuote(item.label), unescapeDoubleQuote(item.color)])
+            })
+        }
+    })
+
+    return object
+}
+
+function escapeDoubleQuote (str) {
+    return str.replace(/"/g, '\\"')
+}
+
+function unescapeDoubleQuote (str) {
+    return str.replace(/\\"/g, '"')
 }
 
 /**
@@ -21051,13 +21071,8 @@ function renderRelation (a) {
   })
 
   // Triangle for the end point.
-  if (a.direction === 'one-way' || a.direction === 'two-way') {
+  if (a.direction === 'relation') {
     relation.setAttribute('marker-end', `url(#${markerId})`)
-  }
-
-  // Triangle for the start point.
-  if (a.direction === 'two-way') {
-    relation.setAttribute('marker-start', `url(#${markerId})`)
   }
 
   group.appendChild(relation)

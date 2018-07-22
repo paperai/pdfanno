@@ -466,9 +466,14 @@ function parseUrlQuery () {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setupResizableColumns", function() { return setupResizableColumns; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "tomlString", function() { return tomlString; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "toml2object", function() { return toml2object; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "uuid", function() { return uuid; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "download", function() { return download; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "loadFileAsText", function() { return loadFileAsText; });
+/* harmony import */ var toml__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(17);
+/* harmony import */ var toml__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(toml__WEBPACK_IMPORTED_MODULE_0__);
+
+
 /**
  * Make the UI resizable.
  */
@@ -545,51 +550,60 @@ function setupResizableColumns () {
 }
 
 /**
- * Convert object to TOML String.
+ * Convert label object to TOML String.
  */
-function tomlString (obj, root = true) {
+function tomlString (obj, type = null) {
     let lines = []
-
-    // `version` is first.
-    if ('version' in obj) {
-        lines.push(`version = "${obj['version']}"`)
-        lines.push('')
-        delete obj['version']
-    }
-
-    // #paperanno-ja/issues/38
-    // Make all values in `position` as string.
-    if ('position' in obj) {
-        let position = obj.position
-        position = position.map(p => {
-            if (typeof p === 'number') {
-                return String(p)
-            } else {
-                return p.map(v => String(v))
-            }
-        })
-        obj.position = position
-    }
 
     Object.keys(obj).forEach(prop => {
         let val = obj[prop]
-        if (typeof val === 'string') {
-            lines.push(`${prop} = "${val}"`)
-            root && lines.push('')
-        } else if (typeof val === 'number') {
-            lines.push(`${prop} = ${val}`)
-            root && lines.push('')
-        } else if (isArray(val)) {
-            lines.push(`${prop} = ${JSON.stringify(val)}`)
-            root && lines.push('')
-        } else if (typeof val === 'object') {
-            lines.push(`[${prop}]`)
-            lines.push(tomlString(val, false))
-            root && lines.push('')
+        if (prop === 'span' || prop === 'relation') {
+            lines.push(tomlString(val, prop))
+        } else if (prop === 'labels') {
+            if (isArray(val)) {
+                val.forEach(v => {
+                    if (type !== null) {
+                        lines.push(`[[${type}]]`)
+                    }
+                    lines.push(`label = "${escapeDoubleQuote(v[0])}"`)
+                    lines.push(`color = "${escapeDoubleQuote(v[1])}"`)
+                    lines.push('')
+                })
+            }
         }
     })
 
     return lines.join('\n')
+}
+
+/**
+ * Convert TOML String to label object.
+ *
+ * @export
+ * @param {String} tomlData
+ */
+function toml2object (tomlData) {
+    const data = toml__WEBPACK_IMPORTED_MODULE_0___default.a.parse(tomlData)
+    const object = {}
+    ;['span', 'relation'].forEach(type => {
+        object[type] = {}
+        object[type].labels = []
+        if (isArray(data[type])) {
+            data[type].forEach(item => {
+                object[type].labels.push([unescapeDoubleQuote(item.label), unescapeDoubleQuote(item.color)])
+            })
+        }
+    })
+
+    return object
+}
+
+function escapeDoubleQuote (str) {
+    return str.replace(/"/g, '\\"')
+}
+
+function unescapeDoubleQuote (str) {
+    return str.replace(/\\"/g, '"')
 }
 
 /**
@@ -6858,13 +6872,8 @@ function renderRelation (a) {
   })
 
   // Triangle for the end point.
-  if (a.direction === 'one-way' || a.direction === 'two-way') {
+  if (a.direction === 'relation') {
     relation.setAttribute('marker-end', `url(#${markerId})`)
-  }
-
-  // Triangle for the start point.
-  if (a.direction === 'two-way') {
-    relation.setAttribute('marker-start', `url(#${markerId})`)
   }
 
   group.appendChild(relation)
@@ -7461,7 +7470,7 @@ class RelationAnnotation extends _abstract__WEBPACK_IMPORTED_MODULE_1__["default
     let a            = new RelationAnnotation()
     a.uuid           = annotation.uuid || Object(anno_ui_src_utils__WEBPACK_IMPORTED_MODULE_0__["uuid"])()
     // a.direction      = annotation.direction
-    a.direction      = 'one-way'
+    a.direction      = 'relation'
     a.rel1Annotation = _abstract__WEBPACK_IMPORTED_MODULE_1__["default"].isAnnotation(annotation.rel1) ? annotation.rel1 : window.annotationContainer.findById(annotation.rel1)
     a.rel2Annotation = _abstract__WEBPACK_IMPORTED_MODULE_1__["default"].isAnnotation(annotation.rel2) ? annotation.rel2 : window.annotationContainer.findById(annotation.rel2)
     a.text           = annotation.text
@@ -7476,7 +7485,7 @@ class RelationAnnotation extends _abstract__WEBPACK_IMPORTED_MODULE_1__["default
    */
   static newInstanceFromTomlObject (d) {
     // d.direction = d.dir
-    d.direction = 'one-way'
+    d.direction = 'relation'
     // TODO Annotation側を、labelに合わせてもいいかも。
     d.text = d.label
     let rel = RelationAnnotation.newInstance(d)
@@ -8306,7 +8315,7 @@ class AnnotationContainer {
         .filter(a => {
           if (annoType === 'span') {
             return a.type === annoType
-          } else if (annoType === 'one-way' || annoType === 'two-way' || annoType === 'link') {
+          } else if (annoType === 'relation') {
             if (a.type === 'relation' && a.direction === annoType) {
               return true
             }
