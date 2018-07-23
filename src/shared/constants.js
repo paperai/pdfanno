@@ -10,8 +10,8 @@
 // }
 //
 // const ANNO_FILE_EXTENSION = 'anno'
-const ANNO_FILE_EXTENSION = 'pdfanno'
+export const ANNO_FILE_EXTENSION = 'pdfanno'
 
-module.exports = {
-  ANNO_FILE_EXTENSION
-}
+// module.exports = {
+//   ANNO_FILE_EXTENSION
+// }

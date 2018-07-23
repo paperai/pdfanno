@@ -46,7 +46,7 @@ export default class RelationAnnotation extends AbstractAnnotation {
     let a            = new RelationAnnotation()
     a.uuid           = annotation.uuid || uuid()
     // a.direction      = annotation.direction
-    a.direction      = 'one-way'
+    a.direction      = 'relation'
     a.rel1Annotation = AbstractAnnotation.isAnnotation(annotation.rel1) ? annotation.rel1 : window.annotationContainer.findById(annotation.rel1)
     a.rel2Annotation = AbstractAnnotation.isAnnotation(annotation.rel2) ? annotation.rel2 : window.annotationContainer.findById(annotation.rel2)
     a.text           = annotation.text
@@ -61,7 +61,7 @@ export default class RelationAnnotation extends AbstractAnnotation {
    */
   static newInstanceFromTomlObject (d) {
     // d.direction = d.dir
-    d.direction = 'one-way'
+    d.direction = 'relation'
     // TODO Annotation側を、labelに合わせてもいいかも。
     d.text = d.label
     let rel = RelationAnnotation.newInstance(d)
