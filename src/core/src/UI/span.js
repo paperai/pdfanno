@@ -137,7 +137,7 @@ export function getRectangles () {
     return null
 
   } else {
-    let targets = findTexts(currentPage, startPosition, endPosition)
+    let targets = window.findTexts(currentPage, startPosition, endPosition)
     return mergeRects(targets)
   }
 
@@ -153,7 +153,7 @@ export function createSpan ({ text = null, zIndex = 10, color = null }) {
 
   } else {
 
-    let targets = findTexts(currentPage, startPosition, endPosition)
+    let targets = window.findTexts(currentPage, startPosition, endPosition)
     if (targets.length === 0) {
       return null
     }
@@ -164,12 +164,12 @@ export function createSpan ({ text = null, zIndex = 10, color = null }) {
 
     const mergedRect = mergeRects(targets)
     const annotation = saveSpan({
-      rects : mergedRect,
-      page  : currentPage,
+      rects     : mergedRect,
+      page      : currentPage,
       text,
       zIndex,
       color,
-      textRange: [ startPosition, endPosition ],
+      textRange : [ startPosition, endPosition ],
       selectedText
     })
 
@@ -189,7 +189,7 @@ export function createSpan ({ text = null, zIndex = 10, color = null }) {
 
 window.addEventListener('DOMContentLoaded', () => {
 
-  function setPositions(e) {
+  function setPositions (e) {
 
     const canvasElement = e.currentTarget
     const pageElement = canvasElement.parentNode
@@ -219,7 +219,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function makeSelections(e) {
+  function makeSelections (e) {
 
     setPositions(e)
 
@@ -228,7 +228,7 @@ window.addEventListener('DOMContentLoaded', () => {
       spanAnnotation = null
     }
 
-    let targets = findTexts(currentPage, startPosition, endPosition)
+    let targets = window.findTexts(currentPage, startPosition, endPosition)
     if (targets.length > 0) {
       const mergedRect = mergeRects(targets)
       spanAnnotation = saveSpan({

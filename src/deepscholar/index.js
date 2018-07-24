@@ -94,7 +94,6 @@ async function fetchResources () {
  */
 async function uploadAnnotation (anno) {
 
-
   const url = window.API_ROOT + `internal/api/deepscholar/${paperId}/annotations`
   const response = await fetch(url, {
     method : 'PUT',

@@ -9,7 +9,7 @@ import {
   unlistenWindowLeaveEvent,
   adjustViewerSize
 } from '../util/window'
-import { saveSpan } from '../../core/src/UI/span'
+// import { saveSpan } from '../../core/src/UI/span'
 import * as constants from '../../shared/constants'
 
 /**
