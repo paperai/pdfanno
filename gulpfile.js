@@ -68,6 +68,7 @@ gulp.task('prepare', () => {
     fs.copySync('build', path.join('dist', 'build'))
     fs.copySync('pages', path.join('dist'))
     fs.copySync('pdfs', path.join('dist', 'pdfs'))
+    fs.copySync('schemas/pdfanno-schema.json', path.join('dist', 'schema.json'))
 })
 
 gulp.task('copy-sw', () => {
