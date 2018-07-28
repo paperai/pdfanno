@@ -4,11 +4,11 @@ npm-debug.log
 .idea
 .env
 
-pdfjs/build
 work/pdf-annotatejs/dist
 site/
 
 dist
+build/
 jsdoc
 .vscode/
 
