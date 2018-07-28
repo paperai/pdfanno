@@ -19,7 +19,8 @@ let config = {
     'l10n': './src/l10n.js'
   },
   output: {
-    filename: './dist/[name].bundle.js',
+    path: path.resolve(__dirname, 'build'),
+    filename: './[name].bundle.js',
     library: 'PDFAnnoCore',
     libraryTarget: 'umd'
   },

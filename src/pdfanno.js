@@ -1,4 +1,4 @@
-require('file-loader?name=dist/index.html!./index.html')
+require('file-loader?name=index.html!./index.html')
 require('!style-loader!css-loader!./pdfanno.css')
 
 import URI from 'urijs'
