@@ -79,7 +79,8 @@ gulp.task('copy-sw', () => {
 
 gulp.task('replace-sw', () => {
   let dir
-  if (process.env.BUILD_TARGET === 'stable') {
+
+  if (process.env.NODE_ENV === 'production') {
     dir = 'pdfanno/' + version
   } else {
     // for webpack-dev-server.
@@ -102,7 +103,7 @@ gulp.task('watch-sw', () => {
   gulp.watch(['src/sw.js'], ['build-sw'])
 })
 
-gulp.task('publish_stable', cb => {
+gulp.task('publish', cb => {
   checkIsStableVersion()
   baseDir = path.join('dist', version)
   publish(cb)
