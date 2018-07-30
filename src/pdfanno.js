@@ -18,6 +18,9 @@ import PDFAnnoPage from './page/pdf/PDFAnnoPage'
 import * as deepscholar from './deepscholar'
 import * as constants from './shared/constants'
 
+// XXX
+process.env.SERVER_PATH = '0.4.1'
+
 /**
  * API root point.
  */

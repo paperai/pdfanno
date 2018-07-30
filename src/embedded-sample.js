@@ -10,6 +10,9 @@ import PDFAnnoPage from './page/pdf/PDFAnnoPage'
 import * as publicApi from './page/public'
 import { unlistenWindowLeaveEvent } from './page/util/window'
 
+// XXX
+process.env.SERVER_PATH = '0.4.1'
+
 /**
  * API root point.
  */
