@@ -11,7 +11,7 @@ import { unlistenWindowLeaveEvent } from './page/util/window'
 import * as publicApi from './page/public'
 import * as searchUI from './page/search'
 import * as textLayer from './page/textLayer'
-import * as pdftxtDownload from './page/pdftxtdownload'
+// import * as pdftxtDownload from './page/pdftxtdownload'
 import { showLoader } from './page/util/display'
 import * as ws from './page/socket'
 import PDFAnnoPage from './page/pdf/PDFAnnoPage'
@@ -269,7 +269,7 @@ function setupUI () {
   })
 
   // Download pdftxt button.
-  pdftxtDownload.setup()
+  // pdftxtDownload.setup()
 
   // Label input.
   annoUI.labelInput.setup({
