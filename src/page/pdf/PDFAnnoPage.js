@@ -93,7 +93,7 @@ export default class PDFAnnoPage {
     //     dispatchWindowEvent('annotationDeselected')
     // })
 
-    setInterval(this.checkAnnotationUpdate, 1500)
+    // setInterval(this.checkAnnotationUpdate, 1500)
   }
 
   /**

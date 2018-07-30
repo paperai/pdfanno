@@ -327,4 +327,4 @@ function getPDFName (url) {
 window.getPDFName = getPDFName
 
 // WebSocket.
-ws.setup()
+// ws.setup()
