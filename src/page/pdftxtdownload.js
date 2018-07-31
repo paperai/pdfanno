@@ -1,4 +1,4 @@
-const constants = require('../shared/constants')
+import * as constants from '../shared/constants'
 
 /*
  * Download the result of pdfextract.jar.

@@ -13,10 +13,11 @@ import * as searchUI from './page/search'
 import * as textLayer from './page/textLayer'
 // import * as pdftxtDownload from './page/pdftxtdownload'
 import { showLoader } from './page/util/display'
-import * as ws from './page/socket'
+// import * as ws from './page/socket'
 import PDFAnnoPage from './page/pdf/PDFAnnoPage'
 import * as deepscholar from './deepscholar'
 import * as constants from './shared/constants'
+import * as pdfextractdownload from './page/pdfextractdownload'
 
 // XXX
 process.env.SERVER_PATH = '0.4.1'
@@ -72,6 +73,9 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   // UI.
   setupUI()
+
+  // Setup downloadPDFExtractButton
+  pdfextractdownload.setup()
 
   // Show loading.
   showLoader(true)
