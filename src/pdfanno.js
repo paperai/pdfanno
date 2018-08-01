@@ -18,6 +18,7 @@ import PDFAnnoPage from './page/pdf/PDFAnnoPage'
 import * as deepscholar from './deepscholar'
 import * as constants from './shared/constants'
 import * as pdfextractdownload from './page/pdfextractdownload'
+import { readPdftxt } from './page/pdf/loadFiles'
 
 // XXX
 process.env.SERVER_PATH = '0.4.1'
@@ -209,14 +210,26 @@ function setupUI () {
       window.annoPage.displayViewer(content)
 
       // Upload and analyze the PDF for search.
-      annoUI.uploadButton.uploadPDF({
-        contentFile     : content,
-        successCallback : text => {
-          dispatchWindowEvent('didChangeContent')
-          searchUI.setup(text)
-          textLayer.setup(text)
-          window.annoPage.pdftxt = text
-        }
+      // annoUI.uploadButton.uploadPDF({
+      //   contentFile     : content,
+      //   successCallback : text => {
+      //     dispatchWindowEvent('didChangeContent')
+      //     searchUI.setup(text)
+      //     textLayer.setup(text)
+      //     window.annoPage.pdftxt = text
+      //   }
+      // })
+
+      // Read pdftxt file.
+      readPdftxt(content.file).then(text => {
+        console.log(text)
+        dispatchWindowEvent('didChangeContent')
+        searchUI.setup(text)
+        textLayer.setup(text)
+        window.annoPage.pdftxt = text
+      }).catch(err => {
+        console.log(err)
+        return annoUI.ui.alertDialog.show({ message : err })
       })
     }
   })

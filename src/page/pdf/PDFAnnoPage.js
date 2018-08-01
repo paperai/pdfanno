@@ -1,6 +1,6 @@
 import axios from 'axios'
 import * as annoUI from 'anno-ui'
-import loadFiles from './loadFiles'
+import { loadFiles } from './loadFiles'
 import { getSearchHighlight } from '../search'
 import * as socket from '../socket'
 import { anyOf, dispatchWindowEvent } from '../../shared/util'
