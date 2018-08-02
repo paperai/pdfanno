@@ -33,6 +33,9 @@ app.post('/internal/api/pdfs/:documentId', upload.fields([]), controller.interna
 app.get('/internal/api/pdfs', controller.internal.loadPDF)
 // Load an annotation from the web.
 app.get('/internal/api/annotations', controller.internal.loadAnno)
+// Load a label file from the web.
+app.get('/internal/api/labels', controller.internal.loadLabel)
+
 
 /***********************
  Internal APIs with DeepScholar.

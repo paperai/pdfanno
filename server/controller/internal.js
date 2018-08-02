@@ -122,3 +122,35 @@ module.exports.loadAnno = function (req, res) {
         });
     });
 }
+
+/**
+ * Load an anno file from web.
+ *
+ * Examples:
+ *  - http://localhost:8080/dist/?pdf=http://www.yoheim.net/tmp/pdf-sample.pdf&anno=http://www.yoheim.net/tmp/ex1.anno
+ */
+module.exports.loadLabel = function (req, res) {
+
+    const labelURL = req.query.url;
+    console.log('labelURL=', labelURL);
+
+    const reqConfig = {
+        method : 'GET',
+        url    : labelURL
+    };
+    request(reqConfig, function(error, response, body) {
+        if (response.statusCode !== 200) {
+            if (response.statusCode === 404) {
+                error = 'Resource is not found.';
+            }
+            return res.json({
+                status : 'failure',
+                error  : error
+            });
+        }
+        res.json({
+            status : 'success',
+            label  : body
+        });
+    });
+}

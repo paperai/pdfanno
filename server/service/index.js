@@ -13,7 +13,6 @@ const packageJson = require('../../package.json')
 // const constants = require('../../src/shared/constants')
 const ANNO_FILE_EXTENSION = 'pdfanno'
 
-
 module.exports.deepscholarService = require('./deepscholar')
 
 module.exports.fetchPDF = async url => {

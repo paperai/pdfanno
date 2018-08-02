@@ -103,11 +103,11 @@ async function displayViewer () {
   const q        = URI(document.URL).query(true)
   const pdfURL   = q.pdf || getDefaultPDFURL()
   const annoURL  = q.anno
+  const labelURL = q.label
   const moveTo   = q.move
 
   // Load a PDF file.
   try {
-
     let { pdf, analyzeResult } = await window.annoPage.loadPDFFromServer(pdfURL)
 
     setTimeout(() => {
@@ -119,6 +119,11 @@ async function displayViewer () {
 
     const listenPageRendered = async () => {
       showLoader(false)
+
+      if (labelURL) {
+        let label = await window.annoPage.loadLabelFileFromServer(labelURL)
+        annoUI.labelInput.loadLabelDbfromUrl(label)
+      }
 
       // Load and display annotations, if annoURL is set.
       if (annoURL) {
