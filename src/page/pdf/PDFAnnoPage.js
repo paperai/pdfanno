@@ -621,6 +621,23 @@ export default class PDFAnnoPage {
     })
   }
 
+  /**
+   * Load a label file from the server.
+   */
+  loadLabelFileFromServer (url) {
+    return axios.get(`${window.API_ROOT}internal/api/labels?url=${url}`).then(res => {
+      if (res.status !== 200 || res.data.status === 'failure') {
+        let reason = ''
+        if (res.data.error) {
+          reason = '<br>Reason: ' + res.data.error
+        }
+        annoUI.ui.alertDialog.show({ message : 'Failed to load an label file. url=' + url + reason })
+        return Promise.reject()
+      }
+      return res.data.label
+    })
+  }
+
   set pdftxt (text) {
     this._pdftxt = text
   }
