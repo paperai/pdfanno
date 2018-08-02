@@ -209,20 +209,8 @@ function setupUI () {
       // Display the PDF on the viewer.
       window.annoPage.displayViewer(content)
 
-      // Upload and analyze the PDF for search.
-      // annoUI.uploadButton.uploadPDF({
-      //   contentFile     : content,
-      //   successCallback : text => {
-      //     dispatchWindowEvent('didChangeContent')
-      //     searchUI.setup(text)
-      //     textLayer.setup(text)
-      //     window.annoPage.pdftxt = text
-      //   }
-      // })
-
       // Read pdftxt file.
       readPdftxt(content.file).then(text => {
-        console.log(text)
         dispatchWindowEvent('didChangeContent')
         searchUI.setup(text)
         textLayer.setup(text)
