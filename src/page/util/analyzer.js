@@ -112,13 +112,13 @@ function parseInfo (info) {
 /**
  * Interpret the meta data.
  */
-export function extractMeta (info) {
-  const [ x, y, w, h ] = info[4]
+export function extractMeta (meta) {
+  const [ x, y, w, h ] = meta[4]
   return {
-    position : info[0],
-    page     : info[1],
+    position : meta[0],
+    page     : meta[1],
     type     : 'TEXT',
-    char     : info[3],
+    char     : meta[3],
     x,
     y,
     w,
