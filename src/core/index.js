@@ -7,6 +7,7 @@ import { dispatchWindowEvent } from '../shared/util'
 import EventEmitter from 'events'
 
 window.globalEvent = new EventEmitter()
+window.globalEvent.setMaxListeners(0)
 
 // This is the entry point of window.xxx.
 // (setting from webpack.config.js)
