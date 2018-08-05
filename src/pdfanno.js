@@ -1,7 +1,9 @@
 require('file-loader?name=index.html!./index.html')
 require('!style-loader!css-loader!./pdfanno.css')
 
-import URI from 'urijs'
+// /tab=TAB&pdf=PDFURL&anno=ANNOURL&move
+
+import urijs from 'urijs'
 
 // UI parts.
 import * as annoUI from 'anno-ui'
@@ -88,7 +90,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   window.annoPage.startViewerApplication()
 
   // initial tab.
-  const q        = URI(document.URL).query(true)
+  const q        = urijs(document.URL).query(true)
   const tabIndex = q.tab && parseInt(q.tab, 10)
   if (tabIndex) {
     $(`.nav-tabs a[href="#tab${tabIndex}"]`).click()
@@ -108,7 +110,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 async function displayViewer () {
 
   // Display a PDF specified via URL query parameter.
-  const q        = URI(document.URL).query(true)
+  const q        = urijs(document.URL).query(true)
   const pdfURL   = q.pdf || getDefaultPDFURL()
   const annoURL  = q.anno
   const moveTo   = q.move
@@ -131,10 +133,18 @@ async function displayViewer () {
       // Load and display annotations, if annoURL is set.
       if (annoURL) {
         let anno = await window.annoPage.loadAnnoFileFromServer(annoURL)
-        publicApi.addAllAnnotations(publicApi.readTOML(anno))
-        // Set colors.
-        const colorMap = annoUI.labelInput.getColorMap()
-        window.iframeWindow.annotationContainer.setColor(colorMap)
+
+        window.annoPage.importAnnotation({
+          primary     : true,
+          annotations : [anno],
+          colorMap    : annoUI.labelInput.getColorMap()
+        }, true)
+
+        // publicApi.addAllAnnotations(publicApi.readTOML(anno))
+        // // Set colors.
+        // const colorMap = annoUI.labelInput.getColorMap()
+        // window.iframeWindow.annotationContainer.setColor(colorMap)
+
         // Move to the annotation.
         if (moveTo) {
           setTimeout(() => {
