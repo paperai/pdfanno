@@ -80,11 +80,12 @@ export default class AnnotationContainer {
   }
 
   /**
-   * Change the annotations color, if the text is the same in an annotation.
+   * Change the annotations color and text, if the text is the same in an annotation.
+   * when the argument has oldText annotation.text is updated by text, too..
    *
-   * annoType : span, one-way, two-way, link
+   * annoType : span, relation
    */
-  changeColor ({ text, color, uuid, annoType }) {
+  changeColor ({ text, color, uuid, annoType, oldText }) {
     console.log('changeColor: ', text, color, uuid)
     if (uuid) {
       const a = this.findById(uuid)
@@ -94,18 +95,31 @@ export default class AnnotationContainer {
         a.enableViewMode()
       }
     } else {
+      const annoTypeFilter = (a) => {
+        if (annoType === 'span') {
+          return a.type === annoType
+        } else if (annoType === 'relation') {
+          if (a.type === 'relation' && a.direction === annoType) {
+            return true
+          }
+        }
+        return false
+      }
+
+      if (oldText !== undefined) {
+        this.getAllAnnotations()
+          .filter(a => a.text === oldText)
+          .filter(annoTypeFilter)
+          .forEach(a => {
+            a.text = text
+            a.render()
+            a.enableViewMode()
+          })
+      }
       this.getAllAnnotations()
         .filter(a => a.text === text)
-        .filter(a => {
-          if (annoType === 'span') {
-            return a.type === annoType
-          } else if (annoType === 'relation') {
-            if (a.type === 'relation' && a.direction === annoType) {
-              return true
-            }
-          }
-          return false
-        }).forEach(a => {
+        .filter(annoTypeFilter)
+        .forEach(a => {
           a.color = color
           a.render()
           a.enableViewMode()
