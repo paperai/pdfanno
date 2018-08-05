@@ -132,6 +132,7 @@ async function displayViewer () {
 
       // Load and display annotations, if annoURL is set.
       if (annoURL) {
+
         let anno = await window.annoPage.loadAnnoFileFromServer(annoURL)
 
         window.annoPage.importAnnotation({
@@ -139,11 +140,6 @@ async function displayViewer () {
           annotations : [anno],
           colorMap    : annoUI.labelInput.getColorMap()
         }, true)
-
-        // publicApi.addAllAnnotations(publicApi.readTOML(anno))
-        // // Set colors.
-        // const colorMap = annoUI.labelInput.getColorMap()
-        // window.iframeWindow.annotationContainer.setColor(colorMap)
 
         // Move to the annotation.
         if (moveTo) {

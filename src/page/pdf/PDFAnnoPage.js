@@ -585,7 +585,8 @@ export default class PDFAnnoPage {
       if (response.ok) {
         return response.arrayBuffer()
       } else {
-        throw new Error(`HTTP ${response.status} - ${response.statusText}`)
+        // throw new Error(`HTTP ${response.status} - ${response.statusText}`)
+        throw new Error(`HTTP ${response.status} - PDFファイルのロードに失敗しました。`)
       }
     }).then(buffer => {
       return new Uint8Array(buffer)
@@ -612,7 +613,8 @@ export default class PDFAnnoPage {
       if (response.ok) {
         return response.arrayBuffer()
       } else {
-        throw new Error(`HTTP ${response.status} - ${response.statusText}`)
+        // throw new Error(`HTTP ${response.status} - ${response.statusText}`)
+        throw new Error(`HTTP ${response.status} - pdftxtファイルのロードに失敗しました。`)
       }
     }).then(buffer => {
       return new Uint8Array(buffer)
@@ -656,7 +658,8 @@ export default class PDFAnnoPage {
       if (response.ok) {
         return response.text()
       } else {
-        throw new Error(`HTTP ${response.status} - ${response.statusText}`)
+        // throw new Error(`HTTP ${response.status} - ${response.statusText}`)
+        throw new Error(`HTTP ${response.status} - annotationファイルのロードに失敗しました。`)
       }
     })
   }
