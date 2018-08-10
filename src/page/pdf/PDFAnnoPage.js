@@ -1,4 +1,4 @@
-import axios from 'axios'
+// import axios from 'axios'
 import * as annoUI from 'anno-ui'
 import { loadFiles } from './loadFiles'
 import { getSearchHighlight } from '../search'
@@ -630,9 +630,7 @@ export default class PDFAnnoPage {
    * @memberof PDFAnnoPage
    */
   loadPDFFromServer (url) {
-    // XXX
-    // const pdftxtUrl = url + '.' + PDFEXTRACT_VERSION.replace(/\./g, '-') + '.txt.gz'
-    const pdftxtUrl = 'http://localhost/proj/naist/project01/dev/__data/P12-1046.pdf.0-3-0.txt.gz'
+    const pdftxtUrl = url + '.' + PDFEXTRACT_VERSION.replace(/\./g, '-') + '.txt.gz'
     return Promise.all([
       this.loadPdf(url),
       this.loadPdftxt(pdftxtUrl)
