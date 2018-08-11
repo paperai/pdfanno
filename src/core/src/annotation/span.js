@@ -1,7 +1,7 @@
 import { uuid } from 'anno-ui/src/utils'
 import AbstractAnnotation from './abstract'
-import { convertFromExportY } from '../../../shared/coords'
-import appendChild from '../render/appendChild'
+// import { convertFromExportY } from '../../../shared/coords'
+// import appendChild from '../render/appendChild'
 
 /**
  * Span Annotation.
@@ -83,7 +83,6 @@ export default class SpanAnnotation extends AbstractAnnotation {
 
     return super.render()
   }
-
 
   /**
    * Set a hover event.

@@ -1,7 +1,9 @@
-require('file-loader?name=dist/index.html!./index.html')
+require('file-loader?name=index.html!./index.html')
 require('!style-loader!css-loader!./pdfanno.css')
 
-import URI from 'urijs'
+// /tab=TAB&pdf=PDFURL&anno=ANNOURL&move
+
+import urijs from 'urijs'
 
 // UI parts.
 import * as annoUI from 'anno-ui'
@@ -11,12 +13,17 @@ import { unlistenWindowLeaveEvent } from './page/util/window'
 import * as publicApi from './page/public'
 import * as searchUI from './page/search'
 import * as textLayer from './page/textLayer'
-import * as pdftxtDownload from './page/pdftxtdownload'
+// import * as pdftxtDownload from './page/pdftxtdownload'
 import { showLoader } from './page/util/display'
-import * as ws from './page/socket'
+// import * as ws from './page/socket'
 import PDFAnnoPage from './page/pdf/PDFAnnoPage'
 import * as deepscholar from './deepscholar'
 import * as constants from './shared/constants'
+import * as pdfextractdownload from './page/pdfextractdownload'
+import { readPdftxt } from './page/pdf/loadFiles'
+
+// XXX
+process.env.SERVER_PATH = '0.4.1'
 
 /**
  * API root point.
@@ -70,6 +77,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   // UI.
   setupUI()
 
+  // Setup downloadPDFExtractButton
+  pdfextractdownload.setup()
+
   // Show loading.
   showLoader(true)
 
@@ -80,7 +90,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   window.annoPage.startViewerApplication()
 
   // initial tab.
-  const q        = URI(document.URL).query(true)
+  const q        = urijs(document.URL).query(true)
   const tabIndex = q.tab && parseInt(q.tab, 10)
   if (tabIndex) {
     $(`.nav-tabs a[href="#tab${tabIndex}"]`).click()
@@ -100,7 +110,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 async function displayViewer () {
 
   // Display a PDF specified via URL query parameter.
-  const q        = URI(document.URL).query(true)
+  const q        = urijs(document.URL).query(true)
   const pdfURL   = q.pdf || getDefaultPDFURL()
   const annoURL  = q.anno
   const moveTo   = q.move
@@ -122,11 +132,15 @@ async function displayViewer () {
 
       // Load and display annotations, if annoURL is set.
       if (annoURL) {
+
         let anno = await window.annoPage.loadAnnoFileFromServer(annoURL)
-        publicApi.addAllAnnotations(publicApi.readTOML(anno))
-        // Set colors.
-        const colorMap = annoUI.labelInput.getColorMap()
-        window.iframeWindow.annotationContainer.setColor(colorMap)
+
+        window.annoPage.importAnnotation({
+          primary     : true,
+          annotations : [anno],
+          colorMap    : annoUI.labelInput.getColorMap()
+        }, true)
+
         // Move to the annotation.
         if (moveTo) {
           setTimeout(() => {
@@ -201,15 +215,15 @@ function setupUI () {
       // Display the PDF on the viewer.
       window.annoPage.displayViewer(content)
 
-      // Upload and analyze the PDF for search.
-      annoUI.uploadButton.uploadPDF({
-        contentFile     : content,
-        successCallback : text => {
-          dispatchWindowEvent('didChangeContent')
-          searchUI.setup(text)
-          textLayer.setup(text)
-          window.annoPage.pdftxt = text
-        }
+      // Read pdftxt file.
+      readPdftxt(content.file).then(text => {
+        dispatchWindowEvent('didChangeContent')
+        searchUI.setup(text)
+        textLayer.setup(text)
+        window.annoPage.pdftxt = text
+      }).catch(err => {
+        console.log(err)
+        return annoUI.ui.alertDialog.show({ message : err })
       })
     }
   })
@@ -266,7 +280,7 @@ function setupUI () {
   })
 
   // Download pdftxt button.
-  pdftxtDownload.setup()
+  // pdftxtDownload.setup()
 
   // Label input.
   annoUI.labelInput.setup({
@@ -308,10 +322,8 @@ function getDefaultPDFURL () {
   // e.g. https://paperai.github.io:80/pdfanno/pdfs/P12-1046.pdf
   const pathnames = location.pathname.split('/')
   const pdfURL = location.protocol + '//' + location.hostname + ':' + location.port + pathnames.slice(0, pathnames.length - 1).join('/') + '/pdfs/P12-1046.pdf'
-  console.log(location.pathname, pathnames, pdfURL)
-  // return pdfURL
-  // XXX 今回のみ
-  return 'https://paperai.github.io/pdfanno/0.4.1/pdfs/P12-1046.pdf'
+  // console.log(location.pathname, pathnames, pdfURL)
+  return pdfURL
 }
 
 /**
@@ -324,4 +336,4 @@ function getPDFName (url) {
 window.getPDFName = getPDFName
 
 // WebSocket.
-ws.setup()
+// ws.setup()

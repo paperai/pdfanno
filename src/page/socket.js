@@ -35,7 +35,7 @@ export function setup () {
 }
 
 export function sendAnnotationUpdated (data) {
-  send('annotation', data)
+  // send('annotation', data)
   console.log(data.updated)
 }
 

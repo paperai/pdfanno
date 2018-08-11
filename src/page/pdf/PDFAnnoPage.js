@@ -1,6 +1,6 @@
-import axios from 'axios'
+// import axios from 'axios'
 import * as annoUI from 'anno-ui'
-import loadFiles from './loadFiles'
+import { loadFiles } from './loadFiles'
 import { getSearchHighlight } from '../search'
 import * as socket from '../socket'
 import { anyOf, dispatchWindowEvent } from '../../shared/util'
@@ -9,8 +9,10 @@ import {
   unlistenWindowLeaveEvent,
   adjustViewerSize
 } from '../util/window'
-import { saveSpan } from '../../core/src/UI/span'
+// import { saveSpan } from '../../core/src/UI/span'
 import * as constants from '../../shared/constants'
+import * as pako from 'pako'
+import { PDFEXTRACT_VERSION } from '../../core/src/version'
 
 /**
  * PDFAnno's Annotation functions for Page produced by .
@@ -93,7 +95,7 @@ export default class PDFAnnoPage {
     //     dispatchWindowEvent('annotationDeselected')
     // })
 
-    setInterval(this.checkAnnotationUpdate, 1500)
+    // setInterval(this.checkAnnotationUpdate, 1500)
   }
 
   /**
@@ -570,54 +572,93 @@ export default class PDFAnnoPage {
   }
 
   /**
-   * Load a PDF data from the server.
+   * Load PDF data from url.
+   * @param {String} url
+   * @returns Promise<Uint8Array>
+   * @memberof PDFAnnoPage
    */
-  loadPDFFromServer (url) {
-    return new Promise((resolve, reject) => {
-      // Load a PDF as ArrayBuffer.
-      var xhr = new XMLHttpRequest()
-      xhr.open('GET', window.API_ROOT + 'internal/api/pdfs?url=' + window.encodeURIComponent(url), true)
-      xhr.responseType = 'json'
-      xhr.onload = function () {
-        if (this.status === 200) {
-          // Error handling.
-          if (this.response.status === 'failure') {
-            let error = this.response.err.stderr || this.response.err
-            return reject(error)
-          }
-          // Get a PDF as arrayBuffer.
-          const pdf = Uint8Array.from(atob(this.response.pdf), c => c.charCodeAt(0))
-          const analyzeResult = this.response.analyzeResult
-          resolve({ pdf, analyzeResult })
-        } else {
-          reject(this.status)
-        }
+  loadPdf (url) {
+    return fetch(url, {
+      method : 'GET',
+      mode   : 'cors'
+    }).then(response => {
+      if (response.ok) {
+        return response.arrayBuffer()
+      } else {
+        // throw new Error(`HTTP ${response.status} - ${response.statusText}`)
+        throw new Error(`HTTP ${response.status} - PDFファイルのロードに失敗しました。`)
       }
-      xhr.timeout = 120 * 1000 // 120s
-      xhr.ontimeout = function () {
-        reject('Failed to load the PDF.')
+    }).then(buffer => {
+      return new Uint8Array(buffer)
+    })
+  }
+
+  // loadPdftxt (url) {
+  //   this.loadPdf(url).then(data => {
+  //     return pako.inflate(data, {to : 'string'})
+  //   })
+  // }
+
+  /**
+   * Load pdftxt data from url.
+   * @param {String} url
+   * @returns Promise<String>
+   * @memberof PDFAnnoPage
+   */
+  loadPdftxt (url) {
+    return fetch(url, {
+      method : 'GET',
+      mode   : 'cors'
+    }).then(response => {
+      if (response.ok) {
+        return response.arrayBuffer()
+      } else {
+        // throw new Error(`HTTP ${response.status} - ${response.statusText}`)
+        throw new Error(`HTTP ${response.status} - pdftxtファイルのロードに失敗しました。`)
       }
-      xhr.onerror = function (err) {
-        reject(err)
-      }
-      xhr.send()
+    }).then(buffer => {
+      return new Uint8Array(buffer)
+    }).then(data => {
+      return pako.inflate(data, {to : 'string'})
     })
   }
 
   /**
-   * Load an annotation file from the server.
+   * Load PDF and pdftxt from url.
+   * @param {String} url
+   * @returns Promise<Object>
+   * @memberof PDFAnnoPage
+   */
+  loadPDFFromServer (url) {
+    const pdftxtUrl = url + '.' + PDFEXTRACT_VERSION.replace(/\./g, '-') + '.txt.gz'
+    return Promise.all([
+      this.loadPdf(url),
+      this.loadPdftxt(pdftxtUrl)
+    ]).then(results => {
+      return {
+        pdf           : results[0],
+        analyzeResult : results[1]
+      }
+    })
+  }
+
+  /**
+   * Load PDF annotaion file from url.
+   * @param {String} url
+   * @returns Promise<String>
+   * @memberof PDFAnnoPage
    */
   loadAnnoFileFromServer (url) {
-    return axios.get(`${window.API_ROOT}internal/api/annotations?url=${url}`).then(res => {
-      if (res.status !== 200 || res.data.status === 'failure') {
-        let reason = ''
-        if (res.data.error) {
-          reason = '<br>Reason: ' + res.data.error
-        }
-        annoUI.ui.alertDialog.show({ message : 'Failed to load an anno file. url=' + url + reason })
-        return Promise.reject()
+    return fetch(url, {
+      method : 'GET',
+      mode   : 'cors'
+    }).then(response => {
+      if (response.ok) {
+        return response.text()
+      } else {
+        // throw new Error(`HTTP ${response.status} - ${response.statusText}`)
+        throw new Error(`HTTP ${response.status} - annotationファイルのロードに失敗しました。`)
       }
-      return res.data.anno
     })
   }
 

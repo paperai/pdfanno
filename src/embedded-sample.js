@@ -1,4 +1,4 @@
-require('file-loader?name=dist/embedded-sample.html!./embedded-sample.html')
+require('file-loader?name=embedded-sample.html!./embedded-sample.html')
 require('!style-loader!css-loader!./embedded-sample.css')
 
 // sample.
@@ -9,6 +9,9 @@ import URI from 'urijs' // TODO これが意外と重たいようだ... setTimeo
 import PDFAnnoPage from './page/pdf/PDFAnnoPage'
 import * as publicApi from './page/public'
 import { unlistenWindowLeaveEvent } from './page/util/window'
+
+// XXX
+process.env.SERVER_PATH = '0.4.1'
 
 /**
  * API root point.

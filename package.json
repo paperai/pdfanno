@@ -7,17 +7,10 @@
     "_prepare": "gulp prepare",
     "docs:dev": "vuepress dev docs",
     "docs:build": "vuepress build docs",
-    "start": "concurrently --kill-others \"npm run server:dev\" \"npm run front:dev\"",
     "front:sw": "gulp build-sw",
     "front:sw:watch": "gulp watch-sw",
-    "front:dev": "concurrently --kill-others \"npm run _prepare && npm run front:sw && webpack-dev-server --inline\" \"npm run front:sw:watch\"",
-    "front:publish:latest": "npm run _prepare && cross-env BUILD_TARGET=latest npm run front:sw && cross-env NODE_ENV=production SERVER_PATH=latest webpack && gulp publish_latest",
-    "front:publish:stable": "npm run _prepare && cross-env BUILD_TARGET=stable  npm run front:sw && cross-env NODE_ENV=production SERVER_PATH=0.3.1  webpack && gulp publish_stable",
-    "front:publish:0-4-1": "npm run _prepare && cross-env BUILD_TARGET=stable  npm run front:sw && cross-env NODE_ENV=production SERVER_PATH=0.4.1  webpack && gulp publish_stable",
-    "server:latest": "cross-env NODE_ENV=production NODE_PORT=1001 node server/server.js",
-    "server:stable": "cross-env NODE_ENV=production NODE_PORT=1000 node server/server.js",
-    "server:0-4-1": "cross-env NODE_ENV=production NODE_PORT=1002 node server/server.js",
-    "server:dev": "cross-env NODE_PORT=3000 ./node_modules/.bin/node-dev server/server.js"
+    "front:dev": "cross-env NODE_ENV=development concurrently --kill-others \"npm run _prepare && npm run front:sw && webpack-dev-server --inline\" \"npm run front:sw:watch\"",
+    "front:publish": "cross-env-shell NODE_ENV=production \"npm run _prepare && npm run front:sw && webpack && gulp publish\""
   },
   "repository": {
     "type": "git",
@@ -30,8 +23,8 @@
   },
   "homepage": "https://github.com/paperai/pdfanno#readme",
   "pdfextract": {
-    "version": "0.2.4",
-    "url": "https://github.com/paperai/pdfextract/releases/download/untagged-6b0e4f23df695e8b7587/pdfextract-0.2.4.jar"
+    "version": "0.3.0",
+    "url": "https://github.com/paperai/pdfextract/releases/download/v0.3.0/pdfextract-0.3.0.jar"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -85,6 +78,7 @@
     "mkdirp": "^0.5.1",
     "mkdirp-promise": "^5.0.1",
     "multer": "^1.3.0",
+    "pako": "^1.0.6",
     "request": "^2.81.0",
     "request-promise": "^4.2.2",
     "requirejs": "^2.3.5",

@@ -1,7 +1,7 @@
 /**
  * Search functions.
  */
-import { paddingBetweenPages, nextZIndex } from '../shared/coords'
+import { paddingBetweenPages } from '../shared/coords'
 import { customizeAnalyzeResult, extractMeta } from './util/analyzer'
 import { searchUI } from 'anno-ui'
 

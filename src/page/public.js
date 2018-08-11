@@ -85,7 +85,6 @@ function setColor (data) {
   }
 }
 
-
 /**
  * Add an annotation, and render it.
  */
