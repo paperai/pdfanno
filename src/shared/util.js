@@ -1,3 +1,5 @@
+import * as Constants from './constants'
+
 /**
  * Utility.
  */
@@ -29,4 +31,30 @@ export function parseUrlQuery () {
       map[key] = value
       return map
     }, {})
+}
+
+/**
+ * get Page Container of PDF Viewer.
+ * @returns {jQueryObject}
+ */
+export function getContainer (page) {
+  return $([
+    '#',
+    Constants.PAGE_CONTAINER_ID,
+    page
+  ].join(''))
+}
+
+/**
+ * get AnnoLayer of PDF Viewer.
+ * @returns {jQueryObject}
+ */
+export function getAnnoLayer (page) {
+  return $([
+    '#',
+    Constants.PAGE_CONTAINER_ID,
+    page,
+    ' .',
+    Constants.ANNO_LAYER_CLASS_NAME
+  ].join(''))
 }

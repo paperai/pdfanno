@@ -248,6 +248,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const $viewer = $('#viewer')
 
   $viewer.on('mousedown', '.canvasWrapper', e => {
+
     if (otherAnnotationTreating) {
       // Ignore, if other annotation is detected.
       return
@@ -264,11 +265,13 @@ window.addEventListener('DOMContentLoaded', () => {
     makeSelections(e)
   })
   $viewer.on('mousemove', '.canvasWrapper', e => {
+
     if (mouseDown) {
       makeSelections(e)
     }
   })
   $viewer.on('mouseup', '.canvasWrapper', e => {
+
     if (mouseDown) {
       makeSelections(e)
       if (spanAnnotation) {

@@ -18,12 +18,12 @@ function transform (node, viewport) {
 /**
  * Append an annotation as a child of an SVG.
  *
- * @param {SVGElement} svg The SVG element to append the annotation to
+ * @param {Element} base element to append the annotation to
  * @param {Object} annotation The annotation definition to render and append
  * @param {Object} viewport The page's viewport data
  * @return {SVGElement} A node that was created and appended by this function
  */
-export default function appendChild (svg, annotation, viewport) {
+export default function appendChild (base, annotation, viewport) {
   // TODO no need third argument(viewport) ?
   if (!viewport) {
     viewport = window.PDFView.pdfViewer.getPageView(0).viewport
@@ -32,16 +32,16 @@ export default function appendChild (svg, annotation, viewport) {
   let child
   switch (annotation.type) {
   case 'rect':
-    child = renderRect(annotation, svg)
+    child = renderRect(annotation, base)
     break
   case 'span':
-    child = renderSpan(annotation, svg)
+    child = renderSpan(annotation, base)
     break
   case 'textbox':
-    child = renderText(annotation, svg)
+    child = renderText(annotation, base)
     break
   case 'relation':
-    child = renderRelation(annotation, svg)
+    child = renderRelation(annotation, base)
     break
   }
 
@@ -52,11 +52,11 @@ export default function appendChild (svg, annotation, viewport) {
     let elm = transform(child, viewport)
 
     if (annotation.type === 'textbox') {
-      svg.appendChild(elm)
+      base.appendChild(elm)
 
       // `text` show above other type elements.
     } else {
-      svg.append(elm)
+      base.append(elm)
     }
   }
   return child

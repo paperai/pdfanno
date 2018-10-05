@@ -2,6 +2,7 @@ import EventEmitter from 'events'
 import appendChild from '../render/appendChild'
 import { DEFAULT_RADIUS } from '../render/renderKnob'
 import { dispatchWindowEvent } from '../utils/event'
+import * as Utils from '../../../shared/util'
 
 /**
  * Abstract Annotation Class.
@@ -49,15 +50,13 @@ export default class AbstractAnnotation extends EventEmitter {
       return false
     }
 
-    const base = $('#annoLayer2')[0]
-    this.$element = $(appendChild(base, this))
+    this.$element = $(appendChild(Utils.getAnnoLayer(this.page)[0], this))
 
     if (!this.hoverEventDisable && this.setHoverEvent) {
       this.setHoverEvent()
     }
 
     this.selected && this.$element.addClass('--selected')
-
     this.disabled && this.disable()
 
     return true
@@ -220,8 +219,6 @@ export default class AbstractAnnotation extends EventEmitter {
     const $circle = this.$element.find('.anno-knob')
     if ($circle.length > 0) {
       return {
-        // x : parseFloat($circle.css('left')) + parseFloat($circle.css('width')) / 2,
-        // y : parseFloat($circle.css('top')) + parseFloat($circle.css('height')) / 2
         x : parseFloat($circle.css('left')) + DEFAULT_RADIUS / 2.0,
         y : parseFloat($circle.css('top')) + DEFAULT_RADIUS / 2.0
       }

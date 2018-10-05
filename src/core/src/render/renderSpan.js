@@ -15,8 +15,7 @@ export function renderSpan (a) {
 
   const color = a.color || '#FF0'
 
-  const $base = $('<div class="anno-span"/>')
-    .css('zIndex', a.zIndex || 10)
+  const $base = $('<div class="anno-span"/>').css('zIndex', a.zIndex || 10)
 
   if (!a.page) {
     if (a.rectangles.length > 0) {
@@ -24,25 +23,25 @@ export function renderSpan (a) {
     }
   }
 
-  let paddingTop = 9
-  const pageView = window.PDFView.pdfViewer.getPageView(0)
-  const viewport = pageView.viewport
-  const scale = viewport.scale
+  // let paddingTop = 9
+  // const pageView = window.PDFView.pdfViewer.getPageView(0)
+  // const viewport = pageView.viewport
+  // const scale = viewport.scale
   // const viewBox = viewport.viewBox
   // let pageHeight = viewBox[3] - viewBox[1]
-  let merginBetweenPages =  1
+  // let merginBetweenPages =  1
 
   // #139 correct the absolute position of annotation
   // let pageTopY = paddingTop + (paddingTop + pageHeight + merginBetweenPages) * (a.page - 1)
   // let pageTopY = $('#pageContainer' + a.page).position().top / scale + paddingTop
-  let pageTopY = $('#pageContainer' + a.page).position().top / scale + paddingTop + merginBetweenPages
-
-  // console.log('renderSpan()', scale, pageTopY, a.rectangles)
+  // let pageTopY = $('#pageContainer' + a.page).position().top / scale + paddingTop + merginBetweenPages
+  // let pageTopY = 0
 
   const rectangles = a.rectangles.map(r => {
     return {
       x      : r.x || r.left,
-      y      : (r.y || r.top) + pageTopY,
+      // y      : (r.y || r.top) + pageTopY,
+      y      : (r.y || r.top),
       width  : r.width || r.right - r.left,
       height : r.height || r.bottom - r.top
     }
