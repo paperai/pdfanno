@@ -54,5 +54,5 @@ export function enableViewMode () {
 
   $(document)
     .off('click', handlePageClick)
-    .on('click', '.page', handlePageClick)
+    .on('click', '.canvasWrapper', handlePageClick)
 }
