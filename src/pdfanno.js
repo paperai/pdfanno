@@ -337,3 +337,16 @@ window.getPDFName = getPDFName
 
 // WebSocket.
 // ws.setup()
+
+window.addEventListener('keydown', event => {
+  if (event.key === 'F2') {
+    console.log('annotationContainer:', window.annotationContainer.getAllAnnotations())
+    // event.preventDefault()
+    return false
+  } else if (event.key === 'F3') {
+    console.log('annotationContainer:', window.annotationContainer.getSelectedAnnotations())
+    // event.preventDefault()
+    return false
+  }
+})
+
