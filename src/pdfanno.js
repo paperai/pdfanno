@@ -8,7 +8,6 @@ import urijs from 'urijs'
 // UI parts.
 import * as annoUI from 'anno-ui'
 
-import { dispatchWindowEvent, parseUrlQuery } from './shared/util'
 import { unlistenWindowLeaveEvent } from './page/util/window'
 import * as publicApi from './page/public'
 import * as searchUI from './page/search'
@@ -21,6 +20,7 @@ import * as deepscholar from './deepscholar'
 import * as constants from './shared/constants'
 import * as pdfextractdownload from './page/pdfextractdownload'
 import { readPdftxt } from './page/pdf/loadFiles'
+import * as Utils from './shared/util'
 
 // XXX
 process.env.SERVER_PATH = '0.4.1'
@@ -201,7 +201,7 @@ function setupUI () {
     overrideWarningMessage : 'Are you sure to load another PDF ?',
     contentReloadHandler   : fileName => {
 
-      dispatchWindowEvent('willChangeContent')
+      Utils.dispatchWindowEvent('willChangeContent')
 
       // Disable UI.
       $('#searchWord, .js-dict-match-file').attr('disabled', 'disabled')
@@ -217,7 +217,7 @@ function setupUI () {
 
       // Read pdftxt file.
       readPdftxt(content.file).then(text => {
-        dispatchWindowEvent('didChangeContent')
+        Utils.dispatchWindowEvent('didChangeContent')
         searchUI.setup(text)
         textLayer.setup(text)
         window.annoPage.pdftxt = text
@@ -265,9 +265,9 @@ function setupUI () {
   annoUI.downloadButton.setup({
     getAnnotationTOMLString : window.annoPage.exportData,
     getDownloadFileName     : () => {
-      if (parseUrlQuery()['paper_id']) {
-        // return parseUrlQuery()['paper_id'] + '.pdf'
-        return parseUrlQuery()['paper_id'] + '.' + constants.ANNO_FILE_EXTENSION
+      if (Utils.parseUrlQuery()['paper_id']) {
+        // return Utils.parseUrlQuery()['paper_id'] + '.pdf'
+        return Utils.parseUrlQuery()['paper_id'] + '.' + constants.ANNO_FILE_EXTENSION
       }
       if (window.annoPage.getCurrentContentFile() && window.annoPage.getCurrentContentFile().name) {
         let filename = window.annoPage.getCurrentContentFile().name
@@ -291,7 +291,7 @@ function setupUI () {
         annotation.text = text
         annotation.save()
         annotation.enableViewMode()
-        dispatchWindowEvent('annotationUpdated')
+        Utils.dispatchWindowEvent('annotationUpdated')
       }
     },
     createSpanAnnotation : window.annoPage.createSpan,
@@ -349,4 +349,3 @@ window.addEventListener('keydown', event => {
     return false
   }
 })
-

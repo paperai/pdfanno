@@ -23,20 +23,6 @@ export function renderSpan (a) {
     }
   }
 
-  // let paddingTop = 9
-  // const pageView = window.PDFView.pdfViewer.getPageView(0)
-  // const viewport = pageView.viewport
-  // const scale = viewport.scale
-  // const viewBox = viewport.viewBox
-  // let pageHeight = viewBox[3] - viewBox[1]
-  // let merginBetweenPages =  1
-
-  // #139 correct the absolute position of annotation
-  // let pageTopY = paddingTop + (paddingTop + pageHeight + merginBetweenPages) * (a.page - 1)
-  // let pageTopY = $('#pageContainer' + a.page).position().top / scale + paddingTop
-  // let pageTopY = $('#pageContainer' + a.page).position().top / scale + paddingTop + merginBetweenPages
-  // let pageTopY = 0
-
   const rectangles = a.rectangles.map(r => {
     return {
       x      : r.x || r.left,

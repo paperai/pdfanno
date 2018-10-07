@@ -1,7 +1,6 @@
 import EventEmitter from 'events'
 import appendChild from '../render/appendChild'
 import { DEFAULT_RADIUS } from '../render/renderKnob'
-import { dispatchWindowEvent } from '../utils/event'
 import * as Utils from '../../../shared/util'
 
 /**
@@ -101,19 +100,9 @@ export default class AbstractAnnotation extends EventEmitter {
     if (this.type !== 'textbox') {
 
       if (this.selected) {
-
-        // TODO Use common function.
-        let event = document.createEvent('CustomEvent')
-        event.initCustomEvent('annotationSelected', true, true, this)
-        window.dispatchEvent(event)
-
+        Utils.dispatchWindowEvent('annotationSelected', this)
       } else {
-
-        // TODO Use common function.
-        let event = document.createEvent('CustomEvent')
-        event.initCustomEvent('annotationDeselected', true, true, this)
-        window.dispatchEvent(event)
-
+        Utils.dispatchWindowEvent('annotationDeselected', this)
       }
     }
   }
@@ -122,20 +111,18 @@ export default class AbstractAnnotation extends EventEmitter {
    * Handle a hoverIn event.
    */
   handleHoverInEvent (e) {
-    console.log('handleHoverInEvent')
     this.highlight()
     this.emit('hoverin')
-    dispatchWindowEvent('annotationHoverIn', this)
+    Utils.dispatchWindowEvent('annotationHoverIn', this)
   }
 
   /**
    * Handle a hoverOut event.
    */
   handleHoverOutEvent (e) {
-    console.log('handleHoverOutEvent')
     this.dehighlight()
     this.emit('hoverout')
-    dispatchWindowEvent('annotationHoverOut', this)
+    Utils.dispatchWindowEvent('annotationHoverOut', this)
   }
 
   /**
@@ -165,7 +152,6 @@ export default class AbstractAnnotation extends EventEmitter {
    * Deselect the annotation.
    */
   deselect () {
-    console.log('deselect')
     this.selected = false
     this.selectedTime = null
     this.$element.removeClass('--selected')
@@ -191,7 +177,7 @@ export default class AbstractAnnotation extends EventEmitter {
 
     if (this.isSelected()) {
       this.destroy().then(() => {
-        dispatchWindowEvent('annotationDeleted', { uuid : this.uuid })
+        Utils.dispatchWindowEvent('annotationDeleted', { uuid : this.uuid })
       })
       return true
     }

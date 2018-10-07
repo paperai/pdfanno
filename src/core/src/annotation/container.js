@@ -1,13 +1,13 @@
 import { uuid } from 'anno-ui/src/utils'
 import { ANNO_VERSION, PDFEXTRACT_VERSION } from '../version'
 import { toTomlString, fromTomlString } from '../utils/tomlString'
-import { dispatchWindowEvent } from '../utils/event'
-// import { convertToExportY } from '../../../shared/coords'
 import SpanAnnotation from './span'
 import RectAnnotation from './rect'
 import RelationAnnotation from './relation'
+import * as Utils from '../../../shared/util'
 import semver from 'semver'
 import Ajv from 'ajv'
+
 /**
  * Annotation Container.
  */
@@ -29,7 +29,7 @@ export default class AnnotationContainer {
    */
   add (annotation) {
     this.set.add(annotation)
-    dispatchWindowEvent('annotationUpdated')
+    Utils.dispatchWindowEvent('annotationUpdated')
   }
 
   /**
@@ -37,7 +37,7 @@ export default class AnnotationContainer {
    */
   remove (annotation) {
     this.set.delete(annotation)
-    dispatchWindowEvent('annotationUpdated')
+    Utils.dispatchWindowEvent('annotationUpdated')
   }
 
   /**

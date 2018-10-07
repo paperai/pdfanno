@@ -1,3 +1,5 @@
+import * as Utils from '../../../shared/util'
+
 /**
  * Disable the action of pageback, if `DEL` or `BackSpace` button pressed.
  */
@@ -26,10 +28,7 @@ function handlePageClick (e) {
   window.annotationContainer
     .getSelectedAnnotations()
     .forEach(a => a.deselect())
-
-  var event = document.createEvent('CustomEvent')
-  event.initCustomEvent('annotationDeselected', true, true, this)
-  window.dispatchEvent(event)
+  Utils.dispatchWindowEvent('annotationDeselected', this)
 }
 
 /**

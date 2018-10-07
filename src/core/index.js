@@ -44,10 +44,10 @@ window.addEventListener('scalechange', event => {
 })
 
 window.addEventListener('pagechange', event => {
-  console.log('pagechange: page=', window.PDFView.pdfViewer.currentPageNumber)
-  // if (event.previousPageNumber !== event.pageNumber) {
-  //   console.log('pagechange', event.pageNumber)
-  // }
+  // console.log('pagechange: page=', window.PDFView.pdfViewer.currentPageNumber)
+  if (event.previousPageNumber !== event.pageNumber) {
+    console.log('pagechange', event.pageNumber)
+  }
 })
 
 /**

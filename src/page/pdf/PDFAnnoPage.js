@@ -3,13 +3,13 @@ import * as annoUI from 'anno-ui'
 import { loadFiles } from './loadFiles'
 import { getSearchHighlight } from '../search'
 import * as socket from '../socket'
-import { anyOf, dispatchWindowEvent } from '../../shared/util'
 import { convertToExportY, paddingBetweenPages, nextZIndex } from '../../shared/coords'
 import {
   unlistenWindowLeaveEvent,
   adjustViewerSize
 } from '../util/window'
 // import { saveSpan } from '../../core/src/UI/span'
+import * as Utils from '../../shared/util'
 import * as constants from '../../shared/constants'
 import * as pako from 'pako'
 import { PDFEXTRACT_VERSION } from '../../core/src/version'
@@ -48,7 +48,7 @@ export default class PDFAnnoPage {
     // Reset the confirm dialog at leaving page.
     unlistenWindowLeaveEvent()
 
-    dispatchWindowEvent('iframeReady')
+    Utils.dispatchWindowEvent('iframeReady')
     // })
 
     // window.iframeWindow.addEventListener('pagerendered', ev => {
@@ -200,7 +200,7 @@ export default class PDFAnnoPage {
       window.iframeWindow.PDFViewerApplication.close()
       $('#numPages', window.iframeWindow.document).text('')
       this.currentContentFile = null
-      dispatchWindowEvent('didCloseViewer')
+      Utils.dispatchWindowEvent('didCloseViewer')
     }
   }
 
@@ -243,7 +243,7 @@ export default class PDFAnnoPage {
           anno.render()
           anno.enableViewMode()
         })
-      dispatchWindowEvent('disappearTextInput')
+      Utils.dispatchWindowEvent('disappearTextInput')
 
       // Create a new rectAnnotation.
     } else if (rects) {
@@ -260,19 +260,18 @@ export default class PDFAnnoPage {
         textRange    : highlight.textRange,
         selectedText : highlight.selectedText
       })
+
       this.addAnnotation(span)
 
-      var event = document.createEvent('CustomEvent')
-      event.initCustomEvent('enableTextInput', true, true, {
+      Utils.dispatchWindowEvent('enableTextInput', {
         uuid      : span.uuid,
         text      : text,
         autoFocus : true
       })
-      window.dispatchEvent(event)
     }
 
     // Notify annotation added.
-    dispatchWindowEvent('annotationrendered')
+    Utils.dispatchWindowEvent('annotationrendered')
   }
 
   /**
@@ -320,8 +319,8 @@ export default class PDFAnnoPage {
       .getAllAnnotations()
       .filter(a => a.type === 'relation')
       .filter(a => {
-        return anyOf(a.rel1Annotation.uuid, [first.uuid, second.uuid])
-          && anyOf(a.rel2Annotation.uuid, [first.uuid, second.uuid])
+        return Utils.anyOf(a.rel1Annotation.uuid, [first.uuid, second.uuid])
+          && Utils.anyOf(a.rel2Annotation.uuid, [first.uuid, second.uuid])
       })
 
     if (arrows.length > 0) {
@@ -335,13 +334,12 @@ export default class PDFAnnoPage {
       arrows[0].save()
       arrows[0].render()
       arrows[0].enableViewMode()
+
       // Show label input.
-      var event = document.createEvent('CustomEvent')
-      event.initCustomEvent('enableTextInput', true, true, {
+      Utils.dispatchWindowEvent('enableTextInput', {
         uuid : arrows[0].uuid,
         text : arrows[0].text
       })
-      window.dispatchEvent(event)
       return
     }
 
@@ -354,7 +352,7 @@ export default class PDFAnnoPage {
     })
 
     // Notify annotation added.
-    dispatchWindowEvent('annotationrendered')
+    Utils.dispatchWindowEvent('annotationrendered')
   }
 
   /**
@@ -504,7 +502,7 @@ export default class PDFAnnoPage {
   importAnnotation (paperData, isPrimary) {
     window.iframeWindow.annotationContainer.importAnnotations(paperData, isPrimary).then(() => {
       // Notify annotations added.
-      dispatchWindowEvent('annotationrendered')
+      Utils.dispatchWindowEvent('annotationrendered')
     }).catch(errors => {
       let message = errors
       if (Array.isArray(errors)) {
@@ -799,6 +797,5 @@ export default class PDFAnnoPage {
     currentAnnotations.forEach(a => {
       this.prevLabelMap[a.uuid] = a.text
     })
-
   }
 }
