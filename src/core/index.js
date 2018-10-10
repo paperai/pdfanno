@@ -98,6 +98,11 @@ function renderAnno (page = null) {
     return
   }
 
+  // This program supports only when pageRotation == 0
+  if (window.PDFView.pageRotation !== 0) {
+    return
+  }
+
   page = page || window.PDFView.pdfViewer.currentPageNumber
 
   // TODO どこで呼ぶべきか、要検討 search と関連する。
