@@ -1,7 +1,5 @@
 import { uuid } from 'anno-ui/src/utils'
 import AbstractAnnotation from './abstract'
-// import { convertFromExportY } from '../../../shared/coords'
-// import appendChild from '../render/appendChild'
 
 /**
  * Span Annotation.

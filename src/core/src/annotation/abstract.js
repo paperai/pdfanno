@@ -1,5 +1,5 @@
 import EventEmitter from 'events'
-import appendChild from '../render/appendChild'
+import appendAnnoChild from '../render/appendChild'
 import { DEFAULT_RADIUS } from '../render/renderKnob'
 import * as Utils from '../../../shared/util'
 
@@ -49,7 +49,7 @@ export default class AbstractAnnotation extends EventEmitter {
       return false
     }
 
-    this.$element = $(appendChild(Utils.getAnnoLayer(this.page)[0], this))
+    this.$element = $(appendAnnoChild(Utils.getAnnoLayer(this.page)[0], this))
 
     if (!this.hoverEventDisable && this.setHoverEvent) {
       this.setHoverEvent()
