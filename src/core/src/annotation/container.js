@@ -5,6 +5,7 @@ import SpanAnnotation from './span'
 import RectAnnotation from './rect'
 import RelationAnnotation from './relation'
 import * as Utils from '../../../shared/util'
+import {addAnnoLayer} from './layer'
 import semver from 'semver'
 import Ajv from 'ajv'
 
@@ -223,6 +224,9 @@ export default class AnnotationContainer {
       this.getAllAnnotations()
         .filter(a => a.readOnly === readOnly)
         .forEach(a => a.destroy())
+
+      // When importing pdfanno file, create annoLayer of all pages in advance
+      addAnnoLayer()
 
       // Add annotations.
       data.annotations.forEach((tomlString, i) => {

@@ -4,6 +4,7 @@
 require('!style-loader!css-loader!./index.css')
 import EventEmitter from 'events'
 import * as Utils from '../shared/util'
+import {addAnnoLayer} from './src/annotation/layer'
 
 // This is the entry point of window.xxx.
 // (setting from webpack.config.js)
@@ -11,7 +12,6 @@ import PDFAnnoCore from './src/PDFAnnoCore'
 export default PDFAnnoCore
 
 import AnnotationContainer from './src/annotation/container'
-import * as Constants from '../shared/constants'
 
 window.globalEvent = new EventEmitter()
 window.globalEvent.setMaxListeners(0)
@@ -31,8 +31,6 @@ window.addEventListener('pagerendered', event => {
     return
   }
 
-  addAnnoLayer(event.detail.pageNumber)
-
   renderAnno(event.detail.pageNumber)
 })
 
@@ -49,31 +47,6 @@ window.addEventListener('pagechange', event => {
     console.log('pagechange', event.pageNumber)
   }
 })
-
-/**
- * Add annotation layer.
- * @param {Integer} page
- */
-function addAnnoLayer (page) {
-
-  console.log('addAnnoLayer: page=', page)
-
-  const view = window.PDFView.pdfViewer.getPageView(page - 1)
-
-  if (view) {
-
-    let $annoLayer = $('<div>').addClass(Constants.ANNO_LAYER_CLASS_NAME).css({
-      width  : `${view.width}px`,
-      height : `${view.height}px`
-    })
-
-    console.log('before', Utils.getAnnoLayer(page))
-
-    Utils.getContainer(page).append($annoLayer)
-
-    console.log('after', Utils.getAnnoLayer(page))
-  }
-}
 
 /*
  * Remove the annotation layer and the temporary rendering layer.
@@ -97,6 +70,9 @@ function renderAnno (page = null) {
   if (!window.PDFView.pdfViewer.getPageView(0)) {
     return
   }
+
+  // If there is no Annotation layer in this page, create it.
+  addAnnoLayer(page)
 
   // This program supports only when pageRotation == 0
   if (window.PDFView.pageRotation !== 0) {

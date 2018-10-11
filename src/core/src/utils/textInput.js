@@ -5,7 +5,7 @@ import * as Utils from '../../../shared/util'
  */
 export function enable ({ uuid, text, disable = false, autoFocus = false, blurListener = null }) {
   Utils.dispatchWindowEvent('enableTextInput', ...arguments)
-  console.log('dispatchEvent:', event, arguments[0])
+  // console.log('dispatchEvent:', event, arguments[0])
 }
 
 /**

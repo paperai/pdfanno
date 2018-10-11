@@ -339,13 +339,13 @@ window.getPDFName = getPDFName
 // ws.setup()
 
 window.addEventListener('keydown', event => {
-  if (event.key === 'F2') {
+  if (event.key === 'F1') {
     console.log('annotationContainer:', window.annotationContainer.getAllAnnotations())
-    // event.preventDefault()
+    event.preventDefault()
     return false
-  } else if (event.key === 'F3') {
+  } else if (event.key === 'F2') {
     console.log('annotationContainer:', window.annotationContainer.getSelectedAnnotations())
-    // event.preventDefault()
+    event.preventDefault()
     return false
   }
 })

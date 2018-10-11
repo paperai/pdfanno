@@ -219,7 +219,7 @@ export default class PDFAnnoPage {
 
     // Get user selection.
     const rects = window.iframeWindow.PDFAnnoCore.default.UI.getRectangles()
-    console.log('createSpan:rects:', rects)
+    // console.log('createSpan:rects:', rects)
 
     // Get a search result, if exists.
     const highlight = getSearchHighlight()
