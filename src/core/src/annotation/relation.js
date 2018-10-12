@@ -1,7 +1,7 @@
 import { uuid } from 'anno-ui/src/utils'
 import AbstractAnnotation from './abstract'
 import { getRelationTextPosition } from '../utils/relation.js'
-import { anyOf } from '../../../shared/util'
+import * as Utils from '../../../shared/util'
 
 let globalEvent
 
@@ -45,7 +45,6 @@ export default class RelationAnnotation extends AbstractAnnotation {
   static newInstance (annotation) {
     let a            = new RelationAnnotation()
     a.uuid           = annotation.uuid || uuid()
-    // a.direction      = annotation.direction
     a.direction      = 'relation'
     a.rel1Annotation = AbstractAnnotation.isAnnotation(annotation.rel1) ? annotation.rel1 : window.annotationContainer.findById(annotation.rel1)
     a.rel2Annotation = AbstractAnnotation.isAnnotation(annotation.rel2) ? annotation.rel2 : window.annotationContainer.findById(annotation.rel2)
@@ -60,7 +59,6 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * Create an instance from a TOML object.
    */
   static newInstanceFromTomlObject (d) {
-    // d.direction = d.dir
     d.direction = 'relation'
     // TODO Annotation側を、labelに合わせてもいいかも。
     d.text = d.label
@@ -361,18 +359,53 @@ export default class RelationAnnotation extends AbstractAnnotation {
   }
 
   /**
+   * Whether the end point crosses the page or not.
+   */
+  isCrossPage () {
+    return this.rel1Annotation.page !== this.rel2Annotation.page
+  }
+
+  /**
+   * Get the difference in coordinates between pages.
+   * @param {Integer} page
+   */
+  dxy (page) {
+    const $targetLayer = Utils.getContainer(page)
+    const scale = window.PDFView.pdfViewer.getPageView(0).viewport.scale
+    let x = $targetLayer.position().left / scale
+    let y = $targetLayer.position().top / scale
+    // console.log('dxy', page, x, y)
+    return {x, y}
+  }
+
+  /**
    * Set the start / end points of the relation.
    */
   setStartEndPosition () {
+
     if (this._rel1Annotation) {
       let p = this._rel1Annotation.getBoundingCirclePosition()
       this.x1 = p.x
       this.y1 = p.y
     }
+
     if (this._rel2Annotation) {
       let p = this._rel2Annotation.getBoundingCirclePosition()
       this.x2 = p.x
       this.y2 = p.y
+
+      if (this.isCrossPage()) {
+        let dxy1 = this.dxy(this.page)
+        if (this.source) {
+          let dxy2 = this.dxy(this.rel2Annotation.page)
+          this.x2 += dxy2.x - dxy1.x
+          this.y2 += dxy2.y - dxy1.y
+        } else {
+          let dxy2 = this.dxy(this.rel1Annotation.page)
+          this.x1 += dxy2.x - dxy1.x
+          this.y1 += dxy2.y - dxy1.y
+        }
+      }
     }
   }
 
@@ -385,8 +418,8 @@ export default class RelationAnnotation extends AbstractAnnotation {
       return false
     }
 
-    const isSame = anyOf(this.rel1Annotation.uuid, [anno.rel1Annotation.uuid, anno.rel2Annotation.uuid])
-      && anyOf(this.rel2Annotation.uuid, [anno.rel1Annotation.uuid, anno.rel2Annotation.uuid])
+    const isSame = Utils.anyOf(this.rel1Annotation.uuid, [anno.rel1Annotation.uuid, anno.rel2Annotation.uuid])
+      && Utils.anyOf(this.rel2Annotation.uuid, [anno.rel1Annotation.uuid, anno.rel2Annotation.uuid])
 
     return isSame
   }

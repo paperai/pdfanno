@@ -64,7 +64,7 @@ window.addEventListener('pagechange', event => {
  */
 function renderAnno (page = null) {
 
-  console.log('renderAnno: page=', page)
+  // console.log('renderAnno: page=', page)
 
   // No action, if the viewer is closed.
   if (!window.PDFView.pdfViewer.getPageView(0)) {
@@ -93,7 +93,7 @@ function renderAnno (page = null) {
  */
 function renderAnnotations (page) {
 
-  console.log('renderAnnotations: page=', page)
+  // console.log('renderAnnotations: page=', page)
 
   window.annotationContainer.getAllAnnotations()
     .filter(a => a.page === page)

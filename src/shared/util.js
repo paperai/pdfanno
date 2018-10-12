@@ -4,6 +4,10 @@ import * as Constants from './constants'
  * Utility.
  */
 
+ /**
+  * @param {Any} target
+  * @param {Array} candidates
+  */
 export function anyOf (target, candidates) {
   return candidates.filter(c => c === target).length > 0
 }

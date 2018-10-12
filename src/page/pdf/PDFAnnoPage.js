@@ -312,7 +312,7 @@ export default class PDFAnnoPage {
 
     const first  = selectedAnnotations[selectedAnnotations.length - 2]
     const second = selectedAnnotations[selectedAnnotations.length - 1]
-    console.log('first:second,', first, second)
+    // console.log('first:second,', first, second)
 
     // Check duplicated.
     const arrows = window.iframeWindow.annotationContainer
