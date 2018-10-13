@@ -26,8 +26,8 @@ export function addAnnoLayer (page = null) {
     if (view && $container.length > 0 && $annoLayer.length === 0) {
 
       let $annoLayer = $('<div>').addClass(Constants.ANNO_LAYER_CLASS_NAME).css({
-        width  : `${parseInt(view.width, 10)}px`,
-        height : `${parseInt(view.height, 10) + borderTop + merginBetweenPages}px`
+        width  : `${view.width.toFixed()}px`,
+        height : `${(view.height + borderTop + merginBetweenPages).toFixed()}px`
       })
 
       // console.log('before', Utils.getAnnoLayer(page))
