@@ -225,6 +225,7 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * The callback for the relational text hoverred in.
    */
   handleTextHoverIn () {
+    console.log('handleTextHoverIn')
     this.highlight()
     this.emit('hoverin')
     this.highlightRelAnnotations()
@@ -243,6 +244,7 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * The callback for the relationals hoverred in.
    */
   handleRelHoverIn () {
+    console.log('handleRelHoverIn')
     this.highlight()
     this.highlightRelAnnotations()
   }
@@ -370,12 +372,12 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * @param {Integer} page
    */
   dxy (page) {
-    const $targetLayer = Utils.getContainer(page)
+    const $targetLayer = Utils.getAnnoLayer(page)
     const scale = window.PDFView.pdfViewer.getPageView(0).viewport.scale
-    let x = $targetLayer.position().left / scale
-    let y = $targetLayer.position().top / scale
-    // console.log('dxy', page, x, y)
-    return {x, y}
+    return {
+      x : parseInt($targetLayer.offset().left / scale, 10),
+      y : parseInt($targetLayer.offset().top / scale, 10)
+    }
   }
 
   /**
@@ -400,10 +402,12 @@ export default class RelationAnnotation extends AbstractAnnotation {
           let dxy2 = this.dxy(this.rel2Annotation.page)
           this.x2 += dxy2.x - dxy1.x
           this.y2 += dxy2.y - dxy1.y
+          // console.log('s', dxy1, dxy2)
         } else {
           let dxy2 = this.dxy(this.rel1Annotation.page)
           this.x1 += dxy2.x - dxy1.x
           this.y1 += dxy2.y - dxy1.y
+          // console.log('t', dxy1, dxy2)
         }
       }
     }
