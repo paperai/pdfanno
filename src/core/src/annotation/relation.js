@@ -372,7 +372,9 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * @param {Integer} page
    */
   dxy (page) {
-    const $targetLayer = Utils.getAnnoLayer(page)
+    // The annoLayer does not exist after the scale change.
+    // const $targetLayer = Utils.getAnnoLayer(page)
+    const $targetLayer = Utils.getContainer(page)
     const scale = window.PDFView.pdfViewer.getPageView(0).viewport.scale
     return {
       x : parseInt($targetLayer.offset().left / scale, 10),
