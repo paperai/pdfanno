@@ -10,6 +10,8 @@ export default class SpanAnnotation extends AbstractAnnotation {
    * Constructor.
    */
   constructor () {
+    console.log('span: constructor')
+
     super()
 
     this.uuid         = null
@@ -33,6 +35,8 @@ export default class SpanAnnotation extends AbstractAnnotation {
    * Create an instance from an annotation data.
    */
   static newInstance (annotation) {
+    console.log('span: newInstance')
+
     let a          = new SpanAnnotation()
     a.uuid         = annotation.uuid || uuid()
     a.text         = annotation.text
@@ -57,6 +61,8 @@ export default class SpanAnnotation extends AbstractAnnotation {
    * Create an instance from a TOML object.
    */
   static newInstanceFromTomlObject (tomlObject) {
+    console.log('span: newInstanceFromTomlObject')
+
     let d = tomlObject
     d.selectedText = d.text
     d.text = d.label
@@ -245,6 +251,10 @@ export default class SpanAnnotation extends AbstractAnnotation {
    * Enable view mode.
    */
   enableViewMode () {
+    // @event
+    console.trace()
+    console.log('span enableViewMode')
+
     this.disableViewMode()
     super.enableViewMode()
     if (!this.readOnly) {

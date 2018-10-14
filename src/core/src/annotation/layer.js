@@ -2,7 +2,7 @@ import * as Constants from '../../../shared/constants'
 import * as Utils from '../../../shared/util'
 
 let borderTop = 9
-let merginBetweenPages =  1 + 1
+let merginBetweenPages =  1
 
 /**
  * Add annotation layer.
@@ -26,8 +26,8 @@ export function addAnnoLayer (page = null) {
     if (view && $container.length > 0 && $annoLayer.length === 0) {
 
       let $annoLayer = $('<div>').addClass(Constants.ANNO_LAYER_CLASS_NAME).css({
-        width  : `${view.width.toFixed()}px`,
-        height : `${(view.height + borderTop + merginBetweenPages).toFixed()}px`
+        width  : `${parseInt(view.width, 10)}px`,
+        height : `${parseInt(view.height, 10) + borderTop + merginBetweenPages}px`
       })
 
       // console.log('before', Utils.getAnnoLayer(page))

@@ -25,6 +25,8 @@ function disablePagebackAction (e) {
  * Deselect annotations when pages clicked.
  */
 function handlePageClick (e) {
+  // @event
+  console.log('handlePageClick')
   window.annotationContainer
     .getSelectedAnnotations()
     .forEach(a => a.deselect())

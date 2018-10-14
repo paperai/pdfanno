@@ -14,6 +14,8 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * Constructor.
    */
   constructor () {
+    console.log('relation: constructor')
+
     super()
 
     globalEvent = window.globalEvent
@@ -23,6 +25,8 @@ export default class RelationAnnotation extends AbstractAnnotation {
     this.direction = null
     this.rel1Annotation = null
     this.rel2Annotation = null
+    this.main = true
+    this.page = null
     this.text = null
     this.color = null
     this.readOnly = false
@@ -43,15 +47,22 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * Create an instance from an annotation data.
    */
   static newInstance (annotation) {
+    console.log('relation: newInstance')
+
     let a            = new RelationAnnotation()
     a.uuid           = annotation.uuid || uuid()
     a.direction      = 'relation'
     a.rel1Annotation = AbstractAnnotation.isAnnotation(annotation.rel1) ? annotation.rel1 : window.annotationContainer.findById(annotation.rel1)
     a.rel2Annotation = AbstractAnnotation.isAnnotation(annotation.rel2) ? annotation.rel2 : window.annotationContainer.findById(annotation.rel2)
+    a.main           = annotation.main !== undefined ? annotation.main : true
+    a.page           = annotation.page || a.rel1Annotation ? a.rel1Annotation.page : null
     a.text           = annotation.text
     a.color          = annotation.color
     a.readOnly       = annotation.readOnly || false
     a.zIndex         = annotation.zIndex || 10
+
+    console.log('relation:', a)
+
     return a
   }
 
@@ -59,6 +70,8 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * Create an instance from a TOML object.
    */
   static newInstanceFromTomlObject (d) {
+    console.log('relation: newInstanceFromTomlObject')
+
     d.direction = 'relation'
     // TODO Annotation側を、labelに合わせてもいいかも。
     d.text = d.label
@@ -342,10 +355,15 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * Enable view mode.
    */
   enableViewMode () {
+    // @event
+    console.trace()
+    console.log('relation: enableViewMode')
 
     this.disableViewMode()
 
     super.enableViewMode()
+
+    console.log(10, this.$element.find('path'))
 
     if (!this.readOnly) {
       this.$element.find('path').on('click', this.handleClickEvent)
@@ -377,8 +395,8 @@ export default class RelationAnnotation extends AbstractAnnotation {
     const $targetLayer = Utils.getContainer(page)
     const scale = window.PDFView.pdfViewer.getPageView(0).viewport.scale
     return {
-      x : parseInt($targetLayer.offset().left / scale, 10),
-      y : parseInt($targetLayer.offset().top / scale, 10)
+      x : Math.round($targetLayer.offset().left / scale),
+      y : Math.round($targetLayer.offset().top / scale)
     }
   }
 
@@ -400,7 +418,7 @@ export default class RelationAnnotation extends AbstractAnnotation {
 
       if (this.isCrossPage()) {
         let dxy1 = this.dxy(this.page)
-        if (this.source) {
+        if (this.main) {
           let dxy2 = this.dxy(this.rel2Annotation.page)
           this.x2 += dxy2.x - dxy1.x
           this.y2 += dxy2.y - dxy1.y
