@@ -295,11 +295,18 @@ export default class AnnotationContainer {
 
         d.rel1 = tomlObject[d.ids[0]].uuid
         d.rel2 = tomlObject[d.ids[1]].uuid
-        let relation = RelationAnnotation.newInstanceFromTomlObject(d)
-        relation.color = getColor(tomlIndex, relation.direction, relation.text)
-        relation.save()
-        relation.render()
-        relation.enableViewMode()
+        let relation = [RelationAnnotation.newInstanceFromTomlObject(d)]
+        relation[0].color = getColor(tomlIndex, relation[0].direction, relation[0].text)
+
+        if (relation[0].isCrossPage()) {
+          relation[1] = relation[0].createSubRelation()
+        }
+
+        for (let rel of relation) {
+          rel.save()
+          rel.render()
+          rel.enableViewMode()
+        }
 
       } else {
         console.log('Unknown: ', key, d)
@@ -332,11 +339,18 @@ export default class AnnotationContainer {
             const span2 = this._findSpan(tomlObject, obj.tail)
             obj.rel1 = span1 ? span1.uuid : null
             obj.rel2 = span2 ? span2.uuid : null
-            const relation = RelationAnnotation.newInstanceFromTomlObject(obj)
-            relation.color = getColor(tomlIndex, relation.direction, relation.text)
-            relation.save()
-            relation.render()
-            relation.enableViewMode()
+            const relation = [RelationAnnotation.newInstanceFromTomlObject(obj)]
+            relation[0].color = getColor(tomlIndex, relation[0].direction, relation[0].text)
+
+            if (relation[0].isCrossPage()) {
+              relation[1] = relation[0].createSubRelation()
+            }
+
+            for (let rel of relation) {
+              rel.save()
+              rel.render()
+              rel.enableViewMode()
+            }
 
           }
         })
