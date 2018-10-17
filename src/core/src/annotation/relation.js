@@ -14,8 +14,6 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * Constructor.
    */
   constructor () {
-    console.log('relation: constructor')
-
     super()
 
     globalEvent = window.globalEvent
@@ -47,15 +45,13 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * Create an instance from an annotation data.
    */
   static newInstance (annotation) {
-    console.log('relation: newInstance')
-
     let a            = new RelationAnnotation()
     a.uuid           = annotation.uuid || uuid()
     a.direction      = 'relation'
     a.rel1Annotation = AbstractAnnotation.isAnnotation(annotation.rel1) ? annotation.rel1 : window.annotationContainer.findById(annotation.rel1)
     a.rel2Annotation = AbstractAnnotation.isAnnotation(annotation.rel2) ? annotation.rel2 : window.annotationContainer.findById(annotation.rel2)
     a.main           = annotation.main !== undefined ? annotation.main : true
-    a.page           = annotation.page || a.rel1Annotation ? a.rel1Annotation.page : null
+    a.page           = annotation.page || (a.rel1Annotation ? a.rel1Annotation.page : null)
     a.text           = annotation.text
     a.color          = annotation.color
     a.readOnly       = annotation.readOnly || false
@@ -77,6 +73,29 @@ export default class RelationAnnotation extends AbstractAnnotation {
     d.text = d.label
     let rel = RelationAnnotation.newInstance(d)
     return rel
+  }
+
+  /**
+   * Create sub relation.
+   */
+  createSubRelation () {
+
+    const sub = RelationAnnotation.newInstance({
+      uuid      : null,
+      direction : this.direction,
+      main      : false,
+      page      : this.rel2Annotation ? this.rel2Annotation.page : null,
+      text      : this.text,
+      color     : this.color,
+      readOnly  : this.readOnly
+    })
+
+    sub._rel1Annotation = this.rel1Annotation
+    sub._rel2Annotation = this.rel2Annotation
+    sub.sibling = this
+    this.sibling = sub
+
+    return sub
   }
 
   /**
@@ -355,16 +374,8 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * Enable view mode.
    */
   enableViewMode () {
-    // @event
-    console.trace()
-    console.log('relation: enableViewMode')
-
     this.disableViewMode()
-
     super.enableViewMode()
-
-    console.log(10, this.$element.find('path'))
-
     if (!this.readOnly) {
       this.$element.find('path').on('click', this.handleClickEvent)
     }
@@ -405,10 +416,19 @@ export default class RelationAnnotation extends AbstractAnnotation {
    */
   setStartEndPosition () {
 
+    let dxy1 = this.dxy(this.page)
+
     if (this._rel1Annotation) {
       let p = this._rel1Annotation.getBoundingCirclePosition()
       this.x1 = p.x
       this.y1 = p.y
+
+      if (this.isCrossPage() && !this.main) {
+        let dxy2 = this.dxy(this.rel1Annotation.page)
+        this.x1 += dxy2.x - dxy1.x
+        this.y1 += dxy2.y - dxy1.y
+        // console.log('t', dxy1, dxy2)
+      }
     }
 
     if (this._rel2Annotation) {
@@ -416,19 +436,11 @@ export default class RelationAnnotation extends AbstractAnnotation {
       this.x2 = p.x
       this.y2 = p.y
 
-      if (this.isCrossPage()) {
-        let dxy1 = this.dxy(this.page)
-        if (this.main) {
-          let dxy2 = this.dxy(this.rel2Annotation.page)
-          this.x2 += dxy2.x - dxy1.x
-          this.y2 += dxy2.y - dxy1.y
-          // console.log('s', dxy1, dxy2)
-        } else {
-          let dxy2 = this.dxy(this.rel1Annotation.page)
-          this.x1 += dxy2.x - dxy1.x
-          this.y1 += dxy2.y - dxy1.y
-          // console.log('t', dxy1, dxy2)
-        }
+      if (this.isCrossPage() && this.main) {
+        let dxy2 = this.dxy(this.rel2Annotation.page)
+        this.x2 += dxy2.x - dxy1.x
+        this.y2 += dxy2.y - dxy1.y
+        // console.log('s', dxy1, dxy2)
       }
     }
   }

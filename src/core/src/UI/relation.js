@@ -10,15 +10,15 @@ import RelationAnnotation from '../annotation/relation'
  * @param {*} color
  * @param {Boolean} main
  */
-function relation (type, anno1, anno2, text, color, main = true) {
+function relation (type, anno1, anno2, text, color) {
   let annotation = new RelationAnnotation()
   annotation.direction = type
   annotation.rel1Annotation = anno1
   annotation.rel2Annotation = anno2
-  annotation.page = main ? anno1.page : anno2.page
+  annotation.page = anno1.page
   annotation.text = text
   annotation.color = color
-  annotation.main = main
+  annotation.main = true
   return annotation
 }
 
@@ -43,10 +43,10 @@ export function createRelation ({ type, anno1, anno2, text, color }) {
   annotation[0] = relation(type, anno1, anno2, text, color)
 
   if (isCrossPage) {
-    annotation[1] = relation(type, anno1, anno2, text, color, false)
-    annotation[0].sibling = annotation[1]
-    annotation[1].sibling = annotation[0]
+    annotation[1] = annotation[0].createSubRelation()
   }
+
+  console.log(10, annotation)
 
   for (let anno of annotation) {
     anno.save()
