@@ -248,7 +248,8 @@ function setupUI () {
 
       // Filter only Primary.
       annotations = annotations.filter(a => {
-        return !a.readOnly
+        // return !a.readOnly && !(a.type === 'relation' && !a.main)
+        return !a.readOnly && (a.main !== false)
       })
 
       // Sort by offsetY.
