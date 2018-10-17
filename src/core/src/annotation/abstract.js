@@ -113,9 +113,6 @@ export default class AbstractAnnotation extends EventEmitter {
    * Handle a hoverIn event.
    */
   handleHoverInEvent (e) {
-    // @event
-    console.log('handleHoverInEvent')
-
     this.highlight()
     this.emit('hoverin')
     Utils.dispatchWindowEvent('annotationHoverIn', this)
@@ -125,9 +122,6 @@ export default class AbstractAnnotation extends EventEmitter {
    * Handle a hoverOut event.
    */
   handleHoverOutEvent (e) {
-    // @event
-    console.log('handleHoverOutEvent')
-
     this.dehighlight()
     this.emit('hoverout')
     Utils.dispatchWindowEvent('annotationHoverOut', this)
