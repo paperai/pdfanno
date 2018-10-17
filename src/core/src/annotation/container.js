@@ -141,7 +141,7 @@ export default class AnnotationContainer {
       dataExport.pdfextract = PDFEXTRACT_VERSION
 
       // Only writable.
-      const annos = this.getAllAnnotations().filter(a => !a.readOnly)
+      const annos = this.getAllAnnotations().filter(a => !a.readOnly && a.main !== false)
 
       // Sort by create time.
       // This reason is that a relation need start/end annotation ids which are numbered at export.
