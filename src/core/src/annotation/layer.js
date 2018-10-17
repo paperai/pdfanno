@@ -2,7 +2,7 @@ import * as Constants from '../../../shared/constants'
 import * as Utils from '../../../shared/util'
 
 let borderTop = 9
-let merginBetweenPages =  1
+let merginBetweenPages =  1 + 1
 
 /**
  * Add annotation layer.
