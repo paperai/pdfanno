@@ -113,6 +113,7 @@ export default class AbstractAnnotation extends EventEmitter {
    * Handle a hoverIn event.
    */
   handleHoverInEvent (e) {
+    // console.log('abstruct handleHoverInEvent')
     this.highlight()
     this.emit('hoverin')
     Utils.dispatchWindowEvent('annotationHoverIn', this)
@@ -122,6 +123,7 @@ export default class AbstractAnnotation extends EventEmitter {
    * Handle a hoverOut event.
    */
   handleHoverOutEvent (e) {
+    // console.log('abstruct handleHoverOutEvent')
     this.dehighlight()
     this.emit('hoverout')
     Utils.dispatchWindowEvent('annotationHoverOut', this)
@@ -166,8 +168,14 @@ export default class AbstractAnnotation extends EventEmitter {
 
     if (this.selected) {
       this.deselect()
+      if (this.sibling) {
+        this.sibling.deselect()
+      }
     } else {
       this.select()
+      if (this.sibling) {
+        this.sibling.select()
+      }
     }
 
   }

@@ -56,9 +56,6 @@ export default class RelationAnnotation extends AbstractAnnotation {
     a.color          = annotation.color
     a.readOnly       = annotation.readOnly || false
     a.zIndex         = annotation.zIndex || 10
-
-    console.log('relation:', a)
-
     return a
   }
 
@@ -257,7 +254,7 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * The callback for the relational text hoverred in.
    */
   handleTextHoverIn () {
-    console.log('handleTextHoverIn')
+    console.log('relation handleTextHoverIn')
     this.highlight()
     this.emit('hoverin')
     this.highlightRelAnnotations()
@@ -267,6 +264,7 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * The callback for the relational text hoverred out.
    */
   handleTextHoverOut () {
+    console.log('relation handleTextHoverOut')
     this.dehighlight()
     this.emit('hoverout')
     this.dehighlightRelAnnotations()
@@ -276,7 +274,8 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * The callback for the relationals hoverred in.
    */
   handleRelHoverIn () {
-    console.log('handleRelHoverIn')
+    // TODO callされていない可能性がある
+    console.log('relation handleRelHoverIn')
     this.highlight()
     this.highlightRelAnnotations()
   }
@@ -285,6 +284,8 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * The callback for the relationals hoverred out.
    */
   handleRelHoverOut () {
+    // TODO callされていない可能性がある
+    console.log('relation handleRelHoverOut')
     this.dehighlight()
     this.dehighlightRelAnnotations()
   }
@@ -326,16 +327,28 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * The callback that is called at hoverred in.
    */
   handleHoverInEvent (e) {
+    // console.log('relation handleHoverInEvent')
     super.handleHoverInEvent(e)
     this.highlightRelAnnotations()
+
+    if (this.sibling && !e.emitonce) {
+      e.emitonce = true
+      this.sibling.handleHoverInEvent(e)
+    }
   }
 
   /**
    * The callback that is called at hoverred out.
    */
   handleHoverOutEvent (e) {
+    // console.log('relation handleHoverOutEvent')
     super.handleHoverOutEvent(e)
     this.dehighlightRelAnnotations()
+
+    if (this.sibling && !e.emitonce) {
+      e.emitonce = true
+      this.sibling.handleHoverOutEvent(e)
+    }
   }
 
   /**
