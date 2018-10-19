@@ -95,7 +95,7 @@ export default class AbstractAnnotation extends EventEmitter {
    * Handle a click event.
    */
   handleClickEvent (e) {
-    console.log('handleClickEvent')
+    // console.log('handleClickEvent')
 
     this.toggleSelect()
 

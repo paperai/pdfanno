@@ -46,8 +46,6 @@ export function createRelation ({ type, anno1, anno2, text, color }) {
     annotation[1] = annotation[0].createSubRelation()
   }
 
-  console.log(10, annotation)
-
   for (let anno of annotation) {
     anno.save()
     anno.render()
