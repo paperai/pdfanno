@@ -63,8 +63,7 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * Create an instance from a TOML object.
    */
   static newInstanceFromTomlObject (d) {
-    console.log('relation: newInstanceFromTomlObject')
-
+    // console.log('relation: newInstanceFromTomlObject')
     d.direction = 'relation'
     // TODO Annotation側を、labelに合わせてもいいかも。
     d.text = d.label
@@ -111,10 +110,10 @@ export default class RelationAnnotation extends AbstractAnnotation {
   set rel1Annotation (a) {
     this._rel1Annotation = a
     if (this._rel1Annotation) {
-      this._rel1Annotation.on('hoverin', this.handleRelHoverIn)
-      this._rel1Annotation.on('hoverout', this.handleRelHoverOut)
-      this._rel1Annotation.on('rectmove', this.handleRelMove)
-      this._rel1Annotation.on('delete', this.handleRelDelete)
+      this._rel1Annotation.on('hoverin', this.handleSpanHoverIn)
+      this._rel1Annotation.on('hoverout', this.handleSpanHoverOut)
+      this._rel1Annotation.on('rectmove', this.handleSpanMove)
+      this._rel1Annotation.on('delete', this.handleSpanDelete)
     }
   }
 
@@ -131,10 +130,10 @@ export default class RelationAnnotation extends AbstractAnnotation {
   set rel2Annotation (a) {
     this._rel2Annotation = a
     if (this._rel2Annotation) {
-      this._rel2Annotation.on('hoverin', this.handleRelHoverIn)
-      this._rel2Annotation.on('hoverout', this.handleRelHoverOut)
-      this._rel2Annotation.on('rectmove', this.handleRelMove)
-      this._rel2Annotation.on('delete', this.handleRelDelete)
+      this._rel2Annotation.on('hoverin', this.handleSpanHoverIn)
+      this._rel2Annotation.on('hoverout', this.handleSpanHoverOut)
+      this._rel2Annotation.on('rectmove', this.handleSpanMove)
+      this._rel2Annotation.on('delete', this.handleSpanDelete)
     }
   }
 
@@ -175,17 +174,17 @@ export default class RelationAnnotation extends AbstractAnnotation {
   destroy () {
     let promise = super.destroy()
     if (this._rel1Annotation) {
-      this._rel1Annotation.removeListener('hoverin', this.handleRelHoverIn)
-      this._rel1Annotation.removeListener('hoverout', this.handleRelHoverOut)
-      this._rel1Annotation.removeListener('rectmove', this.handleRelMove)
-      this._rel1Annotation.removeListener('delete', this.handleRelDelete)
+      this._rel1Annotation.removeListener('hoverin', this.handleSpanHoverIn)
+      this._rel1Annotation.removeListener('hoverout', this.handleSpanHoverOut)
+      this._rel1Annotation.removeListener('rectmove', this.handleSpanMove)
+      this._rel1Annotation.removeListener('delete', this.handleSpanDelete)
       delete this._rel1Annotation
     }
     if (this._rel2Annotation) {
-      this._rel2Annotation.removeListener('hoverin', this.handleRelHoverIn)
-      this._rel2Annotation.removeListener('hoverout', this.handleRelHoverOut)
-      this._rel2Annotation.removeListener('rectmove', this.handleRelMove)
-      this._rel2Annotation.removeListener('delete', this.handleRelDelete)
+      this._rel2Annotation.removeListener('hoverin', this.handleSpanHoverIn)
+      this._rel2Annotation.removeListener('hoverout', this.handleSpanHoverOut)
+      this._rel2Annotation.removeListener('rectmove', this.handleSpanMove)
+      this._rel2Annotation.removeListener('delete', this.handleSpanDelete)
       delete this._rel2Annotation
     }
 
@@ -254,7 +253,7 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * The callback for the relational text hoverred in.
    */
   handleTextHoverIn () {
-    console.log('relation handleTextHoverIn')
+    // console.log('relation handleTextHoverIn')
     this.highlight()
     this.emit('hoverin')
     this.highlightRelAnnotations()
@@ -264,7 +263,7 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * The callback for the relational text hoverred out.
    */
   handleTextHoverOut () {
-    console.log('relation handleTextHoverOut')
+    // console.log('relation handleTextHoverOut')
     this.dehighlight()
     this.emit('hoverout')
     this.dehighlightRelAnnotations()
@@ -273,9 +272,8 @@ export default class RelationAnnotation extends AbstractAnnotation {
   /**
    * The callback for the relationals hoverred in.
    */
-  handleRelHoverIn () {
-    // TODO callされていない可能性がある
-    console.log('relation handleRelHoverIn')
+  handleSpanHoverIn (e) {
+    console.log('relation handleSpanHoverIn')
     this.highlight()
     this.highlightRelAnnotations()
   }
@@ -283,9 +281,8 @@ export default class RelationAnnotation extends AbstractAnnotation {
   /**
    * The callback for the relationals hoverred out.
    */
-  handleRelHoverOut () {
-    // TODO callされていない可能性がある
-    console.log('relation handleRelHoverOut')
+  handleSpanHoverOut (e) {
+    console.log('relation handleSpanHoverOut')
     this.dehighlight()
     this.dehighlightRelAnnotations()
   }
@@ -293,14 +290,14 @@ export default class RelationAnnotation extends AbstractAnnotation {
   /**
    * The callback that is called relations has benn deleted.
    */
-  handleRelDelete () {
+  handleSpanDelete () {
     this.destroy()
   }
 
   /**
    * The callback that is called relations has been moved.
    */
-  handleRelMove () {
+  handleSpanMove () {
     this.render()
   }
 
@@ -327,7 +324,7 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * The callback that is called at hoverred in.
    */
   handleHoverInEvent (e) {
-    // console.log('relation handleHoverInEvent')
+    console.log('relation handleHoverInEvent')
     super.handleHoverInEvent(e)
     this.highlightRelAnnotations()
 
@@ -341,7 +338,7 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * The callback that is called at hoverred out.
    */
   handleHoverOutEvent (e) {
-    // console.log('relation handleHoverOutEvent')
+    console.log('relation handleHoverOutEvent')
     super.handleHoverOutEvent(e)
     this.dehighlightRelAnnotations()
 
