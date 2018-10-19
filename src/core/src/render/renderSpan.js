@@ -39,8 +39,9 @@ export function renderSpan (a) {
 
   if (a.knob) {
     $base.append(renderKnob({
-      x : rectangles[0].x,
-      y : rectangles[0].y,
+      page : a.page,
+      x    : rectangles[0].x,
+      y    : rectangles[0].y,
       readOnly
     }))
   }
@@ -49,33 +50,6 @@ export function renderSpan (a) {
 }
 
 function createRect (a, r, color, readOnly) {
-
-  /*
-  // #135 Change the style of Reference Anno
-  if (readOnly) {
-    return $('<div class="anno-span__border"/>').css({
-      top         : r.y + 'px',
-      left        : r.x + 'px',
-      width       : r.width + 'px',
-      height      : r.height + 'px',
-      borderColor : color
-    })
-
-  } else {
-
-    const rgba = hex2rgba(color, 0.4)
-    const borderCss = (a.border === false ? 'no-border' : '')
-
-    return $(`<div class="anno-span__area ${borderCss}"/>`).css({
-      top             : r.y + 'px',
-      left            : r.x + 'px',
-      width           : r.width + 'px',
-      height          : r.height + 'px',
-      backgroundColor : rgba,
-      borderColor     : color
-    })
-  }
-  */
 
   let className = readOnly ? 'anno-span__border' : 'anno-span__area'
   if (a.border === false) {
