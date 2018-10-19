@@ -94,6 +94,7 @@ function renderAnno (page = null) {
 function renderAnnotations (page) {
 
   // console.log('renderAnnotations: page=', page)
+  console.time(`renderAnnotations: page(${page})`)
 
   window.annotationContainer.getAllAnnotations()
     .filter(a => a.page === page)
@@ -103,4 +104,6 @@ function renderAnnotations (page) {
     })
 
   Utils.dispatchWindowEvent('annotationrendered')
+
+  console.timeEnd(`renderAnnotations: page(${page})`)
 }

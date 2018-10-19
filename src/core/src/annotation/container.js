@@ -207,6 +207,8 @@ export default class AnnotationContainer {
    */
   importAnnotations (data, isPrimary) {
 
+    console.time('importAnnotations')
+
     const readOnly = !isPrimary
     const colorMap = data.colorMap
 
@@ -234,6 +236,7 @@ export default class AnnotationContainer {
         // Create a object from TOML string.
         let tomlObject = fromTomlString(tomlString)
         if (!tomlObject) {
+          console.timeEnd('importAnnotations')
           return
         }
 
@@ -243,6 +246,7 @@ export default class AnnotationContainer {
           // schema Validation
           if (!this.validate(tomlObject)) {
             reject(this.validate.errors)
+            console.timeEnd('importAnnotations')
             return
           }
           this.importAnnotations041(tomlObject, i, readOnly, getColor)
@@ -253,6 +257,8 @@ export default class AnnotationContainer {
 
       // Done.
       resolve(true)
+
+      console.timeEnd('importAnnotations')
     })
   }
 
