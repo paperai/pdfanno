@@ -132,15 +132,21 @@ export default class AbstractAnnotation extends EventEmitter {
   /**
    * Highlight the annotation.
    */
-  highlight () {
+  highlight (e) {
     this.$element.addClass('--hover')
+    if (this.sibling && !e) {
+      this.sibling.highlight('once')
+    }
   }
 
   /**
    * Dehighlight the annotation.
    */
-  dehighlight () {
+  dehighlight (e) {
     this.$element.removeClass('--hover')
+    if (this.sibling && !e) {
+      this.sibling.dehighlight('once')
+    }
   }
 
   /**

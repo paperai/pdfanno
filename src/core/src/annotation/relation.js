@@ -273,7 +273,7 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * The callback for the relationals hoverred in.
    */
   handleSpanHoverIn (e) {
-    console.log('relation handleSpanHoverIn')
+    // console.log('relation handleSpanHoverIn')
     this.highlight()
     this.highlightRelAnnotations()
   }
@@ -282,7 +282,7 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * The callback for the relationals hoverred out.
    */
   handleSpanHoverOut (e) {
-    console.log('relation handleSpanHoverOut')
+    // console.log('relation handleSpanHoverOut')
     this.dehighlight()
     this.dehighlightRelAnnotations()
   }
@@ -290,8 +290,11 @@ export default class RelationAnnotation extends AbstractAnnotation {
   /**
    * The callback that is called relations has benn deleted.
    */
-  handleSpanDelete () {
+  handleSpanDelete (e) {
     this.destroy()
+    if (this.sibling && !e) {
+      this.sibling.handleSpanDelete('once')
+    }
   }
 
   /**
@@ -324,28 +327,18 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * The callback that is called at hoverred in.
    */
   handleHoverInEvent (e) {
-    console.log('relation handleHoverInEvent')
-    super.handleHoverInEvent(e)
+    // console.log('relation handleHoverInEvent')
+    super.handleHoverInEvent()
     this.highlightRelAnnotations()
-
-    if (this.sibling && !e.emitonce) {
-      e.emitonce = true
-      this.sibling.handleHoverInEvent(e)
-    }
   }
 
   /**
    * The callback that is called at hoverred out.
    */
   handleHoverOutEvent (e) {
-    console.log('relation handleHoverOutEvent')
-    super.handleHoverOutEvent(e)
+    // console.log('relation handleHoverOutEvent')
+    super.handleHoverOutEvent()
     this.dehighlightRelAnnotations()
-
-    if (this.sibling && !e.emitonce) {
-      e.emitonce = true
-      this.sibling.handleHoverOutEvent(e)
-    }
   }
 
   /**

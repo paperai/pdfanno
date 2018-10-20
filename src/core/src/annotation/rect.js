@@ -155,7 +155,7 @@ export default class RectAnnotation extends AbstractAnnotation {
    * Save a new text.
    */
   handleTextChanged (newText) {
-    console.log('rect:handleTextChanged:', newText)
+    // console.log('rect:handleTextChanged:', newText)
     this.text = newText
     this.save()
   }
@@ -195,7 +195,7 @@ export default class RectAnnotation extends AbstractAnnotation {
    * Handle a mousedown event.
    */
   handleMouseDownOnRect () {
-    console.log('handleMouseDownOnRect')
+    // console.log('handleMouseDownOnRect')
 
     this.originalX = this.x
     this.originalY = this.y
