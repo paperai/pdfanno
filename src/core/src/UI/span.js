@@ -253,6 +253,11 @@ window.addEventListener('DOMContentLoaded', () => {
       // Ignore, if other annotation is detected.
       return
     }
+
+    if (window.PDFView.pageRotation !== 0) {
+      return
+    }
+
     mouseDown = true
     currentPage = null
     initPosition = null
@@ -264,13 +269,23 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     makeSelections(e)
   })
+
   $viewer.on('mousemove', '.canvasWrapper', e => {
+
+    if (window.PDFView.pageRotation !== 0) {
+      return
+    }
 
     if (mouseDown) {
       makeSelections(e)
     }
   })
+
   $viewer.on('mouseup', '.canvasWrapper', e => {
+
+    if (window.PDFView.pageRotation !== 0) {
+      return
+    }
 
     if (mouseDown) {
       makeSelections(e)
