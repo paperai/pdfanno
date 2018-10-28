@@ -39,26 +39,42 @@ export function parseUrlQuery () {
 
 /**
  * get Page Container of PDF Viewer.
- * @returns {jQueryObject}
+ * @returns {Integer}
  */
 export function getContainer (page) {
-  return $([
-    '#',
-    Constants.PAGE_CONTAINER_ID,
-    page
-  ].join(''))
+  return document.getElementById(Constants.PAGE_CONTAINER_ID + page)
 }
 
 /**
  * get AnnoLayer of PDF Viewer.
- * @returns {jQueryObject}
+ * @returns {Integer}
  */
 export function getAnnoLayer (page) {
-  return $([
-    '#',
-    Constants.PAGE_CONTAINER_ID,
-    page,
-    ' .',
-    Constants.ANNO_LAYER_CLASS_NAME
-  ].join(''))
+  const container = document.getElementById(Constants.PAGE_CONTAINER_ID + page)
+  if (container) {
+    const annoLayer = container.getElementsByClassName(Constants.ANNO_LAYER_CLASS_NAME)
+    if (annoLayer.length > 0) {
+      return annoLayer[0]
+    }
+  }
+  return null
+}
+
+/**
+ *
+ * @param {any} pages
+ */
+export function parsePageParam (pages) {
+  if (pages === undefined) {
+    pages = parsePageParam({first : 1, last : window.PDFView.pdfViewer.pagesCount})
+  } else if (typeof pages === 'number') {
+    pages = [pages]
+  } else if (Array.isArray(pages)) {
+    // Array is also objects.
+  } else if (typeof pages === 'object') {
+    pages = Array.from({length : pages.last - pages.first + 1}, (v, k) => k + pages.first)
+  } else {
+    return []
+  }
+  return pages
 }

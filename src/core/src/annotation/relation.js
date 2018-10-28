@@ -2,6 +2,7 @@ import { uuid } from 'anno-ui/src/utils'
 import AbstractAnnotation from './abstract'
 import { getRelationTextPosition } from '../utils/relation.js'
 import * as Utils from '../../../shared/util'
+import {addAnnoLayer} from '../render/layer'
 
 let globalEvent
 
@@ -145,10 +146,32 @@ export default class RelationAnnotation extends AbstractAnnotation {
   }
 
   /**
+   * Determine whether relation is visible or not.
+   */
+  visible (visiblePages) {
+    visiblePages = this.parseVisibleParam(visiblePages)
+    return (this._rel1Annotation.page >= visiblePages.first.id || this._rel2Annotation.page >= visiblePages.first.id)
+      && (this._rel1Annotation.page <= visiblePages.last.id || this._rel2Annotation.page <= visiblePages.last.id)
+  }
+
+  /**
    * Render the annotation.
    */
   render () {
     this.setStartEndPosition()
+
+    let first, last
+    if (this._rel1Annotation.page <= this._rel2Annotation.page) {
+      first = this._rel1Annotation.page
+      last = this._rel2Annotation.page
+    } else {
+      first = this._rel2Annotation.page
+      last = this._rel1Annotation.page
+    }
+
+    // If there is no Annotation layer in this pages, create it.
+    addAnnoLayer({first, last})
+
     super.render()
   }
 
@@ -405,8 +428,8 @@ export default class RelationAnnotation extends AbstractAnnotation {
    */
   dxy (page) {
     // The annoLayer does not exist after the scale change.
-    // const $targetLayer = Utils.getAnnoLayer(page)
-    const $targetLayer = Utils.getContainer(page)
+    // const $targetLayer = $(Utils.getAnnoLayer(page))
+    const $targetLayer = $(Utils.getContainer(page))
     const scale = window.PDFView.pdfViewer.getPageView(0).viewport.scale
     return {
       x : Math.round($targetLayer.offset().left / scale),

@@ -5,7 +5,6 @@ import SpanAnnotation from './span'
 import RectAnnotation from './rect'
 import RelationAnnotation from './relation'
 import * as Utils from '../../../shared/util'
-import {addAnnoLayer} from './layer'
 import semver from 'semver'
 import Ajv from 'ajv'
 
@@ -48,6 +47,15 @@ export default class AnnotationContainer {
     console.log('AnnotationContainer#destroy')
     this.set.forEach(a => a.destroy())
     this.set = new Set()
+  }
+
+  /**
+   *
+   */
+  clearRenderingStates (filter = () => true) {
+    if (typeof filter === 'function') {
+      this.getAllAnnotations().filter(filter).forEach(a => a.setRenderingInitial())
+    }
   }
 
   /**
@@ -209,6 +217,8 @@ export default class AnnotationContainer {
 
     console.time('importAnnotations')
 
+    window.pageStates.clear()
+
     const readOnly = !isPrimary
     const colorMap = data.colorMap
 
@@ -227,8 +237,7 @@ export default class AnnotationContainer {
         .filter(a => a.readOnly === readOnly)
         .forEach(a => a.destroy())
 
-      // When importing pdfanno file, create annoLayer of all pages in advance
-      addAnnoLayer()
+      // this.clearRenderingStates(a => a.readOnly === readOnly)
 
       // Add annotations.
       data.annotations.forEach((tomlString, i) => {
@@ -325,6 +334,10 @@ export default class AnnotationContainer {
    */
   importAnnotations041 (tomlObject, tomlIndex, readOnly, getColor) {
 
+    console.log('page:', window.PDFView.pdfViewer.currentPageNumber, window.PDFView.pdfViewer._getVisiblePages())
+
+    const visiblePages = window.PDFView.pdfViewer._getVisiblePages()
+
     // order is important.
     ;['spans', 'relations'].forEach(key => {
       const objs = tomlObject[key]
@@ -337,14 +350,22 @@ export default class AnnotationContainer {
             const span = SpanAnnotation.newInstanceFromTomlObject(obj)
             span.color = getColor(tomlIndex, 'span', span.text)
             span.save()
-            span.render()
-            span.enableViewMode()
+            if (span.visible(visiblePages)) {
+              // console.log('SPAN:', span.page, span.uuid)
+              span.render()
+              span.enableViewMode()
+            }
 
           } else if (key === 'relations') {
-            const span1 = this._findSpan(tomlObject, obj.head)
-            const span2 = this._findSpan(tomlObject, obj.tail)
-            obj.rel1 = span1 ? span1.uuid : null
-            obj.rel2 = span2 ? span2.uuid : null
+
+            const spans = [
+              this.findById(this._findSpan(tomlObject, obj.head).uuid),
+              this.findById(this._findSpan(tomlObject, obj.tail).uuid)
+            ]
+
+            obj.rel1 = spans[0].uuid
+            obj.rel2 = spans[1].uuid
+
             const relation = [RelationAnnotation.newInstanceFromTomlObject(obj)]
             relation[0].color = getColor(tomlIndex, relation[0].direction, relation[0].text)
 
@@ -352,10 +373,21 @@ export default class AnnotationContainer {
               relation[1] = relation[0].createSubRelation()
             }
 
+            if (relation[0].visible(visiblePages)) {
+              spans.filter(span => span.isRenderingInitial()).forEach(span => {
+                // console.log('RELSPAN:', span.page, span.uuid)
+                span.render()
+                span.enableViewMode()
+              })
+            }
+
             for (let rel of relation) {
               rel.save()
-              rel.render()
-              rel.enableViewMode()
+              if (rel.visible(visiblePages)) {
+                // console.log('REL:', rel._rel1Annotation.uuid, rel._rel2Annotation.uuid)
+                rel.render()
+                rel.enableViewMode()
+              }
             }
 
           }

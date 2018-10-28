@@ -3,6 +3,12 @@ import appendAnnoChild from '../render/appendChild'
 import { DEFAULT_RADIUS } from '../render/renderKnob'
 import * as Utils from '../../../shared/util'
 
+export const RenderingStates = {
+  INITIAL  : 0,
+  RUNNING  : 1,
+  FINISHED : 3
+}
+
 /**
  * Abstract Annotation Class.
  */
@@ -25,6 +31,7 @@ export default class AbstractAnnotation extends EventEmitter {
     this.selected = false
     this.selectedTime = null
     this.createdAt = new Date().getTime()
+    this.renderingState = RenderingStates.INITIAL
   }
 
   /**
@@ -39,6 +46,25 @@ export default class AbstractAnnotation extends EventEmitter {
   }
 
   /**
+   * Parse visiblePages parameter.
+   */
+  parseVisibleParam (visiblePages) {
+    if (visiblePages === undefined) {
+      return window.PDFView.pdfViewer._getVisiblePages()
+    } else if (typeof visiblePages === 'number') {
+      return {
+        first : {
+          id : visiblePages
+        },
+        last : {
+          id : visiblePages
+        }
+      }
+    }
+    return visiblePages
+  }
+
+  /**
    * Render annotation(s).
    */
   render () {
@@ -49,7 +75,9 @@ export default class AbstractAnnotation extends EventEmitter {
       return false
     }
 
-    this.$element = $(appendAnnoChild(Utils.getAnnoLayer(this.page)[0], this))
+    this.renderingState = RenderingStates.RUNNING
+
+    this.$element = $(appendAnnoChild(Utils.getAnnoLayer(this.page), this))
 
     if (!this.hoverEventDisable && this.setHoverEvent) {
       this.setHoverEvent()
@@ -58,7 +86,23 @@ export default class AbstractAnnotation extends EventEmitter {
     this.selected && this.$element.addClass('--selected')
     this.disabled && this.disable()
 
+    this.renderingState = RenderingStates.FINISHED
+
     return true
+  }
+
+  /**
+   *
+   */
+  isRenderingInitial () {
+    return this.renderingState === RenderingStates.INITIAL
+  }
+
+  /**
+   *
+   */
+  setRenderingInitial () {
+    this.renderingState = RenderingStates.INITIAL
   }
 
   /**

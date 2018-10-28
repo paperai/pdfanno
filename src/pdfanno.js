@@ -348,5 +348,13 @@ window.addEventListener('keydown', event => {
     console.log('annotationContainer:', window.annotationContainer.getSelectedAnnotations())
     event.preventDefault()
     return false
+  } else if (event.key === 'F3') {
+    console.log('pageCount:', window.PDFView.pdfViewer.pagesCount)
+    console.log('pageStates:', window.pageStates)
+    for (let ii = 1; ii <= window.PDFView.pdfViewer.pagesCount; ii++) {
+      console.log('page' + ii, Utils.getAnnoLayer(ii))
+    }
+    event.preventDefault()
+    return false
   }
 })
