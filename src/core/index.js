@@ -158,8 +158,9 @@ function renderAnnotations (page) {
       a.enableViewMode()
     })
 
-    window.pageStates.setState(page, PageStates.RENDERED)
   }
+
+  window.pageStates.setState(page, PageStates.RENDERED)
 
   Utils.dispatchWindowEvent('annotationrendered')
 

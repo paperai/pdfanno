@@ -59,6 +59,25 @@ export default class AnnotationContainer {
   }
 
   /**
+   *
+   */
+  clearPage (page) {
+    this.clearRenderingStates(a => {
+      if (a.type === 'span') {
+        console.log('clearPage.span', page)
+        return a.page === page
+      } else if (a.type === 'relation') {
+        if (a.visible(page)) {
+          ;[a._rel1Annotation, a._rel2Annotation].forEach(s => s.setRenderingInitial())
+          console.log('clearPage.rel', a._rel1Annotation.page, a._rel2Annotation.page)
+          return true
+        }
+      }
+      return false
+    })
+  }
+
+  /**
    * Get all annotations from the container.
    */
   getAllAnnotations () {

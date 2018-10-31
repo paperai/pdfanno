@@ -28,9 +28,9 @@ export function addAnnoLayer (pages) {
               height : `${parseInt(view.height, 10) + borderTop + merginBetweenPages}px`
             })
             $(container).append($annoLayer)
-            window.pageStates.setState(page, PageStates.LAYERED)
             // console.log('addAnnoLayer append', page)
           }
+          window.pageStates.setState(page, PageStates.LAYERED)
         } else {
           throw new Error(Constants.PAGE_CONTAINER_ID + page + ' not found')
         }
