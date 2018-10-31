@@ -81,7 +81,7 @@ window.addEventListener('textlayerrendered', event => {
  */
 function renderAnno (pages, forceRender = false) {
 
-  console.log('renderAnno:', pages, forceRender)
+  // console.log('renderAnno:', pages, forceRender)
 
   // No action, if the viewer is closed.
   if (!window.PDFView.pdfViewer.getPageView(0)) {

@@ -3938,7 +3938,7 @@ var PDFPageView = (function PDFPageViewClosure() {
           if (self.zoomLayer.parentNode) {
             div.removeChild(self.zoomLayer);
           } else {
-            console.trace('pageViewDrawCallback')
+            // console.trace('pageViewDrawCallback')
           }
 
           self.zoomLayer = null;

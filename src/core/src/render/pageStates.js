@@ -1,4 +1,3 @@
-import {RenderingStates} from '../annotation/abstract'
 import * as Utils from '../../../shared/util'
 
 export default class PageStates {
