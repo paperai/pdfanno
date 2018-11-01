@@ -10,11 +10,11 @@ const DEFAULT_FONT_SIZE = 9.5
  * Calculate boundingClientRect that is needed for rendering text.
  *
  * @param {String} text - A text to be renderd.
- * @param {SVGElement} svg - svgHTMLElement to be used for rendering text.
+ * @param {Element} base - Element to be used for rendering text.
  * @return {Object} A boundingBox of text element.
  */
-function getRect (text, svg) {
-  svg.appendChild(text)
+function getRect (text, base) {
+  base.appendChild(text)
   let rect = text.getBoundingClientRect()
   text.parentNode.removeChild(text)
   return rect
@@ -27,7 +27,7 @@ function getRect (text, svg) {
  * @param {Object} a The annotation definition
  * @return {SVGTextElement} A text to be rendered
  */
-export default function renderText (a, svg) {
+export default function renderText (a, base) {
   // Text.
   let text = document.createElementNS('http://www.w3.org/2000/svg', 'text')
   setAttributes(text, {
@@ -40,7 +40,7 @@ export default function renderText (a, svg) {
 
   // Background.
   let box = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
-  let rect = getRect(text, svg)
+  let rect = getRect(text, base)
   setAttributes(box, {
     x      : a.x - 1,
     y      : a.y,

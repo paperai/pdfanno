@@ -39,6 +39,7 @@ export function sendAnnotationUpdated (data) {
   console.log(data.updated)
 }
 
+/*
 function send (topic, data) {
 
   if (socket) {
@@ -48,3 +49,4 @@ function send (topic, data) {
     console.log('socket haven\'t be initialized yet.')
   }
 }
+*/

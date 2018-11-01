@@ -1,13 +1,13 @@
 import { uuid } from 'anno-ui/src/utils'
 import { ANNO_VERSION, PDFEXTRACT_VERSION } from '../version'
 import { toTomlString, fromTomlString } from '../utils/tomlString'
-import { dispatchWindowEvent } from '../utils/event'
-// import { convertToExportY } from '../../../shared/coords'
 import SpanAnnotation from './span'
 import RectAnnotation from './rect'
 import RelationAnnotation from './relation'
+import * as Utils from '../../../shared/util'
 import semver from 'semver'
 import Ajv from 'ajv'
+
 /**
  * Annotation Container.
  */
@@ -29,7 +29,7 @@ export default class AnnotationContainer {
    */
   add (annotation) {
     this.set.add(annotation)
-    dispatchWindowEvent('annotationUpdated')
+    Utils.dispatchWindowEvent('annotationUpdated')
   }
 
   /**
@@ -37,7 +37,7 @@ export default class AnnotationContainer {
    */
   remove (annotation) {
     this.set.delete(annotation)
-    dispatchWindowEvent('annotationUpdated')
+    Utils.dispatchWindowEvent('annotationUpdated')
   }
 
   /**
@@ -47,6 +47,34 @@ export default class AnnotationContainer {
     console.log('AnnotationContainer#destroy')
     this.set.forEach(a => a.destroy())
     this.set = new Set()
+  }
+
+  /**
+   *
+   */
+  clearRenderingStates (filter = () => true) {
+    if (typeof filter === 'function') {
+      this.getAllAnnotations().filter(filter).forEach(a => a.setRenderingInitial())
+    }
+  }
+
+  /**
+   *
+   */
+  clearPage (page) {
+    this.clearRenderingStates(a => {
+      if (a.type === 'span') {
+        // console.log('clearPage.span', page)
+        return a.page === page
+      } else if (a.type === 'relation') {
+        if (a.visible(page)) {
+          ;[a._rel1Annotation, a._rel2Annotation].forEach(s => s.setRenderingInitial())
+          // console.log('clearPage.rel', a._rel1Annotation.page, a._rel2Annotation.page)
+          return true
+        }
+      }
+      return false
+    })
   }
 
   /**
@@ -140,7 +168,7 @@ export default class AnnotationContainer {
       dataExport.pdfextract = PDFEXTRACT_VERSION
 
       // Only writable.
-      const annos = this.getAllAnnotations().filter(a => !a.readOnly)
+      const annos = this.getAllAnnotations().filter(a => !a.readOnly && a.main !== false)
 
       // Sort by create time.
       // This reason is that a relation need start/end annotation ids which are numbered at export.
@@ -206,6 +234,10 @@ export default class AnnotationContainer {
    */
   importAnnotations (data, isPrimary) {
 
+    console.time('importAnnotations')
+
+    window.pageStates.clear()
+
     const readOnly = !isPrimary
     const colorMap = data.colorMap
 
@@ -224,12 +256,15 @@ export default class AnnotationContainer {
         .filter(a => a.readOnly === readOnly)
         .forEach(a => a.destroy())
 
+      // this.clearRenderingStates(a => a.readOnly === readOnly)
+
       // Add annotations.
       data.annotations.forEach((tomlString, i) => {
 
         // Create a object from TOML string.
         let tomlObject = fromTomlString(tomlString)
         if (!tomlObject) {
+          console.timeEnd('importAnnotations')
           return
         }
 
@@ -239,6 +274,7 @@ export default class AnnotationContainer {
           // schema Validation
           if (!this.validate(tomlObject)) {
             reject(this.validate.errors)
+            console.timeEnd('importAnnotations')
             return
           }
           this.importAnnotations041(tomlObject, i, readOnly, getColor)
@@ -249,6 +285,8 @@ export default class AnnotationContainer {
 
       // Done.
       resolve(true)
+
+      console.timeEnd('importAnnotations')
     })
   }
 
@@ -291,11 +329,18 @@ export default class AnnotationContainer {
 
         d.rel1 = tomlObject[d.ids[0]].uuid
         d.rel2 = tomlObject[d.ids[1]].uuid
-        let relation = RelationAnnotation.newInstanceFromTomlObject(d)
-        relation.color = getColor(tomlIndex, relation.direction, relation.text)
-        relation.save()
-        relation.render()
-        relation.enableViewMode()
+        let relation = [RelationAnnotation.newInstanceFromTomlObject(d)]
+        relation[0].color = getColor(tomlIndex, relation[0].direction, relation[0].text)
+
+        if (relation[0].isCrossPage()) {
+          relation[1] = relation[0].createSubRelation()
+        }
+
+        for (let rel of relation) {
+          rel.save()
+          rel.render()
+          rel.enableViewMode()
+        }
 
       } else {
         console.log('Unknown: ', key, d)
@@ -307,6 +352,10 @@ export default class AnnotationContainer {
    * Import annotations.
    */
   importAnnotations041 (tomlObject, tomlIndex, readOnly, getColor) {
+
+    // console.log('page:', window.PDFView.pdfViewer.currentPageNumber, window.PDFView.pdfViewer._getVisiblePages())
+
+    const visiblePages = window.PDFView.pdfViewer._getVisiblePages()
 
     // order is important.
     ;['spans', 'relations'].forEach(key => {
@@ -320,19 +369,45 @@ export default class AnnotationContainer {
             const span = SpanAnnotation.newInstanceFromTomlObject(obj)
             span.color = getColor(tomlIndex, 'span', span.text)
             span.save()
-            span.render()
-            span.enableViewMode()
+            if (span.visible(visiblePages)) {
+              // console.log('SPAN:', span.page, span.uuid)
+              span.render()
+              span.enableViewMode()
+            }
 
           } else if (key === 'relations') {
-            const span1 = this._findSpan(tomlObject, obj.head)
-            const span2 = this._findSpan(tomlObject, obj.tail)
-            obj.rel1 = span1 ? span1.uuid : null
-            obj.rel2 = span2 ? span2.uuid : null
-            const relation = RelationAnnotation.newInstanceFromTomlObject(obj)
-            relation.color = getColor(tomlIndex, relation.direction, relation.text)
-            relation.save()
-            relation.render()
-            relation.enableViewMode()
+
+            const spans = [
+              this.findById(this._findSpan(tomlObject, obj.head).uuid),
+              this.findById(this._findSpan(tomlObject, obj.tail).uuid)
+            ]
+
+            obj.rel1 = spans[0].uuid
+            obj.rel2 = spans[1].uuid
+
+            const relation = [RelationAnnotation.newInstanceFromTomlObject(obj)]
+            relation[0].color = getColor(tomlIndex, relation[0].direction, relation[0].text)
+
+            if (relation[0].isCrossPage()) {
+              relation[1] = relation[0].createSubRelation()
+            }
+
+            if (relation[0].visible(visiblePages)) {
+              spans.filter(span => span.isRenderingInitial()).forEach(span => {
+                // console.log('RELSPAN:', span.page, span.uuid)
+                span.render()
+                span.enableViewMode()
+              })
+            }
+
+            for (let rel of relation) {
+              rel.save()
+              if (rel.visible(visiblePages)) {
+                // console.log('REL:', rel._rel1Annotation.uuid, rel._rel2Annotation.uuid)
+                rel.render()
+                rel.enableViewMode()
+              }
+            }
 
           }
         })

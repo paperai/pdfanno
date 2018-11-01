@@ -15,3 +15,6 @@ export const ANNO_FILE_EXTENSION = 'pdfanno'
 // module.exports = {
 //   ANNO_FILE_EXTENSION
 // }
+
+export const ANNO_LAYER_CLASS_NAME = 'annoLayer'
+export const PAGE_CONTAINER_ID = 'pageContainer'

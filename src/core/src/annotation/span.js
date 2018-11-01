@@ -1,7 +1,6 @@
 import { uuid } from 'anno-ui/src/utils'
 import AbstractAnnotation from './abstract'
-// import { convertFromExportY } from '../../../shared/coords'
-// import appendChild from '../render/appendChild'
+import {addAnnoLayer} from '../render/layer'
 
 /**
  * Span Annotation.
@@ -68,6 +67,14 @@ export default class SpanAnnotation extends AbstractAnnotation {
   }
 
   /**
+   * Determine whether span is visible or not.
+   */
+  visible (visiblePages) {
+    visiblePages = this.parseVisibleParam(visiblePages)
+    return this.page >= visiblePages.first.id && this.page <= visiblePages.last.id
+  }
+
+  /**
    * Render annotation(s).
    */
   render () {
@@ -80,6 +87,9 @@ export default class SpanAnnotation extends AbstractAnnotation {
       rects = window.mergeRects(rects)
       this.rectangles = rects
     }
+
+    // If there is no Annotation layer in this pages, create it.
+    addAnnoLayer(this.page)
 
     return super.render()
   }

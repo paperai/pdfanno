@@ -3,6 +3,7 @@ import UI from './UI'
 import RectAnnotation from './annotation/rect'
 import SpanAnnotation from './annotation/span'
 import RelationAnnotation from './annotation/relation'
+import PageStates from './render/pageStates'
 
 export default {
 
@@ -25,5 +26,10 @@ export default {
   /**
    * RelationAnnotation Class.
    */
-  RelationAnnotation
+  RelationAnnotation,
+
+  /**
+   * Page rendering states
+   */
+  PageStates
 }

@@ -3934,7 +3934,13 @@ var PDFPageView = (function PDFPageViewClosure() {
           zoomLayerCanvas.width = 0;
           zoomLayerCanvas.height = 0;
 
-          div.removeChild(self.zoomLayer);
+          // If the child was in fact a child of element and so existing on the DOM, but was already removed.
+          if (self.zoomLayer.parentNode) {
+            div.removeChild(self.zoomLayer);
+          } else {
+            // console.trace('pageViewDrawCallback')
+          }
+
           self.zoomLayer = null;
         }
 

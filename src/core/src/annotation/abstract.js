@@ -1,7 +1,13 @@
 import EventEmitter from 'events'
-import appendChild from '../render/appendChild'
+import appendAnnoChild from '../render/appendChild'
 import { DEFAULT_RADIUS } from '../render/renderKnob'
-import { dispatchWindowEvent } from '../utils/event'
+import * as Utils from '../../../shared/util'
+
+export const RenderingStates = {
+  INITIAL  : 0,
+  RUNNING  : 1,
+  FINISHED : 3
+}
 
 /**
  * Abstract Annotation Class.
@@ -25,6 +31,7 @@ export default class AbstractAnnotation extends EventEmitter {
     this.selected = false
     this.selectedTime = null
     this.createdAt = new Date().getTime()
+    this.renderingState = RenderingStates.INITIAL
   }
 
   /**
@@ -39,6 +46,25 @@ export default class AbstractAnnotation extends EventEmitter {
   }
 
   /**
+   * Parse visiblePages parameter.
+   */
+  parseVisibleParam (visiblePages) {
+    if (visiblePages === undefined) {
+      return window.PDFView.pdfViewer._getVisiblePages()
+    } else if (typeof visiblePages === 'number') {
+      return {
+        first : {
+          id : visiblePages
+        },
+        last : {
+          id : visiblePages
+        }
+      }
+    }
+    return visiblePages
+  }
+
+  /**
    * Render annotation(s).
    */
   render () {
@@ -49,18 +75,34 @@ export default class AbstractAnnotation extends EventEmitter {
       return false
     }
 
-    const base = $('#annoLayer2')[0]
-    this.$element = $(appendChild(base, this))
+    this.renderingState = RenderingStates.RUNNING
+
+    this.$element = $(appendAnnoChild(Utils.getAnnoLayer(this.page), this))
 
     if (!this.hoverEventDisable && this.setHoverEvent) {
       this.setHoverEvent()
     }
 
     this.selected && this.$element.addClass('--selected')
-
     this.disabled && this.disable()
 
+    this.renderingState = RenderingStates.FINISHED
+
     return true
+  }
+
+  /**
+   *
+   */
+  isRenderingInitial () {
+    return this.renderingState === RenderingStates.INITIAL
+  }
+
+  /**
+   *
+   */
+  setRenderingInitial () {
+    this.renderingState = RenderingStates.INITIAL
   }
 
   /**
@@ -97,24 +139,16 @@ export default class AbstractAnnotation extends EventEmitter {
    * Handle a click event.
    */
   handleClickEvent (e) {
+    // console.log('handleClickEvent')
+
     this.toggleSelect()
 
     if (this.type !== 'textbox') {
 
       if (this.selected) {
-
-        // TODO Use common function.
-        let event = document.createEvent('CustomEvent')
-        event.initCustomEvent('annotationSelected', true, true, this)
-        window.dispatchEvent(event)
-
+        Utils.dispatchWindowEvent('annotationSelected', this)
       } else {
-
-        // TODO Use common function.
-        let event = document.createEvent('CustomEvent')
-        event.initCustomEvent('annotationDeselected', true, true, this)
-        window.dispatchEvent(event)
-
+        Utils.dispatchWindowEvent('annotationDeselected', this)
       }
     }
   }
@@ -123,34 +157,40 @@ export default class AbstractAnnotation extends EventEmitter {
    * Handle a hoverIn event.
    */
   handleHoverInEvent (e) {
-    console.log('handleHoverInEvent')
+    // console.log('abstruct handleHoverInEvent')
     this.highlight()
     this.emit('hoverin')
-    dispatchWindowEvent('annotationHoverIn', this)
+    Utils.dispatchWindowEvent('annotationHoverIn', this)
   }
 
   /**
    * Handle a hoverOut event.
    */
   handleHoverOutEvent (e) {
-    console.log('handleHoverOutEvent')
+    // console.log('abstruct handleHoverOutEvent')
     this.dehighlight()
     this.emit('hoverout')
-    dispatchWindowEvent('annotationHoverOut', this)
+    Utils.dispatchWindowEvent('annotationHoverOut', this)
   }
 
   /**
    * Highlight the annotation.
    */
-  highlight () {
+  highlight (e) {
     this.$element.addClass('--hover')
+    if (this.sibling && !e) {
+      this.sibling.highlight('once')
+    }
   }
 
   /**
    * Dehighlight the annotation.
    */
-  dehighlight () {
+  dehighlight (e) {
     this.$element.removeClass('--hover')
+    if (this.sibling && !e) {
+      this.sibling.dehighlight('once')
+    }
   }
 
   /**
@@ -166,7 +206,6 @@ export default class AbstractAnnotation extends EventEmitter {
    * Deselect the annotation.
    */
   deselect () {
-    console.log('deselect')
     this.selected = false
     this.selectedTime = null
     this.$element.removeClass('--selected')
@@ -179,8 +218,14 @@ export default class AbstractAnnotation extends EventEmitter {
 
     if (this.selected) {
       this.deselect()
+      if (this.sibling) {
+        this.sibling.deselect()
+      }
     } else {
       this.select()
+      if (this.sibling) {
+        this.sibling.select()
+      }
     }
 
   }
@@ -192,7 +237,7 @@ export default class AbstractAnnotation extends EventEmitter {
 
     if (this.isSelected()) {
       this.destroy().then(() => {
-        dispatchWindowEvent('annotationDeleted', { uuid : this.uuid })
+        Utils.dispatchWindowEvent('annotationDeleted', { uuid : this.uuid })
       })
       return true
     }
@@ -220,8 +265,6 @@ export default class AbstractAnnotation extends EventEmitter {
     const $circle = this.$element.find('.anno-knob')
     if ($circle.length > 0) {
       return {
-        // x : parseFloat($circle.css('left')) + parseFloat($circle.css('width')) / 2,
-        // y : parseFloat($circle.css('top')) + parseFloat($circle.css('height')) / 2
         x : parseFloat($circle.css('left')) + DEFAULT_RADIUS / 2.0,
         y : parseFloat($circle.css('top')) + DEFAULT_RADIUS / 2.0
       }

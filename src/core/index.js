@@ -1,147 +1,168 @@
 /**
- Functions for annotations rendered over a PDF file.
+ * Functions for annotations rendered over a PDF file.
  */
 require('!style-loader!css-loader!./index.css')
-import { dispatchWindowEvent } from '../shared/util'
-
 import EventEmitter from 'events'
-
-window.globalEvent = new EventEmitter()
-window.globalEvent.setMaxListeners(0)
+import * as Utils from '../shared/util'
+import PageStates from './src/render/pageStates'
 
 // This is the entry point of window.xxx.
 // (setting from webpack.config.js)
 import PDFAnnoCore from './src/PDFAnnoCore'
 export default PDFAnnoCore
 
-// Create an annocation container.
 import AnnotationContainer from './src/annotation/container'
+
+window.globalEvent = new EventEmitter()
+window.globalEvent.setMaxListeners(0)
+
+// Create an annocation container.
 window.annotationContainer = new AnnotationContainer()
 
 // Enable a view mode.
 PDFAnnoCore.UI.enableViewMode()
 
-// The event called at page rendered by pdfjs.
-window.addEventListener('pagerendered', function (ev) {
-  console.log('pagerendered:', ev.detail.pageNumber)
-
-  // No action, if the viewer is closed.
-  if (!window.PDFView.pdfViewer.getPageView(0)) {
-    return
-  }
-
-  adjustPageGaps()
-  renderAnno()
+window.addEventListener('documentload', event => {
+  console.log('[[documentload]]')
+  window.pageStates = new PDFAnnoCore.PageStates()
 })
 
 // Adapt to scale change.
-window.addEventListener('scalechange', () => {
-  console.log('scalechange')
-  adjustPageGaps()
-  removeAnnoLayer()
-  renderAnno()
+window.addEventListener('scalechange', event => {
+  console.log('[[scalechange]]:',  'page=' + window.PDFView.pdfViewer.currentPageNumber, 'scale=' + event.scale)
+  window.pageStates.clear()
+  window.annotationContainer.clearRenderingStates()
 })
 
-function adjustPageGaps () {
-  // Issue Fix.
-  // Correctly rendering when changing scaling.
-  // The margin between pages is fixed(9px), and never be scaled in default,
-  // then manually have to change the margin.
-  let scale = window.PDFView.pdfViewer.getPageView(0).viewport.scale
-  let borderWidth = `${9 * scale}px`
-  let marginBottom = `${-9 * scale}px`
-  let marginTop = `${1 * scale}px`
-  $('.page').css({
-    'border-top-width'    : borderWidth,
-    'border-bottom-width' : borderWidth,
-    marginBottom,
-    marginTop
-  })
-}
+window.addEventListener('pagechange', event => {
+  if (event.previousPageNumber !== event.pageNumber) {
+    console.log('[[pagechange]]:', 'page=' + event.pageNumber, 'prev=' + event.previousPageNumber)
+    const pages = window.PDFView.pdfViewer._getVisiblePages()
+    renderAnno({first : pages.first.id, last : pages.last.id})
+  }
+})
+
+// The event called at page rendered by pdfjs.
+window.addEventListener('pagerendered', event => {
+  console.log('[[pagerendered]]:', event.detail)
+
+  if (window.PDFView.pageRotation !== 0) {
+    window.pageStates.clear()
+    window.annotationContainer.clearRenderingStates()
+    return
+  }
+
+  renderAnno(event.detail.pageNumber, /* forceRender= */ true)
+})
+
+window.addEventListener('pagesloaded', event => {
+  console.log('[[pagesloaded]]:', event.detail)
+})
 
 /*
- * Remove the annotation layer and the temporary rendering layer.
- */
-function removeAnnoLayer () {
-  // TODO Remove #annoLayer.
-  $('#annoLayer, #annoLayer2').remove()
-}
+window.addEventListener('presentationmodechanged', event => {
+  console.log('[[presentationmodechanged]]:', event.active, event.switchInProgress)
+})
+*/
+
+window.addEventListener('resize', event => {
+  console.log('[[resize]]:')
+})
 
 /*
+window.addEventListener('textlayerrendered', event => {
+  console.log('[[textlayerrendered]]:', event.detail)
+})
+*/
+
+/**
  * Render annotations saved in the storage.
+ * @param {Integer} pages
  */
-function renderAnno () {
+function renderAnno (pages, forceRender = false) {
+
+  // console.log('renderAnno:', pages, forceRender)
 
   // No action, if the viewer is closed.
   if (!window.PDFView.pdfViewer.getPageView(0)) {
     return
   }
 
-  // TODO make it a global const.
-  const svgLayerId = 'annoLayer'
-  const annoLayer2Id = 'annoLayer2'
-
-  // Check already exists.
-  if ($('#' + svgLayerId).length > 0) {
-    return
-  }
-  if ($('#' + annoLayer2Id).length > 0) {
+  // This program supports only when pageRotation == 0.
+  if (window.PDFView.pageRotation !== 0) {
     return
   }
 
-  let leftMargin = ($('#viewer').width() - $('.page').width()) / 2
+  pages = Utils.parsePageParam(pages)
 
-  // At window.width < page.width.
-  if (leftMargin < 0) {
-    leftMargin = 9
+  for (let page of pages) {
+    if (window.pageStates.getState(page) !== PageStates.RENDERED || forceRender) {
+      renderAnnotations(page)
+    }
   }
-
-  let height = $('#viewer').height()
-
-  let width = $('.page').width()
-
-  // TODO no need ?
-  // Add an annotation layer.
-  let $annoLayer = $(`<svg id="${svgLayerId}" class="${svgLayerId}"/>`).css({   // TODO CSSClass.
-    position   : 'absolute',
-    top        : '0px',
-    left       : `${leftMargin}px`,
-    width      : `${width}px`,
-    height     : `${height}px`,
-    visibility : 'hidden',
-    'z-index'  : 2
-  })
-  // Add an annotation layer.
-  let $annoLayer2 = $(`<div id="${annoLayer2Id}"/>`).addClass('annoLayer').css({   // TODO CSSClass.
-    position   : 'absolute',
-    top        : '0px',
-    left       : `${leftMargin}px`,
-    width      : `${width}px`,
-    height     : `${height}px`,
-    visibility : 'hidden',
-    'z-index'  : 2
-  })
-
-  $('#viewer').css({
-    position : 'relative'  // TODO css.
-  }).append($annoLayer).append($annoLayer2)
-
-  dispatchWindowEvent('annotationlayercreated')
-
-  renderAnnotations()
 }
+
+const renderingOptimize = true
 
 /**
  * Render all annotations.
+ * @param {Integer} page
  */
-function renderAnnotations () {
-  const annotations = window.annotationContainer.getAllAnnotations()
-  if (annotations.length === 0) {
-    return
+function renderAnnotations (page) {
+
+  // console.log('renderAnnotations: page=', page)
+  console.time(`renderAnnotations: page(${page})`)
+
+  // TODO どこで呼ぶべきか、要検討 search と関連する。
+  // Utils.dispatchWindowEvent('annotationlayercreated')
+
+  if (renderingOptimize) {
+    let spans = window.annotationContainer.getAllAnnotations()
+      .filter(a => a.type === 'span' && a.page === page && a.isRenderingInitial())
+
+    // spans.forEach(s => { console.log('span on page', s.page, s.uuid) })
+
+    window.annotationContainer.getAllAnnotations()
+      .filter(a => a.type === 'relation')
+      .forEach(a => {
+        if (a.visible(page)) {
+          ;[a._rel1Annotation, a._rel2Annotation]
+            .filter(span => spans.indexOf(span) < 0 && span.isRenderingInitial())
+            .forEach(span => {
+              spans.push(span)
+              // console.log('add span', span.page, span.uuid)
+            })
+        }
+      })
+
+    // Render spans.
+    spans.forEach(a => {
+      a.render()
+      a.enableViewMode()
+    })
+
+    // Render relations.
+    window.annotationContainer.getAllAnnotations()
+      .filter(a => a.type === 'relation')
+      .forEach(a => {
+        if (a.visible(page) && a.isRenderingInitial()) {
+          a.render()
+          a.enableViewMode()
+        }
+      })
+  } else {
+    // Render all annotations.
+    // This rendering is time-consuming.
+    window.annotationContainer.getAllAnnotations().forEach(a => {
+      a.render()
+      a.enableViewMode()
+    })
+
   }
-  annotations.forEach(a => {
-    a.render()
-    a.enableViewMode()
-  })
-  dispatchWindowEvent('annotationrendered')
+
+  window.pageStates.setState(page, PageStates.RENDERED)
+
+  Utils.dispatchWindowEvent('annotationrendered')
+
+  console.timeEnd(`renderAnnotations: page(${page})`)
 }

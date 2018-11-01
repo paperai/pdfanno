@@ -3,13 +3,13 @@ import * as annoUI from 'anno-ui'
 import { loadFiles } from './loadFiles'
 import { getSearchHighlight } from '../search'
 import * as socket from '../socket'
-import { anyOf, dispatchWindowEvent } from '../../shared/util'
 import { convertToExportY, paddingBetweenPages, nextZIndex } from '../../shared/coords'
 import {
   unlistenWindowLeaveEvent,
   adjustViewerSize
 } from '../util/window'
 // import { saveSpan } from '../../core/src/UI/span'
+import * as Utils from '../../shared/util'
 import * as constants from '../../shared/constants'
 import * as pako from 'pako'
 import { PDFEXTRACT_VERSION } from '../../core/src/version'
@@ -36,11 +36,7 @@ export default class PDFAnnoPage {
    */
   startViewerApplication () {
 
-    // Alias for convenience.
-    // TODO Remove this alias.
-    window.iframeWindow = window
-
-    // window.iframeWindow.addEventListener('DOMContentLoaded', () => {
+    // window.addEventListener('DOMContentLoaded', () => {
 
     // Adjust the height of viewer.
     adjustViewerSize()
@@ -48,50 +44,50 @@ export default class PDFAnnoPage {
     // Reset the confirm dialog at leaving page.
     unlistenWindowLeaveEvent()
 
-    dispatchWindowEvent('iframeReady')
+    Utils.dispatchWindowEvent('iframeReady')
     // })
 
-    // window.iframeWindow.addEventListener('pagerendered', ev => {
+    // window.addEventListener('pagerendered', ev => {
     //     dispatchWindowEvent('pagerendered', ev.detail)
     // })
 
-    // window.iframeWindow.addEventListener('annotationrendered', () => {
+    // window.addEventListener('annotationrendered', () => {
     //     dispatchWindowEvent('annotationrendered')
     // })
 
     // Set the confirm dialog when leaving a page.
-    // window.iframeWindow.addEventListener('annotationUpdated', () => {
+    // window.addEventListener('annotationUpdated', () => {
     //     listenWindowLeaveEvent()
     //     dispatchWindowEvent('annotationUpdated')
     // })
 
     // enable text input.
-    // window.iframeWindow.addEventListener('enableTextInput', e => {
+    // window.addEventListener('enableTextInput', e => {
     //     dispatchWindowEvent('enableTextInput', e.detail)
     // })
     //
     // // disable text input.
-    // window.iframeWindow.addEventListener('disappearTextInput', e => {
+    // window.addEventListener('disappearTextInput', e => {
     //     dispatchWindowEvent('disappearTextInput', e.detail)
     // })
     //
-    // window.iframeWindow.addEventListener('annotationDeleted', e => {
+    // window.addEventListener('annotationDeleted', e => {
     //     dispatchWindowEvent('annotationDeleted', e.detail)
     // })
     //
-    // window.iframeWindow.addEventListener('annotationHoverIn', e => {
+    // window.addEventListener('annotationHoverIn', e => {
     //     dispatchWindowEvent('annotationHoverIn', e.detail)
     // })
     //
-    // window.iframeWindow.addEventListener('annotationHoverOut', e => {
+    // window.addEventListener('annotationHoverOut', e => {
     //     dispatchWindowEvent('annotationHoverOut', e.detail)
     // })
     //
-    // window.iframeWindow.addEventListener('annotationSelected', e => {
+    // window.addEventListener('annotationSelected', e => {
     //     dispatchWindowEvent('annotationSelected', e.detail)
     // })
     //
-    // window.iframeWindow.addEventListener('annotationDeselected', () => {
+    // window.addEventListener('annotationDeselected', () => {
     //     dispatchWindowEvent('annotationDeselected')
     // })
 
@@ -154,10 +150,10 @@ export default class PDFAnnoPage {
 
     // Load PDF.
     const uint8Array = new Uint8Array(contentFile.content)
-    window.iframeWindow.PDFViewerApplication.open(uint8Array)
+    window.PDFViewerApplication.open(uint8Array)
 
     // Set the PDF file name.
-    window.iframeWindow.PDFView.url = contentFile.name
+    window.PDFView.url = contentFile.name
 
     // Save the current.
     this.currentContentFile = contentFile
@@ -196,11 +192,11 @@ export default class PDFAnnoPage {
    * Close the viewer.
    */
   closePDFViewer () {
-    if (window.iframeWindow && window.iframeWindow.PDFViewerApplication) {
-      window.iframeWindow.PDFViewerApplication.close()
-      $('#numPages', window.iframeWindow.document).text('')
+    if (window.PDFViewerApplication) {
+      window.PDFViewerApplication.close()
+      $('#numPages', window.document).text('')
       this.currentContentFile = null
-      dispatchWindowEvent('didCloseViewer')
+      Utils.dispatchWindowEvent('didCloseViewer')
     }
   }
 
@@ -218,14 +214,14 @@ export default class PDFAnnoPage {
     // TODO Refactoring: a little too long.
 
     // Get user selection.
-    const rects = window.iframeWindow.PDFAnnoCore.default.UI.getRectangles()
-    console.log('createSpan:rects:', rects)
+    const rects = window.PDFAnnoCore.default.UI.getRectangles()
+    // console.log('createSpan:rects:', rects)
 
     // Get a search result, if exists.
     const highlight = getSearchHighlight()
 
     // Get selected annotations.
-    const selectedAnnotations = window.iframeWindow.annotationContainer.getSelectedAnnotations()
+    const selectedAnnotations = window.annotationContainer.getSelectedAnnotations()
 
     // Check empty.
     if (!rects && !highlight && selectedAnnotations.length === 0) {
@@ -243,11 +239,11 @@ export default class PDFAnnoPage {
           anno.render()
           anno.enableViewMode()
         })
-      dispatchWindowEvent('disappearTextInput')
+      Utils.dispatchWindowEvent('disappearTextInput')
 
       // Create a new rectAnnotation.
     } else if (rects) {
-      window.iframeWindow.PDFAnnoCore.default.UI.createSpan({ text, zIndex : nextZIndex(), color })
+      window.PDFAnnoCore.default.UI.createSpan({ text, zIndex : nextZIndex(), color })
 
     } else if (highlight) {
 
@@ -260,19 +256,18 @@ export default class PDFAnnoPage {
         textRange    : highlight.textRange,
         selectedText : highlight.selectedText
       })
+
       this.addAnnotation(span)
 
-      var event = document.createEvent('CustomEvent')
-      event.initCustomEvent('enableTextInput', true, true, {
+      Utils.dispatchWindowEvent('enableTextInput', {
         uuid      : span.uuid,
         text      : text,
         autoFocus : true
       })
-      window.dispatchEvent(event)
     }
 
     // Notify annotation added.
-    dispatchWindowEvent('annotationrendered')
+    Utils.dispatchWindowEvent('annotationrendered')
   }
 
   /**
@@ -286,7 +281,7 @@ export default class PDFAnnoPage {
     }
 
     // If a user select relation annotation(s), change the color and text only.
-    const relAnnos = window.iframeWindow.annotationContainer.getSelectedAnnotations()
+    const relAnnos = window.annotationContainer.getSelectedAnnotations()
       .filter(anno => anno.type === 'relation')
     if (relAnnos.length > 0) {
       relAnnos
@@ -300,7 +295,7 @@ export default class PDFAnnoPage {
       return
     }
 
-    let selectedAnnotations = window.iframeWindow.annotationContainer.getSelectedAnnotations()
+    let selectedAnnotations = window.annotationContainer.getSelectedAnnotations()
     selectedAnnotations = selectedAnnotations.filter(a => {
       return a.type === 'rect' || a.type === 'span'
     }).sort((a1, a2) => {
@@ -313,15 +308,15 @@ export default class PDFAnnoPage {
 
     const first  = selectedAnnotations[selectedAnnotations.length - 2]
     const second = selectedAnnotations[selectedAnnotations.length - 1]
-    console.log('first:second,', first, second)
+    // console.log('first:second,', first, second)
 
     // Check duplicated.
-    const arrows = window.iframeWindow.annotationContainer
+    const arrows = window.annotationContainer
       .getAllAnnotations()
       .filter(a => a.type === 'relation')
       .filter(a => {
-        return anyOf(a.rel1Annotation.uuid, [first.uuid, second.uuid])
-          && anyOf(a.rel2Annotation.uuid, [first.uuid, second.uuid])
+        return Utils.anyOf(a.rel1Annotation.uuid, [first.uuid, second.uuid])
+          && Utils.anyOf(a.rel2Annotation.uuid, [first.uuid, second.uuid])
       })
 
     if (arrows.length > 0) {
@@ -335,17 +330,16 @@ export default class PDFAnnoPage {
       arrows[0].save()
       arrows[0].render()
       arrows[0].enableViewMode()
+
       // Show label input.
-      var event = document.createEvent('CustomEvent')
-      event.initCustomEvent('enableTextInput', true, true, {
+      Utils.dispatchWindowEvent('enableTextInput', {
         uuid : arrows[0].uuid,
         text : arrows[0].text
       })
-      window.dispatchEvent(event)
       return
     }
 
-    window.iframeWindow.PDFAnnoCore.default.UI.createRelation({
+    window.PDFAnnoCore.default.UI.createRelation({
       type,
       anno1 : first,
       anno2 : second,
@@ -354,7 +348,7 @@ export default class PDFAnnoPage {
     })
 
     // Notify annotation added.
-    dispatchWindowEvent('annotationrendered')
+    Utils.dispatchWindowEvent('annotationrendered')
   }
 
   /**
@@ -363,7 +357,7 @@ export default class PDFAnnoPage {
   displayAnnotation (isPrimary) {
 
     // Check the viewer not clised.
-    if ($('#numPages', window.iframeWindow.document).text() === '') {
+    if ($('#numPages', window.document).text() === '') {
       return
     }
 
@@ -427,47 +421,45 @@ export default class PDFAnnoPage {
    * Get all annotations.
    */
   getAllAnnotations () {
-    if (!window.iframeWindow || !window.iframeWindow.annotationContainer) {
+    if (!window.annotationContainer) {
       return []
     }
-    return window.iframeWindow.annotationContainer.getAllAnnotations()
+    return window.annotationContainer.getAllAnnotations()
   }
 
   /**
    * Get selected annotations.
    */
   getSelectedAnnotations () {
-    return window.iframeWindow.annotationContainer.getSelectedAnnotations()
+    return window.annotationContainer.getSelectedAnnotations()
   }
 
   /**
    * Find an annotation by id.
    */
   findAnnotationById (id) {
-    return window.iframeWindow.annotationContainer.findById(id)
+    return window.annotationContainer.findById(id)
   }
 
   /**
    * Clear the all annotations from the view and storage.
    */
   clearAllAnnotations () {
-    if (window.iframeWindow) {
-      window.iframeWindow.annotationContainer.getAllAnnotations().forEach(a => a.destroy())
-    }
+    window.annotationContainer.getAllAnnotations().forEach(a => a.destroy())
   }
 
   /**
    * Add an annotation to the container.
    */
   addAnnotation  (annotation) {
-    window.iframeWindow.annotationContainer.add(annotation)
+    window.annotationContainer.add(annotation)
   }
 
   /**
    * Create a new rect annotation.
    */
   createRectAnnotation (options) {
-    return window.iframeWindow.PDFAnnoCore.default.RectAnnotation.newInstance(options)
+    return window.PDFAnnoCore.default.RectAnnotation.newInstance(options)
   }
 
   /**
@@ -475,14 +467,14 @@ export default class PDFAnnoPage {
    */
   createSpanAnnotation (options) {
     console.log('createSpanAnnotation:', options)
-    return window.iframeWindow.PDFAnnoCore.default.SpanAnnotation.newInstance(options)
+    return window.PDFAnnoCore.default.SpanAnnotation.newInstance(options)
   }
 
   /**
    * Create a new relation annotation.
    */
   createRelationAnnotation (options) {
-    return window.iframeWindow.PDFAnnoCore.default.RelationAnnotation.newInstance(options)
+    return window.PDFAnnoCore.default.RelationAnnotation.newInstance(options)
   }
 
   validateSchemaErrors (errors) {
@@ -502,9 +494,9 @@ export default class PDFAnnoPage {
    * Import annotations from UI.
    */
   importAnnotation (paperData, isPrimary) {
-    window.iframeWindow.annotationContainer.importAnnotations(paperData, isPrimary).then(() => {
+    window.annotationContainer.importAnnotations(paperData, isPrimary).then(() => {
       // Notify annotations added.
-      dispatchWindowEvent('annotationrendered')
+      Utils.dispatchWindowEvent('annotationrendered')
     }).catch(errors => {
       let message = errors
       if (Array.isArray(errors)) {
@@ -554,21 +546,21 @@ export default class PDFAnnoPage {
    * @return {Promise}
    */
   exportData ({exportType = 'toml'} = {}) {
-    return window.iframeWindow.annotationContainer.exportData(...arguments)
+    return window.annotationContainer.exportData(...arguments)
   }
 
   /**
    * Get the viewport of the viewer.
    */
   getViewerViewport () {
-    return window.iframeWindow.PDFView.pdfViewer.getPageView(0).viewport
+    return window.PDFView.pdfViewer.getPageView(0).viewport
   }
 
   /**
    * Get the content's name displayed now.
    */
   getCurrentContentName () {
-    return window.iframeWindow.getFileName(window.iframeWindow.PDFView.url)
+    return window.getFileName(window.PDFView.url)
   }
 
   /**
@@ -799,6 +791,5 @@ export default class PDFAnnoPage {
     currentAnnotations.forEach(a => {
       this.prevLabelMap[a.uuid] = a.text
     })
-
   }
 }

@@ -1,7 +1,8 @@
 import { uuid } from 'anno-ui/src/utils'
 import AbstractAnnotation from './abstract'
 import { getRelationTextPosition } from '../utils/relation.js'
-import { anyOf } from '../../../shared/util'
+import * as Utils from '../../../shared/util'
+import {addAnnoLayer} from '../render/layer'
 
 let globalEvent
 
@@ -23,6 +24,8 @@ export default class RelationAnnotation extends AbstractAnnotation {
     this.direction = null
     this.rel1Annotation = null
     this.rel2Annotation = null
+    this.main = true
+    this.page = null
     this.text = null
     this.color = null
     this.readOnly = false
@@ -45,10 +48,11 @@ export default class RelationAnnotation extends AbstractAnnotation {
   static newInstance (annotation) {
     let a            = new RelationAnnotation()
     a.uuid           = annotation.uuid || uuid()
-    // a.direction      = annotation.direction
     a.direction      = 'relation'
     a.rel1Annotation = AbstractAnnotation.isAnnotation(annotation.rel1) ? annotation.rel1 : window.annotationContainer.findById(annotation.rel1)
     a.rel2Annotation = AbstractAnnotation.isAnnotation(annotation.rel2) ? annotation.rel2 : window.annotationContainer.findById(annotation.rel2)
+    a.main           = annotation.main !== undefined ? annotation.main : true
+    a.page           = annotation.page || (a.rel1Annotation ? a.rel1Annotation.page : null)
     a.text           = annotation.text
     a.color          = annotation.color
     a.readOnly       = annotation.readOnly || false
@@ -60,12 +64,35 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * Create an instance from a TOML object.
    */
   static newInstanceFromTomlObject (d) {
-    // d.direction = d.dir
+    // console.log('relation: newInstanceFromTomlObject')
     d.direction = 'relation'
     // TODO Annotation側を、labelに合わせてもいいかも。
     d.text = d.label
     let rel = RelationAnnotation.newInstance(d)
     return rel
+  }
+
+  /**
+   * Create sub relation.
+   */
+  createSubRelation () {
+
+    const sub = RelationAnnotation.newInstance({
+      uuid      : null,
+      direction : this.direction,
+      main      : false,
+      page      : this.rel2Annotation ? this.rel2Annotation.page : null,
+      text      : this.text,
+      color     : this.color,
+      readOnly  : this.readOnly
+    })
+
+    sub._rel1Annotation = this.rel1Annotation
+    sub._rel2Annotation = this.rel2Annotation
+    sub.sibling = this
+    this.sibling = sub
+
+    return sub
   }
 
   /**
@@ -84,10 +111,10 @@ export default class RelationAnnotation extends AbstractAnnotation {
   set rel1Annotation (a) {
     this._rel1Annotation = a
     if (this._rel1Annotation) {
-      this._rel1Annotation.on('hoverin', this.handleRelHoverIn)
-      this._rel1Annotation.on('hoverout', this.handleRelHoverOut)
-      this._rel1Annotation.on('rectmove', this.handleRelMove)
-      this._rel1Annotation.on('delete', this.handleRelDelete)
+      this._rel1Annotation.on('hoverin', this.handleSpanHoverIn)
+      this._rel1Annotation.on('hoverout', this.handleSpanHoverOut)
+      this._rel1Annotation.on('rectmove', this.handleSpanMove)
+      this._rel1Annotation.on('delete', this.handleSpanDelete)
     }
   }
 
@@ -104,10 +131,10 @@ export default class RelationAnnotation extends AbstractAnnotation {
   set rel2Annotation (a) {
     this._rel2Annotation = a
     if (this._rel2Annotation) {
-      this._rel2Annotation.on('hoverin', this.handleRelHoverIn)
-      this._rel2Annotation.on('hoverout', this.handleRelHoverOut)
-      this._rel2Annotation.on('rectmove', this.handleRelMove)
-      this._rel2Annotation.on('delete', this.handleRelDelete)
+      this._rel2Annotation.on('hoverin', this.handleSpanHoverIn)
+      this._rel2Annotation.on('hoverout', this.handleSpanHoverOut)
+      this._rel2Annotation.on('rectmove', this.handleSpanMove)
+      this._rel2Annotation.on('delete', this.handleSpanDelete)
     }
   }
 
@@ -119,10 +146,32 @@ export default class RelationAnnotation extends AbstractAnnotation {
   }
 
   /**
+   * Determine whether relation is visible or not.
+   */
+  visible (visiblePages) {
+    visiblePages = this.parseVisibleParam(visiblePages)
+    return (this._rel1Annotation.page >= visiblePages.first.id || this._rel2Annotation.page >= visiblePages.first.id)
+      && (this._rel1Annotation.page <= visiblePages.last.id || this._rel2Annotation.page <= visiblePages.last.id)
+  }
+
+  /**
    * Render the annotation.
    */
   render () {
     this.setStartEndPosition()
+
+    let first, last
+    if (this._rel1Annotation.page <= this._rel2Annotation.page) {
+      first = this._rel1Annotation.page
+      last = this._rel2Annotation.page
+    } else {
+      first = this._rel2Annotation.page
+      last = this._rel1Annotation.page
+    }
+
+    // If there is no Annotation layer in this pages, create it.
+    addAnnoLayer({first, last})
+
     super.render()
   }
 
@@ -148,17 +197,17 @@ export default class RelationAnnotation extends AbstractAnnotation {
   destroy () {
     let promise = super.destroy()
     if (this._rel1Annotation) {
-      this._rel1Annotation.removeListener('hoverin', this.handleRelHoverIn)
-      this._rel1Annotation.removeListener('hoverout', this.handleRelHoverOut)
-      this._rel1Annotation.removeListener('rectmove', this.handleRelMove)
-      this._rel1Annotation.removeListener('delete', this.handleRelDelete)
+      this._rel1Annotation.removeListener('hoverin', this.handleSpanHoverIn)
+      this._rel1Annotation.removeListener('hoverout', this.handleSpanHoverOut)
+      this._rel1Annotation.removeListener('rectmove', this.handleSpanMove)
+      this._rel1Annotation.removeListener('delete', this.handleSpanDelete)
       delete this._rel1Annotation
     }
     if (this._rel2Annotation) {
-      this._rel2Annotation.removeListener('hoverin', this.handleRelHoverIn)
-      this._rel2Annotation.removeListener('hoverout', this.handleRelHoverOut)
-      this._rel2Annotation.removeListener('rectmove', this.handleRelMove)
-      this._rel2Annotation.removeListener('delete', this.handleRelDelete)
+      this._rel2Annotation.removeListener('hoverin', this.handleSpanHoverIn)
+      this._rel2Annotation.removeListener('hoverout', this.handleSpanHoverOut)
+      this._rel2Annotation.removeListener('rectmove', this.handleSpanMove)
+      this._rel2Annotation.removeListener('delete', this.handleSpanDelete)
       delete this._rel2Annotation
     }
 
@@ -227,6 +276,7 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * The callback for the relational text hoverred in.
    */
   handleTextHoverIn () {
+    // console.log('relation handleTextHoverIn')
     this.highlight()
     this.emit('hoverin')
     this.highlightRelAnnotations()
@@ -236,6 +286,7 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * The callback for the relational text hoverred out.
    */
   handleTextHoverOut () {
+    // console.log('relation handleTextHoverOut')
     this.dehighlight()
     this.emit('hoverout')
     this.dehighlightRelAnnotations()
@@ -244,7 +295,8 @@ export default class RelationAnnotation extends AbstractAnnotation {
   /**
    * The callback for the relationals hoverred in.
    */
-  handleRelHoverIn () {
+  handleSpanHoverIn (e) {
+    // console.log('relation handleSpanHoverIn')
     this.highlight()
     this.highlightRelAnnotations()
   }
@@ -252,7 +304,8 @@ export default class RelationAnnotation extends AbstractAnnotation {
   /**
    * The callback for the relationals hoverred out.
    */
-  handleRelHoverOut () {
+  handleSpanHoverOut (e) {
+    // console.log('relation handleSpanHoverOut')
     this.dehighlight()
     this.dehighlightRelAnnotations()
   }
@@ -260,14 +313,17 @@ export default class RelationAnnotation extends AbstractAnnotation {
   /**
    * The callback that is called relations has benn deleted.
    */
-  handleRelDelete () {
+  handleSpanDelete (e) {
     this.destroy()
+    if (this.sibling && !e) {
+      this.sibling.handleSpanDelete('once')
+    }
   }
 
   /**
    * The callback that is called relations has been moved.
    */
-  handleRelMove () {
+  handleSpanMove () {
     this.render()
   }
 
@@ -294,7 +350,8 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * The callback that is called at hoverred in.
    */
   handleHoverInEvent (e) {
-    super.handleHoverInEvent(e)
+    // console.log('relation handleHoverInEvent')
+    super.handleHoverInEvent()
     this.highlightRelAnnotations()
   }
 
@@ -302,7 +359,8 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * The callback that is called at hoverred out.
    */
   handleHoverOutEvent (e) {
-    super.handleHoverOutEvent(e)
+    // console.log('relation handleHoverOutEvent')
+    super.handleHoverOutEvent()
     this.dehighlightRelAnnotations()
   }
 
@@ -342,11 +400,8 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * Enable view mode.
    */
   enableViewMode () {
-
     this.disableViewMode()
-
     super.enableViewMode()
-
     if (!this.readOnly) {
       this.$element.find('path').on('click', this.handleClickEvent)
     }
@@ -361,18 +416,58 @@ export default class RelationAnnotation extends AbstractAnnotation {
   }
 
   /**
+   * Whether the end point crosses the page or not.
+   */
+  isCrossPage () {
+    return this.rel1Annotation.page !== this.rel2Annotation.page
+  }
+
+  /**
+   * Get the difference in coordinates between pages.
+   * @param {Integer} page
+   */
+  dxy (page) {
+    // The annoLayer does not exist after the scale change.
+    // const $targetLayer = $(Utils.getAnnoLayer(page))
+    const $targetLayer = $(Utils.getContainer(page))
+    const scale = window.PDFView.pdfViewer.getPageView(0).viewport.scale
+    return {
+      x : Math.round($targetLayer.offset().left / scale),
+      y : Math.round($targetLayer.offset().top / scale)
+    }
+  }
+
+  /**
    * Set the start / end points of the relation.
    */
   setStartEndPosition () {
+
+    let dxy1 = this.dxy(this.page)
+
     if (this._rel1Annotation) {
       let p = this._rel1Annotation.getBoundingCirclePosition()
       this.x1 = p.x
       this.y1 = p.y
+
+      if (this.isCrossPage() && !this.main) {
+        let dxy2 = this.dxy(this.rel1Annotation.page)
+        this.x1 += dxy2.x - dxy1.x
+        this.y1 += dxy2.y - dxy1.y
+        // console.log('t', dxy1, dxy2)
+      }
     }
+
     if (this._rel2Annotation) {
       let p = this._rel2Annotation.getBoundingCirclePosition()
       this.x2 = p.x
       this.y2 = p.y
+
+      if (this.isCrossPage() && this.main) {
+        let dxy2 = this.dxy(this.rel2Annotation.page)
+        this.x2 += dxy2.x - dxy1.x
+        this.y2 += dxy2.y - dxy1.y
+        // console.log('s', dxy1, dxy2)
+      }
     }
   }
 
@@ -385,8 +480,8 @@ export default class RelationAnnotation extends AbstractAnnotation {
       return false
     }
 
-    const isSame = anyOf(this.rel1Annotation.uuid, [anno.rel1Annotation.uuid, anno.rel2Annotation.uuid])
-      && anyOf(this.rel2Annotation.uuid, [anno.rel1Annotation.uuid, anno.rel2Annotation.uuid])
+    const isSame = Utils.anyOf(this.rel1Annotation.uuid, [anno.rel1Annotation.uuid, anno.rel2Annotation.uuid])
+      && Utils.anyOf(this.rel2Annotation.uuid, [anno.rel1Annotation.uuid, anno.rel2Annotation.uuid])
 
     return isSame
   }
