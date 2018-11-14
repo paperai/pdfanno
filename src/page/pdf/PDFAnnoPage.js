@@ -352,6 +352,41 @@ export default class PDFAnnoPage {
   }
 
   /**
+   * Create a Rect annotation.
+   */
+  createRect ({ text = null, color = null } = {}) {
+
+    // Get user created annotation.
+    const rect = window.PDFAnnoCore.default.UI.getDrawingRect()
+
+    // Get the selected annotation.
+    const selectedAnnotation = window.annotationContainer.getSelectedAnnotations().filter(a => {
+      return a.type === 'rect'
+    })[0]
+
+    // Check empty.
+    if (!rect && !selectedAnnotation) {
+      return annoUI.ui.alertDialog.show({ message : 'Create or select a rect.' })
+    }
+
+    if (rect) {
+      window.PDFAnnoCore.default.UI.createRect({ text, zIndex : nextZIndex(), color })
+    }
+
+    // Change color and label.
+    if (selectedAnnotation) {
+      selectedAnnotation.color = color
+      selectedAnnotation.text = text
+      selectedAnnotation.render()
+      selectedAnnotation.enableViewMode()
+      dispatchWindowEvent('disappearTextInput')
+    }
+
+    // Notify annotation added.
+    dispatchWindowEvent('annotationrendered')
+  }
+
+  /**
    * Display annotations an user selected.
    */
   displayAnnotation (isPrimary) {
