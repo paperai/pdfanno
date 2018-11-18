@@ -1,4 +1,4 @@
-import { scaleDown } from './utils'
+import { scaleDown, getCurrentTab } from './utils'
 import SpanAnnotation from '../annotation/span'
 import * as textInput from '../utils/textInput'
 
@@ -248,6 +248,10 @@ window.addEventListener('DOMContentLoaded', () => {
   const $viewer = $('#viewer')
 
   $viewer.on('mousedown', '.canvasWrapper', e => {
+
+    if (getCurrentTab() !== 'span') {
+      return
+    }
 
     if (otherAnnotationTreating) {
       // Ignore, if other annotation is detected.

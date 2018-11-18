@@ -316,7 +316,7 @@ export default class AnnotationContainer {
         span.enableViewMode()
 
         // Rect.
-      } else if (d.type === 'rect') {
+      } else if (d.type === 'rectangle') {
 
         let rect = RectAnnotation.newInstanceFromTomlObject(d)
         rect.color = getColor(tomlIndex, rect.type, rect.text)
@@ -358,13 +358,14 @@ export default class AnnotationContainer {
     const visiblePages = window.PDFView.pdfViewer._getVisiblePages()
 
     // order is important.
-    ;['spans', 'relations'].forEach(key => {
+    ;['spans', 'relations', 'rectangles'].forEach(key => {
       const objs = tomlObject[key]
       if (Array.isArray(objs)) {
         objs.forEach(obj => {
           obj.uuid = uuid()
           obj.readOnly = readOnly
 
+          // XXX
           if (key === 'spans') {
             const span = SpanAnnotation.newInstanceFromTomlObject(obj)
             span.color = getColor(tomlIndex, 'span', span.text)

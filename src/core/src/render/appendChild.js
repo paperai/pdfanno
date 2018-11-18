@@ -31,7 +31,7 @@ export default function appendAnnoChild (base, annotation, viewport) {
 
   let child
   switch (annotation.type) {
-  case 'rect':
+  case 'rectangle':
     child = renderRect(annotation, base)
     break
   case 'span':

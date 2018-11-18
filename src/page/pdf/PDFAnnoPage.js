@@ -297,7 +297,7 @@ export default class PDFAnnoPage {
 
     let selectedAnnotations = window.annotationContainer.getSelectedAnnotations()
     selectedAnnotations = selectedAnnotations.filter(a => {
-      return a.type === 'rect' || a.type === 'span'
+      return a.type === 'rectangle' || a.type === 'span'
     }).sort((a1, a2) => {
       return (a1.selectedTime - a2.selectedTime) // asc
     })
@@ -361,7 +361,7 @@ export default class PDFAnnoPage {
 
     // Get the selected annotation.
     const selectedAnnotation = window.annotationContainer.getSelectedAnnotations().filter(a => {
-      return a.type === 'rect'
+      return a.type === 'rectangle'
     })[0]
 
     // Check empty.
@@ -379,11 +379,11 @@ export default class PDFAnnoPage {
       selectedAnnotation.text = text
       selectedAnnotation.render()
       selectedAnnotation.enableViewMode()
-      dispatchWindowEvent('disappearTextInput')
+      Utils.dispatchWindowEvent('disappearTextInput')
     }
 
     // Notify annotation added.
-    dispatchWindowEvent('annotationrendered')
+    Utils.dispatchWindowEvent('annotationrendered')
   }
 
   /**

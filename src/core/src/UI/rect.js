@@ -1,4 +1,4 @@
-import { scaleDown } from './utils'
+import { scaleDown, getCurrentTab } from './utils'
 import * as textInput from '../utils/textInput'
 import RectAnnotation from '../annotation/rect'
 
@@ -66,16 +66,19 @@ function saveRect ({
   knob = true
 }) {
 
+  // Save.
   let rectAnnotation = RectAnnotation.newInstance(...arguments)
-
   if (save) {
     rectAnnotation.save()
   }
 
+  // Render.
   rectAnnotation.render()
 
+  // Select.
   rectAnnotation.select()
 
+  // Enable label input.
   if (focusToLabel) {
     textInput.enable({ uuid : rectAnnotation.uuid, autoFocus : true, text })
   }
@@ -84,7 +87,7 @@ function saveRect ({
 }
 
 /**
- * Create a span by current texts selection.
+ * Create a rect
  */
 export function createRect ({ text = null, zIndex = 10, color = null }) {
 
@@ -146,7 +149,6 @@ function setPositions (e) {
   }
   x2 = x
   y2 = y
-
 }
 
 /**
@@ -195,6 +197,10 @@ window.addEventListener('DOMContentLoaded', () => {
   $viewer = $('#viewer')
 
   $viewer.on('mousedown', '.canvasWrapper', e => {
+
+    if (getCurrentTab() !== 'rectangle') {
+      return
+    }
 
     if (otherAnnotationTreating) {
       // Ignore, if other annotation is detected.

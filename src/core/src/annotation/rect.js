@@ -1,7 +1,8 @@
 import { uuid } from 'anno-ui/src/utils'
 import AbstractAnnotation from './abstract'
 import { scaleDown, disableTextlayer, enableTextlayer } from '../UI/utils'
-import { convertFromExportY } from '../../../shared/coords'
+import {addAnnoLayer} from '../render/layer'
+// import { convertFromExportY } from '../../../shared/coords'
 
 let globalEvent
 
@@ -14,14 +15,10 @@ export default class RectAnnotation extends AbstractAnnotation {
    * Constructor.
    */
   constructor () {
-
     super()
 
-    globalEvent = window.globalEvent
-
     this.uuid     = null
-    this.type     = 'rect'
-    this.page     = 1
+    this.type     = 'rectangle'
     this.x        = 0
     this.y        = 0
     this.width    = 0
@@ -29,31 +26,32 @@ export default class RectAnnotation extends AbstractAnnotation {
     this.text     = null
     this.color    = null
     this.readOnly = false
-    this.zIndex   = 10
+    this.page     = 1
     this.knob     = true
     this.$element = this.createDummyElement()
+    this.zIndex   = 10
 
-    globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
-    globalEvent.on('enableViewMode', this.enableViewMode)
+    window.globalEvent.on('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
+    window.globalEvent.on('enableViewMode', this.enableViewMode)
   }
 
   /**
    * Create an instance from an annotation data.
    */
   static newInstance (annotation) {
-    let rect      = new RectAnnotation()
-    rect.uuid     = annotation.uuid || uuid()
-    rect.page     = annotation.page
-    rect.x        = annotation.x
-    rect.y        = annotation.y
-    rect.width    = annotation.width
-    rect.height   = annotation.height
-    rect.text     = annotation.text
-    rect.color    = annotation.color
-    rect.readOnly = annotation.readOnly || false
-    rect.knob     = (typeof annotation.knob === 'boolean' ? annotation.knob : true)
-    rect.zIndex   = annotation.zIndex || 10
-    return rect
+    let a      = new RectAnnotation()
+    a.uuid     = annotation.uuid || uuid()
+    a.page     = annotation.page
+    a.x        = annotation.x
+    a.y        = annotation.y
+    a.width    = annotation.width
+    a.height   = annotation.height
+    a.text     = annotation.text
+    a.color    = annotation.color
+    a.readOnly = annotation.readOnly || false
+    a.knob     = (typeof annotation.knob === 'boolean' ? annotation.knob : true)
+    a.zIndex   = annotation.zIndex || 10
+    return a
   }
 
   /**
@@ -61,14 +59,40 @@ export default class RectAnnotation extends AbstractAnnotation {
    */
   static newInstanceFromTomlObject (tomlObject) {
     let d      = tomlObject
-    d.position = d.position.map(parseFloat)
-    d.x        = d.position[0]
-    d.y        = convertFromExportY(d.page, d.position[1])
-    d.width    = d.position[2]
-    d.height   = d.position[3]
+
+    // d.position = d.position.map(parseFloat)
+    // d.x        = d.position[0]
+    // d.y        = convertFromExportY(d.page, d.position[1])
+    // d.width    = d.position[2]
+    // d.height   = d.position[3]
+
+    d.x        = d.x
+    d.y        = d.y
+    d.width    = d.width
+    d.height   = d.height
+
     d.text     = d.label
 
     return RectAnnotation.newInstance(d)
+  }
+
+  /**
+   * Determine whether span is visible or not.
+   */
+  visible (visiblePages) {
+    visiblePages = this.parseVisibleParam(visiblePages)
+    return this.page >= visiblePages.first.id && this.page <= visiblePages.last.id
+  }
+
+  /**
+   * Render annotation(s).
+   */
+  render () {
+
+    // If there is no Annotation layer in this pages, create it.
+    addAnnoLayer(this.page)
+
+    return super.render()
   }
 
   /**
@@ -87,6 +111,7 @@ export default class RectAnnotation extends AbstractAnnotation {
   destroy () {
     let promise = super.destroy()
     this.emit('delete')
+
     window.globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
     window.globalEvent.removeListener('enableViewMode', this.enableViewMode)
     return promise
@@ -110,13 +135,6 @@ export default class RectAnnotation extends AbstractAnnotation {
   }
 
   /**
-   * Delete the annotation if selected.
-   */
-  deleteSelectedAnnotation () {
-    super.deleteSelectedAnnotation()
-  }
-
-  /**
    * Get the position for text.
    */
   getTextPosition () {
@@ -124,6 +142,13 @@ export default class RectAnnotation extends AbstractAnnotation {
       x : this.x + 7,
       y : this.y - 20
     }
+  }
+
+  /**
+   * Delete the annotation if selected.
+   */
+  deleteSelectedAnnotation () {
+    super.deleteSelectedAnnotation()
   }
 
   /**
@@ -257,13 +282,13 @@ export default class RectAnnotation extends AbstractAnnotation {
 
       this.save()
       this.enableViewMode()
-      globalEvent.emit('rectmoveend', this)
+      window.globalEvent.emit('rectmoveend', this)
     }
 
     document.removeEventListener('mousemove', this.handleMouseMoveOnDocument)
     document.removeEventListener('mouseup', this.handleMouseUpOnDocument)
 
-    if (window.currentType !== 'rect') {
+    if (window.currentType !== 'rectangle') {
       enableTextlayer()
     }
   }
@@ -298,5 +323,4 @@ export default class RectAnnotation extends AbstractAnnotation {
     this.$element.find('.anno-rect, .anno-knob').off('click')
     this.disableDragAction()
   }
-
 }
