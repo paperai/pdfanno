@@ -28,7 +28,7 @@ let y2 = null
 /**
  * The rect for user drawing.
  */
-let drawingRectAnnotation = null
+let rubberBand = null
 
 /**
  * Get the drawing rect data.
@@ -102,9 +102,9 @@ export function createRect ({ text = null, zIndex = 10, color = null }) {
     color
   }))
 
-  if (drawingRectAnnotation) {
-    drawingRectAnnotation.destroy()
-    drawingRectAnnotation = null
+  if (rubberBand) {
+    rubberBand.destroy()
+    rubberBand = null
   }
 
   x1 = null
@@ -158,14 +158,14 @@ function updateDrawingRect (e) {
 
   setPositions(e)
 
-  if (drawingRectAnnotation) {
-    drawingRectAnnotation.destroy()
-    drawingRectAnnotation = null
+  if (rubberBand) {
+    rubberBand.destroy()
+    rubberBand = null
   }
 
   const area = getDrawingRect()
 
-  drawingRectAnnotation = saveRect(Object.assign(area, {
+  rubberBand = saveRect(Object.assign(area, {
     color        : '#00FF00',
     readOnly     : true,
     save         : false,
@@ -173,7 +173,7 @@ function updateDrawingRect (e) {
     knob         : false
   }))
 
-  drawingRectAnnotation.disable()
+  rubberBand.disable()
 }
 
 function reset () {
@@ -182,9 +182,9 @@ function reset () {
   y1 = null
   x2 = null
   y2 = null
-  if (drawingRectAnnotation) {
-    drawingRectAnnotation.destroy()
-    drawingRectAnnotation = null
+  if (rubberBand) {
+    rubberBand.destroy()
+    rubberBand = null
   }
 }
 
@@ -197,42 +197,46 @@ window.addEventListener('DOMContentLoaded', () => {
   $viewer = $('#viewer')
 
   $viewer.on('mousedown', '.canvasWrapper', e => {
+  // $viewer.on('mousedown', '.canvasWrapper, .annoLayer', e => {
+
+    reset()
 
     if (getCurrentTab() !== 'rectangle') {
       return
     }
 
-    if (otherAnnotationTreating) {
-      // Ignore, if other annotation is detected.
-      return
-    }
-
-    reset()
+    // if (otherAnnotationTreating) {
+    //   // Ignore, if other annotation is detected.
+    //   return
+    // }
 
     // Only over the texts.
     setPositions(e)
-    let target = window.findText(drawingPage, { x : x1, y : y1 })
-    if (target) {
-      console.log('text was found, so not started to drawing rect.', target, drawingPage, x1, y1)
-      return
-    }
+
+    // let target = window.findText(drawingPage, { x : x1, y : y1 })
+    // if (target) {
+    //   console.log('text was found, so not started to drawing rect.', target, drawingPage, x1, y1)
+    //   return
+    // }
 
     mouseDown = true
 
     updateDrawingRect(e)
   })
 
-  $viewer.on('mousemove', '.canvasWrapper', e => {
+  // $viewer.on('mousemove', '.canvasWrapper', e => {
+  $viewer.on('mousemove', '.canvasWrapper, .annoLayer', e => {
     if (mouseDown) {
       updateDrawingRect(e)
     }
   })
 
-  $viewer.on('mouseup', '.canvasWrapper', e => {
+  // $viewer.on('mouseup', '.canvasWrapper', e => {
+  $viewer.on('mouseup', '.canvasWrapper, .annoLayer', e => {
     if (mouseDown) {
       updateDrawingRect(e)
-      if (drawingRectAnnotation) {
-        drawingRectAnnotation.deselect()
+      if (rubberBand) {
+        rubberBand.deselect()
       }
       // Remove if only click without dragging.
       if (x1 ===  x2 && y1 === y2) {
@@ -242,16 +246,17 @@ window.addEventListener('DOMContentLoaded', () => {
     mouseDown = false
   })
 
-  let otherAnnotationTreating = false
-  window.addEventListener('annotationHoverIn', () => {
-    otherAnnotationTreating = true
-  })
-  window.addEventListener('annotationHoverOut', () => {
-    otherAnnotationTreating = false
-  })
-  window.addEventListener('annotationDeleted', () => {
-    otherAnnotationTreating = false
-  })
+  // let otherAnnotationTreating = false
+  // window.addEventListener('annotationHoverIn', () => {
+  //   console.log('rect annotationHoverIn')
+  //   otherAnnotationTreating = true
+  // })
+  // window.addEventListener('annotationHoverOut', () => {
+  //   otherAnnotationTreating = false
+  // })
+  // window.addEventListener('annotationDeleted', () => {
+  //   otherAnnotationTreating = false
+  // })
 
 })
 

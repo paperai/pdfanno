@@ -118,7 +118,7 @@ function renderAnnotations (page) {
 
   if (renderingOptimize) {
     let spans = window.annotationContainer.getAllAnnotations()
-      .filter(a => a.type === 'span' && a.page === page && a.isRenderingInitial())
+      .filter(a => (a.type === 'span' || a.type === 'rectangle') && a.page === page && a.isRenderingInitial())
 
     // spans.forEach(s => { console.log('span on page', s.page, s.uuid) })
 

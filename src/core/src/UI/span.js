@@ -184,7 +184,18 @@ export function createSpan ({ text = null, zIndex = 10, color = null }) {
 
     return annotation
   }
+}
 
+function reset () {
+  currentPage = null
+  mouseDown = false
+  initPosition = null
+  startPosition = null
+  endPosition = null
+  if (spanAnnotation) {
+    spanAnnotation.destroy()
+    spanAnnotation = null
+  }
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -248,15 +259,18 @@ window.addEventListener('DOMContentLoaded', () => {
   const $viewer = $('#viewer')
 
   $viewer.on('mousedown', '.canvasWrapper', e => {
+  // $viewer.on('mousedown', '.canvasWrapper, .annoLayer', e => {
+
+    reset()
 
     if (getCurrentTab() !== 'span') {
       return
     }
 
-    if (otherAnnotationTreating) {
-      // Ignore, if other annotation is detected.
-      return
-    }
+    // if (otherAnnotationTreating) {
+    //   // Ignore, if other annotation is detected.
+    //   return
+    // }
 
     if (window.PDFView.pageRotation !== 0) {
       return
@@ -274,7 +288,12 @@ window.addEventListener('DOMContentLoaded', () => {
     makeSelections(e)
   })
 
-  $viewer.on('mousemove', '.canvasWrapper', e => {
+  // $viewer.on('mousemove', '.canvasWrapper', e => {
+  $viewer.on('mousemove', '.canvasWrapper, .annoLayer', e => {
+
+    if (getCurrentTab() !== 'span') {
+      return
+    }
 
     if (window.PDFView.pageRotation !== 0) {
       return
@@ -285,7 +304,12 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   })
 
-  $viewer.on('mouseup', '.canvasWrapper', e => {
+  // $viewer.on('mouseup', '.canvasWrapper', e => {
+  $viewer.on('mouseup', '.canvasWrapper, .annoLayer', e => {
+
+    if (getCurrentTab() !== 'span') {
+      return
+    }
 
     if (window.PDFView.pageRotation !== 0) {
       return
@@ -300,16 +324,17 @@ window.addEventListener('DOMContentLoaded', () => {
     mouseDown = false
   })
 
-  let otherAnnotationTreating = false
-  window.addEventListener('annotationHoverIn', () => {
-    otherAnnotationTreating = true
-  })
-  window.addEventListener('annotationHoverOut', () => {
-    otherAnnotationTreating = false
-  })
-  window.addEventListener('annotationDeleted', () => {
-    otherAnnotationTreating = false
-  })
+  // let otherAnnotationTreating = false
+  // window.addEventListener('annotationHoverIn', () => {
+  //   console.log('span annotationHoverIn')
+  //   otherAnnotationTreating = true
+  // })
+  // window.addEventListener('annotationHoverOut', () => {
+  //   otherAnnotationTreating = false
+  // })
+  // window.addEventListener('annotationDeleted', () => {
+  //   otherAnnotationTreating = false
+  // })
 
 })
 

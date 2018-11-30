@@ -17,9 +17,9 @@ export function renderRect (a) {
   // const y = a.y + pageTopY
   // const y = a.y
 
-  const $base = $('<div class="anno-rect-base"/>')
+  const $base = $('<div class="anno-rect"/>')
 
-  $base.append($('<div class="anno-rect"/>').css({
+  $base.append($('<div class="anno-rect__area"/>').css({
     top    : `${a.y}px`,
     left   : `${a.x}px`,
     width  : `${a.width}px`,
