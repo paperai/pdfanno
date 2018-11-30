@@ -10,7 +10,6 @@ function scale () {
  * Merge user selections.
  */
 function mergeRects (rects) {
-
   // Remove null.
   rects = rects.filter(rect => rect)
 
@@ -132,7 +131,6 @@ window.saveSpan = saveSpan
  * Get the rect area of User selected.
  */
 export function getRectangles () {
-
   if (!currentPage || !startPosition || !endPosition) {
     return null
 
@@ -147,12 +145,9 @@ export function getRectangles () {
  * Create a span by current texts selection.
  */
 export function createSpan ({ text = null, zIndex = 10, color = null }) {
-
   if (!currentPage || !startPosition || !endPosition) {
     return null
-
   } else {
-
     let targets = window.findTexts(currentPage, startPosition, endPosition)
     if (targets.length === 0) {
       return null
@@ -199,9 +194,7 @@ function reset () {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-
   function setPositions (e) {
-
     const canvasElement = e.currentTarget
     const pageElement = canvasElement.parentNode
     const page = parseInt(pageElement.getAttribute('data-page-number'))
@@ -231,7 +224,6 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   function makeSelections (e) {
-
     setPositions(e)
 
     if (spanAnnotation) {
@@ -259,8 +251,6 @@ window.addEventListener('DOMContentLoaded', () => {
   const $viewer = $('#viewer')
 
   $viewer.on('mousedown', '.canvasWrapper', e => {
-  // $viewer.on('mousedown', '.canvasWrapper, .annoLayer', e => {
-
     reset()
 
     if (getCurrentTab() !== 'span') {
@@ -288,9 +278,7 @@ window.addEventListener('DOMContentLoaded', () => {
     makeSelections(e)
   })
 
-  // $viewer.on('mousemove', '.canvasWrapper', e => {
   $viewer.on('mousemove', '.canvasWrapper, .annoLayer', e => {
-
     if (getCurrentTab() !== 'span') {
       return
     }
@@ -304,9 +292,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   })
 
-  // $viewer.on('mouseup', '.canvasWrapper', e => {
   $viewer.on('mouseup', '.canvasWrapper, .annoLayer', e => {
-
     if (getCurrentTab() !== 'span') {
       return
     }
@@ -344,4 +330,3 @@ let startPosition = null
 let endPosition = null
 let currentPage = null
 let spanAnnotation = null
-

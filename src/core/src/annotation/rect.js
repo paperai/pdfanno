@@ -85,7 +85,6 @@ export default class RectAnnotation extends AbstractAnnotation {
    * Render annotation(s).
    */
   render () {
-
     // If there is no Annotation layer in this pages, create it.
     addAnnoLayer(this.page)
 
@@ -238,7 +237,6 @@ export default class RectAnnotation extends AbstractAnnotation {
    * Handle a mousemove event.
    */
   handleMouseMoveOnDocument (e) {
-
     this._dragging = true
 
     if (!this.startX) {
@@ -265,7 +263,6 @@ export default class RectAnnotation extends AbstractAnnotation {
    * Handle a mouseup event.
    */
   handleMouseUpOnDocument () {
-
     if (this._dragging) {
       this._dragging = false
 

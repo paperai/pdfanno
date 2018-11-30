@@ -34,7 +34,6 @@ let rubberBand = null
  * Get the drawing rect data.
  */
 export function getDrawingRect () {
-
   if (!x1 || !y1 || !x2 || !y2) {
     return
   }
@@ -90,7 +89,6 @@ function saveRect ({
  * Create a rect
  */
 export function createRect ({ text = null, zIndex = 10, color = null }) {
-
   const area = getDrawingRect()
   if (!area) {
     return
@@ -119,7 +117,6 @@ export function createRect ({ text = null, zIndex = 10, color = null }) {
  * Set the rect area which user is drawing.
  */
 function setPositions (e) {
-
   const canvasElement = e.currentTarget
   const pageElement = canvasElement.parentNode
   const page = parseInt(pageElement.getAttribute('data-page-number'))
@@ -155,7 +152,6 @@ function setPositions (e) {
  * Update the drawing rect - user drawing rect.
  */
 function updateDrawingRect (e) {
-
   setPositions(e)
 
   if (rubberBand) {
@@ -192,13 +188,10 @@ function reset () {
  * The entry point.
  */
 window.addEventListener('DOMContentLoaded', () => {
-
   // Cache.
   $viewer = $('#viewer')
 
   $viewer.on('mousedown', '.canvasWrapper', e => {
-  // $viewer.on('mousedown', '.canvasWrapper, .annoLayer', e => {
-
     reset()
 
     if (getCurrentTab() !== 'rectangle') {
@@ -224,14 +217,12 @@ window.addEventListener('DOMContentLoaded', () => {
     updateDrawingRect(e)
   })
 
-  // $viewer.on('mousemove', '.canvasWrapper', e => {
   $viewer.on('mousemove', '.canvasWrapper, .annoLayer', e => {
     if (mouseDown) {
       updateDrawingRect(e)
     }
   })
 
-  // $viewer.on('mouseup', '.canvasWrapper', e => {
   $viewer.on('mouseup', '.canvasWrapper, .annoLayer', e => {
     if (mouseDown) {
       updateDrawingRect(e)
@@ -259,4 +250,3 @@ window.addEventListener('DOMContentLoaded', () => {
   // })
 
 })
-
