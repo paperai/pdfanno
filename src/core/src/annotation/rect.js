@@ -286,6 +286,18 @@ export default class RectAnnotation extends AbstractAnnotation {
     }
   }
 
+  export (id) {
+    return {
+      id     : id + '',
+      page   : this.page,
+      label  : this.text || '',
+      x      : this.x,
+      y      : this.y,
+      width  : this.width,
+      height : this.height
+    }
+  }
+
   enableDragAction () {
     this.$element.find('.anno-rect__area, circle')
       .off('mousedown', this.handleMouseDownOnRect)

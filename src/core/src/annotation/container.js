@@ -12,7 +12,6 @@ import Ajv from 'ajv'
  * Annotation Container.
  */
 export default class AnnotationContainer {
-
   /**
    * Constructor.
    */
@@ -63,8 +62,8 @@ export default class AnnotationContainer {
    */
   clearPage (page) {
     this.clearRenderingStates(a => {
-      if (a.type === 'span') {
-        // console.log('clearPage.span', page)
+      if (a.type === 'span' || a.type === 'rectangle') {
+        // console.log('clearPage.span.rectangle', page)
         return a.page === page
       } else if (a.type === 'relation') {
         if (a.visible(page)) {
@@ -113,7 +112,7 @@ export default class AnnotationContainer {
    * annoType : span, one-way, two-way, link
    */
   changeColor ({ text, color, uuid, annoType }) {
-    console.log('changeColor: ', text, color, uuid)
+    console.log('changeColor: ', text, color, uuid, annoType)
     if (uuid) {
       const a = this.findById(uuid)
       if (a) {
@@ -125,7 +124,7 @@ export default class AnnotationContainer {
       this.getAllAnnotations()
         .filter(a => a.text === text)
         .filter(a => {
-          if (annoType === 'span') {
+          if (annoType === 'span' || annoType === 'rectangle') {
             return a.type === annoType
           } else if (annoType === 'relation') {
             if (a.type === 'relation' && a.direction === annoType) {
@@ -184,17 +183,24 @@ export default class AnnotationContainer {
         // Increment to next.
         id++
 
-        // Span.
         if (annotation.type === 'span') {
+          // Span.
           if (!dataExport['spans']) {
             dataExport['spans'] = []
           }
           dataExport['spans'].push(annotation.export(id))
           // Save temporary for relation.
           annotation.exportId = id
-
-        // Relation.
+        } else if (annotation.type === 'rectangle') {
+          // Rectangle.
+          if (!dataExport['rectangles']) {
+            dataExport['rectangles'] = []
+          }
+          dataExport['rectangles'].push(annotation.export(id))
+          // Save temporary for relation.
+          annotation.exportId = id
         } else if (annotation.type === 'relation') {
+          // Relation.
           if (!dataExport['relations']) {
             dataExport['relations'] = []
           }
@@ -365,7 +371,6 @@ export default class AnnotationContainer {
           obj.uuid = uuid()
           obj.readOnly = readOnly
 
-          // XXX
           if (key === 'spans') {
             const span = SpanAnnotation.newInstanceFromTomlObject(obj)
             span.color = getColor(tomlIndex, 'span', span.text)
@@ -375,9 +380,16 @@ export default class AnnotationContainer {
               span.render()
               span.enableViewMode()
             }
-
+          } else if (key === 'rectangles') {
+            const rectangle = SpanAnnotation.newInstanceFromTomlObject(obj)
+            rectangle.color = getColor(tomlIndex, 'rectangle', rectangle.text)
+            rectangle.save()
+            if (rectangle.visible(visiblePages)) {
+              // console.log('RECTANGLE:', rectangle.page, rectangle.uuid)
+              rectangle.render()
+              rectangle.enableViewMode()
+            }
           } else if (key === 'relations') {
-
             const spans = [
               this.findById(this._findSpan(tomlObject, obj.head).uuid),
               this.findById(this._findSpan(tomlObject, obj.tail).uuid)
@@ -409,7 +421,6 @@ export default class AnnotationContainer {
                 rel.enableViewMode()
               }
             }
-
           }
         })
       }
