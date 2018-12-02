@@ -232,6 +232,8 @@ export default class AnnotationContainer {
   _findSpan (tomlObject, id) {
     return tomlObject.spans.find(v => {
       return id === v.id
+    }) || tomlObject.rectangles.find(v => {
+      return id === v.id
     })
   }
 
@@ -239,9 +241,6 @@ export default class AnnotationContainer {
    * Import annotations.
    */
   importAnnotations (data, isPrimary) {
-
-    console.time('importAnnotations')
-
     window.pageStates.clear()
 
     const readOnly = !isPrimary
@@ -256,7 +255,6 @@ export default class AnnotationContainer {
     }
 
     return new Promise((resolve, reject) => {
-
       // Delete old ones.
       this.getAllAnnotations()
         .filter(a => a.readOnly === readOnly)
@@ -300,9 +298,7 @@ export default class AnnotationContainer {
    * Import annotations.
    */
   importAnnotations040 (tomlObject, tomlIndex, readOnly, getColor) {
-
     for (const key in tomlObject) {
-
       let d = tomlObject[key]
 
       // Skip if the content is not object, like version string.
@@ -314,25 +310,20 @@ export default class AnnotationContainer {
       d.readOnly = readOnly
 
       if (d.type === 'span') {
-
         let span = SpanAnnotation.newInstanceFromTomlObject(d)
         span.color = getColor(tomlIndex, span.type, span.text)
         span.save()
         span.render()
         span.enableViewMode()
-
         // Rect.
       } else if (d.type === 'rectangle') {
-
         let rect = RectAnnotation.newInstanceFromTomlObject(d)
         rect.color = getColor(tomlIndex, rect.type, rect.text)
         rect.save()
         rect.render()
         rect.enableViewMode()
-
         // Relation.
       } else if (d.type === 'relation') {
-
         d.rel1 = tomlObject[d.ids[0]].uuid
         d.rel2 = tomlObject[d.ids[1]].uuid
         let relation = [RelationAnnotation.newInstanceFromTomlObject(d)]
@@ -358,13 +349,11 @@ export default class AnnotationContainer {
    * Import annotations.
    */
   importAnnotations041 (tomlObject, tomlIndex, readOnly, getColor) {
-
     // console.log('page:', window.PDFView.pdfViewer.currentPageNumber, window.PDFView.pdfViewer._getVisiblePages())
-
     const visiblePages = window.PDFView.pdfViewer._getVisiblePages()
 
     // order is important.
-    ;['spans', 'relations', 'rectangles'].forEach(key => {
+    ;['spans', 'rectangles', 'relations'].forEach(key => {
       const objs = tomlObject[key]
       if (Array.isArray(objs)) {
         objs.forEach(obj => {
@@ -381,7 +370,7 @@ export default class AnnotationContainer {
               span.enableViewMode()
             }
           } else if (key === 'rectangles') {
-            const rectangle = SpanAnnotation.newInstanceFromTomlObject(obj)
+            const rectangle = RectAnnotation.newInstanceFromTomlObject(obj)
             rectangle.color = getColor(tomlIndex, 'rectangle', rectangle.text)
             rectangle.save()
             if (rectangle.visible(visiblePages)) {
@@ -394,7 +383,6 @@ export default class AnnotationContainer {
               this.findById(this._findSpan(tomlObject, obj.head).uuid),
               this.findById(this._findSpan(tomlObject, obj.tail).uuid)
             ]
-
             obj.rel1 = spans[0].uuid
             obj.rel2 = spans[1].uuid
 

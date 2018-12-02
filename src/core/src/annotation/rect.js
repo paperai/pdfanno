@@ -2,7 +2,6 @@ import { uuid } from 'anno-ui/src/utils'
 import AbstractAnnotation from './abstract'
 import { scaleDown, disableTextlayer, enableTextlayer } from '../UI/utils'
 import {addAnnoLayer} from '../render/layer'
-// import { convertFromExportY } from '../../../shared/coords'
 
 /**
  * Rect Annotation.
@@ -56,20 +55,8 @@ export default class RectAnnotation extends AbstractAnnotation {
    * Create an instance from a TOML object.
    */
   static newInstanceFromTomlObject (tomlObject) {
-    let d      = tomlObject
-
-    // d.position = d.position.map(parseFloat)
-    // d.x        = d.position[0]
-    // d.y        = convertFromExportY(d.page, d.position[1])
-    // d.width    = d.position[2]
-    // d.height   = d.position[3]
-
-    d.x        = d.x
-    d.y        = d.y
-    d.width    = d.width
-    d.height   = d.height
-    d.text     = d.label
-
+    let d = tomlObject
+    d.text = d.label
     return RectAnnotation.newInstance(d)
   }
 
@@ -87,7 +74,6 @@ export default class RectAnnotation extends AbstractAnnotation {
   render () {
     // If there is no Annotation layer in this pages, create it.
     addAnnoLayer(this.page)
-
     return super.render()
   }
 
