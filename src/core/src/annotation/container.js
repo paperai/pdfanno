@@ -50,6 +50,7 @@ export default class AnnotationContainer {
 
   /**
    *
+   * @param {Function} filter
    */
   clearRenderingStates (filter = () => true) {
     if (typeof filter === 'function') {
@@ -59,6 +60,7 @@ export default class AnnotationContainer {
 
   /**
    *
+   * @param {Integer} page
    */
   clearPage (page) {
     this.clearRenderingStates(a => {
@@ -109,7 +111,9 @@ export default class AnnotationContainer {
   /**
    * Change the annotations color, if the text is the same in an annotation.
    *
-   * annoType : span, one-way, two-way, link
+   * annoType : span, rectangle, relation
+   *
+   * @param {Object} param0
    */
   changeColor ({ text, color, uuid, annoType }) {
     console.log('changeColor: ', text, color, uuid, annoType)
@@ -140,6 +144,10 @@ export default class AnnotationContainer {
     }
   }
 
+  /**
+   *
+   * @param {ColorMap} colorMap
+   */
   setColor (colorMap) {
     console.log('setColor:', colorMap)
     Object.keys(colorMap).forEach(annoType => {
@@ -229,6 +237,11 @@ export default class AnnotationContainer {
     })
   }
 
+  /**
+   *
+   * @param {Object} tomlObject
+   * @param {Integer} id
+   */
   _findSpan (tomlObject, id) {
     return tomlObject.spans.find(v => {
       return id === v.id
@@ -239,6 +252,9 @@ export default class AnnotationContainer {
 
   /**
    * Import annotations.
+   *
+   * @param {*} data
+   * @param {Boolean} isPrimary
    */
   importAnnotations (data, isPrimary) {
     window.pageStates.clear()

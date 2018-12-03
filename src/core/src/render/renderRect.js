@@ -6,17 +6,7 @@ import { renderKnob } from './renderKnob'
  */
 export function renderRect (a) {
 
-  let color = a.color || '#FF0000'
-
-  // let paddingTop = 9
-  // const scale = window.PDFView.pdfViewer.getPageView(0).viewport.scale
-  // const marginBetweenPages =  1
-  // let pageTopY = $('#pageContainer' + a.page).position().top / scale + paddingTop + marginBetweenPages
-
-  // const x = a.x
-  // const y = a.y + pageTopY
-  // const y = a.y
-
+  const color = a.color || '#FF0000'
   const $base = $('<div class="anno-rect"/>')
 
   $base.append($('<div class="anno-rect__area"/>').css({

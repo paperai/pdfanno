@@ -45,6 +45,13 @@ export function renderSpan (a) {
   return $base[0]
 }
 
+/**
+ *
+ * @param {RectAnnotation} a
+ * @param {Array} r
+ * @param {String} color
+ * @param {Boolean} readOnly
+ */
 function createRect (a, r, color, readOnly) {
 
   let className = readOnly ? 'anno-span__border' : 'anno-span__area'

@@ -215,7 +215,6 @@ export default class AbstractAnnotation extends EventEmitter {
    * Toggle the selected state.
    */
   toggleSelect () {
-
     if (this.selected) {
       this.deselect()
       if (this.sibling) {
@@ -227,14 +226,12 @@ export default class AbstractAnnotation extends EventEmitter {
         this.sibling.select()
       }
     }
-
   }
 
   /**
    * Delete the annotation if selected.
    */
   deleteSelectedAnnotation () {
-
     if (this.isSelected()) {
       this.destroy().then(() => {
         Utils.dispatchWindowEvent('annotationDeleted', { uuid : this.uuid })

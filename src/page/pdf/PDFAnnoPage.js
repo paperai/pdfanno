@@ -35,9 +35,6 @@ export default class PDFAnnoPage {
    * Start PDFAnno Application.
    */
   startViewerApplication () {
-
-    // window.addEventListener('DOMContentLoaded', () => {
-
     // Adjust the height of viewer.
     adjustViewerSize()
 
@@ -45,53 +42,6 @@ export default class PDFAnnoPage {
     unlistenWindowLeaveEvent()
 
     Utils.dispatchWindowEvent('iframeReady')
-    // })
-
-    // window.addEventListener('pagerendered', ev => {
-    //     dispatchWindowEvent('pagerendered', ev.detail)
-    // })
-
-    // window.addEventListener('annotationrendered', () => {
-    //     dispatchWindowEvent('annotationrendered')
-    // })
-
-    // Set the confirm dialog when leaving a page.
-    // window.addEventListener('annotationUpdated', () => {
-    //     listenWindowLeaveEvent()
-    //     dispatchWindowEvent('annotationUpdated')
-    // })
-
-    // enable text input.
-    // window.addEventListener('enableTextInput', e => {
-    //     dispatchWindowEvent('enableTextInput', e.detail)
-    // })
-    //
-    // // disable text input.
-    // window.addEventListener('disappearTextInput', e => {
-    //     dispatchWindowEvent('disappearTextInput', e.detail)
-    // })
-    //
-    // window.addEventListener('annotationDeleted', e => {
-    //     dispatchWindowEvent('annotationDeleted', e.detail)
-    // })
-    //
-    // window.addEventListener('annotationHoverIn', e => {
-    //     dispatchWindowEvent('annotationHoverIn', e.detail)
-    // })
-    //
-    // window.addEventListener('annotationHoverOut', e => {
-    //     dispatchWindowEvent('annotationHoverOut', e.detail)
-    // })
-    //
-    // window.addEventListener('annotationSelected', e => {
-    //     dispatchWindowEvent('annotationSelected', e.detail)
-    // })
-    //
-    // window.addEventListener('annotationDeselected', () => {
-    //     dispatchWindowEvent('annotationDeselected')
-    // })
-
-    // setInterval(this.checkAnnotationUpdate, 1500)
   }
 
   /**
@@ -171,21 +121,11 @@ export default class PDFAnnoPage {
    * Start the viewer.
    */
   initializeViewer (initialPDFPath = '../pdfs/P12-1046.pdf', viewerSelector = '#viewer') {
-
     window.pdf = null
     window.pdfName = null
 
     // Reset setting.
     this.resetPDFViewerSettings()
-
-    // let url = './viewer.html'
-    // if (initialPDFPath) {
-    //     url += '?file=' + initialPDFPath
-    // }
-
-    // // Reload pdf.js.
-    // $(viewerSelector + ' iframe').remove()
-    // $(viewerSelector).html('<iframe src="' + url + '" class="anno-viewer" frameborder="0"></iframe>')
   }
 
   /**

@@ -206,12 +206,6 @@ window.addEventListener('DOMContentLoaded', () => {
     // Only over the texts.
     setPositions(e)
 
-    // let target = window.findText(drawingPage, { x : x1, y : y1 })
-    // if (target) {
-    //   console.log('text was found, so not started to drawing rect.', target, drawingPage, x1, y1)
-    //   return
-    // }
-
     mouseDown = true
 
     updateDrawingRect(e)
@@ -248,5 +242,4 @@ window.addEventListener('DOMContentLoaded', () => {
   // window.addEventListener('annotationDeleted', () => {
   //   otherAnnotationTreating = false
   // })
-
 })

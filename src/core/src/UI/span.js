@@ -8,6 +8,8 @@ function scale () {
 
 /**
  * Merge user selections.
+ *
+ * @param {Array} rects
  */
 function mergeRects (rects) {
   // Remove null.
@@ -52,6 +54,8 @@ function mergeRects (rects) {
 
 /**
  * Convert a DOMList to a javascript plan object.
+ *
+ * @param {Object} rect
  */
 function convertToObject (rect) {
   return {
@@ -68,6 +72,10 @@ function convertToObject (rect) {
 
 /**
  * Check the value(x) within the range.
+ *
+ * @param {Integer} x
+ * @param {Integer} base
+ * @param {Integer} margin
  */
 function withinMargin (x, base, margin) {
   return (base - margin) <= x && x <= (base + margin)
