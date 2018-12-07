@@ -486,4 +486,29 @@ export default class RelationAnnotation extends AbstractAnnotation {
     return isSame
   }
 
+  /**
+   * Returns the coordinates of the upper left corner.
+   *
+   * @returns
+   * @memberof AbstractAnnotation
+   */
+  leftTopPosition () {
+    let top1, top2
+    let minX, minY, page
+    if (this.rel1Annotation.page === this.rel2Annotation.page) {
+      top1 = this.rel1Annotation.leftTopPosition()
+      top2 = this.rel2Annotation.leftTopPosition()
+      minX = Math.min(top1[0], top2[0])
+      minY = Math.min(top1[1], top2[1])
+      page = top1[2]
+    } else {
+      let span = this.rel1Annotation.page < this.rel2Annotation.page ? this.rel1Annotation : this.rel2Annotation
+      top1 = span.leftTopPosition()
+      minX = top1[0]
+      minY = top1[1]
+      page = top1[2]
+    }
+
+    return [minX, minY, page]
+  }
 }

@@ -1,6 +1,7 @@
 import { uuid } from 'anno-ui/src/utils'
 import AbstractAnnotation from './abstract'
 import {addAnnoLayer} from '../render/layer'
+import * as _ from 'lodash'
 
 /**
  * Span Annotation.
@@ -266,5 +267,17 @@ export default class SpanAnnotation extends AbstractAnnotation {
   disableViewMode () {
     super.disableViewMode()
     this.$element.find('.anno-knob').off('click')
+  }
+
+  /**
+   * Returns the coordinates of the upper left corner.
+   *
+   * @returns
+   * @memberof AbstractAnnotation
+   */
+  leftTopPosition () {
+    let minX = _.minBy(this.rectangles, r => r.x)
+    let minY = _.minBy(this.rectangles, r => r.y)
+    return [minX.x, minY.y, this.page]
   }
 }

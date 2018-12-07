@@ -314,4 +314,14 @@ export default class RectAnnotation extends AbstractAnnotation {
     this.$element.find('.anno-rect__area, .anno-knob').off('click')
     this.disableDragAction()
   }
+
+  /**
+   * Returns the coordinates of the upper left corner.
+   *
+   * @returns
+   * @memberof AbstractAnnotation
+   */
+  leftTopPosition () {
+    return [this.x, this.y, this.page]
+  }
 }

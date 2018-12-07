@@ -308,4 +308,14 @@ export default class AbstractAnnotation extends EventEmitter {
     // Implement Here.
     return false
   }
+
+  /**
+   * Returns the coordinates of the upper left corner.
+   *
+   * @returns
+   * @memberof AbstractAnnotation
+   */
+  leftTopPosition () {
+    return null
+  }
 }
