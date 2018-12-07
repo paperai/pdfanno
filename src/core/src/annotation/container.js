@@ -165,9 +165,7 @@ export default class AnnotationContainer {
    * Export annotations as a TOML string.
    */
   exportData ({exportType = 'toml'} = {}) {
-
     return new Promise((resolve, reject) => {
-
       let dataExport = {}
 
       // Set version.
@@ -187,7 +185,6 @@ export default class AnnotationContainer {
 
       // Create export data.
       annos.forEach(annotation => {
-
         // Increment to next.
         id++
 

@@ -265,11 +265,6 @@ window.addEventListener('DOMContentLoaded', () => {
       return
     }
 
-    // if (otherAnnotationTreating) {
-    //   // Ignore, if other annotation is detected.
-    //   return
-    // }
-
     if (window.PDFView.pageRotation !== 0) {
       return
     }
@@ -317,19 +312,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     mouseDown = false
   })
-
-  // let otherAnnotationTreating = false
-  // window.addEventListener('annotationHoverIn', () => {
-  //   console.log('span annotationHoverIn')
-  //   otherAnnotationTreating = true
-  // })
-  // window.addEventListener('annotationHoverOut', () => {
-  //   otherAnnotationTreating = false
-  // })
-  // window.addEventListener('annotationDeleted', () => {
-  //   otherAnnotationTreating = false
-  // })
-
 })
 
 let mouseDown = false

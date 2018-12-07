@@ -3,7 +3,7 @@ import * as annoUI from 'anno-ui'
 import { loadFiles } from './loadFiles'
 import { getSearchHighlight } from '../search'
 import * as socket from '../socket'
-import { convertToExportY, paddingBetweenPages, nextZIndex } from '../../shared/coords'
+import { paddingBetweenPages, nextZIndex } from '../../shared/coords'
 import {
   unlistenWindowLeaveEvent,
   adjustViewerSize

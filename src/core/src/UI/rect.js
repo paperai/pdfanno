@@ -198,12 +198,6 @@ window.addEventListener('DOMContentLoaded', () => {
       return
     }
 
-    // if (otherAnnotationTreating) {
-    //   // Ignore, if other annotation is detected.
-    //   return
-    // }
-
-    // Only over the texts.
     setPositions(e)
 
     mouseDown = true
@@ -230,16 +224,4 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     mouseDown = false
   })
-
-  // let otherAnnotationTreating = false
-  // window.addEventListener('annotationHoverIn', () => {
-  //   console.log('rect annotationHoverIn')
-  //   otherAnnotationTreating = true
-  // })
-  // window.addEventListener('annotationHoverOut', () => {
-  //   otherAnnotationTreating = false
-  // })
-  // window.addEventListener('annotationDeleted', () => {
-  //   otherAnnotationTreating = false
-  // })
 })

@@ -76,7 +76,6 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * Create sub relation.
    */
   createSubRelation () {
-
     const sub = RelationAnnotation.newInstance({
       uuid      : null,
       direction : this.direction,
@@ -441,7 +440,6 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * Set the start / end points of the relation.
    */
   setStartEndPosition () {
-
     let dxy1 = this.dxy(this.page)
 
     if (this._rel1Annotation) {
@@ -475,7 +473,6 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * @{inheritDoc}
    */
   equalTo (anno) {
-
     if (!anno || this.type !== anno) {
       return false
     }
