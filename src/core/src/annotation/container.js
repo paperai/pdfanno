@@ -254,6 +254,8 @@ export default class AnnotationContainer {
    * @param {Boolean} isPrimary
    */
   importAnnotations (data, isPrimary) {
+    console.time('importAnnotations')
+
     window.pageStates.clear()
 
     const readOnly = !isPrimary
