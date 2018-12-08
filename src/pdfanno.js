@@ -14,7 +14,6 @@ import * as searchUI from './page/search'
 import * as textLayer from './page/textLayer'
 // import * as pdftxtDownload from './page/pdftxtdownload'
 import { showLoader } from './page/util/display'
-// import * as ws from './page/socket'
 import PDFAnnoPage from './page/pdf/PDFAnnoPage'
 import * as deepscholar from './deepscholar'
 import * as constants from './shared/constants'
@@ -54,26 +53,9 @@ publicApi.expose()
 window.annoPage = new PDFAnnoPage()
 
 /**
- * Get the y position in the annotation.
- */
-function _getY (annotation) {
-
-  if (annotation.rectangles) {
-    return annotation.rectangles[0].y
-
-  } else if (annotation.y1) {
-    return annotation.y1
-
-  } else {
-    return annotation.y
-  }
-}
-
-/**
  *  The entry point.
  */
 window.addEventListener('DOMContentLoaded', async () => {
-
   // UI.
   setupUI()
 
@@ -92,6 +74,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   // initial tab.
   const q        = urijs(document.URL).query(true)
   const tabIndex = q.tab && parseInt(q.tab, 10)
+
   if (tabIndex) {
     $(`.nav-tabs a[href="#tab${tabIndex}"]`).click()
   }
@@ -99,16 +82,13 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (deepscholar.isTarget()) {
     // Display for DeepScholar.
     deepscholar.initialize()
-
   } else {
     // Show a content.
     displayViewer()
   }
-
 })
 
 async function displayViewer () {
-
   // Display a PDF specified via URL query parameter.
   const q        = urijs(document.URL).query(true)
   const pdfURL   = q.pdf || getDefaultPDFURL()
@@ -117,7 +97,6 @@ async function displayViewer () {
 
   // Load a PDF file.
   try {
-
     let { pdf, analyzeResult } = await window.annoPage.loadPDFFromServer(pdfURL)
 
     setTimeout(() => {
@@ -161,9 +140,7 @@ async function displayViewer () {
     // Init textLayers.
     textLayer.setup(analyzeResult)
     window.annoPage.pdftxt = analyzeResult
-
   } catch (err) {
-
     // Hide a loading, and show the error message.
     showLoader(false)
     const message = 'Failed to analyze the PDF.<br>Reason: ' + err
@@ -174,7 +151,6 @@ async function displayViewer () {
     // Start application.
     window.annoPage.startViewerApplication()
   }
-
 }
 
 function setupUI () {
@@ -242,7 +218,6 @@ function setupUI () {
   // Anno list dropdown.
   annoUI.annoListDropdown.setup({
     getAnnotations : () => {
-
       // Get displayed annotations.
       let annotations = window.annoPage.getAllAnnotations()
 
@@ -254,7 +229,6 @@ function setupUI () {
 
       // Sort by offsetY.
       annotations = annotations.sort((a1, a2) => {
-        // return _getY(a1) - _getY(a2)
         let [, y1, page1] = a1.leftTopPosition()
         let [, y2, page2] = a2.leftTopPosition()
         if (page1 < page2) {
@@ -322,7 +296,6 @@ function setupUI () {
       window.annoPage.pdftxt = resultText
     }
   })
-
 }
 
 /**
@@ -344,9 +317,6 @@ function getPDFName (url) {
   return a[a.length - 1]
 }
 window.getPDFName = getPDFName
-
-// WebSocket.
-// ws.setup()
 
 window.addEventListener('keydown', event => {
   if (event.key === 'F1') {

@@ -7,7 +7,6 @@ import {addAnnoLayer} from '../render/layer'
  * Rect Annotation.
  */
 export default class RectAnnotation extends AbstractAnnotation {
-
   /**
    * Constructor.
    */
@@ -93,7 +92,6 @@ export default class RectAnnotation extends AbstractAnnotation {
   destroy () {
     let promise = super.destroy()
     this.emit('delete')
-
     window.globalEvent.removeListener('deleteSelectedAnnotation', this.deleteSelectedAnnotation)
     window.globalEvent.removeListener('enableViewMode', this.enableViewMode)
     return promise
@@ -167,7 +165,6 @@ export default class RectAnnotation extends AbstractAnnotation {
    * Save a new text.
    */
   handleTextChanged (newText) {
-    // console.log('rect:handleTextChanged:', newText)
     this.text = newText
     this.save()
   }
@@ -177,7 +174,6 @@ export default class RectAnnotation extends AbstractAnnotation {
    */
   handleHoverInEvent (e) {
     super.handleHoverInEvent(e)
-
     let $elm = $(e.currentTarget)
     if ($elm.prop('tagName') === 'circle') {
       this.emit('circlehoverin', this)
@@ -189,7 +185,6 @@ export default class RectAnnotation extends AbstractAnnotation {
    */
   handleHoverOutEvent (e) {
     super.handleHoverOutEvent(e)
-
     let $elm = $(e.currentTarget)
     if ($elm.prop('tagName') === 'circle') {
       this.emit('circlehoverout', this)
@@ -207,7 +202,6 @@ export default class RectAnnotation extends AbstractAnnotation {
    * Handle a mousedown event.
    */
   handleMouseDownOnRect () {
-    // console.log('handleMouseDownOnRect')
     this.originalX = this.x
     this.originalY = this.y
 

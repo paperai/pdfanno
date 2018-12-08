@@ -97,7 +97,6 @@ export function saveSpan ({
   knob = true,
   border = true
 }) {
-
   if (!rects) {
     return
   }
@@ -146,7 +145,6 @@ export function getRectangles () {
     let targets = window.findTexts(currentPage, startPosition, endPosition)
     return mergeRects(targets)
   }
-
 }
 
 /**

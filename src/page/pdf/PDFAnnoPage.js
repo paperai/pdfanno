@@ -2,15 +2,12 @@
 import * as annoUI from 'anno-ui'
 import { loadFiles } from './loadFiles'
 import { getSearchHighlight } from '../search'
-import * as socket from '../socket'
 import { paddingBetweenPages, nextZIndex } from '../../shared/coords'
 import {
   unlistenWindowLeaveEvent,
   adjustViewerSize
 } from '../util/window'
-// import { saveSpan } from '../../core/src/UI/span'
 import * as Utils from '../../shared/util'
-import * as constants from '../../shared/constants'
 import * as pako from 'pako'
 import { PDFEXTRACT_VERSION } from '../../core/src/version'
 
@@ -18,7 +15,6 @@ import { PDFEXTRACT_VERSION } from '../../core/src/version'
  * PDFAnno's Annotation functions for Page produced by .
  */
 export default class PDFAnnoPage {
-
   constructor () {
     this.autoBind()
   }
@@ -83,8 +79,8 @@ export default class PDFAnnoPage {
   }
 
   displayContent (contentName) {
-
     let contentFile = this.contentFiles.filter(c => c.name === contentName)
+
     if (contentFile.length === 0) {
       console.log('displayContent: NOT FOUND FILE. file=', contentName)
       return
@@ -94,7 +90,6 @@ export default class PDFAnnoPage {
   }
 
   displayViewer (contentFile) {
-
     // Reset settings.
     this.resetPDFViewerSettings()
 
@@ -214,7 +209,6 @@ export default class PDFAnnoPage {
    * Create a Relation annotation.
    */
   createRelation ({ type, text = null, color = null } = {}) {
-
     // for old style.
     if (arguments.length === 1 && typeof arguments[0] === 'string') {
       type = arguments[0]
@@ -295,7 +289,6 @@ export default class PDFAnnoPage {
    * Create a Rect annotation.
    */
   createRect ({ text = null, color = null } = {}) {
-
     // Get user created annotation.
     const rect = window.PDFAnnoCore.default.UI.getDrawingRect()
 
@@ -330,7 +323,6 @@ export default class PDFAnnoPage {
    * Display annotations an user selected.
    */
   displayAnnotation (isPrimary) {
-
     // Check the viewer not clised.
     if ($('#numPages', window.document).text() === '') {
       return
@@ -548,12 +540,6 @@ export default class PDFAnnoPage {
     })
   }
 
-  // loadPdftxt (url) {
-  //   this.loadPdf(url).then(data => {
-  //     return pako.inflate(data, {to : 'string'})
-  //   })
-  // }
-
   /**
    * Load pdftxt data from url.
    * @param {String} url
@@ -623,136 +609,5 @@ export default class PDFAnnoPage {
 
   get pdftxt () {
     return this._pdftxt
-  }
-
-  /**
-   * Check annotation changings.
-   */
-  async checkAnnotationUpdate () {
-
-    // TODO Refactoring. Too Long...
-
-    // prevs.
-    const prevAnnotations = this.prevAnnotations
-    const prevFileName = this.prevFileName
-    const prevLabelMap = this.prevLabelMap
-
-    // current.
-    const currentAnnotations = this.getAllAnnotations()
-    let currentFileName // = annoUI.downloadButton.getDownloadFileName(this.getCurrentContentName)
-    // TODO Refactoring (use in downloadButton)
-    (() => {
-      let primaryAnnotationName
-      $('#dropdownAnnoPrimary a').each((index, element) => {
-        let $elm = $(element)
-        if ($elm.find('.fa-check').hasClass('no-visible') === false) {
-          primaryAnnotationName = $elm.find('.js-annoname').text()
-        }
-      })
-      if (primaryAnnotationName) {
-        currentFileName = primaryAnnotationName
-        return
-      }
-
-      // The name of Content.
-      let pdfFileName = this.getCurrentContentFile() && this.getCurrentContentFile().name
-      if (!pdfFileName) {
-        return
-        // TODO pdftxtとannoダウンロードは、Viewerが閉じている時には無効化すべし.
-      }
-      // let annoName = pdfFileName.replace(/\.pdf$/i, '.anno')
-      let annoName = pdfFileName.replace(/\.pdf$/i, '.' + constants.ANNO_FILE_EXTENSION)
-      currentFileName = annoName
-    })()
-    if (!currentFileName) {
-      return
-    }
-    // console.log('currentFileName:', currentFileName)
-    // console.log('currentAnnotations:', currentAnnotations.length)
-
-    // Check.
-    if (prevAnnotations && prevFileName && currentAnnotations && currentFileName) {
-
-      // TODO test.
-
-      // Check the fileName.
-      if (prevFileName !== currentFileName) {
-        socket.sendAnnotationUpdated({
-          fileName   : currentFileName,
-          updated    : `file was changed (${prevFileName} => ${currentFileName}).`,
-          userId     : $('#userId').val(),
-          annotation : await this.exportData()
-        })
-
-        // Check if added.
-      } else if (currentAnnotations.length > prevAnnotations.length) {
-
-        // TODO test => OK.
-
-        const adds = currentAnnotations.filter(a => {
-          return prevAnnotations.indexOf(a) === -1
-        })
-
-        if (adds.length > 0) {
-          const ids = adds.map(a => a.uuid)
-          socket.sendAnnotationUpdated({
-            fileName   : currentFileName,
-            updated    : `an annotation(${ids.join(',')}) was added.`,
-            userId     : $('#userId').val(),
-            annotation : await this.exportData()
-          })
-        }
-
-        // Check if deleted.
-      } else if (currentAnnotations.length < prevAnnotations.length) {
-
-        // TODO test => OK.
-
-        const deletes = prevAnnotations.filter(a => {
-          return currentAnnotations.indexOf(a) === -1
-        })
-
-        if (deletes.length > 0) {
-          const ids = deletes.map(a => a.uuid)
-          const messages = ids.map(id => {
-            return `an annotation(${id}) was deleted.`
-          })
-          socket.sendAnnotationUpdated({
-            fileName   : currentFileName,
-            updated    : messages.join('\n'),
-            userId     : $('#userId').val(),
-            annotation : await this.exportData()
-          })
-        }
-
-        // Check if labels are modifed.
-      } else {
-
-        const changes = Object.keys(prevLabelMap).filter(uuid => {
-          const b = currentAnnotations.filter(aa => uuid === aa.uuid)
-          if (b.length > 0) {
-            return prevLabelMap[uuid] !== b[0].text
-          }
-          return false
-        })
-
-        if (changes.length > 0) {
-          socket.sendAnnotationUpdated({
-            fileName   : currentFileName,
-            updated    : `an label(${changes.join(',')}) was changed.`,
-            userId     : $('#userId').val(),
-            annotation : await this.exportData()
-          })
-        }
-      }
-    }
-
-    // Save the state.
-    this.prevAnnotations = currentAnnotations
-    this.prevFileName = currentFileName
-    this.prevLabelMap = {}
-    currentAnnotations.forEach(a => {
-      this.prevLabelMap[a.uuid] = a.text
-    })
   }
 }

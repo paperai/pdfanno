@@ -13,7 +13,6 @@ export const RenderingStates = {
  * Abstract Annotation Class.
  */
 export default class AbstractAnnotation extends EventEmitter {
-
   /**
    * Check the argument is an annotation.
    */
@@ -68,7 +67,6 @@ export default class AbstractAnnotation extends EventEmitter {
    * Render annotation(s).
    */
   render () {
-
     this.$element.remove()
 
     if (this.deleted) {

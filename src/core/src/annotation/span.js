@@ -7,7 +7,6 @@ import * as _ from 'lodash'
  * Span Annotation.
  */
 export default class SpanAnnotation extends AbstractAnnotation {
-
   /**
    * Constructor.
    */
