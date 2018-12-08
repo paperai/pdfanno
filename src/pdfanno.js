@@ -254,7 +254,15 @@ function setupUI () {
 
       // Sort by offsetY.
       annotations = annotations.sort((a1, a2) => {
-        return _getY(a1) - _getY(a2)
+        // return _getY(a1) - _getY(a2)
+        let [, y1, page1] = a1.leftTopPosition()
+        let [, y2, page2] = a2.leftTopPosition()
+        if (page1 < page2) {
+          return -1
+        } else if (page1 > page2) {
+          return 1
+        }
+        return y1 - y2
       })
 
       return annotations
