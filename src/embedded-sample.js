@@ -17,7 +17,7 @@ process.env.SERVER_PATH = '0.4.1'
  * API root point.
  */
 if (process.env.NODE_ENV === 'production') {
-  window.API_DOMAIN = 'https://pdfanno.hshindo.com'
+  window.API_DOMAIN = 'https://server.pdfanno.com'
   window.API_PATH = '/' + process.env.SERVER_PATH + '/'
   window.API_ROOT = window.API_DOMAIN + window.API_PATH
 } else {
