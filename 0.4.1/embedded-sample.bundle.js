@@ -20670,7 +20670,7 @@ __webpack_require__(135)
  * API root point.
  */
 if (true) {
-  window.API_DOMAIN = 'https://pdfanno.hshindo.com'
+  window.API_DOMAIN = 'https://server.pdfanno.com'
   window.API_PATH = '/' + "0.4.1" + '/'
   window.API_ROOT = window.API_DOMAIN + window.API_PATH
 } else {}
