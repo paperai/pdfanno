@@ -10,9 +10,6 @@ let merginBetweenPages =  1 + 1
  * @param {Integer} pages
  */
 export function addAnnoLayer (pages) {
-
-  // console.log('addAnnoLayer', pages)
-
   pages = Utils.parsePageParam(pages)
 
   for (let page of pages) {

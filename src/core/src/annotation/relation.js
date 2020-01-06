@@ -7,10 +7,9 @@ import {addAnnoLayer} from '../render/layer'
 let globalEvent
 
 /**
- * Relation Annotation (one-way / two-way / link)
+ * Relation Annotation (one-way)
  */
 export default class RelationAnnotation extends AbstractAnnotation {
-
   /**
    * Constructor.
    */
@@ -76,7 +75,6 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * Create sub relation.
    */
   createSubRelation () {
-
     const sub = RelationAnnotation.newInstance({
       uuid      : null,
       direction : this.direction,
@@ -159,8 +157,8 @@ export default class RelationAnnotation extends AbstractAnnotation {
    */
   render () {
     this.setStartEndPosition()
-
     let first, last
+
     if (this._rel1Annotation.page <= this._rel2Annotation.page) {
       first = this._rel1Annotation.page
       last = this._rel2Annotation.page
@@ -276,7 +274,6 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * The callback for the relational text hoverred in.
    */
   handleTextHoverIn () {
-    // console.log('relation handleTextHoverIn')
     this.highlight()
     this.emit('hoverin')
     this.highlightRelAnnotations()
@@ -286,7 +283,6 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * The callback for the relational text hoverred out.
    */
   handleTextHoverOut () {
-    // console.log('relation handleTextHoverOut')
     this.dehighlight()
     this.emit('hoverout')
     this.dehighlightRelAnnotations()
@@ -296,7 +292,6 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * The callback for the relationals hoverred in.
    */
   handleSpanHoverIn (e) {
-    // console.log('relation handleSpanHoverIn')
     this.highlight()
     this.highlightRelAnnotations()
   }
@@ -305,7 +300,6 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * The callback for the relationals hoverred out.
    */
   handleSpanHoverOut (e) {
-    // console.log('relation handleSpanHoverOut')
     this.dehighlight()
     this.dehighlightRelAnnotations()
   }
@@ -350,7 +344,6 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * The callback that is called at hoverred in.
    */
   handleHoverInEvent (e) {
-    // console.log('relation handleHoverInEvent')
     super.handleHoverInEvent()
     this.highlightRelAnnotations()
   }
@@ -359,7 +352,6 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * The callback that is called at hoverred out.
    */
   handleHoverOutEvent (e) {
-    // console.log('relation handleHoverOutEvent')
     super.handleHoverOutEvent()
     this.dehighlightRelAnnotations()
   }
@@ -428,7 +420,6 @@ export default class RelationAnnotation extends AbstractAnnotation {
    */
   dxy (page) {
     // The annoLayer does not exist after the scale change.
-    // const $targetLayer = $(Utils.getAnnoLayer(page))
     const $targetLayer = $(Utils.getContainer(page))
     const scale = window.PDFView.pdfViewer.getPageView(0).viewport.scale
     return {
@@ -441,7 +432,6 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * Set the start / end points of the relation.
    */
   setStartEndPosition () {
-
     let dxy1 = this.dxy(this.page)
 
     if (this._rel1Annotation) {
@@ -475,7 +465,6 @@ export default class RelationAnnotation extends AbstractAnnotation {
    * @{inheritDoc}
    */
   equalTo (anno) {
-
     if (!anno || this.type !== anno) {
       return false
     }
@@ -486,4 +475,29 @@ export default class RelationAnnotation extends AbstractAnnotation {
     return isSame
   }
 
+  /**
+   * Returns the coordinates of the upper left corner.
+   *
+   * @returns
+   * @memberof AbstractAnnotation
+   */
+  leftTopPosition () {
+    let top1, top2
+    let minX, minY, page
+    if (this.rel1Annotation.page === this.rel2Annotation.page) {
+      top1 = this.rel1Annotation.leftTopPosition()
+      top2 = this.rel2Annotation.leftTopPosition()
+      minX = Math.min(top1[0], top2[0])
+      minY = Math.min(top1[1], top2[1])
+      page = top1[2]
+    } else {
+      let span = this.rel1Annotation.page < this.rel2Annotation.page ? this.rel1Annotation : this.rel2Annotation
+      top1 = span.leftTopPosition()
+      minX = top1[0]
+      minY = top1[1]
+      page = top1[2]
+    }
+
+    return [minX, minY, page]
+  }
 }

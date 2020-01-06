@@ -1,4 +1,3 @@
-
 export const BORDER_COLOR = '#00BFFF'
 
 /**
@@ -58,4 +57,12 @@ export function disableTextlayer () {
  */
 export function enableTextlayer () {
   $('body').removeClass('disable-text-layer')
+}
+
+/**
+ * Get current annotation tab.
+ */
+export function getCurrentTab () {
+  let tab = $('#tab1 .nav-tabs li.active .js-label-tab')
+  return tab.length === 0 ? 'span' : tab.attr('data-type')
 }

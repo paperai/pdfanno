@@ -44,4 +44,3 @@ export function showLoader (display) {
     }, 1000)
   }
 }
-

@@ -80,7 +80,6 @@ window.addEventListener('textlayerrendered', event => {
  * @param {Integer} pages
  */
 function renderAnno (pages, forceRender = false) {
-
   // console.log('renderAnno:', pages, forceRender)
 
   // No action, if the viewer is closed.
@@ -109,16 +108,14 @@ const renderingOptimize = true
  * @param {Integer} page
  */
 function renderAnnotations (page) {
-
-  // console.log('renderAnnotations: page=', page)
   console.time(`renderAnnotations: page(${page})`)
 
-  // TODO どこで呼ぶべきか、要検討 search と関連する。
+  // TODO どこで呼ぶべきか、要検討 search と関連する。呼ぶ必要がないかも。layerは必要なときに作成される。
   // Utils.dispatchWindowEvent('annotationlayercreated')
 
   if (renderingOptimize) {
     let spans = window.annotationContainer.getAllAnnotations()
-      .filter(a => a.type === 'span' && a.page === page && a.isRenderingInitial())
+      .filter(a => (a.type === 'span' || a.type === 'rectangle') && a.page === page && a.isRenderingInitial())
 
     // spans.forEach(s => { console.log('span on page', s.page, s.uuid) })
 

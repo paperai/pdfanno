@@ -127,21 +127,21 @@
 /**
   Rect Annotation.
 */
-.anno-rect-base {
+.anno-rect {
     position: absolute;
     top: 0;
     left: 0;
     visibility: visible;
 }
-.anno-rect {
+.anno-rect__area {
     position: absolute;
 }
-.--hover .anno-rect {
+.--hover .anno-rect__area {
   box-shadow: 0 0 0 1px #ccc inset;
   stroke: #ccc;
   stroke-width: 0.75px;
 }
-.--selected .anno-rect {
+.--selected .anno-rect__area {
   stroke: black;
   stroke-width: 0.5px;
   stroke-dasharray: 3;

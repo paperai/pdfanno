@@ -1,4 +1,4 @@
-import { scaleDown } from './utils'
+import { scaleDown, getCurrentTab } from './utils'
 import SpanAnnotation from '../annotation/span'
 import * as textInput from '../utils/textInput'
 
@@ -8,9 +8,10 @@ function scale () {
 
 /**
  * Merge user selections.
+ *
+ * @param {Array} rects
  */
 function mergeRects (rects) {
-
   // Remove null.
   rects = rects.filter(rect => rect)
 
@@ -53,6 +54,8 @@ function mergeRects (rects) {
 
 /**
  * Convert a DOMList to a javascript plan object.
+ *
+ * @param {Object} rect
  */
 function convertToObject (rect) {
   return {
@@ -69,6 +72,10 @@ function convertToObject (rect) {
 
 /**
  * Check the value(x) within the range.
+ *
+ * @param {Integer} x
+ * @param {Integer} base
+ * @param {Integer} margin
  */
 function withinMargin (x, base, margin) {
   return (base - margin) <= x && x <= (base + margin)
@@ -90,7 +97,6 @@ export function saveSpan ({
   knob = true,
   border = true
 }) {
-
   if (!rects) {
     return
   }
@@ -132,7 +138,6 @@ window.saveSpan = saveSpan
  * Get the rect area of User selected.
  */
 export function getRectangles () {
-
   if (!currentPage || !startPosition || !endPosition) {
     return null
 
@@ -140,19 +145,15 @@ export function getRectangles () {
     let targets = window.findTexts(currentPage, startPosition, endPosition)
     return mergeRects(targets)
   }
-
 }
 
 /**
  * Create a span by current texts selection.
  */
 export function createSpan ({ text = null, zIndex = 10, color = null }) {
-
   if (!currentPage || !startPosition || !endPosition) {
     return null
-
   } else {
-
     let targets = window.findTexts(currentPage, startPosition, endPosition)
     if (targets.length === 0) {
       return null
@@ -184,13 +185,22 @@ export function createSpan ({ text = null, zIndex = 10, color = null }) {
 
     return annotation
   }
+}
 
+function reset () {
+  currentPage = null
+  mouseDown = false
+  initPosition = null
+  startPosition = null
+  endPosition = null
+  if (spanAnnotation) {
+    spanAnnotation.destroy()
+    spanAnnotation = null
+  }
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-
   function setPositions (e) {
-
     const canvasElement = e.currentTarget
     const pageElement = canvasElement.parentNode
     const page = parseInt(pageElement.getAttribute('data-page-number'))
@@ -220,7 +230,6 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   function makeSelections (e) {
-
     setPositions(e)
 
     if (spanAnnotation) {
@@ -248,9 +257,9 @@ window.addEventListener('DOMContentLoaded', () => {
   const $viewer = $('#viewer')
 
   $viewer.on('mousedown', '.canvasWrapper', e => {
+    reset()
 
-    if (otherAnnotationTreating) {
-      // Ignore, if other annotation is detected.
+    if (getCurrentTab() !== 'span') {
       return
     }
 
@@ -270,7 +279,10 @@ window.addEventListener('DOMContentLoaded', () => {
     makeSelections(e)
   })
 
-  $viewer.on('mousemove', '.canvasWrapper', e => {
+  $viewer.on('mousemove', '.canvasWrapper, .annoLayer', e => {
+    if (getCurrentTab() !== 'span') {
+      return
+    }
 
     if (window.PDFView.pageRotation !== 0) {
       return
@@ -281,7 +293,10 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   })
 
-  $viewer.on('mouseup', '.canvasWrapper', e => {
+  $viewer.on('mouseup', '.canvasWrapper, .annoLayer', e => {
+    if (getCurrentTab() !== 'span') {
+      return
+    }
 
     if (window.PDFView.pageRotation !== 0) {
       return
@@ -295,18 +310,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     mouseDown = false
   })
-
-  let otherAnnotationTreating = false
-  window.addEventListener('annotationHoverIn', () => {
-    otherAnnotationTreating = true
-  })
-  window.addEventListener('annotationHoverOut', () => {
-    otherAnnotationTreating = false
-  })
-  window.addEventListener('annotationDeleted', () => {
-    otherAnnotationTreating = false
-  })
-
 })
 
 let mouseDown = false
@@ -315,4 +318,3 @@ let startPosition = null
 let endPosition = null
 let currentPage = null
 let spanAnnotation = null
-

@@ -12,7 +12,6 @@ import Ajv from 'ajv'
  * Annotation Container.
  */
 export default class AnnotationContainer {
-
   /**
    * Constructor.
    */
@@ -51,6 +50,7 @@ export default class AnnotationContainer {
 
   /**
    *
+   * @param {Function} filter
    */
   clearRenderingStates (filter = () => true) {
     if (typeof filter === 'function') {
@@ -60,11 +60,12 @@ export default class AnnotationContainer {
 
   /**
    *
+   * @param {Integer} page
    */
   clearPage (page) {
     this.clearRenderingStates(a => {
-      if (a.type === 'span') {
-        // console.log('clearPage.span', page)
+      if (a.type === 'span' || a.type === 'rectangle') {
+        // console.log('clearPage.span.rectangle', page)
         return a.page === page
       } else if (a.type === 'relation') {
         if (a.visible(page)) {
@@ -110,10 +111,12 @@ export default class AnnotationContainer {
   /**
    * Change the annotations color, if the text is the same in an annotation.
    *
-   * annoType : span, one-way, two-way, link
+   * annoType : span, rectangle, relation
+   *
+   * @param {Object} param0
    */
   changeColor ({ text, color, uuid, annoType }) {
-    console.log('changeColor: ', text, color, uuid)
+    console.log('changeColor: ', text, color, uuid, annoType)
     if (uuid) {
       const a = this.findById(uuid)
       if (a) {
@@ -125,7 +128,7 @@ export default class AnnotationContainer {
       this.getAllAnnotations()
         .filter(a => a.text === text)
         .filter(a => {
-          if (annoType === 'span') {
+          if (annoType === 'span' || annoType === 'rectangle') {
             return a.type === annoType
           } else if (annoType === 'relation') {
             if (a.type === 'relation' && a.direction === annoType) {
@@ -141,6 +144,10 @@ export default class AnnotationContainer {
     }
   }
 
+  /**
+   *
+   * @param {ColorMap} colorMap
+   */
   setColor (colorMap) {
     console.log('setColor:', colorMap)
     Object.keys(colorMap).forEach(annoType => {
@@ -158,9 +165,7 @@ export default class AnnotationContainer {
    * Export annotations as a TOML string.
    */
   exportData ({exportType = 'toml'} = {}) {
-
     return new Promise((resolve, reject) => {
-
       let dataExport = {}
 
       // Set version.
@@ -180,21 +185,27 @@ export default class AnnotationContainer {
 
       // Create export data.
       annos.forEach(annotation => {
-
         // Increment to next.
         id++
 
-        // Span.
         if (annotation.type === 'span') {
+          // Span.
           if (!dataExport['spans']) {
             dataExport['spans'] = []
           }
           dataExport['spans'].push(annotation.export(id))
           // Save temporary for relation.
           annotation.exportId = id
-
-        // Relation.
+        } else if (annotation.type === 'rectangle') {
+          // Rectangle.
+          if (!dataExport['rectangles']) {
+            dataExport['rectangles'] = []
+          }
+          dataExport['rectangles'].push(annotation.export(id))
+          // Save temporary for relation.
+          annotation.exportId = id
         } else if (annotation.type === 'relation') {
+          // Relation.
           if (!dataExport['relations']) {
             dataExport['relations'] = []
           }
@@ -223,17 +234,26 @@ export default class AnnotationContainer {
     })
   }
 
+  /**
+   *
+   * @param {Object} tomlObject
+   * @param {Integer} id
+   */
   _findSpan (tomlObject, id) {
     return tomlObject.spans.find(v => {
+      return id === v.id
+    }) || tomlObject.rectangles.find(v => {
       return id === v.id
     })
   }
 
   /**
    * Import annotations.
+   *
+   * @param {*} data
+   * @param {Boolean} isPrimary
    */
   importAnnotations (data, isPrimary) {
-
     console.time('importAnnotations')
 
     window.pageStates.clear()
@@ -250,7 +270,6 @@ export default class AnnotationContainer {
     }
 
     return new Promise((resolve, reject) => {
-
       // Delete old ones.
       this.getAllAnnotations()
         .filter(a => a.readOnly === readOnly)
@@ -294,9 +313,7 @@ export default class AnnotationContainer {
    * Import annotations.
    */
   importAnnotations040 (tomlObject, tomlIndex, readOnly, getColor) {
-
     for (const key in tomlObject) {
-
       let d = tomlObject[key]
 
       // Skip if the content is not object, like version string.
@@ -308,25 +325,20 @@ export default class AnnotationContainer {
       d.readOnly = readOnly
 
       if (d.type === 'span') {
-
         let span = SpanAnnotation.newInstanceFromTomlObject(d)
         span.color = getColor(tomlIndex, span.type, span.text)
         span.save()
         span.render()
         span.enableViewMode()
-
         // Rect.
-      } else if (d.type === 'rect') {
-
+      } else if (d.type === 'rectangle') {
         let rect = RectAnnotation.newInstanceFromTomlObject(d)
         rect.color = getColor(tomlIndex, rect.type, rect.text)
         rect.save()
         rect.render()
         rect.enableViewMode()
-
         // Relation.
       } else if (d.type === 'relation') {
-
         d.rel1 = tomlObject[d.ids[0]].uuid
         d.rel2 = tomlObject[d.ids[1]].uuid
         let relation = [RelationAnnotation.newInstanceFromTomlObject(d)]
@@ -352,13 +364,11 @@ export default class AnnotationContainer {
    * Import annotations.
    */
   importAnnotations041 (tomlObject, tomlIndex, readOnly, getColor) {
-
     // console.log('page:', window.PDFView.pdfViewer.currentPageNumber, window.PDFView.pdfViewer._getVisiblePages())
-
     const visiblePages = window.PDFView.pdfViewer._getVisiblePages()
 
     // order is important.
-    ;['spans', 'relations'].forEach(key => {
+    ;['spans', 'rectangles', 'relations'].forEach(key => {
       const objs = tomlObject[key]
       if (Array.isArray(objs)) {
         objs.forEach(obj => {
@@ -374,14 +384,20 @@ export default class AnnotationContainer {
               span.render()
               span.enableViewMode()
             }
-
+          } else if (key === 'rectangles') {
+            const rectangle = RectAnnotation.newInstanceFromTomlObject(obj)
+            rectangle.color = getColor(tomlIndex, 'rectangle', rectangle.text)
+            rectangle.save()
+            if (rectangle.visible(visiblePages)) {
+              // console.log('RECTANGLE:', rectangle.page, rectangle.uuid)
+              rectangle.render()
+              rectangle.enableViewMode()
+            }
           } else if (key === 'relations') {
-
             const spans = [
               this.findById(this._findSpan(tomlObject, obj.head).uuid),
               this.findById(this._findSpan(tomlObject, obj.tail).uuid)
             ]
-
             obj.rel1 = spans[0].uuid
             obj.rel2 = spans[1].uuid
 
@@ -408,7 +424,6 @@ export default class AnnotationContainer {
                 rel.enableViewMode()
               }
             }
-
           }
         })
       }

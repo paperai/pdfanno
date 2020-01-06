@@ -13,7 +13,6 @@ export const RenderingStates = {
  * Abstract Annotation Class.
  */
 export default class AbstractAnnotation extends EventEmitter {
-
   /**
    * Check the argument is an annotation.
    */
@@ -68,7 +67,6 @@ export default class AbstractAnnotation extends EventEmitter {
    * Render annotation(s).
    */
   render () {
-
     this.$element.remove()
 
     if (this.deleted) {
@@ -215,7 +213,6 @@ export default class AbstractAnnotation extends EventEmitter {
    * Toggle the selected state.
    */
   toggleSelect () {
-
     if (this.selected) {
       this.deselect()
       if (this.sibling) {
@@ -227,14 +224,12 @@ export default class AbstractAnnotation extends EventEmitter {
         this.sibling.select()
       }
     }
-
   }
 
   /**
    * Delete the annotation if selected.
    */
   deleteSelectedAnnotation () {
-
     if (this.isSelected()) {
       this.destroy().then(() => {
         Utils.dispatchWindowEvent('annotationDeleted', { uuid : this.uuid })
@@ -310,5 +305,15 @@ export default class AbstractAnnotation extends EventEmitter {
   equalTo (anotherAnnotation) {
     // Implement Here.
     return false
+  }
+
+  /**
+   * Returns the coordinates of the upper left corner.
+   *
+   * @returns
+   * @memberof AbstractAnnotation
+   */
+  leftTopPosition () {
+    return null
   }
 }

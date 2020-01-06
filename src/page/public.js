@@ -42,7 +42,7 @@ export function addAllAnnotations (tomlObject) {
     let a
     if (data.type === 'span') {
       a = new PublicSpanAnnotation(data)
-    } else if (data.type === 'rect') {
+    } else if (data.type === 'rectangle') {
       a = new PublicRectAnnotation(data)
     } else if (data.type === 'relation') {
       data.ids = data.ids.map(refId => tomlObject[refId].uuid)

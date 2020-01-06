@@ -1,12 +1,12 @@
 import { uuid } from 'anno-ui/src/utils'
 import AbstractAnnotation from './abstract'
 import {addAnnoLayer} from '../render/layer'
+import * as _ from 'lodash'
 
 /**
  * Span Annotation.
  */
 export default class SpanAnnotation extends AbstractAnnotation {
-
   /**
    * Constructor.
    */
@@ -78,7 +78,6 @@ export default class SpanAnnotation extends AbstractAnnotation {
    * Render annotation(s).
    */
   render () {
-
     if (!this.rectangles || this.rectangles.length === 0) {
       if (!this.page || !this.textRange) {
         return console.log('ERROR: span missing page or textRange. span=', this)
@@ -136,7 +135,6 @@ export default class SpanAnnotation extends AbstractAnnotation {
    * Get the position for text.
    */
   getTextPosition () {
-
     let p = null
 
     if (this.rectangles.length > 0) {
@@ -218,7 +216,6 @@ export default class SpanAnnotation extends AbstractAnnotation {
   }
 
   export (id) {
-
     let text = (this.selectedText || '')
       .replace(/\r\n/g, ' ')
       .replace(/\r/g, ' ')
@@ -236,7 +233,6 @@ export default class SpanAnnotation extends AbstractAnnotation {
   }
 
   export040 () {
-
     let text = (this.selectedText || '')
       .replace(/\r\n/g, ' ')
       .replace(/\r/g, ' ')
@@ -270,5 +266,17 @@ export default class SpanAnnotation extends AbstractAnnotation {
   disableViewMode () {
     super.disableViewMode()
     this.$element.find('.anno-knob').off('click')
+  }
+
+  /**
+   * Returns the coordinates of the upper left corner.
+   *
+   * @returns
+   * @memberof AbstractAnnotation
+   */
+  leftTopPosition () {
+    let minX = _.minBy(this.rectangles, r => r.x)
+    let minY = _.minBy(this.rectangles, r => r.y)
+    return [minX.x, minY.y, this.page]
   }
 }

@@ -20,7 +20,23 @@
                 "required": ["id", "page", "label", "textrange"]
             }
         },
-        "relations": {
+        "rectangles": {
+          "type": "array",
+          "items": {
+              "type": "object",
+              "properties": {
+                  "id": { "type": "string" },
+                  "page": { "type": "integer" },
+                  "label": { "type": "string" },
+                  "x": { "type": "number" },
+                  "y": { "type": "number" },
+                  "width": { "type": "number" },
+                  "height": { "type": "number" }
+              },
+              "required": ["id", "page", "label", "x", "y", "width", "height"]
+          }
+      },
+      "relations": {
             "type": "array",
             "items": {
                 "type": "object",

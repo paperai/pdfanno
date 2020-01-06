@@ -30,7 +30,7 @@ export function toTomlString (obj, root = true) {
       lines.push(`${prop} = ${val}`)
       root && lines.push('')
 
-    } else if (prop === 'spans' || prop === 'relations') {
+    } else if (prop === 'spans' || prop === 'rectangles' || prop === 'relations') {
       if (isArray(val)) {
         val.forEach(v => {
           lines.push(`[[${prop}]]`)

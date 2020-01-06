@@ -1,5 +1,4 @@
 import { renderKnob } from './renderKnob'
-import { hex2rgba } from '../utils/color'
 
 /**
  * Create a rect annotation.
@@ -7,20 +6,25 @@ import { hex2rgba } from '../utils/color'
  */
 export function renderRect (a) {
 
-  let color = a.color || '#FF0'
+  const color = a.color || '#FF0000'
+  const $base = $('<div class="anno-rect"/>')
 
-  const $base = $('<div class="anno-rect-base"/>')
-
-  $base.append($('<div class="anno-rect"/>').css({
-    top             : `${a.y}px`,
-    left            : `${a.x}px`,
-    width           : `${a.width}px`,
-    height          : `${a.height}px`,
-    border          : `1px solid ${color}`,
-    backgroundColor : a.readOnly ? 'none' : hex2rgba(color, 0.3)
+  $base.append($('<div class="anno-rect__area"/>').css({
+    top    : `${a.y}px`,
+    left   : `${a.x}px`,
+    width  : `${a.width}px`,
+    height : `${a.height}px`,
+    border : `1px solid ${color}`
   }))
 
-  $base.append(renderKnob(a))
+  if (a.knob) {
+    $base.append(renderKnob({
+      page     : a.page,
+      x        : a.x,
+      y        : a.y,
+      readOnly : a.readOnly
+    }))
+  }
 
   return $base[0]
 }
